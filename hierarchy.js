@@ -690,6 +690,7 @@ var hierarchy =
     [ "FEAT::Global::SynchVectorTicket< VT_, VMT_ >", "class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html", null ],
     [ "FEAT::Global::Transfer< LocalTransfer_, Mirror_ >", "class_f_e_a_t_1_1_global_1_1_transfer.html", null ],
     [ "FEAT::Global::Vector< LocalVector_, Mirror_ >", "class_f_e_a_t_1_1_global_1_1_vector.html", null ],
+    [ "FEAT::Hash", "class_f_e_a_t_1_1_hash.html", null ],
     [ "FEAT::KahanAccumulator< DT_ >", "class_f_e_a_t_1_1_kahan_accumulator.html", null ],
     [ "FEAT::LAFEM::Arch::Apply", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_apply.html", null ],
     [ "FEAT::LAFEM::Arch::Axpy", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_axpy.html", null ],

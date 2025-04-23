@@ -244,6 +244,10 @@ Functions</h2></td></tr>
 <tr class="memitem:a2ac5fcc9e4f088cd8775aa38eb9abf2d"><td class="memTemplItemLeft" align="right" valign="top">CUDA_HOST_DEVICE void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_tiny.html#a2ac5fcc9e4f088cd8775aa38eb9abf2d">orthogonal_3x2</a> (<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Vector</a>&lt; T_, mx_, smx_ &gt; &amp;nu, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Matrix</a>&lt; T_, ma_, na_, sm_, sn_ &gt; &amp;tau)</td></tr>
 <tr class="memdesc:a2ac5fcc9e4f088cd8775aa38eb9abf2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the positively oriented orthogonal vector to the columns of a 3x2 matrix.  <a href="namespace_f_e_a_t_1_1_tiny.html#a2ac5fcc9e4f088cd8775aa38eb9abf2d">More...</a><br /></td></tr>
 <tr class="separator:a2ac5fcc9e4f088cd8775aa38eb9abf2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f76f275c9f207128f678256228427b9"><td class="memTemplParams" colspan="2">template&lt;typename T_ , int dim_&gt; </td></tr>
+<tr class="memitem:a1f76f275c9f207128f678256228427b9"><td class="memTemplItemLeft" align="right" valign="top">CUDA_HOST <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Vector</a>&lt; T_, dim_ &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_tiny.html#a1f76f275c9f207128f678256228427b9">project_onto</a> (const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Vector</a>&lt; T_, dim_ &gt; &amp;x, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Vector</a>&lt; T_, dim_ &gt; &amp;y)</td></tr>
+<tr class="memdesc:a1f76f275c9f207128f678256228427b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculates the projected vector.  <a href="namespace_f_e_a_t_1_1_tiny.html#a1f76f275c9f207128f678256228427b9">More...</a><br /></td></tr>
+<tr class="separator:a1f76f275c9f207128f678256228427b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p ><a class="el" href="namespace_f_e_a_t_1_1_tiny.html" title="Tiny namespace.">Tiny</a> namespace. </p>
@@ -294,9 +298,9 @@ template&lt;typename T_ , int n_, int sm_, int sn_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02989">2989</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l03007">3007</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02958">add_id()</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02976">add_id()</a>.</p>
 
 </div>
 </div>
@@ -345,9 +349,9 @@ template&lt;typename T_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02958">2958</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02976">2976</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tiny__algebra_8hpp_source.html#l02973">add_id()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l01913">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_jump_operator_matrix()</a>, and <a class="el" href="trace__assembler_8hpp_source.html#l01645">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_jump_stabil_operator_matrix()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="tiny__algebra_8hpp_source.html#l02991">add_id()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l01913">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_jump_operator_matrix()</a>, and <a class="el" href="trace__assembler_8hpp_source.html#l01645">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_jump_stabil_operator_matrix()</a>.</p>
 
 </div>
 </div>
@@ -396,9 +400,9 @@ template&lt;typename T_ , int n_, int sl_, int sm_, int sn_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l03005">3005</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l03023">3023</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02958">add_id()</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02976">add_id()</a>.</p>
 
 </div>
 </div>
@@ -447,9 +451,9 @@ template&lt;typename T_ , int n_, int sn_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02973">2973</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02991">2991</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02958">add_id()</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02976">add_id()</a>.</p>
 
 </div>
 </div>
@@ -506,9 +510,9 @@ template&lt;typename T_ , int m_, int n_, int sm_, int sn_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l03070">3070</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l03088">3088</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l03026">axpy()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01265">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l03044">axpy()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01283">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>.</p>
 
 </div>
 </div>
@@ -565,9 +569,9 @@ template&lt;typename T_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l03026">3026</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l03044">3044</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02225">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::add_double_mat_product()</a>, <a class="el" href="bilinear__operator__assembler_8hpp_source.html#l00390">FEAT::Assembly::BilinearOperatorAssembler::apply1()</a>, <a class="el" href="bilinear__operator__assembler_8hpp_source.html#l00564">FEAT::Assembly::BilinearOperatorAssembler::apply2()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00737">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_functional_vector()</a>, <a class="el" href="bilinear__operator__assembler_8hpp_source.html#l00225">FEAT::Assembly::BilinearOperatorAssembler::assemble_matrix1()</a>, <a class="el" href="bilinear__operator__assembler_8hpp_source.html#l00055">FEAT::Assembly::BilinearOperatorAssembler::assemble_matrix2()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00475">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_operator_matrix2()</a>, <a class="el" href="linear__functional__assembler_8hpp_source.html#l00048">FEAT::Assembly::LinearFunctionalAssembler::assemble_vector()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l03046">axpy()</a>, <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html#l00408">FEAT::LAFEM::MatrixGatherScatterHelper&lt; Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper &gt;::gather_matrix_csr()</a>, <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html#l00197">FEAT::LAFEM::MatrixGatherScatterHelper&lt; Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps &gt;::gather_matrix_csr()</a>, <a class="el" href="vector__gather__scatter__helper_8hpp_source.html#l00134">FEAT::LAFEM::VectorGatherScatterHelper&lt; Space_, DT_, IT_ &gt;::gather_vector_dense()</a>, <a class="el" href="discrete__projector_8hpp_source.html#l00044">FEAT::Assembly::DiscreteVertexProjector::project()</a>, <a class="el" href="discrete__projector_8hpp_source.html#l00266">FEAT::Assembly::DiscreteCellProjector::project()</a>, <a class="el" href="discrete__projector_8hpp_source.html#l00401">FEAT::Assembly::DiscreteCellProjector::project_refined()</a>, <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html#l00314">FEAT::LAFEM::MatrixGatherScatterHelper&lt; Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper &gt;::scatter_matrix_csr()</a>, <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html#l00091">FEAT::LAFEM::MatrixGatherScatterHelper&lt; Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps &gt;::scatter_matrix_csr()</a>, and <a class="el" href="vector__gather__scatter__helper_8hpp_source.html#l00062">FEAT::LAFEM::VectorGatherScatterHelper&lt; Space_, DT_, IT_ &gt;::scatter_vector_dense()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02225">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::add_double_mat_product()</a>, <a class="el" href="bilinear__operator__assembler_8hpp_source.html#l00390">FEAT::Assembly::BilinearOperatorAssembler::apply1()</a>, <a class="el" href="bilinear__operator__assembler_8hpp_source.html#l00564">FEAT::Assembly::BilinearOperatorAssembler::apply2()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00737">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_functional_vector()</a>, <a class="el" href="bilinear__operator__assembler_8hpp_source.html#l00225">FEAT::Assembly::BilinearOperatorAssembler::assemble_matrix1()</a>, <a class="el" href="bilinear__operator__assembler_8hpp_source.html#l00055">FEAT::Assembly::BilinearOperatorAssembler::assemble_matrix2()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00475">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_operator_matrix2()</a>, <a class="el" href="linear__functional__assembler_8hpp_source.html#l00048">FEAT::Assembly::LinearFunctionalAssembler::assemble_vector()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l03064">axpy()</a>, <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html#l00408">FEAT::LAFEM::MatrixGatherScatterHelper&lt; Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper &gt;::gather_matrix_csr()</a>, <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html#l00197">FEAT::LAFEM::MatrixGatherScatterHelper&lt; Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps &gt;::gather_matrix_csr()</a>, <a class="el" href="vector__gather__scatter__helper_8hpp_source.html#l00134">FEAT::LAFEM::VectorGatherScatterHelper&lt; Space_, DT_, IT_ &gt;::gather_vector_dense()</a>, <a class="el" href="discrete__projector_8hpp_source.html#l00044">FEAT::Assembly::DiscreteVertexProjector::project()</a>, <a class="el" href="discrete__projector_8hpp_source.html#l00266">FEAT::Assembly::DiscreteCellProjector::project()</a>, <a class="el" href="discrete__projector_8hpp_source.html#l00401">FEAT::Assembly::DiscreteCellProjector::project_refined()</a>, <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html#l00314">FEAT::LAFEM::MatrixGatherScatterHelper&lt; Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper &gt;::scatter_matrix_csr()</a>, <a class="el" href="matrix__gather__scatter__helper_8hpp_source.html#l00091">FEAT::LAFEM::MatrixGatherScatterHelper&lt; Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps &gt;::scatter_matrix_csr()</a>, and <a class="el" href="vector__gather__scatter__helper_8hpp_source.html#l00062">FEAT::LAFEM::VectorGatherScatterHelper&lt; Space_, DT_, IT_ &gt;::scatter_vector_dense()</a>.</p>
 
 </div>
 </div>
@@ -624,9 +628,9 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_, int sm_, int sn_&gt; 
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l03094">3094</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l03112">3112</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l03026">axpy()</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l03044">axpy()</a>.</p>
 
 </div>
 </div>
@@ -683,9 +687,9 @@ template&lt;typename T_ , int n_, int sn_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l03046">3046</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l03064">3064</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l03026">axpy()</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l03044">axpy()</a>.</p>
 
 </div>
 </div>
@@ -830,9 +834,9 @@ template&lt;typename T_ , int m_, int n_, int sma_, int sna_, int smb_, int snb_
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The dot-product of <code>a</code> and <code>b</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02917">2917</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02935">2935</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02877">dot()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01265">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02895">dot()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01283">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>.</p>
 
 </div>
 </div>
@@ -882,9 +886,9 @@ template&lt;typename T_ , typename std::enable_if&lt; Intern::DataTypeExtractor&
 <dl class="section return"><dt>Returns</dt><dd>The product of <code>a</code> and <code>b</code>.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This overload is disabled by SFINAE for <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html" title="Tiny Vector class template.">Tiny::Vector</a>, <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html" title="Tiny Matrix class template.">Tiny::Matrix</a> and <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_tensor3.html" title="Tiny Tensor3 class template.">Tiny::Tensor3</a> types. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02877">2877</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02895">2895</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="burgers__assembly__job_8hpp_source.html#l00596">FEAT::Assembly::BurgersBlockedAssemblyTaskBase&lt; Job_, DataType_, block_size_ &gt;::assemble_burgers_point()</a>, <a class="el" href="burgers__assembly__job_8hpp_source.html#l01048">FEAT::Assembly::BurgersScalarAssemblyTaskBase&lt; Job_, DataType_ &gt;::assemble_burgers_point()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l01645">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_jump_stabil_operator_matrix()</a>, <a class="el" href="assembly_2burgers__assembler_8hpp_source.html#l00124">FEAT::Assembly::BurgersAssembler&lt; DataType_, IndexType_, dim_ &gt;::assemble_matrix()</a>, <a class="el" href="burgers__assembler__carreau_8hpp_source.html#l00140">FEAT::Assembly::BurgersAssemblerCarreau&lt; DataType_, IndexType_, dim_ &gt;::assemble_matrix()</a>, <a class="el" href="oldroyd__assembler_8hpp_source.html#l00067">FEAT::Assembly::OldroydAssembler::assemble_matrix()</a>, <a class="el" href="assembly_2burgers__assembler_8hpp_source.html#l00460">FEAT::Assembly::BurgersAssembler&lt; DataType_, IndexType_, dim_ &gt;::assemble_scalar_matrix()</a>, <a class="el" href="assembly_2burgers__assembler_8hpp_source.html#l00729">FEAT::Assembly::BurgersAssembler&lt; DataType_, IndexType_, dim_ &gt;::assemble_vector()</a>, <a class="el" href="burgers__assembler__carreau_8hpp_source.html#l00516">FEAT::Assembly::BurgersAssemblerCarreau&lt; DataType_, IndexType_, dim_ &gt;::assemble_vector()</a>, <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html#l00901">FEAT::VoxelAssembly::Kernel::burgers_defect_assembly_kernel()</a>, <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html#l00105">FEAT::VoxelAssembly::Kernel::burgers_mat_assembly_kernel()</a>, <a class="el" href="velocity__analyser_8hpp_source.html#l00261">FEAT::Assembly::VelocityAnalyser::compute()</a>, <a class="el" href="bezier_8hpp_source.html#l00756">FEAT::Geometry::Atlas::Bezier&lt; Mesh_ &gt;::compute_signed_dist()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02894">dot()</a>, <a class="el" href="common__operators_8hpp_source.html#l00174">FEAT::Assembly::Common::LaplaceOperatorBlocked&lt; dimension_ &gt;::Evaluator&lt; AsmTraits_ &gt;::eval()</a>, <a class="el" href="common__operators_8hpp_source.html#l00936">FEAT::Assembly::Common::DuDvOperatorBlocked&lt; dimension_ &gt;::Evaluator&lt; AsmTraits_ &gt;::eval()</a>, <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html#l00500">FEAT::VoxelAssembly::Kernel::grouped_burgers_mat_alt_assembly_kernel()</a>, <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html#l00652">FEAT::VoxelAssembly::Kernel::grouped_burgers_mat_assembly_kernel()</a>, <a class="el" href="standard_2inverse__mapping_8hpp_source.html#l00141">FEAT::Trafo::Standard::inverse_mapping()</a>, <a class="el" href="burgers__assembly__job_8hpp_source.html#l00480">FEAT::Assembly::BurgersAssemblyTaskBase&lt; Job_, DataType_ &gt;::prepare_point()</a>, <a class="el" href="bezier_8hpp_source.html#l00410">FEAT::Geometry::Atlas::Bezier&lt; Mesh_ &gt;::project_on_segment()</a>, <a class="el" href="surface__mesh_8hpp_source.html#l00213">FEAT::Geometry::Atlas::SurfaceMesh&lt; Mesh_ &gt;::project_point()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01835">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::scalar_product()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="burgers__assembly__job_8hpp_source.html#l00596">FEAT::Assembly::BurgersBlockedAssemblyTaskBase&lt; Job_, DataType_, block_size_ &gt;::assemble_burgers_point()</a>, <a class="el" href="burgers__assembly__job_8hpp_source.html#l01048">FEAT::Assembly::BurgersScalarAssemblyTaskBase&lt; Job_, DataType_ &gt;::assemble_burgers_point()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l01645">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_jump_stabil_operator_matrix()</a>, <a class="el" href="assembly_2burgers__assembler_8hpp_source.html#l00124">FEAT::Assembly::BurgersAssembler&lt; DataType_, IndexType_, dim_ &gt;::assemble_matrix()</a>, <a class="el" href="burgers__assembler__carreau_8hpp_source.html#l00140">FEAT::Assembly::BurgersAssemblerCarreau&lt; DataType_, IndexType_, dim_ &gt;::assemble_matrix()</a>, <a class="el" href="oldroyd__assembler_8hpp_source.html#l00067">FEAT::Assembly::OldroydAssembler::assemble_matrix()</a>, <a class="el" href="assembly_2burgers__assembler_8hpp_source.html#l00460">FEAT::Assembly::BurgersAssembler&lt; DataType_, IndexType_, dim_ &gt;::assemble_scalar_matrix()</a>, <a class="el" href="assembly_2burgers__assembler_8hpp_source.html#l00729">FEAT::Assembly::BurgersAssembler&lt; DataType_, IndexType_, dim_ &gt;::assemble_vector()</a>, <a class="el" href="burgers__assembler__carreau_8hpp_source.html#l00516">FEAT::Assembly::BurgersAssemblerCarreau&lt; DataType_, IndexType_, dim_ &gt;::assemble_vector()</a>, <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html#l00901">FEAT::VoxelAssembly::Kernel::burgers_defect_assembly_kernel()</a>, <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html#l00105">FEAT::VoxelAssembly::Kernel::burgers_mat_assembly_kernel()</a>, <a class="el" href="velocity__analyser_8hpp_source.html#l00261">FEAT::Assembly::VelocityAnalyser::compute()</a>, <a class="el" href="bezier_8hpp_source.html#l00756">FEAT::Geometry::Atlas::Bezier&lt; Mesh_ &gt;::compute_signed_dist()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02912">dot()</a>, <a class="el" href="common__operators_8hpp_source.html#l00174">FEAT::Assembly::Common::LaplaceOperatorBlocked&lt; dimension_ &gt;::Evaluator&lt; AsmTraits_ &gt;::eval()</a>, <a class="el" href="common__operators_8hpp_source.html#l00936">FEAT::Assembly::Common::DuDvOperatorBlocked&lt; dimension_ &gt;::Evaluator&lt; AsmTraits_ &gt;::eval()</a>, <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html#l00500">FEAT::VoxelAssembly::Kernel::grouped_burgers_mat_alt_assembly_kernel()</a>, <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html#l00652">FEAT::VoxelAssembly::Kernel::grouped_burgers_mat_assembly_kernel()</a>, <a class="el" href="standard_2inverse__mapping_8hpp_source.html#l00141">FEAT::Trafo::Standard::inverse_mapping()</a>, <a class="el" href="burgers__assembly__job_8hpp_source.html#l00480">FEAT::Assembly::BurgersAssemblyTaskBase&lt; Job_, DataType_ &gt;::prepare_point()</a>, <a class="el" href="bezier_8hpp_source.html#l00410">FEAT::Geometry::Atlas::Bezier&lt; Mesh_ &gt;::project_on_segment()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01241">project_onto()</a>, <a class="el" href="surface__mesh_8hpp_source.html#l00213">FEAT::Geometry::Atlas::SurfaceMesh&lt; Mesh_ &gt;::project_point()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01853">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::scalar_product()</a>.</p>
 
 </div>
 </div>
@@ -933,9 +937,9 @@ template&lt;typename T_ , int l_, int m_, int n_, int sla_, int sma_, int sna_, 
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The dot-product of <code>a</code> and <code>b</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02936">2936</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02954">2954</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02877">dot()</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02895">dot()</a>.</p>
 
 </div>
 </div>
@@ -987,9 +991,9 @@ template&lt;typename T_ , int n_, int sa_, int sb_&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The dot-product of <code>a</code> and <code>b</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02894">2894</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02912">2912</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02877">dot()</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02895">dot()</a>.</p>
 
 </div>
 </div>
@@ -1031,9 +1035,9 @@ template&lt;typename T_ , int m_, int n_, int l_, int sma_, int sna_, int smb_, 
 
 <p>algebraic matrix-matrix-multiply operator </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02399">2399</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02417">2417</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02004">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::set_mat_mat_mult()</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02022">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::set_mat_mat_mult()</a>.</p>
 
 </div>
 </div>
@@ -1075,7 +1079,7 @@ template&lt;typename T_ , int m_, int n_, int sm_, int sn_, int sx_&gt; </div>
 
 <p>matrix-vector-multiply operator </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02371">2371</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02389">2389</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l00691">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::set_mat_vec_mult()</a>.</p>
 
@@ -1119,7 +1123,7 @@ template&lt;typename T_ , int m_, int n_, int sm_, int sn_&gt; </div>
 
 <p>scalar-right-multiply operator </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02392">2392</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02410">2410</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 </div>
 </div>
@@ -1161,7 +1165,7 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_, int sm_, int sn_&gt; 
 
 <p>scalar right-multiply operator </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02854">2854</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02872">2872</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 </div>
 </div>
@@ -1203,7 +1207,7 @@ template&lt;typename T_ , int m_, int n_, int sm_, int sn_, int sx_&gt; </div>
 
 <p>vector-matrix-multiply operator </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02378">2378</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02396">2396</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l00764">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::set_vec_mat_mult()</a>.</p>
 
@@ -1289,7 +1293,7 @@ template&lt;typename T_ , int m_, int n_, int sm_, int sn_&gt; </div>
 
 <p>scalar-left-multiply operator </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02385">2385</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02403">2403</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 </div>
 </div>
@@ -1331,7 +1335,7 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_, int sm_, int sn_&gt; 
 
 <p>scalar left-multiply operator </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02846">2846</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02864">2864</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 </div>
 </div>
@@ -1415,7 +1419,7 @@ template&lt;typename T_ , int m_, int n_, int sma_, int sna_, int smb_, int snb_
 
 <p>matrix addition operator </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02406">2406</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02424">2424</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 </div>
 </div>
@@ -1499,7 +1503,7 @@ template&lt;typename T_ , int m_, int n_, int sma_, int sna_, int smb_, int snb_
 
 <p>matrix subtraction operator </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02413">2413</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02431">2431</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 </div>
 </div>
@@ -1582,7 +1586,7 @@ template&lt;typename T_ , int m_, int sm_, int sn_&gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A vector that is orthogonal to the m_-1 columns of the input matrix, but not normalized.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>So far, this is only implemented for m_ = 2,3. </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="trace__assembler_8hpp_source.html#l00737">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_functional_vector()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00475">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_operator_matrix2()</a>, <a class="el" href="slip__filter__assembler_8hpp_source.html#l00248">FEAT::Assembly::OuterNormalComputer&lt; Trafo_ &gt;::compute_oriented_normals()</a>, and <a class="el" href="surface__mesh_8hpp_source.html#l00286">FEAT::Geometry::Atlas::SurfaceMesh&lt; Mesh_ &gt;::get_normal_on_tria()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="trace__assembler_8hpp_source.html#l00737">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_functional_vector()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00475">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_operator_matrix2()</a>, <a class="el" href="slip__filter__assembler_8hpp_source.html#l00249">FEAT::Assembly::OuterNormalComputer&lt; Trafo_ &gt;::compute_oriented_normals()</a>, and <a class="el" href="surface__mesh_8hpp_source.html#l00286">FEAT::Geometry::Atlas::SurfaceMesh&lt; Mesh_ &gt;::get_normal_on_tria()</a>.</p>
 
 </div>
 </div>
@@ -1623,7 +1627,7 @@ template&lt;typename T_ , int mx_, int smx_, int ma_, int na_, int sm_, int sn_&
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02290">2290</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02308">2308</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 </div>
 </div>
@@ -1664,9 +1668,63 @@ template&lt;typename T_ , int mx_, int smx_, int ma_, int na_, int sm_, int sn_&
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02311">2311</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02329">2329</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="standard_2inverse__mapping_8hpp_source.html#l00205">FEAT::Trafo::Standard::inverse_mapping()</a>.</p>
+
+</div>
+</div>
+<a id="a1f76f275c9f207128f678256228427b9" name="a1f76f275c9f207128f678256228427b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1f76f275c9f207128f678256228427b9">&#9670;&#160;</a></span>project_onto()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T_ , int dim_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">CUDA_HOST <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Vector</a>&lt; T_, dim_ &gt; FEAT::Tiny::project_onto </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Vector</a>&lt; T_, dim_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>x</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Vector</a>&lt; T_, dim_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>y</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Calculates the projected vector. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td><a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html" title="Tiny Vector class template.">Vector</a> to be projected </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">y</td><td><a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html" title="Tiny Vector class template.">Vector</a> to be projected on</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The projected vector </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l01241">1241</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02895">dot()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="dense__vector__blocked_8hpp_source.html#l01373">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::project_onto()</a>.</p>
 
 </div>
 </div>

@@ -1022,6 +1022,7 @@ var annotated_dup =
       [ "FileError", "class_f_e_a_t_1_1_file_error.html", "class_f_e_a_t_1_1_file_error" ],
       [ "FileNotCreated", "class_f_e_a_t_1_1_file_not_created.html", "class_f_e_a_t_1_1_file_not_created" ],
       [ "FileNotFound", "class_f_e_a_t_1_1_file_not_found.html", "class_f_e_a_t_1_1_file_not_found" ],
+      [ "Hash", "class_f_e_a_t_1_1_hash.html", "class_f_e_a_t_1_1_hash" ],
       [ "InternalError", "class_f_e_a_t_1_1_internal_error.html", "class_f_e_a_t_1_1_internal_error" ],
       [ "KahanAccumulator", "class_f_e_a_t_1_1_kahan_accumulator.html", "class_f_e_a_t_1_1_kahan_accumulator" ],
       [ "MemoryPool", "class_f_e_a_t_1_1_memory_pool.html", "class_f_e_a_t_1_1_memory_pool" ],

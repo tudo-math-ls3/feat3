@@ -73,6 +73,7 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked =
     [ "operator()", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#a9072241eb92f6dcb09898a4ae6f6edd0", null ],
     [ "operator=", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#a726a1cee8da6e49580f965d96e32db25", null ],
     [ "permute", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#a35fcca999261adf3f2f84ef6593c7bc6", null ],
+    [ "project_onto", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#a2b86ee4a2eba0083bf20654f2ac405d7", null ],
     [ "read_from", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#a4109a152d616483a2eea9f68eb3d8780", null ],
     [ "read_from", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#a02f9a68c88154f23ebe3943db9eeb12a", null ],
     [ "restore_from_checkpoint_data", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#a958343c0926a9f67dffc5997c3c05b31", null ],

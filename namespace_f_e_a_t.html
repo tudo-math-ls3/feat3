@@ -212,6 +212,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_file_not_found.html">FileNotFound</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">File-Not-Found exception.  <a href="class_f_e_a_t_1_1_file_not_found.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_hash.html">Hash</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_internal_error.html">InternalError</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">exception that is thrown if something that is never supposed to happen happens  <a href="class_f_e_a_t_1_1_internal_error.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -335,6 +337,14 @@ Functions</h2></td></tr>
 <tr class="separator:a295d025ff52fcef38ee443016a2bf8f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae11b35dde6d055cf8e5dc2b93b0966cd"><td class="memItemLeft" align="right" valign="top">CUDA_HOST void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#ae11b35dde6d055cf8e5dc2b93b0966cd">assertion</a> (bool expr, const char *const expr_str, const char *const func, const char *const file, const int line, const std::string &amp;msg)</td></tr>
 <tr class="separator:ae11b35dde6d055cf8e5dc2b93b0966cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a148e444c4e284a335d89327304f5af20"><td class="memTemplParams" colspan="2">template&lt;typename T_ &gt; </td></tr>
+<tr class="memitem:a148e444c4e284a335d89327304f5af20"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#a148e444c4e284a335d89327304f5af20">feat_omp_ex_scan</a> (std::size_t n, const T_ x[], T_ y[])</td></tr>
+<tr class="memdesc:a148e444c4e284a335d89327304f5af20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes an OpenMP-parallel exclusive scan a.k.a. a prefix sum of an array, i.e.  <a href="namespace_f_e_a_t.html#a148e444c4e284a335d89327304f5af20">More...</a><br /></td></tr>
+<tr class="separator:a148e444c4e284a335d89327304f5af20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1cfd9376de2f4a78743c5a2ebfedb08f"><td class="memTemplParams" colspan="2">template&lt;typename T_ &gt; </td></tr>
+<tr class="memitem:a1cfd9376de2f4a78743c5a2ebfedb08f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#a1cfd9376de2f4a78743c5a2ebfedb08f">feat_omp_in_scan</a> (std::size_t n, const T_ x[], T_ y[])</td></tr>
+<tr class="memdesc:a1cfd9376de2f4a78743c5a2ebfedb08f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes an OpenMP-parallel inclusive scan a.k.a. a prefix sum of an array, i.e.  <a href="namespace_f_e_a_t.html#a1cfd9376de2f4a78743c5a2ebfedb08f">More...</a><br /></td></tr>
+<tr class="separator:a1cfd9376de2f4a78743c5a2ebfedb08f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aad5962774e04a08691f4e9ff0d2c353c"><td class="memItemLeft" align="right" valign="top">static constexpr <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815">SpaceTags</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#aad5962774e04a08691f4e9ff0d2c353c">operator&amp;</a> (<a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815">SpaceTags</a> a, <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815">SpaceTags</a> b)</td></tr>
 <tr class="memdesc:aad5962774e04a08691f4e9ff0d2c353c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Binary AND operator for SpaceTags values.  <a href="namespace_f_e_a_t.html#aad5962774e04a08691f4e9ff0d2c353c">More...</a><br /></td></tr>
 <tr class="separator:aad5962774e04a08691f4e9ff0d2c353c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -389,13 +399,15 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:ad1683d7a0b5429b1bbff48716c222df9"><td class="memItemLeft" align="right" valign="top">static const std::uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#ad1683d7a0b5429b1bbff48716c222df9">hash_crc32_table</a> []</td></tr>
+<tr class="separator:ad1683d7a0b5429b1bbff48716c222df9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a915f550e5e25f665a148950f1ae4e249"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#a915f550e5e25f665a148950f1ae4e249">version_major</a> = 3</td></tr>
 <tr class="memdesc:a915f550e5e25f665a148950f1ae4e249"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> major version number.  <a href="namespace_f_e_a_t.html#a915f550e5e25f665a148950f1ae4e249">More...</a><br /></td></tr>
 <tr class="separator:a915f550e5e25f665a148950f1ae4e249"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aadedb307b3e7ac10f521c388fe78eb34"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#aadedb307b3e7ac10f521c388fe78eb34">version_minor</a> = 2025</td></tr>
 <tr class="memdesc:aadedb307b3e7ac10f521c388fe78eb34"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> minor version number.  <a href="namespace_f_e_a_t.html#aadedb307b3e7ac10f521c388fe78eb34">More...</a><br /></td></tr>
 <tr class="separator:aadedb307b3e7ac10f521c388fe78eb34"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaae2520d89ae4daec4069ccbe29a33b7"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#aaae2520d89ae4daec4069ccbe29a33b7">version_patch</a> = 3</td></tr>
+<tr class="memitem:aaae2520d89ae4daec4069ccbe29a33b7"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#aaae2520d89ae4daec4069ccbe29a33b7">version_patch</a> = 4</td></tr>
 <tr class="memdesc:aaae2520d89ae4daec4069ccbe29a33b7"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> patch version number.  <a href="namespace_f_e_a_t.html#aaae2520d89ae4daec4069ccbe29a33b7">More...</a><br /></td></tr>
 <tr class="separator:aaae2520d89ae4daec4069ccbe29a33b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -873,6 +885,116 @@ Variables</h2></td></tr>
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00163">163</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a148e444c4e284a335d89327304f5af20" name="a148e444c4e284a335d89327304f5af20"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a148e444c4e284a335d89327304f5af20">&#9670;&#160;</a></span>feat_omp_ex_scan()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void FEAT::feat_omp_ex_scan </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>n</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const T_&#160;</td>
+          <td class="paramname"><em>x</em>[], </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T_&#160;</td>
+          <td class="paramname"><em>y</em>[]&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes an OpenMP-parallel exclusive scan a.k.a. a prefix sum of an array, i.e. </p>
+<p class="formulaDsp">
+\[ y_k := \sum_{i=0}^{k-1} x_i \]
+</p>
+<dl class="section note"><dt>Note</dt><dd>The temporary memory requirement of this function is O(P), where P is the number of threads.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>The length of x and y, respectively.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The array whose exclusive scan / prefix sums are to be computed; may be identical to y.</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">y</td><td>The array that should receive the exclusive scan / prefix sums of x; may be identical to x. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="omp__util_8hpp_source.html#l00125">125</a> of file <a class="el" href="omp__util_8hpp_source.html">omp_util.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+
+</div>
+</div>
+<a id="a1cfd9376de2f4a78743c5a2ebfedb08f" name="a1cfd9376de2f4a78743c5a2ebfedb08f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1cfd9376de2f4a78743c5a2ebfedb08f">&#9670;&#160;</a></span>feat_omp_in_scan()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void FEAT::feat_omp_in_scan </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>n</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const T_&#160;</td>
+          <td class="paramname"><em>x</em>[], </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">T_&#160;</td>
+          <td class="paramname"><em>y</em>[]&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Computes an OpenMP-parallel inclusive scan a.k.a. a prefix sum of an array, i.e. </p>
+<p class="formulaDsp">
+\[ y_k := \sum_{i=0}^k x_i \]
+</p>
+<dl class="section note"><dt>Note</dt><dd>The temporary memory requirement of this function is O(P), where P is the number of threads.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">n</td><td>The length of x and y, respectively.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The array whose inclusive scan / prefix sums are to be computed; may be identical to y.</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">y</td><td>The array that should receive the inclusive scan / prefix sums of x; may be identical to x. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="omp__util_8hpp_source.html#l00035">35</a> of file <a class="el" href="omp__util_8hpp_source.html">omp_util.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="dof__mapping__renderer_8hpp_source.html#l00033">FEAT::Space::DofMappingRenderer::render()</a>.</p>
 
 </div>
 </div>
@@ -1647,6 +1769,30 @@ template&lt;typename Iterator_ &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
+<a id="ad1683d7a0b5429b1bbff48716c222df9" name="ad1683d7a0b5429b1bbff48716c222df9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad1683d7a0b5429b1bbff48716c222df9">&#9670;&#160;</a></span>hash_crc32_table</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::uint32_t FEAT::hash_crc32_table[]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="hash_8cpp_source.html#l00011">11</a> of file <a class="el" href="hash_8cpp_source.html">hash.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a915f550e5e25f665a148950f1ae4e249" name="a915f550e5e25f665a148950f1ae4e249"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a915f550e5e25f665a148950f1ae4e249">&#9670;&#160;</a></span>version_major</h2>
 
@@ -1713,7 +1859,7 @@ template&lt;typename Iterator_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr int FEAT::version_patch = 3</td>
+          <td class="memname">constexpr int FEAT::version_patch = 4</td>
         </tr>
       </table>
   </td>

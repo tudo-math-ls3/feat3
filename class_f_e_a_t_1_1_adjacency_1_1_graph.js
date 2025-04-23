@@ -6,6 +6,7 @@ var class_f_e_a_t_1_1_adjacency_1_1_graph =
     [ "Graph", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#a389d79737bb22c24e873f3202bb95130", null ],
     [ "Graph", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#a022a90aae42871eb0fb070150ffbca30", null ],
     [ "Graph", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#ad58373d2c140c7357c104b369e3a3f61", null ],
+    [ "Graph", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#a8afea5f5df53756e120264da3ed27cfd", null ],
     [ "Graph", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#a50d8a40159d1de3f9a5c6c88233c30c0", null ],
     [ "Graph", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#a4f6e0af7b96a5f673889f2a861f817c8", null ],
     [ "Graph", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#ad871b5a90457df5f4fd3d904b5b48138", null ],
