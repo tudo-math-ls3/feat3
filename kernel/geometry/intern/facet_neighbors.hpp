@@ -55,7 +55,7 @@ namespace FEAT
 
           // ~Index(0) is the marker for "no neighbor"
           FEAT_PRAGMA_OMP(parallel for)
-          for(Index l(0); l < num_facets; ++l)
+          for(Index l = 0; l < num_facets; ++l)
           {
             shared_by[l][0] = ~Index(0);
             shared_by[l][1] = ~Index(0);
@@ -63,9 +63,9 @@ namespace FEAT
 
           // For each facet, find the cells sharing it
           FEAT_PRAGMA_OMP(parallel for)
-          for(Index k(0); k < num_cells; ++k)
+          for(Index k = 0; k < num_cells; ++k)
           {
-            for(int j(0); j < facet_idx.num_indices; ++j)
+            for(int j = 0; j < facet_idx.num_indices; ++j)
             {
               // Index of the facet
               Index l(facet_idx[k][j]);
@@ -82,9 +82,9 @@ namespace FEAT
           // For every cell and for every facet of that cell, the neighbor at a face is the OTHER cell sharing it
           // (if any)
           FEAT_PRAGMA_OMP(parallel for)
-          for(Index k(0); k < num_cells; ++k)
+          for(Index k = 0; k < num_cells; ++k)
           {
-            for(int j(0); j < facet_idx.num_indices; ++j)
+            for(int j = 0; j < facet_idx.num_indices; ++j)
             {
               // Index of the facet
               Index l(facet_idx[k][j]);
