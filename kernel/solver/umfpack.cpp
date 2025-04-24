@@ -139,9 +139,8 @@ namespace FEAT
         double* x, const double* b, void* nume, const double* control, double* info)
       {
         static_assert(sizeof(Idx_) == sizeof(SuiteSparse_long), "invalid index size");
-        return int(::umfpack_dl_solve(static_cast<SuiteSparse_long>(sys),
-          reinterpret_cast<const SuiteSparse_long*>(row_ptr), reinterpret_cast<const SuiteSparse_long*>(col_idx),
-          data, x, b, nume, control, info));
+        return int(::umfpack_dl_solve(sys, reinterpret_cast<const SuiteSparse_long*>(row_ptr),
+          reinterpret_cast<const SuiteSparse_long*>(col_idx), data, x, b, nume, control, info));
       }
     };
 

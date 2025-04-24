@@ -6,7 +6,7 @@ fparser                 4.5.2
 half                    1.12.0, 2.1.0
 hypre                   2.25.0
 ParMETIS                4.0.3
-SuiteSparse             4.4.3, 5.2.0, 5.4.0
+SuiteSparse             7.0.0 .. 7.10.2
 Triangle                1.6
 zfp                     0.5.5, 1.0.0
 zlib                    1.2.12

@@ -88,7 +88,7 @@ if(FEAT_HAVE_UMFPACK)
       # suitesparse
       UMFPACK
       GIT_REPOSITORY      https://github.com/DrTimothyAldenDavis/SuiteSparse
-      GIT_TAG             v7.8.2
+      GIT_TAG             v7.10.2
       GIT_PROGRESS ON
       UPDATE_DISCONNECTED ON
       # FIND_PACKAGE_ARGS NAMES UMFPACK GLOBAL
@@ -138,7 +138,7 @@ if(FEAT_HAVE_HYPRE)
       FetchContent_Declare(
         HYPRE
         GIT_REPOSITORY      https://github.com/hypre-space/hypre
-        GIT_TAG             ac9d7d0d7b43cd3d0c7f24ec5d64b58fbf900097 # v2.25.0
+        GIT_TAG             d3243638e7dee5208cb4ea643610fa9bdb74123b # v2.33.0
         GIT_PROGRESS        ON
         PATCH_COMMAND       python ${CMAKE_CURRENT_LIST_DIR}/patches/hypre_win.py .
         UPDATE_DISCONNECTED ON
@@ -150,7 +150,7 @@ if(FEAT_HAVE_HYPRE)
       FetchContent_Declare(
         HYPRE
         GIT_REPOSITORY      https://github.com/hypre-space/hypre
-        GIT_TAG             ac9d7d0d7b43cd3d0c7f24ec5d64b58fbf900097 # v2.25.0
+        GIT_TAG             d3243638e7dee5208cb4ea643610fa9bdb74123b # v2.33.0
         GIT_PROGRESS        ON
         UPDATE_DISCONNECTED ON
         SOURCE_SUBDIR       src # HYPRE's CMakeLists.txt is in roots src subdirectory, instead of the project root
@@ -178,9 +178,9 @@ if(FEAT_HAVE_PARMETIS)
 
   if(FEAT_PREFER_EXTERNAL_TPL OR parmetis_DIR)
     if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(parmetis REQUIRED GLOBAL)
+      find_package(parmetis REQUIRED GLOBAL CONFIG)
     else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(parmetis GLOBAL)
+      find_package(parmetis GLOBAL CONFIG)
     endif(FEAT_NO_EXTERNAL_DOWNLOAD)
   endif()
 
@@ -511,32 +511,43 @@ if(FEAT_HAVE_SUPERLU_DIST)
 
   if(NOT superlu_FOUND)
     if(WIN32)
+      ## probably broken right now, since we need to patch and use the new cmakelists...
       FetchContent_declare(
         superlu
-        URL "https://github.com/xiaoyeli/superlu_dist/archive/refs/tags/v8.1.1.tar.gz"
-        URL_HASH MD5=fe2b475e213a7b473774c608980840a3
+        URL "https://github.com/xiaoyeli/superlu_dist/archive/refs/tags/v9.1.0.tar.gz"
+        URL_HASH MD5=f8559a94ee64c8b70ebd79b65576d08d
         PATCH_COMMAND python ${CMAKE_CURRENT_LIST_DIR}/patches/superlu_win.py .
         UPDATE_DISCONNECTED ON
         SOURCE_SUBDIR SRC
-        # FIND_PACKAGE_ARGS GLOBAL
         OVERRIDE_FIND_PACKAGE
+        EXCLUDE_FROM_ALL
       )
     else()
       FetchContent_declare(
         superlu
-        URL "https://github.com/xiaoyeli/superlu_dist/archive/refs/tags/v8.1.1.tar.gz"
-        URL_HASH MD5=fe2b475e213a7b473774c608980840a3
+        URL "https://github.com/xiaoyeli/superlu_dist/archive/refs/tags/v9.1.0.tar.gz"
+        URL_HASH MD5=f8559a94ee64c8b70ebd79b65576d08d
+        PATCH_COMMAND python ${CMAKE_CURRENT_LIST_DIR}/patches/superlu.py .
         UPDATE_DISCONNECTED ON
         SOURCE_SUBDIR SRC
-        # FIND_PACKAGE_ARGS GLOBAL
         OVERRIDE_FIND_PACKAGE
+        EXCLUDE_FROM_ALL
       )
     endif()
 
     set(VERSION_MAJOR 1)
-    set(enable_double ON)
+    set(SUPERLU_DIST_ENABLE_DOUBLE ON)
+    set(SUPERLU_DIST_ENABLE_OMP ${FEAT_HAVE_OMP})
 
-    set(TPL_ENABLE_INTERNAL_BLASLIB ON)
+    set(SUPERLU_DIST_TPL_ENABLE_INTERNAL_BLASLIB ON)
+    set(SUPERLU_DIST_TPL_ENABLE_PARMETISLIB ${FEAT_HAVE_PARMETIS})
+    set(SUPERLU_DIST_ENABLE_COMPLEX_16 OFF)
+    set(SUPERLU_DIST_ENABLE_SINGLE OFF)
+    # appearently, we need to set the index size to 64 if combined with parmetis...
+    # todo: get this from parmetis...
+    if(SUPERLU_DIST_TPL_ENABLE_PARMETISLIB)
+      set(XSDK_INDEX_SIZE 64)
+    endif()
 
     list(APPEND MAKE_AVAIL_LIST superlu)
   else()
@@ -768,32 +779,9 @@ endif()
 if(FEAT_HAVE_SUPERLU_DIST AND NOT TARGET SuperLU::SuperLU)
   FetchContent_GetProperties(superlu)
 
-  # SuperLU does not add its headers as a usage requirements to the superlu_dist target.
   # We thus do so ourselves via a extra interface library
   add_library(feat-superlu-extern INTERFACE)
   target_link_libraries(feat-superlu-extern INTERFACE superlu_dist)
-  target_include_directories(feat-superlu-extern INTERFACE ${superlu_SOURCE_DIR}/SRC)
-
-  # SuperLU has ParMETIS support. This is enabled via a #define in superlu_dist_config.h
-  # We write out the right superlu_dist_config.h depending on if we have a FEAT3 build with ParMETIS and link SuperLU against ParMETIS.
-  if(FEAT_HAVE_PARMETIS)
-    set(HAVE_PARMETIS ON)
-    target_link_libraries(superlu_dist ParMETIS::ParMETIS)
-  else()
-    unset(HAVE_PARMETIS)
-  endif()
-  configure_file(${superlu_SOURCE_DIR}/SRC/superlu_dist_config.h.in ${superlu_SOURCE_DIR}/SRC/superlu_dist_config.h)
-
-
-  # SuperLU requires a BLAS. Usually this would be linked by the main
-  # CMakeLists.txt of SuperLU, but we skip that to avoid leaking SuperLU
-  # headers. We thus link against one here.
-  # This should link against the Intel MKL, if FEAT_HAVE_MKL is set.
-  # NOTE(mmuegge): SuperLU contains its own cblas in
-  # ${superlu_SOURCE_DIR}/CBLAS. Maybe optionally add this to the build if we
-  # don't find any blas via find_package?
-  find_package(BLAS REQUIRED)
-  target_link_libraries(feat-superlu-extern INTERFACE BLAS::BLAS)
 
   add_library(SuperLU::SuperLU ALIAS feat-superlu-extern)
 endif()
