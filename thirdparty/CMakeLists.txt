@@ -30,8 +30,8 @@
 
 # first of all, load fetchContent modul
 include(FetchContent)
-
 include(PrintPackageConfig)
+include(FindPackageOverrideHelper)
 
 # Should dependecies be looked for among the system libraries?
 # set(FETCHCONTENT_TRY_FIND_PACKAGE_MODE OPT_IN CACHE STRING "fetch content mode")
@@ -118,6 +118,7 @@ if(FEAT_HAVE_UMFPACK)
 
     # list(APPEND MAKE_AVAIL_LIST suitesparse)
     list(APPEND MAKE_AVAIL_LIST UMFPACK)
+    find_package_override_helper(umfpack 7.10.2 AnyNewerVersion)
   else()
     print_package_info(UMFPACK)
   endif(NOT UMFPACK_FOUND)
@@ -160,6 +161,7 @@ if(FEAT_HAVE_HYPRE)
     endif()
 
     list(APPEND MAKE_AVAIL_LIST HYPRE)
+    find_package_override_helper(hypre 2.33 AnyNewerVersion)
 
     # Enable hypre MPI support if FEAT is build with MPI support
     set(HYPRE_ENABLE_MPI ${FEAT_HAVE_MPI} CACHE BOOL "Build Hypre with MPI support" FORCE)
@@ -208,6 +210,7 @@ if(FEAT_HAVE_PARMETIS)
       )
     endif()
     list(APPEND MAKE_AVAIL_LIST parmetis)
+    find_package_override_helper(parmetis 4.0.3 AnyNewerVersion)
   else()
     print_package_info(parmetis)
   endif(NOT parmetis_FOUND)
@@ -233,6 +236,7 @@ if(FEAT_HAVE_FPARSER)
       OVERRIDE_FIND_PACKAGE
     )
     list(APPEND MAKE_AVAIL_LIST fparser)
+    find_package_override_helper(fparser 4.5.2 AnyNewerVersion)
   else()
     print_package_info(fparser)
   endif(NOT fparser)
@@ -266,6 +270,7 @@ if(FEAT_HAVE_BOOST)
       # EXCLUDE_FROM_ALL #TODO: probably a good idea
     )
     list(APPEND MAKE_AVAIL_LIST Boost)
+    find_package_override_helper(boost 1.81 AnyNewerVersion)
   else()
     print_package_info(Boost)
   endif(NOT Boost_FOUND)
@@ -293,6 +298,7 @@ if(FEAT_HAVE_CGAL)
       OVERRIDE_FIND_PACKAGE
     )
     list(APPEND MAKE_AVAIL_LIST CGAL)
+    find_package_override_helper(cgal 5.5.5 AnyNewerVersion)
   else()
     print_package_info(CGAL)
   endif(NOT CGAL_FOUND)
@@ -318,6 +324,7 @@ if(FEAT_HAVE_ALGLIB)
       OVERRIDE_FIND_PACKAGE
     )
     list(APPEND MAKE_AVAIL_LIST Alglib)
+    find_package_override_helper(alglib 3.16.0 AnyNewerVersion)
   else()
     print_package_info(Alglib)
   endif(NOT Alglib_FOUND)
@@ -343,6 +350,7 @@ if(FEAT_HAVE_DEATH_HANDLER)
       OVERRIDE_FIND_PACKAGE
     )
     list(APPEND MAKE_AVAIL_LIST death_handler)
+    find_package_override_helper(death_handler 1.0 AnyNewerVersion)
   else()
     print_package_info(death_handler)
   endif(NOT death_handler_FOUND)
@@ -369,8 +377,8 @@ if(FEAT_HAVE_FLOATX)
       # FIND_PACKAGE_ARGS NAMES FloatX GLOBAL
       OVERRIDE_FIND_PACKAGE
     )
-    # find_package(FloatX) TODO: ?? Why was this here, to provide the target?
     list(APPEND MAKE_AVAIL_LIST FloatX)
+    find_package_override_helper(FloatX 1.0 AnyNewerVersion)
   else()
     print_package_info(FloatX)
   endif(NOT FloatX_FOUND)
@@ -403,6 +411,7 @@ if(FEAT_HAVE_ZFP)
     set(BUILD_TESTING "OFF")
 
     list(APPEND MAKE_AVAIL_LIST zfp)
+    find_package_override_helper(zfp 1.0.0 AnyNewerVersion)
   else()
     print_package_info(zfp)
   endif(NOT zfp_FOUND)
@@ -430,6 +439,7 @@ if(FEAT_HAVE_ZLIB)
       OVERRIDE_FIND_PACKAGE
     )
     list(APPEND MAKE_AVAIL_LIST zlib)
+    find_package_override_helper(zlib 1.2.13 AnyNewerVersion)
   else()
     print_package_info(zlib)
   endif(NOT zlib_FOUND)
@@ -455,6 +465,7 @@ if(FEAT_HAVE_TRIANGLE)
       OVERRIDE_FIND_PACKAGE
     )
     list(APPEND MAKE_AVAIL_LIST triangle)
+    find_package_override_helper(triangle 1.0 AnyNewerVersion)
   else()
     print_package_info(triangle)
   endif(NOT triangle_FOUND)
@@ -494,6 +505,7 @@ if(FEAT_HAVE_ZOLTAN)
       )
     endif()
     list(APPEND MAKE_AVAIL_LIST zoltan)
+    find_package_override_helper(zoltan 3.901 AnyNewerVersion)
   else()
     print_package_info(zoltan)
   endif(NOT zoltan_FOUND)
@@ -550,6 +562,7 @@ if(FEAT_HAVE_SUPERLU_DIST)
     endif()
 
     list(APPEND MAKE_AVAIL_LIST superlu)
+    find_package_override_helper(superlu 9.1.0 AnyNewerVersion)
   else()
     print_package_info(superlu)
   endif(NOT superlu_FOUND)
@@ -584,6 +597,7 @@ if(FEAT_HAVE_CUDSS)
     )
 
     list(APPEND MAKE_AVAIL_LIST cudss)
+    find_package_override_helper(cudss 0.5.0.16 AnyNewerVersion)
   else()
     print_package_info(cudss)
   endif(NOT cudss_FOUND)
@@ -612,6 +626,7 @@ if(FEAT_HAVE_PMP)
     )
 
     list(APPEND MAKE_AVAIL_LIST pmp)
+    find_package_override_helper(pmp 3.0.0 AnyNewerVersion)
   else()
     print_package_info(pmp)
   endif(NOT pmp_FOUND)
@@ -625,208 +640,11 @@ if(MAKE_AVAIL_LIST)
     message(STATUS "- Configuring ${tpl}...")
     message(STATUS "-------------------------------------------------------------------")
     FetchContent_MakeAvailable(${tpl})
+
     message(STATUS "-------------------------------------------------------------------")
     message(STATUS "- Configuring ${tpl}...done")
     message(STATUS "-------------------------------------------------------------------")
   endforeach()
-endif()
-
-# At this point all requested third-party dependencies have either been found
-# via find_package or downloaded to disk. Some of the third-party dependencies
-# use proper modern cmake and provide namespaced targets without setting
-# directory-level settings. These dependencies are added to the build by
-# FetchContent_MakeAvailable via add_subdirectory. Other dependencies either
-# do not use CMake at all or use an older style of CMake. For these
-# dependencies we intentionally circumvent their CMake (if it exists) and
-# manually build them from "outside". The following are the "build systems" for
-# these dependencies.
-
-if(FEAT_HAVE_BOOST AND NOT TARGET Boost::boost)
-  add_library(feat-boost-extern INTERFACE)
-  target_link_libraries(feat-boost-extern INTERFACE Boost::graph Boost::heap Boost::logic)
-  add_library(Boost::boost ALIAS feat-boost-extern)
-endif()
-
-if(FEAT_HAVE_FPARSER AND NOT TARGET fparser::fparser)
-  FetchContent_GetProperties(fparser)
-
-  file(GLOB fparser-srcs ${fparser_SOURCE_DIR}/*.cc)
-  add_library(feat-fparser-extern STATIC ${fparser-srcs})
-  target_include_directories(feat-fparser-extern INTERFACE ${fparser_SOURCE_DIR})
-  target_compile_options(feat-fparser-extern PRIVATE -w)
-  target_compile_definitions(feat-fparser-extern PRIVATE FP_SUPPORT_CPLUSPLUS11_MATH_FUNCS FP_USE_THREAD_SAFE_EVAL)
-
-  # The 'fpoptimizer.cc' can not be compiled with clang++, so we have to disable
-  # it by adding the corresponding pre-processor define
-  if (${FEAT_COMPILER_ID} STREQUAL "clang")
-    target_compile_definitions(feat-fparser-extern PRIVATE FP_NO_SUPPORT_OPTIMIZER)
-  endif (${FEAT_COMPILER_ID} STREQUAL "clang")
-
-  add_library(fparser::fparser ALIAS feat-fparser-extern)
-endif()
-
-if(FEAT_HAVE_CGAL AND NOT TARGET CGAL::CGAL)
-  FetchContent_GetProperties(cgal)
-  ## boost required for cgal, so we do a find_package call now... if we have downloaded
-  ## boost oruselves, we provide the sources ourselves, else hope we find boost
-  find_package(Boost REQUIRED)
-
-  add_library(feat-cgal-extern INTERFACE)
-  target_include_directories(feat-cgal-extern INTERFACE "${cgal_SOURCE_DIR}/include")
-  target_link_libraries(feat-cgal-extern INTERFACE Boost::boost)
-
-  add_library(CGAL::CGAL ALIAS feat-cgal-extern)
-endif()
-
-if(FEAT_HAVE_ALGLIB AND NOT TARGET Alglib::Alglib)
-  FetchContent_GetProperties(alglib)
-
-  file(GLOB alglib-srcs ${alglib_SOURCE_DIR}/src/*.cpp)
-
-  add_library(feat-alglib-extern STATIC ${alglib-srcs})
-  target_include_directories(feat-alglib-extern INTERFACE "${alglib_SOURCE_DIR}/src/")
-  target_compile_options(feat-alglib-extern PRIVATE -w)
-
-  add_library(Alglib::Alglib ALIAS feat-alglib-extern)
-endif()
-
-if(FEAT_HAVE_DEATH_HANDLER)
-  FetchContent_GetProperties(death_handler)
-
-  add_library(feat-deathhandler-extern STATIC ${death_handler_SOURCE_DIR}/death_handler.cc)
-  target_include_directories(feat-deathhandler-extern INTERFACE SYSTEM ${death_handler_SOURCE_DIR})
-
-  add_library(deathhandler::deathhandler ALIAS feat-deathhandler-extern)
-endif()
-
-if(FEAT_HAVE_FLOATX AND NOT TARGET FloatX::FloatX)
-  FetchContent_GetProperties(floatx)
-
-  add_library(feat-floatx-extern INTERFACE)
-  target_include_directories(feat-floatx-extern INTERFACE "${floatx_SOURCE_DIR}/src")
-  add_library(FloatX::FloatX ALIAS feat-floatx-extern)
-endif()
-
-if(FEAT_HAVE_ZLIB AND NOT TARGET zlib::zlib)
-  FetchContent_GetProperties(zlib)
-
-  file(GLOB zlib-sources "${zlib_SOURCE_DIR}/*.c")
-  add_library(feat-zlib-extern STATIC ${zlib-sources})
-  target_compile_options(feat-zlib-extern PRIVATE -w)
-  target_compile_definitions(feat-zlib-extern PRIVATE HAVE_UNISTD_H)
-  add_library(zlib::zlib ALIAS feat-zlib-extern)
-endif()
-
-if(FEAT_HAVE_TRIANGLE AND NOT TARGET triangle::triangle)
-  FetchContent_GetProperties(triangle)
-
-  add_library(feat-triangle-extern STATIC ${triangle_SOURCE_DIR}/triangle.c)
-  target_compile_definitions(feat-triangle-extern PRIVATE ANSI_DECLARATORS TRILIBRARY)
-  target_compile_options(feat-triangle-extern PRIVATE -w)
-  add_library(triangle::triangle ALIAS feat-triangle-extern)
-endif()
-
-if(FEAT_HAVE_ZOLTAN AND NOT TARGET Zoltan::Zoltan)
-  FetchContent_GetProperties(triangle)
-
-  # Build file list
-  file(READ filelist_zoltan zoltan-list-in)
-  string(REGEX REPLACE "\n" ";" zoltan-list-in "${zoltan-list-in}")
-  foreach (zoltan-list-item ${zoltan-list-in})
-    set(zoltan-list "${zoltan-list}" "${zoltan_SOURCE_DIR}/${zoltan-list-item}")
-  endforeach ()
-
-  add_library(feat-zoltan-extern STATIC ${zoltan-list})
-  configure_file(${FEAT_SOURCE_DIR}/thirdparty/config_zoltan.h.in ${zoltan_SOURCE_DIR}/src/include/Zoltan_config.h @ONLY)
-  target_include_directories(feat-zoltan-extern PUBLIC  "${zoltan_SOURCE_DIR}/src/include")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/all")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/Utilities/shared")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/Utilities/Timer")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/zz")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/coloring")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/graph")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/ha")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/hier")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/hsfc")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/lb")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/matrix")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/order")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/par")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/params")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/phg")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/rcb")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/reftree")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/simple")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/timer")
-  target_include_directories(feat-zoltan-extern PRIVATE "${zoltan_SOURCE_DIR}/src/tpls")
-
-  if (WIN32 AND (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"))
-   #define __STDC__ since clang for some reason does not "confirm" to the standard,
-   #but in this case this flag should be set to let zoltan compile
-    target_compile_options(feat-zoltan-extern PRIVATE -w)
-    target_compile_definitions(feat-zoltan-extern PRIVATE __STDC__=1)
-  else (WIN32 AND (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")) #todo: Does this make sense? Only for WIN32?
-    target_compile_options(feat-zoltan-extern PRIVATE -w)
-  endif (WIN32 AND (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"))
-    #target_link_options(thirdparty-zoltan PRIVATE "LINKER:-w")
-
-  find_package(MPI REQUIRED)
-  target_link_libraries(feat-zoltan-extern PRIVATE MPI::MPI_C)
-
-  add_library(Zoltan::Zoltan ALIAS feat-zoltan-extern)
-endif()
-
-if(FEAT_HAVE_SUPERLU_DIST AND NOT TARGET SuperLU::SuperLU)
-  FetchContent_GetProperties(superlu)
-
-  # We thus do so ourselves via a extra interface library
-  add_library(feat-superlu-extern INTERFACE)
-  target_link_libraries(feat-superlu-extern INTERFACE superlu_dist)
-
-  add_library(SuperLU::SuperLU ALIAS feat-superlu-extern)
-endif()
-
-if(FEAT_HAVE_CUDSS AND NOT TARGET cuDSS::cuDSS)
-  FetchContent_GetProperties(cudss)
-
-  add_library(feat-cudss-extern UNKNOWN IMPORTED GLOBAL)
-  if(WIN32)
-    set_target_properties(feat-cudss-extern PROPERTIES IMPORTED_LOCATION ${cudss_SOURCE_DIR}/lib/cudss.lib)
-  else()
-    set_target_properties(feat-cudss-extern PROPERTIES IMPORTED_LOCATION ${cudss_SOURCE_DIR}/lib/libcudss.so)
-  endif()
-  target_include_directories(feat-cudss-extern INTERFACE ${cudss_SOURCE_DIR}/include)
-
-  add_library(cuDSS::cuDSS ALIAS feat-cudss-extern)
-endif()
-
-if(FEAT_HAVE_PMP AND NOT TARGET pmp::pmp)
-  FetchContent_GetProperties(pmp)
-
-  message(STATUS "pmp source dir: ${pmp_SOURCE_DIR}")
-
-  file(GLOB pmp-sources ${pmp_SOURCE_DIR}/src/pmp/*.cpp ${pmp_SOURCE_DIR}/src/pmp/algorithms/*.cpp ${pmp_SOURCE_DIR}/src/pmp/io/*.cpp)
-  file(GLOB pmp-headers ${pmp_SOURCE_DIR}/src/pmp/*.h ${pmp_SOURCE_DIR}/src/pmp/algorithms/*.h ${pmp_SOURCE_DIR}/src/pmp/io/*.h)
-
-  add_library(feat-extern-pmp STATIC ${pmp-sources} ${pmp-headers})
-  target_include_directories(feat-extern-pmp PUBLIC ${pmp_SOURCE_DIR}/src/)
-
-  # NOTE(mmuegge): pmp includes the Eigen 3.4.0 headers, but does not link
-  # against Eigen. This is intended.  pmp uses the type definitions of eigen to
-  # support converting from Eigen vectors/matrices to pmp vectors/matrices, but
-  # does not use the implementation of eigen in any way.
-  target_include_directories(feat-extern-pmp PUBLIC ${pmp_SOURCE_DIR}/external/eigen-3.4.0)
-
-  target_compile_features(feat-extern-pmp PRIVATE cxx_std_20)
-
-  if(FEAT_HAVE_OMP)
-    find_package(OpenMP)
-    if(OpenMP_CXX_FOUND)
-      target_link_libraries(pmp PUBLIC OpenMP::OpenMP_CXX)
-    endif()
-  endif()
-
-  add_library(pmp::pmp ALIAS feat-extern-pmp)
 endif()
 
 # Restore previous C/CXX flags to re-enable warnings

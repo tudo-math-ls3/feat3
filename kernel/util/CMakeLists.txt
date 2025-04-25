@@ -51,14 +51,17 @@ endif (FEAT_COTIRE)
 target_link_libraries(feat-kernel-util PUBLIC feat-dependency)
 
 if (FEAT_HAVE_ZLIB)
+  find_package(zlib 1.2.13 REQUIRED)
   target_link_libraries(feat-kernel-util PUBLIC zlib::zlib)
 endif (FEAT_HAVE_ZLIB)
 
 if(FEAT_HAVE_FLOATX)
+  find_package(FloatX REQUIRED)
   target_link_libraries(feat-kernel-util PUBLIC FloatX::FloatX)
 endif()
 
 if(FEAT_HAVE_ZFP)
+  find_package(zfp 1.0.0 REQUIRED)
   target_link_libraries(feat-kernel-util PUBLIC zfp::zfp)
 endif()
 

@@ -57,13 +57,12 @@ target_link_libraries(feat INTERFACE
 )
 
 if (FEAT_HAVE_DEATH_HANDLER)
-  # probably only requirement really necessary?
+  find_package(death_handler REQUIRED)
   target_link_libraries(feat-kernel-root PRIVATE deathhandler::deathhandler)
 endif (FEAT_HAVE_DEATH_HANDLER)
 
 if (FEAT_HAVE_FPARSER)
-  # target_link_libraries(feat-kernel-root PRIVATE fparser::fparser)
-  ## make fparser available to all target linking against feat
+  find_package(fparser 4.5.2 REQUIRED)
   target_link_libraries(feat INTERFACE fparser::fparser)
 endif(FEAT_HAVE_FPARSER)
 
@@ -79,6 +78,7 @@ if (FEAT_HAVE_QUADMATH)
 endif (FEAT_HAVE_QUADMATH)
 
 if(FEAT_HAVE_PMP)
+  find_package(pmp 3.0.0 REQUIRED)
   target_link_libraries(feat-kernel-root PUBLIC pmp::pmp)
 endif()
 

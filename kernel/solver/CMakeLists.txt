@@ -21,18 +21,22 @@ PRIVATE
   feat-kernel-lafem feat-kernel-util feat-kernel-adjacency)
 
 if (FEAT_HAVE_UMFPACK)
+  find_package(UMFPACK 7.10.2 REQUIRED)
   target_link_libraries(feat-kernel-solver PRIVATE SuiteSparse::UMFPACK)
 endif (FEAT_HAVE_UMFPACK)
 
 if (FEAT_HAVE_HYPRE)
+  find_package(HYPRE 2.33.0 REQUIRED)
   target_link_libraries(feat-kernel-solver PRIVATE HYPRE::HYPRE)
 endif (FEAT_HAVE_HYPRE)
 
 if (FEAT_HAVE_SUPERLU_DIST)
+  find_package(superlu 9.1.0 REQUIRED)
   target_link_libraries(feat-kernel-solver PRIVATE SuperLU::SuperLU)
 endif (FEAT_HAVE_SUPERLU_DIST)
 
 if(FEAT_HAVE_ALGLIB)
+  find_package(alglib 3.16.0 REQUIRED)
   target_link_libraries(feat-kernel-solver PUBLIC Alglib::Alglib)
 endif()
 

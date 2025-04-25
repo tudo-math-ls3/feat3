@@ -29,15 +29,17 @@ endif (FEAT_EICKT)
 add_library(feat-kernel-geometry STATIC ${kernel-geometry-list})
 
 if(FEAT_HAVE_PARMETIS)
+  find_package(parmetis 4.0.3 REQUIRED)
   target_link_libraries(feat-kernel-geometry PRIVATE ParMETIS::ParMETIS)
 endif(FEAT_HAVE_PARMETIS)
 
 if(FEAT_HAVE_ZOLTAN)
+  find_package(zoltan 3.901 REQUIRED)
   target_link_libraries(feat-kernel-geometry PRIVATE Zoltan::Zoltan)
 endif()
 
 if(FEAT_HAVE_FPARSER)
-  ## direct build dependy for feat-kernel-geometry
+  find_package(fparser 4.5.2 REQUIRED)
   target_link_libraries(feat-kernel-geometry PRIVATE fparser::fparser)
 endif()
 
@@ -46,6 +48,7 @@ endif()
 # dependency and parts of FEAT. This static library is then linked privately
 # into the geometry kernel. That way cgals dependencies on boost are hidden.
 if(FEAT_HAVE_CGAL)
+  find_package(CGAL 5.5.5 REQUIRED)
   add_library(feat-kernel-geometry-cgal STATIC cgal.cpp)
 
   target_link_libraries(feat-kernel-geometry-cgal

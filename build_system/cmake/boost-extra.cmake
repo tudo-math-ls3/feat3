@@ -1,0 +1,6 @@
+if(NOT TARGET Boost::boost)
+  message(STATUS "Adding missing Boost::boost target")
+  add_library(feat-boost-extern INTERFACE)
+  target_link_libraries(feat-boost-extern INTERFACE Boost::graph Boost::heap Boost::logic)
+  add_library(Boost::boost ALIAS feat-boost-extern)
+endif()
