@@ -210,7 +210,7 @@ namespace FEAT
 
       // loop over all domain nodes
       FEAT_PRAGMA_OMP(parallel for schedule(dynamic, 1000))
-      for(Index i=0; i < _domain_ptr.size()-1; ++i)
+      for(Index i = 0; i < _domain_ptr.size()-1; ++i)
       {
         // let the STL do the sorting work
         std::sort(_image_idx.begin() + IndexVector::difference_type(_domain_ptr[i]),

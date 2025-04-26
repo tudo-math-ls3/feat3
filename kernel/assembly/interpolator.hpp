@@ -55,7 +55,7 @@ namespace FEAT
 
             // loop over all entities
             FEAT_PRAGMA_OMP(for)
-            for(Index i(0); i < num_entities; ++i)
+            for(Index i = 0; i < num_entities; ++i)
             {
               // evaluate the node functional
               node_func.prepare(i);
