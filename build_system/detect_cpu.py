@@ -287,6 +287,9 @@ def detect_cpu():
         cputype = "zen3"
       if model == 80:
         cputype = "zen3"
+    elif cpu_family == 26:
+      if model == 68:
+        cputype = "zen5"
 
   # TODO insert sparc support here once it has been implemented properly
 

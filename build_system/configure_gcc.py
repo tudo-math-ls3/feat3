@@ -259,6 +259,11 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
         cxxflags += " -m64 -march=znver1"
     elif cpu == "zen4":
       cxxflags += " -m64 -march=znver4"
+    elif cpu == "zen5":
+      if major >= 14: # zen5 support was added in GCC v14.0
+        cxxflags += " -m64 -march=znver5"
+      else:
+        cxxflags += " -m64 -march=znver4"
 
     #ARM
     elif cpu == "cortexa15":

@@ -207,6 +207,12 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
         cxxflags += " -m64 -march=znver1"
     elif cpu == "zen4":
       cxxflags += " -m64 -march=znver4"
+    elif cpu == "zen5":
+      if major >= 19: # zen5 support was added in clang v19.0
+        cxxflags += " -m64 -march=znver5"
+      else:
+        cxxflags += " -m64 -march=znver4"
+
     #ARM
     elif cpu == "cortexa53":
       cxxflags += " -march=a53"

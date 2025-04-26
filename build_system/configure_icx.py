@@ -68,6 +68,8 @@ def configure_icx(cpu, buildid, compiler, system_host_compiler, restrict_errors)
       cxxflags += " -mavx2 -mfma -axCORE-AVX2,CORE-AVX512" # not really supported by intel
     elif cpu == "zen4":
       cxxflags += " -mavx2 -mfma -axCORE-AVX2,CORE-AVX512" # not really supported by intel
+    elif cpu == "zen5":
+      cxxflags += " -mavx2 -mfma -axCORE-AVX2,CORE-AVX512" # not really supported by intel
     else:
       print ("Warning: Detected cpu type not supported by configure_icx.py, using generic vectorisation support instead")
       # generate code for every simd unit, existing so far
