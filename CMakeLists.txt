@@ -211,6 +211,11 @@ endif(FEAT_VALGRIND)
 # our custom target to build (but not execute) all tests in all directories
 add_custom_target( tests )
 
+# custom target to build (but not execute) all cuda tests in all directories
+if(FEAT_HAVE_CUDA)
+  add_custom_target( cuda_tests )
+endif()
+
 # fetch contents outsourced to thirdparty subdirectory
 add_subdirectory( thirdparty )
 add_subdirectory( kernel )

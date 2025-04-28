@@ -89,39 +89,8 @@ set(test_list
   parsed_hit_test_factory-test
 )
 
-# create all tests
-foreach (test ${test_list} )
-  add_executable(${test} EXCLUDE_FROM_ALL ${test}.cpp)
-  add_dependencies(${test} feat-kernel-geometry-test-aux)
-  target_link_libraries(${test} PRIVATE feat test_system feat-kernel-geometry-test-aux)
-
-
-  add_test(${test}_all ${CMAKE_CTEST_COMMAND}
-    --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-    --build-generator ${CMAKE_GENERATOR}
-    --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-    --build-target ${test}
-    --build-nocmake
-    --build-noclean
-    --test-command ${FEAT_CTEST_RUNNER} ${FEAT_BINARY_DIR}/kernel/geometry/${test})
-  set_property(TEST ${test}_all PROPERTY LABELS "all")
-
-  if (FEAT_VALGRIND)
-    add_test(${test}_valgrind ${CMAKE_CTEST_COMMAND}
-      --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-      --build-generator ${CMAKE_GENERATOR}
-      --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-      --build-target ${test}
-      --build-nocmake
-      --build-noclean
-      --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${FEAT_BINARY_DIR}/kernel/geometry/${test} generic)
-    set_property(TEST ${test}_valgrind PROPERTY LABELS "valgrind")
-    set_property(TEST ${test}_valgrind PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
-    set_property(TEST ${test}_valgrind PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-  endif (FEAT_VALGRIND)
-
-endforeach (test)
-
+include(FEATKernelTests)
+add_feat_kernel_tests(TESTS test_list TARGET geometry_tests LINK_AGAINST "feat-kernel-geometry-test-aux")
 
 #disabling warnings with pragmas does not always work with gcc
 #https://gcc.gnu.org/bugzilla/show_bug.cgi?id=53431
@@ -139,9 +108,3 @@ if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     set_source_files_properties(cgal-test.cpp APPEND_STRING PROPERTY LINK_OPTIONS " -Wno-alloc-size-larger-than -Wno-undef")
   endif (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER 9.0)
 endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
-
-# add all tests to geometry_tests
-add_custom_target(geometry_tests DEPENDS ${test_list})
-
-# build all tests through top lvl target tests
-add_dependencies(tests geometry_tests)
