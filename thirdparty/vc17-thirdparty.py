@@ -72,7 +72,7 @@ if os.environ.get("VS17PATH") == None:
     print("\nDo you want to set the environment variable permanently now? ([y]es, [n]o, [q]uit)")
     rtn = ask_yes_no_cancel()
     if(rtn == None):
-      print("User cancelled...")
+      print("User canceled...")
       sys.exit(1)
     elif(rtn == True):
       print("Trying to set 'VS17PATH' environment variable permanently...")
@@ -96,11 +96,11 @@ if os.environ.get("VS17PATH") == None:
     print("the installation directory?  ([y]es, [n]o, [q]uit)")
     rtn = ask_yes_no_cancel()
     if(rtn == None):
-      print("User cancelled...")
+      print("User canceled...")
       sys.exit(1)
     path_vc17 = tkinter.filedialog.askdirectory()
     if(len(path_vc17) == 0):
-      print("User cancelled...")
+      print("User canceled...")
       sys.exit(1)
     if(rtn == True):
       print("Trying to set 'VS17PATH' environment variable permanently...")
@@ -173,6 +173,7 @@ class ThirdPartyPackage(object):
     self.file = None
     self.trunk = None
     self.url = None
+    self.url_user_agent = None
     self.page = None
     self.prefix = ""
     self.suffix = ""
@@ -269,7 +270,12 @@ class ThirdPartyPackage(object):
   # download the source archive from website
   def download(self):
     import urllib.request
-    with urllib.request.urlopen(self.url) as response:
+    headers = {}
+    response = None
+    if self.url_user_agent != None:
+      headers["User-Agent"] = self.url_user_agent
+    request = urllib.request.Request(self.url, data=None, headers=headers)
+    with urllib.request.urlopen(request) as response:
       with open(self.file, 'wb') as out_file:
         shutil.copyfileobj(response, out_file)
     return
@@ -399,6 +405,65 @@ class ThirdPartyPackage(object):
 ########################################################################################################################
 ########################################################################################################################
 ########################################################################################################################
+# A L G L I B  -  A L G L I B  -  A L G L I B  -  A L G L I B  -  A L G L I B  -  A L G L I B  -  A L G L I B  -  A L G
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+
+class ThirdPartyAlglib(ThirdPartyPackage):
+  def __init__(self):
+    super().__init__()
+    self.name = "alglib"
+    self.version = "4.04.0"
+    self.date = "2024-12-23"
+    self.file = self.name + "-" + self.version + ".cpp.gpl.zip"
+    self.dir = self.name + "-" + self.version
+    self.trunk = self.dir
+    self.license_files = [os.path.join("docs", "lgpl.txt")]
+    self.url = "https://www.alglib.net/translator/re/" + self.file
+    self.url_user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:137.0) Gecko/20100101 Firefox/137.0"
+    self.page = "https://www.alglib.net"
+    self.baseflags += ' /I"./' + self.dir + '/alglib-cpp/src"'
+
+  def info(self):
+    #      123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-
+    print("The ALGLIB library offers a light-weight linear and nonlinear solver and optimizer package.")
+    print("Installing this package enables the use of the solvers implemented in kernel/solver/alglib_wrapper.hpp.")
+    print("")
+    print("Prerequisites/Constraints: none")
+    print("")
+    print("Installing this package defines the 'FEAT_HAVE_ALGLIB' preprocessor macro.")
+    print("")
+    print("Visit the " + self.name + " homepage for more information:")
+    print(self.page)
+
+  def build(self):
+    if not self.prepare():
+      return
+    print("\nBuilding " + self.name + " " + self.version + " sources...")
+    self.compile_cpp("alglib-cpp/src/alglibinternal")
+    self.compile_cpp("alglib-cpp/src/alglibmisc")
+    self.compile_cpp("alglib-cpp/src/ap")
+    self.compile_cpp("alglib-cpp/src/dataanalysis")
+    self.compile_cpp("alglib-cpp/src/diffequations")
+    self.compile_cpp("alglib-cpp/src/fasttransforms")
+    self.compile_cpp("alglib-cpp/src/integration")
+    self.compile_cpp("alglib-cpp/src/interpolation")
+    self.compile_cpp("alglib-cpp/src/kernels_avx2")
+    self.compile_cpp("alglib-cpp/src/kernels_fma")
+    self.compile_cpp("alglib-cpp/src/kernels_sse2")
+    self.compile_cpp("alglib-cpp/src/linalg")
+    self.compile_cpp("alglib-cpp/src/optimization")
+    self.compile_cpp("alglib-cpp/src/solvers")
+    self.compile_cpp("alglib-cpp/src/specialfunctions")
+    self.compile_cpp("alglib-cpp/src/statistics")
+    self.link()
+
+packages["alglib"] = ThirdPartyAlglib()
+
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
 # B O O S T  -  B O O S T  -  B O O S T  -  B O O S T  -  B O O S T  -  B O O S T  -  B O O S T  -  B O O S T  -  B O O
 ########################################################################################################################
 ########################################################################################################################
@@ -408,13 +473,14 @@ class ThirdPartyBoost(ThirdPartyPackage):
   def __init__(self):
     super().__init__()
     self.name = "boost"
-    self.version = "1.80.0"
-    self.date = "2022-08-10"
+    self.version = "1.88.0"
+    self.date = "2025-04-10"
     self.file = self.name + "_" + self.version.replace(".","_") + ".zip"
     self.dir = self.name + "_" + self.version.replace(".","_")
     self.trunk = "."
     self.license_files = ["LICENSE_1_0.txt"]
     self.url = "https://boostorg.jfrog.io/artifactory/main/release/1.80.0/source/" + self.file
+    self.url = "https://archives.boost.io/release/" + self.version + "/source/" + self.file
     self.page = "https://www.boost.org"
 
   def info(self):
@@ -456,8 +522,8 @@ class ThirdPartyCGAL(ThirdPartyPackage):
   def __init__(self):
     super().__init__()
     self.name = "CGAL"
-    self.version = "5.5.1"
-    self.date = "2022-10-12"
+    self.version = "6.0.1"
+    self.date = "2024-10-22"
     self.file = self.name + "-" + self.version + ".zip"
     self.dir = self.name + "-" + self.version
     self.trunk = "."
@@ -479,7 +545,7 @@ class ThirdPartyCGAL(ThirdPartyPackage):
     print(self.page)
 
   def ready(self):
-    # check for versiion header
+    # check for version header
     return os.path.isfile(os.path.join(self.dir, "include", "CGAL", "version.h"))
 
   def remove(self):
@@ -552,8 +618,8 @@ class ThirdPartyHypre(ThirdPartyPackage):
   def __init__(self):
     super().__init__()
     self.name = "hypre"
-    self.version = "2.26.0"
-    self.date = "2022-10-14"
+    self.version = "2.33.0"
+    self.date = "2025-04-02"
     self.file = self.name + "-" + self.version + ".zip"
     self.dir = self.name + "-" + self.version
     self.trunk = "."
@@ -564,7 +630,7 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.url = "https://github.com/hypre-space/hypre/archive/refs/tags/v" + self.version + ".zip"
     self.page = "http://www.llnl.gov/casc/hypre"
     self.baseflags += ' /wd"4028" /wd"4244" /wd"4293" /wd"4305" /wd"4334" /wd"4700" /wd"4996"'
-    self.baseflags += ' /D "HAVE_CONFIG_H" /D "WIN32"'
+    self.baseflags += ' /D "HAVE_CONFIG_H" /D "WIN32" /D_CRT_SECURE_NO_WARNINGS'
     self.dbgflags += ' /D "HYPRE_DEBUG"'
     self.baseflags += ' /I"./' + self.dir + '/src"'
 
@@ -601,21 +667,22 @@ class ThirdPartyHypre(ThirdPartyPackage):
       fo.write("#define HAVE_STRING_H\n")
       fo.write("#define HYPRE_BIGINT 1\n")
       fo.write("#define HYPRE_MAXDIM 3\n")
+      fo.write("#define HYPRE_DEVELOP_STRING \"v2.33.0-0-gd3243638e\"\n")
       fo.write("#define HYPRE_RELEASE_BUGS \"https://github.com/hypre-space/hypre/issues\"\n")
-      fo.write("#define HYPRE_RELEASE_DATE \"2022/10/14\"\n")
+      fo.write("#define HYPRE_RELEASE_DATE \"2022/04/03\"\n")
       fo.write("#define HYPRE_RELEASE_NAME \"hypre\"\n")
-      fo.write("#define HYPRE_RELEASE_NUMBER 22600\n")
+      fo.write("#define HYPRE_RELEASE_NUMBER 23300\n")
       fo.write("#define HYPRE_RELEASE_TIME \"00:00:00\"\n")
-      fo.write("#define HYPRE_RELEASE_VERSION \"2.26.0\"\n")
+      fo.write("#define HYPRE_RELEASE_VERSION \"2.33.0\"\n")
       fo.write("#define HYPRE_USING_HOST_MEMORY 1\n")
       fo.write("#define HYPRE_USING_HYPRE_BLAS 1\n")
       fo.write("#define HYPRE_USING_HYPRE_LAPACK 1\n")
       fo.write("#define PACKAGE_BUGREPORT \"\"\n")
       fo.write("#define PACKAGE_NAME \"hypre\"\n")
-      fo.write("#define PACKAGE_STRING \"hypre 2.26.0\"\n")
+      fo.write("#define PACKAGE_STRING \"hypre 2.33.0\"\n")
       fo.write("#define PACKAGE_TARNAME \"hypre\"\n")
       fo.write("#define PACKAGE_URL \"\"\n")
-      fo.write("#define PACKAGE_VERSION \"2.26.0\"\n")
+      fo.write("#define PACKAGE_VERSION \"2.33.0\"\n")
       fo.close()
     # patch out non-existing header includes
     self.patch_file(os.path.join("src", "matrix_matrix", "HYPRE_ConvertParCSRMatrixToDistributedMatrix.c"), [
@@ -624,10 +691,14 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.patch_file(os.path.join("src", "matrix_matrix", "HYPRE_ConvertPETScMatrixToDistributedMatrix.c"), [
       [15, '#include <gmalloc.h>', '/*#include <gmalloc.h>*/']
     ])
-    # patch 32 vs 64 bit int issues in utilities
-    self.patch_file(os.path.join("src", "utilities", "_hypre_utilities.h"), [
-      [2171, 'hypre_ulongint h64 = HYPRE_XXH_PRIME64_5 + sizeof(input);', '  hypre_ulonglongint h64 = HYPRE_XXH_PRIME64_5 + sizeof(input);'],
-      [2173, 'hypre_ulongint k1 = input;', '  hypre_ulonglongint k1 = input;']
+    # true and false are not ANSI-C keywords
+    self.patch_file(os.path.join("src", "distributed_ls", "pilut", "parilut.c"), [
+      [964, 'while (true) {', 'while (1) {'],
+      [1048, 'while (true) {', 'while (1) {']
+    ])
+    self.patch_file(os.path.join("src", "distributed_ls", "pilut", "trifactor.c"), [
+      [290, 'hypre_SetUpFactor( ddist, ldu, maxnz,   petotal, rind, imap, &maxsend,   true,', 'hypre_SetUpFactor( ddist, ldu, maxnz,   petotal, rind, imap, &maxsend, 1,'],
+      [307, 'hypre_SetUpFactor( ddist, ldu, maxnz,   petotal, rind, imap, &maxsend,   false,', 'hypre_SetUpFactor( ddist, ldu, maxnz,   petotal, rind, imap, &maxsend, 0,']
     ])
 
   def ready(self):
@@ -715,6 +786,7 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.compile_c("src/lapack/dlacpy")
     self.compile_c("src/lapack/dlae2")
     self.compile_c("src/lapack/dlaev2")
+    self.compile_c("src/lapack/dlamch")
     self.compile_c("src/lapack/dlange")
     self.compile_c("src/lapack/dlanst")
     self.compile_c("src/lapack/dlansy")
@@ -763,13 +835,12 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.compile_c("src/lapack/dsygv")
     self.compile_c("src/lapack/dsytd2")
     self.compile_c("src/lapack/dsytrd")
-    self.compile_c("src/lapack/dtrtri")
     self.compile_c("src/lapack/dtrti2")
+    self.compile_c("src/lapack/dtrtri")
     self.compile_c("src/lapack/ieeeck")
     self.compile_c("src/lapack/ilaenv")
     self.compile_c("src/lapack/lsame")
     self.compile_c("src/lapack/xerbla")
-    self.compile_c("src/lapack/dlamch")
 
     print("\nBuilding " + self.name + " " + self.version + " struct_mv sources...")
     self.cxxflags = self.baseflags + self.modeflags + self.extflags + self.outflags
@@ -784,12 +855,22 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.compile_c("src/utilities/ap")
     self.compile_c("src/utilities/log")
     self.compile_c("src/utilities/complex")
+    self.compile_c("src/utilities/device_utils")
     self.compile_c("src/utilities/error")
+    self.compile_c("src/utilities/general")
+    self.compile_c("src/utilities/handle")
+    self.compile_c("src/utilities/int_array")
+    self.compile_c("src/utilities/int_array_device")
     self.compile_c("src/utilities/hopscotch_hash")
+    self.compile_c("src/utilities/matrix_stats")
+    self.compile_c("src/utilities/magma")
+    self.compile_c("src/utilities/memory")
     self.compile_c("src/utilities/memory_tracker")
     self.compile_c("src/utilities/merge_sort")
     self.compile_c("src/utilities/mmio")
     self.compile_c("src/utilities/mpi_comm_f2c")
+    self.compile_c("src/utilities/nvtx")
+    self.compile_c("src/utilities/omp_device")
     self.compile_c("src/utilities/prefix_sum")
     self.compile_c("src/utilities/printf")
     self.compile_c("src/utilities/qsort")
@@ -797,16 +878,11 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.compile_c("src/utilities/mpistubs")
     self.compile_c("src/utilities/qsplit")
     self.compile_c("src/utilities/random")
+    self.compile_c("src/utilities/state")
+    self.compile_c("src/utilities/stl_ops")
     self.compile_c("src/utilities/threading")
     self.compile_c("src/utilities/timer")
     self.compile_c("src/utilities/timing")
-    self.compile_c("src/utilities/device_utils")
-    self.compile_c("src/utilities/general")
-    self.compile_c("src/utilities/handle")
-    self.compile_c("src/utilities/int_array")
-    self.compile_c("src/utilities/memory")
-    self.compile_c("src/utilities/omp_device")
-    self.compile_c("src/utilities/nvtx")
 
     print("\nBuilding " + self.name + " " + self.version + " multivector sources...")
     self.cxxflags = self.baseflags + self.modeflags + self.extflags + self.outflags
@@ -824,8 +900,8 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.cxxflags += ' /I"./' + self.dir + '/src/utilities"'
     self.compile_c("src/krylov/bicgstab")
     self.compile_c("src/krylov/cgnr")
-    self.compile_c("src/krylov/gmres")
     self.compile_c("src/krylov/cogmres")
+    self.compile_c("src/krylov/gmres")
     self.compile_c("src/krylov/flexgmres")
     self.compile_c("src/krylov/lgmres")
     self.compile_c("src/krylov/HYPRE_bicgstab")
@@ -843,6 +919,7 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.cxxflags = self.baseflags + self.modeflags + self.extflags + self.outflags
     self.cxxflags += ' /I"./' + self.dir + '/src/seq_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/utilities"'
+    self.compile_c("src/seq_mv/csr_filter")
     self.compile_c("src/seq_mv/csr_matop")
     self.compile_c("src/seq_mv/csr_matrix")
     self.compile_c("src/seq_mv/csr_matvec")
@@ -853,7 +930,6 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.compile_c("src/seq_mv/HYPRE_vector")
     self.compile_c("src/seq_mv/mapped_matrix")
     self.compile_c("src/seq_mv/multiblock_matrix")
-    self.compile_c("src/seq_mv/vector")
     self.compile_c("src/seq_mv/vector_batched")
     #self.compile_c("src/seq_mv/csr_matop_device")
     #self.compile_c("src/seq_mv/csr_matrix_cuda_utils")
@@ -891,19 +967,29 @@ class ThirdPartyHypre(ThirdPartyPackage):
     #self.compile_c("src/seq_mv/csr_spgemm_device_util")
     #self.compile_c("src/seq_mv/csr_spmv_device")
     #self.compile_c("src/seq_mv/csr_sptrans_device")
+    self.compile_c("src/seq_mv/vector")
     #self.compile_c("src/seq_mv/vector_device")
+
+    print("\nBuilding " + self.name + " " + self.version + " seq_block_mv sources...")
+    self.cxxflags = self.baseflags + self.modeflags + self.extflags + self.outflags
+    self.cxxflags += ' /I"./' + self.dir + '/src/seq_block_mv"'
+    self.cxxflags += ' /I"./' + self.dir + '/src/seq_mv"'
+    self.cxxflags += ' /I"./' + self.dir + '/src/utilities"'
+    self.compile_c("src/seq_block_mv/dense_block_matrix")
+    self.compile_c("src/seq_block_mv/dense_block_matmult")
 
     print("\nBuilding " + self.name + " " + self.version + " parcsr_mv sources...")
     self.cxxflags = self.baseflags + self.modeflags + self.extflags + self.outflags
+    self.cxxflags += ' /I"./' + self.dir + '/src/seq_block_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/parcsr_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/blas"'
     self.cxxflags += ' /I"./' + self.dir + '/src/lapack"'
     self.cxxflags += ' /I"./' + self.dir + '/src/utilities"'
     self.cxxflags += ' /I"./' + self.dir + '/src/seq_mv"'
     self.compile_c("src/parcsr_mv/communicationT")
+    self.compile_c("src/parcsr_mv/gen_fffc")
     self.compile_c("src/parcsr_mv/HYPRE_parcsr_matrix")
     self.compile_c("src/parcsr_mv/HYPRE_parcsr_vector")
-    self.compile_c("src/parcsr_mv/gen_fffc")
     self.compile_c("src/parcsr_mv/new_commpkg")
     self.compile_c("src/parcsr_mv/numbers")
     self.compile_c("src/parcsr_mv/par_csr_aat")
@@ -911,15 +997,20 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.compile_c("src/parcsr_mv/par_csr_bool_matop")
     self.compile_c("src/parcsr_mv/par_csr_bool_matrix")
     self.compile_c("src/parcsr_mv/par_csr_communication")
+    self.compile_c("src/parcsr_mv/par_csr_filter")
+    #self.compile_c("src/parcsr_mv/par_csr_filter_device")
     self.compile_c("src/parcsr_mv/par_csr_matop")
     self.compile_c("src/parcsr_mv/par_csr_matrix")
-    self.compile_c("src/parcsr_mv/par_csr_matvec")
+    self.compile_c("src/parcsr_mv/par_csr_matrix_stats")
+    self.compile_c("src/parcsr_mv/par_csr_matmat")
+    #self.compile_c("src/parcsr_mv/par_csr_matmat_device")
     self.compile_c("src/parcsr_mv/par_csr_matop_marked")
-    self.compile_c("src/parcsr_mv/par_csr_triplemat")
-    self.compile_c("src/parcsr_mv/par_make_system")
+    self.compile_c("src/parcsr_mv/par_csr_matvec")
+    #self.compile_c("src/parcsr_mv/par_csr_matvec_device")
     self.compile_c("src/parcsr_mv/par_vector")
     self.compile_c("src/parcsr_mv/par_vector_batched")
-    #self.compile_c("src/parcsr_mv/par_csr_matvec_device")
+    self.compile_c("src/parcsr_mv/par_make_system")
+    self.compile_c("src/parcsr_mv/par_csr_triplemat")
     #self.compile_c("src/parcsr_mv/par_csr_fffc_device")
     #self.compile_c("src/parcsr_mv/par_csr_matop_device")
     #self.compile_c("src/parcsr_mv/par_csr_triplemat_device")
@@ -930,6 +1021,7 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.cxxflags += ' /I"./' + self.dir + '/src/parcsr_block_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/utilities"'
     self.cxxflags += ' /I"./' + self.dir + '/src/multivector"'
+    self.cxxflags += ' /I"./' + self.dir + '/src/seq_block_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/seq_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/parcsr_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/parcsr_ls"'
@@ -952,11 +1044,12 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.cxxflags += ' /I"./' + self.dir + '/src/utilities"'
     self.cxxflags += ' /I"./' + self.dir + '/src/parcsr_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/seq_mv"'
+    self.cxxflags += ' /I"./' + self.dir + '/src/seq_block_mv"'
     self.compile_c("src/distributed_matrix/distributed_matrix")
-    self.compile_c("src/distributed_matrix/HYPRE_distributed_matrix")
     self.compile_c("src/distributed_matrix/distributed_matrix_ISIS")
-    self.compile_c("src/distributed_matrix/distributed_matrix_PETSc")
     self.compile_c("src/distributed_matrix/distributed_matrix_parcsr")
+    self.compile_c("src/distributed_matrix/distributed_matrix_PETSc")
+    self.compile_c("src/distributed_matrix/HYPRE_distributed_matrix")
 
     print("\nBuilding " + self.name + " " + self.version + " IJ_mv sources...")
     self.cxxflags = self.baseflags + self.modeflags + self.extflags + self.outflags
@@ -964,6 +1057,7 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.cxxflags += ' /I"./' + self.dir + '/src/utilities"'
     self.cxxflags += ' /I"./' + self.dir + '/src/struct_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/seq_mv"'
+    self.cxxflags += ' /I"./' + self.dir + '/src/seq_block_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/parcsr_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/parcsr_ls"'
     self.compile_c("src/IJ_mv/aux_parcsr_matrix")
@@ -984,6 +1078,7 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.cxxflags += ' /I"./' + self.dir + '/src/utilities"'
     self.cxxflags += ' /I"./' + self.dir + '/src/distributed_matrix"'
     self.cxxflags += ' /I"./' + self.dir + '/src/seq_mv"'
+    self.cxxflags += ' /I"./' + self.dir + '/src/seq_block_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/parcsr_mv"'
     self.compile_c("src/matrix_matrix/HYPRE_ConvertParCSRMatrixToDistributedMatrix")
     self.compile_c("src/matrix_matrix/HYPRE_ConvertPETScMatrixToDistributedMatrix")
@@ -998,6 +1093,7 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.cxxflags += ' /I"./' + self.dir + '/src/multivector"'
     self.cxxflags += ' /I"./' + self.dir + '/src/krylov"'
     self.cxxflags += ' /I"./' + self.dir + '/src/seq_mv"'
+    self.cxxflags += ' /I"./' + self.dir + '/src/seq_block_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/parcsr_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/distributed_matrix"'
     self.cxxflags += ' /I"./' + self.dir + '/src/matrix_matrix"'
@@ -1018,13 +1114,13 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.compile_c("src/parcsr_ls/HYPRE_parcsr_lgmres")
     self.compile_c("src/parcsr_ls/HYPRE_parcsr_hybrid")
     self.compile_c("src/parcsr_ls/HYPRE_parcsr_int")
-    self.compile_c("src/parcsr_ls/HYPRE_parcsr_mgr")
     self.compile_c("src/parcsr_ls/HYPRE_parcsr_ilu")
-    self.compile_c("src/parcsr_ls/HYPRE_parcsr_fsai")
+    self.compile_c("src/parcsr_ls/HYPRE_parcsr_mgr")
     self.compile_c("src/parcsr_ls/HYPRE_parcsr_ParaSails")
     self.compile_c("src/parcsr_ls/HYPRE_parcsr_pcg")
     self.compile_c("src/parcsr_ls/HYPRE_parcsr_pilut")
     self.compile_c("src/parcsr_ls/HYPRE_parcsr_schwarz")
+    self.compile_c("src/parcsr_ls/HYPRE_parcsr_fsai")
     self.compile_c("src/parcsr_ls/HYPRE_ams")
     self.compile_c("src/parcsr_ls/HYPRE_ads")
     self.compile_c("src/parcsr_ls/HYPRE_ame")
@@ -1032,48 +1128,60 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.compile_c("src/parcsr_ls/par_amg")
     self.compile_c("src/parcsr_ls/par_amgdd")
     self.compile_c("src/parcsr_ls/par_amgdd_comp_grid")
-    self.compile_c("src/parcsr_ls/par_amgdd_setup")
     self.compile_c("src/parcsr_ls/par_amgdd_solve")
-    self.compile_c("src/parcsr_ls/par_amgdd_fac_cycle")
     self.compile_c("src/parcsr_ls/par_amgdd_helpers")
+    self.compile_c("src/parcsr_ls/par_amgdd_fac_cycle")
+    self.compile_c("src/parcsr_ls/par_amgdd_setup")
+    self.compile_c("src/parcsr_ls/par_amg_setup")
     self.compile_c("src/parcsr_ls/par_amg_solve")
     self.compile_c("src/parcsr_ls/par_amg_solveT")
-    self.compile_c("src/parcsr_ls/par_fsai")
-    self.compile_c("src/parcsr_ls/par_fsai_setup")
-    self.compile_c("src/parcsr_ls/par_fsai_solve")
     self.compile_c("src/parcsr_ls/par_cg_relax_wt")
     self.compile_c("src/parcsr_ls/par_coarsen")
     self.compile_c("src/parcsr_ls/par_cgc_coarsen")
     self.compile_c("src/parcsr_ls/par_cheby")
+    #self.compile_c("src/parcsr_ls/par_cheby_device")
     self.compile_c("src/parcsr_ls/par_coarse_parms")
+    #self.compile_c("src/parcsr_ls/par_coarse_parms_device")
     self.compile_c("src/parcsr_ls/par_coordinates")
     self.compile_c("src/parcsr_ls/par_cr")
     self.compile_c("src/parcsr_ls/par_cycle")
     self.compile_c("src/parcsr_ls/par_add_cycle")
     self.compile_c("src/parcsr_ls/par_difconv")
+    self.compile_c("src/parcsr_ls/par_fsai")
+    #self.compile_c("src/parcsr_ls/par_fsai_device")
+    self.compile_c("src/parcsr_ls/par_fsai_setup")
+    self.compile_c("src/parcsr_ls/par_fsai_solve")
     self.compile_c("src/parcsr_ls/par_gauss_elim")
+    #self.compile_c("src/parcsr_ls/par_ge_device")
     self.compile_c("src/parcsr_ls/par_gsmg")
     self.compile_c("src/parcsr_ls/par_indepset")
     self.compile_c("src/parcsr_ls/par_interp")
     self.compile_c("src/parcsr_ls/par_jacobi_interp")
     self.compile_c("src/parcsr_ls/par_krylov_func")
     self.compile_c("src/parcsr_ls/par_mod_lr_interp")
-    self.compile_c("src/parcsr_ls/par_multi_interp")
     self.compile_c("src/parcsr_ls/par_mod_multi_interp")
-    self.compile_c("src/parcsr_ls/par_laplace")
+    self.compile_c("src/parcsr_ls/par_multi_interp")
     self.compile_c("src/parcsr_ls/par_laplace_27pt")
     self.compile_c("src/parcsr_ls/par_laplace_9pt")
+    self.compile_c("src/parcsr_ls/par_laplace")
     self.compile_c("src/parcsr_ls/par_lr_interp")
     self.compile_c("src/parcsr_ls/par_mgr")
+    self.compile_c("src/parcsr_ls/par_mgr_coarsen")
+    self.compile_c("src/parcsr_ls/par_mgr_interp")
+    self.compile_c("src/parcsr_ls/par_mgr_rap")
     self.compile_c("src/parcsr_ls/par_mgr_setup")
     self.compile_c("src/parcsr_ls/par_mgr_solve")
+    self.compile_c("src/parcsr_ls/par_mgr_stats")
     self.compile_c("src/parcsr_ls/par_nongalerkin")
     self.compile_c("src/parcsr_ls/par_nodal_systems")
     self.compile_c("src/parcsr_ls/par_rap")
     self.compile_c("src/parcsr_ls/par_rap_communication")
     self.compile_c("src/parcsr_ls/par_rotate_7pt")
+    self.compile_c("src/parcsr_ls/par_vardifconv")
+    self.compile_c("src/parcsr_ls/par_vardifconv_rs")
     self.compile_c("src/parcsr_ls/par_relax")
     self.compile_c("src/parcsr_ls/par_relax_more")
+    #self.compile_c("src/parcsr_ls/par_relax_more_device")
     self.compile_c("src/parcsr_ls/par_relax_interface")
     self.compile_c("src/parcsr_ls/par_scaled_matnorm")
     self.compile_c("src/parcsr_ls/par_schwarz")
@@ -1081,30 +1189,25 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.compile_c("src/parcsr_ls/par_strength")
     self.compile_c("src/parcsr_ls/par_sv_interp")
     self.compile_c("src/parcsr_ls/par_sv_interp_ln")
-    self.compile_c("src/parcsr_ls/par_vardifconv")
-    self.compile_c("src/parcsr_ls/par_vardifconv_rs")
     self.compile_c("src/parcsr_ls/partial")
     self.compile_c("src/parcsr_ls/schwarz")
     self.compile_c("src/parcsr_ls/block_tridiag")
+    self.compile_c("src/parcsr_ls/ams")
+    self.compile_c("src/parcsr_ls/ads")
+    self.compile_c("src/parcsr_ls/ame")
     self.compile_c("src/parcsr_ls/par_restr")
     self.compile_c("src/parcsr_ls/par_lr_restr")
-    self.compile_c("src/parcsr_ls/dsuperlu")
-    self.compile_c("src/parcsr_ls/ads")
-    self.compile_c("src/parcsr_ls/ams")
-    self.compile_c("src/parcsr_ls/ame")
-    self.compile_c("src/parcsr_ls/par_amg_setup")
     self.compile_c("src/parcsr_ls/par_ilu")
     self.compile_c("src/parcsr_ls/par_ilu_setup")
+    #self.compile_c("src/parcsr_ls/par_ilu_setup_device")
     self.compile_c("src/parcsr_ls/par_ilu_solve")
-    #self.compile_c("src/parcsr_ls/par_cheby_device")
-    #self.compile_c("src/parcsr_ls/par_relax_more_device")
+    #self.compile_c("src/parcsr_ls/par_ilu_solve_device")
     #self.compile_c("src/parcsr_ls/par_coarsen_device")
-    #self.compile_c("src/parcsr_ls/par_coarse_parms_device")
     #self.compile_c("src/parcsr_ls/par_indepset_device")
     #self.compile_c("src/parcsr_ls/par_interp_device")
-    #self.compile_c("src/parcsr_ls/par_lr_restr_device")
     #self.compile_c("src/parcsr_ls/par_interp_trunc_device")
     #self.compile_c("src/parcsr_ls/par_lr_interp_device")
+    #self.compile_c("src/parcsr_ls/par_lr_restr_device")
     #self.compile_c("src/parcsr_ls/par_strength_device")
     #self.compile_c("src/parcsr_ls/par_strength2nd_device")
     #self.compile_c("src/parcsr_ls/par_amgdd_fac_cycle_device")
@@ -1129,17 +1232,17 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.compile_c("src/struct_mv/HYPRE_struct_stencil")
     self.compile_c("src/struct_mv/HYPRE_struct_vector")
     self.compile_c("src/struct_mv/project")
-    self.compile_c("src/struct_mv/struct_grid")
-    self.compile_c("src/struct_mv/struct_io")
-    self.compile_c("src/struct_mv/struct_matrix_mask")
-    self.compile_c("src/struct_mv/struct_stencil")
     self.compile_c("src/struct_mv/struct_axpy")
     self.compile_c("src/struct_mv/struct_communication")
     self.compile_c("src/struct_mv/struct_copy")
+    self.compile_c("src/struct_mv/struct_grid")
     self.compile_c("src/struct_mv/struct_innerprod")
+    self.compile_c("src/struct_mv/struct_io")
     self.compile_c("src/struct_mv/struct_matrix")
+    self.compile_c("src/struct_mv/struct_matrix_mask")
     self.compile_c("src/struct_mv/struct_matvec")
     self.compile_c("src/struct_mv/struct_scale")
+    self.compile_c("src/struct_mv/struct_stencil")
     self.compile_c("src/struct_mv/struct_vector")
 
     print("\nBuilding " + self.name + " " + self.version + " struct_ls sources...")
@@ -1150,59 +1253,59 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.cxxflags += ' /I"./' + self.dir + '/src/krylov"'
     self.cxxflags += ' /I"./' + self.dir + '/src/struct_mv"'
     self.compile_c("src/struct_ls/coarsen")
+    self.compile_c("src/struct_ls/cyclic_reduction")
     self.compile_c("src/struct_ls/hybrid")
     self.compile_c("src/struct_ls/HYPRE_struct_bicgstab")
     self.compile_c("src/struct_ls/HYPRE_struct_cycred")
-    self.compile_c("src/struct_ls/HYPRE_struct_flexgmres")
-    self.compile_c("src/struct_ls/HYPRE_struct_gmres")
     self.compile_c("src/struct_ls/HYPRE_struct_hybrid")
+    self.compile_c("src/struct_ls/HYPRE_struct_int")
     self.compile_c("src/struct_ls/HYPRE_struct_jacobi")
-    self.compile_c("src/struct_ls/HYPRE_struct_lgmres")
     self.compile_c("src/struct_ls/HYPRE_struct_pfmg")
     self.compile_c("src/struct_ls/HYPRE_struct_smg")
     self.compile_c("src/struct_ls/HYPRE_struct_sparse_msg")
+    self.compile_c("src/struct_ls/HYPRE_struct_pcg")
+    self.compile_c("src/struct_ls/HYPRE_struct_gmres")
+    self.compile_c("src/struct_ls/HYPRE_struct_flexgmres")
+    self.compile_c("src/struct_ls/HYPRE_struct_lgmres")
     self.compile_c("src/struct_ls/jacobi")
     self.compile_c("src/struct_ls/pcg_struct")
-    self.compile_c("src/struct_ls/pfmg")
-    self.compile_c("src/struct_ls/pfmg_relax")
-    self.compile_c("src/struct_ls/pfmg_setup_rap")
-    self.compile_c("src/struct_ls/pfmg_solve")
-    self.compile_c("src/struct_ls/semi")
-    self.compile_c("src/struct_ls/smg_relax")
-    self.compile_c("src/struct_ls/smg_setup")
-    self.compile_c("src/struct_ls/smg_setup_rap")
-    self.compile_c("src/struct_ls/smg_setup_restrict")
-    self.compile_c("src/struct_ls/smg_solve")
-    self.compile_c("src/struct_ls/sparse_msg")
-    self.compile_c("src/struct_ls/sparse_msg_setup")
-    self.compile_c("src/struct_ls/sparse_msg_setup_rap")
-    self.compile_c("src/struct_ls/sparse_msg_solve")
-    self.compile_c("src/struct_ls/cyclic_reduction")
-    self.compile_c("src/struct_ls/HYPRE_struct_int")
-    self.compile_c("src/struct_ls/HYPRE_struct_pcg")
     self.compile_c("src/struct_ls/pfmg2_setup_rap")
     self.compile_c("src/struct_ls/pfmg3_setup_rap")
+    self.compile_c("src/struct_ls/pfmg")
+    self.compile_c("src/struct_ls/pfmg_relax")
     self.compile_c("src/struct_ls/pfmg_setup")
     self.compile_c("src/struct_ls/pfmg_setup_interp")
     self.compile_c("src/struct_ls/pfmg_setup_rap5")
     self.compile_c("src/struct_ls/pfmg_setup_rap7")
+    self.compile_c("src/struct_ls/pfmg_setup_rap")
+    self.compile_c("src/struct_ls/pfmg_solve")
     self.compile_c("src/struct_ls/point_relax")
     self.compile_c("src/struct_ls/red_black_constantcoef_gs")
     self.compile_c("src/struct_ls/red_black_gs")
+    self.compile_c("src/struct_ls/semi")
     self.compile_c("src/struct_ls/semi_interp")
     self.compile_c("src/struct_ls/semi_restrict")
     self.compile_c("src/struct_ls/semi_setup_rap")
     self.compile_c("src/struct_ls/smg2_setup_rap")
     self.compile_c("src/struct_ls/smg3_setup_rap")
-    self.compile_c("src/struct_ls/smg")
     self.compile_c("src/struct_ls/smg_axpy")
+    self.compile_c("src/struct_ls/smg")
+    self.compile_c("src/struct_ls/smg_relax")
     self.compile_c("src/struct_ls/smg_residual")
+    self.compile_c("src/struct_ls/smg_setup")
     self.compile_c("src/struct_ls/smg_setup_interp")
+    self.compile_c("src/struct_ls/smg_setup_rap")
+    self.compile_c("src/struct_ls/smg_setup_restrict")
+    self.compile_c("src/struct_ls/smg_solve")
     self.compile_c("src/struct_ls/sparse_msg2_setup_rap")
     self.compile_c("src/struct_ls/sparse_msg3_setup_rap")
+    self.compile_c("src/struct_ls/sparse_msg")
     self.compile_c("src/struct_ls/sparse_msg_filter")
     self.compile_c("src/struct_ls/sparse_msg_interp")
     self.compile_c("src/struct_ls/sparse_msg_restrict")
+    self.compile_c("src/struct_ls/sparse_msg_setup")
+    self.compile_c("src/struct_ls/sparse_msg_setup_rap")
+    self.compile_c("src/struct_ls/sparse_msg_solve")
 
     print("\nBuilding " + self.name + " " + self.version + " sstruct_mv sources...")
     self.cxxflags = self.baseflags + self.modeflags + self.extflags + self.outflags
@@ -1210,6 +1313,7 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.cxxflags += ' /I"./' + self.dir + '/src/utilities"'
     self.cxxflags += ' /I"./' + self.dir + '/src/struct_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/seq_mv"'
+    self.cxxflags += ' /I"./' + self.dir + '/src/seq_block_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/parcsr_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/IJ_mv"'
     self.compile_c("src/sstruct_mv/HYPRE_sstruct_graph")
@@ -1222,10 +1326,10 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.compile_c("src/sstruct_mv/sstruct_graph")
     self.compile_c("src/sstruct_mv/sstruct_grid")
     self.compile_c("src/sstruct_mv/sstruct_innerprod")
+    self.compile_c("src/sstruct_mv/sstruct_matrix")
     self.compile_c("src/sstruct_mv/sstruct_matvec")
     self.compile_c("src/sstruct_mv/sstruct_scale")
     self.compile_c("src/sstruct_mv/sstruct_stencil")
-    self.compile_c("src/sstruct_mv/sstruct_matrix")
     self.compile_c("src/sstruct_mv/sstruct_vector")
 
     print("\nBuilding " + self.name + " " + self.version + " sstruct_ls sources...")
@@ -1236,6 +1340,7 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.cxxflags += ' /I"./' + self.dir + '/src/krylov"'
     self.cxxflags += ' /I"./' + self.dir + '/src/struct_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/seq_mv"'
+    self.cxxflags += ' /I"./' + self.dir + '/src/seq_block_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/parcsr_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/IJ_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/parcsr_block_mv"'
@@ -1254,14 +1359,19 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.compile_c("src/sstruct_ls/HYPRE_sstruct_sys_pfmg")
     self.compile_c("src/sstruct_ls/bsearch")
     self.compile_c("src/sstruct_ls/fac")
+    self.compile_c("src/sstruct_ls/fac_amr_rap")
+    self.compile_c("src/sstruct_ls/fac_amr_fcoarsen")
     self.compile_c("src/sstruct_ls/fac_amr_zero_data")
     self.compile_c("src/sstruct_ls/fac_cf_coarsen")
     self.compile_c("src/sstruct_ls/fac_cfstencil_box")
     self.compile_c("src/sstruct_ls/fac_CFInterfaceExtents")
     self.compile_c("src/sstruct_ls/fac_interp2")
     self.compile_c("src/sstruct_ls/fac_relax")
+    self.compile_c("src/sstruct_ls/fac_restrict2")
+    self.compile_c("src/sstruct_ls/fac_setup2")
     self.compile_c("src/sstruct_ls/fac_solve3")
     self.compile_c("src/sstruct_ls/fac_zero_cdata")
+    self.compile_c("src/sstruct_ls/fac_zero_stencilcoef")
     self.compile_c("src/sstruct_ls/krylov")
     self.compile_c("src/sstruct_ls/krylov_sstruct")
     self.compile_c("src/sstruct_ls/eliminate_rowscols")
@@ -1276,6 +1386,7 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.compile_c("src/sstruct_ls/maxwell_TV_setup")
     self.compile_c("src/sstruct_ls/maxwell_zeroBC")
     self.compile_c("src/sstruct_ls/nd1_amge_interpolation")
+    self.compile_c("src/sstruct_ls/node_relax")
     self.compile_c("src/sstruct_ls/sstruct_amr_intercommunication")
     self.compile_c("src/sstruct_ls/sstruct_owninfo")
     self.compile_c("src/sstruct_ls/sstruct_recvinfo")
@@ -1289,12 +1400,6 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.compile_c("src/sstruct_ls/sys_pfmg_solve")
     self.compile_c("src/sstruct_ls/sys_semi_interp")
     self.compile_c("src/sstruct_ls/sys_semi_restrict")
-    self.compile_c("src/sstruct_ls/fac_amr_fcoarsen")
-    self.compile_c("src/sstruct_ls/fac_amr_rap")
-    self.compile_c("src/sstruct_ls/fac_restrict2")
-    self.compile_c("src/sstruct_ls/fac_setup2")
-    self.compile_c("src/sstruct_ls/fac_zero_stencilcoef")
-    self.compile_c("src/sstruct_ls/node_relax")
 
     print("\nBuilding " + self.name + " " + self.version + " distributed_ls/pilut sources...")
     self.cxxflags = self.baseflags + self.modeflags + self.extflags + self.outflags
@@ -1343,6 +1448,7 @@ class ThirdPartyHypre(ThirdPartyPackage):
     self.cxxflags += ' /I"./' + self.dir + '/src/utilities"'
     self.cxxflags += ' /I"./' + self.dir + '/src/parcsr_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/seq_mv"'
+    self.cxxflags += ' /I"./' + self.dir + '/src/seq_block_mv"'
     self.cxxflags += ' /I"./' + self.dir + '/src/distributed_matrix"'
     self.compile_c("src/distributed_ls/Euclid/blas_dh")
     self.compile_c("src/distributed_ls/Euclid/Euclid_apply")
@@ -1389,9 +1495,9 @@ class ThirdPartyParMETIS(ThirdPartyPackage):
   def __init__(self):
     super().__init__()
     self.name = "ParMETIS"
-    self.version = "4.0.3"
-    self.date = "2013-03-30"
-    self.file = "parmetis-" + self.version + ".tar.gz"
+    self.version = "4.0.3.1_aio"
+    self.date = "2025-04-29"
+    self.file = "ParMETIS-" + self.version + ".zip"
     self.dir = self.name + "-" + self.version
     self.trunk = "."
     self.need_mpi = True
@@ -1399,10 +1505,10 @@ class ThirdPartyParMETIS(ThirdPartyPackage):
       "ParMETIS has a rather restrictive license, which is the first one shown here. Additionally,\n" +\
       "ParMETIS relies on METIS. which has its own license, which is the second license shown below\n\n"
     self.license_files = ["LICENSE.txt", os.path.join("metis", "LICENSE.txt")]
-    self.url = "http://glaros.dtc.umn.edu/gkhome/fetch/sw/parmetis/" + self.file
-    self.page = "http://glaros.dtc.umn.edu/gkhome/metis/parmetis/overview"
+    self.url = "https://github.com/tudo-math-ls3/ParMETIS/archive/refs/tags/v" + self.version + ".zip"
+    self.page = "https://github.com/KarypisLab/ParMETIS"
     self.baseflags += " /DUSE_GKREGEX"
-    self.baseflags += ' /wd"4028" /wd"4018" /wd"4101" /wd"4102" /wd"4244" /wd"4267" /wd"4305" /wd"4996"'
+    self.baseflags += ' /wd"4028" /wd"4018" /wd"4101" /wd"4102" /wd"4244" /wd"4267" /wd"4305" /wd"4334" /wd"4996"'
 
   def info(self):
     #      123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-
@@ -1422,103 +1528,115 @@ class ThirdPartyParMETIS(ThirdPartyPackage):
   def patch(self):
     print("\nPatching " + self.name + " " + self.version + " sources...")
     # remove some outdated MS-specific preprocessor mumbo-jumbo
-    self.patch_file(os.path.join("metis", "GKlib", "gk_arch.h"), [
-      [35, '#include "ms_stdint.h"', '  #include <stdint.h>'],
-      [36, '#include "ms_inttypes.h"', '  #include <inttypes.h>'],
-      [48, '', '#if defined(_WIN32) && !defined(WIN32)\n  #define WIN32\n#endif'],
-      [61, '#ifdef __MSC__', '#if 0'],
-      [70, '', '#ifdef __MSC__\n#define __thread __declspec(thread)\n#endif']
+    self.patch_file(os.path.join("GKlib", "gk_arch.h"), [
+      [35, '#include "gk_ms_stdint.h"', '  #include <stdint.h>'],
+      [36, '#include "gk_ms_inttypes.h"', '  #include <inttypes.h>'],
+      [60, '', '#ifdef __MSC__\n#define __thread __declspec(thread)\n#endif'],
+      [66, '#ifndef INFINITY', '#if 0']
     ])
     # patch some broken pointer casts
-    self.patch_file(os.path.join("metis", "GKlib", "gkregex.c"), [
+    self.patch_file(os.path.join("GKlib", "gkregex.c"), [
       [5089, 'postorder (elem, mark_opt_subexp, (void *) (long) elem->token.opr.idx);',
          '    postorder (elem, mark_opt_subexp, (void *) (intptr_t) elem->token.opr.idx);'],
       [6301, 'int idx = (int) (long) extra;', '  int idx = (int) (intptr_t) extra;']
     ])
-    # patch more outdated MS-specific preprocessor mumbo-jumbo
+    # patch POSIX file read
+    self.patch_file(os.path.join("GKlib", "io.c"), [
+      [18, '', '#include <io.h>'],
+      [63, 'if ((rsize = read(fd, buf, tsize)) == -1)', 'if ((rsize = _read(fd, buf, tsize)) == -1)'],
+      [84, 'if ((size = write(fd, buf, tsize)) == -1)', 'if ((size = _write(fd, buf, tsize)) == -1)']
+    ])
+    # set index and real types
     self.patch_file(os.path.join("metis", "include", "metis.h"), [
-      [66, '#ifdef COMPILER_MSC', '#if 0 /*def COMPILER_MSC*/']
+      [33, '//#define IDXTYPEWIDTH 32', '#define IDXTYPEWIDTH 64'],
+      [43, '//#define REALTYPEWIDTH 32', '#define REALTYPEWIDTH 64'],
+      [75, '#define INT32_MIN    ((int32_t)_I32_MIN)', '//#define INT32_MIN    ((int32_t)_I32_MIN)'],
+      [76, '#define INT32_MAX    _I32_MAX', '//#define INT32_MAX    _I32_MAX'],
+      [77, '#define INT64_MIN    ((int64_t)_I64_MIN)', '//#define INT64_MIN    ((int64_t)_I64_MIN)'],
+      [78, '#define INT64_MAX    _I64_MAX', '//#define INT64_MAX    _I64_MAX']
     ])
 
   def build(self):
     if not self.prepare():
       return
     print("\nBuilding " + self.name + " " + self.version + " GKlib sources...")
-    self.extflags = ' /I"./' + os.path.join(self.dir, "metis", "GKlib") + '"'
+    self.extflags = ' /I"./' + os.path.join(self.dir, "GKlib") + '"'
     self.cxxflags = self.baseflags + self.modeflags + self.extflags + self.outflags
-    self.compile_c("metis/GKlib/b64")
-    self.compile_c("metis/GKlib/blas")
-    self.compile_c("metis/GKlib/csr")
-    self.compile_c("metis/GKlib/error")
-    self.compile_c("metis/GKlib/evaluate")
-    self.compile_c("metis/GKlib/fkvkselect")
-    self.compile_c("metis/GKlib/fs")
-    self.compile_c("metis/GKlib/getopt")
-    self.compile_c("metis/GKlib/gkregex")
-    self.compile_c("metis/GKlib/graph")
-    self.compile_c("metis/GKlib/htable")
-    self.compile_c("metis/GKlib/io")
-    self.compile_c("metis/GKlib/itemsets")
-    self.compile_c("metis/GKlib/mcore")
-    self.compile_c("metis/GKlib/memory")
-    self.compile_c("metis/GKlib/omp")
-    self.compile_c("metis/GKlib/pdb")
-    self.compile_c("metis/GKlib/pqueue")
-    self.compile_c("metis/GKlib/random")
-    self.compile_c("metis/GKlib/rw")
-    self.compile_c("metis/GKlib/seq")
-    self.compile_c("metis/GKlib/sort")
-    self.compile_c("metis/GKlib/string")
-    self.compile_c("metis/GKlib/timers")
-    self.compile_c("metis/GKlib/tokenizer")
-    self.compile_c("metis/GKlib/util")
+    self.compile_c("GKlib/win32/adapt")
+    self.compile_c("GKlib/b64")
+    self.compile_c("GKlib/blas")
+    self.compile_c("GKlib/cache")
+    self.compile_c("GKlib/csr")
+    self.compile_c("GKlib/error")
+    self.compile_c("GKlib/evaluate")
+    self.compile_c("GKlib/fkvkselect")
+    self.compile_c("GKlib/fs")
+    self.compile_c("GKlib/getopt")
+    self.compile_c("GKlib/gkregex")
+    self.compile_c("GKlib/gk_util")
+    self.compile_c("GKlib/graph")
+    self.compile_c("GKlib/htable")
+    self.compile_c("GKlib/io")
+    self.compile_c("GKlib/itemsets")
+    self.compile_c("GKlib/mcore")
+    self.compile_c("GKlib/memory")
+    self.compile_c("GKlib/pqueue")
+    self.compile_c("GKlib/random")
+    self.compile_c("GKlib/rw")
+    self.compile_c("GKlib/seq")
+    self.compile_c("GKlib/sort")
+    self.compile_c("GKlib/string")
+    self.compile_c("GKlib/timers")
+    self.compile_c("GKlib/tokenizer")
+
     print("\nBuilding " + self.name + " " + self.version + " METIS sources...")
     self.extflags  = ' /I"./' + os.path.join(self.dir, "metis", "include") + '"'
     self.extflags += ' /I"./' + os.path.join(self.dir, "metis", "libmetis") + '"'
-    self.extflags += ' /I"./' + os.path.join(self.dir, "metis", "GKlib") + '"'
+    self.extflags += ' /I"./' + os.path.join(self.dir, "GKlib") + '"'
     self.cxxflags = self.baseflags + self.modeflags + self.extflags + self.outflags
-    self.compile_c("metis/libmetis/auxapi")
-    self.compile_c("metis/libmetis/balance")
-    self.compile_c("metis/libmetis/bucketsort")
-    self.compile_c("metis/libmetis/checkgraph")
-    self.compile_c("metis/libmetis/coarsen")
-    self.compile_c("metis/libmetis/compress")
-    self.compile_c("metis/libmetis/contig")
-    self.compile_c("metis/libmetis/debug")
-    self.compile_c("metis/libmetis/fm")
-    self.compile_c("metis/libmetis/fortran")
-    self.compile_c("metis/libmetis/frename")
-    self.compile_c("metis/libmetis/gklib")
-    self.compile_c("metis/libmetis/graph")
-    self.compile_c("metis/libmetis/initpart")
-    self.compile_c("metis/libmetis/kmetis")
-    self.compile_c("metis/libmetis/kwayfm")
-    self.compile_c("metis/libmetis/kwayrefine")
-    self.compile_c("metis/libmetis/mcutil")
-    self.compile_c("metis/libmetis/mesh")
-    self.compile_c("metis/libmetis/meshpart")
-    self.compile_c("metis/libmetis/minconn")
-    self.compile_c("metis/libmetis/mincover")
-    self.compile_c("metis/libmetis/mmd")
-    self.compile_c("metis/libmetis/ometis")
-    self.compile_c("metis/libmetis/options")
-    self.compile_c("metis/libmetis/parmetis")
-    self.compile_c("metis/libmetis/pmetis")
-    self.compile_c("metis/libmetis/refine")
-    self.compile_c("metis/libmetis/separator")
-    self.compile_c("metis/libmetis/sfm")
-    self.compile_c("metis/libmetis/srefine")
-    self.compile_c("metis/libmetis/stat")
-    self.compile_c("metis/libmetis/timing")
-    self.compile_c("metis/libmetis/util")
-    self.compile_c("metis/libmetis/wspace")
+    self.compile_c("METIS/libmetis/auxapi")
+    self.compile_c("METIS/libmetis/balance")
+    self.compile_c("METIS/libmetis/bucketsort")
+    self.compile_c("METIS/libmetis/checkgraph")
+    self.compile_c("METIS/libmetis/coarsen")
+    self.compile_c("METIS/libmetis/compress")
+    self.compile_c("METIS/libmetis/contig")
+    self.compile_c("METIS/libmetis/debug")
+    self.compile_c("METIS/libmetis/fm")
+    self.compile_c("METIS/libmetis/fortran")
+    self.compile_c("METIS/libmetis/frename")
+    self.compile_c("METIS/libmetis/gklib")
+    self.compile_c("METIS/libmetis/graph")
+    self.compile_c("METIS/libmetis/initpart")
+    self.compile_c("METIS/libmetis/kmetis")
+    self.compile_c("METIS/libmetis/kwayfm")
+    self.compile_c("METIS/libmetis/kwayrefine")
+    self.compile_c("METIS/libmetis/mcutil")
+    self.compile_c("METIS/libmetis/mesh")
+    self.compile_c("METIS/libmetis/meshpart")
+    self.compile_c("METIS/libmetis/minconn")
+    self.compile_c("METIS/libmetis/mincover")
+    self.compile_c("METIS/libmetis/mmd")
+    self.compile_c("METIS/libmetis/ometis")
+    self.compile_c("METIS/libmetis/options")
+    self.compile_c("METIS/libmetis/parmetis")
+    self.compile_c("METIS/libmetis/pmetis")
+    self.compile_c("METIS/libmetis/refine")
+    self.compile_c("METIS/libmetis/separator")
+    self.compile_c("METIS/libmetis/sfm")
+    self.compile_c("METIS/libmetis/srefine")
+    self.compile_c("METIS/libmetis/stat")
+    self.compile_c("METIS/libmetis/timing")
+    self.compile_c("METIS/libmetis/util")
+    self.compile_c("METIS/libmetis/wspace")
+
     print("\nBuilding " + self.name + " " + self.version + " ParMETIS sources...")
     self.extflags  = ' /I"' + os.path.join(path_mpi, "Include") + '"'
     self.extflags += ' /I"./' + os.path.join(self.dir, "include") + '"'
     self.extflags += ' /I"./' + os.path.join(self.dir, "libparmetis") + '"'
     self.extflags += ' /I"./' + os.path.join(self.dir, "metis", "include") + '"'
     self.extflags += ' /I"./' + os.path.join(self.dir, "metis", "libmetis") + '"'
-    self.extflags += ' /I"./' + os.path.join(self.dir, "metis", "GKlib") + '"'
+    self.extflags += ' /I"./' + os.path.join(self.dir, "GKlib") + '"'
     self.cxxflags = self.baseflags + self.modeflags + self.extflags + self.outflags
     self.compile_c("libparmetis/akwayfm")
     self.compile_c("libparmetis/ametis")
@@ -1529,6 +1647,7 @@ class ThirdPartyParMETIS(ThirdPartyPackage):
     self.compile_c("libparmetis/debug")
     self.compile_c("libparmetis/diffutil")
     self.compile_c("libparmetis/frename")
+    self.compile_c("libparmetis/gklib")
     self.compile_c("libparmetis/gkmetis")
     self.compile_c("libparmetis/gkmpi")
     self.compile_c("libparmetis/graph")
@@ -1559,10 +1678,87 @@ class ThirdPartyParMETIS(ThirdPartyPackage):
     self.compile_c("libparmetis/weird")
     self.compile_c("libparmetis/wspace")
     self.compile_c("libparmetis/xyzpart")
-
     self.link()
 
 packages["parmetis"] = ThirdPartyParMETIS()
+
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+# P M P  -  P M P   -  P M P   -  P M P   -  P M P   -  P M P   -  P M P   -  P M P   -  P M P   -  P M P   -  P M P   -
+########################################################################################################################
+########################################################################################################################
+########################################################################################################################
+
+class ThirdPartyPmp(ThirdPartyPackage):
+  def __init__(self):
+    super().__init__()
+    self.name = "pmp"
+    self.version = "3.0.0"
+    self.date = "2023-08-24"
+    self.file = self.name + "-library-" + self.version + ".zip"
+    self.dir = self.name + "-library-" + self.version
+    self.trunk = "."
+    self.license_files = ["LICENSE"]
+    self.url = "https://github.com/pmp-library/pmp-library/archive/refs/tags/" + self.version + ".zip"
+    self.page = "https://www.pmp-library.org"
+    self.baseflags += ' /wd"4244" /wd"4267" /wd"4305" /wd"4996"'
+    self.baseflags += ' /std:c++17 /D_USE_MATH_DEFINES'
+    self.baseflags += ' /I"./' + self.dir + '/src"'
+    self.baseflags += ' /I"./' + self.dir + '/external/eigen-3.4.0"'
+
+  def info(self):
+    #      123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-
+    print("The Polygon Mesh Processing Library is a modern C++ open-source library for processing and")
+    print("visualizing polygon surface meshes.")
+    print("")
+    print("Prerequisites/Constraints: none")
+    print("")
+    print("Installing this package defines the 'FEAT_HAVE_PMP' preprocessor macro.")
+    print("")
+    print("Visit the " + self.name + " homepage for more information:")
+    print(self.page)
+
+  def build(self):
+    if not self.prepare():
+      return
+    print("\nBuilding " + self.name + " " + self.version + " sources...")
+    self.compile_cpp("src/pmp/algorithms/curvature")
+    self.compile_cpp("src/pmp/algorithms/decimation")
+    self.compile_cpp("src/pmp/algorithms/differential_geometry")
+    self.compile_cpp("src/pmp/algorithms/distance_point_triangle")
+    self.compile_cpp("src/pmp/algorithms/fairing")
+    self.compile_cpp("src/pmp/algorithms/features")
+    self.compile_cpp("src/pmp/algorithms/geodesics")
+    self.compile_cpp("src/pmp/algorithms/hole_filling")
+    self.compile_cpp("src/pmp/algorithms/laplace")
+    self.compile_cpp("src/pmp/algorithms/normals")
+    self.compile_cpp("src/pmp/algorithms/numerics")
+    self.compile_cpp("src/pmp/algorithms/parameterization")
+    self.compile_cpp("src/pmp/algorithms/remeshing")
+    self.compile_cpp("src/pmp/algorithms/shapes")
+    self.compile_cpp("src/pmp/algorithms/smoothing")
+    self.compile_cpp("src/pmp/algorithms/subdivision")
+    self.compile_cpp("src/pmp/algorithms/triangulation")
+    self.compile_cpp("src/pmp/algorithms/utilities")
+    self.compile_cpp("src/pmp/io/io")
+    self.compile_cpp("src/pmp/io/read_obj")
+    self.compile_cpp("src/pmp/io/read_off")
+    self.compile_cpp("src/pmp/io/read_pmp")
+    self.compile_cpp("src/pmp/io/read_stl")
+    self.compile_cpp("src/pmp/io/write_obj")
+    self.compile_cpp("src/pmp/io/write_off")
+    self.compile_cpp("src/pmp/io/write_pmp")
+    self.compile_cpp("src/pmp/io/write_stl")
+    self.compile_cpp("src/pmp/surface_mesh")
+    #self.compile_cpp("src/pmp/visualization/mesh_viewer")
+    #self.compile_cpp("src/pmp/visualization/renderer")
+    #self.compile_cpp("src/pmp/visualization/shader")
+    #self.compile_cpp("src/pmp/visualization/trackball_viewer")
+    #self.compile_cpp("src/pmp/visualization/window")
+    self.link()
+
+packages["pmp"] = ThirdPartyPmp()
 
 ########################################################################################################################
 ########################################################################################################################
@@ -1576,8 +1772,8 @@ class ThirdPartySuiteSparse(ThirdPartyPackage):
   def __init__(self):
     super().__init__()
     self.name = "SuiteSparse"
-    self.version = "5.13.0"
-    self.date = "2022-08-25"
+    self.version = "7.10.2"
+    self.date = "2025-04-10"
     self.file = self.name + "-" + self.version + ".zip"
     self.dir = self.name + "-" + self.version
     self.trunk = "."
@@ -1587,8 +1783,9 @@ class ThirdPartySuiteSparse(ThirdPartyPackage):
     self.license_files = [os.path.join("AMD", "Doc", "License.txt"), os.path.join("UMFPACK", "Doc", "License.txt")]
     self.url = "https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v" + self.version + ".zip"
     self.page = "https://people.engr.tamu.edu/davis/suitesparse.html"
-    self.baseflags += ' /DNBLAS /DNCHOLMOD /D_MBCS'
-    self.baseflags += ' /wd"4068" /wd"4101" /wd"4244" /wd"4267" /wd"4996"'
+    self.baseflags += ' /DNBLAS /DNCHOLMOD /D_MBCS /DNTIMER'
+    self.baseflags += ' /wd"4018" /wd"4068" /wd"4101" /wd"4244" /wd"4267" /wd"4996"'
+    self.baseflags += ' /I"./' + self.dir + '/UMFPACK/Source"'
     self.baseflags += ' /I"./' + self.dir + '/UMFPACK/Include"'
     self.baseflags += ' /I"./' + self.dir + '/AMD/Include"'
     self.baseflags += ' /I"./' + self.dir + '/SuiteSparse_config"'
@@ -1608,123 +1805,221 @@ class ThirdPartySuiteSparse(ThirdPartyPackage):
     print("Visit the " + self.name + " homepage for more information:")
     print(self.page)
 
-  # compile 'DINT' and 'DLONG' version of source file
-  def compile_c_il(self, filename, extflags = "", extname = ""):
-    self.compile(filename + ".c", filename.replace("/","_") + extname + "_i.obj", extflags + ' /TC /DDINT')
-    self.compile(filename + ".c", filename.replace("/","_") + extname + "_l.obj", extflags + ' /TC /DDLONG')
-
   def build(self):
     if not self.prepare():
       return
     print("\nBuilding " + self.name + " " + self.version + " SuiteSparse_config sources...")
     self.compile_c("SuiteSparse_config/SuiteSparse_config")
     print("\nBuilding " + self.name + " " + self.version + " AMD sources...")
-    self.compile_c("AMD/Source/amd_global")
-    self.compile_c_il("AMD/Source/amd_aat")
-    self.compile_c_il("AMD/Source/amd_1")
-    self.compile_c_il("AMD/Source/amd_2")
-    self.compile_c_il("AMD/Source/amd_dump")
-    self.compile_c_il("AMD/Source/amd_postorder")
-    self.compile_c_il("AMD/Source/amd_post_tree")
-    self.compile_c_il("AMD/Source/amd_defaults")
-    self.compile_c_il("AMD/Source/amd_order")
-    self.compile_c_il("AMD/Source/amd_control")
-    self.compile_c_il("AMD/Source/amd_info")
-    self.compile_c_il("AMD/Source/amd_valid")
-    self.compile_c_il("AMD/Source/amd_preprocess")
+    self.compile_c("AMD/Source/amd_1")
+    self.compile_c("AMD/Source/amd_2")
+    self.compile_c("AMD/Source/amd_aat")
+    self.compile_c("AMD/Source/amd_control")
+    self.compile_c("AMD/Source/amd_defaults")
+    self.compile_c("AMD/Source/amd_dump")
+    self.compile_c("AMD/Source/amd_info")
+    self.compile_c("AMD/Source/amd_l1")
+    self.compile_c("AMD/Source/amd_l2")
+    self.compile_c("AMD/Source/amd_l_aat")
+    self.compile_c("AMD/Source/amd_l_control")
+    self.compile_c("AMD/Source/amd_l_defaults")
+    self.compile_c("AMD/Source/amd_l_dump")
+    self.compile_c("AMD/Source/amd_l_info")
+    self.compile_c("AMD/Source/amd_l_order")
+    self.compile_c("AMD/Source/amd_l_postorder")
+    self.compile_c("AMD/Source/amd_l_post_tree")
+    self.compile_c("AMD/Source/amd_l_preprocess")
+    self.compile_c("AMD/Source/amd_l_valid")
+    self.compile_c("AMD/Source/amd_order")
+    self.compile_c("AMD/Source/amd_postorder")
+    self.compile_c("AMD/Source/amd_post_tree")
+    self.compile_c("AMD/Source/amd_preprocess")
+    self.compile_c("AMD/Source/amd_valid")
+    self.compile_c("AMD/Source/amd_version")
     print("\nBuilding " + self.name + " " + self.version + " UMFPACK sources...")
-    self.compile_c("UMFPACK/Source/umfpack_timer")
-    self.compile_c("UMFPACK/Source/umfpack_tictoc")
-    self.compile_c_il("UMFPACK/Source/umf_analyze")
-    self.compile_c_il("UMFPACK/Source/umf_apply_order")
-    self.compile_c_il("UMFPACK/Source/umf_colamd")
-    self.compile_c_il("UMFPACK/Source/umf_cholmod")
-    self.compile_c_il("UMFPACK/Source/umf_free")
-    self.compile_c_il("UMFPACK/Source/umf_fsize")
-    self.compile_c_il("UMFPACK/Source/umf_is_permutation")
-    self.compile_c_il("UMFPACK/Source/umf_malloc")
-    self.compile_c_il("UMFPACK/Source/umf_realloc")
-    self.compile_c_il("UMFPACK/Source/umf_report_perm")
-    self.compile_c_il("UMFPACK/Source/umf_singletons")
-    self.compile_c_il("UMFPACK/Source/umf_assemble")
-    self.compile_c_il("UMFPACK/Source/umf_blas3_update")
-    self.compile_c_il("UMFPACK/Source/umf_build_tuples")
-    self.compile_c_il("UMFPACK/Source/umf_create_element")
-    self.compile_c_il("UMFPACK/Source/umf_dump")
-    self.compile_c_il("UMFPACK/Source/umf_extend_front")
-    self.compile_c_il("UMFPACK/Source/umf_garbage_collection")
-    self.compile_c_il("UMFPACK/Source/umf_get_memory")
-    self.compile_c_il("UMFPACK/Source/umf_init_front")
-    self.compile_c_il("UMFPACK/Source/umf_kernel")
-    self.compile_c_il("UMFPACK/Source/umf_kernel_init")
-    self.compile_c_il("UMFPACK/Source/umf_kernel_wrapup")
-    self.compile_c_il("UMFPACK/Source/umf_local_search")
-    self.compile_c_il("UMFPACK/Source/umf_lsolve")
-    self.compile_c_il("UMFPACK/Source/umf_ltsolve")
-    self.compile_c_il("UMFPACK/Source/umf_mem_alloc_element")
-    self.compile_c_il("UMFPACK/Source/umf_mem_alloc_head_block")
-    self.compile_c_il("UMFPACK/Source/umf_mem_alloc_tail_block")
-    self.compile_c_il("UMFPACK/Source/umf_mem_free_tail_block")
-    self.compile_c_il("UMFPACK/Source/umf_mem_init_memoryspace")
-    self.compile_c_il("UMFPACK/Source/umf_report_vector")
-    self.compile_c_il("UMFPACK/Source/umf_row_search")
-    self.compile_c_il("UMFPACK/Source/umf_scale_column")
-    self.compile_c_il("UMFPACK/Source/umf_set_stats")
-    self.compile_c_il("UMFPACK/Source/umf_solve")
-    self.compile_c_il("UMFPACK/Source/umf_symbolic_usage")
-    self.compile_c_il("UMFPACK/Source/umf_transpose")
-    self.compile_c_il("UMFPACK/Source/umf_tuple_lengths")
-    self.compile_c_il("UMFPACK/Source/umf_usolve")
-    self.compile_c_il("UMFPACK/Source/umf_utsolve")
-    self.compile_c_il("UMFPACK/Source/umf_valid_numeric")
-    self.compile_c_il("UMFPACK/Source/umf_valid_symbolic")
-    self.compile_c_il("UMFPACK/Source/umf_grow_front")
-    self.compile_c_il("UMFPACK/Source/umf_start_front")
-    self.compile_c_il("UMFPACK/Source/umf_store_lu")
-    self.compile_c_il("UMFPACK/Source/umf_scale")
-    self.compile_c_il("UMFPACK/Source/umfpack_col_to_triplet")
-    self.compile_c_il("UMFPACK/Source/umfpack_defaults")
-    self.compile_c_il("UMFPACK/Source/umfpack_free_numeric")
-    self.compile_c_il("UMFPACK/Source/umfpack_free_symbolic")
-    self.compile_c_il("UMFPACK/Source/umfpack_get_numeric")
-    self.compile_c_il("UMFPACK/Source/umfpack_get_lunz")
-    self.compile_c_il("UMFPACK/Source/umfpack_get_symbolic")
-    self.compile_c_il("UMFPACK/Source/umfpack_get_determinant")
-    self.compile_c_il("UMFPACK/Source/umfpack_numeric")
-    self.compile_c_il("UMFPACK/Source/umfpack_qsymbolic")
-    self.compile_c_il("UMFPACK/Source/umfpack_report_control")
-    self.compile_c_il("UMFPACK/Source/umfpack_report_info")
-    self.compile_c_il("UMFPACK/Source/umfpack_report_matrix")
-    self.compile_c_il("UMFPACK/Source/umfpack_report_numeric")
-    self.compile_c_il("UMFPACK/Source/umfpack_report_perm")
-    self.compile_c_il("UMFPACK/Source/umfpack_report_status")
-    self.compile_c_il("UMFPACK/Source/umfpack_report_symbolic")
-    self.compile_c_il("UMFPACK/Source/umfpack_report_triplet")
-    self.compile_c_il("UMFPACK/Source/umfpack_report_vector")
-    self.compile_c_il("UMFPACK/Source/umfpack_solve")
-    self.compile_c_il("UMFPACK/Source/umfpack_symbolic")
-    self.compile_c_il("UMFPACK/Source/umfpack_transpose")
-    self.compile_c_il("UMFPACK/Source/umfpack_triplet_to_col")
-    self.compile_c_il("UMFPACK/Source/umfpack_scale")
-    self.compile_c_il("UMFPACK/Source/umfpack_load_numeric")
-    self.compile_c_il("UMFPACK/Source/umfpack_save_numeric")
-    self.compile_c_il("UMFPACK/Source/umfpack_load_symbolic")
-    self.compile_c_il("UMFPACK/Source/umfpack_save_symbolic")
-    # preprocessor abuse at its finest...
-    self.compile_c_il("UMFPACK/Source/umf_ltsolve")
-    self.compile_c_il("UMFPACK/Source/umf_ltsolve", " /DCONJUGATE_SOLVE", '_cs')
-    self.compile_c_il("UMFPACK/Source/umf_utsolve")
-    self.compile_c_il("UMFPACK/Source/umf_utsolve", " /DCONJUGATE_SOLVE", '_cs')
-    self.compile_c_il("UMFPACK/Source/umf_assemble")
-    self.compile_c_il("UMFPACK/Source/umf_assemble", '/DFIXQ', '_fixq')
-    self.compile_c_il("UMFPACK/Source/umf_store_lu")
-    self.compile_c_il("UMFPACK/Source/umf_store_lu", '/DDROP', '_drop')
-    self.compile_c_il("UMFPACK/Source/umfpack_solve")
-    self.compile_c_il("UMFPACK/Source/umfpack_solve", " /DWSOLVE", '_w')
-    self.compile_c_il("UMFPACK/Source/umf_triplet")
-    self.compile_c_il("UMFPACK/Source/umf_triplet", " /DDO_MAP", "_map_novalues")
-    self.compile_c_il("UMFPACK/Source/umf_triplet", " /DDO_VALUES", "_nomap_values")
-    self.compile_c_il("UMFPACK/Source/umf_triplet", " /DDO_MAP /DDO_VALUES", "_map_values")
+    self.compile_c("UMFPACK/Source2/umfpack_di_col_to_triplet")
+    self.compile_c("UMFPACK/Source2/umfpack_di_copy_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_di_copy_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_di_defaults")
+    self.compile_c("UMFPACK/Source2/umfpack_di_deserialize_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_di_deserialize_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_di_free_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_di_free_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_di_get_determinant")
+    self.compile_c("UMFPACK/Source2/umfpack_di_get_lunz")
+    self.compile_c("UMFPACK/Source2/umfpack_di_get_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_di_get_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_di_load_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_di_load_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_di_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_di_qsymbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_di_report_control")
+    self.compile_c("UMFPACK/Source2/umfpack_di_report_info")
+    self.compile_c("UMFPACK/Source2/umfpack_di_report_matrix")
+    self.compile_c("UMFPACK/Source2/umfpack_di_report_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_di_report_perm")
+    self.compile_c("UMFPACK/Source2/umfpack_di_report_status")
+    self.compile_c("UMFPACK/Source2/umfpack_di_report_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_di_report_triplet")
+    self.compile_c("UMFPACK/Source2/umfpack_di_report_vector")
+    self.compile_c("UMFPACK/Source2/umfpack_di_save_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_di_save_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_di_scale")
+    self.compile_c("UMFPACK/Source2/umfpack_di_serialize_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_di_serialize_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_di_solve")
+    self.compile_c("UMFPACK/Source2/umfpack_di_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_di_transpose")
+    self.compile_c("UMFPACK/Source2/umfpack_di_triplet_to_col")
+    self.compile_c("UMFPACK/Source2/umfpack_di_wsolve")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_col_to_triplet")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_copy_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_copy_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_defaults")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_deserialize_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_deserialize_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_free_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_free_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_get_determinant")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_get_lunz")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_get_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_get_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_load_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_load_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_qsymbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_report_control")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_report_info")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_report_matrix")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_report_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_report_perm")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_report_status")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_report_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_report_triplet")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_report_vector")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_save_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_save_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_scale")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_serialize_numeric")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_serialize_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_solve")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_symbolic")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_transpose")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_triplet_to_col")
+    self.compile_c("UMFPACK/Source2/umfpack_dl_wsolve")
+    self.compile_c("UMFPACK/Source2/umfpack_gn_tictoc")
+    self.compile_c("UMFPACK/Source2/umfpack_gn_timer")
+    self.compile_c("UMFPACK/Source2/umfpack_version")
+    self.compile_c("UMFPACK/Source2/umf_di_assemble")
+    self.compile_c("UMFPACK/Source2/umf_di_assemble_fixq")
+    self.compile_c("UMFPACK/Source2/umf_di_blas3_update")
+    self.compile_c("UMFPACK/Source2/umf_di_build_tuples")
+    self.compile_c("UMFPACK/Source2/umf_di_create_element")
+    self.compile_c("UMFPACK/Source2/umf_di_dump")
+    self.compile_c("UMFPACK/Source2/umf_di_extend_front")
+    self.compile_c("UMFPACK/Source2/umf_di_garbage_collection")
+    self.compile_c("UMFPACK/Source2/umf_di_get_memory")
+    self.compile_c("UMFPACK/Source2/umf_di_grow_front")
+    self.compile_c("UMFPACK/Source2/umf_di_init_front")
+    self.compile_c("UMFPACK/Source2/umf_di_kernel")
+    self.compile_c("UMFPACK/Source2/umf_di_kernel_init")
+    self.compile_c("UMFPACK/Source2/umf_di_kernel_wrapup")
+    self.compile_c("UMFPACK/Source2/umf_di_lhsolve")
+    self.compile_c("UMFPACK/Source2/umf_di_local_search")
+    self.compile_c("UMFPACK/Source2/umf_di_lsolve")
+    self.compile_c("UMFPACK/Source2/umf_di_ltsolve")
+    self.compile_c("UMFPACK/Source2/umf_di_mem_alloc_element")
+    self.compile_c("UMFPACK/Source2/umf_di_mem_alloc_head_block")
+    self.compile_c("UMFPACK/Source2/umf_di_mem_alloc_tail_block")
+    self.compile_c("UMFPACK/Source2/umf_di_mem_free_tail_block")
+    self.compile_c("UMFPACK/Source2/umf_di_mem_init_memoryspace")
+    self.compile_c("UMFPACK/Source2/umf_di_report_vector")
+    self.compile_c("UMFPACK/Source2/umf_di_row_search")
+    self.compile_c("UMFPACK/Source2/umf_di_scale")
+    self.compile_c("UMFPACK/Source2/umf_di_scale_column")
+    self.compile_c("UMFPACK/Source2/umf_di_set_stats")
+    self.compile_c("UMFPACK/Source2/umf_di_solve")
+    self.compile_c("UMFPACK/Source2/umf_di_start_front")
+    self.compile_c("UMFPACK/Source2/umf_di_store_lu")
+    self.compile_c("UMFPACK/Source2/umf_di_store_lu_drop")
+    self.compile_c("UMFPACK/Source2/umf_di_symbolic_usage")
+    self.compile_c("UMFPACK/Source2/umf_di_transpose")
+    self.compile_c("UMFPACK/Source2/umf_di_triplet_map_nox")
+    self.compile_c("UMFPACK/Source2/umf_di_triplet_map_x")
+    self.compile_c("UMFPACK/Source2/umf_di_triplet_nomap_nox")
+    self.compile_c("UMFPACK/Source2/umf_di_triplet_nomap_x")
+    self.compile_c("UMFPACK/Source2/umf_di_tuple_lengths")
+    self.compile_c("UMFPACK/Source2/umf_di_uhsolve")
+    self.compile_c("UMFPACK/Source2/umf_di_usolve")
+    self.compile_c("UMFPACK/Source2/umf_di_utsolve")
+    self.compile_c("UMFPACK/Source2/umf_di_valid_numeric")
+    self.compile_c("UMFPACK/Source2/umf_di_valid_symbolic")
+    self.compile_c("UMFPACK/Source2/umf_dl_assemble")
+    self.compile_c("UMFPACK/Source2/umf_dl_assemble_fixq")
+    self.compile_c("UMFPACK/Source2/umf_dl_blas3_update")
+    self.compile_c("UMFPACK/Source2/umf_dl_build_tuples")
+    self.compile_c("UMFPACK/Source2/umf_dl_create_element")
+    self.compile_c("UMFPACK/Source2/umf_dl_dump")
+    self.compile_c("UMFPACK/Source2/umf_dl_extend_front")
+    self.compile_c("UMFPACK/Source2/umf_dl_garbage_collection")
+    self.compile_c("UMFPACK/Source2/umf_dl_get_memory")
+    self.compile_c("UMFPACK/Source2/umf_dl_grow_front")
+    self.compile_c("UMFPACK/Source2/umf_dl_init_front")
+    self.compile_c("UMFPACK/Source2/umf_dl_kernel")
+    self.compile_c("UMFPACK/Source2/umf_dl_kernel_init")
+    self.compile_c("UMFPACK/Source2/umf_dl_kernel_wrapup")
+    self.compile_c("UMFPACK/Source2/umf_dl_lhsolve")
+    self.compile_c("UMFPACK/Source2/umf_dl_local_search")
+    self.compile_c("UMFPACK/Source2/umf_dl_lsolve")
+    self.compile_c("UMFPACK/Source2/umf_dl_ltsolve")
+    self.compile_c("UMFPACK/Source2/umf_dl_mem_alloc_element")
+    self.compile_c("UMFPACK/Source2/umf_dl_mem_alloc_head_block")
+    self.compile_c("UMFPACK/Source2/umf_dl_mem_alloc_tail_block")
+    self.compile_c("UMFPACK/Source2/umf_dl_mem_free_tail_block")
+    self.compile_c("UMFPACK/Source2/umf_dl_mem_init_memoryspace")
+    self.compile_c("UMFPACK/Source2/umf_dl_report_vector")
+    self.compile_c("UMFPACK/Source2/umf_dl_row_search")
+    self.compile_c("UMFPACK/Source2/umf_dl_scale")
+    self.compile_c("UMFPACK/Source2/umf_dl_scale_column")
+    self.compile_c("UMFPACK/Source2/umf_dl_set_stats")
+    self.compile_c("UMFPACK/Source2/umf_dl_solve")
+    self.compile_c("UMFPACK/Source2/umf_dl_start_front")
+    self.compile_c("UMFPACK/Source2/umf_dl_store_lu")
+    self.compile_c("UMFPACK/Source2/umf_dl_store_lu_drop")
+    self.compile_c("UMFPACK/Source2/umf_dl_symbolic_usage")
+    self.compile_c("UMFPACK/Source2/umf_dl_transpose")
+    self.compile_c("UMFPACK/Source2/umf_dl_triplet_map_nox")
+    self.compile_c("UMFPACK/Source2/umf_dl_triplet_map_x")
+    self.compile_c("UMFPACK/Source2/umf_dl_triplet_nomap_nox")
+    self.compile_c("UMFPACK/Source2/umf_dl_triplet_nomap_x")
+    self.compile_c("UMFPACK/Source2/umf_dl_tuple_lengths")
+    self.compile_c("UMFPACK/Source2/umf_dl_uhsolve")
+    self.compile_c("UMFPACK/Source2/umf_dl_usolve")
+    self.compile_c("UMFPACK/Source2/umf_dl_utsolve")
+    self.compile_c("UMFPACK/Source2/umf_dl_valid_numeric")
+    self.compile_c("UMFPACK/Source2/umf_dl_valid_symbolic")
+    self.compile_c("UMFPACK/Source2/umf_i_analyze")
+    self.compile_c("UMFPACK/Source2/umf_i_apply_order")
+    self.compile_c("UMFPACK/Source2/umf_i_cholmod")
+    self.compile_c("UMFPACK/Source2/umf_i_colamd")
+    self.compile_c("UMFPACK/Source2/umf_i_free")
+    self.compile_c("UMFPACK/Source2/umf_i_fsize")
+    self.compile_c("UMFPACK/Source2/umf_i_is_permutation")
+    self.compile_c("UMFPACK/Source2/umf_i_malloc")
+    self.compile_c("UMFPACK/Source2/umf_i_realloc")
+    self.compile_c("UMFPACK/Source2/umf_i_report_perm")
+    self.compile_c("UMFPACK/Source2/umf_i_singletons")
+    self.compile_c("UMFPACK/Source2/umf_l_analyze")
+    self.compile_c("UMFPACK/Source2/umf_l_apply_order")
+    self.compile_c("UMFPACK/Source2/umf_l_cholmod")
+    self.compile_c("UMFPACK/Source2/umf_l_colamd")
+    self.compile_c("UMFPACK/Source2/umf_l_free")
+    self.compile_c("UMFPACK/Source2/umf_l_fsize")
+    self.compile_c("UMFPACK/Source2/umf_l_is_permutation")
+    self.compile_c("UMFPACK/Source2/umf_l_malloc")
+    self.compile_c("UMFPACK/Source2/umf_l_realloc")
+    self.compile_c("UMFPACK/Source2/umf_l_report_perm")
+    self.compile_c("UMFPACK/Source2/umf_l_singletons")
     self.link()
 
 packages["suitesparse"] = ThirdPartySuiteSparse()
@@ -1741,8 +2036,8 @@ class ThirdPartySuperLU(ThirdPartyPackage):
   def __init__(self):
     super().__init__()
     self.name = "SuperLU"
-    self.version = "8.1.1"
-    self.date = "2022-10-01"
+    self.version = "9.1.0"
+    self.date = "2024-11-11"
     self.prefix = "_dist"
     self.file = self.name + self.prefix + "-" + self.version + ".zip"
     self.dir = self.name.lower() + self.prefix + "-" + self.version
@@ -1751,11 +2046,12 @@ class ThirdPartySuperLU(ThirdPartyPackage):
     self.license_files = ["License.txt"]
     self.url = "https://github.com/xiaoyeli/superlu_dist/archive/refs/tags/v" + self.version + ".zip"
     self.page = "https://github.com/xiaoyeli/superlu_dist"
-    self.baseflags += ' /wd"4996" /wd"4005" /wd"4013" /wd"4068" /wd"4101" /wd"4146" /wd"4244" /wd"4267" /wd"4305" /wd"4334" /wd"4477" /wd"4700" /wd"4715"'
+    self.baseflags += ' /wd"4996" /wd"4005" /wd"4013" /wd"4068" /wd"4101" /wd"4133" /wd"4146" /wd"4244" /wd"4267" /wd"4305" /wd"4334" /wd"4477" /wd"4700" /wd"4715"'
     if(path_mpi != None):
       self.baseflags += ' /I"' + os.path.join(path_mpi, "Include") + '"'
     self.baseflags += ' /I"./' + self.dir + '/CBLAS"'
     self.baseflags += ' /I"./' + self.dir + '/SRC"'
+    self.baseflags += ' /I"./' + self.dir + '/SRC/include"'
 
   def info(self):
     #      123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-
@@ -1774,12 +2070,31 @@ class ThirdPartySuperLU(ThirdPartyPackage):
 
   def patch(self):
     print("\nPatching " + self.name + " " + self.version + " sources...")
+    # write configure file
+    cfg_file = os.path.join(self.dir, "SRC", "superlu_dist_config.h")
+    if not os.path.isfile(cfg_file):
+      print("Writing Config Header '%s'..." % cfg_file)
+      fo = open(cfg_file, "wt")
+      fo.write("/* SuperLU_dist config header generated by FEAT3 'vc17-thirdparty.py' script */\n")
+      fo.write("#undef HAVE_CUDA\n")
+      fo.write("#undef HAVE_NVSHMEM\n")
+      fo.write("#undef HAVE_HIP\n")
+      fo.write("#undef HAVE_PARMETIS\n")
+      fo.write("#undef HAVE_COLAMD\n")
+      fo.write("#undef SLU_HAVE_LAPACK\n")
+      fo.write("#undef HAVE_COMBBLAS\n")
+      fo.write("#undef HAVE_MAGMA\n")
+      fo.write("#define XSDK_INDEX_SIZE 64\n")
+      fo.write("#if defined(XSDK_INDEX_SIZE) && (XSDK_INDEX_SIZE == 64)\n")
+      fo.write("#define _LONGINT 1\n")
+      fo.write("#endif\n")
+      fo.close()
     # don't use ParMETIS
-    self.patch_file(os.path.join("SRC", "superlu_dist_config.h"), [
-      [10, '#define HAVE_PARMETIS TRUE', '/* #undef HAVE_PARMETIS */'],
-    ])
+    #self.patch_file(os.path.join("SRC", "superlu_dist_config.h"), [
+    #  [10, '#define HAVE_PARMETIS TRUE', '/* #undef HAVE_PARMETIS */'],
+    #])
     # don't include unistd.h header
-    self.patch_file(os.path.join("SRC", "util.c"), [
+    self.patch_file(os.path.join("SRC", "prec-independent", "util.c"), [
       [25, '#include <unistd.h>', '/*#include <unistd.h>*/'],
     ])
 
@@ -1797,84 +2112,98 @@ class ThirdPartySuperLU(ThirdPartyPackage):
     self.compile_c("CBLAS/input_error_dist")
 
     print("\nBuilding " + self.name + " " + self.version + " sources...")
-    self.compile_c("SRC/sp_ienv")
-    self.compile_c("SRC/etree")
-    self.compile_c("SRC/sp_colorder")
-    self.compile_c("SRC/get_perm_c")
-    self.compile_c("SRC/mmd")
-    self.compile_c("SRC/comm")
-    self.compile_c("SRC/memory")
-    self.compile_c("SRC/util")
-    self.compile_c("SRC/gpu_api_utils")
-    self.compile_c("SRC/superlu_grid")
-    self.compile_c("SRC/pxerr_dist")
-    self.compile_c("SRC/superlu_timer")
-    self.compile_c("SRC/symbfact")
-    self.compile_c("SRC/psymbfact")
-    self.compile_c("SRC/psymbfact_util")
-    self.compile_c("SRC/get_perm_c_parmetis")
-    self.compile_c("SRC/mc64ad_dist")
-    self.compile_c("SRC/xerr_dist")
-    self.compile_c("SRC/smach_dist")
-    self.compile_c("SRC/dmach_dist")
-    self.compile_c("SRC/superlu_dist_version")
-    self.compile_c("SRC/comm_tree")
-    self.compile_c("SRC/superlu_grid3d")
-    self.compile_c("SRC/supernodal_etree")
-    self.compile_c("SRC/supernodalForest")
-    self.compile_c("SRC/trfAux")
-    self.compile_c("SRC/communication_aux")
-    self.compile_c("SRC/treeFactorization")
-    self.compile_c("SRC/sec_structs")
-    self.compile_c("SRC/wingetopt")
-    self.compile_c("SRC/dlangs_dist")
-    self.compile_c("SRC/dgsequ_dist")
-    self.compile_c("SRC/dlaqgs_dist")
-    self.compile_c("SRC/dutil_dist")
-    self.compile_c("SRC/dmemory_dist")
-    self.compile_c("SRC/dmyblas2_dist")
-    self.compile_c("SRC/dsp_blas2_dist")
-    self.compile_c("SRC/dsp_blas3_dist")
-    self.compile_c("SRC/pdgssvx")
-    self.compile_c("SRC/pdgssvx_ABglobal")
-    self.compile_c("SRC/dreadhb")
-    self.compile_c("SRC/dreadrb")
-    self.compile_c("SRC/dreadtriple")
-    self.compile_c("SRC/dreadtriple_noheader")
-    self.compile_c("SRC/dbinary_io")
-    self.compile_c("SRC/dreadMM")
-    self.compile_c("SRC/pdgsequ")
-    self.compile_c("SRC/pdlaqgs")
-    self.compile_c("SRC/dldperm_dist")
-    self.compile_c("SRC/pdlangs")
-    self.compile_c("SRC/pdutil")
-    self.compile_c("SRC/pdsymbfact_distdata")
-    self.compile_c("SRC/ddistribute")
-    self.compile_c("SRC/pddistribute")
-    self.compile_c("SRC/pdgstrf")
-    self.compile_c("SRC/dstatic_schedule")
-    self.compile_c("SRC/pdgstrf2")
-    self.compile_c("SRC/pdgstrs")
-    self.compile_c("SRC/pdgstrs1")
-    self.compile_c("SRC/pdgstrs_lsum")
-    self.compile_c("SRC/pdgstrs_Bglobal")
-    self.compile_c("SRC/pdgsrfs")
-    self.compile_c("SRC/pdgsmv")
-    self.compile_c("SRC/pdgsrfs_ABXglobal")
-    self.compile_c("SRC/pdgsmv_AXglobal")
-    self.compile_c("SRC/pdGetDiagU")
-    self.compile_c("SRC/pdgssvx3d")
-    self.compile_c("SRC/dnrformat_loc3d")
-    self.compile_c("SRC/pdgstrf3d")
-    self.compile_c("SRC/dtreeFactorization")
-    self.compile_c("SRC/dtreeFactorizationGPU")
-    self.compile_c("SRC/dgather")
-    self.compile_c("SRC/dscatter3d")
-    self.compile_c("SRC/pd3dcomm")
-    self.compile_c("SRC/dtrfAux")
-    self.compile_c("SRC/dcommunication_aux")
-    self.compile_c("SRC/dtrfCommWrapper")
-    self.compile_c("SRC/dsuperlu_blas")
+    self.compile_c("SRC/prec-independent/sp_ienv")
+    self.compile_c("SRC/prec-independent/etree")
+    self.compile_c("SRC/prec-independent/sp_colorder")
+    self.compile_c("SRC/prec-independent/get_perm_c")
+    self.compile_c("SRC/prec-independent/mmd")
+    self.compile_c("SRC/prec-independent/comm")
+    self.compile_c("SRC/prec-independent/memory")
+    self.compile_c("SRC/prec-independent/util")
+    self.compile_c("SRC/prec-independent/gpu_api_utils")
+    self.compile_c("SRC/prec-independent/superlu_grid")
+    self.compile_c("SRC/prec-independent/pxerr_dist")
+    self.compile_c("SRC/prec-independent/superlu_timer")
+    self.compile_c("SRC/prec-independent/symbfact")
+    self.compile_c("SRC/prec-independent/ilu_level_symbfact")
+    self.compile_c("SRC/prec-independent/psymbfact")
+    self.compile_c("SRC/prec-independent/psymbfact_util")
+    self.compile_c("SRC/prec-independent/get_perm_c_parmetis")
+    self.compile_c("SRC/prec-independent/mc64ad_dist")
+    self.compile_c("SRC/prec-independent/xerr_dist")
+    self.compile_c("SRC/prec-independent/smach_dist")
+    self.compile_c("SRC/prec-independent/dmach_dist")
+    self.compile_c("SRC/prec-independent/superlu_dist_version")
+    self.compile_c("SRC/prec-independent/comm_tree")
+    self.compile_c("SRC/prec-independent/superlu_grid3d")    ## 3D code
+    self.compile_c("SRC/prec-independent/supernodal_etree")
+    self.compile_c("SRC/prec-independent/supernodalForest")
+    self.compile_c("SRC/prec-independent/trfAux")
+    self.compile_c("SRC/prec-independent/communication_aux")
+    self.compile_c("SRC/prec-independent/treeFactorization")
+    self.compile_c("SRC/prec-independent/sec_structs")
+    self.compile_c("SRC/prec-independent/get_perm_c_batch")
+    self.compile_c("SRC/prec-independent/wingetopt")
+    self.compile_c("SRC/double/dsuperlu_blas")
+    self.compile_c("SRC/single/ssuperlu_blas")
+    self.compile_c("SRC/complex16/zsuperlu_blas")
+    self.compile_c("SRC/double/dlangs_dist")
+    self.compile_c("SRC/double/dgsequ_dist")
+    self.compile_c("SRC/double/dlaqgs_dist")
+    self.compile_c("SRC/double/dutil_dist")
+    self.compile_c("SRC/double/dmemory_dist")
+    self.compile_c("SRC/double/dmyblas2_dist")
+    self.compile_c("SRC/double/dsp_blas2_dist")
+    self.compile_c("SRC/double/dsp_blas3_dist")
+    self.compile_c("SRC/double/pdgssvx")
+    self.compile_c("SRC/double/pdgssvx_ABglobal")
+    self.compile_c("SRC/double/dreadhb")
+    self.compile_c("SRC/double/dreadrb")
+    self.compile_c("SRC/double/dreadtriple")
+    self.compile_c("SRC/double/dreadtriple_noheader")
+    self.compile_c("SRC/double/dbinary_io")
+    self.compile_c("SRC/double/dreadMM")
+    self.compile_c("SRC/double/pdgsequ")
+    self.compile_c("SRC/double/pdlaqgs")
+    self.compile_c("SRC/double/dldperm_dist")
+    self.compile_c("SRC/double/pdlangs")
+    self.compile_c("SRC/double/pdutil")
+    self.compile_c("SRC/double/pdsymbfact_distdata")
+    self.compile_c("SRC/double/ddistribute")
+    self.compile_c("SRC/double/pddistribute")
+    self.compile_c("SRC/double/pddistribute3d")
+    self.compile_c("SRC/double/d3DPartition")
+    self.compile_c("SRC/double/distCheckArray")
+    self.compile_c("SRC/double/pddistribute-aux3d")
+    self.compile_c("SRC/double/pdgstrf")
+    self.compile_c("SRC/double/dstatic_schedule")
+    self.compile_c("SRC/double/pdgstrf2")
+    self.compile_c("SRC/double/pdgstrs")
+    self.compile_c("SRC/double/pdgstrs3d")
+    self.compile_c("SRC/double/pdgstrs1")
+    self.compile_c("SRC/double/pdgstrs_lsum")
+    self.compile_c("SRC/double/pdgstrs_Bglobal")
+    self.compile_c("SRC/double/pdgsrfs")
+    self.compile_c("SRC/double/pdgsmv")
+    self.compile_c("SRC/double/pdgsrfs_ABXglobal")
+    self.compile_c("SRC/double/pdgsmv_AXglobal")
+    self.compile_c("SRC/double/pdGetDiagU")
+    self.compile_c("SRC/double/pdgssvx3d")     ## 3D code
+    self.compile_c("SRC/double/dssvx3dAux")
+    self.compile_c("SRC/double/dnrformat_loc3d")
+    self.compile_c("SRC/double/pdgstrf3d")
+    self.compile_c("SRC/double/dtreeFactorization")
+    self.compile_c("SRC/double/dtreeFactorizationGPU")
+    self.compile_c("SRC/double/dgather")
+    self.compile_c("SRC/double/dscatter3d")
+    self.compile_c("SRC/double/pd3dcomm")
+    self.compile_c("SRC/double/dtrfAux")
+    self.compile_c("SRC/double/dcommunication_aux")
+    self.compile_c("SRC/double/dtrfCommWrapper")
+    self.compile_c("SRC/double/dsuperlu_blas")
+    self.compile_c("SRC/double/pdgssvx3d_csc_batch") # batch in CSC format
+    self.compile_c("SRC/double/dequil_batch") # batch in CSC format
+    self.compile_c("SRC/double/dpivot_batch")
     self.link()
 
 packages["superlu"] = ThirdPartySuperLU()

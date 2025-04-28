@@ -283,6 +283,11 @@ void Runtime::initialize(int& argc, char**& argv)
 #else
         std::cout << "FEAT_HAVE_PARMETIS............: no\n";
 #endif
+#ifdef FEAT_HAVE_PMP
+        std::cout << "FEAT_HAVE_PMP.................: yes\n";
+#else
+        std::cout << "FEAT_HAVE_PMP.................: no\n";
+#endif
 #ifdef FEAT_HAVE_QUADMATH
         std::cout << "FEAT_HAVE_QUADMATH............: yes\n";
 #else

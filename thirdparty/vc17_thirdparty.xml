@@ -4,13 +4,15 @@
   <!-- Third-Party Library versions that we want to check for -->
   <!-- ############################################################################################################# -->
   <PropertyGroup Label="ThirdPartyVersions">
-    <VersionBoost>1_80_0</VersionBoost> <!-- boost uses underscores -->
-    <VersionCGAL>5.5.1</VersionCGAL>
+    <VersionAlglib>4.04.0</VersionAlglib>
+    <VersionBoost>1_88_0</VersionBoost> <!-- boost uses underscores -->
+    <VersionCGAL>6.0.1</VersionCGAL>
     <VersionFParser>4.5.2</VersionFParser>
-    <VersionHypre>2.26.0</VersionHypre>
-    <VersionParMetis>4.0.3</VersionParMetis>
-    <VersionSuiteSparse>5.13.0</VersionSuiteSparse>
-    <VersionSuperLU>8.1.1</VersionSuperLU>
+    <VersionHypre>2.33.0</VersionHypre>
+    <VersionParMetis>4.0.3.1_aio</VersionParMetis>
+    <VersionPmp>3.0.0</VersionPmp>
+    <VersionSuiteSparse>7.10.2</VersionSuiteSparse>
+    <VersionSuperLU>9.1.0</VersionSuperLU>
     <VersionTriangle>1.6</VersionTriangle>
     <VersionZfp>1.0.0</VersionZfp>
     <VersionZlib>1.3.1</VersionZlib>
@@ -30,12 +32,15 @@
   <!-- ############################################################################################################# -->
   <!-- Third-Party Library Detection -->
   <!-- ############################################################################################################# -->
+  <PropertyGroup Condition="Exists('$(FeatTPLLibPath)\alglib-$(VersionAlglib).vc17-$(FeatBuildMode)-$(FeatPlatform).lib')">
+    <FeatHaveAlglib>true</FeatHaveAlglib>
+  </PropertyGroup>
   <!-- Note: BOOST is a pure header library -->
   <PropertyGroup Condition="Exists('$(FeatTPLSrcPath)\boost_$(VersionBoost)\README.md')">
     <FeatHaveBoost>true</FeatHaveBoost>
   </PropertyGroup>
   <!-- Note: CGAL is a pure header library -->
-  <PropertyGroup Condition="Exists('$(FeatTPLSrcPath)\CGAL-$(VersionCGAL)\README')">
+  <PropertyGroup Condition="Exists('$(FeatTPLSrcPath)\CGAL-$(VersionCGAL)\README.md')">
     <FeatHaveCGAL>true</FeatHaveCGAL>
   </PropertyGroup>
   <PropertyGroup Condition="Exists('$(FeatTPLLibPath)\fparser-$(VersionFParser).vc17-$(FeatBuildMode)-$(FeatPlatform).lib')">
@@ -54,6 +59,9 @@
   <!-- Note: ParMETIS can only be used in combination with MPI -->
   <PropertyGroup Condition="Exists('$(FeatTPLLibPath)\ParMETIS-$(VersionParMetis).vc17-$(FeatBuildMode)-$(FeatPlatform).lib') And '$(EnableMPI)'=='true'">
     <FeatHaveParMetis>true</FeatHaveParMetis>
+  </PropertyGroup>
+  <PropertyGroup Condition="Exists('$(FeatTPLLibPath)\pmp-$(VersionPmp).vc17-$(FeatBuildMode)-$(FeatPlatform).lib')">
+    <FeatHavePmp>true</FeatHavePmp>
   </PropertyGroup>
   <PropertyGroup Condition="Exists('$(FeatTPLLibPath)\SuiteSparse-$(VersionSuiteSparse).vc17-$(FeatBuildMode)-$(FeatPlatform).lib')">
     <FeatHaveSuiteSparse>true</FeatHaveSuiteSparse>
@@ -80,6 +88,8 @@
   <!-- FEAT Third-Party Library pre-processor define list -->
   <!-- ############################################################################################################# -->
   <ItemGroup Label="FEAT Third-Party Defines">
+    <FeatTPLDef Condition="'$(FeatHaveAlglib)'=='true'"
+      Include="FEAT_HAVE_ALGLIB" />
     <FeatTPLDef Condition="'$(FeatHaveBoost)'=='true'"
       Include="FEAT_HAVE_BOOST" />
     <FeatTPLDef Condition="'$(FeatHaveCGAL)'=='true'"
@@ -92,6 +102,8 @@
       Include="FEAT_HAVE_HYPRE;HYPRE_SEQUENTIAL" />
     <FeatTPLDef Condition="'$(FeatHaveParMetis)'=='true'"
       Include="FEAT_HAVE_METIS;FEAT_HAVE_PARMETIS" />
+    <FeatTPLDef Condition="'$(FeatHavePmp)'=='true'"
+      Include="FEAT_HAVE_PMP" />
     <FeatTPLDef Condition="'$(FeatHaveSuiteSparse)'=='true'"
       Include="FEAT_HAVE_SUITESPARSE;FEAT_HAVE_UMFPACK" />
     <FeatTPLDef Condition="'$(FeatHaveSuperLU)'=='true'"
@@ -110,6 +122,8 @@
   <!-- FEAT Third-Party Library additional include directory list -->
   <!-- ############################################################################################################# -->
   <ItemGroup Label="FEAT Include Paths">
+    <FeatTPLInc Condition="'$(FeatHaveAlglib)'=='true'"
+      Include="$(FeatTPLSrcPath)\alglib-$(VersionAlglib)\alglib-cpp\src;" />
     <FeatTPLInc Condition="'$(FeatHaveBoost)'=='true'"
       Include="$(FeatTPLSrcPath)\boost_$(VersionBoost);" />
     <FeatTPLInc Condition="'$(FeatHaveCGAL)'=='true'"
@@ -119,13 +133,15 @@
     <FeatTPLInc Condition="'$(FeatHaveHypre)'=='true'"
       Include="$(FeatTPLSrcPath)\hypre-$(VersionHypre)\src;$(FeatTPLSrcPath)\hypre-$(VersionHypre)\src\krylov;$(FeatTPLSrcPath)\hypre-$(VersionHypre)\src\parcsr_ls;$(FeatTPLSrcPath)\hypre-$(VersionHypre)\src\utilities;$(FeatTPLSrcPath)\hypre-$(VersionHypre)\src\seq_mv;$(FeatTPLSrcPath)\hypre-$(VersionHypre)\src\parcsr_mv;$(FeatTPLSrcPath)\hypre-$(VersionHypre)\src\IJ_mv;$(FeatTPLSrcPath)\hypre-$(VersionHypre)\src\multivector;" />
     <FeatTPLInc Condition="'$(FeatHaveParmetis)'=='true'"
-      Include="$(FeatTPLSrcPath)\parmetis-$(VersionParMetis)\include;$(FeatTPLSrcPath)\parmetis-$(VersionParMetis)\metis\include;" />
+      Include="$(FeatTPLSrcPath)\ParMETIS-$(VersionParMetis)\include;$(FeatTPLSrcPath)\ParMETIS-$(VersionParMetis)\metis\include;" />
     <FeatTPLInc Condition="'$(FeatHaveSuperLU)'=='true'"
-      Include="$(FeatTPLSrcPath)\superlu_dist-$(VersionSuperLU)\SRC;" />
+      Include="$(FeatTPLSrcPath)\superlu_dist-$(VersionSuperLU)\SRC;$(FeatTPLSrcPath)\superlu_dist-$(VersionSuperLU)\SRC\include;" />
     <FeatTPLInc Condition="'$(FeatHaveTriangle)'=='true'"
       Include="$(FeatTPLSrcPath)\triangle-$(VersionTriangle);" />
     <FeatTPLInc Condition="'$(FeatHaveSuiteSparse)'=='true'"
       Include="$(FeatTPLSrcPath)\SuiteSparse-$(VersionSuiteSparse)\SuiteSparse_config;$(FeatTPLSrcPath)\SuiteSparse-$(VersionSuiteSparse)\AMD\Include;$(FeatTPLSrcPath)\SuiteSparse-$(VersionSuiteSparse)\UMFPACK\Include" />
+    <FeatTPLInc Condition="'$(FeatHavePmp)'=='true'"
+      Include="$(FeatTPLSrcPath)\pmp-library-$(VersionPmp)\include;" />
     <FeatTPLInc Condition="'$(FeatHaveZfp)'=='true'"
       Include="$(FeatTPLSrcPath)\zfp-$(VersionZfp)\include;" />
     <FeatTPLInc Condition="'$(FeatHaveZlib)'=='true'"
@@ -136,6 +152,8 @@
 
   <!-- FEAT additional library dependencies list -->
   <ItemGroup Label="FEAT Library Dependencies">
+    <FeatTPLDep Condition="'$(FeatHaveAlglib)'=='true'"
+      Include="alglib-$(VersionAlglib).vc17-$(FeatBuildMode)-$(FeatPlatform).lib" />
     <FeatTPLDep Condition="'$(FeatHaveFParser)'=='true'"
       Include="fparser-$(VersionFParser).vc17-$(FeatBuildMode)-$(FeatPlatform).lib" />
     <FeatTPLDep Condition="'$(FeatHaveHypre)'=='true' And '$(EnableMPI)'=='true'"
@@ -144,6 +162,8 @@
       Include="hypre-seq-$(VersionHypre).vc17-$(FeatBuildMode)-$(FeatPlatform).lib" />
     <FeatTPLDep Condition="'$(FeatHaveParMetis)'=='true'"
       Include="ParMETIS-$(VersionParMetis).vc17-$(FeatBuildMode)-$(FeatPlatform).lib" />
+    <FeatTPLDep Condition="'$(FeatHavePmp)'=='true'"
+      Include="pmp-$(VersionPmp).vc17-$(FeatBuildMode)-$(FeatPlatform).lib" />
     <FeatTPLDep Condition="'$(FeatHaveSuiteSparse)'=='true'"
       Include="SuiteSparse-$(VersionSuiteSparse).vc17-$(FeatBuildMode)-$(FeatPlatform).lib" />
     <FeatTPLDep Condition="'$(FeatHaveSuperLU)'=='true'"

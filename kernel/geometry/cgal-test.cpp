@@ -3,16 +3,17 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
-#include "kernel/util/math.hpp"
-#include <iomanip>
 #include <test_system/test_system.hpp>
+#include "kernel/util/math.hpp"
 #include <kernel/util/half.hpp>
 #include <kernel/util/random.hpp>
 
 #ifdef FEAT_HAVE_CGAL
 #include <kernel/geometry/cgal.hpp>
 
+#include <iomanip>
 #include <algorithm>
+
 #ifdef FEAT_HAVE_OMP
 #include "omp.h"
 #endif

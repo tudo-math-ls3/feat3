@@ -17,9 +17,10 @@
 #endif // FEAT_COMPILER_MICROSOFT
 
 FEAT_DISABLE_WARNINGS
+#define CGAL_NO_DEPRECATION_WARNINGS 1
 #include <CGAL/Simple_cartesian.h>
 #include <CGAL/AABB_tree.h>
-#include <CGAL/AABB_traits.h>
+#include <CGAL/AABB_traits.h> // deprecated in CGAL 6.x
 #include <CGAL/Polyhedron_3.h>
 #include <CGAL/boost/graph/graph_traits_Polyhedron_3.h>
 #include <CGAL/AABB_face_graph_triangle_primitive.h>
