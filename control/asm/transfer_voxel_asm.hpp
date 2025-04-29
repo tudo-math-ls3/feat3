@@ -183,10 +183,6 @@ namespace FEAT
         if (loc_prol.empty())
           Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol, space_f, space_c);
 
-          // if we need a truncation matrix, then compute its sparsity pattern now
-        if(trunc)
-          loc_trunc.transpose(loc_prol);
-
         // create local weight vectors
         auto loc_vec_weight_p = loc_prol.create_vector_l();
         auto loc_vec_weight_t = loc_prol.create_vector_r();
@@ -195,6 +191,10 @@ namespace FEAT
         loc_prol.format();
         loc_vec_weight_p.format();
         loc_vec_weight_t.format();
+
+        // if we need a truncation matrix, then compute its sparsity pattern now
+        if(trunc)
+          loc_trunc.transpose(loc_prol);
 
         // assemble prolongation matrix
         Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight_p, space_f, space_c, cubature);
@@ -375,10 +375,6 @@ namespace FEAT
         if (loc_prol.empty())
           Assembly::SymbolicAssembler::assemble_matrix_2lvl(loc_prol, space_f, space_c);
 
-        // if we need a truncation matrix, then compute its sparsity pattern now
-        if(trunc)
-          loc_trunc.transpose(loc_prol);
-
         // create local weight vector
         auto loc_vec_weight_p = loc_prol.create_vector_l();
         auto loc_vec_weight_t = loc_prol.create_vector_r();
@@ -387,6 +383,10 @@ namespace FEAT
         loc_prol.format();
         loc_vec_weight_p.format();
         loc_vec_weight_t.format();
+
+        // if we need a truncation matrix, then compute its sparsity pattern now
+        if(trunc)
+          loc_trunc.transpose(loc_prol);
 
         // assemble prolongation matrix
         Assembly::GridTransfer::assemble_prolongation(loc_prol, loc_vec_weight_p, space_f, space_c, cubature);
