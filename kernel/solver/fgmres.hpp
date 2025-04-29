@@ -338,6 +338,9 @@ namespace FEAT
               if((def_cur > this->_div_abs) || (def_cur > (this->_div_rel * this->_def_init)))
                 break;
 
+              // increase iteration count
+              ++this->_num_iter;
+
               // minimum number of iterations performed?
               if(!(this->_num_iter < this->_min_iter))
               {
@@ -352,9 +355,6 @@ namespace FEAT
               }
 
               // set our pseudo defect
-              // increase iteration count
-              ++this->_num_iter;
-
               // compute new defect
               this->_def_cur = def_cur;
 
