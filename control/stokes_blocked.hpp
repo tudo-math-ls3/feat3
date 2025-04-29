@@ -422,6 +422,7 @@ namespace FEAT
       {
         // assemble matrix structure
         Assembly::SymbolicAssembler::assemble_matrix_std1(this->matrix_a.local(), space_velo);
+        this->matrix_a.local().format();
       }
 
       template<typename SpacePres_>
@@ -429,6 +430,7 @@ namespace FEAT
       {
         // assemble matrix structure
         Assembly::SymbolicAssembler::assemble_matrix_std1(this->matrix_s.local(), space_pres);
+        this->matrix_s.local().format();
       }
 
       void compile_local_matrix_sys_type1()

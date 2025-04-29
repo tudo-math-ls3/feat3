@@ -568,8 +568,9 @@ namespace StokesVoxelYPipe
 #endif //  FEAT_HAVE_UMFPACK
       else
       {
-        auto cgsolver = Solver::new_jacobi_precond(lvl.matrix_sys, lvl.filter_sys, 1.0);
-        multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, cgsolver);
+        auto vanka = Solver::new_amavanka(local_matrices.at(i), lvl.filter_sys.local());
+        auto csolver = Solver::new_schwarz_precond(vanka, lvl.filter_sys);
+        multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, csolver);
       }
     }
 
