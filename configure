@@ -95,7 +95,7 @@ if len(sys.argv) > 1 and ("help" in sys.argv[1:] or "?" in sys.argv[1:]):
   print ("  - 'quadmath': enable libquadmath __float128 type (GCC only)")
   print ("  - 'half': enable CUDA half type (requires CUDA)")
   print ("")
-  print ("* Additional third-party libraries:")
+  print ("* Additional third-party libraries (TPL):")
   print ("- 'alglib': enable ALGLIB library TPL")
   print ("- 'boost': enable BOOST TPL")
   print ("- 'cgal': enable CGAL TPL, requires BOOST")
