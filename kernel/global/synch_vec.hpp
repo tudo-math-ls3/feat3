@@ -152,7 +152,7 @@ namespace FEAT
 #else
         _finished(other._finished)
       {
-        other->_finished = true;
+        other._finished = true;
       }
 #endif // FEAT_HAVE_MPI
 
@@ -172,10 +172,10 @@ namespace FEAT
         _send_bufs = std::forward<std::vector<BufferType>>(other._send_bufs);
         _recv_bufs = std::forward<std::vector<BufferType>>(other._recv_bufs);
 
-        other->_finished = true;
-        other->_comm = nullptr;
-        other->_target = nullptr;
-        other->_mirrors = nullptr;
+        other._finished = true;
+        other._comm = nullptr;
+        other._target = nullptr;
+        other._mirrors = nullptr;
 #else
         _finished = other._finished;
         other._finished = true;
