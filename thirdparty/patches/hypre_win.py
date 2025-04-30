@@ -13,8 +13,12 @@ patch_file(directory, os.path.join("src", "matrix_matrix", "HYPRE_ConvertPETScMa
   [15, '#include <gmalloc.h>', '/*#include <gmalloc.h>*/']
 ])
 
-# patch 32 vs 64 bit int issues in utilities
-patch_file(directory, os.path.join("src", "utilities", "_hypre_utilities.h"), [
-  #[2171, 'hypre_ulongint h64 = HYPRE_XXH_PRIME64_5 + sizeof(input);', '  hypre_ulonglongint h64 = HYPRE_XXH_PRIME64_5 + sizeof(input);'],
-  #[2173, 'hypre_ulongint k1 = input;', '  hypre_ulonglongint k1 = input;']
+# true and false are not ANSI-C keywords
+patch_file(directory, os.path.join("src", "distributed_ls", "pilut", "parilut.c"), [
+  [964, 'while (true) {', 'while (1) {'],
+  [1048, 'while (true) {', 'while (1) {']
+])
+patch_file(directory, os.path.join("src", "distributed_ls", "pilut", "trifactor.c"), [
+  [290, 'hypre_SetUpFactor( ddist, ldu, maxnz,   petotal, rind, imap, &maxsend,   true,', 'hypre_SetUpFactor( ddist, ldu, maxnz,   petotal, rind, imap, &maxsend, 1,'],
+  [307, 'hypre_SetUpFactor( ddist, ldu, maxnz,   petotal, rind, imap, &maxsend,   false,', 'hypre_SetUpFactor( ddist, ldu, maxnz,   petotal, rind, imap, &maxsend, 0,']
 ])

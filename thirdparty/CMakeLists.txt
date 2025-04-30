@@ -248,28 +248,30 @@ if(FEAT_HAVE_BOOST)
     # TODO: Raise minimum boost to 1.82? See https://github.com/boostorg/cmake/tree/7f5336b3bf8067bb40da4e8b9940c133271e938a
     # before targets are not correctly set
     if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(Boost 1.81 REQUIRED)
+      find_package(Boost 1.88 REQUIRED)
     else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(Boost 1.81)
+      find_package(Boost 1.88)
     endif(FEAT_NO_EXTERNAL_DOWNLOAD)
   endif()
 
   if(NOT Boost_FOUND)
     set(BOOST_INCLUDE_LIBRARIES graph heap logic)
+
+    # Make boost create Boost::boost target
+    set(BOOST_ENABLE_COMPATIBILITY_TARGETS ON)
     # Fetch Boost from the github repository. For some reason the github releases
     # contain a root CMakeLists.txt and the website releases do not.
     FetchContent_declare(
       Boost
-      URL https://github.com/boostorg/boost/releases/download/boost-1.81.0/boost-1.81.0.tar.xz
-      URL_HASH MD5=6cf0cdd797bca685910d527ae3c08cb3
-      PATCH_COMMAND python ${CMAKE_CURRENT_LIST_DIR}/patches/boost.py .
+      URL https://github.com/boostorg/boost/releases/download/boost-1.88.0/boost-1.88.0-cmake.tar.xz
+      URL_HASH MD5=3edffaacd2cfe63c240ef1b99497c74f
       UPDATE_DISCONNECTED ON
       # FIND_PACKAGE_ARGS CONFIG GLOBAL
       OVERRIDE_FIND_PACKAGE
       # EXCLUDE_FROM_ALL #TODO: probably a good idea
     )
     list(APPEND MAKE_AVAIL_LIST Boost)
-    find_package_override_helper(boost 1.81 AnyNewerVersion)
+    find_package_override_helper(boost 1.88 AnyNewerVersion)
   else()
     print_package_info(Boost)
   endif(NOT Boost_FOUND)
@@ -280,24 +282,24 @@ if(FEAT_HAVE_CGAL)
 
   if(FEAT_PREFER_EXTERNAL_TPL OR CGAL_DIR)
     if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(CGAL 5.5.5 CONFIG REQUIRED)
+      find_package(CGAL 6.0.1 CONFIG REQUIRED)
     else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(CGAL 5.5.5 CONFIG)
+      find_package(CGAL 6.0.1 CONFIG)
     endif(FEAT_NO_EXTERNAL_DOWNLOAD)
   endif()
 
   if(NOT CGAL_FOUND)
     FetchContent_declare(
       CGAL
-      URL https://github.com/CGAL/cgal/releases/download/v5.5.5/CGAL-5.5.5.tar.xz
-      URL_HASH MD5=f17ec1a7667a6ebb28137dedcd327b74
+      URL https://github.com/CGAL/cgal/releases/download/v6.0.1/CGAL-6.0.1.tar.xz
+      URL_HASH MD5=944c789615bff14a56d78b398ec2cc49
       SOURCE_SUBDIR Non-Existing # Use non-existing source dir to disable add_subdirectory call of MakeAvailable
       UPDATE_DISCONNECTED ON
       # FIND_PACKAGE_ARGS NAMES CGAL GLOBAL
       OVERRIDE_FIND_PACKAGE
     )
     list(APPEND MAKE_AVAIL_LIST CGAL)
-    find_package_override_helper(cgal 5.5.5 AnyNewerVersion)
+    find_package_override_helper(cgal 6.0.1 AnyNewerVersion)
   else()
     print_package_info(CGAL)
   endif(NOT CGAL_FOUND)
@@ -307,23 +309,23 @@ option(FEAT_HAVE_ALGLIB "Enable Alglib" OFF)
 if(FEAT_HAVE_ALGLIB)
   if(FEAT_PREFER_EXTERNAL_TPL OR Alglib_DIR)
     if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(Alglib 3.16.0 REQUIRED)
+      find_package(Alglib 4.04.0 REQUIRED)
     else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(Alglib 3.16.0)
+      find_package(Alglib 4.04.0)
     endif(FEAT_NO_EXTERNAL_DOWNLOAD)
   endif()
 
   if(NOT Alglib_FOUND)
     FetchContent_declare(
       Alglib
-      URL http://www.alglib.net/translator/re/alglib-3.16.0.cpp.gpl.zip
-      URL_HASH MD5=b12c3babddaa74ad634116a2bbed06a3
+      URL http://www.alglib.net/translator/re/alglib-4.04.0.cpp.gpl.zip
+      URL_HASH MD5=c9a6b38c9b41ef1121fb0b33c8228394
       UPDATE_DISCONNECTED ON
       # FIND_PACKAGE_ARGS NAMES Alglib GLOBAL
       OVERRIDE_FIND_PACKAGE
     )
     list(APPEND MAKE_AVAIL_LIST Alglib)
-    find_package_override_helper(alglib 3.16.0 AnyNewerVersion)
+    find_package_override_helper(alglib 4.04.0 AnyNewerVersion)
   else()
     print_package_info(Alglib)
   endif(NOT Alglib_FOUND)
