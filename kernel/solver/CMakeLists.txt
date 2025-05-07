@@ -69,6 +69,7 @@ set(test_list
   optimizer-test
   superlu-test
   umfpack-test
+  uzawa_bfbt-test
   vanka-test
   voxel_amavanka-test
 )
