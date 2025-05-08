@@ -62,7 +62,6 @@ namespace FEAT
           }
 
           // For each facet, find the cells sharing it
-          FEAT_PRAGMA_OMP(parallel for)
           for(Index k = 0; k < num_cells; ++k)
           {
             for(int j = 0; j < facet_idx.num_indices; ++j)
