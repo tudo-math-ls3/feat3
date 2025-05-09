@@ -21,7 +21,7 @@ PRIVATE
   feat-kernel-lafem feat-kernel-util feat-kernel-adjacency)
 
 if (FEAT_HAVE_UMFPACK)
-  find_package(UMFPACK 7.10.2 REQUIRED)
+  find_package(UMFPACK 6.3.5 REQUIRED)
   target_link_libraries(feat-kernel-solver PRIVATE SuiteSparse::UMFPACK)
 endif (FEAT_HAVE_UMFPACK)
 
