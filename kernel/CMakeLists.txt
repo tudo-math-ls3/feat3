@@ -29,6 +29,9 @@ if (FEAT_FINALIZE_RESETS_DEVICE)
   target_compile_definitions(feat-kernel-root PRIVATE FEAT_FINALIZE_RESETS_DEVICE)
 endif (FEAT_FINALIZE_RESETS_DEVICE)
 
+if (FEAT_TESTING_VC)
+  target_compile_definitions(feat-kernel-root PRIVATE FEAT_TESTING_VC)
+endif (FEAT_TESTING_VC)
 
 # feat-kernel-root and kernel-util have cyclic dependency
 target_link_libraries(feat-kernel-root PRIVATE feat-kernel-util)

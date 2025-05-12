@@ -214,6 +214,10 @@ if len(sys.argv) > 1 and ("help" in sys.argv[1:] or "?" in sys.argv[1:]):
   print ("--initial-cache-file=/path/to/initital/cache/file")
   print (" Provide a cmake pre-load script to populate the cache. Options defined therein overwrite all options defined by this configure script.")
   print ("")
+  print ("")
+  print ("--set-testing-vc")
+  print (" Sets flag so debug prompt is skipped in windows testing enviroment.")
+  print ("")
   print ("Note that the first gcc(g++) in $PATH is chosen as the cuda host compiler, if no other one is provided.")
   print ("Note that these additional options are only valid in build-id mode and not in guess mode.")
   sys.exit()
@@ -530,6 +534,10 @@ for option in extra_options:
   if option.startswith("--initial-cache-file="):
     unused_extra_options.remove(option)
     init_cache_file = option.replace("--initial-cache-file=", "", 1)
+
+  if option.startswith("--set-testing-vc"):
+    unused_extra_options.remove(option)
+    cmake_flags += " -DFEAT_TESTING_VC:BOOL=ON"
 
 
 # check for in-source configure
