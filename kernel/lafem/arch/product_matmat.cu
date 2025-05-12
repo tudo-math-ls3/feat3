@@ -197,7 +197,8 @@ void ProductMatMat::dsd_cuda(DT_ * r, const DT_ alpha, const DT_ beta, const DT_
   if (status != CUSPARSE_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsrmvex_buffersize failed with status code: " + stringify(cusparseGetErrorString(status)));
 
-  void* buffer = Util::cuda_malloc(buffer_size);
+  // void* buffer = Util::cuda_malloc(buffer_size);
+  void* buffer = Util::cuda_get_static_memory(buffer_size);
 
   status = cusparseSpMM(Util::Intern::cusparse_handle, trans, trans, &alpha, descr_x, descr_y, &beta, descr_r, ct, CUSPARSE_SPMM_CSR_ALG2, buffer);
   if (status != CUSPARSE_STATUS_SUCCESS)
@@ -206,7 +207,7 @@ void ProductMatMat::dsd_cuda(DT_ * r, const DT_ alpha, const DT_ beta, const DT_
   cusparseDestroyDnMat(descr_r);
   cusparseDestroySpMat(descr_x);
   cusparseDestroyDnMat(descr_y);
-  Util::cuda_free(buffer);
+  // Util::cuda_free(buffer);
 
   cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE

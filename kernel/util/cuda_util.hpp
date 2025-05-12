@@ -73,8 +73,10 @@ namespace FEAT
     void * cuda_malloc_managed(const Index bytes);
     void * cuda_malloc(const Index bytes);
     void * cuda_malloc_host(const Index bytes);
+    void * cuda_get_static_memory(const Index bytes);
     void cuda_free(void * address);
     void cuda_free_host(void * address);
+    void cuda_free_static_memory();
     void cuda_initialize(int rank, int ranks_per_node, int ranks_per_uma, int gpus_per_node);
     void cuda_finalize();
     NOINLINE void cuda_synchronize();

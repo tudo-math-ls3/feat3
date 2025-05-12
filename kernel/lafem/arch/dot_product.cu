@@ -11,6 +11,8 @@
 #include <kernel/util/cuda_util.hpp>
 #include <kernel/util/half.hpp>
 
+#include <kernel/util/memory_pool.hpp>
+
 // includes, CUDA
 #include <cublas_v2.h>
 
@@ -68,10 +70,11 @@ template double DotProduct::value_cuda(const double * const, const double * cons
 template <typename DT_>
 DT_ TripleDotProduct::value_cuda(const DT_ * const x, const DT_ * const y, const DT_ * const z, const Index size)
 {
-  DT_ * temp = (DT_*)Util::cuda_malloc(size * sizeof(DT_));
+  // DT_ * temp = (DT_*)Util::cuda_malloc(size * sizeof(DT_));
+  DT_ * temp = (DT_*)Util::cuda_get_static_memory(size * sizeof(DT_));
   ComponentProduct::value_cuda(temp, y, z, size);
   DT_ result = DotProduct::value_cuda(x, temp, size);
-  Util::cuda_free(temp);
+  // Util::cuda_free(temp);
 
   cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE

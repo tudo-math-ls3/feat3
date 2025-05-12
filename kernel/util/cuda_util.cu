@@ -130,6 +130,28 @@ void * FEAT::Util::cuda_malloc_host(const Index bytes)
   return memory;
 }
 
+void * FEAT::Util::cuda_get_static_memory(const Index bytes)
+{
+  if(Intern::cuda_workspace_size < bytes)
+  {
+    cudaFree(Intern::cuda_workspace);
+    auto status = cudaMalloc(&Intern::cuda_workspace, bytes);
+    if (status != cudaSuccess)
+      throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_get_static_memory allocation error\n" + stringify(cudaGetErrorString(status)));
+    if (Intern::cuda_workspace == nullptr)
+      throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_get_static_memory allocation error (null pointer returned)");
+    Intern::cuda_workspace_size = bytes;
+  }
+  return Intern::cuda_workspace;
+}
+
+void FEAT::Util::cuda_free_static_memory()
+{
+  cudaFree(Intern::cuda_workspace);
+  Intern::cuda_workspace_size = size_t(0u);
+  Intern::cuda_workspace = nullptr;
+}
+
 void FEAT::Util::cuda_free(void * address)
 {
   if (address == nullptr)
@@ -210,8 +232,8 @@ void FEAT::Util::cuda_finalize()
   delete[] Util::Intern::cublas_lt_algo_matmat;
   delete[] Util::Intern::cublas_lt_algo_matmat_initialized;
 
-  //if (cudaSuccess != cudaFree(Util::Intern::cuda_workspace))
-  //  throw InternalError(__func__, __FILE__, __LINE__, "cudaFree failed!");
+  if (cudaSuccess != cudaFree(Util::Intern::cuda_workspace))
+   throw InternalError(__func__, __FILE__, __LINE__, "cudaFree failed!");
 
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
