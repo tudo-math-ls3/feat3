@@ -147,7 +147,12 @@ void * FEAT::Util::cuda_get_static_memory(const Index bytes)
 
 void FEAT::Util::cuda_free_static_memory()
 {
-  cudaFree(Intern::cuda_workspace);
+  if (Intern::cuda_workspace == nullptr)
+    return;
+
+  auto status = cudaFree(Intern::cuda_workspace);
+  if (cudaSuccess != status)
+    throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_free_static_memory: cudaFree failed!\n" + stringify(cudaGetErrorString(status)));
   Intern::cuda_workspace_size = size_t(0u);
   Intern::cuda_workspace = nullptr;
 }
@@ -232,8 +237,7 @@ void FEAT::Util::cuda_finalize()
   delete[] Util::Intern::cublas_lt_algo_matmat;
   delete[] Util::Intern::cublas_lt_algo_matmat_initialized;
 
-  if (cudaSuccess != cudaFree(Util::Intern::cuda_workspace))
-   throw InternalError(__func__, __FILE__, __LINE__, "cudaFree failed!");
+  cuda_free_static_memory();
 
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)

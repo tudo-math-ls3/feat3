@@ -139,8 +139,10 @@ namespace FEAT
       template<typename DT_>
       void batch_invert_matrices(dim3 grid, dim3 block, Index num_macros, Index stride, Index uniform_mat_size, DT_* __restrict__ local, DT_* __restrict__ local_t, int* __restrict__ pivot, int* __restrict__ info_array)
       {
-        DT_** local_ptrs = (DT_**)Util::cuda_malloc(sizeof(DT_*)*num_macros);
-        DT_** local_t_ptrs = (DT_**)Util::cuda_malloc(sizeof(DT_*)*num_macros);
+        void* loc_ptr_wrapper = Util::cuda_get_static_memory(2u*sizeof(DT_*)*num_macros);
+        DT_** local_ptrs = static_cast<DT_**>(loc_ptr_wrapper);
+        DT_** local_t_ptrs = local_ptrs + num_macros;
+
 
         //set matrix ptr arrays
         Kernel::template set_batched_matrix_ptrs<DT_><<<grid, block>>>(local_ptrs, local, num_macros, stride);
@@ -151,9 +153,6 @@ namespace FEAT
         //and now call cublas kernels to invert our matrices
         cublas_getrfBatched(local_ptrs, pivot, info_array, num_macros, uniform_mat_size, uniform_mat_size);
         cublas_getriBatched(local_ptrs, local_t_ptrs, pivot, info_array, num_macros, uniform_mat_size, uniform_mat_size, uniform_mat_size);
-
-        Util::cuda_free((void*)local_t_ptrs);
-        Util::cuda_free((void*)local_ptrs);
       }
 
 
@@ -421,6 +420,7 @@ namespace FEAT
           Util::cuda_set_memory(local_t, DataType(0), num_macros*stride*stride);
           int* pivot = (int*)Util::cuda_malloc(num_macros*actual_matrix_size*sizeof(int));
           Util::cuda_set_memory(pivot, int(0), num_macros*stride);
+          // do NOT use static memory here, since the batch invert kernel also uses it
           int* info_array = (int*)Util::cuda_malloc(num_macros*sizeof(int));
           Util::cuda_set_memory(info_array, int(0), num_macros);
           // gather and invert

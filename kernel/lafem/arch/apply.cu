@@ -240,7 +240,6 @@ void Apply::csr_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, con
   if (status != CUSPARSE_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "cusparseSpMV_bufferSize failed with status code: " + stringify(cusparseGetErrorString(status)));
 
-  // void* buffer = Util::cuda_malloc(buffer_size);
   void* buffer = Util::cuda_get_static_memory(buffer_size);
 
   status = cusparseSpMV(Util::Intern::cusparse_handle, trans, &a, descr, dx, &b, dr, ct, CUSPARSE_SPMV_CSR_ALG1, buffer);
@@ -250,7 +249,6 @@ void Apply::csr_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, con
   cusparseDestroySpMat(descr);
   cusparseDestroyDnVec(dx);
   cusparseDestroyDnVec(dr);
-  // Util::cuda_free(buffer);
 
   cudaDeviceSynchronize();
 #ifdef FEAT_DEBUG_MODE
