@@ -220,6 +220,8 @@ def detect_cpu():
         cputype = "alder-lake"
       elif model == 158:
         cputype = "coffee-lake"
+      elif model == 183:
+        cputype = "raptor-lake"
     elif cpu_family == 7:
       cputype ="itanium"
     elif cpu_family == 15:

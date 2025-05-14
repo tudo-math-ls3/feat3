@@ -193,6 +193,11 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
           cxxflags += " -march=cascadelake -m64"
         else:
           cxxflags += " -march=skylake -m64"
+    elif cpu == "raptor-lake":
+      if major >= 13:
+        cxxflags += " -march=raptorlake -m64"
+      else:
+        cxxflags += " -march=skylake -m64"
     elif cpu == "sapphirerapids":
       cxxflags += " -march=sapphirerapids -m64"
     elif cpu == "alder-lake":
