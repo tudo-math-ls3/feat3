@@ -8,7 +8,6 @@ find_path(superlu_INCLUDE_DIR NAMES superlu_defs.h)
 find_package_handle_standard_args(superlu REQUIRED_VARS superlu_LIBRARY superlu_INCLUDE_DIR)
 
 if(superlu_FOUND)
-  message(STATUS "Found SuperLU: ${superlu_LIBRARY}")
   mark_as_advanced(superlu_LIBRARY)
   mark_as_advanced(superlu_INCLUDE_DIR)
 endif()

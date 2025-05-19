@@ -2,9 +2,6 @@
 
 include(FindPackageHandleStandardArgs)
 
-message(STATUS "Trying to find zlib")
-
-
 find_library(zlib_LIBRARY NAMES z)
 find_path(zlib_INCLUDE_DIR NAMES zlib.h)
 
@@ -16,7 +13,6 @@ if(zlib_FOUND)
 endif()
 
 if(zlib_FOUND AND NOT TARGET zlib::zlib)
-  message(STATUS "Found zlib at ${zlib_LIBRARY}")
   add_library(zlib::zlib UNKNOWN IMPORTED GLOBAL)
   set_target_properties(zlib::zlib PROPERTIES IMPORTED_LOCATION ${zlib_LIBRARY})
   target_include_directories(zlib::zlib INTERFACE ${zlib_INCLUDE_DIR})

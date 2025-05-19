@@ -132,6 +132,12 @@ if len(sys.argv) > 1 and ("help" in sys.argv[1:] or "?" in sys.argv[1:]):
   print ("  Do not download any thirdparty dependency. If given dependcies are not findable by cmake")
   print ("  this will lead to an error.")
   print ("")
+  print ("--thirdparty_cache_dir=/path/to/cache")
+  print ("  Set cache directory for thirdparty dependencies. Defaults to ./thirdparty/cache if not set.")
+  print ("")
+  print ("--no_thirdparty_cache")
+  print ("  Disable caching for thirdparty dependencies.")
+  print ("")
   print ("--package_install_dir=/path/to/install")
   print ("  Sets CMAKE_PREFIX_PATH to allow externally build dependencies.")
   print ("")
@@ -360,6 +366,7 @@ trilinos_path = ""
 marker_options = ""
 explicit_likwid_path = ""
 tpl_path = ""
+cache_path = ""
 init_cache_file = ""
 
 unused_extra_options = copy.copy(extra_options)
@@ -518,6 +525,18 @@ for option in extra_options:
       exit(1)
     tpl_path = option.replace("--package_install_dir=", "", 1)
     cmake_flags += " -DCMAKE_PREFIX_PATH:STRING=" + tpl_path
+
+  if option.startswith("--thirdparty_cache_dir="):
+    unused_extra_options.remove(option)
+    if cache_path:
+      print ("Error: multiple thirdparty_cache_dir parameters in\n" + "\n".join(extra_options))
+      exit(1)
+    cache_path = option.replace("--thirdparty_cache_dir=", "", 1)
+    cmake_flags += " -DFEAT_TPL_CACHE_DIRECTORY:STRING=" + os.path.abspath(cache_path)
+
+  if option.startswith("--no_thirdparty_cache"):
+    unused_extra_options.remove(option)
+    cmake_flags += " -DFEAT_TPL_CACHE_DIRECTORY:STRING=\"\""
 
   if option.startswith("--no_external_download"):
     unused_extra_options.remove(option)

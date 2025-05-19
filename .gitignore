@@ -74,6 +74,7 @@ thirdparty/triangle*/
 thirdparty/zfp-*/
 thirdparty/zlib-*/
 thirdparty/Zoltan-*/
+thirdparty/cache/*
 
 # Ignore Visual Studio symlinks
 build_system/vc*/kernel

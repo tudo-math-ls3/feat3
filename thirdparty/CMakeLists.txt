@@ -32,19 +32,24 @@
 include(FetchContent)
 include(PrintPackageConfig)
 include(FindPackageOverrideHelper)
+include(FEATGetTPL)
+include(CMakeDependentOption)
 
-# Should dependecies be looked for among the system libraries?
-# set(FETCHCONTENT_TRY_FIND_PACKAGE_MODE OPT_IN CACHE STRING "fetch content mode")
 # Enable output during dependency download
 set(FETCHCONTENT_QUIET OFF CACHE BOOL "fetch content verboseness")
-set(FEAT_NO_EXTERNAL_DOWNLOAD OFF CACHE BOOL "no thirdparty download allowed")
 
-set(FEAT_PREFER_EXTERNAL_TPL ON CACHE BOOL "try to find external libraries before fetching?")
-if(FEAT_NO_EXTERNAL_DOWNLOAD)
-  message(STATUS "External tpl implicitly required")
-  set(FEAT_PREFER_EXTERNAL_TPL ON CACHE BOOL "try to find external libraries before fetching?" FORCE)
-endif()
+option(FEAT_NO_EXTERNAL_DOWNLOAD "disable thirdparty downloads" OFF)
 
+# Directory for cache of TPL archives.
+# feat_get_tpl will search for archives in this directory and download missing archives to it.
+# Unset (or set to an empty string) to disable caching behaviour.
+set(FEAT_TPL_CACHE_DIRECTORY "${PROJECT_SOURCE_DIR}/thirdparty/cache" CACHE PATH "cache for downloaded TPL archives" )
+
+# Only show the FEAT_PREFER_EXTERNAL_TPL option if FEAT_NO_EXTERNAL_DOWNLOAD is not true
+# Otherwise force it to true
+cmake_dependent_option(FEAT_PREFER_EXTERNAL_TPL
+  "prefer installed libraries over downloaded ones" ON
+  "NOT FEAT_NO_EXTERNAL_DOWNLOAD" ON)
 
 # MAKE_AVAIL_LIST will contain all third-party dependencies that should be enabled
 set(MAKE_AVAIL_LIST "")
@@ -72,29 +77,21 @@ set(CMAKE_C_FLAGS_BACKUP ${CMAKE_C_FLAGS})
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
 
+if(FEAT_TPL_CACHE_DIRECTORY)
+  file(MAKE_DIRECTORY ${FEAT_TPL_CACHE_DIRECTORY})
+endif()
+
 option(FEAT_HAVE_UMFPACK "Use umfpack solver of suitesparse?" OFF)
 if(FEAT_HAVE_UMFPACK)
-  # TODO: instead use value of FETCHCONTENT_TRY_FIND_PACKAGE_MODE?
-  if(FEAT_PREFER_EXTERNAL_TPL OR UMFPACK_DIR)
-    if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(UMFPACK 6.3.5 CONFIG REQUIRED)
-    else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(UMFPACK 6.3.5 CONFIG)
-    endif(FEAT_NO_EXTERNAL_DOWNLOAD)
-  endif()
+  feat_get_tpl(
+    PACKAGE_NAME UMFPACK
+    VERSION 6.3.5
+    URL https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v7.10.2.zip
+    URL_HASH MD5=b54b521b41f1468e37e0c0199a85e598
+    CONFIG
+  )
 
   if(NOT UMFPACK_FOUND)
-    FetchContent_Declare(
-      # suitesparse
-      UMFPACK
-      GIT_REPOSITORY      https://github.com/DrTimothyAldenDavis/SuiteSparse
-      GIT_TAG             v7.10.2
-      GIT_PROGRESS ON
-      UPDATE_DISCONNECTED ON
-      # FIND_PACKAGE_ARGS NAMES UMFPACK GLOBAL
-      OVERRIDE_FIND_PACKAGE
-    )
-
     ## set cmake variables for suitesparse
     # this should build everything necessary for umfpack
     set(SUITESPARSE_ENABLE_PROJECTS "umfpack" CACHE STRING "which projects to build?" FORCE)
@@ -115,54 +112,22 @@ if(FEAT_HAVE_UMFPACK)
 
     # Disable CHOLDMOD tests
     set(BUILD_TESTING "OFF")
-
-    # list(APPEND MAKE_AVAIL_LIST suitesparse)
-    list(APPEND MAKE_AVAIL_LIST UMFPACK)
-    find_package_override_helper(umfpack 6.3.5 AnyNewerVersion)
-  else()
-    print_package_info(UMFPACK)
-  endif(NOT UMFPACK_FOUND)
-endif(FEAT_HAVE_UMFPACK)
+  endif()
+endif()
 
 option(FEAT_HAVE_HYPRE "Use hypre solvers?" OFF)
 if(FEAT_HAVE_HYPRE)
-  if(FEAT_PREFER_EXTERNAL_TPL OR HYPRE_DIR)
-    if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(HYPRE 2.33 CONFIG REQUIRED)
-    else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(HYPRE 2.33 CONFIG)
-    endif(FEAT_NO_EXTERNAL_DOWNLOAD)
-  endif()
+  feat_get_tpl(
+    PACKAGE_NAME HYPRE
+    VERSION 2.33
+    URL https://github.com/hypre-space/hypre/archive/refs/tags/v2.33.0.zip
+    URL_HASH MD5=6fe2c8ef054836d88bb8fad9794c4db5
+    PATCH_COMMAND_WINDOWS python ${CMAKE_CURRENT_LIST_DIR}/patches/hypre_win.py .
+    SOURCE_SUBDIR src
+    CONFIG
+  )
 
   if(NOT HYPRE_FOUND)
-    if(WIN32)
-      FetchContent_Declare(
-        HYPRE
-        GIT_REPOSITORY      https://github.com/hypre-space/hypre
-        GIT_TAG             d3243638e7dee5208cb4ea643610fa9bdb74123b # v2.33.0
-        GIT_PROGRESS        ON
-        PATCH_COMMAND       python ${CMAKE_CURRENT_LIST_DIR}/patches/hypre_win.py .
-        UPDATE_DISCONNECTED ON
-        SOURCE_SUBDIR       src # HYPRE's CMakeLists.txt is in roots src subdirectory, instead of the project root
-        # FIND_PACKAGE_ARGS NAMES HYPRE GLOBAL
-        OVERRIDE_FIND_PACKAGE
-      )
-    else()
-      FetchContent_Declare(
-        HYPRE
-        GIT_REPOSITORY      https://github.com/hypre-space/hypre
-        GIT_TAG             d3243638e7dee5208cb4ea643610fa9bdb74123b # v2.33.0
-        GIT_PROGRESS        ON
-        UPDATE_DISCONNECTED ON
-        SOURCE_SUBDIR       src # HYPRE's CMakeLists.txt is in roots src subdirectory, instead of the project root
-        # FIND_PACKAGE_ARGS NAMES HYPRE GLOBAL
-        OVERRIDE_FIND_PACKAGE
-      )
-    endif()
-
-    list(APPEND MAKE_AVAIL_LIST HYPRE)
-    find_package_override_helper(hypre 2.33 AnyNewerVersion)
-
     # Enable hypre MPI support if FEAT is build with MPI support
     set(HYPRE_ENABLE_MPI ${FEAT_HAVE_MPI} CACHE BOOL "Build Hypre with MPI support" FORCE)
     set(HYPRE_HAVE_MPI ${FEAT_HAVE_MPI} CACHE BOOL "Build Hypre with MPI support" FORCE)
@@ -170,384 +135,155 @@ if(FEAT_HAVE_HYPRE)
 
     # Enable Hypre OpenMP support if FEAT is build with OpenMP support
     set(HYPRE_WITH_OPENMP ${FEAT_HAVE_OMP} CACHE BOOL "Build Hypre with OMP support" FORCE)
-  else()
-    print_package_info(HYPRE)
-  endif(NOT HYPRE_FOUND)
-endif(FEAT_HAVE_HYPRE)
+  endif()
+endif()
 
 option(FEAT_HAVE_PARMETIS "Enable ParMETIS" OFF)
 if(FEAT_HAVE_PARMETIS)
-  if(FEAT_PREFER_EXTERNAL_TPL OR parmetis_DIR)
-    if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(parmetis 4.0.3 REQUIRED CONFIG)
-    else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(parmetis 4.0.3 CONFIG)
-    endif(FEAT_NO_EXTERNAL_DOWNLOAD)
-  endif()
+  feat_get_tpl(
+    PACKAGE_NAME parmetis
+    VERSION 4.0.3
+    URL https://github.com/otkmesser/ParMETIS/releases/download/v4.0.3/ParMETIS-4.0.3.zip
+    URL_HASH MD5=b4d52c875b0506daedc7037f66aedbbd
+    PATCH_COMMAND_WINDOWS python ${CMAKE_CURRENT_LIST_DIR}/patches/parmetis_win.py .
+    CONFIG
+  )
 
-  if(NOT parmetis_FOUND)
-    if(WIN32)
-      FetchContent_Declare(
-        parmetis
-        GIT_REPOSITORY https://github.com/otkmesser/ParMETIS
-        GIT_TAG main
-        GIT_PROGRESS ON
-        PATCH_COMMAND python ${CMAKE_CURRENT_LIST_DIR}/patches/parmetis_win.py .
-        UPDATE_DISCONNECTED ON
-        # FIND_PACKAGE_ARGS NAMES parmetis GLOBAL
-        OVERRIDE_FIND_PACKAGE
-      )
-    else()
-      FetchContent_Declare(
-        parmetis
-        GIT_REPOSITORY https://github.com/otkmesser/ParMETIS
-        GIT_TAG main
-        GIT_PROGRESS ON
-        UPDATE_DISCONNECTED ON
-        # FIND_PACKAGE_ARGS NAMES parmetis GLOBAL
-        OVERRIDE_FIND_PACKAGE
-      )
-    endif()
-    list(APPEND MAKE_AVAIL_LIST parmetis)
-    find_package_override_helper(parmetis 4.0.3 AnyNewerVersion)
-  else()
-    print_package_info(parmetis)
-  endif(NOT parmetis_FOUND)
 endif(FEAT_HAVE_PARMETIS)
 
 option(FEAT_HAVE_FPARSER "Enable FParser" OFF)
 if(FEAT_HAVE_FPARSER)
-  if(FEAT_PREFER_EXTERNAL_TPL OR fparser_DIR)
-    if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(fparser 4.5.2 REQUIRED)
-    else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(fparser 4.5.2)
-    endif(FEAT_NO_EXTERNAL_DOWNLOAD)
-  endif()
-
-  if(NOT fparser)
-    FetchContent_declare(
-      fparser
-      URL http://warp.povusers.org/FunctionParser/fparser4.5.2.zip
-      URL_HASH MD5=ce805d2f827f25e61f266e176b8d338d
-      UPDATE_DISCONNECTED ON
-      # FIND_PACKAGE_ARGS GLOBAL
-      OVERRIDE_FIND_PACKAGE
-    )
-    list(APPEND MAKE_AVAIL_LIST fparser)
-    find_package_override_helper(fparser 4.5.2 AnyNewerVersion)
-  else()
-    print_package_info(fparser)
-  endif(NOT fparser)
-endif(FEAT_HAVE_FPARSER)
+  feat_get_tpl(
+    PACKAGE_NAME fparser
+    VERSION 4.5.2
+    URL http://warp.povusers.org/FunctionParser/fparser4.5.2.zip
+    URL_HASH MD5=ce805d2f827f25e61f266e176b8d338d
+  )
+endif()
 
 option(FEAT_HAVE_BOOST "Enable Boost" OFF)
 if(FEAT_HAVE_BOOST)
-
-  if(FEAT_PREFER_EXTERNAL_TPL OR Boost_DIR)
-    # TODO: Raise minimum boost to 1.82? See https://github.com/boostorg/cmake/tree/7f5336b3bf8067bb40da4e8b9940c133271e938a
-    # before targets are not correctly set
-    if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(Boost 1.88 REQUIRED)
-    else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(Boost 1.88)
-    endif(FEAT_NO_EXTERNAL_DOWNLOAD)
-  endif()
+  feat_get_tpl(
+    PACKAGE_NAME Boost
+    VERSION 1.88
+    URL https://github.com/boostorg/boost/releases/download/boost-1.88.0/boost-1.88.0-cmake.zip
+    URL_HASH MD5=419f6a9273cb90d4f3f65ca0ae02cd00
+  )
 
   if(NOT Boost_FOUND)
+    # Only build libraries required for CGAL
     set(BOOST_INCLUDE_LIBRARIES graph heap logic)
-
     # Make boost create Boost::boost target
     set(BOOST_ENABLE_COMPATIBILITY_TARGETS ON)
-    # Fetch Boost from the github repository. For some reason the github releases
-    # contain a root CMakeLists.txt and the website releases do not.
-    FetchContent_declare(
-      Boost
-      URL https://github.com/boostorg/boost/releases/download/boost-1.88.0/boost-1.88.0-cmake.tar.xz
-      URL_HASH MD5=3edffaacd2cfe63c240ef1b99497c74f
-      UPDATE_DISCONNECTED ON
-      # FIND_PACKAGE_ARGS CONFIG GLOBAL
-      OVERRIDE_FIND_PACKAGE
-      # EXCLUDE_FROM_ALL #TODO: probably a good idea
-    )
-    list(APPEND MAKE_AVAIL_LIST Boost)
-    find_package_override_helper(boost 1.88 AnyNewerVersion)
-  else()
-    print_package_info(Boost)
-  endif(NOT Boost_FOUND)
-endif(FEAT_HAVE_BOOST)
+  endif()
+endif()
 
 option(FEAT_HAVE_CGAL "Enable CGAL" OFF)
 if(FEAT_HAVE_CGAL)
-
-  if(FEAT_PREFER_EXTERNAL_TPL OR CGAL_DIR)
-    if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(CGAL 6.0.1 CONFIG REQUIRED)
-    else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(CGAL 6.0.1 CONFIG)
-    endif(FEAT_NO_EXTERNAL_DOWNLOAD)
-  endif()
-
-  if(NOT CGAL_FOUND)
-    FetchContent_declare(
-      CGAL
-      URL https://github.com/CGAL/cgal/releases/download/v6.0.1/CGAL-6.0.1.tar.xz
-      URL_HASH MD5=944c789615bff14a56d78b398ec2cc49
-      SOURCE_SUBDIR Non-Existing # Use non-existing source dir to disable add_subdirectory call of MakeAvailable
-      UPDATE_DISCONNECTED ON
-      # FIND_PACKAGE_ARGS NAMES CGAL GLOBAL
-      OVERRIDE_FIND_PACKAGE
-    )
-    list(APPEND MAKE_AVAIL_LIST CGAL)
-    find_package_override_helper(cgal 6.0.1 AnyNewerVersion)
-  else()
-    print_package_info(CGAL)
-  endif(NOT CGAL_FOUND)
-endif(FEAT_HAVE_CGAL)
+  feat_get_tpl(
+    PACKAGE_NAME CGAL
+    VERSION 6.0.1
+    URL https://github.com/CGAL/cgal/releases/download/v6.0.1/CGAL-6.0.1.zip
+    URL_HASH MD5=f30c69bf83e294c44e936fa4ad2c2b2c
+    SOURCE_SUBDIR Non-Existing # Use non-existing source dir to disable add_subdirectory call of MakeAvailable
+    CONFIG
+  )
+endif()
 
 option(FEAT_HAVE_ALGLIB "Enable Alglib" OFF)
 if(FEAT_HAVE_ALGLIB)
-  if(FEAT_PREFER_EXTERNAL_TPL OR Alglib_DIR)
-    if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(Alglib 4.04.0 REQUIRED)
-    else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(Alglib 4.04.0)
-    endif(FEAT_NO_EXTERNAL_DOWNLOAD)
-  endif()
-
-  if(NOT Alglib_FOUND)
-    FetchContent_declare(
-      Alglib
-      URL http://www.alglib.net/translator/re/alglib-4.04.0.cpp.gpl.zip
-      URL_HASH MD5=c9a6b38c9b41ef1121fb0b33c8228394
-      UPDATE_DISCONNECTED ON
-      # FIND_PACKAGE_ARGS NAMES Alglib GLOBAL
-      OVERRIDE_FIND_PACKAGE
-    )
-    list(APPEND MAKE_AVAIL_LIST Alglib)
-    find_package_override_helper(alglib 4.04.0 AnyNewerVersion)
-  else()
-    print_package_info(Alglib)
-  endif(NOT Alglib_FOUND)
-endif(FEAT_HAVE_ALGLIB)
+  feat_get_tpl(
+    PACKAGE_NAME Alglib
+    VERSION 4.04.0
+    URL http://www.alglib.net/translator/re/alglib-4.04.0.cpp.gpl.zip
+    URL_HASH MD5=c9a6b38c9b41ef1121fb0b33c8228394
+  )
+endif()
 
 option(FEAT_HAVE_DEATH_HANDLER "Enable deathhandler" OFF)
 if(FEAT_HAVE_DEATH_HANDLER)
-  if(FEAT_PREFER_EXTERNAL_TPL OR death_handler_DIR)
-    if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(death_handler 1.0 REQUIRED)
-    else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(death_handler 1.0)
-    endif(FEAT_NO_EXTERNAL_DOWNLOAD)
-  endif()
-
-  if(NOT death_handler_FOUND)
-    FetchContent_declare(
-      death_handler
-      GIT_REPOSITORY https://github.com/vmarkovtsev/DeathHandler
-      GIT_TAG 911e4df429a89309b10111d76d232d4a7c2b5485
-      UPDATE_DISCONNECTED ON
-      GIT_PROGRESS ON
-      OVERRIDE_FIND_PACKAGE
-    )
-    list(APPEND MAKE_AVAIL_LIST death_handler)
-    find_package_override_helper(death_handler 1.0 AnyNewerVersion)
-  else()
-    print_package_info(death_handler)
-  endif(NOT death_handler_FOUND)
+  feat_get_tpl(
+    PACKAGE_NAME death_handler
+    VERSION 1.0
+    URL https://github.com/vmarkovtsev/DeathHandler/archive/refs/heads/master.zip
+    URL_HASH MD5=c1e443dbd6b1e5a6e0cb072a5726e9a0
+  )
 endif()
 
 option(FEAT_HAVE_FLOATX "Enable FloatX" OFF)
 if(FEAT_HAVE_FLOATX)
-  if(FEAT_PREFER_EXTERNAL_TPL OR FloatX_DIR)
-    if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(FloatX 1.0 REQUIRED)
-    else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(FloatX 1.0)
-    endif(FEAT_NO_EXTERNAL_DOWNLOAD)
-  endif()
-
-  if(NOT FloatX_FOUND)
-    FetchContent_declare(
-      FloatX
-      GIT_REPOSITORY https://github.com/oprecomp/FloatX
-      GIT_TAG 5ae867b16310864a6d7654a0253b0064289cf822
-      GIT_PROGRESS ON
-      UPDATE_DISCONNECTED ON
-      SOURCE_SUBDIR Non-Existing
-      # FIND_PACKAGE_ARGS NAMES FloatX GLOBAL
-      OVERRIDE_FIND_PACKAGE
-    )
-    list(APPEND MAKE_AVAIL_LIST FloatX)
-    find_package_override_helper(FloatX 1.0 AnyNewerVersion)
-  else()
-    print_package_info(FloatX)
-  endif(NOT FloatX_FOUND)
+  feat_get_tpl(
+    PACKAGE_NAME FloatX
+    VERSION 1.0
+    URL https://github.com/oprecomp/FloatX/archive/refs/heads/master.zip
+    URL_HASH MD5=e8bd646b92de39ee2404ecafd08941de
+    SOURCE_SUBDIR Non-existing
+  )
 endif()
 
 option(FEAT_HAVE_ZFP "Enable zfp" OFF)
 if(FEAT_HAVE_ZFP)
-  if(FEAT_PREFER_EXTERNAL_TPL OR zfp_DIR)
-    if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(zfp 1.0.0 CONFIG REQUIRED)
-    else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(zfp 1.0.0 CONFIG)
-    endif(FEAT_NO_EXTERNAL_DOWNLOAD)
-  endif()
-
+  feat_get_tpl(
+    PACKAGE_NAME zfp
+    VERSION 1.0.0
+    URL https://github.com/LLNL/zfp/releases/download/1.0.0/zfp-1.0.0.zip
+    URL_HASH MD5=28c1a0a53931973b18eb4b3d3b7c5f63
+    CONFIG
+  )
   if(NOT zfp_FOUND)
-    FetchContent_declare(
-      zfp
-      GIT_REPOSITORY https://github.com/LLNL/zfp
-      GIT_TAG f39af72648a2aeb88e9b2cca8c64f51b493ad5f4 #v1.0.0
-      GIT_PROGRESS ON
-      UPDATE_DISCONNECTED ON
-      # FIND_PACKAGE_ARGS GLOBAL
-      OVERRIDE_FIND_PACKAGE
-    )
-
     set(ZFP_WITH_OPENMP ${FEAT_HAVE_OMP} CACHE BOOL "Enable OpenMP for ZFP" FORCE)
-
     # Disable zfp tests
     set(BUILD_TESTING "OFF")
-
-    list(APPEND MAKE_AVAIL_LIST zfp)
-    find_package_override_helper(zfp 1.0.0 AnyNewerVersion)
-  else()
-    print_package_info(zfp)
-  endif(NOT zfp_FOUND)
+ endif()
 endif()
 
 option(FEAT_HAVE_ZLIB "Enable zlib" OFF)
 if(FEAT_HAVE_ZLIB)
-  if(FEAT_PREFER_EXTERNAL_TPL OR zlib_DIR)
-    if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(zlib 1.2.13 REQUIRED)
-    else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(zlib 1.2.13)
-    endif(FEAT_NO_EXTERNAL_DOWNLOAD)
-  endif()
-
-  if(NOT zlib_FOUND)
-    FetchContent_declare(
-      zlib
-      URL https://www.zlib.net/fossils/zlib-1.2.13.tar.gz
-      URL_HASH MD5=9b8aa094c4e5765dabf4da391f00d15c
-      UPDATE_DISCONNECTED ON
-      # zlibs default CMakeLists.txt adds example binaries to the build. Ignore it.
-      SOURCE_SUBDIR Non-Existing
-      # FIND_PACKAGE_ARGS GLOBAL
-      OVERRIDE_FIND_PACKAGE
-    )
-    list(APPEND MAKE_AVAIL_LIST zlib)
-    find_package_override_helper(zlib 1.2.13 AnyNewerVersion)
-  else()
-    print_package_info(zlib)
-  endif(NOT zlib_FOUND)
+  feat_get_tpl(
+    PACKAGE_NAME zlib
+    VERSION 1.2.13
+    URL https://www.zlib.net/fossils/zlib-1.2.13.tar.gz
+    URL_HASH MD5=9b8aa094c4e5765dabf4da391f00d15c
+    SOURCE_SUBDIR Non-existing
+  )
 endif()
 
 option(FEAT_HAVE_TRIANGLE "Enable triangle" OFF)
 if(FEAT_HAVE_TRIANGLE)
-  if(FEAT_PREFER_EXTERNAL_TPL OR triangle_DIR)
-    if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(triangle 1.0 REQUIRED)
-    else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(triangle 1.0)
-    endif(FEAT_NO_EXTERNAL_DOWNLOAD)
-  endif()
-
-  if(NOT triangle_FOUND)
-    FetchContent_declare(
-      triangle
-      URL "http://www.netlib.org/voronoi/triangle.zip"
-      URL_HASH MD5=10aff8d7950f5e0e2fb6dd2e340be2c9
-      UPDATE_DISCONNECTED ON
-      # FIND_PACKAGE_ARGS GLOBAL
-      OVERRIDE_FIND_PACKAGE
-    )
-    list(APPEND MAKE_AVAIL_LIST triangle)
-    find_package_override_helper(triangle 1.0 AnyNewerVersion)
-  else()
-    print_package_info(triangle)
-  endif(NOT triangle_FOUND)
+  feat_get_tpl(
+    PACKAGE_NAME triangle
+    VERSION 1.0
+    URL "http://www.netlib.org/voronoi/triangle.zip"
+    URL_HASH MD5=10aff8d7950f5e0e2fb6dd2e340be2c9
+  )
 endif()
 
 option(FEAT_HAVE_ZOLTAN "Enable zoltan" OFF)
 if(FEAT_HAVE_ZOLTAN)
-  if(FEAT_PREFER_EXTERNAL_TPL OR zoltan_DIR)
-    if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(zoltan 3.901 REQUIRED)
-    else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(zoltan 3.901)
-    endif(FEAT_NO_EXTERNAL_DOWNLOAD)
-  endif()
-
-  if(NOT zoltan_FOUND)
-    if(WIN32)
-      FetchContent_declare(
-        zoltan
-        URL "https://github.com/sandialabs/Zoltan/archive/refs/tags/v3.901.tar.gz"
-        URL_HASH MD5=a951ef9b1529fed3a325d57e0be21734
-        PATCH_COMMAND python ${CMAKE_CURRENT_LIST_DIR}/patches/zoltan_win.py .
-        UPDATE_DISCONNECTED ON
-        SOURCE_SUBDIR Non-Existing
-        # FIND_PACKAGE_ARGS GLOBAL
-        OVERRIDE_FIND_PACKAGE
-      )
-    else()
-      FetchContent_declare(
-        zoltan
-        URL "https://github.com/sandialabs/Zoltan/archive/refs/tags/v3.901.tar.gz"
-        URL_HASH MD5=a951ef9b1529fed3a325d57e0be21734
-        UPDATE_DISCONNECTED ON
-        SOURCE_SUBDIR Non-Existing
-        # FIND_PACKAGE_ARGS GLOBAL
-        OVERRIDE_FIND_PACKAGE
-      )
-    endif()
-    list(APPEND MAKE_AVAIL_LIST zoltan)
-    find_package_override_helper(zoltan 3.901 AnyNewerVersion)
-  else()
-    print_package_info(zoltan)
-  endif(NOT zoltan_FOUND)
+  feat_get_tpl(
+    PACKAGE_NAME zoltan
+    VERSION 3.901
+    URL "https://github.com/sandialabs/Zoltan/archive/refs/tags/v3.901.tar.gz"
+    URL_HASH MD5=a951ef9b1529fed3a325d57e0be21734
+    PATCH_COMMAND_WINDOWS python ${CMAKE_CURRENT_LIST_DIR}/patches/zoltan_win.py .
+    SOURCE_SUBDIR Non-Existing
+  )
 endif()
 
 option(FEAT_HAVE_SUPERLU_DIST "Enable SuperLU (dist)" OFF)
 if(FEAT_HAVE_SUPERLU_DIST)
-  if(FEAT_PREFER_EXTERNAL_TPL OR superlu_DIR)
-    if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(superlu 9.1.0 REQUIRED)
-    else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(superlu 9.1.0)
-    endif(FEAT_NO_EXTERNAL_DOWNLOAD)
-  endif()
+  feat_get_tpl(
+    PACKAGE_NAME superlu
+    VERSION 9.1.0
+    URL "https://github.com/xiaoyeli/superlu_dist/archive/refs/tags/v9.1.0.tar.gz"
+    URL_HASH MD5=f8559a94ee64c8b70ebd79b65576d08d
+    PATCH_COMMAND_WINDOWS python ${CMAKE_CURRENT_LIST_DIR}/patches/superlu_win.py .
+    PATCH_COMMAND_LINUX python ${CMAKE_CURRENT_LIST_DIR}/patches/superlu.py .
+    SOURCE_SUBDIR SRC
+    EXCLUDE_FROM_ALL
+  )
 
   if(NOT superlu_FOUND)
-    if(WIN32)
-      ## probably broken right now, since we need to patch and use the new cmakelists...
-      FetchContent_declare(
-        superlu
-        URL "https://github.com/xiaoyeli/superlu_dist/archive/refs/tags/v9.1.0.tar.gz"
-        URL_HASH MD5=f8559a94ee64c8b70ebd79b65576d08d
-        PATCH_COMMAND python ${CMAKE_CURRENT_LIST_DIR}/patches/superlu_win.py .
-        UPDATE_DISCONNECTED ON
-        SOURCE_SUBDIR SRC
-        OVERRIDE_FIND_PACKAGE
-        EXCLUDE_FROM_ALL
-      )
-    else()
-      FetchContent_declare(
-        superlu
-        URL "https://github.com/xiaoyeli/superlu_dist/archive/refs/tags/v9.1.0.tar.gz"
-        URL_HASH MD5=f8559a94ee64c8b70ebd79b65576d08d
-        PATCH_COMMAND python ${CMAKE_CURRENT_LIST_DIR}/patches/superlu.py .
-        UPDATE_DISCONNECTED ON
-        SOURCE_SUBDIR SRC
-        OVERRIDE_FIND_PACKAGE
-        EXCLUDE_FROM_ALL
-      )
-    endif()
-
     set(VERSION_MAJOR 1)
     set(SUPERLU_DIST_ENABLE_DOUBLE ON)
     set(SUPERLU_DIST_ENABLE_OMP ${FEAT_HAVE_OMP})
@@ -556,81 +292,43 @@ if(FEAT_HAVE_SUPERLU_DIST)
     set(SUPERLU_DIST_TPL_ENABLE_PARMETIS ${FEAT_HAVE_PARMETIS})
     set(SUPERLU_DIST_ENABLE_COMPLEX_16 OFF)
     set(SUPERLU_DIST_ENABLE_SINGLE OFF)
+
     # appearently, we need to set the index size to 64 if combined with parmetis...
     # todo: get this from parmetis...
     if(SUPERLU_DIST_TPL_ENABLE_PARMETIS)
       set(XSDK_INDEX_SIZE 64)
     endif()
-
-    list(APPEND MAKE_AVAIL_LIST superlu)
-    find_package_override_helper(superlu 9.1.0 AnyNewerVersion)
-  else()
-    print_package_info(superlu)
-  endif(NOT superlu_FOUND)
+  endif()
 endif()
 
 option(FEAT_HAVE_CUDSS "Enable cuDSS" OFF)
 if(FEAT_HAVE_CUDSS)
-  if(FEAT_PREFER_EXTERNAL_TPL OR cudss_DIR)
-    if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(cudss 0.5.0.16 REQUIRED)
-    else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(cudss)
-    endif(FEAT_NO_EXTERNAL_DOWNLOAD)
+  if(WIN32)
+    set(cudss_url "https://developer.download.nvidia.com/compute/cudss/redist/libcudss/windows-x86_64/libcudss-windows-x86_64-0.5.0.16_cuda12-archive.zip")
+    set(cudss_hash "2ea2f64901db68c0e0e7f419ab60bef1")
+  else()
+    set(cudss_url "https://developer.download.nvidia.com/compute/cudss/redist/libcudss/linux-x86_64/libcudss-linux-x86_64-0.5.0.16_cuda12-archive.tar.xz")
+    set(cudss_hash "cb438f906120c01d062bd5db40244cd2")
   endif()
 
-  if(NOT cudss_FOUND)
-    if(WIN32)
-      set(cudss_url "https://developer.download.nvidia.com/compute/cudss/redist/libcudss/windows-x86_64/libcudss-windows-x86_64-0.5.0.16_cuda12-archive.zip")
-      set(cudss_hash "2ea2f64901db68c0e0e7f419ab60bef1")
-    else()
-      set(cudss_url "https://developer.download.nvidia.com/compute/cudss/redist/libcudss/linux-x86_64/libcudss-linux-x86_64-0.5.0.16_cuda12-archive.tar.xz")
-      set(cudss_hash "cb438f906120c01d062bd5db40244cd2")
-    endif()
-
-    FetchContent_declare(
-      cudss
-      URL ${cudss_url}
-      URL_HASH MD5=${cudss_hash}
-      UPDATE_DISCONNECTED ON
-      # FIND_PACKAGE_ARGS GLOBAL
-      OVERRIDE_FIND_PACKAGE
-    )
-
-    list(APPEND MAKE_AVAIL_LIST cudss)
-    find_package_override_helper(cudss 0.5.0.16 AnyNewerVersion)
-  else()
-    print_package_info(cudss)
-  endif(NOT cudss_FOUND)
+  feat_get_tpl(
+    PACKAGE_NAME cudss
+    VERSION 0.5.0.16
+    URL ${cudss_url}
+    URL_HASH MD5=${cudss_hash}
+  )
 endif()
 
 option(FEAT_HAVE_PMP "Enable pmp" OFF)
 if(FEAT_HAVE_PMP)
-  if(FEAT_PREFER_EXTERNAL_TPL OR pmp_DIR)
-    if(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(pmp 3.0.0 CONFIG REQUIRED)
-    else(FEAT_NO_EXTERNAL_DOWNLOAD)
-      find_package(pmp 3.0.0 CONFIG)
-    endif(FEAT_NO_EXTERNAL_DOWNLOAD)
-  endif()
-
-  if(NOT pmp_FOUND)
-    FetchContent_declare(
-      pmp
-      GIT_REPOSITORY https://github.com/pmp-library/pmp-library
-      GIT_TAG 3.0.0
-      GIT_PROGRESS ON
-      UPDATE_DISCONNECTED ON
-      SOURCE_SUBDIR Non-Existing # Use non-existing source dir to disable add_subdirectory call of MakeAvailable
-      # FIND_PACKAGE_ARGS GLOBAL
-      OVERRIDE_FIND_PACKAGE
-    )
-
-    list(APPEND MAKE_AVAIL_LIST pmp)
-    find_package_override_helper(pmp 3.0.0 AnyNewerVersion)
-  else()
-    print_package_info(pmp)
-  endif(NOT pmp_FOUND)
+  feat_get_tpl(
+    PACKAGE_NAME pmp
+    VERSION 3.0.0
+    URL https://github.com/pmp-library/pmp-library/archive/refs/tags/3.0.0.zip
+    URL_HASH MD5=7b7f9ce07a7a687c9d78a6583cf64a2c
+    SOURCE_SUBDIR Non-Existing # Use non-existing source dir to disable add_subdirectory call of MakeAvailable
+    CONFIG
+  )
 endif()
 
 # after all target are declared, call now make available
