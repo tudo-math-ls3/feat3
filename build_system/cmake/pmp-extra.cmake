@@ -18,7 +18,7 @@ if(NOT TARGET pmp::pmp)
   if(FEAT_HAVE_OMP)
     find_package(OpenMP)
     if(OpenMP_CXX_FOUND)
-      target_link_libraries(pmp PUBLIC OpenMP::OpenMP_CXX)
+      target_link_libraries(feat-extern-pmp PUBLIC OpenMP::OpenMP_CXX)
     endif()
   endif()
 
