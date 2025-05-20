@@ -67,6 +67,7 @@ thirdparty/floatx/
 thirdparty/half-*/
 thirdparty/hypre-*/
 thirdparty/parmetis-*/
+thirdparty/pmp-library-*/
 thirdparty/SuiteSparse-*/
 thirdparty/superlu_dist-*/
 thirdparty/triangle*/
