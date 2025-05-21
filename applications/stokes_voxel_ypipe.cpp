@@ -259,7 +259,7 @@ namespace StokesVoxelYPipe
     // create Y-pipe chart
     Geometry::Atlas::Bezier<MeshType> ypipe_chart;
     ypipe_chart.push_vertex(WorldPoint{-1.0, 0.0});
-    ypipe_chart.push_vertex(WorldPoint{-1.0, -0.4});
+    ypipe_chart.push_vertex(WorldPoint{-1.0, -0.45});
     ypipe_chart.push_vertex(WorldPoint{0.35, -0.45});
     ypipe_chart.push_control(WorldPoint{1.25, -0.45});
     ypipe_chart.push_control(WorldPoint{1.25, -0.9});
