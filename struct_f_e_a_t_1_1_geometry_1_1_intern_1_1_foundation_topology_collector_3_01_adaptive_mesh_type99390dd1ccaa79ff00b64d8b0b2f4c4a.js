@@ -1,0 +1,4 @@
+var struct_f_e_a_t_1_1_geometry_1_1_intern_1_1_foundation_topology_collector_3_01_adaptive_mesh_type99390dd1ccaa79ff00b64d8b0b2f4c4a =
+[
+    [ "collect", "struct_f_e_a_t_1_1_geometry_1_1_intern_1_1_foundation_topology_collector_3_01_adaptive_mesh_type99390dd1ccaa79ff00b64d8b0b2f4c4a.html#a6ea6c10dcab688c3a5852cd61f019f3a", null ]
+];

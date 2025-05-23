@@ -1,5 +1,8 @@
 var dir_2fc8e21c74047a85e942968bac7fe59f =
 [
+    [ "adaptive_mesh_algorithms.hpp", "adaptive__mesh__algorithms_8hpp_source.html", null ],
+    [ "adaptive_mesh_storage.hpp", "adaptive__mesh__storage_8hpp_source.html", null ],
+    [ "adaptive_refinement_utils.hpp", "adaptive__refinement__utils_8hpp_source.html", null ],
     [ "boundary_computer.hpp", "boundary__computer_8hpp_source.html", null ],
     [ "coarse_fine_cell_mapping.hpp", "coarse__fine__cell__mapping_8hpp_source.html", null ],
     [ "congruency_mapping.hpp", "congruency__mapping_8hpp_source.html", null ],
@@ -14,6 +17,7 @@ var dir_2fc8e21c74047a85e942968bac7fe59f =
     [ "index_set_filler.hpp", "index__set__filler_8hpp_source.html", null ],
     [ "macro_index_mapping.hpp", "macro__index__mapping_8hpp_source.html", null ],
     [ "patch_index_mapping.hpp", "patch__index__mapping_8hpp_source.html", null ],
+    [ "refinement_field.hpp", "refinement__field_8hpp_source.html", null ],
     [ "shape_convert_index.hpp", "shape__convert__index_8hpp_source.html", null ],
     [ "shape_convert_target.hpp", "shape__convert__target_8hpp_source.html", null ],
     [ "shape_convert_traits.hpp", "shape__convert__traits_8hpp_source.html", null ],

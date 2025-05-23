@@ -6,6 +6,7 @@ var dir_58759e03702cf5d3134868f6de633189 =
     [ "amavanka.hpp", "amavanka_8hpp_source.html", null ],
     [ "amavanka_base.hpp", "amavanka__base_8hpp_source.html", null ],
     [ "base.hpp", "kernel_2solver_2base_8hpp_source.html", null ],
+    [ "bfbt.hpp", "bfbt_8hpp_source.html", null ],
     [ "bicgstab.hpp", "bicgstab_8hpp_source.html", null ],
     [ "bicgstabl.hpp", "bicgstabl_8hpp_source.html", null ],
     [ "chebyshev.hpp", "chebyshev_8hpp_source.html", null ],

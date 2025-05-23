@@ -34,6 +34,7 @@ var dir_7ab5cd9d6a44db3bf3b807f89e50cefe =
     [ "property_map.hpp", "property__map_8hpp_source.html", null ],
     [ "random.hpp", "random_8hpp_source.html", null ],
     [ "simple_arg_parser.hpp", "simple__arg__parser_8hpp_source.html", null ],
+    [ "slotmap.hpp", "slotmap_8hpp_source.html", null ],
     [ "statistics.cpp", "statistics_8cpp_source.html", null ],
     [ "statistics.hpp", "kernel_2util_2statistics_8hpp_source.html", null ],
     [ "stop_watch.hpp", "stop__watch_8hpp_source.html", null ],

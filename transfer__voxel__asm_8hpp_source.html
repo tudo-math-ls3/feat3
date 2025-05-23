@@ -247,18 +247,18 @@ $(document).ready(function(){initNavTree('transfer__voxel__asm_8hpp_source.html'
 <div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>        <span class="keywordflow">if</span> (loc_prol.empty())</div>
 <div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>          <a class="code hl_function" href="class_f_e_a_t_1_1_assembly_1_1_symbolic_assembler.html#af0c69efa0352e0c8365c8462adfdbf0a">Assembly::SymbolicAssembler::assemble_matrix_2lvl</a>(loc_prol, space_f, space_c);</div>
 <div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span> </div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>          <span class="comment">// if we need a truncation matrix, then compute its sparsity pattern now</span></div>
-<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>        <span class="keywordflow">if</span>(trunc)</div>
-<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>          loc_trunc.transpose(loc_prol);</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>        <span class="comment">// create local weight vectors</span></div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>        <span class="keyword">auto</span> loc_vec_weight_p = loc_prol.create_vector_l();</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>        <span class="keyword">auto</span> loc_vec_weight_t = loc_prol.create_vector_r();</div>
 <div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span> </div>
-<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>        <span class="comment">// create local weight vectors</span></div>
-<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>        <span class="keyword">auto</span> loc_vec_weight_p = loc_prol.create_vector_l();</div>
-<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>        <span class="keyword">auto</span> loc_vec_weight_t = loc_prol.create_vector_r();</div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span> </div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>        <span class="comment">// assemble prolongation matrix</span></div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>        loc_prol.format();</div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>        loc_vec_weight_p.format();</div>
-<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>        loc_vec_weight_t.format();</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>        <span class="comment">// assemble prolongation matrix</span></div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>        loc_prol.format();</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>        loc_vec_weight_p.format();</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>        loc_vec_weight_t.format();</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span> </div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>        <span class="comment">// if we need a truncation matrix, then compute its sparsity pattern now</span></div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>        <span class="keywordflow">if</span>(trunc)</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>          loc_trunc.transpose(loc_prol);</div>
 <div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span> </div>
 <div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>        <span class="comment">// assemble prolongation matrix</span></div>
 <div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>        <a class="code hl_function" href="class_f_e_a_t_1_1_assembly_1_1_grid_transfer.html#abe2d349bf0141d0c5a0c7e454ea693cf">Assembly::GridTransfer::assemble_prolongation</a>(loc_prol, loc_vec_weight_p, space_f, space_c, cubature);</div>
@@ -401,18 +401,18 @@ $(document).ready(function(){initNavTree('transfer__voxel__asm_8hpp_source.html'
 <div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span>        <span class="keywordflow">if</span> (loc_prol.empty())</div>
 <div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span>          <a class="code hl_function" href="class_f_e_a_t_1_1_assembly_1_1_symbolic_assembler.html#af0c69efa0352e0c8365c8462adfdbf0a">Assembly::SymbolicAssembler::assemble_matrix_2lvl</a>(loc_prol, space_f, space_c);</div>
 <div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span> </div>
-<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span>        <span class="comment">// if we need a truncation matrix, then compute its sparsity pattern now</span></div>
-<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>        <span class="keywordflow">if</span>(trunc)</div>
-<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>          loc_trunc.transpose(loc_prol);</div>
+<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span>        <span class="comment">// create local weight vector</span></div>
+<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span>        <span class="keyword">auto</span> loc_vec_weight_p = loc_prol.create_vector_l();</div>
+<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span>        <span class="keyword">auto</span> loc_vec_weight_t = loc_prol.create_vector_r();</div>
 <div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span> </div>
-<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>        <span class="comment">// create local weight vector</span></div>
-<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span>        <span class="keyword">auto</span> loc_vec_weight_p = loc_prol.create_vector_l();</div>
-<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span>        <span class="keyword">auto</span> loc_vec_weight_t = loc_prol.create_vector_r();</div>
-<div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span> </div>
-<div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span>        <span class="comment">// assemble prolongation matrix</span></div>
-<div class="line"><a id="l00387" name="l00387"></a><span class="lineno">  387</span>        loc_prol.format();</div>
-<div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span>        loc_vec_weight_p.format();</div>
-<div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span>        loc_vec_weight_t.format();</div>
+<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>        <span class="comment">// assemble prolongation matrix</span></div>
+<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span>        loc_prol.format();</div>
+<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span>        loc_vec_weight_p.format();</div>
+<div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span>        loc_vec_weight_t.format();</div>
+<div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span> </div>
+<div class="line"><a id="l00387" name="l00387"></a><span class="lineno">  387</span>        <span class="comment">// if we need a truncation matrix, then compute its sparsity pattern now</span></div>
+<div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span>        <span class="keywordflow">if</span>(trunc)</div>
+<div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span>          loc_trunc.transpose(loc_prol);</div>
 <div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span> </div>
 <div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span>        <span class="comment">// assemble prolongation matrix</span></div>
 <div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span>        <a class="code hl_function" href="class_f_e_a_t_1_1_assembly_1_1_grid_transfer.html#abe2d349bf0141d0c5a0c7e454ea693cf">Assembly::GridTransfer::assemble_prolongation</a>(loc_prol, loc_vec_weight_p, space_f, space_c, cubature);</div>

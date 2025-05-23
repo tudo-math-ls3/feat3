@@ -168,7 +168,7 @@ $(document).ready(function(){initNavTree('unit__filter__assembler_8hpp_source.ht
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>        Intern::UnitAsmWrapper&lt;shape_dim&gt;::assemble(idx_set, space, <a class="code hl_variable" href="class_f_e_a_t_1_1_assembly_1_1_unit_filter_assembler.html#a1ffdb971961fc0fadc2196764987031f">_cells</a>);</div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span> </div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>        <span class="comment">// allocate filter if necessary</span></div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        <span class="keywordflow">if</span>(filter.<a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html#a7ddbc8f401401c97f043a8d8ada1cad6">size</a>() == <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0))</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        <span class="keywordflow">if</span>(filter.size() == <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0))</div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>        {</div>
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>          filter = <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html">LAFEM::UnitFilter&lt;DataType_, IndexType_&gt;</a>(space.get_num_dofs());</div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        }</div>
@@ -179,7 +179,7 @@ $(document).ready(function(){initNavTree('unit__filter__assembler_8hpp_source.ht
 <div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>        <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0); it != jt; ++it, ++i)</div>
 <div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>        {</div>
 <div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>          <span class="comment">// store the dof-index</span></div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>          filter.<a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html#ac5183a95145bfeb66b070692995a9400">add</a>(IndexType_(*it), DataType_(0));</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>          filter.add(IndexType_(*it), DataType_(0));</div>
 <div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>        }</div>
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>      }</div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span> </div>
@@ -194,7 +194,7 @@ $(document).ready(function(){initNavTree('unit__filter__assembler_8hpp_source.ht
 <div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>        Intern::UnitAsmWrapper&lt;shape_dim&gt;::assemble(idx_set, space, <a class="code hl_variable" href="class_f_e_a_t_1_1_assembly_1_1_unit_filter_assembler.html#a1ffdb971961fc0fadc2196764987031f">_cells</a>);</div>
 <div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span> </div>
 <div class="line"><a id="l00138" name="l00138"></a><span class="lineno">  138</span>        <span class="comment">// allocate filter if necessary</span></div>
-<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>        <span class="keywordflow">if</span>(filter.<a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html#a7ddbc8f401401c97f043a8d8ada1cad6">size</a>() == <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0))</div>
+<div class="line"><a id="l00139" name="l00139"></a><span class="lineno">  139</span>        <span class="keywordflow">if</span>(filter.size() == <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0))</div>
 <div class="line"><a id="l00140" name="l00140"></a><span class="lineno">  140</span>        {</div>
 <div class="line"><a id="l00141" name="l00141"></a><span class="lineno">  141</span>          filter = <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html">LAFEM::UnitFilter&lt;DataType_, IndexType_&gt;</a>(space.get_num_dofs());</div>
 <div class="line"><a id="l00142" name="l00142"></a><span class="lineno">  142</span>        }</div>
@@ -205,7 +205,7 @@ $(document).ready(function(){initNavTree('unit__filter__assembler_8hpp_source.ht
 <div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>        <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0); it != jt; ++it, ++i)</div>
 <div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>        {</div>
 <div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>          <span class="comment">// store the dof-index</span></div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>          filter.<a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html#ac5183a95145bfeb66b070692995a9400">add</a>(IndexType_(*it), vector_(IndexType_(*it)));</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>          filter.add(IndexType_(*it), vector_(IndexType_(*it)));</div>
 <div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>        }</div>
 <div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>      }</div>
 <div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span> </div>
@@ -228,7 +228,7 @@ $(document).ready(function(){initNavTree('unit__filter__assembler_8hpp_source.ht
 <div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>        Intern::UnitAsmWrapper&lt;shape_dim&gt;::assemble(idx_map, space, <a class="code hl_variable" href="class_f_e_a_t_1_1_assembly_1_1_unit_filter_assembler.html#a1ffdb971961fc0fadc2196764987031f">_cells</a>, function);</div>
 <div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span> </div>
 <div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>        <span class="comment">// allocate filter if necessary</span></div>
-<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>        <span class="keywordflow">if</span>(filter.<a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html#a7ddbc8f401401c97f043a8d8ada1cad6">size</a>() == <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0))</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>        <span class="keywordflow">if</span>(filter.size() == <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0))</div>
 <div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>        {</div>
 <div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>          filter = <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html">LAFEM::UnitFilter&lt;DataType_, IndexType_&gt;</a>(space.get_num_dofs());</div>
 <div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>        }</div>
@@ -239,7 +239,7 @@ $(document).ready(function(){initNavTree('unit__filter__assembler_8hpp_source.ht
 <div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>        <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0); it != jt; ++it, ++i)</div>
 <div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>        {</div>
 <div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>          <span class="comment">// store the dof-index</span></div>
-<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>          filter.<a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html#ac5183a95145bfeb66b070692995a9400">add</a>(IndexType_(it-&gt;first), it-&gt;second);</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>          filter.add(IndexType_(it-&gt;first), it-&gt;second);</div>
 <div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>        }</div>
 <div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>      }</div>
 <div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span> </div>
@@ -253,7 +253,7 @@ $(document).ready(function(){initNavTree('unit__filter__assembler_8hpp_source.ht
 <div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>        Intern::UnitAsmWrapper&lt;shape_dim&gt;::assemble(idx_set, space, <a class="code hl_variable" href="class_f_e_a_t_1_1_assembly_1_1_unit_filter_assembler.html#a1ffdb971961fc0fadc2196764987031f">_cells</a>);</div>
 <div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span> </div>
 <div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>        <span class="comment">// allocate filter if necessary</span></div>
-<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>        <span class="keywordflow">if</span> (filter.<a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#a157e29726c65993670f105d62550f46b">size</a>() == <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0))</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>        <span class="keywordflow">if</span> (filter.size() == <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0))</div>
 <div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>        {</div>
 <div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>          filter = <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html">LAFEM::UnitFilterBlocked&lt;DataType_, IndexType_, BlockSize_&gt;</a>(space.get_num_dofs());</div>
 <div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>        }</div>
@@ -265,7 +265,7 @@ $(document).ready(function(){initNavTree('unit__filter__assembler_8hpp_source.ht
 <div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>        <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0); it != jt; ++it, ++i)</div>
 <div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>        {</div>
 <div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>          <span class="comment">// store the dof-index</span></div>
-<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>          filter.<a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#aa6937d5273042fe670b56e27efc47f12">add</a>(IndexType_(*it), tmp);</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>          filter.add(IndexType_(*it), tmp);</div>
 <div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>        }</div>
 <div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>      }</div>
 <div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span> </div>
@@ -288,7 +288,7 @@ $(document).ready(function(){initNavTree('unit__filter__assembler_8hpp_source.ht
 <div class="line"><a id="l00272" name="l00272"></a><span class="lineno">  272</span>        Intern::UnitAsmWrapper&lt;shape_dim&gt;::assemble(idx_map, space, <a class="code hl_variable" href="class_f_e_a_t_1_1_assembly_1_1_unit_filter_assembler.html#a1ffdb971961fc0fadc2196764987031f">_cells</a>, function);</div>
 <div class="line"><a id="l00273" name="l00273"></a><span class="lineno">  273</span> </div>
 <div class="line"><a id="l00274" name="l00274"></a><span class="lineno">  274</span>        <span class="comment">// allocate filter if necessary</span></div>
-<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>        <span class="keywordflow">if</span> (filter.<a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#a157e29726c65993670f105d62550f46b">size</a>() == <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0))</div>
+<div class="line"><a id="l00275" name="l00275"></a><span class="lineno">  275</span>        <span class="keywordflow">if</span> (filter.size() == <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0))</div>
 <div class="line"><a id="l00276" name="l00276"></a><span class="lineno">  276</span>        {</div>
 <div class="line"><a id="l00277" name="l00277"></a><span class="lineno">  277</span>          filter = <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html">LAFEM::UnitFilterBlocked&lt;DataType_, IndexType_, BlockSize_&gt;</a>(space.get_num_dofs());</div>
 <div class="line"><a id="l00278" name="l00278"></a><span class="lineno">  278</span>        }</div>
@@ -299,7 +299,7 @@ $(document).ready(function(){initNavTree('unit__filter__assembler_8hpp_source.ht
 <div class="line"><a id="l00283" name="l00283"></a><span class="lineno">  283</span>        <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0); it != jt; ++it, ++i)</div>
 <div class="line"><a id="l00284" name="l00284"></a><span class="lineno">  284</span>        {</div>
 <div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>          <span class="comment">// store the dof-index</span></div>
-<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>          filter.<a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#aa6937d5273042fe670b56e27efc47f12">add</a>(IndexType_(it-&gt;first), it-&gt;second);</div>
+<div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span>          filter.add(IndexType_(it-&gt;first), it-&gt;second);</div>
 <div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>        }</div>
 <div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>      }</div>
 <div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span> </div>
@@ -314,7 +314,7 @@ $(document).ready(function(){initNavTree('unit__filter__assembler_8hpp_source.ht
 <div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>        Intern::UnitAsmWrapper&lt;shape_dim&gt;::assemble(idx_set, space, <a class="code hl_variable" href="class_f_e_a_t_1_1_assembly_1_1_unit_filter_assembler.html#a1ffdb971961fc0fadc2196764987031f">_cells</a>);</div>
 <div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span> </div>
 <div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>        <span class="comment">// allocate filter if necessary</span></div>
-<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>        <span class="keywordflow">if</span> (filter.<a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#a157e29726c65993670f105d62550f46b">size</a>() == <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0))</div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>        <span class="keywordflow">if</span> (filter.size() == <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>(0))</div>
 <div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>        {</div>
 <div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>          filter = <a class="code hl_class" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html">LAFEM::UnitFilterBlocked&lt;DTF_, ITF_, BlockSize_&gt;</a>(space.get_num_dofs());</div>
 <div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>        }</div>
@@ -325,7 +325,7 @@ $(document).ready(function(){initNavTree('unit__filter__assembler_8hpp_source.ht
 <div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>        <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i(0); it != jt; ++it, ++i)</div>
 <div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>        {</div>
 <div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span>          <span class="comment">// store the dof-index</span></div>
-<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>          filter.<a class="code hl_function" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#aa6937d5273042fe670b56e27efc47f12">add</a>(ITF_(*it), vector_(ITV_(*it)));</div>
+<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span>          filter.add(ITF_(*it), vector_(ITV_(*it)));</div>
 <div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span>        }</div>
 <div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>      }</div>
 <div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>    }; <span class="comment">// class UnitFilterAssembler</span></div>
@@ -549,11 +549,7 @@ $(document).ready(function(){initNavTree('unit__filter__assembler_8hpp_source.ht
 <div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked_html"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">FEAT::LAFEM::DenseVectorBlocked</a></div><div class="ttdoc">Blocked Dense data vector class template.</div><div class="ttdef"><b>Definition:</b> <a href="dense__vector__blocked_8hpp_source.html#l00079">dense_vector_blocked.hpp:80</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_html"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">FEAT::LAFEM::DenseVector</a></div><div class="ttdoc">Dense data vector class template.</div><div class="ttdef"><b>Definition:</b> <a href="dense__vector_8hpp_source.html#l00056">dense_vector.hpp:57</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked_html"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html">FEAT::LAFEM::UnitFilterBlocked</a></div><div class="ttdoc">Unit Filter Blocked class template.</div><div class="ttdef"><b>Definition:</b> <a href="unit__filter__blocked_8hpp_source.html#l00047">unit_filter_blocked.hpp:48</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked_html_a157e29726c65993670f105d62550f46b"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#a157e29726c65993670f105d62550f46b">FEAT::LAFEM::UnitFilterBlocked::size</a></div><div class="ttdeci">Index size() const</div><div class="ttdef"><b>Definition:</b> <a href="unit__filter__blocked_8hpp_source.html#l00218">unit_filter_blocked.hpp:218</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked_html_aa6937d5273042fe670b56e27efc47f12"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html#aa6937d5273042fe670b56e27efc47f12">FEAT::LAFEM::UnitFilterBlocked::add</a></div><div class="ttdeci">void add(IndexType idx, ValueType val)</div><div class="ttdoc">Adds one element to the filter.</div><div class="ttdef"><b>Definition:</b> <a href="unit__filter__blocked_8hpp_source.html#l00212">unit_filter_blocked.hpp:212</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_html"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html">FEAT::LAFEM::UnitFilter</a></div><div class="ttdoc">Unit Filter class template.</div><div class="ttdef"><b>Definition:</b> <a href="unit__filter_8hpp_source.html#l00028">unit_filter.hpp:29</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_html_a7ddbc8f401401c97f043a8d8ada1cad6"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html#a7ddbc8f401401c97f043a8d8ada1cad6">FEAT::LAFEM::UnitFilter::size</a></div><div class="ttdeci">Index size() const</div><div class="ttdef"><b>Definition:</b> <a href="unit__filter_8hpp_source.html#l00164">unit_filter.hpp:164</a></div></div>
-<div class="ttc" id="aclass_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_html_ac5183a95145bfeb66b070692995a9400"><div class="ttname"><a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html#ac5183a95145bfeb66b070692995a9400">FEAT::LAFEM::UnitFilter::add</a></div><div class="ttdeci">void add(IndexType idx, DataType val)</div><div class="ttdoc">Adds one element to the filter.</div><div class="ttdef"><b>Definition:</b> <a href="unit__filter_8hpp_source.html#l00158">unit_filter.hpp:158</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_tiny_1_1_vector_html"><div class="ttname"><a href="class_f_e_a_t_1_1_tiny_1_1_vector.html">FEAT::Tiny::Vector</a></div><div class="ttdoc">Tiny Vector class template.</div><div class="ttdef"><b>Definition:</b> <a href="tiny__algebra_8hpp_source.html#l00052">tiny_algebra.hpp:52</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00011">adjactor.hpp:12</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00122">base_header.hpp:122</a></div></div>

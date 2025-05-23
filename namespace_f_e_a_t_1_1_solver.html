@@ -139,6 +139,12 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_approximate_hessian_precond.html">ApproximateHessianPrecond</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Wrapper class for applying an the inverse of an operator's approximate Hessian as a preconditioner.  <a href="class_f_e_a_t_1_1_solver_1_1_approximate_hessian_precond.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_b_f_b_t.html">BFBT</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_b_f_b_t.html" title="BFBT Schur-complement preconditioner.">BFBT</a> Schur-complement preconditioner.  <a href="class_f_e_a_t_1_1_solver_1_1_b_f_b_t.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_b_f_b_t_3_01_global_1_1_matrix_3_01_matrix_a___00_01_mirror_v___00_b78d0c70abd3b3b8f4e08d78d44fb7d6.html">BFBT&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_b_f_b_t.html" title="BFBT Schur-complement preconditioner.">BFBT</a> specialization for <a class="el" href="namespace_f_e_a_t_1_1_global.html" title="Global linear algebra namespace.">Global</a> matrices.  <a href="class_f_e_a_t_1_1_solver_1_1_b_f_b_t_3_01_global_1_1_matrix_3_01_matrix_a___00_01_mirror_v___00_b78d0c70abd3b3b8f4e08d78d44fb7d6.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab.html">BiCGStab</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">(Preconditioned) Bi-Conjugate Gradient Stabilized solver implementation  <a href="class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -588,6 +594,10 @@ Functions</h2></td></tr>
 <tr class="memitem:af040d5ae2582eca39ae5831872f44e1b"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_approximate_hessian_precond.html">ApproximateHessianPrecond</a>&lt; Operator_, Filter_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#af040d5ae2582eca39ae5831872f44e1b">new_approximate_hessian_precond</a> (Operator_ &amp;op_, const Filter_ &amp;filter_)</td></tr>
 <tr class="memdesc:af040d5ae2582eca39ae5831872f44e1b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_approximate_hessian_precond.html" title="Wrapper class for applying an the inverse of an operator&#39;s approximate Hessian as a preconditioner.">ApproximateHessianPrecond</a>.  <a href="namespace_f_e_a_t_1_1_solver.html#af040d5ae2582eca39ae5831872f44e1b">More...</a><br /></td></tr>
 <tr class="separator:af040d5ae2582eca39ae5831872f44e1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad37e16cacfafa0c3619d355b2c5db6d8"><td class="memTemplParams" colspan="2">template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename FilterV_ , typename FilterP_ &gt; </td></tr>
+<tr class="memitem:ad37e16cacfafa0c3619d355b2c5db6d8"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_b_f_b_t.html">BFBT</a>&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#ad37e16cacfafa0c3619d355b2c5db6d8">new_bfbt</a> (const MatrixA_ &amp;matrix_a, const MatrixB_ &amp;matrix_b, const MatrixD_ &amp;matrix_d, const FilterV_ &amp;filter_v, const FilterP_ &amp;filter_p, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">SolverBase</a>&lt; typename MatrixD_::VectorTypeL &gt; &gt; solver_left, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">SolverBase</a>&lt; typename MatrixD_::VectorTypeL &gt; &gt; solver_right, const typename MatrixB_::VectorTypeL &amp;lumped_velo_mass_vec)</td></tr>
+<tr class="memdesc:ad37e16cacfafa0c3619d355b2c5db6d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_b_f_b_t.html" title="BFBT Schur-complement preconditioner.">BFBT</a> solver object.  <a href="namespace_f_e_a_t_1_1_solver.html#ad37e16cacfafa0c3619d355b2c5db6d8">More...</a><br /></td></tr>
+<tr class="separator:ad37e16cacfafa0c3619d355b2c5db6d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af9f083d0e11b367f7f641ca58444b0c1"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Filter_ &gt; </td></tr>
 <tr class="memitem:af9f083d0e11b367f7f641ca58444b0c1"><td class="memTemplItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab.html">BiCGStab</a>&lt; Matrix_, Filter_ &gt; &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#af9f083d0e11b367f7f641ca58444b0c1">new_bicgstab</a> (const Matrix_ &amp;matrix, const Filter_ &amp;filter, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">SolverBase</a>&lt; typename Matrix_::VectorTypeL &gt; &gt; precond=nullptr, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a84303e5a9eeeb8bd47fb8e76c3d3694e">BiCGStabPreconVariant</a> precon_variant=BiCGStabPreconVariant::left)</td></tr>
 <tr class="memdesc:af9f083d0e11b367f7f641ca58444b0c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab.html" title="(Preconditioned) Bi-Conjugate Gradient Stabilized solver implementation">BiCGStab</a> solver object.  <a href="namespace_f_e_a_t_1_1_solver.html#af9f083d0e11b367f7f641ca58444b0c1">More...</a><br /></td></tr>
@@ -1809,6 +1819,95 @@ template&lt;typename Operator_ , typename Filter_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A shared pointer to a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_hessian_precond.html" title="Preconditioner that applies the inverse of an operator&#39;s Hessian.">HessianPrecond</a> object. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="hessian__precond_8hpp_source.html#l00327">327</a> of file <a class="el" href="hessian__precond_8hpp_source.html">hessian_precond.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ad37e16cacfafa0c3619d355b2c5db6d8" name="ad37e16cacfafa0c3619d355b2c5db6d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad37e16cacfafa0c3619d355b2c5db6d8">&#9670;&#160;</a></span>new_bfbt()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixA_ , typename MatrixB_ , typename MatrixD_ , typename FilterV_ , typename FilterP_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_b_f_b_t.html">BFBT</a>&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt; &gt; FEAT::Solver::new_bfbt </td>
+          <td>(</td>
+          <td class="paramtype">const MatrixA_ &amp;&#160;</td>
+          <td class="paramname"><em>matrix_a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const MatrixB_ &amp;&#160;</td>
+          <td class="paramname"><em>matrix_b</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const MatrixD_ &amp;&#160;</td>
+          <td class="paramname"><em>matrix_d</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const FilterV_ &amp;&#160;</td>
+          <td class="paramname"><em>filter_v</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const FilterP_ &amp;&#160;</td>
+          <td class="paramname"><em>filter_p</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">SolverBase</a>&lt; typename MatrixD_::VectorTypeL &gt; &gt;&#160;</td>
+          <td class="paramname"><em>solver_left</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">SolverBase</a>&lt; typename MatrixD_::VectorTypeL &gt; &gt;&#160;</td>
+          <td class="paramname"><em>solver_right</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const typename MatrixB_::VectorTypeL &amp;&#160;</td>
+          <td class="paramname"><em>lumped_velo_mass_vec</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Creates a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_b_f_b_t.html" title="BFBT Schur-complement preconditioner.">BFBT</a> solver object. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">matrix_a,matrix_b,matrix_d</td><td>The three sub-matrices of the saddle-point system matrix.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">filter_v,filter_p</td><td>The two sub-filters of the system.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">solver_left</td><td>The solver object for the left L_p-matrix.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">solver_right</td><td>The solver object for the right L_p-matrix.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">lumped_velo_mass_vec</td><td>The inverse lumped velocity mass matrix vector</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A shared pointer to a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_b_f_b_t.html" title="BFBT Schur-complement preconditioner.">BFBT</a> object. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="bfbt_8hpp_source.html#l00449">449</a> of file <a class="el" href="bfbt_8hpp_source.html">bfbt.hpp</a>.</p>
 
 </div>
 </div>
@@ -7686,7 +7785,7 @@ template&lt;typename Vector_ , typename Matrix_ , typename Filter_ &gt; </div>
 
 <p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edaa520882cd714abbd1bf9f72d23990f0e">max_iter</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edaa3d1e0a7dd736bc430ba471d9dfdf3a2">stagnated</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda260ca9dd8a4577fc00b7bd5810298076">success</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="multigrid_8hpp_source.html#l01524">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;::_apply_coarse()</a>, <a class="el" href="iterative_8hpp_source.html#l01071">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::_apply_precond()</a>, <a class="el" href="schwarz__precond_8hpp_source.html#l00161">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::apply()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00098">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;::apply()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00202">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;::apply()</a>, and <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00347">solve()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="multigrid_8hpp_source.html#l01524">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;::_apply_coarse()</a>, <a class="el" href="iterative_8hpp_source.html#l01071">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::_apply_precond()</a>, <a class="el" href="schwarz__precond_8hpp_source.html#l00161">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::apply()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00098">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;::apply()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00202">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;::apply()</a>, <a class="el" href="bfbt_8hpp_source.html#l00211">FEAT::Solver::BFBT&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;::apply()</a>, and <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00347">solve()</a>.</p>
 
 </div>
 </div>

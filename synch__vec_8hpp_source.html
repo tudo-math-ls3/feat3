@@ -224,7 +224,7 @@ $(document).ready(function(){initNavTree('synch__vec_8hpp_source.html',''); init
 <div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span><span class="preprocessor">#else</span></div>
 <div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>        <a class="code hl_variable" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#aec8e870a33907f11933f058cc6d83853">_finished</a>(other._finished)</div>
 <div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>      {</div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>        other-&gt;_finished = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>        other._finished = <span class="keyword">true</span>;</div>
 <div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>      }</div>
 <div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_MPI</span></div>
 <div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span> </div>
@@ -243,10 +243,10 @@ $(document).ready(function(){initNavTree('synch__vec_8hpp_source.html',''); init
 <div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>        <a class="code hl_variable" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#ae5c7912d4f9e034874f641ac4020aef7">_send_bufs</a> = std::forward&lt;std::vector&lt;BufferType&gt;&gt;(other._send_bufs);</div>
 <div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>        _recv_bufs = std::forward&lt;std::vector&lt;BufferType&gt;&gt;(other._recv_bufs);</div>
 <div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span> </div>
-<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>        other-&gt;_finished = <span class="keyword">true</span>;</div>
-<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>        other-&gt;_comm = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>        other-&gt;_target = <span class="keyword">nullptr</span>;</div>
-<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>        other-&gt;_mirrors = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>        other._finished = <span class="keyword">true</span>;</div>
+<div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>        other._comm = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>        other._target = <span class="keyword">nullptr</span>;</div>
+<div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>        other._mirrors = <span class="keyword">nullptr</span>;</div>
 <div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span><span class="preprocessor">#else</span></div>
 <div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>        <a class="code hl_variable" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#aec8e870a33907f11933f058cc6d83853">_finished</a> = other._finished;</div>
 <div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>        other._finished = <span class="keyword">true</span>;</div>
