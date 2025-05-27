@@ -882,12 +882,28 @@ namespace FEAT::Geometry
       Index _domain_node;
       Index _next;
 
+      std::optional<Adjacency::Permutation> _inverse_face_permutation = std::nullopt;
+
     public:
       AdaptiveNeighborsAdjactor(std::shared_ptr<AdaptiveMeshType> mesh, Layer layer, Index domain_node, Index next) :
         _mesh(std::move(mesh)),
         _layer(layer),
         _domain_node(domain_node),
         _next(next)
+      {
+      }
+
+      AdaptiveNeighborsAdjactor(
+        std::shared_ptr<AdaptiveMeshType> mesh,
+        Layer layer,
+        Index domain_node,
+        Index next,
+        Adjacency::Permutation inverse_face_permutation) :
+        _mesh(std::move(mesh)),
+        _layer(layer),
+        _domain_node(domain_node),
+        _next(next),
+        _inverse_face_permutation(inverse_face_permutation)
       {
       }
 
@@ -910,6 +926,10 @@ namespace FEAT::Geometry
 
       Index operator*() const
       {
+        if(_inverse_face_permutation)
+        {
+          return _mesh->get_neighbor(_layer, _domain_node, _inverse_face_permutation.value().map(_next));
+        }
         return _mesh->get_neighbor(_layer, _domain_node, _next);
       }
     };
@@ -1059,11 +1079,19 @@ namespace FEAT::Geometry
 
     AdaptiveNeighborsAdjactor image_begin(Index domain_node) const
     {
+      if(_permutation)
+      {
+        return AdaptiveIndexSetAdjactor(_mesh, _layer, _permutation.value().map(domain_node), 0, _inverse_face_permutation.value());
+      }
       return AdaptiveIndexSetAdjactor(_mesh, _layer, domain_node, 0);
     }
 
     AdaptiveNeighborsAdjactor image_end(Index domain_node) const
     {
+      if(_permutation)
+      {
+        return AdaptiveIndexSetAdjactor(_mesh, _layer, _permutation.value().map(domain_node), num_indices, _inverse_face_permutation.value());
+      }
       return AdaptiveIndexSetAdjactor(_mesh, _layer, domain_node, num_indices);
     }
   };
@@ -1249,12 +1277,6 @@ namespace FEAT::Geometry
 
       // permute index sets
       this->_index_set_holder.permute(this->_permutation.get_perms(), this->_permutation.get_inv_perms());
-
-      // rebuild neighbor index set
-      static_assert(false);
-      // We need to calculate neighbors on the adaptive mesh
-      // We also need to mock the neighbors, to support permutations
-      //fill_neighbors();
     }
 
     /**
@@ -1295,12 +1317,6 @@ namespace FEAT::Geometry
 
       // permute index sets
       this->_index_set_holder.permute(this->_permutation.get_perms(), this->_permutation.get_inv_perms());
-
-      // rebuild neighbor index set
-      static_assert(false);
-      // We need to calculate neighbors on the adaptive mesh
-      // We also need to mock the neighbors, to support permutations
-      //fill_neighbors();
     }
 
     /**
