@@ -91,6 +91,7 @@ if (FEAT_HAVE_CUDA)
 #TODO: Use Static variants?  target_link_libraries(kernel-lafem-arch-cuda kernel-util-cuda ${CUDA_cusparse_static_LIBRARY} ${CUDA_cublas_static_LIBRARY})
 
   if(FEAT_HAVE_CUDSS)
+    find_package(cuDSS)
     target_link_libraries(feat-kernel-lafem-arch-cuda PRIVATE cuDSS::cuDSS)
   endif()
 
