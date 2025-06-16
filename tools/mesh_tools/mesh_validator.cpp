@@ -8,6 +8,7 @@
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/mesh_file_reader.hpp>
+#include <kernel/trafo/standard/mapping.hpp>
 
 using namespace FEAT;
 using namespace FEAT::Geometry;
@@ -219,6 +220,33 @@ public:
 };
 
 template<typename Mesh_>
+void validate_jacobian_determinants(Mesh_& mesh)
+{
+  std::cout << "Validating Jacobian determinants...\n";
+  typedef Trafo::Standard::Mapping<Mesh_> TrafoType;
+  TrafoType trafo(mesh);
+
+  typedef typename TrafoType::template Evaluator<>::Type TrafoEvaluator;
+  TrafoEvaluator trafo_eval(trafo);
+
+  typename TrafoEvaluator::JacobianMatrixType jac_mat;
+  typename TrafoEvaluator::DomainPointType dom_point(0.0);
+
+  const Index n = trafo_eval.get_num_cells();
+  for(Index i = 0; i < n; ++i)
+  {
+    trafo_eval.prepare(i);
+    trafo_eval.calc_jac_mat(jac_mat, dom_point);
+    double det = jac_mat.det();
+    if(det < 1E-8)
+    {
+      std::cout << "ERROR: element " << i << " has non-positive determinant with value " << det << "\n";
+    }
+    trafo_eval.finish();
+  }
+}
+
+template<typename Mesh_>
 int run_xml(Geometry::MeshFileReader& mesh_reader)
 {
   typedef typename Mesh_::ShapeType ShapeType;
@@ -250,6 +278,9 @@ int run_xml(Geometry::MeshFileReader& mesh_reader)
   // get the mesh
   const Mesh_& mesh = *node->get_mesh();
 
+  static constexpr int shape_dim = Mesh_::shape_dim;
+  static constexpr int world_dim = Mesh_::world_dim;
+
   std::cout << "Number of mesh entities:" << std::endl;
   for(int i(0); i <= ShapeType::dimension; ++i)
   {
@@ -259,6 +290,12 @@ int run_xml(Geometry::MeshFileReader& mesh_reader)
 
   // validate index sets
   IndexSetValidator<ShapeType>::validate(mesh.get_index_set_holder());
+
+  // validate jacobian determinants
+  if constexpr (shape_dim == world_dim)
+  {
+    validate_jacobian_determinants(mesh);
+  }
 
   return 0;
 }
