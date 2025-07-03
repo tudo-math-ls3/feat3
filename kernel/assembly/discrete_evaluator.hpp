@@ -656,6 +656,164 @@ namespace FEAT
       }
 
       /**
+       * \brief Evaluates the gradient of a scalar finite-element function in a given point.
+       *
+       * \note
+       * If you intend to evaluate several finite-element functions in the same point,
+       * then you might consider unmapping the input point by yourself and using the
+       * other overload of this function instead for performance reasons.
+       *
+       * \param[in] point
+       * The point in real world coordinates in which the finite element function
+       * is to be evaluated.
+       *
+       * \param[in] vector
+       * The coefficient vector of the finite-element function.
+       *
+       * \param[in] space
+       * The finite-element space.
+       *
+       * \returns
+       * A VectorDiscreteEvalData object that contains the evaluations results.
+       */
+      template<typename DT_, typename DTP_, typename IT_, int dim_, int s_, typename Space_>
+      static VectorDiscreteEvalData<DT_, dim_> eval_fe_gradient(
+        const Tiny::Vector<DTP_, dim_, s_>& point,
+        const LAFEM::DenseVector<DT_, IT_>& vector,
+        const Space_& space)
+      {
+        // create inverse trafo mapping
+        Trafo::InverseMapping<typename Space_::TrafoType, DT_> inv_mapping(space.get_trafo());
+
+        // unmap point
+        auto inv_map_data = inv_mapping.unmap_point(point);
+
+        // evaluate FE function
+        return eval_fe_gradient(inv_map_data, vector, space);
+      }
+
+      /**
+       * \brief Evaluates the gradient of a scalar finite-element function in a given unmapped point.
+       *
+       * \param[in] inv_map_data
+       * A Trafo::InverseMappingData object that represents the unmapped evaluation point,
+       * as computed by the Trafo::InverseMapping class.
+       *
+       * \param[in] vector
+       * The coefficient vector of the finite-element function.
+       *
+       * \param[in] space
+       * The finite-element space.
+       *
+       * \returns
+       * A VectorDiscreteEvalData object that contains the evaluations results.
+       */
+      template<typename DT_, typename DTP_, typename IT_, int dim_, typename Space_>
+      static VectorDiscreteEvalData<DT_, dim_> eval_fe_gradient(
+        const Trafo::InverseMappingData<DTP_, dim_, dim_>& inv_map_data,
+        const LAFEM::DenseVector<DT_, IT_>& vector,
+        const Space_& space)
+      {
+        // vector type
+        typedef LAFEM::DenseVector<DT_, IT_> VectorType;
+        // space type
+        typedef Space_ SpaceType;
+        // assembly traits
+        typedef AsmTraits1<DT_, SpaceType, TrafoTags::none, SpaceTags::value|SpaceTags::grad> AsmTraits;
+        // data type
+        typedef typename AsmTraits::DataType DataType;
+
+        // fetch the trafo
+        const typename AsmTraits::TrafoType& trafo = space.get_trafo();
+
+        // create a trafo evaluator
+        typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
+
+        // create a space evaluator and evaluation data
+        typename AsmTraits::SpaceEvaluator space_eval(space);
+
+        // create a dof-mapping
+        typename AsmTraits::DofMapping dof_mapping(space);
+
+        // create trafo evaluation data
+        typename AsmTraits::TrafoEvalData trafo_data;
+
+        // create space evaluation data
+        typename AsmTraits::SpaceEvalData space_data;
+
+        // get maximum number of local dofs
+        static constexpr int max_local_dofs = AsmTraits::max_local_test_dofs;
+
+        // create local vector data
+        typedef Tiny::Vector<DataType, max_local_dofs> LocalVectorType;
+        LocalVectorType local_vector;
+
+        // create matrix scatter-axpy
+        typename VectorType::GatherAxpy gather_axpy(vector);
+
+        // our local gradient
+        Tiny::Vector<DataType, dim_> loc_grad;
+        loc_grad.format();
+
+        // create evaluation data
+        VectorDiscreteEvalData<DT_, dim_> eval_data;
+
+        // loop over all cells of the mesh
+        for(std::size_t i(0); i < inv_map_data.size(); ++i)
+        {
+          const Index& cell = inv_map_data.cells.at(i);
+          const auto& dom_point = inv_map_data.dom_points.at(i);
+
+          // format local vector
+          local_vector.format();
+
+          // initialize dof-mapping
+          dof_mapping.prepare(cell);
+
+          // gather local vector data
+          gather_axpy(local_vector, dof_mapping);
+
+          // finish dof-mapping
+          dof_mapping.finish();
+
+          // prepare trafo evaluator
+          trafo_eval.prepare(cell);
+
+          // prepare space evaluator
+          space_eval.prepare(trafo_eval);
+
+          // compute trafo data
+          trafo_eval(trafo_data, dom_point);
+
+          // compute basis function data
+          space_eval(space_data, trafo_data);
+
+          // fetch number of local dofs
+          const int num_loc_dofs = space_eval.get_num_local_dofs();
+
+          // compute function value
+          loc_grad.format();
+          for(int j(0); j < num_loc_dofs; ++j)
+          {
+            // update gradient
+            Tiny::axpy(loc_grad, space_data.phi[j].grad, local_vector[j]);
+          }
+
+          // finally, add this result to the eval data
+          eval_data.values.push_back(loc_grad);
+
+          // finish evaluators
+          space_eval.finish();
+          trafo_eval.finish();
+
+          // continue with next cell
+        }
+
+        // return evaluation data
+        return eval_data;
+      }
+
+      /**
        * \brief Evaluates the gradient of a vector-valued finite-element function in a given point.
        *
        * \note
@@ -677,7 +835,7 @@ namespace FEAT
        * A MatrixDiscreteEvalData object that contains the evaluations results.
        */
       template<typename DT_, typename DTP_, typename IT_, int dim_, int s_, typename Space_>
-      static MatrixDiscreteEvalData<DT_, dim_, dim_> eval_fe_gradient_function(
+      static MatrixDiscreteEvalData<DT_, dim_, dim_> eval_fe_gradient(
         const Tiny::Vector<DTP_, dim_, s_>& point,
         const LAFEM::DenseVectorBlocked<DT_, IT_, dim_>& vector,
         const Space_& space)
@@ -689,7 +847,7 @@ namespace FEAT
         auto inv_map_data = inv_mapping.unmap_point(point);
 
         // evaluate FE function
-        return eval_fe_gradient_function(inv_map_data, vector, space);
+        return eval_fe_gradient(inv_map_data, vector, space);
       }
 
       /**
@@ -709,7 +867,7 @@ namespace FEAT
        * A MatrixDiscreteEvalData object that contains the evaluations results.
        */
       template<typename DT_, typename DTP_, typename IT_, int dim_, typename Space_>
-      static MatrixDiscreteEvalData<DT_, dim_, dim_> eval_fe_gradient_function(
+      static MatrixDiscreteEvalData<DT_, dim_, dim_> eval_fe_gradient(
         const Trafo::InverseMappingData<DTP_, dim_, dim_>& inv_map_data,
         const LAFEM::DenseVectorBlocked<DT_, IT_, dim_>& vector,
         const Space_& space)
@@ -758,7 +916,6 @@ namespace FEAT
 
         // create evaluation data
         MatrixDiscreteEvalData<DT_, dim_, dim_> eval_data;
-
 
         // loop over all cells of the mesh
         for(std::size_t i(0); i < inv_map_data.size(); ++i)

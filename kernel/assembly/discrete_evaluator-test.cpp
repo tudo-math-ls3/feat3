@@ -109,7 +109,7 @@ public:
       auto scalar_eval_data = Assembly::DiscreteEvaluator::eval_fe_function(inv_point, scalar_vec, space);
       auto vector_eval_data = Assembly::DiscreteEvaluator::eval_fe_function(inv_point, blocked_vec, space);
       //also evaluate the vector_valued function in its gradient
-      auto matrix_eval_data = Assembly::DiscreteEvaluator::eval_fe_gradient_function(inv_point, blocked_vec, space);
+      auto matrix_eval_data = Assembly::DiscreteEvaluator::eval_fe_gradient(inv_point, blocked_vec, space);
 
       // ensure that the data structures are not empty
       TEST_CHECK(!scalar_eval_data.empty());
