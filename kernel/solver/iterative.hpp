@@ -138,17 +138,17 @@ namespace FEAT
        * the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init\n
        * or\n
        * the defect is smaller than _tol_abs and also smaller than _tol_abs_low\n
-       * As this might not be a sufficent description, the criterion that is checked is
+       * As this might not be a sufficient description, the criterion that is checked is
        * \f[
        *   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
        * \f]
        * where \f$ r_k \f$ is the defect vector in the current iteration and \f$ r_0 \f$ the initial defect vector.
-       * Both _tol_rel and _tol_abs alone were not sufficent because of one practical case:
+       * Both _tol_rel and _tol_abs alone were not sufficient because of one practical case:
        * If you have already a good initial solution so that the defect is 10^{-3}, it might be
        * very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8}
        * anyways. On the other hand, if you have a bad initial solution and your defect
        * is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori
-       * you do not know the quality of the intial guess.
+       * you do not know the quality of the initial guess.
        * The way it is now allows to say "I want the defect to be smaller than 10^{-3},
        * and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
        * did not gain 8 digits so far then I'm also happy"
@@ -186,8 +186,8 @@ namespace FEAT
       PlotMode _plot_mode;
       /// plot output interval
       Index _plot_interval;
-      /// whether to skip defect computation if possible
-      bool _skip_def_calc;
+      /// whether skipping of defect computation is allowed or not
+      bool _allow_skip_def_calc;
 
       /**
        * \brief Protected constructor
@@ -230,7 +230,7 @@ namespace FEAT
         _iter_digits(Math::ilog10(_max_iter)),
         _plot_mode(PlotMode::none),
         _plot_interval(1),
-        _skip_def_calc(true)
+        _allow_skip_def_calc(true)
       {
       }
 
@@ -338,7 +338,6 @@ namespace FEAT
         return _tol_abs_low;
       }
 
-
       /// Sets the relative divergence for the solver.
       void set_div_rel(DataType div_rel)
       {
@@ -363,7 +362,7 @@ namespace FEAT
         return _div_abs;
       }
 
-      /// Sets the stagnation rate fot the solver.
+      /// Sets the stagnation rate for the solver.
       void set_stag_rate(DataType rate)
       {
         _stag_rate = rate;
@@ -431,7 +430,7 @@ namespace FEAT
        */
       void skip_defect_calc(bool skip)
       {
-        _skip_def_calc = skip;
+        _allow_skip_def_calc = skip;
       }
 
       /**
@@ -483,7 +482,7 @@ namespace FEAT
        * \details \copydetails Solver::IterativeSolver::_tol_rel
        *
        * \param[in] def_cur
-       * The defect that is to be analysed
+       * The defect that is to be analyzed
        *
        * \returns \c true, if converged, else \c false
        */
@@ -745,10 +744,23 @@ namespace FEAT
        */
       virtual Status _set_initial_defect(const VectorType& vec_def, const VectorType& vec_sol)
       {
-        // store new defect
-        this->_def_init = this->_def_cur = this->_def_prev = this->_calc_def_norm(vec_def, vec_sol);
+        // reset iteration counts
+        this->_def_init = DataType(0);
         this->_num_iter = Index(0);
         this->_num_stag_iter = Index(0);
+
+        // first, let's see if we have to compute the defect at all
+        bool calc_def = !_allow_skip_def_calc;
+        calc_def = calc_def || (this->_min_iter < this->_max_iter);
+        calc_def = calc_def || (this->_plot_iter() || this->_plot_summary());
+        calc_def = calc_def || (this->_min_stag_iter > Index(0));
+
+        // if we don't have to compute the initial defect, we can exit here
+        if(!calc_def)
+          return Status::progress;
+
+        // compute new initial defect
+        this->_def_init = this->_def_cur = this->_def_prev = this->_calc_def_norm(vec_def, vec_sol);
         Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_init, this->get_num_iter()));
 
         // plot iteration line?
@@ -772,7 +784,7 @@ namespace FEAT
       }
 
       /**
-       * \brief Internal function: analyse the current defect
+       * \brief Internal function: analyze the current defect
        *
        * \note
        * This function is called by _set_new_defect() and _update_defect().
@@ -794,7 +806,7 @@ namespace FEAT
        * \returns
        * The updated status code.
        */
-      virtual Status _analyse_defect(Index num_iter, DataType def_cur, DataType def_prev, bool check_stag)
+      virtual Status _analyze_defect(Index num_iter, DataType def_cur, DataType def_prev, bool check_stag)
       {
         // ensure that the defect is neither NaN nor infinity
         if(!Math::isfinite(def_cur))
@@ -861,7 +873,7 @@ namespace FEAT
         this->_def_prev = this->_def_cur;
 
         // first, let's see if we have to compute the defect at all
-        bool calc_def = !_skip_def_calc;
+        bool calc_def = !_allow_skip_def_calc;
         calc_def = calc_def || (this->_min_iter < this->_max_iter);
         calc_def = calc_def || (this->_plot_iter());
         calc_def = calc_def || (this->_min_stag_iter > Index(0));
@@ -873,8 +885,8 @@ namespace FEAT
           Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_cur, this->get_num_iter()));
         }
 
-        // analyse defect
-        Status status = this->_analyse_defect(this->_num_iter, this->_def_cur, this->_def_prev, true);
+        // analyze defect
+        Status status = this->_analyze_defect(this->_num_iter, this->_def_cur, this->_def_prev, true);
 
         // plot defect?
         if(this->_plot_iter(status))
@@ -910,8 +922,8 @@ namespace FEAT
         this->_def_cur = def_cur_norm;
         Statistics::add_solver_expression(std::make_shared<ExpressionDefect>(this->name(), this->_def_cur, this->get_num_iter()));
 
-        // analyse defect
-        Status status = this->_analyse_defect(this->_num_iter, this->_def_cur, this->_def_prev, true);
+        // analyze defect
+        Status status = this->_analyze_defect(this->_num_iter, this->_def_cur, this->_def_prev, true);
 
         // plot defect?
         if(this->_plot_iter(status))
