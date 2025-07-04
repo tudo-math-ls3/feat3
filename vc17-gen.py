@@ -44,7 +44,7 @@ sys.dont_write_bytecode = True
 
 ########################################################################################################################
 
-kernel_project_path = os.path.join(".","build_system","vc17","kernel.vc17.vcxproj")
+kernel_project_path = os.path.join(".","kernel","kernel.vc17.vcxproj")
 build_modes_path = os.path.join(".","build_system","vc17","build-modes.xml")
 
 build_ids = []
@@ -331,7 +331,7 @@ ofs.write("  <!-- **************************************************************
 ofs.write("  <!-- Final Imports -->\n")
 ofs.write("  <!-- ********************************************************************* -->\n")
 ofs.write("  <ItemGroup>\n")
-ofs.write("    <ProjectReference Include=\"$(FeatRootPath)\\build_system\\vc17\\kernel.vc17.vcxproj\">\n")
+ofs.write("    <ProjectReference Include=\"$(FeatRootPath)\\kernel\\kernel.vc17.vcxproj\">\n")
 ofs.write("      <Project>" + kernel_guid + "</Project>\n")
 ofs.write("    </ProjectReference>\n")
 ofs.write("  </ItemGroup>\n")

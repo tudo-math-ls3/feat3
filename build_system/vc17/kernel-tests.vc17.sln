@@ -5,7 +5,7 @@ VisualStudioVersion = 17.3.32929.385
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kernel-tests.vc17", "kernel-tests.vc17.vcxproj", "{1AAEDE40-225C-458D-8DE0-531D1E809C3B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kernel.vc17", "kernel.vc17.vcxproj", "{98608C16-F806-46BE-BDB4-77BA4023DC38}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "..\..\kernel\kernel.vc17", "..\..\kernel\kernel.vc17.vcxproj", "{98608C16-F806-46BE-BDB4-77BA4023DC38}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

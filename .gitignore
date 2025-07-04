@@ -50,6 +50,7 @@ test_system/Testing/
 
 # Ignore FEAT test output files
 *test*.log
+*.log
 
 # Ignore Doxygen output files
 doc/*

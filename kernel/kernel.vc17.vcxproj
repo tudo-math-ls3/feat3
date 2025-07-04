@@ -5,7 +5,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{98608C16-F806-46BE-BDB4-77BA4023DC38}</ProjectGuid>
     <FeatAppName>kernel</FeatAppName>
-    <FeatRootPath>$([MSBuild]::NormalizeDirectory($(MSBuildProjectDirectory)\..\..))</FeatRootPath>
+    <FeatRootPath>$([MSBuild]::NormalizeDirectory($(MSBuildProjectDirectory)\..))</FeatRootPath>
   </PropertyGroup>
   <PropertyGroup>
     <ReplaceWildcardsInProjectItems>true</ReplaceWildcardsInProjectItems>
@@ -15,30 +15,30 @@
   <Import Project="$(FeatRootPath)\build_system\vc17\common-config.xml" />
   <!-- Kernel Header Inclusion List -->
   <ItemGroup>
-    <FeatKernelIncludeHeader Include="kernel\**\*.hpp" />
+    <FeatKernelIncludeHeader Include="**\*.hpp" />
   </ItemGroup>
   <!-- Kernel Source Inclusion List -->
   <ItemGroup>
-    <FeatKernelIncludeSource Include="kernel\**\*.cpp" />
+    <FeatKernelIncludeSource Include="**\*.cpp" />
   </ItemGroup>
   <!-- Kernel Source Exclusion List -->
   <ItemGroup>
     <!-- exclude all test sources -->
-    <FeatKernelExcludeSource Include="kernel\**\*-test*.cpp" />
+    <FeatKernelExcludeSource Include="**\*-test*.cpp" />
     <!-- exclude all EICKT sources -->
-    <FeatKernelExcludeSource Include="kernel\**\*-eickt*.cpp" />
+    <FeatKernelExcludeSource Include="**\*-eickt*.cpp" />
     <!-- exclude geometry test_aux sources -->
-    <FeatKernelExcludeSource Include="kernel\geometry\test_aux\*.cpp" />
+    <FeatKernelExcludeSource Include="geometry\test_aux\*.cpp" />
     <!-- exclude MKL sources unless the MKL backend is enabled -->
-    <FeatKernelExcludeSource Include="kernel\**\*_mkl.cpp" Condition="'$(EnableMKL)'!='true'" />
+    <FeatKernelExcludeSource Include="**\*_mkl.cpp" Condition="'$(EnableMKL)'!='true'" />
     <!-- exclude CGAL source (this one is included explicitly below) -->
-    <FeatKernelExcludeSource Include="kernel\geometry\cgal.cpp" />
+    <FeatKernelExcludeSource Include="geometry\cgal.cpp" />
     <!-- exclude OS Windows utility source (this one is included explicitly below) -->
-    <FeatKernelExcludeSource Include="kernel\util\os_windows.cpp" />
+    <FeatKernelExcludeSource Include="util\os_windows.cpp" />
   </ItemGroup>
   <!-- Kernel Cuda Inclusion List -->
   <ItemGroup>
-    <FeatKernelIncludeCuda Include="kernel\**\*.cu" />
+    <FeatKernelIncludeCuda Include="**\*.cu" />
   </ItemGroup>
   <!-- Kernel Cuda Exclusion List -->
   <!-- ************************************************************************************************************* -->
@@ -52,12 +52,12 @@
   <ItemGroup>
     <ClCompile Include="@(FeatKernelIncludeSource)" Exclude="@(FeatKernelExcludeSource)" />
     <!-- CGAL wrapper source file -->
-    <ClCompile Include="kernel\geometry\cgal.cpp">
+    <ClCompile Include="geometry\cgal.cpp">
       <!-- BOOST threads need language extensions enabled -->
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
     </ClCompile>
     <!-- OS Windows utility source file -->
-    <ClCompile Include="kernel\util\os_windows.cpp">
+    <ClCompile Include="util\os_windows.cpp">
       <DisableLanguageExtensions>false</DisableLanguageExtensions>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
     </ClCompile>

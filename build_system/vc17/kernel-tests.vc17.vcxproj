@@ -35,7 +35,7 @@
   <!-- Final Imports -->
   <!-- ********************************************************************* -->
   <ItemGroup>
-    <ProjectReference Include="$(FeatRootPath)\build_system\vc17\kernel.vc17.vcxproj">
+    <ProjectReference Include="$(FeatRootPath)\kernel\kernel.vc17.vcxproj">
       <Project>{98608C16-F806-46BE-BDB4-77BA4023DC38}</Project>
     </ProjectReference>
   </ItemGroup>
