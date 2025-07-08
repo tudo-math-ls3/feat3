@@ -3,20 +3,25 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+/// This header/source file pair defines the SteadySolver class, which implements the non-linear Newton-/Picard-solver
+/// along with the setup of its linear Multigrid-AmaVanka preconditioner/solver. This class is also responsible for
+/// assembling the non-linear Burgers matrices as well as the non-linear defects. This class also contains some helper
+/// functions for the assembly of boundary condition filters, the assembly of right-hand-side vectors and the
+/// interpolation of initial solution vectors. Finally, this class also offers functionality for the I/O of joined
+/// solution vectors.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
+#include "base.hpp"
 #include "stokes_level.hpp"
 
-#include <kernel/assembly/burgers_assembly_job.hpp>
-
-#include <kernel/solver/multigrid.hpp>
-#include <kernel/solver/richardson.hpp>
-#include <kernel/solver/schwarz_precond.hpp>
+#include <kernel/solver/iterative.hpp>
 #include <kernel/solver/amavanka.hpp>
-#include <kernel/solver/vanka.hpp>
-#include <kernel/solver/bicgstab.hpp>
-#include <kernel/solver/fgmres.hpp>
-#include <kernel/solver/umfpack.hpp>
+#include <kernel/solver/multigrid.hpp>
 
 namespace CCNDSimple
 {
@@ -24,73 +29,131 @@ namespace CCNDSimple
    * \brief Steady-state Navier-Stokes solver class
    *
    * This class provides a simple monolithic steady-state Navier-Stokes solver, which can be used either directly
-   * or as a base-class for custom Navier-Stokes solver implementations. This class also acts as a base-class for
-   * the unsteady Navier-Stokes solving, supplying the functionality to solve the nonlinear system in each time step.
+   * or as a base-class for custom Navier-Stokes solver implementations. This class can also be used to solve each
+   * time step update of an unsteady (Navier-)Stokes system.
    *
    * \author Peter Zajac
    */
-  class SteadySolver
+  class StokesSolver
   {
   public:
     /// our domain controller
     DomainControl& domain;
+
     /// our communicator
     const Dist::Comm& comm;
 
-    /// solve Navier-Stokes or only Stokes?
-    bool navier_stokes = true;
-    /// use Newton or Picard for Navier-Stokes?
+    // ----------------
+    // input attributes
+    // ----------------
+
+    /// solve nonlinear Navier-Stokes or only linear Stokes?
+    bool nonlinear_system = true;
+
+    /// use Newton or Picard for non-linear iteration?
     bool newton_solver = true;
+
     /// deformation tensor or gradient tensor for diffusion?
     bool deform_tensor = true;
+
     /// use adaptive tolerance for multigrid?
     bool adaptive_tol = true;
+
     /// plot multigrid iterations during non-linear iteration?
     bool plot_mg_iter = false;
 
-    /// plot Stokes solver iterations?
-    bool plot_stokes = true;
-    /// plot Stokes iterations header lines?
-    bool plot_stokes_header = true;
-    /// plot Navier-Stokes iterations?
-    bool plot_navier = true;
-    /// plot Navier-Stokes iterations header lines? (set to false by unsteady derived class)
-    bool plot_navier_header = true;
+    /// plot linear solver iterations?
+    bool plot_linear = true;
 
-    /// Filename to load joined solution vector from
-    String load_joined_filename;
-    /// Filename to save joined solution vector to
-    String save_joined_filename;
+    /// plot linear iteration header lines?
+    bool plot_linear_header = true;
+
+    /// plot nonlinear iterations?
+    bool plot_nonlinear = true;
+
+    /// plot nonlinear iteration header lines?
+    bool plot_nonlinear_header = true;
 
     /// viscosity parameter nu
     DataType nu = DataType(1);
+
+    /// reaction parameter theta (from time stepping scheme)
+    DataType theta = DataType(0);
+
     // streamline diffusion stabilization parameter
     DataType upsam = DataType(0);
+
     /// min. nonlinear solver iterations
     Index min_nl_iter = Index(1);
+
     /// max. nonlinear solver iterations
     Index max_nl_iter = Index(25);
+
     /// min. multigrid iterations
     Index min_mg_iter = Index(1);
+
     /// max. multigrid iterations
     Index max_mg_iter = Index(25);
+
     /// number of smoothing steps
     Index smooth_steps = Index(8);
+
     /// damping parameter for smoother
     DataType smooth_damp = DataType(0.5);
+
     /// relative tolerance for linear solver
     DataType mg_tol_rel = DataType(1E-3);
+
     /// absolute tolerance for nonlinear solver
     DataType nl_tol_abs = DataType(1E-8);
+
     /// non-linear stagnation rate
     DataType nl_stag_rate = DataType(0.95);
-    /// use UMPFACK as coarse grid solver?
+
+    /// use direct solver as coarse grid solver?
     bool direct_coarse_solver = true;
 
     /// the cubature rule used for assembly
     String cubature = "gauss-legendre:3";
+
     /// the cubature rule used for post-processing
     String cubature_postproc = "gauss-legendre:4";
+
+    /// Filename to load joined solution vector from
+    String load_joined_filename;
+
+    /// Filename to save joined solution vector to
+    String save_joined_filename;
+
+    // -----------------
+    // output attributes
+    // -----------------
+
+    /// vector of all non-linear defect norms (cleared upon each solver call)
+    std::vector<DataType> nl_defs;
+
+    /// vector of all multigrid iteration counts (cleared upon each solver call)
+    std::vector<Index> mg_iters;
+
+    /// plot line for short plot
+    String plot_line;
+
+    /// watch for total nonlinear solver
+    StopWatch watch_nonlinear_solve;
+
+    /// watches for matrix/vector/filter assembly
+    StopWatch watch_asm_matrix, watch_asm_vector, watch_asm_filter;
+
+    /// watches for symbolic/numeric solver initialization
+    StopWatch watch_linsol_create, watch_linsol_sym, watch_linsol_num, watch_linsol_apply;
+
+    /// total time for smoother and coarse grid solver
+    double time_mg_smooth = 0.0;
+    double time_mg_coarse = 0.0;
+
+    // ----------------
+    // state attributes
+    // ----------------
 
     // our actual Stokes levels
     std::deque<std::shared_ptr<StokesLevel>> stokes_levels;
@@ -115,24 +178,22 @@ namespace CCNDSimple
     /// the iterative solver preconditioned with multigrid
     std::shared_ptr<Solver::IterativeSolver<StokesLevel::GlobalSystemVector>> stokes_solver;
 
-    // vector of all non-linear defect norms
-    std::vector<DataType> nl_defs;
-
-    // vector of all multigrid iteration counts
-    std::vector<Index> mg_iters;
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   public:
     /// constructor
-    explicit SteadySolver(DomainControl& domain_);
+    explicit StokesSolver(DomainControl& domain_);
 
     /// destructor
-    virtual ~SteadySolver();
+    virtual ~StokesSolver();
 
     /// non-copyable
-    SteadySolver(const SteadySolver&) = delete;
+    StokesSolver(const StokesSolver&) = delete;
 
     /// non-copyable
-    SteadySolver& operator=(const SteadySolver&) = delete;
+    StokesSolver& operator=(const StokesSolver&) = delete;
 
     /// adds all supported arguments to the argument parser
     static void add_supported_args(SimpleArgParser& args);
@@ -155,19 +216,45 @@ namespace CCNDSimple
      * \param[in] slip_parts
      * The name of the slip meshparts, separated by whitespaces.
      *
-     * \param[in] inflow_part
+     * \param[in] flow_part
      * The name of the in-flow meshparts, separated by whitespaces
      *
-     * \param[in] inflow_formula
+     * \param[in] flow_formula
      * The formula of the inflow profile
      *
      * \param[in] pressure_mean
      * Specifies whether a integral-mean filter for the pressure is to be assembled or not.
      */
-    virtual void assemble_boundary_conditions(const String& noflow_parts, const String& slip_parts,
-      const String& inflow_parts, const String& inflow_formula, const bool pressure_mean);
+    template<typename FlowFunc_>
+    void assemble_boundary_conditions(const String& noflow_parts, const String& slip_parts,
+      const String& flow_parts, const FlowFunc_& flow_function, const bool pressure_mean)
+    {
+      watch_asm_filter.start();
+      std::deque<String> noflow_deqs = noflow_parts.split_by_charset("|");
+      std::deque<String> slip_deqs = slip_parts.split_by_charset("|");
+      std::deque<String> flow_deqs = flow_parts.split_by_charset("|");
 
-    /// compiles the local system matrices for the Vanka/UMFPACK
+      String pres_cub = "auto-degree:" + stringify(SpacePresType::local_degree+1);
+
+      for(std::size_t i(0); i < stokes_levels.size(); ++i)
+      {
+        for(auto it = noflow_deqs.begin(); it != noflow_deqs.end(); ++it)
+          stokes_levels.at(i)->assemble_noflow_bc(*it);
+        for(auto it = slip_deqs.begin(); it != slip_deqs.end(); ++it)
+          stokes_levels.at(i)->assemble_slip_bc(*it);
+        for(auto it = flow_deqs.begin(); it != flow_deqs.end(); ++it)
+          stokes_levels.at(i)->assemble_flow_bc(*it, flow_function);
+        if(pressure_mean)
+          stokes_levels.at(i)->assemble_pressure_mean_filter(pres_cub);
+        if(!slip_deqs.empty())
+          stokes_levels.at(i)->sync_velocity_slip_filters();
+        stokes_levels.at(i)->compile_system_filter();
+      }
+      watch_asm_filter.stop();
+    }
+
+
+    /// compiles the local system matrices for AmaVanka/UMFPACK
     virtual void compile_local_systems();
 
     /// creates a new global Stokes vector on the finest vector
@@ -178,22 +265,6 @@ namespace CCNDSimple
 
     /// creates a new global Stokes right-hand-side vector on the finest level, formatted to 0 and filtered
     virtual GlobalStokesVector create_rhs_vector() const;
-
-    /**
-     * \brief Creates a new global Stokes solution vector on the finest level
-     *
-     * This function interpolates the solution vector from two given analytical functions for the
-     * velocity and the pressure.
-     *
-     * \param[in] formulae_v
-     * The formulae for the components of the velocity field.
-     *
-     * \param[in] formula_p
-     * The formula for the pressure function.
-     *
-     * \returns A new synchronized and filtered Stokes vector that contains the interpolated functions.
-     */
-    virtual GlobalStokesVector create_sol_vector(const String& formula_v, const String& formula_p) const;
 
     /**
      * \brief Creates a new global Stokes solution vector on the finest level
@@ -257,12 +328,56 @@ namespace CCNDSimple
      * \brief Creates a new global Stokes right-hand-side vector on the finest level
      *
      * \param[in] formula_f
-     * The formula for the right-hand-side of the momentum equation. May be an empty string if f = 0.
+     * The analytic function for the right-hand-side of the momentum equation.
      *
      * \param[in] formula_g
-     * The formula for the right-hand-side of the continuity equation. May be an empty string if g = 0.
+     * The analytic function for the right-hand-side of the continuity equation.
      */
-    virtual GlobalStokesVector create_rhs_vector(const String& formula_f, const String& formula_g = "") const;
+    template<typename FuncF_, typename FuncG_>
+    GlobalStokesVector create_rhs_vector(const FuncF_& function_f, const FuncG_& function_g) const
+    {
+      // create vector and format it
+      GlobalStokesVector vec_rhs = create_vector();
+      vec_rhs.format();
+
+      // assemble force functional for velocity
+      Assembly::assemble_force_function_vector(domain.front()->domain_asm, vec_rhs.local().at<0>(),
+        function_f, domain.front()->space_velo, cubature);
+
+      // assemble force functional for pressure
+      Assembly::assemble_force_function_vector(domain.front()->domain_asm, vec_rhs.local().at<1>(),
+        function_g, domain.front()->space_pres, cubature);
+
+      // synchronize and filter
+      vec_rhs.sync_0();
+      stokes_levels.front()->filter_sys.filter_rhs(vec_rhs);
+
+      return vec_rhs;
+    }
+
+    /**
+     * \brief Creates a new global Stokes right-hand-side vector on the finest level
+     *
+     * \param[in] formula_f
+     * The analytic function for the right-hand-side of the momentum equation.
+     */
+    template<typename FuncF_>
+    GlobalStokesVector create_rhs_vector(const FuncF_& function_f) const
+    {
+      // create vector and format it
+      GlobalStokesVector vec_rhs = create_vector();
+      vec_rhs.format();
+
+      // assemble force functional for velocity
+      Assembly::assemble_force_function_vector(domain.front()->domain_asm, vec_rhs.local().at<0>(),
+        function_f, domain.front()->space_velo, cubature);
+
+      // synchronize and filter
+      vec_rhs.sync_0();
+      stokes_levels.front()->filter_sys.filter_rhs(vec_rhs);
+
+      return vec_rhs;
+    }
 
     /**
      * \brief Computes and prints the H^k errors of the solution against a reference solution
@@ -303,17 +418,7 @@ namespace CCNDSimple
     }
 
     /**
-     * \brief Computes and prints the body forces of the final solution on a mesh part
-     *
-     * \note This function prints out the \em raw body forces and not the drag/lift \em coefficients, which are
-     * typically used in the DFG95 benchmarks. To obtain these DFG95 drag/lift coefficients,one has to multiply
-     * the raw body forces by 2/(rho*U^2*D) in 2D and by 2/(rho*U^2*D*H) in 3D; the factors for the standard benchmarks
-     * are given here:
-     * - 2D bench1 (steady): 500
-     * - 3D bench1 (steady): 50000 / 41
-     * - 3D bench7 (steady): 800
-     * - 2D bench2 (unsteady): 20
-     * - 3D bench2 (unsteady): 2000 / 41
+     * \brief Computes and prints the body forces of the final solution on a specific mesh part
      *
      * \param[in] body_mesh_part
      * The name of the mesh part that represents the body on which the forces are to be computed
@@ -323,10 +428,14 @@ namespace CCNDSimple
      *
      * \param[in] vec_rhs
      * A \transient reference to the right-hand-side vector.
+     *
+     * \param[in] scaling_factor
+     * A problem-dependent scaling factor for the body forces.
      */
-    void compute_body_forces(const String& body_mesh_part, const GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs);
+    void compute_body_forces(const String& body_mesh_part, const GlobalStokesVector& vec_sol,
+      const GlobalStokesVector& vec_rhs, const DataType scaling_factor = DataType(1));
 
-    /// creates the linear multigrid-Vanka solver
+    /// creates the linear multigrid-AmaVanka solver
     virtual void create_multigrid_solver();
 
     /**
@@ -341,10 +450,10 @@ namespace CCNDSimple
      * \returns
      * true, if the solution was successful, otherwise false
      */
-    virtual bool solve_stokes(GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs);
+    virtual bool solve_linear(GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs);
 
     /**
-     * \brief Solves the non-linear Navier-Stokes system
+     * \brief Solves the nonlinear Navier-Stokes system
      *
      * \param[inout] vec_sol
      * The solution vector to be updated.
@@ -355,7 +464,7 @@ namespace CCNDSimple
      * \returns
      * true, if the solution was successful, otherwise false
      */
-    virtual bool solve_navier_stokes(GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs);
+    virtual bool solve_nonlinear(GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs);
 
     /**
      * \brief Assembles the nonlinear defect vector for the Navier-Stokes equations
@@ -372,14 +481,8 @@ namespace CCNDSimple
      * \param[in] filter_def
      * Specifies whether the defect vector is to be filtered or not.
      */
-    virtual void assemble_nonlinear_defect(GlobalStokesVector& vec_def, const GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs, bool filter_def = true);
-
-    /**
-     * \brief Sets up the Burgers assembly job for the nonlinear defect assembly.
-     *
-     * This function is called by assemble_nonlinear_defect().
-     */
-    virtual void setup_defect_burgers_job(Assembly::BurgersBlockedVectorAssemblyJob<LocalVeloVector, SpaceVeloType>& burgers_def_job);
+    virtual void assemble_nonlinear_defect(GlobalStokesVector& vec_def, const GlobalStokesVector& vec_sol,
+      const GlobalStokesVector& vec_rhs, bool filter_def = true);
 
     /**
      * \brief Assembles the Burgers matrix blocks A on all levels
@@ -390,13 +493,6 @@ namespace CCNDSimple
     virtual void assemble_burgers_matrices(const GlobalStokesVector& vec_sol);
 
     /**
-     * \brief Sets up the Burgers assembly job for the nonlinear matrix assembly.
-     *
-     * This function is called by assemble_burgers_matrices().
-     */
-    virtual void setup_matrix_burgers_job(Assembly::BurgersBlockedMatrixAssemblyJob<LocalMatrixBlockA, SpaceVeloType, LocalVeloVector>& burgers_mat_job);
-
-    /**
      * \brief Computes the adaptive multigrid tolerance based on the non-linear defect norms
      */
     virtual void compute_adaptive_mg_tol();
@@ -405,5 +501,58 @@ namespace CCNDSimple
      * \brief Releases the Stokes solver and frees up (almost) all internal data structures
      */
     virtual void release();
-  }; // class StokesSteadySolver
+
+    /// prints runtime information for this object
+    virtual void print_runtime(double total_time);
+
+  protected:
+    /**
+     * \brief Assembles the local Burgers defect vector on a level
+     *
+     * This method is called by #assemble_nonlinear_defect() to assemble the Burgers part of the
+     * defect vector.
+     *
+     * \param[inout] vec_def
+     * The defect vector to be assembled; its contents are already initialized.
+     *
+     * \param[in] vec_velo
+     * The velocity vector for the convective part of the Burgers operator.
+     *
+     * \param[in] domain_lyr
+     * The domain layer that the domain level belongs to.
+     *
+     * \param[in] domain_lvl
+     * The domain level to assemble on; this is typically the finest domain level.
+     *
+     * \param[in] stokes_lvl
+     * The Stokes level to assemble on; this is typically the finest Stokes level.
+     */
+    virtual void _assemble_local_burgers_defect(LocalVeloVector& vec_def, const LocalVeloVector& vec_velo,
+      const DomainLayer& domain_lyr, DomainLevel& domain_lvl, StokesLevel& stokes_lvl);
+
+    /**
+     * \brief Assembles the local Burgers matrix on a level
+     *
+     * This method is called by #assemble_burgers_matrices() to assemble the Burgers part of the
+     * matrix on a given level.
+     *
+     * \param[inout] matrix_a
+     * The Burgers matrix to be assembled; its contents are already formatted/initialized.
+     *
+     * \param[in] vec_velo
+     * The velocity vector for the convective part of the Burgers operator.
+     *
+     * \param[in] domain_lyr
+     * The domain layer that the domain level belongs to.
+     *
+     * \param[in] domain_lvl
+     * The domain level to assemble on
+     *
+     * \param[in] stokes_lvl
+     * The Stokes level to assemble on
+     */
+    virtual void _assemble_local_burgers_matrix(LocalMatrixBlockA& matrix_a, const LocalVeloVector& vec_velo,
+      const DomainLayer& domain_lyr, DomainLevel& domain_lvl, StokesLevel& stokes_lvl);
+
+  }; // class StokesSolver
 } // namespace CCNDSimple

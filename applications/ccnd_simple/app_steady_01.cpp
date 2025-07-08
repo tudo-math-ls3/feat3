@@ -16,9 +16,9 @@
 // --problem <problem>
 // Specifies which benchmark problem to solve; must be one of the following:
 // * "simple"     Solves a simple parabolic Poiseuille flow on a 2D/3D unit-square/-cube domain.
+// * "conexp"     Simulates a contraction-expansion flow on a 2D domain.
 // * "dricav"     Solves a lid-driven cavity problem on a 2D/3D unit-square/-cube domain.
 // * "bench1"     Solves a DFG95 flow-around-a-cylinder problem on a flowbench_c2d/c3d domain.
-// * "bench7"     Solves a flow-around-a-sphere-inside-a-cylinder problem on a flowbench_p3d domain.
 // * "taygre"     Solves a 2D Taylor-Green vortex problem on a unit-square domain.
 //                This is the only benchmark which also computes H^k velocity and pressure errors
 //                against an analytic reference solution, which can be used to verify the correct
@@ -48,246 +48,274 @@
 // \author Peter Zajac
 // ================================================================================================
 
-#include "steady_solver.hpp"
+#include "stokes_solver.hpp"
 #include "vtk_writer.hpp"
-
-namespace CCNDSimple
-{
-  int main(int argc, char* argv[])
-  {
-    // create world communicator
-    Dist::Comm comm(Dist::Comm::world());
-
-    // print number of processes
-    print_pad(comm, "Number of MPI Processes", stringify(comm.size()));
-
-    // create argument parser
-    SimpleArgParser args(argc, argv);
-
-    // check command line arguments
-    DomainControl::add_supported_args(args);
-    SteadySolver::add_supported_args(args);
-    VtkWriter::add_supported_args(args);
-
-    args.support("problem",
-      "<type>\nSpecifies the problem to solve; valid options are:\n"
-      "simple   Simulate a simple Poiseuille flow.\n"
-      "dricav   Simulate a Driven Cavity flow.\n"
-      "bench1   Simulate a Flow Around A Cylinder.\n"
-      "bench7   Simulate a Flow Inside A Cylinder (3D only).\n"
-      "taygre   Simulate a Taylor-Green vortex (2D only)."
-    );
-
-    // no arguments given?
-    if(args.num_args() <= 1)
-    {
-      comm.print("\nNo arguments given; supported arguments:\n");
-      comm.print(args.get_supported_help());
-      return 0;
-    }
-
-    // check for unsupported options
-    {
-      auto unsupported = args.query_unsupported();
-      if (!unsupported.empty())
-      {
-        // print all unsupported options
-        for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
-          comm.print(std::cerr, "ERROR: unknown option '--" + (*it).second + "'");
-
-        // abort
-        return 1;
-      }
-    }
-
-
-    // query and verify our problem type
-    String problem("simple");
-    args.parse("problem", problem);
-    if(!problem.is_one_of("simple dricav bench1 bench7 taygre"))
-    {
-      comm.print("ERROR: invalid problem type: '" + problem + "'");
-      return 1;
-    }
-    if((problem == "bench7") && (dim != 3))
-    {
-      comm.print("ERROR: bench7 simulation is only available in 3D");
-      return 1;
-    }
-    if((problem == "taygre") && (dim != 2))
-    {
-      comm.print("ERROR: Taylor-Green simulation is only available in 2D");
-      return 1;
-    }
-
-    StopWatch watch_total;
-    watch_total.start();
-
-    // our domain control object
-    DomainControl domain(comm);
-
-    // create the domain
-    domain.create_domain(args);
-
-    // print domain info
-    domain.print_info();
-
-    // our Stokes solver
-    SteadySolver solver(domain);
-
-    // parse arguments and print parsed configuration
-    solver.parse_args(args);
-    solver.print_config();
-
-    // create VTK writer
-    VtkWriter writer(domain, String("ccnd-simple-steady-01-") + problem + "-" + stringify(dim) + "d");
-    writer.parse_args(args);
-    writer.print_config();
-
-    // create levels
-    solver.create_levels();
-
-    // analytic solution for Taylor-Green
-    Analytic::Common::TaylorGreenVortexVelo2D<DataType> taylor_green_velo;
-    Analytic::Common::TaylorGreenVortexPres2D<DataType> taylor_green_pres;
-
-    // assemble boundary conditions
-    if(problem == "simple")
-    {
-      // Poiseuille-Flow: inflow, no-flow and outflow
-      if(dim == 3)
-        solver.assemble_boundary_conditions("bnd:t bnd:b bnd:n bnd:f", "", "bnd:l", "16*y*(1-y)*z*(1-z) ' 0 ' 0", false);
-      else
-        solver.assemble_boundary_conditions("bnd:t bnd:b", "", "bnd:l", "4*y*(1-y) ' 0", false);
-    }
-    else if(problem == "bench1")
-    {
-      // Flow Around A Cylinder: inflow, no-flow and outflow
-      if(dim == 3)
-        solver.assemble_boundary_conditions("bnd:t bnd:b bnd:n bnd:f bnd:c", "", "bnd:l", "72/0.2825761*y*(0.41-y)*z*(0.41-z) ' 0 ' 0", false);
-      else
-        solver.assemble_boundary_conditions("bnd:t bnd:b bnd:c", "", "bnd:l", "12/1.681*y*(0.41-y) ' 0", false);
-    }
-    else if(problem == "bench7")
-    {
-      // Flow Inside A Cylinder: inflow, no-flow and outflow
-      solver.assemble_boundary_conditions("bnd:pipe bnd:sphere", "", "bnd:in", "40000/1681*(0.205^2-(y-0.2)^2-(z-0.205)^2) ' 0 ' 0", false);
-    }
-    else if(problem == "dricav")
-    {
-      // Driven Cavity: all Dirichlet boundary conditions
-      if(dim == 3)
-        solver.assemble_boundary_conditions("bnd:l bnd:r bnd:b bnd:n bnd:f", "", "bnd:t", "if((x>0.0001) & (x<0.9999),1,0) ' 0 ' 0", true);
-      else
-        solver.assemble_boundary_conditions("bnd:l bnd:r bnd:b", "", "bnd:t", "1 ' 0", true);
-    }
-    else if(problem == "taygre")
-    {
-      // Taylor Green: all slip boundary conditions
-      solver.assemble_boundary_conditions("", "bnd:l | bnd:r | bnd:b | bnd:t", "", "", true);
-    }
-
-    // compile local systems for Vanka smoother
-    solver.compile_local_systems();
-
-    // create multigrid solver
-    solver.create_multigrid_solver();
-
-    // create initial solution vector
-    GlobalStokesVector vec_sol = solver.create_sol_vector();
-
-    // create RHS vector
-    GlobalStokesVector vec_rhs = solver.create_rhs_vector();
-
-    // in case of Taylor-Green, assemble the corresponding RHS vector
-    if(problem == "taygre")
-    {
-      String formula_vx = " 2*(pi^2)*(" + stringify(solver.nu) + ")*sin(pi*x)*cos(pi*y)";
-      String formula_vy = "-2*(pi^2)*(" + stringify(solver.nu) + ")*cos(pi*x)*sin(pi*y)";
-      if(!solver.navier_stokes)
-      {
-        formula_vx += "-pi*cos(pi*x)*sin(pi*x)";
-        formula_vy += "-pi*sin(pi*y)*cos(pi*y)";
-      }
-      vec_rhs = solver.create_rhs_vector(formula_vx + " ' " + formula_vy);
-    }
-
-    // load joined solution if desired
-    if(!solver.load_joined_sol_vector(vec_sol))
-    {
-      // no solution loaded; solve Stokes instead
-      comm.print("\nSolving Stokes system...\n");
-
-      // solve Stokes system
-      if(!solver.solve_stokes(vec_sol, vec_rhs))
-        return 1;
-    }
-
-    // now let's go for Navier-Stokes
-    comm.print("\nSolving Navier-Stokes system...\n");
-
-    if(!solver.solve_navier_stokes(vec_sol, vec_rhs))
-      return 1;
-
-    // post-process solution in dependence of the chosen problem
-    if(problem == "taygre")
-    {
-#ifndef FEAT_CCND_SIMPLE_3D
-      // compute errors against reference solution
-      solver.compute_errors(vec_sol, taylor_green_velo, taylor_green_pres);
-#endif
-    }
-    if(problem == "bench1")
-    {
-      // compute body forces on circle/cylinder
-      solver.compute_body_forces("bnd:c", vec_sol, vec_rhs);
-    }
-    if(problem == "bench7")
-    {
-      // compute body forces on sphere
-      solver.compute_body_forces("bnd:sphere", vec_sol, vec_rhs);
-    }
-
-    // write joined solution vector if desired
-    solver.save_joined_sol_vector(vec_sol);
-
-    // release the stokes solver
-    solver.release();
-
-    // write VTK file if desired
-    if(writer.prepare_write())
-    {
-      comm.print("\nWriting VTK output to '" + writer.vtk_name + ".pvtu'");
-      writer.add_stokes_vector(vec_sol);
-      writer.write();
-    }
-
-    // stop watch and print statistics
-    watch_total.stop();
-    print_final_stats(comm, watch_total);
-
-    // okay, we're done
-    return 0;
-  }
-} // namespace CCNDSimple
 
 int main(int argc, char* argv[])
 {
   FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
-  int rtn = 1;
-  try
+
+  using namespace CCNDSimple;
+
+  // create world communicator
+  Dist::Comm comm(Dist::Comm::world());
+
+  // print number of processes
+  print_pad(comm, "Number of MPI Processes", stringify(comm.size()));
+
+  // create argument parser
+  SimpleArgParser args(argc, argv);
+
+  // check command line arguments
+  DomainControl::add_supported_args(args);
+  StokesSolver::add_supported_args(args);
+  VtkWriter::add_supported_args(args);
+
+  args.support("problem",
+    "<type>\nSpecifies the problem to solve; valid options are:\n"
+    "simple   Simulate a simple Poiseuille flow.\n"
+    "conexp   Simulate a contraction-expansion flow.\n"
+    "dricav   Simulate a Driven Cavity flow.\n"
+    "bench1   Simulate a Flow Around A Cylinder.\n"
+    "taygre   Simulate a Taylor-Green vortex (2D only)."
+  );
+
+  // no arguments given?
+  if(args.num_args() <= 1)
   {
-    rtn = CCNDSimple::main(argc, argv);
+    comm.print("\nNo arguments given; supported arguments:\n");
+    comm.print(args.get_supported_help());
+    return 0;
   }
-  catch(std::exception& e)
+
+  // check for unsupported options
   {
-    std::cerr << "ERROR: " << e.what() << "\n";
-    FEAT::Runtime::abort();
+    auto unsupported = args.query_unsupported();
+    if (!unsupported.empty())
+    {
+      // print all unsupported options
+      for (auto it = unsupported.begin(); it != unsupported.end(); ++it)
+        comm.print(std::cerr, "ERROR: unknown option '--" + (*it).second + "'");
+
+      // abort
+      return 1;
+    }
   }
-  catch (...)
+
+  // query and verify our problem type
+  String problem("simple");
+  args.parse("problem", problem);
+  if(!problem.is_one_of("simple dricav bench1 taygre conexp"))
   {
-    std::cerr << "ERROR: unknown exception\n";
-    FEAT::Runtime::abort();
+    comm.print("ERROR: invalid problem type: '" + problem + "'");
+    return 1;
   }
-  return rtn;
+  if((problem == "taygre") && (dim != 2))
+  {
+    comm.print("ERROR: Taylor-Green simulation is only available in 2D");
+    return 1;
+  }
+
+  StopWatch watch_total;
+  watch_total.start();
+
+  // create domain control object and print info
+  DomainControl domain_control(comm);
+  domain_control.create_domain(args);
+  domain_control.print_info();
+
+  // create Stokes solver object, set default parameter, parse arguments and print info
+  StokesSolver stokes_solver(domain_control);
+  stokes_solver.parse_args(args);
+  stokes_solver.print_config();
+
+  // create VTK writer
+  VtkWriter vtk_writer(domain_control);
+  vtk_writer.name_prefix = String("ccnd-simple-steady-01-") + problem + "-" + stringify(dim) + "d";
+  vtk_writer.parse_args(args);
+  vtk_writer.print_config();
+
+  // create levels
+  stokes_solver.create_levels();
+
+  // null functions
+  Analytic::Common::ConstantVectorFunction<dim, DataType> null_function;
+
+  // analytic solution for 2D Taylor-Green problem
+  Analytic::Common::TaylorGreenVortexVelo2D<DataType> taylor_green_velo_2d;
+  Analytic::Common::TaylorGreenVortexPres2D<DataType> taylor_green_pres_2d;
+
+  // inflow function for parabolic 2D inflow ("simple" problem)
+  Analytic::Common::ParProfileVector<DataType> parabolic_inflow_2d(DataType(0), DataType(0), DataType(0), DataType(1));
+
+  // inflow function for parabolic 3D inflow ("simple" problem)
+  auto parabolic_inflow_3d = Analytic::create_lambda_function_vector_3d(
+    [] (DataType, DataType y, DataType z) {return DataType(16)*y*(DataType(1)-y)*z*(DataType(1)-z);},
+    [] (DataType, DataType, DataType) {return DataType(0);},
+    [] (DataType, DataType, DataType) {return DataType(0);}
+  );
+
+  // inflow function for parabolic 2D inflow for DFG95 benchmark
+  auto dfg95_inflow_2d = Analytic::create_lambda_function_vector_2d(
+    [] (DataType, DataType y) {return DataType(12)/DataType(1.681)*y*(DataType(0.41)-y);},
+    [] (DataType, DataType) {return DataType(0);}
+  );
+
+  // inflow function for parabolic 3D inflow for DFG95 benchmark
+  auto dfg95_inflow_3d = Analytic::create_lambda_function_vector_3d(
+    [] (DataType, DataType y, DataType z) {return DataType(72)/DataType(0.2825761)*y*(DataType(0.41)-y)*z*(DataType(0.41)-z);},
+    [] (DataType, DataType, DataType) {return DataType(0);},
+    [] (DataType, DataType, DataType) {return DataType(0);}
+  );
+
+  // boundary function for 2D driven cavity
+  auto dricav_flow_2d = Analytic::create_lambda_function_vector_2d(
+    [] (DataType x, DataType) {return (x > DataType(0.0001)) && (x < DataType(0.9999)) ? DataType(1) : DataType(0);},
+    [] (DataType, DataType) {return DataType(0);}
+  );
+
+  // boundary function for 3D driven cavity
+  auto dricav_flow_3d = Analytic::create_lambda_function_vector_3d(
+    [] (DataType x, DataType, DataType) {return (x > DataType(0.0001)) && (x < DataType(0.9999)) ? DataType(1) : DataType(0);},
+    [] (DataType, DataType, DataType) {return DataType(0);},
+    [] (DataType, DataType, DataType) {return DataType(0);}
+  );
+
+  // inflow function for contraction-expansion flow
+  Analytic::Common::ParProfileVector<DataType> conexp_inflow_2d(DataType(0), DataType(0), DataType(0), DataType(1));
+
+  // assemble boundary conditions
+  if(problem == "simple")
+  {
+    // Poiseuille-Flow: inflow, no-flow and outflow
+    if constexpr (dim == 3)
+      stokes_solver.assemble_boundary_conditions("bnd:t bnd:b bnd:n bnd:f", "", "bnd:l", parabolic_inflow_3d, false);
+    else
+      stokes_solver.assemble_boundary_conditions("bnd:t bnd:b", "", "bnd:l", parabolic_inflow_2d, false);
+  }
+  else if(problem == "bench1")
+  {
+    // Flow Around A Cylinder: inflow, no-flow and outflow
+    if constexpr(dim == 3)
+      stokes_solver.assemble_boundary_conditions("bnd:t bnd:b bnd:n bnd:f bnd:c", "", "bnd:l", dfg95_inflow_3d, false);
+    else
+      stokes_solver.assemble_boundary_conditions("bnd:t bnd:b bnd:c", "", "bnd:l", dfg95_inflow_2d, false);
+  }
+  else if(problem == "dricav")
+  {
+    // Driven Cavity: all Dirichlet boundary conditions
+    if constexpr(dim == 3)
+      stokes_solver.assemble_boundary_conditions("bnd:l bnd:r bnd:b bnd:n bnd:f", "", "bnd:t", dricav_flow_3d, true);
+    else
+      stokes_solver.assemble_boundary_conditions("bnd:l bnd:r bnd:b", "", "bnd:t", dricav_flow_2d, true);
+  }
+  else if(problem == "taygre")
+  {
+    // Taylor Green: all slip boundary conditions
+    stokes_solver.assemble_boundary_conditions("", "bnd:l | bnd:r | bnd:b | bnd:t", "", null_function, true);
+  }
+  else if(problem == "conexp")
+  {
+    // contraction-expansion: inflow and slip boundary conditions
+    if constexpr(dim == 2)
+    {
+      stokes_solver.assemble_boundary_conditions(
+        "bnd:bl bnd:br bnd:bcl bnd:bcr bnd:bct bnd:tl bnd:tr bnd:tcl bnd:tcr bnd:tcb", "", "bnd:l", conexp_inflow_2d, false);
+    }
+  }
+
+  // compile local systems for Vanka smoother
+  stokes_solver.compile_local_systems();
+
+  // create multigrid solver
+  stokes_solver.create_multigrid_solver();
+
+  // create initial solution vector
+  GlobalStokesVector vec_sol = stokes_solver.create_sol_vector();
+
+  // create null RHS vector
+  GlobalStokesVector vec_rhs = stokes_solver.create_rhs_vector();
+
+  // in case of Taylor-Green, assemble the corresponding RHS vector
+  if(problem == "taygre")
+  {
+    if constexpr(dim == 2)
+    {
+      // declare constant pi
+      const DataType pi = Math::pi<DataType>();
+      const DataType nu = stokes_solver.nu;
+
+      // RHS function for 2D Taylor-Green problem
+      auto taylor_green_rhs_2d = Analytic::create_lambda_function_vector_2d(
+        [pi,nu] (DataType x, DataType y) {return  DataType(2)*pi*pi*nu*Math::sin(pi*x)*Math::cos(pi*y);},
+        [pi,nu] (DataType x, DataType y) {return -DataType(2)*pi*pi*nu*Math::cos(pi*x)*Math::sin(pi*y);}
+      );
+
+      // create RHS vector from force function
+      vec_rhs = stokes_solver.create_rhs_vector(taylor_green_rhs_2d);
+    }
+  }
+
+  // load joined solution if desired
+  if(!stokes_solver.load_joined_sol_vector(vec_sol))
+  {
+    // no solution loaded; solve Stokes instead
+    comm.print("\nSolving Stokes system...\n");
+
+    // solve Stokes system
+    if(!stokes_solver.solve_linear(vec_sol, vec_rhs))
+      return 1;
+  }
+
+  // now let's go for Navier-Stokes
+  comm.print("\nSolving Navier-Stokes system...\n");
+
+  // solve the actual non-linear system
+  if(!stokes_solver.solve_nonlinear(vec_sol, vec_rhs))
+    return 1;
+
+  // post-process solution in dependence of the chosen problem
+  if(problem == "taygre")
+  {
+    if constexpr(dim == 2)
+    {
+      // compute errors against reference solution
+      stokes_solver.compute_errors(vec_sol, taylor_green_velo_2d, taylor_green_pres_2d);
+    }
+  }
+  if(problem == "bench1")
+  {
+    // compute body forces on circle/cylinder
+    stokes_solver.compute_body_forces("bnd:c", vec_sol, vec_rhs,
+      dim == 2 ? DataType(500) : DataType(50000) / DataType(41));
+  }
+
+  // write joined solution vector if desired
+  stokes_solver.save_joined_sol_vector(vec_sol);
+
+  // release the stokes stokes_solver
+  stokes_solver.release();
+
+  // write VTK file if desired
+  if(vtk_writer.prepare_write())
+  {
+    comm.print("\nWriting VTK output to '" + vtk_writer.vtk_name + ".pvtu'");
+    vtk_writer.add_stokes_vector(vec_sol);
+    vtk_writer.write();
+  }
+
+  // make sure everyone is finished
+  comm.barrier();
+
+  // stop watch and print statistics
+  watch_total.stop();
+  comm.print(String("\n") + String(100u, '=') + "\n");
+  print_pad(comm, "Total Runtime", watch_total.elapsed_string().pad_front(10) + " sec {Balance} [Fraction]", 40);
+  domain_control.print_runtime(watch_total.elapsed());
+  stokes_solver.print_runtime(watch_total.elapsed());
+  vtk_writer.print_runtime(watch_total.elapsed());
+  print_memory_usage(comm);
+
+  // okay, we're done
+  return 0;
 }

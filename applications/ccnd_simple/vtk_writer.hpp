@@ -3,10 +3,21 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// This header/source file pair defines the VtkWriter class, which is an extension of the simple Geometry::ExportVTK
+// class template. The VtkWriter class allows to export of the solutions on a once refined mesh, which is generally
+// useful since the spatial discretization uses a Q2/P1dc FE space pair, which contains more DOFs than could be
+// exported into a VTK file on the same level.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
-#include "domain.hpp"
+#include "base.hpp"
+#include "domain_control.hpp"
 #include "stokes_level.hpp"
+#include "time_stepping.hpp"
 
 #include <kernel/geometry/export_vtk.hpp>
 
@@ -25,20 +36,49 @@ namespace CCNDSimple
   public:
     /// the domain controller
     const DomainControl& domain;
-    /// the once refined mesh (nullptr if we're exporting on non-refined mesh)
-    std::unique_ptr<MeshType> refined_mesh;
-    /// the actual VTK exporter that does the dirty work
-    std::unique_ptr<Geometry::ExportVTK<MeshType>> exporter;
 
-    // did the user want a refined export?
+    // ----------------
+    // input attributes
+    // ----------------
+
+    /// write refined VTK files?
     bool want_refined = true;
 
     /// VTK name prefix
     String name_prefix;
+
     /// VTK filename
     String vtk_name;
+
     /// VTK stepping
     Index stepping = Index(0);
+
+    // -----------------
+    // output attributes
+    // -----------------
+
+    /// plot line for short plot
+    String plot_line;
+
+    /// watch for VTK output
+    StopWatch watch_vtk_write;
+
+    // ----------------
+    // state attributes
+    // ----------------
+
+    /// the once refined mesh (nullptr if we're exporting on non-refined mesh)
+    std::unique_ptr<MeshType> refined_mesh;
+
+    /// the actual VTK exporter that does the dirty work
+    std::unique_ptr<Geometry::ExportVTK<MeshType>> exporter;
+
+    /// a map of Stokes vectors
+    std::map<String, GlobalStokesVector*> stokes_vectors;
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   public:
     /**
@@ -47,13 +87,10 @@ namespace CCNDSimple
      * \param[in] domain_
      * A \resident reference to the domain controller
      *
-     * \param[in] name_prefix_
-     * The default filename prefix to be used if the caller did not specify one via --vtk <filename>
-     *
      * \param[in] refined_
      * Specifies whether to export on a once refined mesh
      */
-    explicit VtkWriter(const DomainControl& domain_, const String& name_prefix_, bool refined_ = true);
+    explicit VtkWriter(const DomainControl& domain_, bool refined_ = true);
 
     /// destructor
     virtual ~VtkWriter();
@@ -66,6 +103,12 @@ namespace CCNDSimple
 
     // print configuration to console
     virtual void print_config();
+
+    /// adds a Stokes vector reference to the writer
+    virtual bool register_stokes_vector(const String& name, GlobalStokesVector& vector);
+
+    /// removes all previously registered Stokes vectors from the writer
+    virtual void unregister_stokes_vectors();
 
     /**
      * \brief Prepares the writer for the output in a steady simulation
@@ -118,7 +161,7 @@ namespace CCNDSimple
     * \param[in] name
     * The name of the vector in the VTK file
     */
-    void add_p0_vector(const LocalScalarVectorType& vector, const String& name);
+    void add_p0dc_vector(const LocalScalarVectorType& vector, const String& name);
     void add_p1dc_vector(const LocalScalarVectorType& vector, const String& name);
 
     /**
@@ -127,6 +170,22 @@ namespace CCNDSimple
      * This function also clears the exporter from all previously added vectors, so that the
      * same VtkWriter object can be used to write several VTKs, e.g. in an unsteady simulation.
      */
-    void write();
+    virtual void write();
+
+    /**
+     * \brief Writes all registered vectors to a VTK file
+     *
+     * This function checks whether a VTK file is to be written for the current time step and,
+     * if so, writes all vectors that have been registered to this writer to a VTK file.
+     *
+     * \returns
+     * \c true, if a VTK file was written or \c false, if no VTK file is to be written in this
+     * time step.
+     */
+    virtual bool write_registered(const TimeStepping& time_stepping);
+
+    /// prints runtime information for this object
+    virtual void print_runtime(double total_time);
+
   }; // class VtkWriter
 } // namespace CCNDSimple

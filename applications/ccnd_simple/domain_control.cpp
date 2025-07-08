@@ -3,7 +3,7 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
-#include "domain.hpp"
+#include "domain_control.hpp"
 
 namespace CCNDSimple
 {
@@ -63,6 +63,8 @@ namespace CCNDSimple
 
   void DomainControl::create_domain(SimpleArgParser& args)
   {
+    watch_domain_create.start();
+
     if(args.check("mesh") < 1)
     {
       _comm.print(std::cerr, "ERROR: Mandatory option '--mesh <mesh-file>' is missing!");
@@ -93,42 +95,46 @@ namespace CCNDSimple
     String mesh_type = mesh_reader.get_meshtype_string();
 
     // run 2D or 3D ?
-#ifdef FEAT_CCND_SIMPLE_3D
-    if(mesh_type != "conformal:hypercube:3:3")
+    if constexpr(dim == 2)
     {
-      _comm.print("ERROR: invalid mesh type '" + mesh_type + "', expected 'conformal:hypercube:3:3'");
-      FEAT::Runtime::abort();
+      if(mesh_type != "conformal:hypercube:2:2")
+      {
+        _comm.print("ERROR: invalid mesh type '" + mesh_type + "', expected 'conformal:hypercube:2:2'");
+        FEAT::Runtime::abort();
+      }
     }
-#else
-    if(mesh_type != "conformal:hypercube:2:2")
+    if constexpr(dim == 3)
     {
-      _comm.print("ERROR: invalid mesh type '" + mesh_type + "', expected 'conformal:hypercube:2:2'");
-      FEAT::Runtime::abort();
+      if(mesh_type != "conformal:hypercube:3:3")
+      {
+        _comm.print("ERROR: invalid mesh type '" + mesh_type + "', expected 'conformal:hypercube:3:3'");
+        FEAT::Runtime::abort();
+      }
     }
-#endif // FEAT_CCND_SIMPLE_3D
 
     // create the domain control
     BaseClass::create(mesh_reader);
-
-    // add iso-parametric mesh-part charts
-    BaseClass::add_trafo_mesh_part_charts();
 
     // compile all domain assemblers
     for(Index i(0); i < this->size_physical(); ++i)
       this->at(i)->domain_asm.compile_all_elements();
 
     // okay, we're done here
+    watch_domain_create.stop();
   }
 
   void DomainControl::print_info()
   {
-    // print mesh files
     print_pad(_comm, "Mesh Files", stringify_join(this->mesh_file_names, " "));
-    // print partitioning info
-    print_pad(_comm, "Partitioning Info", this->get_chosen_parti_info());
-
-    // plot our levels
+    auto parti_info = this->get_chosen_parti_info().split_by_charset("\n");
+    for(auto& pi : parti_info)
+      print_pad(_comm, "Partitioning Info", pi);
     print_pad(_comm, "Desired Levels", this->format_desired_levels());
     print_pad(_comm, "Chosen Levels", this->format_chosen_levels());
+  }
+
+  void DomainControl::print_runtime(double total_time)
+  {
+    print_time(_comm, "Domain Create Time", watch_domain_create.elapsed(), total_time);
   }
 } // namespace CCNDSimple

@@ -5,39 +5,12 @@
 
 #include "stokes_level.hpp"
 
-#include <kernel/analytic/parsed_function.hpp>
 #include <kernel/assembly/mean_filter_assembler.hpp>
 #include <kernel/assembly/slip_filter_assembler.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 
-
 namespace CCNDSimple
 {
-  // helper function: add meshparts to assembler
-  template<typename Asm_>
-  String aux_add_mesh_parts(Asm_& assm, DomainLevel& domain_level, const String& mesh_parts)
-  {
-    // split mesh part names and sort them
-    std::deque<String> parts_in = mesh_parts.split_by_whitespaces();
-    std::sort(parts_in.begin(), parts_in.end());
-
-    // loop over all mesh parts
-    for(String& s : parts_in)
-    {
-      // try to find the mesh part node
-      auto* part_node = domain_level.get_mesh_node()->find_mesh_part_node(s);
-      XASSERT(part_node != nullptr);
-
-      // get the mesh part and add it to the assembler
-      auto* mpart = part_node->get_mesh();
-      if(mpart != nullptr)
-        assm.add_mesh_part(*mpart);
-    }
-
-    // join all part names
-    return stringify_join(parts_in, "##");
-  }
-
   void StokesLevel::assemble_velocity_laplace_matrix(const String& cubature, const DataType nu, bool defo)
   {
     auto& loc_a = this->matrix_a.local();
@@ -78,22 +51,6 @@ namespace CCNDSimple
       filter.second.filter_mat(this->local_matrix_sys.block_a());
       filter.second.filter_offdiag_row_mat(this->local_matrix_sys.block_b());
     }
-  }
-
-  void StokesLevel::assemble_inflow_bc(const String& mesh_parts, const String& formula)
-  {
-    Assembly::UnitFilterAssembler<MeshType> unit_filter_asm;
-    Analytic::ParsedVectorFunction<dim> parsed_function(formula);
-
-    // get the filter name
-    String filter_name = aux_add_mesh_parts(unit_filter_asm, this->domain_level, mesh_parts);
-
-    // get the unit filter and clear it
-    BaseClass::LocalVeloUnitFilter& filter = this->get_local_velo_unit_filter_seq().find_or_add(filter_name);
-
-    // clear and assemble
-    filter.clear();
-    unit_filter_asm.assemble(filter, this->domain_level.space_velo, parsed_function);
   }
 
   void StokesLevel::assemble_noflow_bc(const String& mesh_parts)

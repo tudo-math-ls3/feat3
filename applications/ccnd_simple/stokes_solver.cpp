@@ -3,29 +3,32 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
-#include "steady_solver.hpp"
+#include "stokes_solver.hpp"
 
 #include <kernel/analytic/parsed_function.hpp>
 #include <kernel/assembly/interpolator.hpp>
 #include <kernel/assembly/domain_assembler_basic_jobs.hpp>
+#include <kernel/assembly/burgers_assembly_job.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/solver/direct_stokes_solver.hpp>
-
+#include <kernel/solver/richardson.hpp>
+#include <kernel/solver/gmres.hpp>
+#include <kernel/solver/schwarz_precond.hpp>
+#include <kernel/solver/bicgstab.hpp>
 
 namespace CCNDSimple
 {
-
-  SteadySolver::SteadySolver(DomainControl& domain_) :
+  StokesSolver::StokesSolver(DomainControl& domain_) :
     domain(domain_),
     comm(domain.comm())
   {
   }
 
-  SteadySolver::~SteadySolver()
+  StokesSolver::~StokesSolver()
   {
   }
 
-  void SteadySolver::add_supported_args(SimpleArgParser& args)
+  void StokesSolver::add_supported_args(SimpleArgParser& args)
   {
     args.support("nu", "<nu>\nSets the viscosity parameter nu.");
     args.support("upsam", "<upsam>\nSets the streamline diffusion stabilization parameter.");
@@ -38,26 +41,33 @@ namespace CCNDSimple
     args.support("mg-tol-rel", "<tol>\nSets the relative tolerance for the multigrid solver.");
     args.support("nl-tol-abs", "<tol>\nSets the absolute tolerance for the nonlinear solver.");
     args.support("nl-stag-rate", "<rate>\nSets the defect stagnation rate for the nonlinear solver.");
-    args.support("no-navier", "\nIf given, solve only the linear Stokes equation instead of Navier-Stokes.");
-    args.support("no-newton", "\nIf given, use Picard iteration instead of Newton for the nonlinear solve.");
-    args.support("no-deform", "\nIf given, use the simple gradient tensor instead of the deformation tensor.");
+    args.support("stokes", "\nIf given, solve only the linear Stokes equation instead of nonlinear Navier-Stokes.");
+    args.support("picard", "\nIf given, use Picard iteration instead of Newton for the nonlinear solve.");
+    args.support("deform", "\nIf given, use the deformation tensor instead of the gradient tensor.");
     args.support("no-umfpack", "\nIf given, use BiCGStab-AmaVanka instead of UMFPACK as a coarse grid solver.");
     args.support("load-joined-sol", "<filename>\nLoads the initial solution vector from a joined vector file.");
     args.support("save-joined-sol", "<filename>\nSaves the final solution vector to a joined vector file.");
   }
 
-  bool SteadySolver::parse_args(SimpleArgParser& args)
+  bool StokesSolver::parse_args(SimpleArgParser& args)
   {
     // solve Navier-Stokes or only Stokes?
-    navier_stokes = (args.check("no-navier") < 0);
+    nonlinear_system = (args.check("stokes") < 0);
     // use Newton or Picard for Navier-Stokes?
-    newton_solver = (args.check("no-newton") < 0);
+    newton_solver = (args.check("picard") < 0);
     // deformation tensor or gradient tensor for diffusion?
-    deform_tensor = (args.check("no-deform") < 0);
+    deform_tensor = (args.check("deform") >= 0);
     // use adaptive tolerance for multigrid?
     adaptive_tol = (args.check("mg-tol-rel") < 0);
     // plot multigrid iterations?
     plot_mg_iter = (args.check("plot-mg-iter") >= 0);
+
+    // use UMPFACK as coarse grid solver?
+#ifdef FEAT_HAVE_UMFPACK
+    direct_coarse_solver = (domain.back_layer().comm().size() == 1) && (args.check("no-umfpack") < 0);
+#else
+    direct_coarse_solver = false;
+#endif
 
     // viscosity parameter nu
     args.parse("nu", nu);
@@ -85,21 +95,14 @@ namespace CCNDSimple
     // filename of joined solution vector to write out
     args.parse("save-joined-sol", save_joined_filename);
 
-    // use UMPFACK as coarse grid solver?
-#ifdef FEAT_HAVE_UMFPACK
-    direct_coarse_solver = (domain.back_layer().comm().size() == 1) && (args.check("no-umfpack") < 0);
-#else
-    direct_coarse_solver = false;
-#endif
-
     return true;
   }
 
-  void SteadySolver::print_config() const
+  void StokesSolver::print_config() const
   {
     print_pad(comm, "Nu", stringify(nu));
     print_pad(comm, "upsam", stringify(upsam));
-    print_pad(comm, "System", (navier_stokes ? "Navier-Stokes" : "Stokes"));
+    print_pad(comm, "System", (nonlinear_system ? "Navier-Stokes" : "Stokes"));
     print_pad(comm, "Diffusion Tensor", (deform_tensor ? "Deformation" : "Gradient"));
     print_pad(comm, "Nonlinear Solver", (newton_solver ? "Newton" : "Picard"));
     print_pad(comm, "AmaVanka Smoother Steps", stringify(smooth_steps));
@@ -122,7 +125,7 @@ namespace CCNDSimple
     comm.print_flush();
   }
 
-  void SteadySolver::create_levels()
+  void StokesSolver::create_levels()
   {
     bool assemble_splitters = (!load_joined_filename.empty() || !save_joined_filename.empty());
     const Index num_levels = Index(domain.size_physical());
@@ -157,34 +160,11 @@ namespace CCNDSimple
       stokes_levels.at(i)->assemble_grad_div_matrices(cubature);
       stokes_levels.at(i)->compile_system_matrix();
     }
+
+    stokes_levels.front()->assemble_velocity_mass_matrix(cubature);
   }
 
-  void SteadySolver::assemble_boundary_conditions(const String& noflow_parts, const String& slip_parts,
-    const String& inflow_parts, const String& inflow_formula, const bool pressure_mean)
-  {
-    std::deque<String> noflow_deqs = noflow_parts.split_by_charset("|");
-    std::deque<String> slip_deqs = slip_parts.split_by_charset("|");
-    std::deque<String> inflow_deqs = inflow_parts.split_by_charset("|");
-
-    String pres_cub = "auto-degree:" + stringify(SpacePresType::local_degree+1);
-
-    for(std::size_t i(0); i < stokes_levels.size(); ++i)
-    {
-      for(auto it = noflow_deqs.begin(); it != noflow_deqs.end(); ++it)
-        stokes_levels.at(i)->assemble_noflow_bc(*it);
-      for(auto it = slip_deqs.begin(); it != slip_deqs.end(); ++it)
-        stokes_levels.at(i)->assemble_slip_bc(*it);
-      for(auto it = inflow_deqs.begin(); it != inflow_deqs.end(); ++it)
-        stokes_levels.at(i)->assemble_inflow_bc(*it, inflow_formula);
-      if(pressure_mean)
-        stokes_levels.at(i)->assemble_pressure_mean_filter(pres_cub);
-      if(!slip_deqs.empty())
-        stokes_levels.at(i)->sync_velocity_slip_filters();
-      stokes_levels.at(i)->compile_system_filter();
-    }
-  }
-
-  void SteadySolver::compile_local_systems()
+  void StokesSolver::compile_local_systems()
   {
     for(std::size_t i(0); i < stokes_levels.size(); ++i)
     {
@@ -193,13 +173,13 @@ namespace CCNDSimple
     }
   }
 
-  GlobalStokesVector SteadySolver::create_vector() const
+  GlobalStokesVector StokesSolver::create_vector() const
   {
     XASSERT(!stokes_levels.empty());
     return stokes_levels.front()->matrix_sys.create_vector_l();
   }
 
-  GlobalStokesVector SteadySolver::create_sol_vector() const
+  GlobalStokesVector StokesSolver::create_sol_vector() const
   {
     GlobalStokesVector vec_sol = create_vector();
     vec_sol.format();
@@ -207,7 +187,7 @@ namespace CCNDSimple
     return vec_sol;
   }
 
-  GlobalStokesVector SteadySolver::create_rhs_vector() const
+  GlobalStokesVector StokesSolver::create_rhs_vector() const
   {
     GlobalStokesVector vec_rhs = create_vector();
     vec_rhs.format();
@@ -215,63 +195,7 @@ namespace CCNDSimple
     return vec_rhs;
   }
 
-  GlobalStokesVector SteadySolver::create_sol_vector(const String& formula_v, const String& formula_p) const
-  {
-    // create vector and format it
-    GlobalStokesVector vec_sol = create_vector();
-    vec_sol.format();
-
-    // interpolate velocity function
-    if(!formula_v.empty())
-    {
-      Analytic::ParsedVectorFunction<dim, dim> function_v(formula_v);
-      Assembly::Interpolator::project(vec_sol.local().at<0>(), function_v, domain.front()->space_velo);
-    }
-
-    // interpolate pressure function
-    if(!formula_p.empty())
-    {
-      Analytic::ParsedScalarFunction<dim> function_p(formula_p);
-      Assembly::Interpolator::project(vec_sol.local().at<1>(), function_p, domain.front()->space_pres);
-    }
-
-    // synchronize and filter
-    vec_sol.sync_1();
-    stokes_levels.front()->filter_sys.filter_sol(vec_sol);
-
-    return vec_sol;
-  }
-
-  GlobalStokesVector SteadySolver::create_rhs_vector(const String& formula_f, const String& formula_g) const
-  {
-    // create vector and format it
-    GlobalStokesVector vec_rhs = create_vector();
-    vec_rhs.format();
-
-    // assemble force functional for velocity
-    if(!formula_f.empty())
-    {
-      Analytic::ParsedVectorFunction<dim, dim> function_f(formula_f);
-      Assembly::assemble_force_function_vector(domain.front()->domain_asm, vec_rhs.local().at<0>(),
-        function_f, domain.front()->space_velo, this->cubature);
-    }
-
-    // assemble force functional for pressure
-    if(!formula_g.empty())
-    {
-      Analytic::ParsedScalarFunction<dim> function_g(formula_g);
-      Assembly::assemble_force_function_vector(domain.front()->domain_asm, vec_rhs.local().at<1>(),
-        function_g, domain.front()->space_pres, this->cubature);
-    }
-
-    // synchronize and filter
-    vec_rhs.sync_0();
-    stokes_levels.front()->filter_sys.filter_rhs(vec_rhs);
-
-    return vec_rhs;
-  }
-
-  bool SteadySolver::load_joined_sol_vector(GlobalStokesVector& vec_sol)
+  bool StokesSolver::load_joined_sol_vector(GlobalStokesVector& vec_sol)
   {
     if(load_joined_filename.empty())
       return false;
@@ -284,7 +208,7 @@ namespace CCNDSimple
     return true;
   }
 
-  void SteadySolver::save_joined_sol_vector(const GlobalStokesVector& vec_sol)
+  void StokesSolver::save_joined_sol_vector(const GlobalStokesVector& vec_sol)
   {
     if(save_joined_filename.empty())
       return;
@@ -294,11 +218,22 @@ namespace CCNDSimple
     stokes_levels.front()->base_splitter_sys.join_write_out(vec_sol, save_joined_filename);
   }
 
-  void SteadySolver::compute_body_forces(const String& body_mesh_part, const GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs)
+  void StokesSolver::compute_body_forces(const String& body_mesh_part, const GlobalStokesVector& vec_sol,
+    const GlobalStokesVector& vec_rhs, const DataType scaling_factor)
   {
     // our local body forces
     Tiny::Vector<DataType, dim> body_forces;
     body_forces.format();
+
+    // clone the RHS and convert to type 0
+    GlobalStokesVector vec_def = vec_rhs.clone(LAFEM::CloneMode::Layout);
+    vec_def.format();
+
+    // call the setup function to set the parameters
+    this->assemble_nonlinear_defect(vec_def, vec_sol, vec_rhs, false);
+
+    // we need a type-0 defect vector here
+    vec_def.from_1_to_0();
 
     // fetch the body mesh part
     DomainLevel& the_domain_level = *domain.front();
@@ -311,25 +246,6 @@ namespace CCNDSimple
       unit_asm.add_mesh_part(*body_part);
       unit_asm.assemble(filter_char, the_domain_level.space_velo);
       LAFEM::SparseVector<DataType, IndexType>& vec_char = filter_char.get_filter_vector();
-
-      // clone the RHS and convert to type 0
-      GlobalStokesVector vec_def = vec_rhs.clone(LAFEM::CloneMode::Deep);
-      vec_def.from_1_to_0();
-
-      // set up Burgers assembly job for our defect vector
-      Assembly::BurgersBlockedVectorAssemblyJob<LocalVeloVector, SpaceVeloType> burgers_def_job(
-        vec_def.local().template at<0>(), vec_sol.local().template at<0>(),
-        vec_sol.local().template at<0>(), the_domain_level.space_velo, cubature);
-
-      // call the setup function to set the parameters
-      this->setup_defect_burgers_job(burgers_def_job);
-
-      // assemble burgers operator defect
-      the_domain_level.domain_asm.assemble(burgers_def_job);
-
-      // compute remainder of velocity defect vector by using matrix B
-      stokes_levels.front()->matrix_sys.local().block_b().apply(
-        vec_def.local().template at<0>(), vec_sol.local().template at<1>(), vec_def.local().template at<0>(), -DataType(1));
 
       // compute dot product of char vector and defect vector
       const auto* velo_def = vec_def.local().first().elements();
@@ -344,16 +260,19 @@ namespace CCNDSimple
     // stringify our body forces
     String out;
     for(int i(0); i < dim; ++i)
-      out += stringify_fp_sci(body_forces[i], 16, 25);
+      out += stringify_fp_sci(scaling_factor * body_forces[i], 16, 25);
 
     // print body forces
     print_pad(comm, "Body Forces on " + body_mesh_part, out);
   }
 
-  void SteadySolver::create_multigrid_solver()
+
+  void StokesSolver::create_multigrid_solver()
   {
+    watch_linsol_create.start();
+
     // create a multigrid hierarchy
-    this->multigrid_hierarchy = std::make_shared<
+    multigrid_hierarchy = std::make_shared<
       Solver::MultiGridHierarchy<
       StokesLevel::GlobalSystemMatrix,
       StokesLevel::GlobalSystemFilter,
@@ -401,11 +320,11 @@ namespace CCNDSimple
     }
 
     // create our multigrid solver
-    this->multigrid_precond = Solver::new_multigrid(multigrid_hierarchy, Solver::MultiGridCycle::V);
+    multigrid_precond = Solver::new_multigrid(multigrid_hierarchy, Solver::MultiGridCycle::V);
 
     // create our solver
-    this->stokes_solver = Solver::new_richardson(stokes_levels.front()->matrix_sys,
-      stokes_levels.front()->filter_sys, 1.0, this->multigrid_precond);
+    stokes_solver = Solver::new_richardson(stokes_levels.front()->matrix_sys,
+      stokes_levels.front()->filter_sys, 1.0, multigrid_precond);
 
     stokes_solver->set_plot_name("Multigrid");
     stokes_solver->set_min_iter(min_mg_iter);
@@ -413,36 +332,50 @@ namespace CCNDSimple
     stokes_solver->set_tol_rel(mg_tol_rel);
     stokes_solver->set_min_stag_iter(Index(3));
 
+    watch_linsol_create.stop();
+
     // initialize the solver symbolically
-    this->multigrid_hierarchy->init_symbolic();
-    this->stokes_solver->init_symbolic();
+    watch_linsol_sym.start();
+    multigrid_hierarchy->init_symbolic();
+    stokes_solver->init_symbolic();
+    watch_linsol_sym.stop();
   }
 
-  bool SteadySolver::solve_stokes(GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs)
+  bool StokesSolver::solve_linear(GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs)
   {
     // set plot mode to enable output
-    stokes_solver->set_plot_mode(plot_stokes ? Solver::PlotMode::iter : Solver::PlotMode::none);
+    stokes_solver->set_plot_mode(plot_linear ? Solver::PlotMode::iter : Solver::PlotMode::none);
 
     // initialize solver
-    this->multigrid_hierarchy->init_numeric();
-    this->stokes_solver->init_numeric();
+    watch_linsol_num.start();
+    multigrid_hierarchy->init_numeric();
+    stokes_solver->init_numeric();
+    watch_linsol_num.stop();
 
     // print header
-    if(plot_stokes_header)
+    if(plot_linear_header)
     {
       //         "Multigrid:  2 : 5.012506e-03 / 4.283371e-04 / 0.028025"
-      comm.print(String(this->stokes_solver->get_plot_name().size(), ' ') +
+      comm.print(String(stokes_solver->get_plot_name().size(), ' ') +
         "  It   Abs. Def.      Rel. Def.      Improve");
-      comm.print(String(this->stokes_solver->get_plot_name().size(), '-') +
+      comm.print(String(stokes_solver->get_plot_name().size(), '-') +
         "---------------------------------------------");
     }
+
+    multigrid_hierarchy->reset_timings();
 
     // apply solver
     Solver::Status status = stokes_solver->correct(vec_sol, vec_rhs);
 
+    // update solver times
+    time_mg_smooth += multigrid_hierarchy->get_time_smooth();
+    time_mg_coarse += multigrid_hierarchy->get_time_coarse();
+
     // release solver
-    this->multigrid_hierarchy->done_numeric();
-    this->stokes_solver->done_numeric();
+    watch_linsol_num.start();
+    multigrid_hierarchy->done_numeric();
+    stokes_solver->done_numeric();
+    watch_linsol_num.stop();
 
     // check solver output
     if(!Solver::status_success(status))
@@ -454,21 +387,28 @@ namespace CCNDSimple
     return true;
   }
 
-  bool SteadySolver::solve_navier_stokes(GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs)
+  bool StokesSolver::solve_nonlinear(GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs)
   {
+    watch_nonlinear_solve.start();
+
+    // clear statistics
+    nl_defs.clear();
+    mg_iters.clear();
+    plot_line.clear();
+
     // set plot mode to enable output
-    stokes_solver->set_plot_mode(plot_navier ? Solver::PlotMode::iter : Solver::PlotMode::none);
+    stokes_solver->set_plot_mode(plot_mg_iter ? Solver::PlotMode::iter : Solver::PlotMode::none);
 
     // create two vectors
     GlobalStokesVector vec_cor = create_vector();
     GlobalStokesVector vec_def = create_vector();
 
     // print header
-    if(plot_navier_header)
+    if(plot_nonlinear_header)
     {
-      //         "Newton:   1: 2.373388e-05 / 4.732559e-03 / 4.733e-03 |   5: 8.7702e-12 / 3.6952e-07 [1.0000e-10]"
-      comm.print("         It  Abs. Defect    Rel. Defect    Improve   |  It  Abs. Def.    Rel. Def.   Rel. Tol.");
-      comm.print("-----------------------------------------------------+------------------------------------------");
+      //         "Newton...:   1: 2.373388e-05 / 4.732559e-03 / 4.733e-03 |   5: 8.7702e-12 / 3.6952e-07 [1.0000e-10]"
+      comm.print("            It  Abs. Defect    Rel. Defect    Improve   |  It  Abs. Def.    Rel. Def.   Rel. Tol.");
+      comm.print("--------------------------------------------------------+------------------------------------------");
     }
 
     // nonlinear loop
@@ -484,10 +424,10 @@ namespace CCNDSimple
       nl_defs.push_back(def_nl);
 
       // start building nonlinear solver output line
-      String line = (newton_solver ? "Newton:" : "Picard:");
-      if(plot_navier)
+      String line = (newton_solver ? "Newton...:" : "Picard...:");
+      if(plot_nonlinear)
       {
-        line += stringify(nl_step).pad_front(4) + ": ";
+        line += stringify(nl_step).pad_front(3) + " : ";
         line += stringify_fp_sci(def_nl, 6) + " / ";
         line += stringify_fp_sci(def_nl/nl_defs.front()) + " / ";
         line += stringify_fp_sci(def_improve, 3);
@@ -497,6 +437,7 @@ namespace CCNDSimple
       if(def_nl > nl_defs.front() * DataType(1E+3))
       {
         comm.print(line + "\n\nERROR: NONLINEAR SOLVER DIVERGED !!!\n");
+        watch_nonlinear_solve.stop();
         return false;
       }
 
@@ -505,19 +446,19 @@ namespace CCNDSimple
       {
         if(def_nl < nl_tol_abs)
         {
-          if(plot_navier)
+          if(plot_nonlinear)
             comm.print(line + "\n\nNonlinear solver converged!\n");
           break;
         }
         else if(nl_step >= max_nl_iter)
         {
-          if(plot_navier)
+          if(plot_nonlinear)
             comm.print(line + "\n\nMaximum iterations reached!\n");
           break;
         }
         else if((nl_step >= 3) && (nl_stag_rate*def_prev < def_nl))
         {
-          if(plot_navier)
+          if(plot_nonlinear)
             comm.print(line + "\n\nNonlinear solver stagnated!\n");
           break;
         }
@@ -540,17 +481,27 @@ namespace CCNDSimple
       }
 
       // initialize linear solver
+      watch_linsol_num.start();
       multigrid_hierarchy->init_numeric();
       stokes_solver->init_numeric();
+      watch_linsol_num.stop();
+
+      multigrid_hierarchy->reset_timings();
 
       // solve linear system
+      watch_linsol_apply.start();
       Solver::Status status = stokes_solver->apply(vec_cor, vec_def);
+      watch_linsol_apply.stop();
 
       // save MG iterations
       mg_iters.push_back(stokes_solver->get_num_iter());
 
+      // update solver times
+      time_mg_smooth += multigrid_hierarchy->get_time_smooth();
+      time_mg_coarse += multigrid_hierarchy->get_time_coarse();
+
       // build output line and print it
-      if(plot_navier)
+      if(plot_nonlinear)
       {
         line += String(" | ") + stringify(stokes_solver->get_num_iter()).pad_front(3) + ": "
           + stringify_fp_sci(stokes_solver->get_def_final(), 4) + " / "
@@ -561,13 +512,16 @@ namespace CCNDSimple
       }
 
       // release linear solver
+      watch_linsol_num.start();
       stokes_solver->done_numeric();
       multigrid_hierarchy->done_numeric();
+      watch_linsol_num.stop();
 
       // check linear solver status
       if(!Solver::status_success(status))
       {
         comm.print("\nERROR: LINEAR SOLVER BREAKDOWN\nStatus: " + stringify(status));
+        watch_nonlinear_solve.stop();
         return false;
       }
 
@@ -576,32 +530,40 @@ namespace CCNDSimple
 
       // next non-linear iteration
     }
+
+    // build short plot line
+    {
+      plot_line += stringify(Math::max(int(nl_defs.size()),1)-1).pad_front(4) + ": ";
+      plot_line += stringify_fp_sci(nl_defs.front(), 3) + " > ";
+      plot_line += stringify_fp_sci(nl_defs.back(), 3) + " : ";
+      Index mgi(0u);
+      for(auto& i : mg_iters)
+        mgi += i;
+      plot_line += stringify(mgi).pad_front(4);
+    }
+
     // end of Navier-Stokes solve
     comm.print_flush();
+
+    watch_nonlinear_solve.stop();
 
     return true;
   }
 
-  void SteadySolver::assemble_nonlinear_defect(GlobalStokesVector& vec_def, const GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs, bool filter_def)
+  void StokesSolver::assemble_nonlinear_defect(GlobalStokesVector& vec_def, const GlobalStokesVector& vec_sol, const GlobalStokesVector& vec_rhs, bool filter_def)
   {
-    // fetch our finest levels
-    DomainLevel& the_domain_level = *domain.front();
-    StokesLevel& the_stokes_level = *stokes_levels.front();
-
-    // set up Burgers assembly job for our defect vector
-    Assembly::BurgersBlockedVectorAssemblyJob<LocalVeloVector, SpaceVeloType> burgers_def_job(
-      vec_def.local().template at<0>(), vec_sol.local().template at<0>(),
-      vec_sol.local().template at<0>(), the_domain_level.space_velo, cubature);
-
-    // call the setup function to set the parameters
-    this->setup_defect_burgers_job(burgers_def_job);
+    watch_asm_vector.start();
 
     // copy rhs vector and convert it to a 0-type vector
     vec_def.copy(vec_rhs);
     vec_def.from_1_to_0();
 
+    // fetch our finest levels
+    StokesLevel& the_stokes_level = *stokes_levels.front();
+
     // assemble burgers operator defect
-    the_domain_level.domain_asm.assemble(burgers_def_job);
+    this->_assemble_local_burgers_defect(vec_def.local().template at<0>(), vec_sol.local().template at<0>(),
+      domain.front().layer(), *domain.front(), the_stokes_level);
 
     // compute remainder of defect vector by using matrices B and D
     the_stokes_level.matrix_sys.local().block_b().apply(
@@ -613,26 +575,20 @@ namespace CCNDSimple
     vec_def.sync_0();
     if(filter_def)
       the_stokes_level.filter_sys.filter_def(vec_def);
+
+    watch_asm_vector.stop();
   }
 
-  void SteadySolver::setup_defect_burgers_job(Assembly::BurgersBlockedVectorAssemblyJob<LocalVeloVector, SpaceVeloType>& burgers_def_job)
+  void StokesSolver::assemble_burgers_matrices(const GlobalStokesVector& vec_sol)
   {
-    burgers_def_job.deformation = deform_tensor;
-    burgers_def_job.nu = -nu;
-    burgers_def_job.beta = DataType(navier_stokes ? -1 : 0);
-  }
+    watch_asm_matrix.start();
 
-  void SteadySolver::assemble_burgers_matrices(const GlobalStokesVector& vec_sol)
-  {
     // fetch our finest levels
     StokesLevel& the_stokes_level = *stokes_levels.front();
 
     // get a clone of the global velocity vector
     // this one will be truncated as we go down the level hierarchy
     GlobalVeloVector vec_conv(&the_stokes_level.gate_velo, vec_sol.local().template at<0>().clone());
-
-    // initialize velocity norm for streamline diffusion (if enabled)
-    DataType sd_v_norm = DataType(0);
 
     // loop over all system levels
     for(std::size_t i(0); i < stokes_levels.size(); ++i)
@@ -641,25 +597,8 @@ namespace CCNDSimple
       LocalMatrixBlockA& loc_mat_a = stokes_levels.at(i)->matrix_sys.local().block_a();
       loc_mat_a.format();
 
-      // set up Burgers assembly job
-      Assembly::BurgersBlockedMatrixAssemblyJob<LocalMatrixBlockA, SpaceVeloType, LocalVeloVector>
-        burgers_mat_job(loc_mat_a, vec_conv.local(), domain.at(i)->space_velo, cubature);
-
-      // call the setup function to set the parameters
-      setup_matrix_burgers_job(burgers_mat_job);
-      if(i == size_t(0))
-      {
-        burgers_mat_job.set_sd_v_norm(vec_conv);
-        sd_v_norm = burgers_mat_job.sd_v_norm;
-      }
-      else
-      {
-        // use fine mesh norm
-        burgers_mat_job.sd_v_norm = sd_v_norm;
-      }
-
-      // assemble our matrix block
-      domain.at(i)->domain_asm.assemble(burgers_mat_job);
+      // assemble local burgers matrix
+      this->_assemble_local_burgers_matrix(loc_mat_a, vec_conv.local(), domain.at(i).layer(), *domain.at(i), *stokes_levels.at(i));
 
       // compile the local matrix for the Vanka smoother / UMFPACK solver
       stokes_levels.at(i)->compile_local_matrix();
@@ -686,20 +625,10 @@ namespace CCNDSimple
         stokes_levels.at(i)->transfer_velo.trunc_send(vec_conv);
       }
     }
+    watch_asm_matrix.stop();
   }
 
-  void SteadySolver::setup_matrix_burgers_job(Assembly::BurgersBlockedMatrixAssemblyJob<LocalMatrixBlockA, SpaceVeloType, LocalVeloVector>& burgers_mat_job)
-  {
-    burgers_mat_job.deformation = deform_tensor;
-    burgers_mat_job.nu = nu;
-    burgers_mat_job.beta = DataType(navier_stokes ? 1 : 0);
-    burgers_mat_job.frechet_beta = DataType(navier_stokes && newton_solver ? 1 : 0);
-    burgers_mat_job.sd_delta = upsam;
-    burgers_mat_job.sd_nu = nu;
-  }
-
-
-  void SteadySolver::compute_adaptive_mg_tol()
+  void StokesSolver::compute_adaptive_mg_tol()
   {
     XASSERT(nl_defs.size() >= std::size_t(2));
 
@@ -745,11 +674,13 @@ namespace CCNDSimple
     }
   }
 
-  void SteadySolver::release()
+  void StokesSolver::release()
   {
     // release solver
+    watch_linsol_sym.start();
     stokes_solver->done_symbolic();
     multigrid_hierarchy->done_symbolic();
+    watch_linsol_sym.stop();
 
     // clear amavankas deque
     amavankas.clear();
@@ -761,7 +692,62 @@ namespace CCNDSimple
     // release all levels except for the finest one
     while(stokes_levels.size() > std::size_t(1))
       stokes_levels.pop_back();
-
-    // todo: release matrices, filters, etc on finest level
   }
+
+  void StokesSolver::print_runtime(double total_time)
+  {
+    print_time(comm, "Stokes NonLinear Solver Apply Time", watch_nonlinear_solve.elapsed(), total_time);
+    print_time(comm, "Stokes Linear Solver Create Time", watch_linsol_create.elapsed(), total_time);
+    print_time(comm, "Stokes Linear Solver Init Symbolic Time", watch_linsol_sym.elapsed(), total_time);
+    print_time(comm, "Stokes Linear Solver Init Numeric Time", watch_linsol_num.elapsed(), total_time);
+    print_time(comm, "Stokes Linear Solver Apply Time", watch_linsol_apply.elapsed(), total_time);
+    print_time(comm, "Stokes Multigrid Smoother Time", time_mg_smooth, total_time);
+    print_time(comm, "Stokes Multigrid Coarse Solver Time", time_mg_coarse, total_time);
+    print_time(comm, "Stokes Burgers Matrix Assembly Time", watch_asm_matrix.elapsed(), total_time);
+    print_time(comm, "Stokes Defect Vector Assembly Time", watch_asm_vector.elapsed(), total_time);
+    print_time(comm, "Stokes Filter Assembly Time", watch_asm_filter.elapsed(), total_time);
+  }
+
+  void StokesSolver::_assemble_local_burgers_defect(LocalVeloVector& vec_def, const LocalVeloVector& vec_velo,
+    const DomainLayer& DOXY(domain_lyr), DomainLevel& domain_lvl, StokesLevel& DOXY(stokes_lvl))
+  {
+    // set up Burgers assembly job for our defect vector
+    Assembly::BurgersBlockedVectorAssemblyJob<LocalVeloVector, SpaceVeloType> burgers_def_job(
+      vec_def, vec_velo, vec_velo, domain_lvl.space_velo, cubature);
+
+    // set the parameters for the Burgers assembly
+    burgers_def_job.deformation = deform_tensor;
+    burgers_def_job.nu = -nu;
+    burgers_def_job.beta = DataType(nonlinear_system ? -1 : 0);
+    burgers_def_job.theta = -theta;
+
+    // assemble burgers operator defect
+    domain_lvl.domain_asm.assemble(burgers_def_job);
+  }
+
+  void StokesSolver::_assemble_local_burgers_matrix(LocalMatrixBlockA& matrix_a, const LocalVeloVector& vec_velo,
+    const DomainLayer& DOXY(domain_lyr), DomainLevel& domain_lvl, StokesLevel& stokes_lvl)
+  {
+    // set up Burgers assembly job
+    Assembly::BurgersBlockedMatrixAssemblyJob<LocalMatrixBlockA, SpaceVeloType, LocalVeloVector>
+      burgers_mat_job(matrix_a, vec_velo, domain_lvl.space_velo, cubature);
+
+    // set the parameters for the Burgers assembly
+    burgers_mat_job.deformation = deform_tensor;
+    burgers_mat_job.nu = nu;
+    burgers_mat_job.beta = DataType(nonlinear_system ? 1 : 0);
+    burgers_mat_job.frechet_beta = DataType(nonlinear_system && newton_solver ? 1 : 0);
+    burgers_mat_job.sd_delta = upsam;
+    burgers_mat_job.sd_nu = nu;
+    burgers_mat_job.theta = theta;
+    if(burgers_mat_job.sd_delta > DataType(0))
+    {
+      burgers_mat_job.set_sd_v_norm(vec_velo);
+      burgers_mat_job.sd_v_norm = stokes_lvl.gate_sys.sum(burgers_mat_job.sd_v_norm);
+    }
+
+    // assemble our matrix block
+    domain_lvl.domain_asm.assemble(burgers_mat_job);
+  }
+
 } // namespace CCNDSimple

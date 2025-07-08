@@ -3,14 +3,28 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// This header/source file pair defines the StokesLevel class, which is derived from an instance of the
+// Control::StokesBlockedCombinedSystemLevel class template. This class contains all linear algebra containers which
+// are required on each level of the multigrid hierarchy, i.e. all gates, muxers, matrices, filters and grid transfers.
+// This class also provides a set of member functions for the assembly of matrices and filters.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
-#include "domain.hpp"
+#include "base.hpp"
+#include "domain_control.hpp"
 
 #include <control/stokes_blocked.hpp>
 
 namespace CCNDSimple
 {
+  // helper function: add meshparts to assembler
+  template<typename Asm_>
+  String aux_add_mesh_parts(Asm_& assembler, DomainLevel& domain_level, const String& mesh_parts);
+
   /**
    * \brief (Navier-)Stokes System Level class
    *
@@ -35,6 +49,13 @@ namespace CCNDSimple
 
     /// the local velocity mass matrix (used for the RHS assembly in unsteady Stokes)
     typename BaseClass::LocalMatrixBlockA local_velo_mass_matrix;
+
+    /// the global Stokes vector type
+    typedef BaseClass::GlobalSystemVector GlobalStokesVector;
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   public:
     /**
@@ -91,7 +112,7 @@ namespace CCNDSimple
     void compile_local_matrix();
 
     /**
-     * \brief Assembles an inflow boundary condition for the velocity.
+     * \brief Assembles a flow boundary condition for the velocity.
      *
      * This function will create a single unit filter in the filter sequence for the union of all
      * the mesh-parts given.
@@ -100,10 +121,24 @@ namespace CCNDSimple
      * The names of the mesh-parts on which the boundary conditions are to be assembled,
      * separated by whitespaces.
      *
-     * \param[in] formula
-     * The formula to be used for the inflow, given as a string.
+     * \param[in] flow_function
+     * The analytic function to be used for the flow, given as a string.
      */
-    void assemble_inflow_bc(const String& mesh_parts, const String& formula);
+    template<typename FlowFunc_>
+    void assemble_flow_bc(const String& mesh_parts, const FlowFunc_& flow_function)
+    {
+      Assembly::UnitFilterAssembler<MeshType> unit_filter_asm;
+
+      // get the filter name
+      String filter_name = aux_add_mesh_parts(unit_filter_asm, this->domain_level, mesh_parts);
+
+      // get the unit filter and clear it
+      BaseClass::LocalVeloUnitFilter& filter = this->get_local_velo_unit_filter_seq().find_or_add(filter_name);
+
+      // clear and assemble
+      filter.clear();
+      unit_filter_asm.assemble(filter, this->domain_level.space_velo, flow_function);
+    }
 
     /**
      * \brief Assembles a no-flow boundary condition for the velocity.
@@ -139,6 +174,23 @@ namespace CCNDSimple
      * The cubature rule to use for integration.
      */
     void assemble_pressure_mean_filter(const String& cubature);
+
+    /**
+     * \brief Updates the RHS vector by adding the terms that depend on previous time step solutions
+     *
+     * \param[inout] vec_rhs
+     * The RHS vector that should be updated
+     *
+     * \param[in] theta
+     * The theta factors from the time stepping scheme.
+     *
+     * \param[in] vec_sol_1, vec_sol_2
+     * The solution vectors of the last two time steps.
+     */
+    void update_unsteady_rhs(GlobalStokesVector& vec_rhs, const GlobalStokesVector& vec_tmp)
+    {
+      local_velo_mass_matrix.apply(vec_rhs.local().first(), vec_tmp.local().first(), vec_rhs.local().first());
+    }
   }; // class StokesLevel
 
   /// the global Stokes matrix type
@@ -158,4 +210,29 @@ namespace CCNDSimple
 
   /// the local matrix A block
   typedef StokesLevel::LocalMatrixBlockA LocalMatrixBlockA;
+
+  // helper function: add meshparts to assembler
+  template<typename Asm_>
+  String aux_add_mesh_parts(Asm_& assembler, DomainLevel& domain_level, const String& mesh_parts)
+  {
+    // split mesh part names and sort them
+    std::deque<String> parts_in = mesh_parts.split_by_whitespaces();
+    std::sort(parts_in.begin(), parts_in.end());
+
+    // loop over all mesh parts
+    for(String& s : parts_in)
+    {
+      // try to find the mesh part node
+      auto* part_node = domain_level.get_mesh_node()->find_mesh_part_node(s);
+      XASSERT(part_node != nullptr);
+
+      // get the mesh part and add it to the assembler
+      auto* mpart = part_node->get_mesh();
+      if(mpart != nullptr)
+        assembler.add_mesh_part(*mpart);
+    }
+
+    // join all part names
+    return stringify_join(parts_in, "##");
+  }
 } // namespace CCNDSimple

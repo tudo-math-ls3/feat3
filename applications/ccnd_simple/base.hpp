@@ -19,6 +19,7 @@
 #include <kernel/space/discontinuous/element.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
+#include <kernel/analytic/lambda_function.hpp>
 
 /**
  * \brief CCND Simple namespace
@@ -30,12 +31,12 @@ namespace CCNDSimple
   /// we're using FEAT
   using namespace FEAT;
 
-  /// the dimension that this app is being compiled for
-#ifdef FEAT_CCND_SIMPLE_3D
-  static constexpr int dim = 3;
-#else
-  static constexpr int dim = 2;
+#ifndef FEAT_CCND_SIMPLE_DIM
+#error Macro 'FEAT_CCND_SIMPLE_DIM' must be defined by build system!
 #endif
+
+  /// the dimension that this app is being compiled for
+  static constexpr int dim = FEAT_CCND_SIMPLE_DIM;
 
   /// our one and only index type
   typedef FEAT::Index IndexType;
@@ -92,30 +93,70 @@ namespace CCNDSimple
    * \param[in] pad_char
    * The character to pad with.
    */
-  inline void print_pad(const Dist::Comm& comm, const String& key, const String& value, int pad_len = 30, char pad_char = '.')
+  inline void print_pad(const Dist::Comm& comm, const String& key, const String& value, int pad_len = 40, char pad_char = '.')
   {
     comm.print(key.pad_back(std::size_t(pad_len), pad_char) + ": " + value);
   }
 
   /**
-   * \brief Prints memory usage and timing statistics
+   * \brief Auxiliary helper function for padded runtime printing
    *
    * \param[in] comm
    * The communicator
    *
-   * \param[in] watch_total
-   * The stop watch for the total runtime
+   * \param[in] key
+   * The key to be printed
+   *
+   * \param[in] time
+   * The runtime to be printed
+   *
+   * \param[in] total_runtime
+   * The total runtime of the entire simulation
+   *
+   * \param[in] pad_len
+   * The padding length
+   *
+   * \param[in] pad_char
+   * The character to pad with.
    */
-  inline void print_final_stats(const Dist::Comm& comm, const StopWatch& watch_total)
+  inline void print_time(const Dist::Comm& comm, const String& key, double time, double total_runtime, int pad_len = 40, char pad_char = '.')
   {
-    // collect and print memory usage
-    MemoryUsage mi;
-    std::size_t mem_use[2] = {mi.get_peak_physical(), mi.get_peak_virtual()};
-    comm.allreduce(mem_use, mem_use, std::size_t(2), Dist::op_sum);
+    double min_time = time, max_time = time;
+    comm.reduce(&min_time, &min_time, std::size_t(1), Dist::op_min, 0);
+    comm.reduce(&max_time, &max_time, std::size_t(1), Dist::op_max, 0);
+    if(comm.rank() == 0)
+    {
+      std::cout << key.pad_back(std::size_t(pad_len), pad_char);
+      std::cout << ": ";
+      std::cout << stringify_fp_fix(max_time, 3, 10);
+      std::cout << " sec { ";
+      std::cout << stringify_fp_fix(min_time > 1E-5 ? min_time/max_time : 0.0, 3, 5);
+      std::cout << " } [";
+      std::cout << stringify_fp_fix(100.0*max_time/total_runtime, 2, 6);
+      std::cout << "% ]\n";
+    }
+  }
 
-    comm.print(String("\n") + String(100u, '=') + "\n");
-    print_pad(comm, "Peak Physical Memory", stringify_fp_fix(double(mem_use[0]) * 9.313225746154785E-10, 3, 10) + " GiB");
-    print_pad(comm, "Peak Virtual Memory",  stringify_fp_fix(double(mem_use[1]) * 9.313225746154785E-10, 3, 10) + " GiB");
-    print_pad(comm, "Total Runtime", watch_total.elapsed_string().pad_front(10) + " seconds [" + watch_total.elapsed_string(TimeFormat::h_m_s_m) + "]");
+  /**
+   * \brief Prints memory usage statistics
+   *
+   * \param[in] comm
+   * The communicator
+   */
+  inline void print_memory_usage(const Dist::Comm& comm, int pad_len = 40, char pad_char = '.')
+  {
+    MemoryUsage mi;
+    std::size_t mem_sum[2] = {mi.get_peak_physical(), mi.get_peak_virtual()};
+    std::size_t mem_min[2] = {mi.get_peak_physical(), mi.get_peak_virtual()};
+    std::size_t mem_max[2] = {mi.get_peak_physical(), mi.get_peak_virtual()};
+    comm.reduce(mem_sum, mem_sum, std::size_t(2), Dist::op_sum, 0);
+    comm.reduce(mem_min, mem_min, std::size_t(2), Dist::op_min, 0);
+    comm.reduce(mem_max, mem_max, std::size_t(2), Dist::op_max, 0);
+    print_pad(comm, "Peak Physical Memory Usage per Process", stringify_bytes(mem_max[0], 3, 10)
+      + " { " + stringify_fp_fix(mem_min[0] > 0u ? double(mem_min[0])/double(mem_max[0]) : 0.0, 3, 5) + " }", pad_len, pad_char);
+    print_pad(comm, "Peak Virtual Memory Usage per Process", stringify_bytes(mem_max[1], 3, 10)
+      + " { " + stringify_fp_fix(mem_min[1] > 0u ? double(mem_min[1])/double(mem_max[1]) : 0.0, 3, 5) + " }", pad_len, pad_char);
+    print_pad(comm, "Total Peak Physical Memory Usage", stringify_bytes(mem_sum[0], 3, 10), pad_len, pad_char);
+    print_pad(comm, "Total Peak Virtual Memory Usage",  stringify_bytes(mem_sum[1], 3, 10), pad_len, pad_char);
   }
 } // namespace CCNDSimple

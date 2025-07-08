@@ -3,12 +3,23 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// This header/source file pair defines the DomainLevel class, which is a required class for the use of the
+// Control::Domain::PartiDomainControl class, as well as a custom DomainControl class, which derives from the
+// PartiDomainControl class. The DomainLevel class merely defines the basic mandatory contents of a domain level, i.e.
+// the trafo and the FE spaces a well as a DomainAssembler object. The DomainControl class extends the
+// PartiDomainControl with some additional output. The DomainControl class is used by the application to read in the
+// mesh from a mesh file and to partition and distribute it to the individual processes in an MPI-parallel simulation.
+//
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #pragma once
 
 #include "base.hpp"
 
-#include <control/domain/parti_domain_control.hpp>
 #include <kernel/assembly/domain_assembler.hpp>
+#include <control/domain/parti_domain_control.hpp>
 
 namespace CCNDSimple
 {
@@ -38,7 +49,7 @@ namespace CCNDSimple
     /// our pressure space: discontinuous P1
     SpacePresType space_pres;
 
-    /// auxiliary space: Lagrange-1
+    /// auxiliary Q1 space
     SpaceTypeQ1 space_q1;
 
     /// our domain assembler object
@@ -58,14 +69,10 @@ namespace CCNDSimple
 
     /// destructor
     virtual ~DomainLevel();
-
-    /// helper function to add mesh-part charts to trafo
-    void add_trafo_mesh_part_charts()
-    {
-      BaseClass::_add_trafo_mesh_part_charts(trafo);
-    }
   }; // class DomainLevel<...>
 
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,6 +95,9 @@ namespace CCNDSimple
 
     /// the names of the mesh files
     std::deque<String> mesh_file_names;
+
+    /// watch for domain creation
+    StopWatch watch_domain_create;
 
   public:
     /**
@@ -112,5 +122,12 @@ namespace CCNDSimple
 
     /// prints info on chosen partitioning and levels after creation
     virtual void print_info();
+
+    /// prints runtime information for this object
+    virtual void print_runtime(double total_time);
+
   }; // class DomainControl
+
+  /// get a typedef for our domain layer type
+  typedef typename DomainControl::LayerType DomainLayer;
 } // namespace CCNDSimple

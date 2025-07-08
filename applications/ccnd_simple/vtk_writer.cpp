@@ -10,13 +10,9 @@
 
 namespace CCNDSimple
 {
-  VtkWriter::VtkWriter(const DomainControl& domain_, const String& name_prefix_, bool refined_) :
+  VtkWriter::VtkWriter(const DomainControl& domain_,bool refined_) :
     domain(domain_),
-    refined_mesh(),
-    exporter(),
-    want_refined(refined_),
-    name_prefix(name_prefix_),
-    vtk_name(name_prefix_)
+    want_refined(refined_)
   {
     if(refined_)
     {
@@ -36,28 +32,18 @@ namespace CCNDSimple
 
   void VtkWriter::add_supported_args(SimpleArgParser& args)
   {
-    args.support("vtk", "[<filename>] [<stepping>]\n"
+    args.support("vtk", "[<filename>]\n"
       "Specifies that a VTK output file is to be written.\n"
       "If no filename is given, a default one will be used.");
+    args.support("vtk-step", "<stepping>\n"
+      "Specifies the VTK output stepping for unsteady simulations.");
   }
 
   /// parse arguments from command line
   bool VtkWriter::parse_args(SimpleArgParser& args)
   {
-    int n = args.check("vtk");
-    if(n < 0)
-    {
-      stepping = Index(0);
-    }
-    else
-    {
-      stepping = Index(1); // by default, write every single time-step
-      if(n > 0)
-      {
-        if(args.parse("vtk", name_prefix, stepping) < 0)
-          return false;
-      }
-    }
+    args.parse("vtk", name_prefix);
+    args.parse("vtk-step", stepping);
     return true;
   }
 
@@ -65,6 +51,17 @@ namespace CCNDSimple
   {
     print_pad(domain.comm(), "VTK Name Prefix", name_prefix);
     print_pad(domain.comm(), "VTK Stepping", stringify(stepping));
+  }
+
+  /// adds a vector reference to the checkpoint system
+  bool VtkWriter::register_stokes_vector(const String& name, GlobalStokesVector& vector)
+  {
+    return stokes_vectors.emplace(name, &vector).second;
+  }
+
+  void VtkWriter::unregister_stokes_vectors()
+  {
+    stokes_vectors.clear();
   }
 
   bool VtkWriter::prepare_write()
@@ -98,6 +95,8 @@ namespace CCNDSimple
 
   bool VtkWriter::prepare_write(Index step)
   {
+    plot_line.clear();
+
     // VTK output, anyone?
     if(!prepare_write())
       return false;
@@ -163,7 +162,7 @@ namespace CCNDSimple
     exporter->add_vertex_vector(name, vector);
   }
 
-  void VtkWriter::add_p0_vector(const LocalScalarVectorType& vector, const String& name)
+  void VtkWriter::add_p0dc_vector(const LocalScalarVectorType& vector, const String& name)
   {
     if(refined_mesh)
     {
@@ -283,7 +282,28 @@ namespace CCNDSimple
 
   void VtkWriter::write()
   {
+    plot_line += " ; > '" + vtk_name + ".pvtu'";
     exporter->write(vtk_name, domain.comm());
     exporter->clear();
+  }
+
+  bool VtkWriter::write_registered(const TimeStepping& time_stepping)
+  {
+    // write VTK file if desired
+    if(prepare_write(time_stepping.time_step))
+    {
+      if(time_stepping.full_plot)
+        domain.comm().print("\nWriting VTK output to '" + vtk_name + ".pvtu'");
+      for(const auto& x : stokes_vectors)
+        add_stokes_vector(*x.second, x.first + "_v", x.first + "_p");
+      write();
+      return true;
+    }
+    return false;
+  }
+
+  void VtkWriter::print_runtime(double total_time)
+  {
+    print_time(domain.comm(), "VTK Export Write Time", watch_vtk_write.elapsed(), total_time);
   }
 } // namespace CCNDSimple

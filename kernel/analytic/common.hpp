@@ -835,6 +835,24 @@ namespace FEAT
           _value_vector(vec)
         {
         }
+
+        explicit ConstantVectorFunction(DataType_ value_x, DataType_ value_y) :
+          _value_vector()
+        {
+          _value_vector[0] = value_x;
+          if constexpr(dim_ > 1)
+            _value_vector[1] = value_y;
+        }
+
+        explicit ConstantVectorFunction(DataType_ value_x, DataType_ value_y, DataType_ value_z) :
+          _value_vector()
+        {
+          _value_vector[0] = value_x;
+          if constexpr(dim_ > 1)
+            _value_vector[1] = value_y;
+          if constexpr(dim_ > 2)
+            _value_vector[2] = value_z;
+        }
       }; // class ConstantVectorFunction
 
       /**
