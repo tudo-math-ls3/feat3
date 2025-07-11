@@ -488,23 +488,23 @@ namespace FEAT::Geometry
     EntityReference(EntitySource s, Index i, int o, int e) : source(s), index(i), orientation(o), entity(e)
     {
     }
+
+    // Equals operator for EntityReferences
+    bool operator==(const EntityReference& rhs) const
+    {
+      return (source == rhs.source) && (index == rhs.index) && (orientation == rhs.orientation) &&
+            (entity == rhs.entity);
+    }
+
+    // Not-equals operator for EntityReferences
+    bool operator!=(const EntityReference& rhs) const
+    {
+      return !(*this == rhs);
+    }
   };
 
-  /// Equals operator for EntityReferences
-  bool operator==(const EntityReference& lhs, const EntityReference& rhs)
-  {
-    return (lhs.source == rhs.source) && (lhs.index == rhs.index) && (lhs.orientation == rhs.orientation) &&
-           (lhs.entity == rhs.entity);
-  }
-
-  /// Not-equals operator for EntityReferences
-  bool operator!=(const EntityReference& lhs, const EntityReference& rhs)
-  {
-    return !(lhs == rhs);
-  }
-
   /// Output operator for EntityReferences
-  std::ostream& operator<<(std::ostream& stream, const EntityReference& reference)
+  inline std::ostream& operator<<(std::ostream& stream, const EntityReference& reference)
   {
     stream << "EntityReference {"
            << "source: " << reference.source << ", index: " << stringify(reference.index)

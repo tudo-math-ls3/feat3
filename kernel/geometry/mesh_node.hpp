@@ -6,6 +6,7 @@
 #pragma once
 
 // includes, FEAT
+#include <kernel/geometry/adaptive_mesh.hpp>
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/mesh_atlas.hpp>
 #include <kernel/geometry/mesh_part.hpp>
@@ -16,6 +17,7 @@
 #include <kernel/geometry/patch_mesh_factory.hpp>
 #include <kernel/geometry/patch_meshpart_factory.hpp>
 #include <kernel/geometry/patch_meshpart_splitter.hpp>
+#include <kernel/geometry/subdivision_levels.hpp>
 #include <kernel/geometry/intern/dual_adaptor.hpp>
 #include <kernel/adjacency/graph.hpp>
 
@@ -1014,6 +1016,96 @@ namespace FEAT
           {
             StandardRefinery<MeshPartType> patch_refinery(*v.second, *this->_mesh);
             fine_node->add_patch(v.first, patch_refinery.make_unique());
+          }
+          else
+            fine_node->add_patch(v.first, nullptr);
+        }
+
+        // adapt by chart?
+        if((adapt_mode & AdaptMode::chart) != AdaptMode::none)
+        {
+          fine_node->adapt(true);
+        }
+
+        // adapt dual?
+        if((adapt_mode & AdaptMode::dual) != AdaptMode::none)
+        {
+          Intern::DualAdaptor<MeshType>::adapt(*fine_node->get_mesh(), *this->get_mesh());
+        }
+
+        // okay
+        return fine_node;
+      }
+
+      /**
+       * \brief Refines this node and its sub-tree partially.
+       *
+       * \param[in] adapt_mode
+       * Mode for adaption, defaults to chart.
+       *
+       * \returns
+       * A unique pointer to a newly created RootMeshNode containing the refined mesh tree.
+       */
+      template<typename TemplateSet_, typename VertexMarker_>
+      std::unique_ptr<RootMeshNode> refine_partial_unique(const VertexMarker_& marker, AdaptMode adapt_mode = AdaptMode::chart) const
+      {
+        using AdaptiveMeshType = AdaptiveMesh<TemplateSet_, typename MeshType::ShapeType>;
+
+        // Create subdivision levels
+        const Index num_vertices = this->_mesh->get_num_vertices();
+        SubdivisionLevels sdls(num_vertices);
+
+        for(Index i(0); i < num_vertices; ++i)
+        {
+          sdls[i] = marker(i);
+        }
+
+        AdaptiveMeshType adaptive_mesh(*this->_mesh);
+        adaptive_mesh.adapt(sdls, AdaptiveMeshType::ImportBehaviour::All);
+
+        Layer top_layer{adaptive_mesh.num_layers() - 1};
+
+        // create a new root mesh node
+        std::unique_ptr<RootMeshNode> fine_node = make_unique(
+          std::make_unique<MeshType>(adaptive_mesh.to_conformal_mesh(top_layer)),
+          this->_atlas);
+
+        // Projects mesh parts
+        typename BaseClass::MeshPartNodeConstIterator it(this->_mesh_part_nodes.begin());
+        typename BaseClass::MeshPartNodeConstIterator jt(this->_mesh_part_nodes.end());
+
+        for(; it != jt; ++it)
+        {
+          auto new_mesh_part = std::make_unique<MeshPartType>(
+            adaptive_mesh.template project_meshpart<MeshType>(top_layer, *(it->second.node->get_mesh())));
+          auto new_mesh_part_node = std::make_unique<typename BaseClass::MeshPartNodeType>(std::move(new_mesh_part));
+
+          fine_node->add_mesh_part_node(
+            it->first,
+            std::move(new_mesh_part_node),
+            it->second.chart_name,
+            it->second.chart);
+        }
+
+        // refine our halos
+        for(const auto& v : _halos)
+        {
+          if(v.second)
+          {
+            auto new_halo = std::make_unique<MeshPartType>(adaptive_mesh.template project_meshpart<MeshType>(top_layer, *v.second));
+            fine_node->add_halo(v.first, std::move(new_halo));
+          }
+          else
+            fine_node->add_halo(v.first, nullptr);
+        }
+
+        // refine our patch mesh-parts
+        for(const auto& v : _patches)
+        {
+          if(v.second)
+          {
+            auto new_halo = std::make_unique<MeshPartType>(adaptive_mesh.template project_meshpart<MeshType>(top_layer, *v.second));
+            fine_node->add_patch(v.first, std::move(new_halo));
           }
           else
             fine_node->add_patch(v.first, nullptr);
