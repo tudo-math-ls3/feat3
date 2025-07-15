@@ -11,6 +11,7 @@
 #include <kernel/geometry/mesh_node.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/mesh_file_reader.hpp>
+#include <kernel/geometry/mesh_quality_heuristic.hpp>
 #include <kernel/geometry/parsed_hit_test_factory.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 
@@ -65,6 +66,9 @@ static void display_help()
   std::cout << "\n";
   std::cout << " --no-volume\n";
   std::cout << "Do not compute cell volumes\n";
+  std::cout << "\n";
+  std::cout << " --no-angles\n";
+  std::cout << "Do not compute minimum cell angles\n";
   std::cout << "\n";
   std::cout << " --hit-test <name1> <formula1> [<name2> <formula2> ...]\n";
   std::cout << "Specifies a set of name-formula argument pairs which are used to generate meshparts\n";
@@ -276,6 +280,9 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
   // compute cell volumes?
   bool calc_volume = (args.check("no-volume") < 0);
 
+  // compute cell angles?
+  bool calc_cell_angles = (args.check("no-angles") < 0);
+
   // compute edge ratios?
   bool calc_edge_ratio = (args.check("no-edge-ratio") < 0);
 
@@ -444,6 +451,20 @@ int run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const 
         }
 
         exporter.add_cell_scalar("edge_ratio", edge_ratio.data());
+      }
+    }
+
+    // compute cell angles?
+    if constexpr(shape_dim > 1) // cell angles not available in 1D
+    {
+      if(calc_cell_angles)
+      {
+        std::vector<double> cell_angle(mesh.get_num_elements(), 0.0);
+
+        Geometry::MeshQualityHeuristic<typename Mesh_::ShapeType>::angle(
+          mesh.template get_index_set<shape_dim,0>(), mesh.get_vertex_set(), cell_angle.data());
+
+        exporter.add_cell_scalar("cell_angle", cell_angle.data());
       }
     }
 
