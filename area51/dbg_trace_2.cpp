@@ -24,6 +24,7 @@
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/trace_assembler.hpp>
+#include <kernel/assembly/trace_assembler_basic_jobs.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/unit_filter.hpp>
@@ -118,7 +119,7 @@ namespace Tutorial01
       trace_asm.compile();
       NeumannRhsFunction neu_func;
       Assembly::Common::ForceFunctional<decltype(neu_func)> neu_force(neu_func);
-      trace_asm.assemble_functional_vector(vec_rhs, neu_force, space, cubature_factory);
+      Assembly::assemble_linear_functional_vector(trace_asm, vec_rhs, neu_force, space, "auto-degree:5");
     }
 
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

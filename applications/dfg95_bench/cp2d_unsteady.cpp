@@ -220,6 +220,8 @@
 #include <deque>
 #include <numeric>
 
+#include "ccnd_common.hpp"
+
 namespace NavierStokesCP2D
 {
   using namespace FEAT;
@@ -615,127 +617,6 @@ namespace NavierStokesCP2D
       time_steps = max_time_steps = 1500;
     }
   }; // class Config
-
-  template<typename DataType_>
-  class BenchBodyForceAccumulator
-  {
-  private:
-    const bool _defo;
-    const DataType_ _nu;
-    const DataType_ _v_max;
-
-  public:
-    DataType_ drag;
-    DataType_ lift;
-
-    explicit BenchBodyForceAccumulator(bool defo, DataType_ nu, DataType_ v_max) :
-      _defo(defo), _nu(nu), _v_max(v_max),
-      drag(DataType_(0)), lift(DataType_(0))
-    {
-    }
-
-    /// 2D variant
-    template<typename T_>
-    void operator()(
-      const T_ omega,
-      const Tiny::Vector<T_, 2, 2>& /*pt*/,
-      const Tiny::Matrix<T_, 2, 1, 2, 1>& jac,
-      const Tiny::Vector<T_, 2, 2>& /*val_v*/,
-      const Tiny::Matrix<T_, 2, 2, 2, 2>& grad_v,
-      const T_ val_p)
-    {
-      // compute normal and tangential
-      const T_ n2 = T_(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
-      const T_ tx = jac(0,0) * n2;
-      const T_ ty = jac(1,0) * n2;
-      const T_ nx = -ty;
-      const T_ ny =  tx;
-
-      /// \todo adjust this to support the deformation tensor (?)
-
-      Tiny::Matrix<T_, 2, 2, 2, 2> nt;
-      nt(0,0) = tx * nx;
-      nt(0,1) = tx * ny;
-      nt(1,0) = ty * nx;
-      nt(1,1) = ty * ny;
-
-      const T_ dut = Tiny::dot(nt, grad_v);
-      const T_ dpf1 = _nu;
-      const T_ dpf2 = (2.0 / (0.1*Math::sqr(_v_max*(2.0/3.0)))); // = 2 / (rho * U^2 * D)
-
-      drag += DataType_(omega * dpf2 * ( dpf1 * dut * ny - val_p * nx));
-      lift += DataType_(omega * dpf2 * (-dpf1 * dut * nx - val_p * ny));
-    }
-
-    /// 3D variant
-    template<typename T_>
-    void operator()(
-      const T_ omega,
-      const Tiny::Vector<T_, 3, 3>& /*pt*/,
-      const Tiny::Matrix<T_, 3, 2, 3, 2>& jac,
-      const Tiny::Vector<T_, 3, 3>& /*val_v*/,
-      const Tiny::Matrix<T_, 3, 3, 3, 3>& grad_v,
-      const T_ val_p)
-    {
-      // compute normal and tangential
-      const T_ n2 = T_(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
-      const T_ tx = jac(0,0) * n2;
-      const T_ ty = jac(1,0) * n2;
-      const T_ nx = -ty;
-      const T_ ny =  tx;
-
-      /// \todo adjust this to support the deformation tensor (?)
-
-      Tiny::Matrix<T_, 3, 3, 3, 3> nt;
-      nt.format();
-      nt(0,0) = tx * nx;
-      nt(0,1) = tx * ny;
-      nt(1,0) = ty * nx;
-      nt(1,1) = ty * ny;
-
-      const T_ dut = Tiny::dot(nt, grad_v);
-      const T_ dpf1 = _nu;
-      const T_ dpf2 = (2.0 / (0.1*Math::sqr(_v_max*(4.0/9.0))* 0.41)); // = 2 / (rho * U^2 * D * H)
-
-      drag += DataType_(omega * dpf2 * ( dpf1 * dut * ny - val_p * nx));
-      lift += DataType_(omega * dpf2 * (-dpf1 * dut * nx - val_p * ny));
-    }
-
-    void sync(const Dist::Comm& comm)
-    {
-      comm.allreduce(&drag, &drag, std::size_t(1), Dist::op_sum);
-      comm.allreduce(&lift, &lift, std::size_t(1), Dist::op_sum);
-    }
-  }; // class BenchBodyForceAccumulator<...>
-
-  template<typename DataType_>
-  class XFluxAccumulator
-  {
-  public:
-    DataType_ flux;
-
-    XFluxAccumulator() :
-      flux(DataType_(0))
-    {
-    }
-
-    template<typename T_, int d_, int d2_>
-    void operator()(
-      const T_ omega,
-      const Tiny::Vector<T_, d_, d_>& /*pt*/,
-      const Tiny::Matrix<T_, d_, d2_, d_, d2_>& /*jac*/,
-      const Tiny::Vector<T_, d_, d_>& val_v,
-      const Tiny::Matrix<T_, d_, d_, d_, d_>& /*grad_v*/,
-      const T_ /*val_p*/)
-    {
-      flux += DataType_(omega * val_v[0]);
-    }
-
-    void sync(const Dist::Comm& comm)
-    {
-      comm.allreduce(&flux, &flux, std::size_t(1), Dist::op_sum);
-    }
-  };
 
   /**
    * \brief Navier-Stokes System Level class
@@ -1567,17 +1448,19 @@ namespace NavierStokesCP2D
 
         // assemble drag and lift forces
         {
-          BenchBodyForceAccumulator<DataType> body_force_accum(false, cfg.nu, cfg.vmax);
-          body_force_asm.assemble_flow_accum(
-            body_force_accum,
-            vec_sol_v.local(),
-            vec_sol_p.local(),
-            the_domain_level.space_velo,
-            the_domain_level.space_pres,
-            cubature);
-          body_force_accum.sync(comm);
-          c_drag = body_force_accum.drag;
-          c_lift = body_force_accum.lift;
+          DFG95::DFG95SurfaceBodyForceAssemblyJob<
+            typename SystemLevelType::LocalVeloVector, typename SystemLevelType::LocalPresVector,
+            typename DomainLevelType::SpaceVeloType, typename DomainLevelType::SpacePresType>
+            job(vec_sol_v.local(), vec_sol_p.local(), the_domain_level.space_velo, the_domain_level.space_pres, "gauss-legendre:3");
+          body_force_asm.assemble(job);
+          job.sync(comm);
+
+          const DataType dpf2 = DataType(2) / (dim == 2 ?
+            DataType(0.100)*Math::sqr(cfg.vmax*(DataType(2)/DataType(3))) : // = 2 / (rho * U^2 * D)
+            DataType(0.041)*Math::sqr(cfg.vmax*(DataType(4)/DataType(9)))); // = 2 / (rho * U^2 * D * H)
+
+          c_drag = job.drag_old(cfg.nu) * dpf2;
+          c_lift = job.lift_old(cfg.nu) * dpf2;
         }
 
         // compute pressure values and difference
@@ -1596,32 +1479,16 @@ namespace NavierStokesCP2D
 
         // assemble upper flux
         {
-          XFluxAccumulator<DataType> flux_accum;
-          flux_u_asm.assemble_flow_accum(
-            flux_accum,
-            vec_sol_v.local(),
-            vec_sol_p.local(),
-            the_domain_level.space_velo,
-            the_domain_level.space_pres,
-            cubature);
-
-          flux_accum.sync(comm);
-          u_flux = flux_accum.flux / DataType(2);
+          auto flux_u = Assembly::integrate_discrete_function<0>(flux_u_asm, vec_sol_v.local(), the_domain_level.space_velo, "gauss-legendre:3");
+          flux_u.synchronize(comm);
+          u_flux = flux_u.value[0] / DataType(2);
         }
 
         // assemble lower flux
         {
-          XFluxAccumulator<DataType> flux_accum;
-          flux_l_asm.assemble_flow_accum(
-            flux_accum,
-            vec_sol_v.local(),
-            vec_sol_p.local(),
-            the_domain_level.space_velo,
-            the_domain_level.space_pres,
-            cubature);
-
-          flux_accum.sync(comm);
-          l_flux = flux_accum.flux / DataType(2);
+          auto flux_l = Assembly::integrate_discrete_function<0>(flux_l_asm, vec_sol_v.local(), the_domain_level.space_velo, "gauss-legendre:3");
+          flux_l.synchronize(comm);
+          l_flux = flux_l.value[0] / DataType(2);
         }
 
         // console output, part 3
@@ -1771,6 +1638,7 @@ namespace NavierStokesCP2D
 
     // print number of processes
     comm.print("Number of Processes: " + stringify(comm.size()));
+    comm.print("Floating Point Type: " + String(DFG95::fp_typename) + " precision");
 
     // create arg parser
     SimpleArgParser args(argc, argv);

@@ -262,17 +262,22 @@ namespace CCND
     {
       watch_sol_analysis.start();
 
-      Cubature::DynamicFactory cubature_factory("gauss-legendre:2");
+      String cubature("gauss-legendre:2");
 
       const LocalVeloVector& vec_sol_v = this->vec_sol.local().first();
       const SpaceVeloType& space_v = domain.front()->space_velo;
 
+      auto fx_i = Assembly::integrate_discrete_function<0>(*flux_asm_in, vec_sol_v, space_v, cubature);
+      auto fx_o = Assembly::integrate_discrete_function<0>(*flux_asm_out, vec_sol_v, space_v, cubature);
+      auto fx_ot = Assembly::integrate_discrete_function<0>(*flux_asm_out_t, vec_sol_v, space_v, cubature);
+      auto fx_ob = Assembly::integrate_discrete_function<0>(*flux_asm_out_b, vec_sol_v, space_v, cubature);
+
       DataType fx[4] =
       {
-        flux_asm_in->assemble_discrete_integral(vec_sol_v, space_v, cubature_factory)[0],
-        flux_asm_out->assemble_discrete_integral(vec_sol_v, space_v, cubature_factory)[0],
-        flux_asm_out_t->assemble_discrete_integral(vec_sol_v, space_v, cubature_factory)[0],
-        flux_asm_out_b->assemble_discrete_integral(vec_sol_v, space_v, cubature_factory)[0]
+        fx_i.value[0],
+        fx_o.value[0],
+        fx_ot.value[0],
+        fx_ob.value[0]
       };
 
       comm.allreduce(fx, fx, 4u, Dist::op_sum);

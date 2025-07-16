@@ -1034,20 +1034,21 @@ namespace DFG95
     // compute drag & lift coefficients by line integration using the trace assembler
     if(bench == 1)
     {
-      BenchBodyForceAccumulator<DataType> body_force_accum(defo, nu, v_max);
-      body_force_asm.assemble_flow_accum(
-        body_force_accum,
-        vec_sol.local().template at<0>(),
-        vec_sol.local().template at<1>(),
-        the_domain_level.space_velo,
-        the_domain_level.space_pres,
-        cubature_postproc);
-      body_force_accum.sync(comm);
+      DFG95SurfaceBodyForceAssemblyJob<
+        typename SystemLevelType::LocalVeloVector, typename SystemLevelType::LocalPresVector, SpaceVeloType, SpacePresType>
+        job(vec_sol.local().template at<0>(), vec_sol.local().template at<1>(),
+          the_domain_level.space_velo, the_domain_level.space_pres, cubature_postproc);
+      body_force_asm.assemble(job);
+      job.sync(comm);
 
-      summary.drag_coeff_line = body_force_accum.drag;
-      summary.lift_coeff_line = body_force_accum.lift;
-      summary.drag_err_line = Math::abs((body_force_accum.drag - ref_drag) / ref_drag);
-      summary.lift_err_line = Math::abs((body_force_accum.lift - ref_lift) / ref_lift);
+      const DataType dpf2 = DataType(2) / (dim == 2 ?
+        DataType(0.100)*Math::sqr(v_max*(DataType(2)/DataType(3))) : // = 2 / (rho * U^2 * D)
+        DataType(0.041)*Math::sqr(v_max*(DataType(4)/DataType(9)))); // = 2 / (rho * U^2 * D * H)
+
+      summary.drag_coeff_line = job.drag_old(nu) * dpf2;
+      summary.lift_coeff_line = job.lift_old(nu) * dpf2;
+      summary.drag_err_line = Math::abs((summary.drag_coeff_line - ref_drag) / ref_drag);
+      summary.lift_err_line = Math::abs((summary.lift_coeff_line - ref_lift) / ref_lift);
     }
 
     // compute drag & lift coefficients via volume integration from unsynchronized final defect
@@ -1101,33 +1102,17 @@ namespace DFG95
     // compute flow through upper region
     if(bench == 1)
     {
-      XFluxAccumulator<DataType> flux_accum_u;
-      flux_asm_u.assemble_flow_accum(
-        flux_accum_u,
-        vec_sol.local().template at<0>(),
-        vec_sol.local().template at<1>(),
-        the_domain_level.space_velo,
-        the_domain_level.space_pres,
-        cubature_postproc);
-      flux_accum_u.sync(comm);
-
-      summary.flux_upper = flux_accum_u.flux / DataType(2);
+      auto flux_u = Assembly::integrate_discrete_function<0>(flux_asm_u, vec_sol.local().template at<0>(), the_domain_level.space_velo, cubature_postproc);
+      flux_u.synchronize(comm);
+      summary.flux_upper = flux_u.value[0] / DataType(2);
     }
 
     // compute flow through lower region
     if(bench == 1)
     {
-      XFluxAccumulator<DataType> flux_accum_l;
-      flux_asm_l.assemble_flow_accum(
-        flux_accum_l,
-        vec_sol.local().template at<0>(),
-        vec_sol.local().template at<1>(),
-        the_domain_level.space_velo,
-        the_domain_level.space_pres,
-        cubature_postproc);
-      flux_accum_l.sync(comm);
-
-      summary.flux_lower = flux_accum_l.flux / DataType(2);
+      auto flux_l = Assembly::integrate_discrete_function<0>(flux_asm_l, vec_sol.local().template at<0>(), the_domain_level.space_velo, cubature_postproc);
+      flux_l.synchronize(comm);
+      summary.flux_lower = flux_l.value[0] / DataType(2);
     }
 
     // perform analysis of velocity field

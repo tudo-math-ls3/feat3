@@ -4,6 +4,7 @@
 #include <kernel/assembly/linear_functional_assembler.hpp> // for LinearFunctionalAssembler
 #include <area51/ccnd_fiber/ccnd_steady_function.hpp> //for steady boundary conditions and test functions
 #include <kernel/assembly/common_functionals.hpp>
+#include <kernel/assembly/trace_assembler_basic_jobs.hpp>
 
 namespace CCND_FIBER
 {
@@ -175,6 +176,7 @@ namespace CCND_FIBER
   public:
     TimeStamp stamp_init_time;
     double init_time;
+    String cubature_name;
     Cubature::DynamicFactory cubature;
     const String InflowFacetName;
     const String OutflowFacetName;
@@ -198,9 +200,10 @@ namespace CCND_FIBER
   public:
     template<typename DirichletFunctionType, typename RHSFunctionType, typename NeumannFunctionType, typename NoSlipFunctionType>
     CCNDUnsteadyInterface(const Dist::Comm& comm, SimpleArgParser& args, std::unique_ptr<Control::Domain::PartiDomainControl<DomainLevel_>>&& domain_ptr,
-                          DirichletFunctionType& diri_func, RHSFunctionType& rhs_func, NeumannFunctionType& neumann_func, NoSlipFunctionType& no_slip_func, String cubature_name = "auto-degree:6",
-                          String inflow_name = "bnd:io:big", String outflow_name = "bnd:io:small")
-    : cubature(cubature_name),
+                          DirichletFunctionType& diri_func, RHSFunctionType& rhs_func, NeumannFunctionType& neumann_func, NoSlipFunctionType& no_slip_func, String cubature_name_ = "auto-degree:6",
+                          String inflow_name = "bnd:io:big", String outflow_name = "bnd:io:small") :
+      cubature_name(cubature_name_),
+      cubature(cubature_name_),
       InflowFacetName(inflow_name),
       OutflowFacetName(outflow_name),
       _comm(comm),
@@ -252,7 +255,7 @@ namespace CCND_FIBER
         //create the associated lin func assembler
         Assembly::Common::ForceFunctional<NeumannFunctionType> neumann_functional(neumann_func);
         //and now we should be able to compile our vector
-        neumann_boundary_asm.assemble_functional_vector(_vec_sol.local().template at<0>(), neumann_functional, velo_space, cubature);
+        Assembly::assemble_linear_functional_vector(neumann_boundary_asm, _vec_sol.local().template at<0>(), neumann_functional, velo_space, cubature_name);
 
         //and now add this vector onto cor
         vec_temp.copy(_vec_rhs);
@@ -324,7 +327,7 @@ namespace CCND_FIBER
         //create the associated lin func assembler
         Assembly::Common::ForceFunctional<NeumannFunctionType> neumann_functional(neumann_func);
         //and now we should be able to compile our vector
-        neumann_boundary_asm.assemble_functional_vector(vec_temp.local().template at<0>(), neumann_functional, velo_space, cubature);
+        Assembly::assemble_linear_functional_vector(neumann_boundary_asm, vec_temp.local().template at<0>(), neumann_functional, velo_space, cubature_name);
 
         //and now add this vector onto cor
         vec_temp.axpy(_vec_rhs, DataType(1.));

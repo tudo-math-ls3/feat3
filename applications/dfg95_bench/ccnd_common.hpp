@@ -21,6 +21,7 @@
 #include <kernel/assembly/trace_assembler.hpp>
 #include <kernel/assembly/velocity_analyser.hpp>
 #include <kernel/assembly/discrete_evaluator.hpp>
+#include <kernel/assembly/trace_assembler_basic_jobs.hpp>
 #include <kernel/solver/multigrid.hpp>
 #include <kernel/solver/richardson.hpp>
 #include <kernel/solver/schwarz_precond.hpp>
@@ -568,131 +569,214 @@ namespace DFG95
     }
   }; // struct BenchmarkSummary<...>
 
-  // accumulator for benchmark body forces (i.e. drag and lift)
-  // this class is used for the computation of the 'line integration' variants of drag and lift
-  template<typename DataType_>
-  class BenchBodyForceAccumulator
-  {
-  private:
-    const bool _defo;
-    const DataType_ _nu;
-    const DataType_ _v_max;
-
-  public:
-    DataType_ drag;
-    DataType_ lift;
-
-    explicit BenchBodyForceAccumulator(bool defo, DataType_ nu, DataType_ v_max) :
-      _defo(defo), _nu(nu), _v_max(v_max),
-      drag(DataType_(0)), lift(DataType_(0))
-    {
-    }
-
-    /// 2D variant
-    template<typename T_>
-    void operator()(
-      const T_ omega,
-      const Tiny::Vector<T_, 2, 2>& /*pt*/,
-      const Tiny::Matrix<T_, 2, 1, 2, 1>& jac,
-      const Tiny::Vector<T_, 2, 2>& /*val_v*/,
-      const Tiny::Matrix<T_, 2, 2, 2, 2>& grad_v,
-      const T_ val_p)
-    {
-      // compute normal and tangential
-      const T_ n2 = T_(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
-      const T_ tx = jac(0,0) * n2;
-      const T_ ty = jac(1,0) * n2;
-      const T_ nx = -ty;
-      const T_ ny =  tx;
-
-      /// \todo adjust this to support the deformation tensor!!!
-      // question to self: is it even necessary to adjust something?
-
-      Tiny::Matrix<T_, 2, 2, 2, 2> nt;
-      nt(0,0) = tx * nx;
-      nt(0,1) = tx * ny;
-      nt(1,0) = ty * nx;
-      nt(1,1) = ty * ny;
-
-      const T_ dut = Tiny::dot(nt, grad_v);
-      const T_ dpf1 = _nu;
-      const T_ dpf2 = (2.0 / (0.1*Math::sqr(_v_max*(2.0/3.0)))); // = 2 / (rho * U^2 * D)
-
-      drag += DataType_(omega * dpf2 * ( dpf1 * dut * ny - val_p * nx));
-      lift += DataType_(omega * dpf2 * (-dpf1 * dut * nx - val_p * ny));
-    }
-
-    /// 3D variant
-    template<typename T_>
-    void operator()(
-      const T_ omega,
-      const Tiny::Vector<T_, 3, 3>& /*pt*/,
-      const Tiny::Matrix<T_, 3, 2, 3, 2>& jac,
-      const Tiny::Vector<T_, 3, 3>& /*val_v*/,
-      const Tiny::Matrix<T_, 3, 3, 3, 3>& grad_v,
-      const T_ val_p)
-    {
-      // compute normal and tangential
-      const T_ n2 = T_(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
-      const T_ tx = jac(0,0) * n2;
-      const T_ ty = jac(1,0) * n2;
-      const T_ nx = -ty;
-      const T_ ny =  tx;
-
-      /// \todo adjust this to support the deformation tensor!!!
-      // question to self: is it even necessary to adjust something?
-
-      Tiny::Matrix<T_, 3, 3, 3, 3> nt;
-      nt.format();
-      nt(0,0) = tx * nx;
-      nt(0,1) = tx * ny;
-      nt(1,0) = ty * nx;
-      nt(1,1) = ty * ny;
-
-      const T_ dut = Tiny::dot(nt, grad_v);
-      const T_ dpf1 = _nu;
-      const T_ dpf2 = (2.0 / (0.1*Math::sqr(_v_max*(4.0/9.0))* 0.41)); // = 2 / (rho * U^2 * D * H)
-
-      drag += DataType_(omega * dpf2 * ( dpf1 * dut * ny - val_p * nx));
-      lift += DataType_(omega * dpf2 * (-dpf1 * dut * nx - val_p * ny));
-    }
-
-    void sync(const Dist::Comm& comm)
-    {
-      comm.allreduce(&drag, &drag, std::size_t(1), Dist::op_sum);
-      comm.allreduce(&lift, &lift, std::size_t(1), Dist::op_sum);
-    }
-  }; // class BenchBodyForces<...,2>
-
-  // accumulator for computation of X-flux
-  template<typename DataType_>
-  class XFluxAccumulator
+  // trace assembly job for surface body forces computation; this class extends the assembly that is also included
+  // in Assembly::TraceAssemblyStokesBodyForceAssemblyJob by the formulae given in the original DFG95 paper, which
+  // only work for 2.5D obstacles, whereas the 'new' formulae from the Giles paper also work for 'true' 3D obstacles,
+  // however, the resulting coefficients by the two formulae are slightly different, so we print out the coefficients
+  // according to both the old and the new fomulae in this application
+  template<typename VectorVelo_, typename VectorPres_, typename SpaceVelo_, typename SpacePres_>
+  class DFG95SurfaceBodyForceAssemblyJob
   {
   public:
-    DataType_ flux;
+    typedef typename VectorVelo_::DataType DataType;
+    typedef typename VectorVelo_::ValueType VeloValueType;
+    typedef typename VectorPres_::ValueType PresValueType;
 
-    XFluxAccumulator() :
-      flux(DataType_(0))
+    static constexpr TrafoTags trafo_config = TrafoTags::none;
+    static constexpr SpaceTags space_velo_config = SpaceTags::value | SpaceTags::grad;
+    static constexpr SpaceTags space_pres_config = SpaceTags::value;
+    static constexpr TrafoTags facet_trafo_config = TrafoTags::jac_mat | TrafoTags::jac_det | TrafoTags::normal;
+
+    static constexpr int dim = SpaceVelo_::shape_dim;
+
+    typedef Tiny::Matrix<DataType, 3, 2> RawNewForces;
+    typedef Tiny::Matrix<DataType, 2, 2> RawOldForces;
+
+    class Task :
+      public Assembly::TraceAssemblyStokesVectorAnalysisTaskCRTP<Task, VectorVelo_, VectorPres_, SpaceVelo_, SpacePres_, trafo_config, facet_trafo_config, space_velo_config, space_pres_config>
     {
+    public:
+      /// our base-class typedef
+      typedef Assembly::TraceAssemblyStokesVectorAnalysisTaskCRTP<Task, VectorVelo_, VectorPres_, SpaceVelo_, SpacePres_, trafo_config, facet_trafo_config, space_velo_config, space_pres_config> BaseClass;
+
+      /// our assembly traits
+      typedef typename BaseClass::AsmTraits AsmTraits;
+
+      // we do not support pairwise assembly
+      static constexpr bool assemble_pairwise = false;
+      /// this task needs to scatter
+      static constexpr bool need_scatter = false;
+      /// this task has no combine
+      static constexpr bool need_combine = true;
+
+      using typename BaseClass::TrafoEvalData;
+      using typename BaseClass::TrafoFacetEvalData;
+      using typename BaseClass::VeloData;
+      using typename BaseClass::PresData;
+
+    protected:
+      RawOldForces& job_raw_old_forces;
+      RawNewForces& job_raw_new_forces;
+      RawOldForces raw_old_forces;
+      RawNewForces raw_new_forces;
+
+    public:
+      explicit Task(DFG95SurfaceBodyForceAssemblyJob& job) :
+        BaseClass(job.vector_velo, job.vector_pres, job.space_velo, job.space_pres, job.cubature_factory),
+        job_raw_old_forces(job.raw_old_forces),
+        job_raw_new_forces(job.raw_new_forces),
+        raw_old_forces(),
+        raw_new_forces()
+      {
+        raw_old_forces.format();
+        raw_new_forces.format();
+      }
+
+      void eval(TrafoFacetEvalData& tau_f, TrafoEvalData& DOXY(tau), DataType weight, const VeloData& velo, const PresData& pres)
+      {
+        this->_eval(weight, tau_f.jac_mat, tau_f.normal, velo.grad, pres.value);
+      }
+
+      void scatter()
+      {
+        // nothing to do here
+      }
+
+      void combine()
+      {
+        job_raw_old_forces += raw_old_forces;
+        job_raw_new_forces += raw_new_forces;
+      }
+
+    protected:
+      /// 2D version
+      void _eval(const DataType omega, const Tiny::Matrix<DataType, 2, 1, 2, 1>& jac, const Tiny::Vector<DataType, 2, 2>& n,
+        const Tiny::Matrix<DataType, 2, 2, 2, 2>& grad_v, const DataType val_p)
+      {
+        // 'old' implementation according to original DFG95 paper
+        const DataType n2 = DataType(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
+        const DataType tx = jac(0,0) * n2;
+        const DataType ty = jac(1,0) * n2;
+        const DataType nx = -ty;
+        const DataType ny =  tx;
+
+        Tiny::Matrix<DataType, 2, 2, 2, 2> nt;
+        nt(0,0) = tx * nx;
+        nt(0,1) = tx * ny;
+        nt(1,0) = ty * nx;
+        nt(1,1) = ty * ny;
+
+        const DataType dut = Tiny::dot(nt, grad_v);
+
+        raw_old_forces(0, 0) += omega * dut * ny;
+        raw_old_forces(1, 0) -= omega * dut * nx;
+        raw_old_forces(0, 1) += omega * val_p * nx;
+        raw_old_forces(1, 1) += omega * val_p * ny;
+
+        // 'new' implementation according to Giles paper
+        raw_new_forces(0, 0) -= omega * (DataType(2) * grad_v(0,0) * n[0] + (grad_v(0, 1) + grad_v(1, 0)) * n[1]);
+        raw_new_forces(1, 0) -= omega * (DataType(2) * grad_v(1,1) * n[1] + (grad_v(1, 0) + grad_v(0, 1)) * n[0]);
+        raw_new_forces(0, 1) -= omega * val_p * n[0];
+        raw_new_forces(1, 1) -= omega * val_p * n[1];
+      }
+
+      /// 3D version
+      void _eval(const DataType omega, const Tiny::Matrix<DataType, 3, 2, 3, 2>& jac, const Tiny::Vector<DataType, 3, 3>& n,
+        const Tiny::Matrix<DataType, 3, 3, 3, 3>& grad_v, const DataType val_p)
+      {
+        // 'old' implementation according to original DFG95 paper
+        const DataType n2 = DataType(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
+        const DataType tx = jac(0,0) * n2;
+        const DataType ty = jac(1,0) * n2;
+        const DataType nx = -ty;
+        const DataType ny =  tx;
+
+        Tiny::Matrix<DataType, 3, 3, 3, 3> nt;
+        nt.format();
+        nt(0,0) = tx * nx;
+        nt(0,1) = tx * ny;
+        nt(1,0) = ty * nx;
+        nt(1,1) = ty * ny;
+
+        const DataType dut = Tiny::dot(nt, grad_v);
+
+        raw_old_forces(0, 0) += omega * dut * ny;
+        raw_old_forces(1, 0) -= omega * dut * nx;
+        raw_old_forces(0, 1) += omega * val_p * nx;
+        raw_old_forces(1, 1) += omega * val_p * ny;
+
+        // 'new' implementation according to Giles paper
+        raw_new_forces(0, 0) -= omega * (DataType(2) * grad_v(0,0) * n[0] + (grad_v(0, 1) + grad_v(1, 0)) * n[1] + (grad_v(0, 2) + grad_v(2, 0)) * n[2]);
+        raw_new_forces(1, 0) -= omega * (DataType(2) * grad_v(1,1) * n[1] + (grad_v(1, 2) + grad_v(2, 1)) * n[2] + (grad_v(1, 0) + grad_v(0, 1)) * n[0]);
+        raw_new_forces(2, 0) -= omega * (DataType(2) * grad_v(2,2) * n[2] + (grad_v(2, 0) + grad_v(0, 2)) * n[0] + (grad_v(2, 1) + grad_v(1, 2)) * n[1]);
+        raw_new_forces(0, 1) -= omega * val_p * n[0];
+        raw_new_forces(1, 1) -= omega * val_p * n[1];
+        raw_new_forces(2, 1) -= omega * val_p * n[2];
+      }
+    }; // class Task
+
+  protected:
+    const VectorVelo_& vector_velo;
+    const VectorPres_& vector_pres;
+    const SpaceVelo_& space_velo;
+    const SpacePres_& space_pres;
+    Cubature::DynamicFactory cubature_factory;
+    RawOldForces raw_old_forces;
+    RawNewForces raw_new_forces;
+
+  public:
+    explicit DFG95SurfaceBodyForceAssemblyJob(const VectorVelo_& vector_velo_, const VectorPres_& vector_pres_,
+      const SpaceVelo_& space_velo_, const SpacePres_& space_pres_, String cubature_):
+      vector_velo(vector_velo_),
+      vector_pres(vector_pres_),
+      space_velo(space_velo_),
+      space_pres(space_pres_),
+      cubature_factory(cubature_),
+      raw_old_forces(),
+      raw_new_forces()
+    {
+      raw_old_forces.format();
+      raw_new_forces.format();
     }
 
-    template<typename T_, int d_, int d2_>
-    void operator()(
-      const T_ omega,
-      const Tiny::Vector<T_, d_, d_>& /*pt*/,
-      const Tiny::Matrix<T_, d_, d2_, d_, d2_>& /*jac*/,
-      const Tiny::Vector<T_, d_, d_>& val_v,
-      const Tiny::Matrix<T_, d_, d_, d_, d_>& /*grad_v*/,
-      const T_ /*val_p*/)
+    /// Returns the raw drag force coefficient for a given viscosity parameter (formula as in DFG95 paper)
+
+    DataType drag_old(DataType nu) const
     {
-      flux += DataType_(omega * val_v[0]);
+      return nu * raw_old_forces(0, 0) - raw_old_forces(0, 1);
     }
 
+    /// Returns the raw lift  force coefficient for a given viscosity parameter (formula as in DFG95 paper)
+    DataType lift_old(DataType nu) const
+    {
+      return nu * raw_old_forces(1, 0) - raw_old_forces(1, 1);
+    }
+
+    /// Returns the raw drag force coefficient for a given viscosity parameter
+    DataType drag_new(DataType nu) const
+    {
+      return nu * raw_new_forces(0, 0) - raw_new_forces(0, 1);
+    }
+
+    /// Returns the raw lift  force coefficient for a given viscosity parameter
+    DataType lift_new(DataType nu) const
+    {
+      return nu * raw_new_forces(1, 0) - raw_new_forces(1, 1);
+    }
+
+    /// Returns the raw side force coefficient for a given viscosity parameter
+    DataType side_new(DataType nu) const
+    {
+      return nu * raw_new_forces(2, 0) - raw_new_forces(2, 1);
+    }
+
+    /// Synchronizes the forces over a communicator
     void sync(const Dist::Comm& comm)
     {
-      comm.allreduce(&flux, &flux, std::size_t(1), Dist::op_sum);
+      comm.allreduce(&raw_old_forces.v[0][0], &raw_old_forces.v[0][0], std::size_t(4), Dist::op_sum);
+      comm.allreduce(&raw_new_forces.v[0][0], &raw_new_forces.v[0][0], std::size_t(6), Dist::op_sum);
     }
-  }; // class XFluxAccumulator
+  }; // class DFG95SurfaceBodyForceAssemblyJob<...>
 
   // computes the body forces by the volumetric 'defect vector' approach
   template<typename DT_, typename IT_, int dim_>

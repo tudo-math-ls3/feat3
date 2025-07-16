@@ -111,12 +111,18 @@ namespace FEAT
 
       /// basis function value type
       typedef Tiny::Vector<DataType, image_dim> BasisValueType;
+      /// basis function value type on reference element
+      typedef Tiny::Vector<DataType, domain_dim> BasisReferenceValueType;
 
       /// basis gradient type
       typedef Tiny::Matrix<DataType, image_dim, image_dim> BasisGradientType;
+      /// basis gradient type on reference element
+      typedef Tiny::Matrix<DataType, domain_dim, domain_dim> BasisReferenceGradientType;
 
       /// basis hessian type
       typedef Tiny::Tensor3<DataType, image_dim, image_dim, image_dim> BasisHessianType;
-    }; // class StandardScalarEvalTraits<...>
+      /// basis hessian type on reference element
+      typedef Tiny::Tensor3<DataType, domain_dim, domain_dim, domain_dim> BasisReferenceHessianType;
+    }; // class StandardVectorEvalTraits<...>
   } // namespace Space
 } // namespace FEAT

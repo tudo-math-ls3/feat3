@@ -14,6 +14,7 @@
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/interpolator.hpp>
 #include <kernel/assembly/trace_assembler.hpp>
+#include <kernel/assembly/trace_assembler_jump_jobs.hpp>
 #include <kernel/analytic/common.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
@@ -182,7 +183,7 @@ public:
     Cubature::DynamicFactory cubature_factory("gauss-legendre:5");
     Assembly::TraceAssembler<typename Space_::TrafoType> trace_asm(space.get_trafo());
     trace_asm.compile_all_facets(true, false);
-    trace_asm.assemble_jump_stabil_operator_matrix(matrix, space, cubature_factory, 0.01, 2.0, 2.0);
+    Assembly::assemble_jump_stabilization_matrix(trace_asm, matrix, space, "gauss-legendre:5", 0.01, 2.0, 2.0);
 
     // interpolate sine bubble
     Analytic::Common::SineBubbleFunction<2> sine_bubble;

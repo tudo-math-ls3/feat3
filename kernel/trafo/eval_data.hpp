@@ -74,6 +74,19 @@ namespace FEAT
         jac_det = qnan;
       }
 #endif // DEBUG
+
+      void format()
+      {
+        typedef typename EvalTraits_::DataType DataType;
+        hess_inv = DataType(0);
+        hess_ten = DataType(0);
+        jac_inv = DataType(0);
+        jac_mat = DataType(0);
+        normal = DataType(0);
+        img_point = DataType(0);
+        dom_point = DataType(0);
+        jac_det = DataType(0);
+      }
     }; // class EvalData<...>
   } // namespace Trafo
 } // namespace FEAT

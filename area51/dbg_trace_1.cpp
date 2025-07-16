@@ -23,6 +23,7 @@
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/trace_assembler.hpp>
+#include <kernel/assembly/trace_assembler_basic_jobs.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/unit_filter.hpp>
@@ -131,7 +132,7 @@ namespace Tutorial01
       Assembly::TraceAssembler<TrafoType> trace_asm(trafo);
       trace_asm.add_mesh_part(boundary);
       trace_asm.compile();
-      trace_asm.assemble_operator_matrix1(matrix, id_op, space, cubature_factory);
+      Assembly::assemble_bilinear_operator_matrix_1(trace_asm, matrix, id_op, space, "auto-degree:5");
     }
 
     // <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<

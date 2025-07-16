@@ -8,7 +8,6 @@
 // includes, FEAT
 #include <kernel/assembly/asm_traits.hpp>
 #include <kernel/geometry/mesh_part.hpp>
-#include <kernel/geometry/intern/face_index_mapping.hpp>
 #include <kernel/geometry/intern/face_ref_trafo.hpp>
 #include <kernel/geometry/intern/congruency_sampler.hpp>
 #include <kernel/geometry/intern/congruency_trafo.hpp>
@@ -40,82 +39,304 @@ namespace FEAT
           return _outer[Geometry::Intern::FaceIndexMapping<Shape_, cell_dim_, 0>::map(_idx,i)];
         }
       }; // class CompIndexMap
-
-      template<int max_>
-      class CommonDofMap
-      {
-      public:
-        Index glob_dofs[max_];
-        int loc1_dofs[max_];
-        int loc2_dofs[max_];
-        int num_dofs;
-
-        explicit CommonDofMap() : num_dofs(0) {}
-
-        void clear()
-        {
-          num_dofs = 0;
-        }
-
-        int push_1(Index dof, int loc)
-        {
-          for(int i(0); i < num_dofs; ++i)
-          {
-            if(dof == glob_dofs[i])
-            {
-              loc1_dofs[i] = loc;
-              return i;
-            }
-          }
-          ASSERT(num_dofs < max_);
-          glob_dofs[num_dofs] = dof;
-          loc1_dofs[num_dofs] = loc;
-          loc2_dofs[num_dofs] = -1;
-          return num_dofs++;
-        }
-
-        int push_2(Index dof, int loc)
-        {
-          for(int i(0); i < num_dofs; ++i)
-          {
-            if(dof == glob_dofs[i])
-            {
-              loc2_dofs[i] = loc;
-              return i;
-            }
-          }
-          ASSERT(num_dofs < max_);
-          glob_dofs[num_dofs] = dof;
-          loc1_dofs[num_dofs] = -1;
-          loc2_dofs[num_dofs] = loc;
-          return num_dofs++;
-        }
-
-        int loc_1(int k) const
-        {
-          return loc1_dofs[k];
-        }
-
-        int loc_2(int k) const
-        {
-          return loc2_dofs[k];
-        }
-
-        int get_num_local_dofs() const
-        {
-          return num_dofs;
-        }
-
-        Index get_index(int i) const
-        {
-          return glob_dofs[i];
-        }
-      }; // class CommonDofMap<...>
     } // namespace Intern
     /// \endcond
 
+#ifdef DOXYGEN
     /**
-     * \brief Assembler for operators/functionals on boundaries and other sub-dimensional mesh parts.
+     * \brief Interface description of a trace assembly job
+     *
+     * \attention
+     * This class is only defined for the doxygen documentation, because it only serves as a
+     * duck-type class interface documentation.
+     *
+     * The only mandatory member of a job class is the nested Task class, which is instantiated by
+     * each worker thread in the trace assembler. This outer job class can be used to store
+     * coefficients and references to data that has to be used by each task during the assembly
+     * process. Each newly created instance of the nested Task class receives a reference to the
+     * outer job object, so it can retrieve all the necessary data from it inside the constructor.
+     *
+     * \author Peter Zajac
+     */
+    class TraceAssemblyJob
+    {
+    public:
+      /**
+       * \brief Trace assembly task class
+       *
+       * \attention
+       * This class is only defined for the doxygen documentation, because it only serves as a
+       * duck-type class interface documentation.
+       *
+       * An instance of this Task class is created by each worker thread at the beginning of the
+       * assembly process and is used to perform the assembly on the set of the elements that
+       * are assigned to that particular worker thread.
+       *
+       * At the very least, this class contains a mandatory constructor, the five member functions
+       * prepare(), assemble(), scatter(), finish() and combine() as well as three constexpr
+       * members #assemble_pairwise, #need_scatter and #need_combine, which determine whether the
+       * assembly tasks supports cell-pairwise assembly (see below for details) and whether the
+       * scatter and combine functions have to be called by the trace assembler at all. All member
+       * functions except for scatter() and combine() are silently assumed to be thread-safe.
+       *
+       * Because the trace assembler assembles surface integrals over facets which may be shared by
+       * two neighboring cells (unless the facet is a boundary or halo facet), there are two ways
+       * how the assembler may proceed in this case: it may either assemble the trace integral on
+       * both adjacent cells separately or it may assemble both cells at the same time.
+       * If the task's #assemble_pairwise member is set to true and the assembler processes a facet
+       * that is shared by two neighboring cells, then the assembler will call the task's prepare
+       * function overload with 7 function parameters indicating that the task shall assemble on
+       * that pair of neighboring cells at the same time, otherwise the assembler will process the
+       * two neighboring cells successively and it will call the task's prepare function overload
+       * with 4 function parameters for each of the two cells.
+       *
+       * In the case of boundary (or halo) facets, the assembler will always call the task's prepare
+       * function overload with 4 parameters, independently of whether #assemble_pairwise is set to
+       * true or false.
+       *
+       * \note Currently, the TraceAssembler does not perform any sort of multi-threading and so it
+       * does not employ any worker threads, but this may change in future.
+       *
+       * <b><u>Basic Job Assembly work flow:</u></b>\n
+       * Each worker thread employed by the trace assembler will perform the following
+       * (simplified) steps (pseudo-code):
+       \code{.cpp}
+         // create a Task object for this worker thread
+         Job::Task task(job);
+
+         // loop over all facets of this worker thread
+         for(auto facet : this_workers_facet_list)
+         {
+           // is this an inner facet and do we assemble pairwise?
+           if(facet.is_inner && task.assemble_pairwise)
+           {
+             // prepare task for assembly on a pair of neighboring cells sharing a facet
+             task.prepare(facet, cell_a, cell_b, ...);
+
+             // assemble on current cell pair
+             task.assemble();
+
+             // does the task need to scatter?
+             if(task.need_scatter)
+             {
+               // scatter local data
+               neighbor_mutex.lock();
+               task.scatter();
+               neighbor_mutex.unlock();
+             }
+
+             // finish assembly on current cell pair
+             task.finish();
+
+             // continue with next facet
+             continue;
+           }
+
+           // no pairwise assembly
+           for(auto cell : facet.adjacent_cells)
+           {
+             // prepare task for assembly on one cell adjacent to the facet
+             task.prepare(facet, cell, ...);
+
+             // assemble on current cell pair
+             task.assemble();
+
+             // does the task need to scatter?
+             if(task.need_scatter)
+             {
+               // scatter local data
+               neighbor_mutex.lock();
+               task.scatter();
+               neighbor_mutex.unlock();
+             }
+
+             // finish assembly on current cell pair
+             task.finish();
+           }
+         }
+
+         // does the task need to combine?
+         if(task.need_combine)
+         {
+           // combine local data
+           domain_mutex.lock();
+           task.combine();
+           domain_mutex.unlock();
+         }
+       \endcode
+       * In the pseudo-code above, the code lines between <c>neighbor_mutex.lock()</c> and
+       * <c>neighbor_mutex.unlock()</c> are executed in a neighbor-mutually exclusive fashion,
+       * i.e. it is guaranteed that this code (<c>task.scatter()</c>) is never executed by two
+       * threads, which are active on two neighbor elements, at the same time. However, the code
+       * may be executed by two threads simultaneously if the cells, that the two threads are
+       * currently active on, are not adjacent to each other.\n
+       * Furthermore, the code lines between <c>domain_mutex.lock()</c> and
+       * <c>domain_mutex.unlock()</c> are executed in a (domain-) mutually exclusive fashion, i.e.
+       * it is guaranteed that this code (<c>task.combine()</c>) is never executed by two threads
+       * at the same time.
+       *
+       * \author Peter Zajac
+       */
+      class Task
+      {
+      public:
+        /**
+         * \brief Specifies whether this task assembles element pairs on inner facets simultaenously.
+         */
+        static constexpr bool assemble_pairwise = true or false;
+
+        /**
+         * \brief Specifies whether this task has a #scatter() function, which is required to be
+         * called from within a critical section after the local assembly on each facet.
+         */
+        static constexpr bool need_scatter = true or false;
+
+        /**
+         * \brief Specifies whether this task fas a #combine() function, which is required to be
+         * called from within a critical section after the overall assembly is finished.
+         */
+        static constexpr bool need_combine = true or false;
+
+        /**
+         * \brief Mandatory Constructor
+         *
+         * This constructor is used by each of the trace assemblers worker threads to create its
+         * own task object.
+         *
+         * \param[in] job
+         * A \resident reference to the encapsulating job class object.
+         *
+         * \attention
+         * This constructor is silently assumed to be thread-safe, i.e. no thread may try to write
+         * to a common shared resource inside this function (without manual mutexing).
+         */
+        explicit Task(TraceAssemblyJob& job);
+
+        /**
+         * \brief Prepares the task for assembly for a facet on a single one of its adjacent elements
+         *
+         * This function is called by the assembly worker thread each time the assembly on a new
+         * element begins. This function is called for boundary facets as well as for each inner
+         * facet and one of its adjacent elements if assemble_pairwise is false, otherwise the
+         * 7-parameter overload of this function is called.
+         * This function is typically used to gather various local data from the
+         * mesh and/or linear algebra containers prior to the actual local assembly.
+         *
+         * \param[in] facet
+         * The index of the mesh facet that the following assembly is going to take place on.
+         *
+         * \param[in] cell
+         * The index of the mesh element that the following assembly is going to take place on.
+         *
+         * \param[in] local_facet
+         * The index of the local facet on the element that the global facet corresponds to.
+         *
+         * \param[in] facet_ori
+         * The facet orientation code that encodes the orientation between the local reference facet
+         * and the global facet.
+         *
+         * \attention
+         * This function is silently assumed to be thread-safe, i.e. no thread may try to write
+         * to a common shared resource inside this function (without manual mutexing).
+         */
+        void prepare(Index facet, Index cell, int local_facet, int facet_ori);
+
+        /**
+         * \brief Prepares the task for assembly for a facet on both of its adjacent elements
+         *
+         * This function is called by the assembly worker thread each time the assembly on a new
+         * inner facet begins, but only if #assemble_pairwise is true, otherwise the assembler will
+         * call the 4-parameter overload of this function when assembling both adjacent elements
+         * successively. This function is typically used to gather various local data from the
+         * mesh and/or linear algebra containers prior to the actual local assembly.
+         *
+         * \param[in] facet
+         * The index of the mesh facet that the following assembly is going to take place on.
+         *
+         * \param[in] cell_a, cell_b
+         * The indices of the two mesh elements that share the common facet that the following assembly is going to take place on.
+         *
+         * \param[in] local_facet_a, local_facet_b
+         * The indices of the local facets on the two elements that the global facet corresponds to.
+         *
+         * \param[in] facet_ori_a, facet_ori_b
+         * The facet orientation codes that encodes the orientation between the local reference facets of both elements
+         * and the global facet.
+         *
+         * \attention
+         * This function is silently assumed to be thread-safe, i.e. no thread may try to write
+         * to a common shared resource inside this function (without manual mutexing).
+         */
+        void prepare(Index facet, Index cell_a, Index cell_b, int local_facet_a, int local_facet_b, int facet_ori_a, int facet_ori_b);
+
+        /**
+         * \brief Performs the local assembly on the current facet
+         *
+         * This function is called by the assembly worker thread directly after the #prepare()
+         * function and is typically used to perform the actual local assembly, i.e. this is where
+         * most of the magic happens.
+         *
+         * \attention
+         * This function is silently assumed to be thread-safe, i.e. no thread may try to write
+         * to a common shared resource inside this function (without manual mutexing).
+         */
+        void assemble();
+
+        /**
+         * \brief Scatters the local assembly into the global system
+         *
+         * This function is called by the assembly worker thread after the #assemble() function
+         * and is typically used to scatter the local (i.e. element-wise) assembled data into a
+         * global (i.e. mesh/patch-wise) container.
+         *
+         * \note
+         * This function is called by the worker threads in a neighbor-mutually exclusive fashion,
+         * i.e. this function is never called by two (or more) threads at the same time, which are
+         * active on vertex-adjacent elements. This ensures that no race condition can appear
+         * when scattering a local matrix/vector into a global matrix/vector.
+         *
+         * \attention
+         * This function is only called by the assembler if #need_scatter is true, however, it
+         * must always exist even if #need_scatter is false to prevent linker errors.
+         */
+        void scatter();
+
+        /**
+         * \brief Finishes the task on the current cell.
+         *
+         * This function is called by the assembly worker thread after the #scatter() function
+         * and is typically only used to call the finish member functions of all corresponding
+         * member functions like e.g. evaluators.
+         *
+         * \attention
+         * This function is silently assumed to be thread-safe, i.e. no thread may try to write
+         * to a common shared resource inside this function (without manual mutexing).
+         */
+        void finish();
+
+        /**
+         * \brief Finishes the overall assembly and combines all local results
+         *
+         * This function is called once per assembly run after the worker thread has finished
+         * assembling all its cells. This function can be used to collect (or reduce) the
+         * information assembled in each task into a combined result in the job object.
+         *
+         * \note
+         * This function is called by the worker threads in a mutually exclusive fashion,
+         * i.e. this function is never called by two threads at the same time, so accessing
+         * a common resource shared by all threads is safe inside this function.
+         *
+         * \attention
+         * This function is only called by the assembler if #need_combine is true, however, it
+         * must always exist even if #need_combine is false to prevent linker errors.
+         */
+        void combine();
+      }; // class Task
+    }; // class TraceAssemblyJob
+#endif // DOXYGEN
+
+    /**
+     * \brief Trace Integral Assembler class template
      *
      * This class can be used to assemble operators, functionals and various other quantities on
      * (a part of) the boundary of a mesh or any other set of mesh facets.
@@ -129,8 +350,21 @@ namespace FEAT
      *   #add_facet() and #add_mesh_part() functions. Afterwards, you need to compile the assembler
      *   by calling the #compile() function.
      *
+     * \note
+     * Each trace assembler object is tied to the trafo object that is has been constructed on, i.e.
+     * if you have several different trafo objects (such as in a multigrid scenario) then you also
+     * need several trace assembler objects -- one for each trafo object. Also, a trace assembler
+     * always assembles over the elements of its trafo, so all FE spaces used in the assembly have
+     * to be defined on the same trafo object as the trace assembler.
+     *
      * \tparam Trafo_
      * The transformation on whose underlying mesh the assembly should take place
+     *
+     * \note
+     * This class currently does not employ any sort of multi-threading, however, the documentation
+     * of the classes and functions related to this class may already be written as if this class
+     * already supported assembly with multiple threads -- which it actually may do sometime in the
+     * future.
      *
      * \author Peter Zajac
      */
@@ -164,6 +398,12 @@ namespace FEAT
         _trafo(trafo),
         _facet_mask(trafo.get_mesh().get_num_entities(facet_dim), 0)
       {
+      }
+
+      /// \returns a reference to the trafo
+      const TrafoType& get_trafo() const
+      {
+        return _trafo;
       }
 
       /**
@@ -312,1805 +552,80 @@ namespace FEAT
       }
 
       /**
-       * \brief Assembles a bilinear operator into a matrix.
+       * \brief Executes a trace assembly job
        *
-       * This function is the version for identical test- and trial-spaces.
-       *
-       * \note
-       * The assembler automatically computes the normal vectors in the cubature points of each
-       * facet (even if the operator did not ask for this), which can be queried by <c>tau.normal</c>
-       * during the <c>set_point()</c> function call of the operator's evaluator.
-       *
-       * \param[in,out] matrix
-       * The \transient matrix that is to be assembled.
-       *
-       * \param[in] operat
-       * A \transient reference to the operator implementing the BilinearOperator interface to be assembled.
-       *
-       * \param[in] space
-       * A \transient reference to the finite-element test-/trial-space to be used.
-       *
-       * \param[in] cubature_name
-       * The name of to the cubature rule to be used for integration.
-       *
-       * \param[in] alpha
-       * The scaling factor for the bilinear operator.
+       * \param[inout] job
+       * A \transient reference to the job that is to be assembled.
+       * See Assembly::TraceAssemblyJob for details.
        */
-      template<
-        typename Matrix_,
-        typename Operator_,
-        typename Space_>
-      void assemble_operator_matrix1(
-        Matrix_& matrix,
-        Operator_& operat,
-        const Space_& space,
-        const String& cubature_name,
-        typename Matrix_::DataType alpha = typename Matrix_::DataType(1)) const
+      template<typename Job_>
+      void assemble(Job_& job)
       {
-        // call the version for 2 FE spaces for the sake of laziness
-        Cubature::DynamicFactory cubature_factory(cubature_name);
-        assemble_operator_matrix2(matrix, operat, space, space, cubature_factory, alpha);
-      }
+        typedef typename Job_::Task TaskType;
 
-      /**
-       * \brief Assembles a bilinear operator into a matrix.
-       *
-       * This function is the version for different test- and trial-spaces.
-       *
-       * \note
-       * The assembler automatically computes the normal vectors in the cubature points of each
-       * facet (even if the operator did not ask for this), which can be queried by <c>tau.normal</c>
-       * during the <c>set_point()</c> function call of the operator's evaluator.
-       *
-       * \param[in,out] matrix
-       * The \transient matrix that is to be assembled.
-       *
-       * \param[in] operat
-       * A \transient reference to the operator implementing the BilinearOperator interface to be assembled.
-       *
-       * \param[in] test_space
-       * A \transient reference to the finite-element test-space to be used.
-       *
-       * \param[in] trial_space
-       * A \transient reference to the finite-element trial-space to be used.
-       *
-       * \param[in] cubature_name
-       * The name of to the cubature rule to be used for integration.
-       *
-       * \param[in] alpha
-       * The scaling factor for the bilinear operator.
-       */
-      template<
-        typename Matrix_,
-        typename Operator_,
-        typename TestSpace_,
-        typename TrialSpace_>
-      void assemble_operator_matrix2(
-        Matrix_& matrix,
-        Operator_& operat,
-        const TestSpace_& test_space,
-        const TrialSpace_& trial_space,
-        const String& cubature_name,
-        typename Matrix_::DataType alpha = typename Matrix_::DataType(1)) const
-      {
-        Cubature::DynamicFactory cubature_factory(cubature_name);
-        assemble_operator_matrix2(matrix, operat, test_space, trial_space, cubature_factory, alpha);
-      }
+        //XASSERTM(_compiled, "assembler has not been compiled yet");
 
-      /**
-       * \brief Assembles a bilinear operator into a matrix.
-       *
-       * This function is the version for identical test- and trial-spaces.
-       *
-       * \note
-       * The assembler automatically computes the normal vectors in the cubature points of each
-       * facet (even if the operator did not ask for this), which can be queried by <c>tau.normal</c>
-       * during the <c>set_point()</c> function call of the operator's evaluator.
-       *
-       * \param[in,out] matrix
-       * The \transient matrix that is to be assembled.
-       *
-       * \param[in] operat
-       * A \transient reference to the operator implementing the BilinearOperator interface to be assembled.
-       *
-       * \param[in] space
-       * A \transient reference to the finite-element test-/trial-space to be used.
-       *
-       * \param[in] cubature_factory
-       * A \transient reference to the cubature factory to be used for integration.
-       *
-       * \param[in] alpha
-       * The scaling factor for the bilinear operator.
-       */
-      template<
-        typename Matrix_,
-        typename Operator_,
-        typename Space_,
-        typename CubatureFactory_>
-      void assemble_operator_matrix1(
-        Matrix_& matrix,
-        Operator_& operat,
-        const Space_& space,
-        const CubatureFactory_& cubature_factory,
-        typename Matrix_::DataType alpha = typename Matrix_::DataType(1)) const
-      {
-        // call the version for 2 FE spaces for the sake of laziness
-        assemble_operator_matrix2(matrix, operat, space, space, cubature_factory, alpha);
-      }
+        // no facets to assemble on?
+        if(this->_facets.empty())
+          return;
 
-      /**
-       * \brief Assembles a bilinear operator into a matrix.
-       *
-       * This function is the version for different test- and trial-spaces.
-       *
-       * \note
-       * The assembler automatically computes the normal vectors in the cubature points of each
-       * facet (even if the operator did not ask for this), which can be queried by <c>tau.normal</c>
-       * during the <c>set_point()</c> function call of the operator's evaluator.
-       *
-       * \param[in,out] matrix
-       * The \transient matrix that is to be assembled.
-       *
-       * \param[in] operat
-       * A \transient reference to the operator implementing the BilinearOperator interface to be assembled.
-       *
-       * \param[in] test_space
-       * A \transient reference to the finite-element test-space to be used.
-       *
-       * \param[in] trial_space
-       * A \transient reference to the finite-element trial-space to be used.
-       *
-       * \param[in] cubature_factory
-       * A \transient reference to the cubature factory to be used for integration.
-       *
-       * \param[in] alpha
-       * The scaling factor for the bilinear operator.
-       */
-      template<
-        typename Matrix_,
-        typename Operator_,
-        typename TestSpace_,
-        typename TrialSpace_,
-        typename CubatureFactory_>
-      void assemble_operator_matrix2(
-        Matrix_& matrix,
-        Operator_& operat,
-        const TestSpace_& test_space,
-        const TrialSpace_& trial_space,
-        const CubatureFactory_& cubature_factory,
-        typename Matrix_::DataType alpha = typename Matrix_::DataType(1)) const
-      {
-        // validate matrix dimensions
-        XASSERTM(matrix.rows() == test_space.get_num_dofs(), "invalid matrix dimensions");
-        XASSERTM(matrix.columns() == trial_space.get_num_dofs(), "invalid matrix dimensions");
+        // create a task for this thread
+        std::unique_ptr<TaskType> task(new TaskType(job));
 
-        // matrix type
-        typedef Matrix_ MatrixType;
-        // operator type
-        typedef Operator_ OperatorType;
-        // test-space type
-        typedef TestSpace_ TestSpaceType;
-        // trial-space type
-        typedef TrialSpace_ TrialSpaceType;
+        // note: in the case of inner facets, a single inner facet is stored twice in the _facets
+        // vector in two successive elements, i.e. one has _facets[i] == _facets[i+1], and the
+        // corresponding two adjacent cells are given by _cells[i] and _cells[i+1]
 
-        // assembly traits
-        typedef AsmTraits2<
-          typename MatrixType::DataType,
-          TestSpaceType,
-          TrialSpaceType,
-          OperatorType::trafo_config,
-          OperatorType::test_config,
-          OperatorType::trial_config> AsmTraits;
-
-        typedef typename AsmTraits::DataType DataType;
-
-        // shape types
-        typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
-
-        // fetch the trafo
-        const TrafoType& trafo = test_space.get_trafo();
-
-        // create a trafo evaluator
-        typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
-
-        // create a trafo facet evaluator
-        typedef typename TrafoType::template Evaluator<FacetType, DataType>::Type TrafoFacetEvaluator;
-        TrafoFacetEvaluator trafo_facet_eval(trafo);
-
-        static constexpr TrafoTags trafo_facet_tags = TrafoTags::jac_det | TrafoTags::jac_mat;
-        typedef typename TrafoFacetEvaluator::template ConfigTraits<trafo_facet_tags>::EvalDataType TrafoFacetEvalData;
-
-        // create space evaluators
-        typename AsmTraits::TestEvaluator test_eval(test_space);
-        typename AsmTraits::TrialEvaluator trial_eval(trial_space);
-
-        // create dof-mappings
-        typename AsmTraits::TestDofMapping test_dof_mapping(test_space);
-        typename AsmTraits::TrialDofMapping trial_dof_mapping(trial_space);
-
-        // create a operator evaluator
-        typename OperatorType::template Evaluator<AsmTraits> oper_eval(operat);
-
-        // create trafo evaluation data
-        typename AsmTraits::TrafoEvalData trafo_data;
-        TrafoFacetEvalData trafo_facet_data;
-
-        // create space evaluation data
-        typename AsmTraits::TestEvalData test_data;
-        typename AsmTraits::TrialEvalData trial_data;
-
-        // the value type of the operator
-        typedef typename OperatorType::template Evaluator<AsmTraits>::ValueType ValueType;
-
-        // ensure that the operator and matrix value types are compatible
-        static_assert(std::is_same<ValueType, typename MatrixType::ValueType>::value,
-          "matrix and bilinear operator have different value types!");
-
-        // create local matrix data
-        typename AsmTraits::template TLocalMatrix<ValueType> loc_mat;
-
-        // create cubature rule
-        typename Intern::CubatureTraits<TrafoFacetEvaluator>::RuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
-
-        // create matrix scatter-axpy
-        typename MatrixType::ScatterAxpy scatter_axpy(matrix);
-
-        // trafo matrices and vectors
-        Tiny::Matrix<DataType, shape_dim, facet_dim> face_mat;
-        Tiny::Matrix<DataType, facet_dim, facet_dim> ori_mat;
-        Tiny::Vector<DataType, shape_dim> face_vec;
-        Tiny::Vector<DataType, facet_dim> ori_vec;
-
-        face_mat.format();
-        ori_mat.format();
-        face_vec.format();
-        ori_vec.format();
-
-        // loop over all cells of the mesh
-        for(Index f(0); f < Index(_facets.size()); ++f)
+        // loop over all facets that have been added to the assembler
+        for(Index fi(0); fi < Index(_facets.size()); ++fi)
         {
-          // get facet index
-          const Index face = _facets[f];
-          const Index cell = _cells[f];
-
-          // compute facet trafos
-          Geometry::Intern::FaceRefTrafo<ShapeType, facet_dim>::compute(face_mat, face_vec, _cell_facet[f]);
-
-          // compute orientation trafos
-          Geometry::Intern::CongruencyTrafo<FacetType>::compute(ori_mat, ori_vec, _facet_ori[f]);
-
-          // compute orientation of actual cell facet
-          const int cell_facet_ori = Geometry::Intern::CongruencySampler<FacetType>::orientation(_facet_ori[f])
-            * Shape::ReferenceCell<ShapeType>::facet_orientation(_cell_facet[f]);
-
-          // prepare trafo evaluators
-          trafo_facet_eval.prepare(face);
-          trafo_eval.prepare(cell);
-
-          // prepare space evaluators
-          test_eval.prepare(trafo_eval);
-          trial_eval.prepare(trafo_eval);
-
-          // prepare operator evaluator
-          oper_eval.prepare(trafo_eval);
-
-          // fetch number of local dofs
-          int num_loc_test_dofs = test_eval.get_num_local_dofs();
-          int num_loc_trial_dofs = trial_eval.get_num_local_dofs();
-
-          // format local matrix
-          loc_mat.format();
-
-          // loop over all quadrature points and integrate
-          for(int k(0); k < cubature_rule.get_num_points(); ++k)
+          // prepare task -- either pairwise or not
+          if constexpr(TaskType::assemble_pairwise)
           {
-            // get cubature point
-            auto cub_pt = cubature_rule.get_point(k);
-
-            // transform to local facet
-            auto cub_cf = (face_mat * ((ori_mat * cub_pt) + ori_vec)) + face_vec;
-
-            // compute trafo data
-            trafo_facet_eval(trafo_facet_data, cub_pt);
-            trafo_eval(trafo_data, cub_cf);
-
-            // compute normal vector
-            trafo_data.normal = Tiny::orthogonal(trafo_facet_data.jac_mat).normalize();
-            if(cell_facet_ori < 0)
-              trafo_data.normal.negate();
-
-            // compute basis function data
-            test_eval(test_data, trafo_data);
-            trial_eval(trial_data, trafo_data);
-
-            // prepare bilinear operator
-            oper_eval.set_point(trafo_data);
-
-            // test function loop
-            for(int i(0); i < num_loc_test_dofs; ++i)
+            // task supports pairwise assembly, so let's check if the next facet is an inner facet
+            Index fj = fi+1u;
+            if((fj < Index(_facets.size())) && (_facets[fi] == _facets[fj]))
             {
-              // trial function loop
-              for(int j(0); j < num_loc_trial_dofs; ++j)
-              {
-                // evaluate operator and integrate
-                Tiny::axpy(loc_mat(i,j), oper_eval.eval(trial_data.phi[j], test_data.phi[i]),
-                  trafo_facet_data.jac_det * cubature_rule.get_weight(k));
-                // continue with next trial function
-              }
-              // continue with next test function
+              // that's an inner facet, so assemble pairwise here
+              task->prepare(_facets[fi], _cells[fi], _cells[fj], _cell_facet[fi], _cell_facet[fj], _facet_ori[fi], _facet_ori[fj]);
+
+              // make sure we don't try to assemble on fi+1 again
+              ++fi;
             }
-            // continue with next cubature point
-          }
-
-          // finish operator evaluator
-          oper_eval.finish();
-
-          // finish evaluators
-          trial_eval.finish();
-          test_eval.finish();
-          trafo_eval.finish();
-          trafo_facet_eval.finish();
-
-          // initialize dof-mappings
-          test_dof_mapping.prepare(cell);
-          trial_dof_mapping.prepare(cell);
-
-          // incorporate local matrix
-          scatter_axpy(loc_mat, test_dof_mapping, trial_dof_mapping, alpha);
-
-          // finish dof mapping
-          trial_dof_mapping.finish();
-          test_dof_mapping.finish();
-
-          // continue with next cell
-        }
-
-        // okay, that's it
-      }
-
-      /**
-       * \brief Assembles a linear functional into a vector.
-       *
-       * \note
-       * The assembler automatically computes the normal vectors in the cubature points of each
-       * facet (even if the functional did not ask for this), which can be queried by <c>tau.normal</c>
-       * during the <c>set_point()</c> function call of the operator's evaluator.
-       *
-       * \param[in,out] vector
-       * A \transient reference to the vector that is to be assembled.
-       *
-       * \param[in] functional
-       * A \transient reference to the linear functional implementing the LinearFunctional interface to be assembled.
-       *
-       * \param[in] space
-       * A \transient reference to the finite-element (test) space to be used.
-       *
-       * \param[in] cubature_name
-       * The name of the cubature rule to be used for integration.
-       *
-       * \param[in] alpha
-       * The scaling factor for the linear functional.
-       */
-      template<
-        typename Vector_,
-        typename Functional_,
-        typename Space_>
-      void assemble_functional_vector(
-        Vector_& vector,
-        const Functional_& functional,
-        const Space_& space,
-        const String& cubature_name,
-        typename Vector_::DataType alpha = typename Vector_::DataType(1)) const
-      {
-        Cubature::DynamicFactory cubature_factory(cubature_name);
-        assemble_functional_vector(vector, functional, space, cubature_factory, alpha);
-      }
-
-      /**
-       * \brief Assembles a linear functional into a vector.
-       *
-       * \note
-       * The assembler automatically computes the normal vectors in the cubature points of each
-       * facet (even if the functional did not ask for this), which can be queried by <c>tau.normal</c>
-       * during the <c>set_point()</c> function call of the operator's evaluator.
-       *
-       * \param[in,out] vector
-       * A \transient reference to the vector that is to be assembled.
-       *
-       * \param[in] functional
-       * A \transient reference to the linear functional implementing the LinearFunctional interface to be assembled.
-       *
-       * \param[in] space
-       * A \transient reference to the finite-element (test) space to be used.
-       *
-       * \param[in] cubature_factory
-       * A \transient reference to the cubature factory to be used for integration.
-       *
-       * \param[in] alpha
-       * The scaling factor for the linear functional.
-       */
-      template<
-        typename Vector_,
-        typename Functional_,
-        typename CubatureFactory_,
-        typename Space_>
-      void assemble_functional_vector(
-        Vector_& vector,
-        const Functional_& functional,
-        const Space_& space,
-        const CubatureFactory_& cubature_factory,
-        typename Vector_::DataType alpha = typename Vector_::DataType(1)) const
-      {
-        // validate vector dimensions
-        XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
-
-        // vector type
-        typedef Vector_ VectorType;
-        // functional type
-        typedef Functional_ FunctionalType;
-        // space type
-        typedef Space_ SpaceType;
-
-        // assembly traits
-        typedef AsmTraits1<
-          typename VectorType::DataType,
-          SpaceType,
-          FunctionalType::trafo_config,
-          FunctionalType::test_config> AsmTraits;
-
-        typedef typename AsmTraits::DataType DataType;
-
-        // shape types
-        typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
-
-        // fetch the trafo
-        const TrafoType& trafo = space.get_trafo();
-
-        // create a trafo evaluator
-        typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
-
-        // create a trafo facet evaluator
-        typedef typename TrafoType::template Evaluator<FacetType, DataType>::Type TrafoFacetEvaluator;
-        TrafoFacetEvaluator trafo_facet_eval(trafo);
-
-        typedef typename TrafoFacetEvaluator::template ConfigTraits<TrafoTags::jac_det>::EvalDataType TrafoFacetEvalData;
-
-        // create a space evaluator and evaluation data
-        typename AsmTraits::TestEvaluator test_eval(space);
-
-        // create a dof-mapping
-        typename AsmTraits::DofMapping dof_mapping(space);
-
-        // create a functional evaluator
-        typename FunctionalType::template Evaluator<AsmTraits> func_eval(functional);
-
-        // create trafo evaluation data
-        typename AsmTraits::TrafoEvalData trafo_data;
-        TrafoFacetEvalData trafo_facet_data;
-
-        // create space evaluation data
-        typename AsmTraits::TestEvalData test_data;
-
-        // the value type of the functional
-        typedef typename FunctionalType::template Evaluator<AsmTraits>::ValueType ValueType;
-
-        // ensure that the functional and vector value types are compatible
-        static_assert(std::is_same<ValueType, typename VectorType::ValueType>::value,
-          "vector and linear functional have different value types!");
-
-        // create local vector data
-        typename AsmTraits::template TLocalVector<ValueType> loc_vec;
-
-        // create cubature rule
-        typename Intern::CubatureTraits<TrafoFacetEvaluator>::RuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
-
-        // create matrix scatter-axpy
-        typename VectorType::ScatterAxpy scatter_axpy(vector);
-
-        // trafo matrices and vectors
-        Tiny::Matrix<DataType, shape_dim, facet_dim> face_mat;
-        Tiny::Matrix<DataType, facet_dim, facet_dim> ori_mat;
-        Tiny::Vector<DataType, shape_dim> face_vec;
-        Tiny::Vector<DataType, facet_dim> ori_vec;
-
-        face_mat.format();
-        ori_mat.format();
-        face_vec.format();
-        ori_vec.format();
-
-        // loop over all cells of the mesh
-        for(Index f(0); f < Index(_facets.size()); ++f)
-        {
-          // get facet index
-          const Index face = _facets[f];
-          const Index cell = _cells[f];
-
-          // compute facet trafos
-          Geometry::Intern::FaceRefTrafo<ShapeType, facet_dim>::compute(face_mat, face_vec, _cell_facet[f]);
-
-          // compute orientation trafos
-          Geometry::Intern::CongruencyTrafo<FacetType>::compute(ori_mat, ori_vec, _facet_ori[f]);
-
-          // compute orientation of actual cell facet
-          const int cell_facet_ori = Geometry::Intern::CongruencySampler<FacetType>::orientation(_facet_ori[f])
-            * Shape::ReferenceCell<ShapeType>::facet_orientation(_cell_facet[f]);
-
-          // prepare trafo evaluators
-          trafo_facet_eval.prepare(face);
-          trafo_eval.prepare(cell);
-
-          // prepare test-space evaluator
-          test_eval.prepare(trafo_eval);
-
-          // prepare functional evaluator
-          func_eval.prepare(trafo_eval);
-
-          // fetch number of local dofs
-          int num_loc_dofs = test_eval.get_num_local_dofs();
-
-          // format local matrix
-          loc_vec.format();
-
-          // loop over all quadrature points and integrate
-          for(int k(0); k < cubature_rule.get_num_points(); ++k)
-          {
-            // get cubature point
-            auto cub_pt = cubature_rule.get_point(k);
-
-            // transform to local facet
-            auto cub_cf = (face_mat * ((ori_mat * cub_pt) + ori_vec)) + face_vec;
-
-            // compute trafo data
-            trafo_facet_eval(trafo_facet_data, cub_pt);
-            trafo_eval(trafo_data, cub_cf);
-
-            // compute normal vector
-            trafo_data.normal = Tiny::orthogonal(trafo_facet_data.jac_mat).normalize();
-            if(cell_facet_ori < 0)
-              trafo_data.normal.negate();
-
-            // compute test basis function data
-            test_eval(test_data, trafo_data);
-
-            // prepare functional
-            func_eval.set_point(trafo_data);
-
-            // test function loop
-            for(int i(0); i < num_loc_dofs; ++i)
+            else
             {
-              // evaluate functional and integrate
-              Tiny::axpy(loc_vec(i), func_eval.eval(test_data.phi[i]),
-                trafo_facet_data.jac_det * cubature_rule.get_weight(k));
-              // continue with next trial function
+              // not an inner facet, so call single-cell prepare overload
+              task->prepare(_facets[fi], _cells[fi], _cell_facet[fi], _facet_ori[fi]);
             }
-            // continue with next test function
+          }
+          else
+          {
+            // task does not support pairwise assembly, so always call the single-cell prepare overload
+            task->prepare(_facets[fi], _cells[fi], _cell_facet[fi], _facet_ori[fi]);
           }
 
-          // finish functional evaluator
-          func_eval.finish();
+          // assemble task
+          task->assemble();
 
-          // finish evaluators
-          test_eval.finish();
-          trafo_eval.finish();
-          trafo_facet_eval.finish();
+          // scatter
+          if(task->need_scatter)
+          {
+            task->scatter();
+          }
 
-          // initialize dof-mapping
-          dof_mapping.prepare(cell);
-
-          // incorporate local matrix
-          scatter_axpy(loc_vec, dof_mapping, alpha);
-
-          // finish dof-mapping
-          dof_mapping.finish();
-
-          // continue with next cell
+          // finish
+          task->finish();
         }
-      }
 
-      /**
-       * \brief Assembles a flow accumulator.
-       *
-       * This function assembles a so-called accumulator on a sub-dimensional
-       * mesh region, which can be used to assemble body forces on a boundary.
-       *
-       * \attention
-       * This assembly function is somewhat provisional - use at own risk!
-       *
-       * The accumulator that is assembled by this function has to provide
-       * an overloaded "operator()" with the following function parameters:
-       * - cubature weight (scalar)
-       * - mapped image point (Tiny::Vector)
-       * - jacobi matrix (Tiny::Matrix)
-       * - velocity value (Tiny::Vector)
-       * - velocity gradient (Tiny::Matrix)
-       * - pressure value (scalar)
-       *
-       * \param[inout] accum
-       * The accumulator to be assembled. The "operator()" of this object
-       * is called for each cubature point on each facet.
-       *
-       * \param[in] vector_v
-       * The velocity vector.
-       *
-       * \param[in] vector_p
-       * The pressure vector.
-       *
-       * \param[in] space_v
-       * The velocity space.
-       *
-       * \param[in] space_p
-       * The pressure space.
-       *
-       * \param[in] cubature_name
-       * The name of the cubature rule that is to be used for integration.
-       */
-      template<
-        typename Accum_,
-        typename DataType_,
-        typename IndexType_,
-        int dim_,
-        typename SpaceV_,
-        typename SpaceP_>
-      void assemble_flow_accum(
-        Accum_& accum,
-        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector_v,
-        const LAFEM::DenseVector<DataType_, IndexType_>& vector_p,
-        const SpaceV_& space_v,
-        const SpaceP_& space_p,
-        const String& cubature_name)
-      {
-        Cubature::DynamicFactory cubature_factory(cubature_name);
-        assemble_flow_accum(accum, vector_v, vector_p, space_v, space_p, cubature_factory);
-      }
-
-      /**
-       * \brief Assembles a flow accumulator.
-       *
-       * This function assembles a so-called accumulator on a sub-dimensional
-       * mesh region, which can be used to assemble body forces on a boundary.
-       *
-       * \attention
-       * This assembly function is somewhat provisional - use at own risk!
-       *
-       * The accumulator that is assembled by this function has to provide
-       * an overloaded "operator()" with the following function parameters:
-       * - cubature weight (scalar)
-       * - mapped image point (Tiny::Vector)
-       * - jacobi matrix (Tiny::Matrix)
-       * - velocity value (Tiny::Vector)
-       * - velocity gradient (Tiny::Matrix)
-       * - pressure value (scalar)
-       *
-       * \param[inout] accum
-       * The accumulator to be assembled. The "operator()" of this object
-       * is called for each cubature point on each facet.
-       *
-       * \param[in] vector_v
-       * The velocity vector.
-       *
-       * \param[in] vector_p
-       * The pressure vector.
-       *
-       * \param[in] space_v
-       * The velocity space.
-       *
-       * \param[in] space_p
-       * The pressure space.
-       *
-       * \param[in] cubature_factory
-       * The cubature factory that is to be used for integration.
-       */
-      template<
-        typename Accum_,
-        typename DataType_,
-        typename IndexType_,
-        int dim_,
-        typename SpaceV_,
-        typename SpaceP_,
-        typename CubatureFactory_>
-      void assemble_flow_accum(
-        Accum_& accum,
-        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector_v,
-        const LAFEM::DenseVector<DataType_, IndexType_>& vector_p,
-        const SpaceV_& space_v,
-        const SpaceP_& space_p,
-        const CubatureFactory_& cubature_factory)
-      {
-        // validate vector dimensions
-        XASSERTM(vector_v.size() == space_v.get_num_dofs(), "invalid velocity vector size");
-        XASSERTM(vector_p.size() == space_p.get_num_dofs(), "invalid pressure vector size");
-
-        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VeloVector;
-        typedef LAFEM::DenseVector<DataType_, IndexType_> PresVector;
-
-        // assembly traits
-        typedef Assembly::AsmTraits2<
-          DataType_,
-          SpaceP_,
-          SpaceV_,
-          TrafoTags::none,
-          SpaceTags::value,
-          SpaceTags::value|SpaceTags::grad> AsmTraits;
-
-        typedef typename AsmTraits::DataType DataType;
-
-        // shape types
-        typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
-
-        // fetch the trafo
-        const TrafoType& trafo = space_v.get_trafo();
-
-        // create a trafo evaluator
-        typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
-
-        // create a trafo facet evaluator
-        typedef typename TrafoType::template Evaluator<FacetType, DataType>::Type TrafoFacetEvaluator;
-        TrafoFacetEvaluator trafo_facet_eval(trafo);
-
-        // trafo facet evaluation data
-        static constexpr TrafoTags trafo_facet_eval_tags = TrafoTags::img_point|TrafoTags::jac_det|TrafoTags::jac_mat;
-        typedef typename TrafoFacetEvaluator::template ConfigTraits <trafo_facet_eval_tags>::EvalDataType TrafoFacetEvalData;
-
-        // create a space evaluator and evaluation data
-        typename AsmTraits::TrialEvaluator space_eval_v(space_v);
-        typename AsmTraits::TestEvaluator space_eval_p(space_p);
-
-        // create a dof-mapping
-        typename AsmTraits::TrialDofMapping dof_mapping_v(space_v);
-        typename AsmTraits::TestDofMapping dof_mapping_p(space_p);
-
-        // create trafo evaluation data
-        typename AsmTraits::TrafoEvalData trafo_data;
-        TrafoFacetEvalData trafo_facet_data;
-
-        // create space evaluation data
-        typename AsmTraits::TrialEvalData space_data_v;
-        typename AsmTraits::TestEvalData space_data_p;
-
-        // create cubature rule
-        typename Assembly::Intern::CubatureTraits<TrafoFacetEvaluator>::RuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
-
-        // create matrix scatter-axpy
-        typename VeloVector::GatherAxpy gather_v(vector_v);
-        typename PresVector::GatherAxpy gather_p(vector_p);
-
-        // get maximum number of local dofs
-        static constexpr int max_local_dofs_v = AsmTraits::max_local_trial_dofs;
-        static constexpr int max_local_dofs_p = AsmTraits::max_local_test_dofs;
-
-        // create local vector data
-        typedef Tiny::Vector<DataType, dim_> VectorValue;
-        typedef Tiny::Vector<VectorValue, max_local_dofs_v> LocalVectorTypeV;
-        typedef Tiny::Vector<DataType, max_local_dofs_p> LocalVectorTypeP;
-        LocalVectorTypeV local_vector_v;
-        LocalVectorTypeP local_vector_p;
-
-        // our local velocity gradient
-        Tiny::Vector<DataType, dim_> loc_value_v;
-        Tiny::Matrix<DataType, dim_, dim_> loc_grad_v;
-
-        // trafo matrices and vectors
-        Tiny::Matrix<DataType, shape_dim, facet_dim> face_mat;
-        Tiny::Matrix<DataType, facet_dim, facet_dim> ori_mat;
-        Tiny::Vector<DataType, shape_dim> face_vec;
-        Tiny::Vector<DataType, facet_dim> ori_vec;
-
-        face_mat.format();
-        ori_mat.format();
-        face_vec.format();
-        ori_vec.format();
-
-        // loop over all cells of the mesh
-        for(Index f(0); f < Index(this->_facets.size()); ++f)
+        // do we have to combine the assembly?
+        if(task->need_combine)
         {
-          // get facet index
-          const Index face = this->_facets[f];
-          const Index cell = this->_cells[f];
-
-          // compute facet trafos
-          Geometry::Intern::FaceRefTrafo<ShapeType, facet_dim>::compute(face_mat, face_vec, this->_cell_facet[f]);
-
-          // compute orientation trafos
-          Geometry::Intern::CongruencyTrafo<FacetType>::compute(ori_mat, ori_vec, this->_facet_ori[f]);
-
-          // prepare trafo evaluators
-          trafo_facet_eval.prepare(face);
-          trafo_eval.prepare(cell);
-
-          // prepare space evaluators
-          space_eval_v.prepare(trafo_eval);
-          space_eval_p.prepare(trafo_eval);
-
-          // initialize dof-mappings
-          dof_mapping_v.prepare(cell);
-          dof_mapping_p.prepare(cell);
-
-          // fetch number of local dofs
-          const int num_loc_dofs_v = space_eval_v.get_num_local_dofs();
-          const int num_loc_dofs_p = space_eval_p.get_num_local_dofs();
-
-          // gather our local velocity dofs
-          local_vector_v.format();
-          local_vector_p.format();
-          gather_v(local_vector_v, dof_mapping_v);
-          gather_p(local_vector_p, dof_mapping_p);
-
-          // finish dof-mapping
-          dof_mapping_p.finish();
-          dof_mapping_v.finish();
-
-          // loop over all quadrature points and integrate
-          for(int k(0); k < cubature_rule.get_num_points(); ++k)
-          {
-            // get cubature point
-            auto cub_pt = cubature_rule.get_point(k);
-
-            // transform to local facet
-            auto cub_cf = (face_mat * ((ori_mat * cub_pt) + ori_vec)) + face_vec;
-
-            // compute trafo data
-            trafo_facet_eval(trafo_facet_data, cub_pt);
-            trafo_eval(trafo_data, cub_cf);
-
-            // compute test basis function data
-            space_eval_v(space_data_v, trafo_data);
-            space_eval_p(space_data_p, trafo_data);
-
-            // compute local velocity value
-            loc_value_v.format();
-            for(int i(0); i < num_loc_dofs_v; ++i)
-              loc_value_v.axpy(space_data_v.phi[i].value, local_vector_v[i]);
-
-            // compute local velocity gradient
-            loc_grad_v.format();
-            for(int i(0); i < num_loc_dofs_v; ++i)
-              loc_grad_v.add_outer_product(local_vector_v[i], space_data_v.phi[i].grad);
-
-            // compute local pressure value
-            DataType loc_value_p = DataType(0);
-            for(int i(0); i < num_loc_dofs_p; ++i)
-              loc_value_p += local_vector_p[i] * space_data_p.phi[i].value;
-
-            // call accumulator
-            accum(
-              trafo_facet_data.jac_det * cubature_rule.get_weight(k),
-              trafo_facet_data.img_point,
-              trafo_facet_data.jac_mat,
-              loc_value_v,
-              loc_grad_v,
-              loc_value_p
-            );
-
-            // continue with next basis function
-          }
-
-          // finish evaluators
-          space_eval_p.finish();
-          space_eval_v.finish();
-          trafo_eval.finish();
-          trafo_facet_eval.finish();
-
-          // continue with next cell
-        }
-      }
-
-      /**
-       * \brief Assembles the surface integral of a discrete function
-       *
-       * \param[in] vector
-       * A \transient reference to the vector that represents the function to be integrated
-       *
-       * \param[in] space
-       * A \transient reference to the finite element space
-       *
-       * \param[in] cubature_nane
-       * The name of the cubature rule to be used for integration
-       *
-       * \returns The surface integral of the discrete function
-       */
-      template<typename DataType_, typename IndexType_, typename Space_>
-      DataType_ assemble_discrete_integral(
-        const LAFEM::DenseVector<DataType_, IndexType_>& vector,
-        const Space_& space,
-        const String& cubature_name)
-      {
-        Cubature::DynamicFactory cubature_factory(cubature_name);
-        return assemble_discrete_integral(vector, space, cubature_factory);
-      }
-
-      /**
-       * \brief Assembles the surface integral of a discrete function
-       *
-       * \param[in] vector
-       * A \transient reference to the vector that represents the function to be integrated
-       *
-       * \param[in] space
-       * A \transient reference to the finite element space
-       *
-       * \param[in] cubature_factory
-       * The cubature factory
-       *
-       * \returns The surface integral of the discrete function
-       */
-      template<typename DataType_, typename IndexType_, typename Space_, typename CubatureFactory_>
-      DataType_ assemble_discrete_integral(
-        const LAFEM::DenseVector<DataType_, IndexType_>& vector,
-        const Space_& space,
-        const CubatureFactory_& cubature_factory)
-      {
-        // validate vector dimensions
-        XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
-
-        typedef LAFEM::DenseVector<DataType_, IndexType_> VectorType;
-
-        // assembly traits
-        typedef Assembly::AsmTraits1<DataType_, Space_, TrafoTags::none, SpaceTags::value> AsmTraits;
-
-        typedef typename AsmTraits::DataType DataType;
-
-        // shape types
-        typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
-
-        // fetch the trafo
-        const TrafoType& trafo = space.get_trafo();
-
-        // create a trafo evaluator
-        typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
-
-        // create a trafo facet evaluator
-        typedef typename TrafoType::template Evaluator<FacetType, DataType>::Type TrafoFacetEvaluator;
-        TrafoFacetEvaluator trafo_facet_eval(trafo);
-
-        // trafo facet evaluation data
-        typedef typename TrafoFacetEvaluator::template ConfigTraits <TrafoTags::jac_det>::EvalDataType TrafoFacetEvalData;
-
-        // create a space evaluator and evaluation data
-        typename AsmTraits::TrialEvaluator space_eval(space);
-
-        // create a dof-mapping
-        typename AsmTraits::TrialDofMapping dof_mapping(space);
-
-        // create trafo evaluation data
-        typename AsmTraits::TrafoEvalData trafo_data;
-        TrafoFacetEvalData trafo_facet_data;
-
-        // create space evaluation data
-        typename AsmTraits::TrialEvalData space_data;
-
-        // create cubature rule
-        typename Assembly::Intern::CubatureTraits<TrafoFacetEvaluator>::RuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
-
-        // create matrix scatter-axpy
-        typename VectorType::GatherAxpy gather(vector);
-
-        // get maximum number of local dofs
-        static constexpr int max_local_dofs = AsmTraits::max_local_trial_dofs;
-
-        // create local vector data
-        typedef DataType VectorValue;
-        typedef Tiny::Vector<VectorValue, max_local_dofs> LocalVectorType;
-        LocalVectorType local_vector;
-
-        // our local velocity gradient
-        DataType loc_value;
-
-        // trafo matrices and vectors
-        Tiny::Matrix<DataType, shape_dim, facet_dim> face_mat;
-        Tiny::Matrix<DataType, facet_dim, facet_dim> ori_mat;
-        Tiny::Vector<DataType, shape_dim> face_vec;
-        Tiny::Vector<DataType, facet_dim> ori_vec;
-
-        face_mat.format();
-        ori_mat.format();
-        face_vec.format();
-        ori_vec.format();
-
-        // the computed flux
-        DataType flux = DataType(0);
-
-        // loop over all cells of the mesh
-        for(Index f(0); f < Index(this->_facets.size()); ++f)
-        {
-          // get facet index
-          const Index face = this->_facets[f];
-          const Index cell = this->_cells[f];
-
-          // compute facet trafos
-          Geometry::Intern::FaceRefTrafo<ShapeType, facet_dim>::compute(face_mat, face_vec, this->_cell_facet[f]);
-
-          // compute orientation trafos
-          Geometry::Intern::CongruencyTrafo<FacetType>::compute(ori_mat, ori_vec, this->_facet_ori[f]);
-
-          // prepare trafo evaluators
-          trafo_facet_eval.prepare(face);
-          trafo_eval.prepare(cell);
-
-          // prepare space evaluators
-          space_eval.prepare(trafo_eval);
-
-          // initialize dof-mappings
-          dof_mapping.prepare(cell);
-
-          // fetch number of local dofs
-          const int num_loc_dofs = space_eval.get_num_local_dofs();
-
-          // gather our local velocity dofs
-          local_vector.format();
-          gather(local_vector, dof_mapping);
-
-          // finish dof-mapping
-          dof_mapping.finish();
-
-          // loop over all quadrature points and integrate
-          for(int k(0); k < cubature_rule.get_num_points(); ++k)
-          {
-            // get cubature point
-            auto cub_pt = cubature_rule.get_point(k);
-
-            // transform to local facet
-            auto cub_cf = (face_mat * ((ori_mat * cub_pt) + ori_vec)) + face_vec;
-
-            // compute trafo data
-            trafo_facet_eval(trafo_facet_data, cub_pt);
-            trafo_eval(trafo_data, cub_cf);
-
-            // compute test basis function data
-            space_eval(space_data, trafo_data);
-
-            // compute local velocity value
-            loc_value = DataType(0);
-            for(int i(0); i < num_loc_dofs; ++i)
-              loc_value += space_data.phi[i].value * local_vector[i];
-
-            // compute flux
-            flux += trafo_facet_data.jac_det * cubature_rule.get_weight(k) * loc_value;
-
-            // continue with next basis function
-          }
-
-          // finish evaluators
-          space_eval.finish();
-          trafo_eval.finish();
-          trafo_facet_eval.finish();
-
-          // continue with next cell
+          // combine the assembly
+          task->combine();
         }
 
-        // done
-        return flux;
-      }
-
-      /**
-       * \brief Assembles the surface integral of a discrete function
-       *
-       * \param[in] vector
-       * A \transient reference to the vector that represents the function to be integrated
-       *
-       * \param[in] space
-       * A \transient reference to the finite element space
-       *
-       * \param[in] cubature_nane
-       * The name of the cubature rule to be used for integration
-       *
-       * \returns The surface integral of the discrete function
-       */
-      template<typename DataType_, typename IndexType_, typename Space_, int dim_>
-      Tiny::Vector<DataType_, dim_> assemble_discrete_integral(
-        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
-        const Space_& space,
-        const String& cubature_name)
-      {
-        Cubature::DynamicFactory cubature_factory(cubature_name);
-        return assemble_discrete_integral(vector, space, cubature_factory);
-      }
-
-      /**
-       * \brief Assembles the surface integral of a discrete function
-       *
-       * \param[in] vector
-       * A \transient reference to the vector that represents the function to be integrated
-       *
-       * \param[in] space
-       * A \transient reference to the finite element space
-       *
-       * \param[in] cubature_factory
-       * The cubature factory
-       *
-       * \returns The surface integral of the discrete function
-       */
-      template<typename DataType_, typename IndexType_, typename Space_, typename CubatureFactory_, int dim_>
-      Tiny::Vector<DataType_, dim_> assemble_discrete_integral(
-        const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& vector,
-        const Space_& space,
-        const CubatureFactory_& cubature_factory)
-      {
-        // validate vector dimensions
-        XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
-
-        typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
-
-        // assembly traits
-        typedef Assembly::AsmTraits1<DataType_, Space_, TrafoTags::none, SpaceTags::value> AsmTraits;
-
-        typedef typename AsmTraits::DataType DataType;
-
-        // shape types
-        typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
-
-        // fetch the trafo
-        const TrafoType& trafo = space.get_trafo();
-
-        // create a trafo evaluator
-        typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
-
-        // create a trafo facet evaluator
-        typedef typename TrafoType::template Evaluator<FacetType, DataType>::Type TrafoFacetEvaluator;
-        TrafoFacetEvaluator trafo_facet_eval(trafo);
-
-        // trafo facet evaluation data
-        typedef typename TrafoFacetEvaluator::template ConfigTraits <TrafoTags::jac_det>::EvalDataType TrafoFacetEvalData;
-
-        // create a space evaluator and evaluation data
-        typename AsmTraits::TrialEvaluator space_eval(space);
-
-        // create a dof-mapping
-        typename AsmTraits::TrialDofMapping dof_mapping(space);
-
-        // create trafo evaluation data
-        typename AsmTraits::TrafoEvalData trafo_data;
-        TrafoFacetEvalData trafo_facet_data;
-
-        // create space evaluation data
-        typename AsmTraits::TrialEvalData space_data;
-
-        // create cubature rule
-        typename Assembly::Intern::CubatureTraits<TrafoFacetEvaluator>::RuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
-
-        // create matrix scatter-axpy
-        typename VectorType::GatherAxpy gather(vector);
-
-        // get maximum number of local dofs
-        static constexpr int max_local_dofs = AsmTraits::max_local_trial_dofs;
-
-        // create local vector data
-        typedef Tiny::Vector<DataType, dim_> VectorValue;
-        typedef Tiny::Vector<VectorValue, max_local_dofs> LocalVectorType;
-        LocalVectorType local_vector;
-
-        // our local velocity gradient
-        Tiny::Vector<DataType, dim_> loc_value;
-
-        // trafo matrices and vectors
-        Tiny::Matrix<DataType, shape_dim, facet_dim> face_mat;
-        Tiny::Matrix<DataType, facet_dim, facet_dim> ori_mat;
-        Tiny::Vector<DataType, shape_dim> face_vec;
-        Tiny::Vector<DataType, facet_dim> ori_vec;
-
-        face_mat.format();
-        ori_mat.format();
-        face_vec.format();
-        ori_vec.format();
-
-        // the computed flux
-        Tiny::Vector<DataType_, dim_> flux;
-        flux.format();
-
-        // loop over all cells of the mesh
-        for(Index f(0); f < Index(this->_facets.size()); ++f)
-        {
-          // get facet index
-          const Index face = this->_facets[f];
-          const Index cell = this->_cells[f];
-
-          // compute facet trafos
-          Geometry::Intern::FaceRefTrafo<ShapeType, facet_dim>::compute(face_mat, face_vec, this->_cell_facet[f]);
-
-          // compute orientation trafos
-          Geometry::Intern::CongruencyTrafo<FacetType>::compute(ori_mat, ori_vec, this->_facet_ori[f]);
-
-          // prepare trafo evaluators
-          trafo_facet_eval.prepare(face);
-          trafo_eval.prepare(cell);
-
-          // prepare space evaluators
-          space_eval.prepare(trafo_eval);
-
-          // initialize dof-mappings
-          dof_mapping.prepare(cell);
-
-          // fetch number of local dofs
-          const int num_loc_dofs = space_eval.get_num_local_dofs();
-
-          // gather our local velocity dofs
-          local_vector.format();
-          gather(local_vector, dof_mapping);
-
-          // finish dof-mapping
-          dof_mapping.finish();
-
-          // loop over all quadrature points and integrate
-          for(int k(0); k < cubature_rule.get_num_points(); ++k)
-          {
-            // get cubature point
-            auto cub_pt = cubature_rule.get_point(k);
-
-            // transform to local facet
-            auto cub_cf = (face_mat * ((ori_mat * cub_pt) + ori_vec)) + face_vec;
-
-            // compute trafo data
-            trafo_facet_eval(trafo_facet_data, cub_pt);
-            trafo_eval(trafo_data, cub_cf);
-
-            // compute test basis function data
-            space_eval(space_data, trafo_data);
-
-            // compute local velocity value
-            loc_value.format();
-            for(int i(0); i < num_loc_dofs; ++i)
-              loc_value.axpy(space_data.phi[i].value, local_vector[i]);
-
-            // compute flux
-            flux.axpy(trafo_facet_data.jac_det * cubature_rule.get_weight(k), loc_value);
-
-            // continue with next basis function
-          }
-
-          // finish evaluators
-          space_eval.finish();
-          trafo_eval.finish();
-          trafo_facet_eval.finish();
-
-          // continue with next cell
-        }
-
-        // done
-        return flux;
-      }
-
-      /**
-       * \brief Assembles the jump-stabilization operator onto a matrix.
-       *
-       * This function assembles the jump stabilization operator:
-       *   \f[J(\varphi,\psi) = \gamma \sum_E (s\cdot J_E)^{p} \int_E [\nabla \varphi]\cdot[\nabla\psi]\f]
-       *
-       * \attention
-       * The matrix must have an extended stencil, which must have been assembled by calling
-       * Assembly::SymbolicAssembler::assemble_matrix_ext_facet1() !
-       *
-       * \param[inout] matrix
-       * The matrix that is to be assembled.
-       *
-       * \param[in] space
-       * The finite element space to be used.
-       *
-       * \param[in] cubature_name
-       * The cubature for integration. Note that this is a cubature rule on the facets.
-       *
-       * \param[in] gamma
-       * The scaling factor gamma for the jump stabilization operator.
-       *
-       * \param[in] jacdet_scal
-       * The scaling factor \e s for the Jacobian determinant factor.
-       *
-       * \param[in] jacdet_expo
-       * The exponent \e p for the Jacobian determinant factor.
-       */
-      template<
-        typename Matrix_,
-        typename Space_>
-      void assemble_jump_stabil_operator_matrix(
-        Matrix_& matrix,
-        const Space_& space,
-        const String& cubature_name,
-        typename Matrix_::DataType gamma = typename Matrix_::DataType(1),
-        typename Matrix_::DataType jacdet_scal = typename Matrix_::DataType(2),
-        typename Matrix_::DataType jacdet_expo = typename Matrix_::DataType(2)) const
-      {
-        Cubature::DynamicFactory cubature_factory(cubature_name);
-        assemble_jump_stabil_operator_matrix(matrix, space, cubature_factory, gamma, jacdet_scal, jacdet_expo);
-      }
-
-      /**
-       * \brief Assembles the jump-stabilization operator onto a matrix.
-       *
-       * This function assembles the jump stabilization operator:
-       *   \f[J(\varphi,\psi) = \gamma \sum_E (s\cdot J_E)^{p} \int_E [\nabla \varphi]\cdot[\nabla\psi]\f]
-       *
-       * \attention
-       * The matrix must have an extended stencil, which must have been assembled by calling
-       * Assembly::SymbolicAssembler::assemble_matrix_ext_facet1() !
-       *
-       * \param[inout] matrix
-       * The matrix that is to be assembled.
-       *
-       * \param[in] space
-       * The finite element space to be used.
-       *
-       * \param[in] cubature_factory
-       * The cubature for integration. Note that this is a cubature rule on the facets.
-       *
-       * \param[in] gamma
-       * The scaling factor gamma for the jump stabilization operator.
-       *
-       * \param[in] jacdet_scal
-       * The scaling factor \e s for the Jacobian determinant factor.
-       *
-       * \param[in] jacdet_expo
-       * The exponent \e p for the Jacobian determinant factor.
-       */
-      template<
-        typename Matrix_,
-        typename Space_,
-        typename CubatureFactory_>
-      void assemble_jump_stabil_operator_matrix(
-        Matrix_& matrix,
-        const Space_& space,
-        const CubatureFactory_& cubature_factory,
-        typename Matrix_::DataType gamma = typename Matrix_::DataType(1),
-        typename Matrix_::DataType jacdet_scal = typename Matrix_::DataType(2),
-        typename Matrix_::DataType jacdet_expo = typename Matrix_::DataType(2)) const
-      {
-        // validate matrix dimensions
-        XASSERTM(matrix.rows() == space.get_num_dofs(), "invalid matrix dimensions");
-        XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
-
-        // matrix type
-        typedef Matrix_ MatrixType;
-        // test-space type
-        typedef Space_ SpaceType;
-
-        // assembly traits
-        typedef AsmTraits1<
-          typename MatrixType::DataType,
-          SpaceType,
-          TrafoTags::none,
-          SpaceTags::grad> AsmTraits;
-
-        typedef typename AsmTraits::DataType DataType;
-        typedef typename Matrix_::ValueType ValueType;
-
-        // shape types
-        typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
-
-        // fetch the trafo
-        const TrafoType& trafo = space.get_trafo();
-
-        // create a trafo evaluator
-        typename AsmTraits::TrafoEvaluator trafo_eval_1(trafo), trafo_eval_2(trafo);
-
-        // create a trafo facet evaluator
-        typedef typename TrafoType::template Evaluator<FacetType, DataType>::Type TrafoFacetEvaluator;
-        typedef typename TrafoFacetEvaluator::template ConfigTraits<TrafoTags::jac_det>::EvalDataType TrafoFacetEvalData;
-        TrafoFacetEvaluator trafo_facet_eval(trafo);
-
-        // create space evaluators
-        typename AsmTraits::SpaceEvaluator space_eval_1(space), space_eval_2(space);
-
-        // create dof-mappings
-        typename AsmTraits::DofMapping dof_mapping_1(space), dof_mapping_2(space);
-
-        // create trafo evaluation data
-        typename AsmTraits::TrafoEvalData trafo_data_1, trafo_data_2;
-        TrafoFacetEvalData trafo_facet_data;
-
-        // create space evaluation data
-        typename AsmTraits::SpaceEvalData space_data_1, space_data_2;
-
-        // create cubature rule
-        typename Intern::CubatureTraits<TrafoFacetEvaluator>::RuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
-
-        // create matrix scatter-axpy
-        typename MatrixType::ScatterAxpy scatter_axpy(matrix);
-
-        // common DOF mapping
-        static constexpr int max_common_dofs = 2 * AsmTraits::max_local_test_dofs;
-        Intern::CommonDofMap<max_common_dofs> common_map;
-
-        // jump gradients
-        typename AsmTraits::SpaceEvalTraits::BasisGradientType jump_grad[max_common_dofs];
-
-        // local matrix data
-        Tiny::Matrix<ValueType, max_common_dofs, max_common_dofs> loc_mat;
-
-        // trafo matrices and vectors
-        Tiny::Matrix<DataType, shape_dim, facet_dim> face_mat_1, face_mat_2;
-        Tiny::Matrix<DataType, facet_dim, facet_dim> ori_mat_1, ori_mat_2;
-        Tiny::Vector<DataType, shape_dim> face_vec_1, face_vec_2;
-        Tiny::Vector<DataType, facet_dim> ori_vec_1, ori_vec_2;
-
-        face_mat_1.format();
-        face_mat_2.format();
-        ori_mat_1.format();
-        ori_mat_2.format();
-        face_vec_1.format();
-        face_vec_2.format();
-        ori_vec_1.format();
-        ori_vec_2.format();
-
-        // loop over all cells of the mesh
-        for(std::size_t f(0); f < _facets.size(); /*++f*/)
-        {
-          // get facet index
-          const Index face = _facets[f];
-          const Index cell_1 = _cells[f];
-          const int cell_facet_1 = _cell_facet[f];
-          const int facet_ori_1 = _facet_ori[f];
-          ++f;
-
-          // check for next cell
-          const bool inner = ((f < _facets.size()) && (face == _facets[f]));
-          const Index cell_2 = (inner ? _cells[f] : cell_1);
-          const int cell_facet_2 = (inner ? _cell_facet[f] : cell_facet_1);
-          const int facet_ori_2 = (inner ? _facet_ori[f] : facet_ori_1);
-          if(inner)
-            ++f;
-
-          // prepare dof mappings
-          dof_mapping_1.prepare(cell_1);
-          dof_mapping_2.prepare(cell_2);
-
-          // build local dof map
-          common_map.clear();
-          for(int i(0); i < dof_mapping_1.get_num_local_dofs(); ++i)
-            common_map.push_1(dof_mapping_1.get_index(i), i);
-          if(inner)
-          {
-            for(int i(0); i < dof_mapping_2.get_num_local_dofs(); ++i)
-              common_map.push_2(dof_mapping_2.get_index(i), i);
-          }
-
-          // finish dof mapping
-          dof_mapping_2.finish();
-          dof_mapping_1.finish();
-
-          // get number of common local dofs
-          const int num_local_dofs = common_map.get_num_local_dofs();
-          XASSERT(num_local_dofs <= max_common_dofs);
-
-          // compute facet trafos
-          Geometry::Intern::FaceRefTrafo<ShapeType, facet_dim>::compute(face_mat_1, face_vec_1, cell_facet_1);
-          Geometry::Intern::FaceRefTrafo<ShapeType, facet_dim>::compute(face_mat_2, face_vec_2, cell_facet_2);
-
-          // compute orientation trafos
-          Geometry::Intern::CongruencyTrafo<FacetType>::compute(ori_mat_1, ori_vec_1, facet_ori_1);
-          Geometry::Intern::CongruencyTrafo<FacetType>::compute(ori_mat_2, ori_vec_2, facet_ori_2);
-
-          // prepare trafo evaluators
-          trafo_facet_eval.prepare(face);
-          trafo_eval_1.prepare(cell_1);
-          trafo_eval_2.prepare(cell_2);
-
-          // prepare space evaluators
-          space_eval_1.prepare(trafo_eval_1);
-          space_eval_2.prepare(trafo_eval_2);
-
-          // format local matrix
-          loc_mat.format();
-
-          // loop over all quadrature points and integrate
-          for(int k(0); k < cubature_rule.get_num_points(); ++k)
-          {
-            // get cubature point
-            auto cub_pt = cubature_rule.get_point(k);
-
-            // transform to local facets
-            auto cub_cf_1 = (face_mat_1 * ((ori_mat_1 * cub_pt) + ori_vec_1)) + face_vec_1;
-            auto cub_cf_2 = (face_mat_2 * ((ori_mat_2 * cub_pt) + ori_vec_2)) + face_vec_2;
-
-            // compute trafo data
-            trafo_facet_eval(trafo_facet_data, cub_pt);
-            trafo_eval_1(trafo_data_1, cub_cf_1);
-            trafo_eval_2(trafo_data_2, cub_cf_2);
-
-            // compute basis function data
-            space_eval_1(space_data_1, trafo_data_1);
-            space_eval_2(space_data_2, trafo_data_2);
-
-            // compute weight factor
-            const DataType weight = trafo_facet_data.jac_det * cubature_rule.get_weight(k) *
-              Math::pow(jacdet_scal * trafo_facet_data.jac_det, jacdet_expo);
-
-            // compute jump gradients
-            for(int i(0); i < num_local_dofs; ++i)
-            {
-              jump_grad[i].format();
-              const int i_1 = common_map.loc_1(i);
-              const int i_2 = common_map.loc_2(i);
-              // note the different signs to compute the jump
-              if(i_1 > -1) jump_grad[i] += space_data_1.phi[i_1].grad;
-              if(i_2 > -1) jump_grad[i] -= space_data_2.phi[i_2].grad;
-            }
-
-            // assemble jump stabilization operator
-            for(int i(0); i < num_local_dofs; ++i)
-            {
-              for(int j(0); j < num_local_dofs; ++j)
-              {
-                Tiny::add_id(loc_mat(i,j), weight * Tiny::dot(jump_grad[i], jump_grad[j]));
-              }
-            }
-
-            // continue with next cubature point
-          }
-
-          // finish evaluators
-          space_eval_2.finish();
-          space_eval_1.finish();
-          trafo_eval_2.finish();
-          trafo_eval_1.finish();
-          trafo_facet_eval.finish();
-
-          // incorporate local matrix
-          scatter_axpy(loc_mat, common_map, common_map, gamma);
-
-          // continue with next cell
-        }
-
-        // okay, that's it
-      }
-
-      /**
-       * \brief Assembles the jump operator onto a matrix.
-       *
-       * This function assembles the jump operator:
-       *   \f[J(\varphi,\psi) = \alpha \sum_E \int_E [\varphi]\cdot[\psi]\f]
-       *
-       * \attention
-       * The matrix must have an extended stencil, which must have been assembled by calling
-       * Assembly::SymbolicAssembler::assemble_matrix_ext_facet1() !
-       *
-       * \param[inout] matrix
-       * The matrix that is to be assembled.
-       *
-       * \param[in] space
-       * The finite element space to be used.
-       *
-       * \param[in] cubature_name
-       * The cubature rule for integration. Note that this is a cubature rule on the facets.
-       *
-       * \param[in] alpha
-       * The scaling factor alpha for the jump operator.
-       */
-      template<
-        typename Matrix_,
-        typename Space_>
-      void assemble_jump_operator_matrix(
-        Matrix_& matrix,
-        const Space_& space,
-        const String& cubature_name,
-        typename Matrix_::DataType alpha = typename Matrix_::DataType(1)) const
-      {
-        Cubature::DynamicFactory cubature_factory(cubature_name);
-        assemble_jump_operator_matrix(matrix, space, cubature_name, alpha);
-      }
-
-      /**
-       * \brief Assembles the jump operator onto a matrix.
-       *
-       * This function assembles the jump operator:
-       *   \f[J(\varphi,\psi) = \alpha \sum_E \int_E [\varphi]\cdot[\psi]\f]
-       *
-       * \attention
-       * The matrix must have an extended stencil, which must have been assembled by calling
-       * Assembly::SymbolicAssembler::assemble_matrix_ext_facet1() !
-       *
-       * \param[inout] matrix
-       * The matrix that is to be assembled.
-       *
-       * \param[in] space
-       * The finite element space to be used.
-       *
-       * \param[in] cubature_factory
-       * The cubature rule for integration. Note that this is a cubature rule on the facets.
-       *
-       * \param[in] alpha
-       * The scaling factor alpha for the jump operator.
-       */
-      template<
-        typename Matrix_,
-        typename Space_,
-        typename CubatureFactory_>
-      void assemble_jump_operator_matrix(
-        Matrix_& matrix,
-        const Space_& space,
-        const CubatureFactory_& cubature_factory,
-        typename Matrix_::DataType alpha = typename Matrix_::DataType(1)) const
-      {
-        // validate matrix dimensions
-        XASSERTM(matrix.rows() == space.get_num_dofs(), "invalid matrix dimensions");
-        XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
-
-        // matrix type
-        typedef Matrix_ MatrixType;
-        // test-space type
-        typedef Space_ SpaceType;
-
-        // assembly traits
-        typedef AsmTraits1<
-          typename MatrixType::DataType,
-          SpaceType,
-          TrafoTags::none,
-          SpaceTags::value> AsmTraits;
-
-        typedef typename AsmTraits::DataType DataType;
-        typedef typename Matrix_::ValueType ValueType;
-
-        // shape types
-        typedef typename Shape::FaceTraits<ShapeType, ShapeType::dimension-1>::ShapeType FacetType;
-
-        // fetch the trafo
-        const TrafoType& trafo = space.get_trafo();
-
-        // create a trafo evaluator
-        typename AsmTraits::TrafoEvaluator trafo_eval_1(trafo), trafo_eval_2(trafo);
-
-        // create a trafo facet evaluator
-        typedef typename TrafoType::template Evaluator<FacetType, DataType>::Type TrafoFacetEvaluator;
-        typedef typename TrafoFacetEvaluator::template ConfigTraits<TrafoTags::jac_det>::EvalDataType TrafoFacetEvalData;
-        TrafoFacetEvaluator trafo_facet_eval(trafo);
-
-        // create space evaluators
-        typename AsmTraits::SpaceEvaluator space_eval_1(space), space_eval_2(space);
-
-        // create dof-mappings
-        typename AsmTraits::DofMapping dof_mapping_1(space), dof_mapping_2(space);
-
-        // create trafo evaluation data
-        typename AsmTraits::TrafoEvalData trafo_data_1, trafo_data_2;
-        TrafoFacetEvalData trafo_facet_data;
-
-        // create space evaluation data
-        typename AsmTraits::SpaceEvalData space_data_1, space_data_2;
-
-        // create cubature rule
-        typename Intern::CubatureTraits<TrafoFacetEvaluator>::RuleType cubature_rule(Cubature::ctor_factory, cubature_factory);
-
-        // create matrix scatter-axpy
-        typename MatrixType::ScatterAxpy scatter_axpy(matrix);
-
-        // common DOF mapping
-        static constexpr int max_common_dofs = 2 * AsmTraits::max_local_test_dofs;
-        Intern::CommonDofMap<max_common_dofs> common_map;
-
-        // jump gradients
-        typename AsmTraits::SpaceEvalTraits::BasisValueType jump_value[max_common_dofs];
-
-        // local matrix data
-        Tiny::Matrix<ValueType, max_common_dofs, max_common_dofs> loc_mat;
-
-        // trafo matrices and vectors
-        Tiny::Matrix<DataType, shape_dim, facet_dim> face_mat_1, face_mat_2;
-        Tiny::Matrix<DataType, facet_dim, facet_dim> ori_mat_1, ori_mat_2;
-        Tiny::Vector<DataType, shape_dim> face_vec_1, face_vec_2;
-        Tiny::Vector<DataType, facet_dim> ori_vec_1, ori_vec_2;
-
-        face_mat_1.format();
-        face_mat_2.format();
-        ori_mat_1.format();
-        ori_mat_2.format();
-        face_vec_1.format();
-        face_vec_2.format();
-        ori_vec_1.format();
-        ori_vec_2.format();
-
-        // loop over all cells of the mesh
-        for(std::size_t f(0); f < _facets.size(); /*++f*/)
-        {
-          // get facet index
-          const Index face = _facets[f];
-          const Index cell_1 = _cells[f];
-          const int cell_facet_1 = _cell_facet[f];
-          const int facet_ori_1 = _facet_ori[f];
-          ++f;
-
-          // check for next cell
-          const bool inner = ((f < _facets.size()) && (face == _facets[f]));
-          const Index cell_2 = (inner ? _cells[f] : cell_1);
-          const int cell_facet_2 = (inner ? _cell_facet[f] : cell_facet_1);
-          const int facet_ori_2 = (inner ? _facet_ori[f] : facet_ori_1);
-          if(inner)
-            ++f;
-
-          // prepare dof mappings
-          dof_mapping_1.prepare(cell_1);
-          dof_mapping_2.prepare(cell_2);
-
-          // build local dof map
-          common_map.clear();
-          for(int i(0); i < dof_mapping_1.get_num_local_dofs(); ++i)
-            common_map.push_1(dof_mapping_1.get_index(i), i);
-          if(inner)
-          {
-            for(int i(0); i < dof_mapping_2.get_num_local_dofs(); ++i)
-              common_map.push_2(dof_mapping_2.get_index(i), i);
-          }
-
-          // finish dof mapping
-          dof_mapping_2.finish();
-          dof_mapping_1.finish();
-
-          // get number of common local dofs
-          const int num_local_dofs = common_map.get_num_local_dofs();
-
-          // compute facet trafos
-          Geometry::Intern::FaceRefTrafo<ShapeType, facet_dim>::compute(face_mat_1, face_vec_1, cell_facet_1);
-          Geometry::Intern::FaceRefTrafo<ShapeType, facet_dim>::compute(face_mat_2, face_vec_2, cell_facet_2);
-
-          // compute orientation trafos
-          Geometry::Intern::CongruencyTrafo<FacetType>::compute(ori_mat_1, ori_vec_1, facet_ori_1);
-          Geometry::Intern::CongruencyTrafo<FacetType>::compute(ori_mat_2, ori_vec_2, facet_ori_2);
-
-          // prepare trafo evaluators
-          trafo_facet_eval.prepare(face);
-          trafo_eval_1.prepare(cell_1);
-          trafo_eval_2.prepare(cell_2);
-
-          // prepare space evaluators
-          space_eval_1.prepare(trafo_eval_1);
-          space_eval_2.prepare(trafo_eval_2);
-
-          // format local matrix
-          loc_mat.format();
-
-          // loop over all quadrature points and integrate
-          for(int k(0); k < cubature_rule.get_num_points(); ++k)
-          {
-            // get cubature point
-            auto cub_pt = cubature_rule.get_point(k);
-
-            // transform to local facets
-            auto cub_cf_1 = (face_mat_1 * ((ori_mat_1 * cub_pt) + ori_vec_1)) + face_vec_1;
-            auto cub_cf_2 = (face_mat_2 * ((ori_mat_2 * cub_pt) + ori_vec_2)) + face_vec_2;
-
-            // compute trafo data
-            trafo_facet_eval(trafo_facet_data, cub_pt);
-            trafo_eval_1(trafo_data_1, cub_cf_1);
-            trafo_eval_2(trafo_data_2, cub_cf_2);
-
-            // compute basis function data
-            space_eval_1(space_data_1, trafo_data_1);
-            space_eval_2(space_data_2, trafo_data_2);
-
-            // compute weight factor
-            const DataType weight = trafo_facet_data.jac_det * cubature_rule.get_weight(k);
-
-            // compute jump gradients
-            for(int i(0); i < num_local_dofs; ++i)
-            {
-              jump_value[i] = DataType(0);
-              const int i_1 = common_map.loc_1(i);
-              const int i_2 = common_map.loc_2(i);
-              // note the different signs to compute the jump
-              if(i_1 > -1) jump_value[i] += space_data_1.phi[i_1].value;
-              if(i_2 > -1) jump_value[i] -= space_data_2.phi[i_2].value;
-            }
-
-            // assemble jump stabilization operator
-            for(int i(0); i < num_local_dofs; ++i)
-            {
-              for(int j(0); j < num_local_dofs; ++j)
-              {
-                Tiny::add_id(loc_mat(i,j), weight * jump_value[i] * jump_value[j]);
-              }
-            }
-
-            // continue with next cubature point
-          }
-
-          // finish evaluators
-          space_eval_2.finish();
-          space_eval_1.finish();
-          trafo_eval_2.finish();
-          trafo_eval_1.finish();
-          trafo_facet_eval.finish();
-
-          // incorporate local matrix
-          scatter_axpy(loc_mat, common_map, common_map, alpha);
-
-          // continue with next cell
-        }
-
-        // okay, that's it
+        // delete task object
+        task.reset();
       }
 
     protected:
@@ -2144,7 +659,6 @@ namespace FEAT
 
         const auto& vert_at_elem = _trafo.get_mesh().template get_index_set<shape_dim, 0>();
         const auto& vert_at_face = _trafo.get_mesh().template get_index_set<facet_dim, 0>();
-        //const auto& face_at_elem = _trafo.get_mesh().template get_index_set<shape_dim, facet_dim>();
 
         Index face_verts[num_vaf];
         FacetRepr::compute(face_verts, vert_at_face[face]);

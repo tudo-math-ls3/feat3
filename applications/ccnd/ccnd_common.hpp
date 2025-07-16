@@ -29,6 +29,7 @@
 #include <kernel/assembly/slip_filter_assembler.hpp>
 #include <kernel/assembly/error_computer.hpp>
 #include <kernel/assembly/trace_assembler.hpp>
+#include <kernel/assembly/trace_assembler_basic_jobs.hpp>
 #include <kernel/assembly/velocity_analyser.hpp>
 #include <kernel/assembly/discrete_evaluator.hpp>
 #include <kernel/assembly/stokes_fbm_assembler.hpp>

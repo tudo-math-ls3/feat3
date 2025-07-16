@@ -21,7 +21,9 @@
 #include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
+#include <kernel/assembly/domain_assembler.hpp>
 #include <kernel/assembly/trace_assembler.hpp>
+#include <kernel/assembly/trace_assembler_jump_jobs.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/error_computer.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
@@ -232,7 +234,9 @@ namespace Andicore
 
     // ********************************************************************************************
 
-    Cubature::DynamicFactory cubature(String("auto-degree:") + stringify(2*(SpaceType::local_degree)+3));
+    //Cubature::DynamicFactory cubature(String("auto-degree:") + stringify(2*(SpaceType::local_degree)+3));
+    String cubature = String("auto-degree:") + stringify(2*(SpaceType::local_degree)+3);
+    Cubature::DynamicFactory cubature_factory(cubature);
 
     Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
     MeshType mesh(mesh_factory);
@@ -271,7 +275,7 @@ namespace Andicore
     vec_sol_3.format();
     vec_rhs.format();
 
-    Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, rhs_functional, space, cubature);
+    Assembly::LinearFunctionalAssembler::assemble_vector(vec_rhs, rhs_functional, space, cubature_factory);
 
     FilterType filter;
     Assembly::UnitFilterAssembler<MeshType> unit_asm;
@@ -300,7 +304,7 @@ namespace Andicore
     burgers.beta = beta;
     burgers.theta = theta;
     matrix.format();
-    burgers.assemble_scalar_matrix(matrix, vec_conv, space, cubature);
+    burgers.assemble_scalar_matrix(matrix, vec_conv, space, cubature_factory);
     filter.filter_mat(matrix);
 
     solver->init_numeric();
@@ -308,7 +312,7 @@ namespace Andicore
     solver->done_numeric();
 
     Assembly::ScalarErrorInfo<DataType> errors_1 = Assembly::ScalarErrorComputer<1>::
-      compute(vec_sol_1, sol_function, space, cubature);
+      compute(vec_sol_1, sol_function, space, cubature_factory);
     std::cout << errors_1 << "\n";
 
 
@@ -318,7 +322,7 @@ namespace Andicore
     burgers.sd_nu = nu;
     burgers.set_sd_v_norm(vec_conv);
     matrix.format();
-    burgers.assemble_scalar_matrix(matrix, vec_conv, space, cubature);
+    burgers.assemble_scalar_matrix(matrix, vec_conv, space, cubature_factory);
     filter.filter_mat(matrix);
 
     solver->init_numeric();
@@ -326,7 +330,7 @@ namespace Andicore
     solver->done_numeric();
 
     Assembly::ScalarErrorInfo<DataType> errors_2 = Assembly::ScalarErrorComputer<1>::
-      compute(vec_sol_2, sol_function, space, cubature);
+      compute(vec_sol_2, sol_function, space, cubature_factory);
     std::cout << errors_2 << "\n";
 
 
@@ -338,8 +342,8 @@ namespace Andicore
     burgers.sd_nu = 0.0;
     burgers.sd_delta = 0.0;
     matrix.format();
-    burgers.assemble_scalar_matrix(matrix, vec_conv, space, cubature);
-    trace_asm.assemble_jump_stabil_operator_matrix(matrix, space, cubature, gamma, DataType(2), DataType(2));
+    burgers.assemble_scalar_matrix(matrix, vec_conv, space, cubature_factory);
+    Assembly::assemble_jump_stabilization_matrix(trace_asm, matrix, space, cubature, gamma, DataType(2), DataType(2));
     filter.filter_mat(matrix);
 
     solver->init_numeric();
@@ -347,7 +351,7 @@ namespace Andicore
     solver->done_numeric();
 
     Assembly::ScalarErrorInfo<DataType> errors_3 = Assembly::ScalarErrorComputer<1>::
-      compute(vec_sol_3, sol_function, space, cubature);
+      compute(vec_sol_3, sol_function, space, cubature_factory);
     std::cout << errors_3 << "\n";
 
     solver->done_symbolic();

@@ -236,6 +236,7 @@
 #include <kernel/assembly/unit_filter_assembler.hpp>
 #include <kernel/assembly/error_computer.hpp>
 #include <kernel/assembly/trace_assembler.hpp>
+#include <kernel/assembly/trace_assembler_basic_jobs.hpp>
 #include <kernel/assembly/velocity_analyser.hpp>
 #include <kernel/assembly/discrete_evaluator.hpp>
 #include <kernel/solver/multigrid.hpp>
@@ -630,137 +631,216 @@ namespace DFG95
 
   }; // class BenchmarkSummary
 
-  // accumulator for benchmark body forces (i.e. drag and lift)
-  // this class is used for the computation of the 'surface integration' variants of drag and lift
-  class BenchBodyForceAccumulator
+  // This class is a custom trace assembly job for the assembly of the surface-based body forces (drag & lift), which
+  // is an extension of the class Assembly::TraceAssemblyStokesBodyForceAssemblyJob that also includes the formulae
+  // from the original Schaefer & Turek 'DFG95' paper, which only works for 2D and 2.5D obstacles, whereas the other
+  // assembly class implements the formulae of the Giles et al. paper "Adaptive Error Control For Finite Element
+  // Approximations of the Lift and Drag Coefficients in Viscous Flow" that works for arbitrary 2D/3D obstacles, but
+  // gives slightly worse coefficients in the case of the DFG95 benchmark. This class computes the forces with both
+  // the 'old' DFG95-style formulae and the 'new' Giles formulae and the application prints both of them.
+  template<typename VectorVelo_, typename VectorPres_, typename SpaceVelo_, typename SpacePres_>
+  class DFG95SurfaceBodyForceAssemblyJob
   {
   public:
-    const SystemDataType _nu;
+    typedef typename VectorVelo_::DataType DataType;
+    typedef typename VectorVelo_::ValueType VeloValueType;
+    typedef typename VectorPres_::ValueType PresValueType;
 
-    // old: computation method from DFG95 paper, works only for 2.5D (cylinder), gives wrong results for sphere obstacle
-    SystemDataType drag_raw_old, lift_raw_old;
+    static constexpr TrafoTags trafo_config = TrafoTags::none;
+    static constexpr SpaceTags space_velo_config = SpaceTags::value | SpaceTags::grad;
+    static constexpr SpaceTags space_pres_config = SpaceTags::value;
+    static constexpr TrafoTags facet_trafo_config = TrafoTags::jac_mat | TrafoTags::jac_det | TrafoTags::normal;
 
-    // new: computation method from Giles paper, always gives correct results, but may be slightly less accurate on cylinder
-    SystemDataType drag_raw_new, lift_raw_new, side_raw_new;
+    static constexpr int dim = SpaceVelo_::shape_dim;
 
-    explicit BenchBodyForceAccumulator(SystemDataType nu) :
-      _nu(nu),
-      drag_raw_old(SystemDataType(0)), lift_raw_old(SystemDataType(0)),
-      drag_raw_new(SystemDataType(0)), lift_raw_new(SystemDataType(0)), side_raw_new(SystemDataType(0))
+    typedef Tiny::Matrix<DataType, 3, 2> RawNewForces;
+    typedef Tiny::Matrix<DataType, 2, 2> RawOldForces;
+
+    class Task :
+      public Assembly::TraceAssemblyStokesVectorAnalysisTaskCRTP<Task, VectorVelo_, VectorPres_, SpaceVelo_, SpacePres_, trafo_config, facet_trafo_config, space_velo_config, space_pres_config>
     {
-    }
+    public:
+      /// our base-class typedef
+      typedef Assembly::TraceAssemblyStokesVectorAnalysisTaskCRTP<Task, VectorVelo_, VectorPres_, SpaceVelo_, SpacePres_, trafo_config, facet_trafo_config, space_velo_config, space_pres_config> BaseClass;
 
-    /// 2D variant
-    template<typename T_>
-    void operator()(
-      const T_ omega,
-      const Tiny::Vector<T_, 2, 2>& /*pt*/,
-      const Tiny::Matrix<T_, 2, 1, 2, 1>& jac,
-      const Tiny::Vector<T_, 2, 2>& /*val_v*/,
-      const Tiny::Matrix<T_, 2, 2, 2, 2>& grad_v,
-      const T_ val_p)
-    {
-      // compute normal and tangential
-      const T_ n2 = T_(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
-      const T_ tx = jac(0,0) * n2;
-      const T_ ty = jac(1,0) * n2;
-      const T_ nx = -ty;
-      const T_ ny =  tx;
+      /// our assembly traits
+      typedef typename BaseClass::AsmTraits AsmTraits;
 
-      Tiny::Matrix<T_, 2, 2, 2, 2> nt;
-      nt(0,0) = tx * nx;
-      nt(0,1) = tx * ny;
-      nt(1,0) = ty * nx;
-      nt(1,1) = ty * ny;
+      // we do not support pairwise assembly
+      static constexpr bool assemble_pairwise = false;
+      /// this task needs to scatter
+      static constexpr bool need_scatter = false;
+      /// this task has no combine
+      static constexpr bool need_combine = true;
 
-      const T_ dut = Tiny::dot(nt, grad_v);
+      using typename BaseClass::TrafoEvalData;
+      using typename BaseClass::TrafoFacetEvalData;
+      using typename BaseClass::VeloData;
+      using typename BaseClass::PresData;
 
-      drag_raw_old += SystemDataType(omega * ( _nu * dut * ny - val_p * nx));
-      lift_raw_old += SystemDataType(omega * (-_nu * dut * nx - val_p * ny));
+    protected:
+      RawOldForces& job_raw_old_forces;
+      RawNewForces& job_raw_new_forces;
+      RawOldForces raw_old_forces;
+      RawNewForces raw_new_forces;
 
-      const Tiny::Vector<T_, 2> eta = Tiny::orthogonal(jac).normalize();
-      drag_raw_new -= SystemDataType(omega * (_nu*(T_(2) * grad_v(0,0) * eta[0] + (grad_v(0, 1) + grad_v(1, 0)) * eta[1]) - val_p * eta[0]));
-      lift_raw_new -= SystemDataType(omega * (_nu*(T_(2) * grad_v(1,1) * eta[1] + (grad_v(1, 0) + grad_v(0, 1)) * eta[0]) - val_p * eta[1]));
-    }
-
-    /// 3D variant
-    template<typename T_>
-    void operator()(
-      const T_ omega,
-      const Tiny::Vector<T_, 3, 3>& /*pt*/,
-      const Tiny::Matrix<T_, 3, 2, 3, 2>& jac,
-      const Tiny::Vector<T_, 3, 3>& /*val_v*/,
-      const Tiny::Matrix<T_, 3, 3, 3, 3>& grad_v,
-      const T_ val_p)
-    {
-      // compute normal and tangential
-      const T_ n2 = T_(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
-      const T_ tx = jac(0,0) * n2;
-      const T_ ty = jac(1,0) * n2;
-      const T_ nx = -ty;
-      const T_ ny =  tx;
-
-      Tiny::Matrix<T_, 3, 3, 3, 3> nt;
-      nt.format();
-      nt(0,0) = tx * nx;
-      nt(0,1) = tx * ny;
-      nt(1,0) = ty * nx;
-      nt(1,1) = ty * ny;
-
-      const T_ dut = Tiny::dot(nt, grad_v);
-
-      drag_raw_old += SystemDataType(omega * ( _nu * dut * ny - val_p * nx));
-      lift_raw_old += SystemDataType(omega * (-_nu * dut * nx - val_p * ny));
-
-      const Tiny::Vector<T_, 3> eta = Tiny::orthogonal(jac).normalize();
-      drag_raw_new -= SystemDataType(omega * (_nu*(T_(2) * grad_v(0,0) * eta[0] + (grad_v(0, 1) + grad_v(1, 0)) * eta[1] + (grad_v(0, 2) + grad_v(2, 0)) * eta[2]) - val_p * eta[0]));
-      lift_raw_new -= SystemDataType(omega * (_nu*(T_(2) * grad_v(1,1) * eta[1] + (grad_v(1, 2) + grad_v(2, 1)) * eta[2] + (grad_v(1, 0) + grad_v(0, 1)) * eta[0]) - val_p * eta[1]));
-      side_raw_new -= SystemDataType(omega * (_nu*(T_(2) * grad_v(2,2) * eta[2] + (grad_v(2, 0) + grad_v(0, 2)) * eta[0] + (grad_v(2, 1) + grad_v(1, 2)) * eta[1]) - val_p * eta[2]));
-    }
-
-    void sync(const Dist::Comm& comm)
-    {
-      SystemDataType v[] =
+    public:
+      explicit Task(DFG95SurfaceBodyForceAssemblyJob& job) :
+        BaseClass(job.vector_velo, job.vector_pres, job.space_velo, job.space_pres, job.cubature_factory),
+        job_raw_old_forces(job.raw_old_forces),
+        job_raw_new_forces(job.raw_new_forces),
+        raw_old_forces(),
+        raw_new_forces()
       {
-        drag_raw_old, lift_raw_old, drag_raw_new, lift_raw_new, side_raw_new
-      };
-      comm.allreduce(v, v, std::size_t(5), Dist::op_sum);
-      drag_raw_old = v[0];
-      lift_raw_old = v[1];
-      drag_raw_new = v[2];
-      lift_raw_new = v[3];
-      side_raw_new = v[4];
-    }
-  }; // class BenchBodyForces<...,2>
+        raw_old_forces.format();
+        raw_new_forces.format();
+      }
 
-  // accumulator for computation of X-flux
-  class XFluxAccumulator
-  {
+      void eval(TrafoFacetEvalData& tau_f, TrafoEvalData& DOXY(tau), DataType weight, const VeloData& velo, const PresData& pres)
+      {
+        this->_eval(weight, tau_f.jac_mat, tau_f.normal, velo.grad, pres.value);
+      }
+
+      void scatter()
+      {
+        // nothing to do here
+      }
+
+      void combine()
+      {
+        job_raw_old_forces += raw_old_forces;
+        job_raw_new_forces += raw_new_forces;
+      }
+
+    protected:
+      /// 2D version
+      void _eval(const DataType omega, const Tiny::Matrix<DataType, 2, 1, 2, 1>& jac, const Tiny::Vector<DataType, 2, 2>& n,
+        const Tiny::Matrix<DataType, 2, 2, 2, 2>& grad_v, const DataType val_p)
+      {
+        // 'old' implementation according to original Schaefer & Turek DFG95 paper
+        const DataType n2 = DataType(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
+        const DataType tx = jac(0,0) * n2;
+        const DataType ty = jac(1,0) * n2;
+        const DataType nx = -ty;
+        const DataType ny =  tx;
+
+        Tiny::Matrix<DataType, 2, 2, 2, 2> nt;
+        nt(0,0) = tx * nx;
+        nt(0,1) = tx * ny;
+        nt(1,0) = ty * nx;
+        nt(1,1) = ty * ny;
+
+        const DataType dut = Tiny::dot(nt, grad_v);
+
+        raw_old_forces(0, 0) += omega * dut * ny;
+        raw_old_forces(1, 0) -= omega * dut * nx;
+        raw_old_forces(0, 1) += omega * val_p * nx;
+        raw_old_forces(1, 1) += omega * val_p * ny;
+
+        // 'new' implementation according to Giles paper
+        raw_new_forces(0, 0) -= omega * (DataType(2) * grad_v(0,0) * n[0] + (grad_v(0, 1) + grad_v(1, 0)) * n[1]);
+        raw_new_forces(1, 0) -= omega * (DataType(2) * grad_v(1,1) * n[1] + (grad_v(1, 0) + grad_v(0, 1)) * n[0]);
+        raw_new_forces(0, 1) -= omega * val_p * n[0];
+        raw_new_forces(1, 1) -= omega * val_p * n[1];
+      }
+
+      /// 3D version
+      void _eval(const DataType omega, const Tiny::Matrix<DataType, 3, 2, 3, 2>& jac, const Tiny::Vector<DataType, 3, 3>& n,
+        const Tiny::Matrix<DataType, 3, 3, 3, 3>& grad_v, const DataType val_p)
+      {
+        // 'old' implementation according to original Schaefer & Turek DFG95 paper
+        const DataType n2 = DataType(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
+        const DataType tx = jac(0,0) * n2;
+        const DataType ty = jac(1,0) * n2;
+        const DataType nx = -ty;
+        const DataType ny =  tx;
+
+        Tiny::Matrix<DataType, 3, 3, 3, 3> nt;
+        nt.format();
+        nt(0,0) = tx * nx;
+        nt(0,1) = tx * ny;
+        nt(1,0) = ty * nx;
+        nt(1,1) = ty * ny;
+
+        const DataType dut = Tiny::dot(nt, grad_v);
+
+        raw_old_forces(0, 0) += omega * dut * ny;
+        raw_old_forces(1, 0) -= omega * dut * nx;
+        raw_old_forces(0, 1) += omega * val_p * nx;
+        raw_old_forces(1, 1) += omega * val_p * ny;
+
+        // 'new' implementation according to Giles paper
+        raw_new_forces(0, 0) -= omega * (DataType(2) * grad_v(0,0) * n[0] + (grad_v(0, 1) + grad_v(1, 0)) * n[1] + (grad_v(0, 2) + grad_v(2, 0)) * n[2]);
+        raw_new_forces(1, 0) -= omega * (DataType(2) * grad_v(1,1) * n[1] + (grad_v(1, 2) + grad_v(2, 1)) * n[2] + (grad_v(1, 0) + grad_v(0, 1)) * n[0]);
+        raw_new_forces(2, 0) -= omega * (DataType(2) * grad_v(2,2) * n[2] + (grad_v(2, 0) + grad_v(0, 2)) * n[0] + (grad_v(2, 1) + grad_v(1, 2)) * n[1]);
+        raw_new_forces(0, 1) -= omega * val_p * n[0];
+        raw_new_forces(1, 1) -= omega * val_p * n[1];
+        raw_new_forces(2, 1) -= omega * val_p * n[2];
+      }
+    }; // class Task
+
+  protected:
+    const VectorVelo_& vector_velo;
+    const VectorPres_& vector_pres;
+    const SpaceVelo_& space_velo;
+    const SpacePres_& space_pres;
+    Cubature::DynamicFactory cubature_factory;
+    RawOldForces raw_old_forces;
+    RawNewForces raw_new_forces;
+
   public:
-    SystemDataType flux;
-
-    XFluxAccumulator() :
-      flux(SystemDataType(0))
+    explicit DFG95SurfaceBodyForceAssemblyJob(const VectorVelo_& vector_velo_, const VectorPres_& vector_pres_,
+      const SpaceVelo_& space_velo_, const SpacePres_& space_pres_, String cubature_):
+      vector_velo(vector_velo_),
+      vector_pres(vector_pres_),
+      space_velo(space_velo_),
+      space_pres(space_pres_),
+      cubature_factory(cubature_),
+      raw_old_forces(),
+      raw_new_forces()
     {
+      raw_old_forces.format();
+      raw_new_forces.format();
     }
 
-    template<typename T_, int d_, int d2_>
-    void operator()(
-      const T_ omega,
-      const Tiny::Vector<T_, d_, d_>& /*pt*/,
-      const Tiny::Matrix<T_, d_, d2_, d_, d2_>& /*jac*/,
-      const Tiny::Vector<T_, d_, d_>& val_v,
-      const Tiny::Matrix<T_, d_, d_, d_, d_>& /*grad_v*/,
-      const T_ /*val_p*/)
+    /// Returns the raw drag force coefficient for a given viscosity parameter (formula as in DFG95 paper)
+
+    DataType drag_old(DataType nu) const
     {
-      flux += SystemDataType(omega * val_v[0]);
+      return nu * raw_old_forces(0, 0) - raw_old_forces(0, 1);
     }
 
+    /// Returns the raw lift  force coefficient for a given viscosity parameter (formula as in DFG95 paper)
+    DataType lift_old(DataType nu) const
+    {
+      return nu * raw_old_forces(1, 0) - raw_old_forces(1, 1);
+    }
+
+    /// Returns the raw drag force coefficient for a given viscosity parameter
+    DataType drag_new(DataType nu) const
+    {
+      return nu * raw_new_forces(0, 0) - raw_new_forces(0, 1);
+    }
+
+    /// Returns the raw lift  force coefficient for a given viscosity parameter
+    DataType lift_new(DataType nu) const
+    {
+      return nu * raw_new_forces(1, 0) - raw_new_forces(1, 1);
+    }
+
+    /// Returns the raw side force coefficient for a given viscosity parameter
+    DataType side_new(DataType nu) const
+    {
+      return nu * raw_new_forces(2, 0) - raw_new_forces(2, 1);
+    }
+
+    /// Synchronizes the forces over a communicator
     void sync(const Dist::Comm& comm)
     {
-      comm.allreduce(&flux, &flux, std::size_t(1), Dist::op_sum);
+      comm.allreduce(&raw_old_forces.v[0][0], &raw_old_forces.v[0][0], std::size_t(4), Dist::op_sum);
+      comm.allreduce(&raw_new_forces.v[0][0], &raw_new_forces.v[0][0], std::size_t(6), Dist::op_sum);
     }
-  }; // class XFluxAccumulator
+  }; // class DFG95SurfaceBodyForceAssemblyJob<...>
 
   // computes the body forces by the volumetric 'defect vector' approach
   template<typename DT_, typename IT_, int dim_>
@@ -1218,7 +1298,7 @@ int main(int argc, char* argv[])
   const String cubature("gauss-legendre:3");
 
   // cubature for post-processing
-  Cubature::DynamicFactory cubature_postproc("gauss-legendre:5");
+  const String cubature_postproc("gauss-legendre:5");
 
   StopWatch watch_asm;
   watch_asm.start();
@@ -2207,23 +2287,20 @@ int main(int argc, char* argv[])
   // compute drag & lift coefficients by line integration using the trace assembler
   if(!skip_analysis)
   {
-    BenchBodyForceAccumulator body_force_accum(nu);
-    body_force_asm.assemble_flow_accum(
-      body_force_accum,
-      vec_sol.local().template at<0>(),
-      vec_sol.local().template at<1>(),
-      the_domain_level.space_velo,
-      the_domain_level.space_pres,
-      cubature_postproc);
-    body_force_accum.sync(comm);
+    DFG95SurfaceBodyForceAssemblyJob<
+      typename SystemLevelType::LocalVeloVector, typename SystemLevelType::LocalPresVector, SpaceVeloType, SpacePresType>
+      job(vec_sol.local().template at<0>(), vec_sol.local().template at<1>(),
+        the_domain_level.space_velo, the_domain_level.space_pres, cubature_postproc);
+    body_force_asm.assemble(job);
+    job.sync(comm);
 
-    summary.body_forces_raw_surf[0] = body_force_accum.drag_raw_new;
-    summary.body_forces_raw_surf[1] = body_force_accum.lift_raw_new;
-    summary.body_forces_raw_surf[2] = body_force_accum.side_raw_new;
-    summary.drag_coeff_surf_cylinder = body_force_accum.drag_raw_old * dpf2_cylinder;
-    summary.lift_coeff_surf_cylinder = body_force_accum.lift_raw_old * dpf2_cylinder;
-    summary.drag_coeff_surf_sphere = body_force_accum.drag_raw_new * dpf2_sphere;
-    summary.lift_coeff_surf_sphere = body_force_accum.lift_raw_new * dpf2_sphere;
+    summary.body_forces_raw_surf[0] = job.drag_new(nu);
+    summary.body_forces_raw_surf[1] = job.lift_new(nu);
+    summary.body_forces_raw_surf[2] = job.side_new(nu);
+    summary.drag_coeff_surf_cylinder = job.drag_old(nu) * dpf2_cylinder;
+    summary.lift_coeff_surf_cylinder = job.lift_old(nu) * dpf2_cylinder;
+    summary.drag_coeff_surf_sphere = job.drag_new(nu) * dpf2_sphere;
+    summary.lift_coeff_surf_sphere = job.lift_new(nu) * dpf2_sphere;
   }
 
   // compute drag & lift coefficients via volume integration from unsynchronized final defect
@@ -2263,50 +2340,32 @@ int main(int argc, char* argv[])
   if(!skip_analysis)
   {
     // compute pressure integrals
-    SystemDataType pv[2] =
-    {
-      flux_asm_in.assemble_discrete_integral(vec_sol.local().template at<1>(), the_domain_level.space_pres, cubature_postproc),
-      flux_asm_out.assemble_discrete_integral(vec_sol.local().template at<1>(), the_domain_level.space_pres, cubature_postproc)
-    };
+    auto pv_i = Assembly::integrate_discrete_function<0>(flux_asm_in, vec_sol.local().template at<1>(), the_domain_level.space_pres, cubature_postproc);
+    auto pv_o = Assembly::integrate_discrete_function<0>(flux_asm_out, vec_sol.local().template at<1>(), the_domain_level.space_pres, cubature_postproc);
 
-    comm.allreduce(pv, pv, 2u, Dist::op_sum);
+    pv_i.synchronize(comm);
+    pv_o.synchronize(comm);
 
     // compute pressure drop average over inflow area
-    summary.pres_drop_raw = pv[0] - pv[1];
-    summary.pres_drop_pipe = (pv[0] - pv[1]) / (dim == 2 ? SystemDataType(0.41) : SystemDataType(0.205*0.205)*Math::pi<SystemDataType>());
-    summary.pres_drop_cuboid = (pv[0] - pv[1]) / (dim == 2 ? SystemDataType(0.41) : SystemDataType(0.41*0.41));
+    summary.pres_drop_raw = pv_i.value - pv_o.value;
+    summary.pres_drop_pipe = (pv_i.value - pv_o.value) / (dim == 2 ? SystemDataType(0.41) : SystemDataType(0.205*0.205)*Math::pi<SystemDataType>());
+    summary.pres_drop_cuboid = (pv_i.value - pv_o.value) / (dim == 2 ? SystemDataType(0.41) : SystemDataType(0.41*0.41));
   }
 
   // compute flux through region above cylinder
   if(!skip_analysis)
   {
-    XFluxAccumulator flux_accum_u;
-    flux_asm_u.assemble_flow_accum(
-      flux_accum_u,
-      vec_sol.local().template at<0>(),
-      vec_sol.local().template at<1>(),
-      the_domain_level.space_velo,
-      the_domain_level.space_pres,
-      cubature_postproc);
-    flux_accum_u.sync(comm);
-
-    summary.flux_upper = flux_accum_u.flux / SystemDataType(2);
+    auto flux_u = Assembly::integrate_discrete_function<0>(flux_asm_u, vec_sol.local().template at<0>(), the_domain_level.space_velo, cubature_postproc);
+    flux_u.synchronize(comm);
+    summary.flux_upper = flux_u.value[0] / SystemDataType(2);
   }
 
   // compute flux through region below cylinder
   if(!skip_analysis)
   {
-    XFluxAccumulator flux_accum_l;
-    flux_asm_l.assemble_flow_accum(
-      flux_accum_l,
-      vec_sol.local().template at<0>(),
-      vec_sol.local().template at<1>(),
-      the_domain_level.space_velo,
-      the_domain_level.space_pres,
-      cubature_postproc);
-    flux_accum_l.sync(comm);
-
-    summary.flux_lower = flux_accum_l.flux / SystemDataType(2);
+    auto flux_l = Assembly::integrate_discrete_function<0>(flux_asm_l, vec_sol.local().template at<0>(), the_domain_level.space_velo, cubature_postproc);
+    flux_l.synchronize(comm);
+    summary.flux_lower = flux_l.value[0] / SystemDataType(2);
   }
 
   // perform analysis of velocity field

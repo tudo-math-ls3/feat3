@@ -228,130 +228,6 @@ namespace CCND
       };
     }; // class UnsteadyInflowFunction
 
-
-    // accumulator for benchmark body forces (i.e. drag and lift)
-    // this class is used for the computation of the 'line integration' variants of drag and lift
-    // for details see Giles et al: "Adaptive error control for finite element approximations of the lift and drag coefficients in viscous flow"
-    class BenchBodyForceAccumulator
-    {
-    public:
-      Tiny::Matrix<DataType, 3, 2> raw;
-
-      BenchBodyForceAccumulator()
-      {
-        raw.format();
-      }
-
-      /// 2D variant
-      template<typename T_>
-      void operator()(
-        const T_ omega,
-        const Tiny::Vector<T_, 2, 2>& /*pt*/,
-        const Tiny::Matrix<T_, 2, 1, 2, 1>& jac,
-        const Tiny::Vector<T_, 2, 2>& /*val_v*/,
-        const Tiny::Matrix<T_, 2, 2, 2, 2>& grad_v,
-        const T_ val_p)
-      {
-#if 0
-        // Note: This is the old FeatFlow 1.x / FeatFlow 2 way of computing the 2D body forces
-
-        // compute normal and tangential
-        const T_ n2 = T_(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
-        const T_ tx = jac(0,0) * n2;
-        const T_ ty = jac(1,0) * n2;
-        const T_ nx = -ty;
-        const T_ ny =  tx;
-
-        Tiny::Matrix<T_, 2, 2, 2, 2> nt;
-        nt(0,0) = tx * nx;
-        nt(0,1) = tx * ny;
-        nt(1,0) = ty * nx;
-        nt(1,1) = ty * ny;
-
-        const T_ dut = Tiny::dot(nt, grad_v);
-
-        raw(0, 0) += omega * dut * ny;
-        raw(0, 1) -= omega * val_p * nx;
-        raw(1, 0) -= omega * dut * nx;
-        raw(1, 1) -= omega * val_p * ny;
-#endif
-        // compute normal vector
-        const Tiny::Vector<T_, 2> n = Tiny::orthogonal(jac).normalize();
-        raw(0, 0) -= omega * (T_(2) * grad_v(0,0) * n[0] + (grad_v(0, 1) + grad_v(1, 0)) * n[1]);
-        raw(1, 0) -= omega * (T_(2) * grad_v(1,1) * n[1] + (grad_v(1, 0) + grad_v(0, 1)) * n[0]);
-        raw(0, 1) -= omega * val_p * n[0];
-        raw(1, 1) -= omega * val_p * n[1];
-      }
-
-      /// 3D variant
-      template<typename T_>
-      void operator()(
-        const T_ omega,
-        const Tiny::Vector<T_, 3, 3>& /*pt*/,
-        const Tiny::Matrix<T_, 3, 2, 3, 2>& jac,
-        const Tiny::Vector<T_, 3, 3>& /*val_v*/,
-        const Tiny::Matrix<T_, 3, 3, 3, 3>& grad_v,
-        const T_ val_p)
-      {
-#if 0
-        // Note: This is the old FeatFlow 1.x / FeatFlow 2 way of computing the 3D body forces
-
-        // compute normal and tangential
-        const T_ n2 = T_(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
-        const T_ tx = jac(0,0) * n2;
-        const T_ ty = jac(1,0) * n2;
-        const T_ nx = -ty;
-        const T_ ny =  tx;
-
-        Tiny::Matrix<T_, 3, 3, 3, 3> nt;
-        nt.format();
-        nt(0,0) = tx * nx;
-        nt(0,1) = tx * ny;
-        nt(1,0) = ty * nx;
-        nt(1,1) = ty * ny;
-
-        const T_ dut = Tiny::dot(nt, grad_v);
-        //const T_ dpf1 = _nu;
-        //const T_ dpf2 = (2.0 / (0.1*Math::sqr(_v_max*(4.0/9.0))* 0.41)); // = 2 / (rho * U^2 * D * H)
-
-        raw(0, 0) += omega * dut * ny;
-        raw(0, 1) -= omega * val_p * nx;
-        raw(1, 0) -= omega * dut * nx;
-        raw(1, 1) -= omega * val_p * ny;
-#endif
-
-        // compute normal vector
-        const Tiny::Vector<T_, 3> n = Tiny::orthogonal(jac).normalize();
-        raw(0, 0) -= omega * (T_(2) * grad_v(0,0) * n[0] + (grad_v(0, 1) + grad_v(1, 0)) * n[1] + (grad_v(0, 2) + grad_v(2, 0)) * n[2]);
-        raw(1, 0) -= omega * (T_(2) * grad_v(1,1) * n[1] + (grad_v(1, 2) + grad_v(2, 1)) * n[2] + (grad_v(1, 0) + grad_v(0, 1)) * n[0]);
-        raw(2, 0) -= omega * (T_(2) * grad_v(2,2) * n[2] + (grad_v(2, 0) + grad_v(0, 2)) * n[0] + (grad_v(2, 1) + grad_v(1, 2)) * n[1]);
-        raw(0, 1) -= omega * val_p * n[0];
-        raw(1, 1) -= omega * val_p * n[1];
-        raw(2, 1) -= omega * val_p * n[2];
-      }
-
-      DataType drag(DataType nu) const
-      {
-        return nu * raw(0, 0) - raw(0, 1);
-      }
-
-      DataType lift(DataType nu) const
-      {
-        return nu * raw(1, 0) - raw(1, 1);
-      }
-
-      DataType side(DataType nu) const
-      {
-        return nu * raw(2, 0) - raw(2, 1);
-      }
-
-      void sync(const Dist::Comm& comm)
-      {
-        comm.allreduce(&raw.v[0][0], &raw.v[0][0], std::size_t(2*dim), Dist::op_sum);
-      }
-    }; // class BenchBodyForces<...,2>
-
-
     // class for collecting benchmark post-processing summary data
     class BenchmarkAnalysis
     {
@@ -627,14 +503,15 @@ namespace CCND
       virtual void compute_body_forces_surf(const Dist::Comm& comm, const LocalVeloVector& vec_sol_v, const LocalPresVector& vec_sol_p,
         const SpaceVeloType& space_velo, const SpacePresType& space_pres, DataType nu, DataType v_max, int bench)
       {
-        BenchBodyForceAccumulator body_force_accum;
-        body_force_asm->assemble_flow_accum(body_force_accum, vec_sol_v, vec_sol_p, space_velo, space_pres, cubature_body_forces_surf);
-        body_force_accum.sync(comm);
-
+        Assembly::TraceAssemblyStokesBodyForceAssemblyJob<LocalVeloVector, LocalPresVector, SpaceVeloType, SpacePresType>
+          job(vec_sol_v, vec_sol_p, space_velo, space_pres, cubature_body_forces_surf);
+        body_force_asm->assemble(job);
+        job.sync(comm);
         DataType bbf = bench_body_factor(bench, v_max);
-        drag_coeff_surf = bbf * body_force_accum.drag(nu);
-        lift_coeff_surf = bbf * body_force_accum.lift(nu);
-        side_coeff_surf = bbf * body_force_accum.side(nu);
+        drag_coeff_surf = bbf * job.drag(nu);
+        lift_coeff_surf = bbf * job.lift(nu);
+        side_coeff_surf = bbf * job.side(nu);
+
         if(Math::abs(ref_drag) > DataType(1E-7))
           drag_err_surf = Math::abs((drag_coeff_surf - ref_drag) / ref_drag);
         if(Math::abs(ref_lift) > DataType(1E-7))
@@ -696,39 +573,36 @@ namespace CCND
 
       virtual void compute_pressure_drop(const Dist::Comm& comm, const LocalPresVector& vec_sol_p, const SpacePresType& space_pres, int bench)
       {
-        DataType pv[2] =
-        {
-          flux_asm_in->assemble_discrete_integral(vec_sol_p, space_pres, cubature_flux),
-          flux_asm_out->assemble_discrete_integral(vec_sol_p, space_pres, cubature_flux)
-        };
+        auto pv_i = Assembly::integrate_discrete_function<0>(*flux_asm_in, vec_sol_p, space_pres, cubature_flux);
+        auto pv_o = Assembly::integrate_discrete_function<0>(*flux_asm_out, vec_sol_p, space_pres, cubature_flux);
 
-        comm.allreduce(pv, pv, 2u, Dist::op_sum);
+        pv_i.synchronize(comm);
+        pv_o.synchronize(comm);
 
         // compute error to reference values
         if(bench == 7)
-          pres_drop = (pv[0] - pv[1]) / (DataType(0.205*0.205) * Math::pi<DataType>());
+          pres_drop = (pv_i.value - pv_o.value) / (DataType(0.205*0.205) * Math::pi<DataType>());
         else if(dim == 2)
-          pres_drop = (pv[0] - pv[1]) / DataType(0.41);
+          pres_drop = (pv_i.value - pv_o.value) / DataType(0.41);
         else if(dim == 3)
-          pres_drop = (pv[0] - pv[1]) / DataType(0.41*0.41);
+          pres_drop = (pv_i.value - pv_o.value) / DataType(0.41*0.41);
         if(Math::abs(ref_p_drop) > 1E-7)
           pres_drop_err = Math::abs((pres_drop - ref_p_drop) / ref_p_drop);
       }
 
       virtual void compute_fluxes(const Dist::Comm& comm, const LocalVeloVector& vec_sol_v, const SpaceVeloType& space_velo)
       {
-        DataType fx[3] =
-        {
-          flux_asm_u->assemble_discrete_integral(vec_sol_v, space_velo, cubature_flux)[0],
-          flux_asm_l->assemble_discrete_integral(vec_sol_v, space_velo, cubature_flux)[0],
-          flux_asm_out->assemble_discrete_integral(vec_sol_v, space_velo, cubature_flux)[0]
-        };
+        auto fx_u = Assembly::integrate_discrete_function<0>(*flux_asm_u, vec_sol_v, space_velo, cubature_flux);
+        auto fx_l = Assembly::integrate_discrete_function<0>(*flux_asm_l, vec_sol_v, space_velo, cubature_flux);
+        auto fx_o = Assembly::integrate_discrete_function<0>(*flux_asm_out, vec_sol_v, space_velo, cubature_flux);
 
-        comm.allreduce(fx, fx, 3u, Dist::op_sum);
+        fx_u.synchronize(comm);
+        fx_l.synchronize(comm);
+        fx_o.synchronize(comm);
 
-        flux_upper = fx[0];
-        flux_lower = fx[1];
-        flux_out = fx[2];
+        flux_upper = fx_u.value[0];
+        flux_lower = fx_l.value[0];
+        flux_out = fx_o.value[0];
       }
 
       virtual void compute_velocity_info(const Dist::Comm& comm, const LocalVeloVector& vec_sol_v, const SpaceVeloType& space_velo)

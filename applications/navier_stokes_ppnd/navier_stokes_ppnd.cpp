@@ -94,6 +94,7 @@
 #include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/assembly/error_computer.hpp>
 #include <kernel/assembly/trace_assembler.hpp>
+#include <kernel/assembly/trace_assembler_basic_jobs.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
 
 // FEAT-Geometry includes
@@ -766,128 +767,6 @@ namespace NavierStokesPP
     }
   }; // class Config
 
-
-  template<typename DataType_>
-  class BenchBodyForceAccumulator
-  {
-  private:
-    const bool _defo;
-    const DataType_ _nu;
-    const DataType_ _v_max;
-
-  public:
-    DataType_ drag;
-    DataType_ lift;
-
-    explicit BenchBodyForceAccumulator(bool defo, DataType_ nu, DataType_ v_max) :
-      _defo(defo), _nu(nu), _v_max(v_max),
-      drag(DataType_(0)), lift(DataType_(0))
-    {
-    }
-
-    /// 2D variant
-    template<typename T_>
-    void operator()(
-      const T_ omega,
-      const Tiny::Vector<T_, 2, 2>& /*pt*/,
-      const Tiny::Matrix<T_, 2, 1, 2, 1>& jac,
-      const Tiny::Vector<T_, 2, 2>& /*val_v*/,
-      const Tiny::Matrix<T_, 2, 2, 2, 2>& grad_v,
-      const T_ val_p)
-    {
-      // compute normal and tangential
-      const T_ n2 = T_(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
-      const T_ tx = jac(0,0) * n2;
-      const T_ ty = jac(1,0) * n2;
-      const T_ nx = -ty;
-      const T_ ny =  tx;
-
-      /// \todo adjust this to support the deformation tensor (?)
-
-      Tiny::Matrix<T_, 2, 2, 2, 2> nt;
-      nt(0,0) = tx * nx;
-      nt(0,1) = tx * ny;
-      nt(1,0) = ty * nx;
-      nt(1,1) = ty * ny;
-
-      const T_ dut = Tiny::dot(nt, grad_v);
-      const T_ dpf1 = _nu;
-      const T_ dpf2 = (2.0 / (0.1*Math::sqr(_v_max*(2.0/3.0)))); // = 2 / (rho * U^2 * D)
-
-      drag += DataType_(omega * dpf2 * ( dpf1 * dut * ny - val_p * nx));
-      lift += DataType_(omega * dpf2 * (-dpf1 * dut * nx - val_p * ny));
-    }
-
-    /// 3D variant
-    template<typename T_>
-    void operator()(
-      const T_ omega,
-      const Tiny::Vector<T_, 3, 3>& /*pt*/,
-      const Tiny::Matrix<T_, 3, 2, 3, 2>& jac,
-      const Tiny::Vector<T_, 3, 3>& /*val_v*/,
-      const Tiny::Matrix<T_, 3, 3, 3, 3>& grad_v,
-      const T_ val_p)
-    {
-      // compute normal and tangential
-      const T_ n2 = T_(1) / Math::sqrt(jac(0,0)*jac(0,0) + jac(1,0)*jac(1,0));
-      const T_ tx = jac(0,0) * n2;
-      const T_ ty = jac(1,0) * n2;
-      const T_ nx = -ty;
-      const T_ ny =  tx;
-
-      /// \todo adjust this to support the deformation tensor (?)
-
-      Tiny::Matrix<T_, 3, 3, 3, 3> nt;
-      nt.format();
-      nt(0,0) = tx * nx;
-      nt(0,1) = tx * ny;
-      nt(1,0) = ty * nx;
-      nt(1,1) = ty * ny;
-
-      const T_ dut = Tiny::dot(nt, grad_v);
-      const T_ dpf1 = _nu;
-      const T_ dpf2 = (2.0 / (0.1*Math::sqr(_v_max*(4.0/9.0))* 0.41)); // = 2 / (rho * U^2 * D * H)
-
-      drag += DataType_(omega * dpf2 * ( dpf1 * dut * ny - val_p * nx));
-      lift += DataType_(omega * dpf2 * (-dpf1 * dut * nx - val_p * ny));
-    }
-
-    void sync(const Dist::Comm& comm)
-    {
-      comm.allreduce(&drag, &drag, std::size_t(1), Dist::op_sum);
-      comm.allreduce(&lift, &lift, std::size_t(1), Dist::op_sum);
-    }
-  }; // class BenchBodyForceAccumulator<...>
-
-  template<typename DataType_>
-  class XFluxAccumulator
-  {
-  public:
-    DataType_ flux;
-
-    XFluxAccumulator() :
-      flux(DataType_(0))
-    {
-    }
-
-    template<typename T_, int d_, int d2_>
-    void operator()(
-      const T_ omega,
-      const Tiny::Vector<T_, d_, d_>& /*pt*/,
-      const Tiny::Matrix<T_, d_, d2_, d_, d2_>& /*jac*/,
-      const Tiny::Vector<T_, d_, d_>& val_v,
-      const Tiny::Matrix<T_, d_, d_, d_, d_>& /*grad_v*/,
-      const T_ /*val_p*/)
-    {
-      flux += DataType_(omega * val_v[0]);
-    }
-
-    void sync(const Dist::Comm& comm)
-    {
-      comm.allreduce(&flux, &flux, std::size_t(1), Dist::op_sum);
-    }
-  }; // class XFluxAccumulator<...>
-
   //
   // InflowFunction
   //
@@ -1453,26 +1332,16 @@ namespace NavierStokesPP
 
     // set up body forces and flux assemblers
     Assembly::TraceAssembler<TrafoType> body_force_asm(the_domain_level.trafo);
-    Assembly::TraceAssembler<TrafoType> flux_u_asm(the_domain_level.trafo);
-    Assembly::TraceAssembler<TrafoType> flux_l_asm(the_domain_level.trafo);
     Trafo::InverseMappingData<DataType, dim> point_pa, point_pe;
 
     // set up post-processing for flow benchmark
     if(cfg.flowbench_c2d)
     {
       auto* mesh_part_c = the_domain_level.get_mesh_node()->find_mesh_part("bnd:c");
-      auto* mesh_part_u = the_domain_level.get_mesh_node()->find_mesh_part("inner:u");
-      auto* mesh_part_l = the_domain_level.get_mesh_node()->find_mesh_part("inner:l");
       if(mesh_part_c != nullptr)
         body_force_asm.add_mesh_part(*mesh_part_c);
-      if(mesh_part_u != nullptr)
-        flux_u_asm.add_mesh_part(*mesh_part_u);
-      if(mesh_part_l != nullptr)
-        flux_l_asm.add_mesh_part(*mesh_part_l);
 
       body_force_asm.compile();
-      flux_u_asm.compile();
-      flux_l_asm.compile();
 
       // set up inverse trafo mapping
       typedef Trafo::InverseMapping<TrafoType, DataType> InvMappingType;
@@ -2083,7 +1952,7 @@ namespace NavierStokesPP
           // console output
           if ((nonlin_step <= cfg.fixpoint_steps) && (nonlin_step > 0))
           {
-            comm.print(line);
+            //comm.print(line); // don't spam cout with unnecessary output
             line = "";
           }
 
@@ -2190,18 +2059,19 @@ namespace NavierStokesPP
           vec_sol_p_mid.axpy(vec_sol_p); /// \todo use axpby here
 
           {
-          // assemble drag and lift forces
-            BenchBodyForceAccumulator<DataType> body_force_accum(false, cfg.nu, cfg.vmax);
-            body_force_asm.assemble_flow_accum(
-              body_force_accum,
-              vec_sol_v_1.local(),
-              vec_sol_p_mid.local(),
-              the_domain_level.space_velo,
-              the_domain_level.space_pres,
-              cubature);
-            body_force_accum.sync(comm);
-            c_drag = body_force_accum.drag;
-            c_lift = body_force_accum.lift;
+            const DataType dpf2 = DataType(2) / (dim == 2 ?
+              DataType(0.100)*Math::sqr(cfg.vmax*(DataType(2)/DataType(3))) : // = 2 / (rho * U^2 * D)
+              DataType(0.041)*Math::sqr(cfg.vmax*(DataType(4)/DataType(9)))); // = 2 / (rho * U^2 * D * H)
+
+            // assemble drag and lift forces
+            Assembly::TraceAssemblyStokesBodyForceAssemblyJob<
+              typename SystemLevelType::LocalVeloVector, typename SystemLevelType::LocalPresVector,
+              typename DomainLevelType::SpaceVeloType, typename DomainLevelType::SpacePresType>
+              job(vec_sol_v.local(), vec_sol_p.local(), the_domain_level.space_velo, the_domain_level.space_pres, "gauss-legendre:3");
+            body_force_asm.assemble(job);
+            job.sync(comm);
+            c_drag = dpf2 * job.drag(cfg.nu);
+            c_lift = dpf2 * job.lift(cfg.nu);
           }
 
           // compute pressure values and difference
@@ -2423,29 +2293,23 @@ namespace NavierStokesPP
     // are we in test-mode?
     if(cfg.test_mode)
     {
-      // (on rosetyler)
-      // LVL 1 : linear extrapolation
-      // mpirun -n 12 applications/navier_stokes_ppnd/navier_stokes_ppnd --setup fb-c2d-03 --mesh-path ~/FEAT/feat3/data/meshes/  --level 1 --time-steps 1600  --tol-rel-a 0.99   --test-mode
-      // 10 |   0.05000000 |  1 |    1 | 6.388e-05 > 6.292e-05 |   87 | 1.034e-03 | 5.379e-15 |  3.045e-01 | -6.638e-04 |  1.714e-01 |  1.000e-02 |  3.492e-01 |  5.000e-03 | -4.636e-04 | 0.148
-      // LVL 1: full fixpoint iteration
-      // mpirun -n 12 applications/navier_stokes_ppnd/navier_stokes_ppnd --setup fb-c2d-03 --mesh-path ~/FEAT/feat3/data/meshes/  --level 1 --time-steps 1600  --tol-rel-a 0.99 --test-mode --no-nonlinear --fix-steps 400
-      // 10 |   0.05000000 | 311 |    1 | 7.178e-05 > 7.099e-07 |   84 | 4.511e-03 | 9.428e-15 |  1.839e-01 | -2.967e-04 |  1.066e-01 |  5.000e-03 |  2.082e-01 |  1.000e-02 | -2.905e-04 | 1.085
-
       if (cfg.no_nonlinear)
       {
-        if ((c_drag < 3.035e-01) || (c_drag > 3.055e-01)
-              || (c_lift < -6.65e-04) || (c_lift > -6.62e-4)
-              || (p_diff < 1.70e-01) || (p_diff > 1.73e-01)
-              || (c_drag_time != 1.00e-02) || (c_lift_time != 5.00e-03))
-                failure = true;
+        failure =
+          (Math::abs(c_drag - 3.112e-01) > 1E-3) ||
+          (Math::abs(c_lift + 6.793e-04) > 1E-6) ||
+          (Math::abs(p_diff - 1.714e-01) > 1E-3) ||
+          (Math::abs(c_drag_time - 5.000e-02) > 1E-3) ||
+          (Math::abs(c_lift_time - 5.000e-03) > 1E-4);
       }
       else
       {
-        if ((c_drag < 1.82e-01) || (c_drag > 1.85e-01)
-              || (c_lift < -2.97e-04) || (c_lift > -2.96e-4)
-              || (p_diff < 1.00e-01) || (p_diff > 1.10e-01)
-              || (c_drag_time != 5.00e-03) || (c_lift_time != 1.00e-02))
-                failure = true;
+        failure =
+          (Math::abs(c_drag - 1.852e-01) > 1E-3) ||
+          (Math::abs(c_lift + 3.015e-04) > 1E-6) ||
+          (Math::abs(p_diff - 1.066e-01) > 1E-3) ||
+          (Math::abs(c_drag_time - 5.000e-02) > 1E-3) ||
+          (Math::abs(c_lift_time - 5.000e-02) > 1E-4);
       }
 
       if(failure)

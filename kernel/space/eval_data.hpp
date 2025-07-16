@@ -36,6 +36,9 @@ namespace FEAT
     class BasisData
     {
     public:
+      /// the underlying data type
+      typedef typename EvalTraits_::DataType DataType;
+
       /// basis hessian object
       typename EvalTraits_::BasisHessianType hess;
       /// basis gradient object
@@ -66,6 +69,16 @@ namespace FEAT
         ref_value = qnan;
       }
 #endif // DEBUG
+
+      void format()
+      {
+        hess = DataType(0);
+        grad = DataType(0);
+        value = DataType(0);
+        ref_hess = DataType(0);
+        ref_grad = DataType(0);
+        ref_value = DataType(0);
+      }
     }; // class BasisData<...>
 
     /**
