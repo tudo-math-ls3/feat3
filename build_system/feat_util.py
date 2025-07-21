@@ -5,6 +5,7 @@
 import os
 import sys
 import subprocess
+import json
 
 #Stupid fix for the following problem:
 #distutils will be removed in python 3.12, but shutil's which function is only
@@ -80,17 +81,6 @@ def is_found(name):
 def find_exe(name):
   return which(name)
 
-def remove_string(array, string):
-  while array.count(string) > 0:
-    array.remove(string)
-  return array
-
-def remove_substring(array, sub):
-  for s in array:
-    if sub in s:
-      array.remove(s)
-  return array
-
 def get_output(command):
   pipe = subprocess.Popen(command.split(), stdout=subprocess.PIPE, stdin=subprocess.PIPE, stderr=subprocess.STDOUT)
   pipe.stdin.close()
@@ -102,3 +92,58 @@ def get_output_utf8(command):
   pipe.stdin.close()
   output = pipe.stdout.read().splitlines()
   return output
+
+def preset_header():
+  return {
+    "version": 8,
+    "cmakeMinimumRequired": {
+      "major": 3,
+      "minor": 28,
+      "patch": 0,
+    },
+    "configurePresets": []
+  }
+
+def warning(*args):
+  YELLOW = "\033[33;49;1m"
+  RESET = "\033[0m"
+  print(YELLOW + "Warning: " + " ".join(args) + RESET)
+
+def error(*args):
+  RED = "\033[31;49;1m"
+  RESET = "\033[0m"
+  print(RED + "Error: " + " ".join(args) + RESET)
+  sys.exit(1)
+
+def header(*args):
+  BLUE = "\033[34;49m"
+  RESET = "\033[0m"
+  print(BLUE + " ".join(args) + RESET)
+
+def append_preset_to_file(filename, configure_preset):
+  presets = preset_header()
+
+  if os.path.isfile(filename):
+    with open(filename, "r") as in_file:
+      content = in_file.read()
+      if content:
+        presets = json.loads(content)
+
+
+  present = False
+  for idx, preset in enumerate(presets["configurePresets"]):
+    if preset["name"] == configure_preset["name"]:
+      presets["configurePresets"][idx] = configure_preset
+      present = True
+
+  if not present:
+    presets["configurePresets"].append(configure_preset)
+
+  try:
+    with open(filename, "w") as out:
+      json.dump(presets, out, indent=2)
+  except PermissionError:
+    warning((f"Can not open file {filename} for writing.\n"
+              "If you are trying to develop FEAT, move your repository to a location you have write permissions for.\n"
+              "If you are trying to configure FEAT on a HPC-cluster and do not have write-access to your home directory,\n"
+              "you can use the '--no-preset' flag to stop preset generation and supress this warning."))

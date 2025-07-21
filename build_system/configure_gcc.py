@@ -19,8 +19,7 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
     print ("Error: GNU Compiler version less then 7 is not supported, please update your compiler or choose another one!")
     sys.exit(1)
 
-  cmake_flags = ""
-  cxxflags = "-std=c++17 -ggdb -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -Wuninitialized -Wvla -Wdouble-promotion -Wformat=2 -Wnonnull"
+  cxxflags = "-std=c++17 -ggdb -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -Wuninitialized -Wvla -Wdouble-promotion -Wformat=2"
 
   cxxflags += " -pthread"
 
@@ -43,7 +42,7 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
     #cxxflags += " -Wnull-dereference" #produces too much false positives
 
   if major >= 7:
-    cxxflags += " -Wduplicated-branches -Wrestrict -Wdangling-else -Wnonnull -Wrestrict -Walloc-zero -Wparentheses"
+    cxxflags += " -Wduplicated-branches -Wrestrict -Wdangling-else -Wnonnull -Walloc-zero -Wparentheses"
 
   if "coverage" in buildid:
     cxxflags += " -fprofile-arcs -ftest-coverage"
@@ -103,9 +102,6 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
         cxxflags += " -flto=auto"
       else:
         cxxflags += " -flto"
-      #use gcc provided binutils for lto
-      cmake_flags += " -DCMAKE_RANLIB:PATH=" + find_exe("gcc-ranlib")
-      cmake_flags += " -DCMAKE_AR:PATH=" + find_exe("gcc-ar")
     if major >= 5 and "x86_64" in platform.machine():
       cxxflags +=" -malign-data=cacheline"
     if "opt" in buildid:
@@ -289,4 +285,4 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
       cxxflags += " -march=native"
       print ("Warning: Detected cpu type not supported by configure_gcc.py, using -march=native instead.")
 
-  return cxxflags, cmake_flags
+  return cxxflags

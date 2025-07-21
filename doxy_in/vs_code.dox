@@ -7,15 +7,15 @@ This page describes the setup and use of FEAT with the Visual Studio Code editor
 \subsection unix_vscode_prereques Prerequisites under unix
 
 In addition to a working build toolchain, i.e. a compiler toolchain, e.g. gcc or LLVM/clang, and a generator, e.g. make or ninja, in your path,
-you need at least a version of CMake 3.9 or higher and a version of python(3) installed, both of which should also be in your path.
+you need at least a version of CMake 3.28 or higher and a version of python(3) installed, both of which should also be in your path.
 Of course you will also need <c>VScode</c> installed.
 To also use MPI, etc., see the configure script, but basically certain packages, such as MPI or CUDA, need to be pre-installed and findable on your system,
 i.e. in your path or you are able to pass the location, others like UMFPACK, Zoltan, ... will be automatically installed in a FEAT subdirectory if you pass the
 flag to the configure system, more on this later.
 
-\subsubsection unix_vscode_greenhouse Special case: Modul based enviroment
+\subsubsection unix_vscode_greenhouse Special case: Module based enviroment
 
-In the case of a module-based software distribution (e.g. our greenhouse servers), first load the modules you need, then open <c>VScode</c> from the terminal by changing the current directory
+In the case of a module-based software distribution, first load the modules you need, then open <c>VScode</c> from the terminal by changing the current directory
 to the FEAT source folder and run
 \verbatim
   code .
@@ -77,18 +77,7 @@ First of all, you need to install (by Microsoft recommended) the <c>C/C++</c> to
 in particular debugger, <c>AutoComplete</c> and <c>IntelliSense</c> support, <c>CMake</c> language support and, very importantly, the <c>CMake Tools</c> extension,
 which handles the configuration of <c>CMake</c> projects as well as building and project support for <c>IntelliSense</c>.
 
-Once installed, the first thing you need to do is find your compiler toolchain.
-To do this, press
-\verbatim
- CTRL + Shift + P
- \endverbatim
- to activate the <c>VScode</c> commandline and type in
- \verbatim
- Cmake kit
- \endverbatim
- and choose the option <c>select kit</c> and then <c>scan for kits</c>.
- Compiler you want/should use.
- Select it, which changes the selected toolkit in the box at the bottom (blue) line of the <c>VScode</c> window.
+After starting <c>VScode</c> it will prompt you to select a compiler kit. Select any kit for now. We will give <c>VScode</c> more specific instructions on how to configure and build FEAT later.
 
  \note
  A few things to keep in mind:
@@ -110,58 +99,30 @@ To do this, press
 
 
  \section vscode_configuration_setup Configuration Setup
- Before we can configure the FEAT <c>CMake</c> project, we need to run the Python script <c>configureVScode.py</c> from our workfolder.
- To do this, open an internal terminal by typing
+ The CMake Toolse extension uses CMake <a href="https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html">presets</a> to determine how to configure and build FEAT. Whenever you execute the configure script
+ the generated configuration gets appended to the CMakeUserPresets.json file in the root of your FEAT repository.
+ If a configuration with the same build-id already exists, it will be overwritten.
+ Whenever you run the configure script, <c>VScode</c> should automatically pick up any new or changed presets.
+ You can select the preset you want to use in the CMake tab of the sidebar or via
+
  \verbatim
- CTRL + Shift + `
+ CTRL + Shift + P   -> CMake: Select Configure Preset
  \endverbatim
 
- This configure script works similarly to the "standard" configure script used to configure FEAT under GNU without IDE support,
- but instead of triggering the <c>CMake</c> call itself, it simply edits the <c>cmake-variants.json</c> file , which is then used to
- to configure and build FEAT in <c>VScode</c>.
- The simplest way to do this is to use
- \verbatim
- python3 configureVScode.py gcc
- \endverbatim
- or
- \verbatim
- python3 configureVScode.py clang
- \endverbatim
- which provides the simplest setup of four variants for your chosen compiler, differing in the selected optimization type.
+ <c>VScode</c> will then create its own independent build directory in <c>out/${presetName}</c> and configure FEAT.
 
- \note See
-  \verbatim
- python3 configureVScode.py --help
- \endverbatim
- for various options and flags for setting up FEAT variants.
- Importantly, we differentiate between four variant types. First of all the optimization type, i.e. <c>opt, debug, fast</c> or <c>noop</c>, then the
- "standard" thirdparties, with <c>thirdparty</c> enabling <b>ALL</b> selected non-mpi thirdparties and <c>thirdparty-off</c> disabling all thirdparties.
- Furthermore the <c>mpi</c> variant, with <c>mpi-off</c> disabling mpi, <c>mpi</c> enabling only mpi and <c>mpi-thirdparty</c> enabling mpi and all selected thirdparties
- requiring mpi.
- At last there is also the <c>cuda</c> variant, enabling or disabling cuda.
-
- \attention
- Due to <c>CMake Tools</c>, changes to the variants file are not automatically registered by <c>VScode</c>. After running the configure script, you will need to restart <c>VScode</c>.
- This can be easily done by using
- \verbatim
- CTRL + Shift + P -> Reload window
- \endverbatim
+ \note
+ If you do not want your own build directory and only want to use the one managed by <c>VScode</c> you can run the configure script with the <c>--preset-only</c> flag.
 
  \attention
  If a third-party library is not found in your third-party folder, it will be downloaded automatically.
  For this reason (and others) you should place your FEAT source directory somewhere where you do not need root or admin rights to write/modify files.
 
- \note If you want to change your FEAT build, you will need to re-run the configuration script and repeat the steps above.
-
  \section vscode_cmake_tools Working with CMake Tools
 
  \subsection vscode_cmake_configure Configuring FEAT
-  Before configuring, you should first select your build variant by using
- \verbatim
- CTRL + Shift + P -> Cmake variant
- \endverbatim
 
- After choosing your variant, VScode will automatically start a (shallow) <c>CMake</c> configuration and you should be able to build your first programs.
+ After choosing your preset, VScode will automatically start a (shallow) <c>CMake</c> configuration and you should be able to build your first programs.
 
  \attention If something does not work, or you get a configuration warning, you should do a clean configuration using
   \verbatim
@@ -169,8 +130,7 @@ To do this, press
  \endverbatim
 
  \subsection vscode_cmake_build Building FEAT
- While you can now change to your build directory (by default, just the ./build folder in your working directory) and build from the command line
- (e.g. with make if that is your chosen build system), you can also use <c>CMake Tools</c> to build executables in FEAT.
+ You could now navigate to the build directory in <c>out/${presetName}</c> and build executables from the command line, but you can also use <c>CMake Tools</c> to build executables in FEAT.
  As an example, let us build the first tutorial.
  With
  \verbatim
@@ -182,7 +142,7 @@ To do this, press
  \note
  After the first configuration, you can run ctest with
  \verbatim
- CTRL + Shift + P -> Ctest
+ CTRL + Shift + P -> CMake: Run Tests
  \endverbatim
  to verify that everything is working. Note that you need to set the number of ctest threads to 1 as described above.
 
@@ -261,22 +221,16 @@ You will also see a prompt asking which language server should be your default p
 Then, add to your settings file:
 \verbatim
 "C_Cpp.intelliSenseEngine": "disabled", //disable intellisense lsp
-"clangd.path": "/path/to/your/clangd",
+"cmake.copyCompileCommands": "${workspaceFolder}/compile_commands.json",
+"clangd.path": "/usr/bin/clangd",
 "clangd.arguments": ["-log=verbose",
-                      "-pretty",
-                      "--background-index",
-                      "--compile-commands-dir=${workspaceFolder}/build"]
+                     "-pretty",
+                     "--background-index",
+                     "--compile-commands-dir=${workspaceFolder}"]
 \endverbatim
 
-which disables IntelliSense and add a few options to the clangd language server.
-One important thing is <c>"--compile-commands-dir=${workspaceFolder}/build"</c>, which provides the path to the
-<c>compile_commands.json</c> file.
-This file provides the building information, clangd needs to correctly parse you project and can fortunally be automatically build by <c>CMake</c>.
-To do this, simply add
-\verbatim
---export_compile_commands
-\endverbatim
-to the config call of the <c>FEAT3</c> configuration, e.g. either <c>configure</c> or <c>configureVScode</c>.
+which disables IntelliSense, adds a few options to the clangd language server, and instructs the CMake extension to copy the current compile_commands.json file to the project root for clangd to find.
+The compile_commands.json file provides the building information clangd needs to correctly parse your project. It is automatically generated by CMake each time you (re-)configure FEAT.
 
 To reduce the load IntelliSense has on the system, you can also add to your settings file
 \verbatim

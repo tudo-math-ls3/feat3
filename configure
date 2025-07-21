@@ -6,865 +6,915 @@
 # FEAT3 is released under the GNU General Public License version 3,
 # see the file 'copyright.txt' in the top level directory for details.
 
-import sys
-import subprocess
-import os
-import shutil
+import argparse
 import copy
+import os
 import platform
+import shlex
+import shutil
+import subprocess
+import sys
 
 sys.dont_write_bytecode = True
 from build_system.detect_cpu import detect_cpu
+from build_system.detect_cuda_arch import detect_cuda_arch
 from build_system.configure_gcc import configure_gcc
 from build_system.configure_icc import configure_icc
 from build_system.configure_icx import configure_icx
 from build_system.configure_clang import configure_clang
 from build_system.configure_cray import configure_cray
 from build_system.configure_msvc import configure_msvc
-from build_system.feat_util import remove_string
-from build_system.feat_util import remove_substring
 from build_system.feat_util import is_found
 from build_system.feat_util import find_exe
 from build_system.feat_util import get_output
+from build_system.feat_util import error
+from build_system.feat_util import header
+from build_system.feat_util import warning
+from build_system.feat_util import append_preset_to_file
 from build_system.is_subdirectory import *
 
-# print help message if desired
-if len(sys.argv) > 1 and ("help" in sys.argv[1:] or "?" in sys.argv[1:]):
-  #                1         2         3         4         5         6         7         8         9         0
-  #       123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-123456789-
-  print ("")
-  print ("USAGE: configure [build-id]/[guess]/[help] [additional-options]")
-  print ("")
-  print ("Configures FEAT3 and sets up all necessary environment variables.")
-  print ("")
-  print ("The build system of FEAT3 is intended to be configured in a separate build directory, which shall")
-  print ("not be a sub-directory of the source directory. This way, your source directory will remain clean")
-  print ("of any object files and compiled binaries. Please create a build directory at a location of your")
-  print ("choice and call this configure script from within that folder and supply either the tag 'guess'")
-  print ("or a valid 'build-id' (see below) to configure your FEAT3 compilation.")
-  print ("")
-  print ("============= REQUIREMENTS ==================")
-  print ("Needs CMake (at least version 3.18.0) to run properly.")
-  print ("")
-  print ("============== BUILD-ID ====================")
-  print ("The FEAT3 build-id is a string of various keyword tokens, delimited by either hyphens or spaces,")
-  print ("which are used to select a compiler, configure the build mode and enable additional functionality.")
-  print ("A valid build-id requires at least a compiler tag and a build mode tag, all other tags are optional.")
-  print ("")
-  print ("The following build-id tags, grouped by category, are currently supported by this scripts:")
-  print ("")
-  print ("* Compiler suite (mutually exclusive):")
-  print ("  - 'gcc': use the GNU C++ compiler, version 7.0 or newer (binaries 'gcc' and 'g++')")
-  print ("  - 'icc': use the Intel C/C++ compiler, version 19.0 or newer (binaries 'icc' and 'icpc')")
-  print ("  - 'icx': use the oneAPI DPC++/C++ compiler, version 2021 or newer (binaries 'icx' and 'icpx')")
-  print ("  - 'clang': use the Clang LLVM compiler, version 19.0 or newer (binaries 'clang' and 'clang++')")
-  print ("  - 'cray': use the Cray C/C++ compiler")
-  print ("")
-  print ("* Build mode (mutually exclusive):")
-  print ("  - 'opt': compile in optimized mode (recommended)")
-  print ("  - 'debug': compile in debug mode and disable all optimizations")
-  print ("  - 'nopt': compile in non-optimized mode")
-  print ("")
-  print ("* Parallelization backends:")
-  print ("  - 'mpi': enable MPI-based cluster parallelization")
-  print ("  - 'cuda': enable Nvidia CUDA-based GPU parallelization")
-  print ("  - 'mkl': enable Intel MKL-based thread parallelization")
-  print ("  - 'omp': enable OpenMP based thread parallelization")
-  print ("")
-  print ("* CMake generators:")
-  print (" - 'unixmake': generate GNU make makefiles (default)")
-  print (" - 'ninja': generate ninja files")
-  print (" - 'xcode': generate XCode project files")
-  print (" - 'vsproject': generate Visual Studio project files")
-  print ("")
-  print ("* Build system extensions")
-  print (" - 'ccache': enable ccache")
-  print (" - 'cotire': enable cotire")
-  print ("")
-  print ("* Instrumentation:")
-  print (" - 'scorep': enable instrumentation by Score-P")
-  print (" - 'likwid': enable instrumentation by LIKWID")
-  print ("")
-  print ("* Additional debugging features:")
-  print (" - 'valgrind': set proper suppressions and flags for valgrind")
-  print (" - 'cudamemcheck': enable cuda memcheck (only in combination with CUDA)")
-  print (" - 'sanitizer': enable sanitize compiler flags")
-  print ("")
-  print ("* Additional optimization features:")
-  print (" - 'lto': enable link-time optimizations")
-  print ("")
-  print ("* Additional floating point formats:")
-  print ("  - 'quadmath': enable libquadmath __float128 type (GCC only)")
-  print ("  - 'half': enable CUDA half type (requires CUDA)")
-  print ("")
-  print ("* Additional third-party libraries (TPL):")
-  print ("- 'alglib': enable ALGLIB library TPL")
-  print ("- 'boost': enable BOOST TPL")
-  print ("- 'cgal': enable CGAL TPL, requires BOOST")
-  print ("- 'cudss': enable CUDSS cuda direct sparse solver TPL")
-  print ("- 'deathhandler': enable deathhandler TPL")
-  print ("- 'fparser': enable fparser TPL")
-  print ("- 'floatx': enable floatx TPL")
-  print ("- 'hypre': enable HYPRE TPL")
-  print ("- 'metis': enable METIS and ParMETIS TPLs")
-  print ("- 'pmp': enable PMP TPL")
-  print ("- 'superlu': enable SuperLU_Dist TPL")
-  print ("- 'triangle': enable triangle TPL")
-  print ("- 'trilinos': link against pre-built Trilinos library")
-  print ("- 'umfpack': enable UMFPACK TPL")
-  print ("- 'zfp': enable zfp TPL")
-  print ("- 'zlib': enale ZLIB TPL")
-  print ("- 'zoltan': enable Zoltan TPL")
-  print ("")
-  print ("Note that the actual compiler version and mpi implementation is chosen by the")
-  print ("'first come, first served' principle corresponding to your $PATH settings.")
-  print ("")
-  print ("============== ADDITIONAL OPTIONS ==============")
-  print ("--system_host_compiler=/usr/bin/gcc")
-  print ("  Selects the system compiler (and header files) used by icc, icx and clang.")
-  print ("  Be aware that icc/icx needs the path to a gcc binary and clang needs the path to folder")
-  print( "  containing the whole toolchain.")
-  print ("")
-  print ("--no_external_libs")
-  print ("  Always download thirdparties in configure step.")
-  print ("")
-  print ("--no_external_download")
-  print ("  Do not download any thirdparty dependency. If given dependcies are not findable by cmake")
-  print ("  this will lead to an error.")
-  print ("")
-  print ("--thirdparty_cache_dir=/path/to/cache")
-  print ("  Set cache directory for thirdparty dependencies. Defaults to ./thirdparty/cache if not set.")
-  print ("")
-  print ("--no_thirdparty_cache")
-  print ("  Disable caching for thirdparty dependencies.")
-  print ("")
-  print ("--package_install_dir=/path/to/install")
-  print ("  Sets CMAKE_PREFIX_PATH to allow externally build dependencies.")
-  print ("")
-  print ("--cuda_host_compiler=/usr/bin/gcc")
-  print ("  Selects the system compiler (and header files) used by nvcc.")
-  print ("")
-  print ("--cuda_arch=sm_60")
-  print ("  Selects the cuda architecture target (defaults to check by return value of nvidia-smi,")
-  print ("  if not available, defaults to sm_60.")
-  print ("")
-  print ("--export_compile_commands")
-  print ("  Let CMake export the used compile commands to compile_commands.json.")
-  print ("")
-  print ("--cpu=cputype")
-  print ("  Override cpu auto detection with provided string (see build_system/detect_cpu.py for a list).")
-  print ("")
-  print ("--cxx=path/to/binary")
-  print ("  Override default c++ compiler binary by absolute path to binary. This does not replace the")
-  print ("  proper compiler statement in the build id.")
-  print ("")
-  print ("--cc=path/to/binary")
-  print ("  Override default c compiler binary by absolute path to binary. This muss 'match' the c++")
-  print ("  compiler and the compiler statement in the build id.")
-  print ("")
-  print ("--cuda_verbose")
-  print ("  Be way more verbosive on cuda compilation steps")
-  print ("")
-  print ("--unroll_banded")
-  print ("  Use fancy template meta programming to unroll SparseMatrixBanded kernels.")
-  print ("")
-  print ("--eickt")
-  print ("  Explicitly instantiate common kernel templates.")
-  print ("")
-  print ("--ovr_mpi_ops")
-  print ("  Override MPI operations with custom implementations.")
-  print ("  Is automatically enabled if both quadmath and MPI are used.")
-  print ("")
-  print ("--in-source")
-  print ("  Allow for in-source builds; not recommended.")
-  print ("")
-  print ("--mpi_thread_multiple")
-  print ("  Use multiple threads for asynchronous mpi calls.")
-  print ("")
-  print ("--mpi_c=xyz")
-  print ("  Set mpi c compiler wrapper to xyz.")
-  print ("")
-  print ("--mpi_cxx=xyz")
-  print ("  Set mpi c++ compiler wrapper to xyz.")
-  print ("")
-  print ("--mkl_sparse_executor")
-  print ("  Use the Intel MKL sparse executor interface.")
-  print ("")
-  print ("--restrict_errors")
-  print ("  Abort compilation after an error is encountered.")
-  print ("")
-  print ("--trilinos_path")
-  print ("  Path to a FROSch compatible Trilinos installation.")
-  print ("")
-  print ("--likwid_explicit_path=path/to/likwid/prefix")
-  print ("  This flag turn off the internal find_package mechanism of cmake and instead uses")
-  print ("  the provided prefix path to the install directory of likwid, i.e. .../prefix/include/likwid.h")
-  print ("  and .../prefix/lib/liblikwid.so must exist and in turn are guranteed to be used.")
-  print ("  This option will probably be removed in a future release with an internal find script.")
-  print ("")
-  print ("--likwid_markers=mark1,mark2,mark3")
-  print ("  Decide in a comma separated list, which performance markers are activated.")
-  print ("  Current choices: kernel app special cuda . Defaults to app.")
-  print ("")
-  print ("--allow_unsupported_compiler")
-  print ("  Adds a flag to allow for unsupported host compiler for nvcc.")
-  print (" Ignored if not linked against cuda.")
-  print ("")
-  print ("--finalize_resets_device")
-  print (" This option controls whether the cuda device is reset explicitly at the end of the finalize call")
-  print (" in the runtime. While resetting is generally not reuqired, this can help to mitigate false postive memory leaks")
-  print (" as well as allow for correct profiling. On the other hand, activating this by default can lead to cuda context errors in")
-  print (" in applications that link against FEAT, so this is optional.")
-  print (" Ignored if not linked against cuda.")
-  print ("")
-  print ("--initial-cache-file=/path/to/initital/cache/file")
-  print (" Provide a cmake pre-load script to populate the cache. Options defined therein overwrite all options defined by this configure script.")
-  print ("")
-  print ("")
-  print ("--set-testing-vc")
-  print (" Sets flag so debug prompt is skipped in windows testing enviroment.")
-  print ("")
-  print ("Note that the first gcc(g++) in $PATH is chosen as the cuda host compiler, if no other one is provided.")
-  print ("Note that these additional options are only valid in build-id mode and not in guess mode.")
-  sys.exit()
+class FeatConfig:
+  """Class representing a possible FEAT3 configuration.
+
+  Stores compilers, cmake/compiler/linker flags, and other miscellaneous data
+  """
+  def __init__(self):
+    # Build id for this configuration
+    self.buildid = []
+    # Set of cmake cache variables
+    self.cmake_cache = {}
+    # List of C compiler flags
+    self.c_flags = []
+    # List of C++ compiler flags
+    self.cxx_flags = []
+    # List of linker flags
+    self.ld_flags = []
+    # Set of environment variables
+    self.env = {}
+    # Chosen C++ compiler
+    self.compiler_cxx = ""
+    # Chosen C compiler
+    self.compiler_cc = ""
+    # Chosen compiler wrapper, if any
+    self.compiler_wrapper = ""
+    # Chosen system host compiler
+    self.system_host_compiler = ""
+    # Chosen CMake generator
+    self.generator = "Unix Makefiles"
+    # Chosen (or determined) cpu type
+    self.cputype = ""
+    # Cuda architecture
+    self.cuda_arch = ""
+    self.cuda_arch_int = 0
+
+  def set_compiler_cxx(self, compiler):
+    """Set CXX compiler. Will abort if a different compiler is already set."""
+    if self.compiler_cxx and self.compiler_cxx != compiler:
+      error("Trying to configure with multiple different C++ compilers")
+    self.compiler_cxx = compiler
+
+  def set_compiler_cc(self, compiler):
+    """Set CC compiler. Will abort if a different compiler is already set."""
+    if self.compiler_cc and self.compiler_cc != compiler:
+      error("Trying to configure with multiple different C compilers")
+    self.compiler_cc = compiler
+
+  def set_compiler_wrapper(self, wrapper):
+    """Set the compiler wrapper. Errors if a different wrapper was already set"""
+    if self.compiler_wrapper and self.compiler_wrapper != wrapper:
+      error("Trying to configure with multiple different compiler wrapper")
+    self.compiler_wrapper = wrapper
+
+  def cache_entry(self, var, value, kind="STRING"):
+    """Add a CMake cache entry. Warns if the entry already exists and either the value or type changed"""
+    if var in self.cmake_cache and self.cmake_cache[var]["value"] != value:
+      error("Duplicate CMake cache entry for", var, "with different value")
+    if var in self.cmake_cache and self.cmake_cache[var]["type"] != kind:
+      error("Duplicate CMake cache entry for", var, "with different type")
+
+    self.cmake_cache[var] = {
+      "value": value,
+      "type": kind
+    }
+
+  def add_c_flags(self, *args):
+    """Add CC compiler flags. Warns on duplicate flags"""
+    for flag in args:
+      if flag in self.c_flags:
+        warning("C flag", flag, "is set twice")
+      else:
+        self.c_flags.append(flag)
+
+  def add_cxx_flags(self, *args):
+    """Add CXX compiler flags. Warns on duplicate flags"""
+    for flag in args:
+      if flag in self.cxx_flags:
+        warning("CXX flag", flag, "is set twice")
+      else:
+        self.cxx_flags.append(flag)
+
+  def add_ld_flags(self, *args):
+    """Add linker flags. Warns on duplicate flags"""
+    for flag in args:
+      if flag in self.ld_flags:
+        warning("Linker flag", flag, "is set twice")
+      else:
+        self.ld_flags.append(flag)
+
+  def cmake_flags(self):
+    """Return the CMake flags as a list"""
+    flags = []
+
+    for var, entry in self.cmake_cache.items():
+      if entry["type"]:
+        flags.append(f"-D{var}:{entry['type']}={entry['value']}")
+      else:
+        flags.append(f"-D{var}={entry['value']}")
+
+    return flags
+
+
+  def cmake_flags_str(self):
+    """Return the CMake flags as a string that can be passed to cmake."""
+    return " ".join(self.cmake_flags())
+
+  def cxx_flags_str(self):
+    """Return the CXX flags as a string that can be passed to the compiler."""
+    return " ".join(self.cxx_flags)
+
+  def c_flags_str(self):
+    """Return the CC flags as a string that can be passed to the compiler."""
+    return " ".join(self.c_flags)
+
+  def ld_flags_str(self):
+    """Return the linker flags as a string that can be passed to the compiler."""
+    return " ".join(self.ld_flags)
+
+  def get_compiler_cxx(self):
+    """Return the CXX compiler for this configuration. Handles compiler wrappers."""
+    if self.compiler_wrapper:
+      return self.compiler_wrapper + " " + self.compiler_cxx
+    else:
+      return self.compiler_cxx
+
+  def get_compiler_c(self):
+    """Return the CC compiler for this configuration. Handles compiler wrappers."""
+    if self.compiler_wrapper:
+      return self.compiler_wrapper + " " + self.compiler_cc
+    else:
+      return self.compiler_cc
+
+  def get_linker(self):
+    """Return the linker for this configuration."""
+    return self.compiler_cxx
+
+  def as_configure_preset(self):
+    """Returns a dictionary that can be written as a JSON CMake configure preset"""
+    environment = {}
+
+    for key, value in self.env.items():
+      environment[key] = value
+
+    environment["CXXFLAGS"] = self.cxx_flags_str()
+    environment["CXX"] = self.get_compiler_cxx()
+    environment["LD"] = self.get_linker()
+    environment["CC"] = self.get_compiler_c()
+    environment["LDFLAGS"] = self.ld_flags_str()
+    environment["CFLAGS"] = self.c_flags_str()
+
+    return {
+      "name": "-".join(self.buildid),
+      "generator": self.generator,
+      "binaryDir": "./build",
+      "cacheVariables": self.cmake_cache,
+      "environment": environment,
+    }
 
 # get path to feat source trunk
 trunk_dirname = os.path.abspath(os.path.dirname(sys.argv[0]))
 #get current path to build directory
 build_dirname = os.getcwd()
 
-available_package_dict = {
-  "alglib": "ALGLIB",
-  "boost": "BOOST",
-  "cgal": "CGAL",
-  "cudss":"CUDSS",
-  "death-handler":"DEAT_HANDLER",
-  "floatx":"FLOATX",
-  "fparser":"FPARSER",
-  "hypre":"HYPRE",
-  "metis":"PARMETIS",
-  "pmp":"PMP",
-  "superlu":"SUPERLU_DIST",
-  "triangle":"TRIANGLE",
-  "umfpack":"UMFPACK",
-  "zfp":"ZFP",
-  "zlib":"ZLIB",
-  "zoltan":"ZOLTAN"
-}
+description = (
+  "Configures FEAT3 and sets up all necessary environment variables.\n"
+  "\n"
+  "The build system of FEAT3 is intended to be configured in a separate build directory, which shall\n"
+  "not be a sub-directory of the source directory. This way, your source directory will remain clean\n"
+  "of any object files and compiled binaries. Please create a build directory at a location of your\n"
+  "choice and call this configure script from within that folder and supply either the tag 'guess'\n"
+  "or a valid 'build-id' (see below) to configure your FEAT3 compilation.\n"
+  "\n"
+  "============= REQUIREMENTS ==================\n"
+  "Needs CMake (at least version 3.28.0) to run properly.\n"
+  "\n"
+  "============= BUILD-ID ======================\n"
+  "The FEAT3 build-id is a string of various keyword tokens, delimited by hyphens,\n"
+  "which are used to select a compiler, configure the build mode and enable additional functionality.\n"
+  "A valid build-id requires at least a compiler tag and a build mode tag, all other tags are optional.\n"
+  "\n"
+  "The following build-id tags, grouped by category, are currently supported by this script:\n"
+  "\n"
+  "* Compiler suite (mutually exclusive):\n"
+  "  - 'gcc':   use the GNU C++ compiler, version 7.0 or newer (binaries 'gcc' and 'g++')\n"
+  "  - 'icc':   use the Intel C/C++ compiler, version 19.0 or newer (binaries 'icc' and 'icpc')\n"
+  "  - 'icx':   use the oneAPI DPC++/C++ compiler, version 2021 or newer (binaries 'icx' and 'icpx')\n"
+  "  - 'clang': use the Clang LLVM compiler, version 19.0 or newer (binaries 'clang' and 'clang++')\n"
+  "  - 'cray':  use the Cray C/C++ compiler\n"
+  "\n"
+  "* Build mode (mutually exclusive):\n"
+  "  - 'opt':   compile in optimized mode (recommended)\n"
+  "  - 'debug': compile in debug mode and disable all optimizations\n"
+  "  - 'nopt':  compile in non-optimized mode\n"
+  "\n"
+  "* Parallelization backends:\n"
+  "  - 'mpi':  enable MPI-based cluster parallelization\n"
+  "  - 'cuda': enable Nvidia CUDA-based GPU parallelization\n"
+  "  - 'mkl':  enable Intel MKL-based thread parallelization\n"
+  "  - 'omp':  enable OpenMP based thread parallelization\n"
+  "\n"
+  "* CMake generators:\n"
+  "  - 'unixmake':  generate GNU make makefiles (default)\n"
+  "  - 'ninja':     generate ninja files\n"
+  "  - 'xcode':     generate XCode project files\n"
+  "  - 'vsproject': generate Visual Studio project files\n"
+  "\n"
+  "* Build system extensions\n"
+  "  - 'ccache': enable ccache\n"
+  "  - 'cotire': enable cotire\n"
+  "\n"
+  "* Instrumentation\n:"
+  "  - 'scorep': enable instrumentation by Score-P\n"
+  "  - 'likwid': enable instrumentation by LIKWID\n"
+  "\n"
+  "* Additional debugging features:\n"
+  "  - 'valgrind':     set proper suppressions and flags for valgrind\n"
+  "  - 'cudamemcheck': enable cuda memcheck (only in combination with CUDA)\n"
+  "  - 'sanitizer':    enable sanitize compiler flags\n"
+  "\n"
+  "* Additional optimization features:\n"
+  "  - 'lto': enable link-time optimizations\n"
+  "\n"
+  "* Additional floating point formats:\n"
+  "  - 'quadmath': enable libquadmath __float128 type (GCC only)\n"
+  "  - 'half':     enable CUDA half type (requires CUDA)\n"
+  "\n"
+  "* Additional third-party libraries (TPL):\n"
+  "  - 'alglib':       enable ALGLIB library TPL\n"
+  "  - 'boost':        enable BOOST TPL\n"
+  "  - 'cgal':         enable CGAL TPL, requires BOOST\n"
+  "  - 'cudss':        enable CUDSS cuda direct sparse solver TPL\n"
+  "  - 'deathhandler': enable deathhandler TPL\n"
+  "  - 'fparser':      enable fparser TPL\n"
+  "  - 'floatx':       enable floatx TPL\n"
+  "  - 'hypre':        enable HYPRE TPL\n"
+  "  - 'metis':        enable METIS and ParMETIS TPLs\n"
+  "  - 'pmp':          enable PMP TPL\n"
+  "  - 'superlu':      enable SuperLU_Dist TPL\n"
+  "  - 'triangle':     enable triangle TPL\n"
+  "  - 'trilinos':     link against pre-built Trilinos library\n"
+  "  - 'umfpack':      enable UMFPACK TPL\n"
+  "  - 'zfp':          enable zfp TPL\n"
+  "  - 'zlib':         enable ZLIB TPL\n"
+  "  - 'zoltan':       enable Zoltan TPL\n"
+  "\n"
+  "Note that the actual compiler version and mpi implementation is chosen by the\n"
+  "'first come, first served' principle corresponding to your $PATH settings.\n"
+  "\n"
+  "============= Thirdparty Dependencies =======\n"
+  "CMake will try to satisfy all thirdparty dependencies you requested in the build-id.\n"
+  "It will, in order, try to find locally installed versions of the dependencies, try to find\n"
+  "cached versions to add to the build, and finally download any missing dependencies and add them to the build.\n"
+  "You can forbid using locally installed versions of the dependencies using the --no-external-libs flag.\n"
+  "You can forbid using cached files with the --no-thirdparty-cache flag.\n"
+  "You can forbid using downloaded dependencies with the --no-external-downloads flag.\n"
+  "\n"
+  "============= CMake Presets =================\n"
+  "To properly integrate with other tooling (for example the CMake Tools Visual Studio Code extension)\n"
+  "this configure script will add a CMake preset to the CMakeUserPresets.json file in the repository this\n"
+  "this script is located in. This allows other tooling to easily build FEAT with the same configuration\n"
+  "you use for your own build directory. In a module-based environment, make sure you load the same modules\n"
+  "when running VSCode as you did when running the configure script for your preset.\n"
+  "\n"
+  "The presets are named by their build-id. If a preset for a build-id already exists, it will be overwritten.\n"
+  "\n"
+  "If you only want to generate a preset, without configuring a build directory, you can use the --preset-only flag.\n"
+  "If you do not want to generate a preset, for example because you do not have write-access to the repository, use\n"
+  "the --no-preset flag."
+)
 
-# clear all related
-os.environ["CXXFLAGS"] = ""
-os.environ["CXX"] = ""
-os.environ["LD"] = ""
-os.environ["CC"] = ""
-os.environ["LDFLAGS"] = ""
-os.environ["OMP_CXX"] = ""
-os.environ["OMP_CC"] = ""
-os.environ["MPICH_CXX"] = ""
-os.environ["MPICH_CC"] = ""
+epilog = (
+  "Note that the first gcc(g++) in $PATH is chosen as the cuda host compiler, if no other one is provided.\n"
+  "Note that these options might not be applicable in guess mode."
+)
 
-extra_options = []
-# separate extra options from build id
-for i in range(1, len(sys.argv)):
-  if len(sys.argv[i]) > 2 and sys.argv[i][:2] == "--":
-    extra_options.append(sys.argv[i])
+parser = argparse.ArgumentParser(description=description, epilog=epilog, formatter_class=argparse.RawDescriptionHelpFormatter)
 
-# check for cmake binary
-if not is_found ("cmake"):
-  print("Error: no cmake binary found!")
-  sys.exit()
+parser.add_argument("buildid", default="guess", nargs="?", help="build-id for this configuration. Will be guessed if not given")
+
+parser.add_argument("--allow-unsupported-compiler", "--allow_unsupported_compiler", action="store_true", help=
+"allow an unsupported host compiler for nvcc")
+
+parser.add_argument("--cc", help=
+"override default C compiler binary with absolute path to binary. This option does not replace the compiler tag in the build-id")
+
+parser.add_argument("--cpu", help=
+"override cpu auto detection with provided string. See build_system/detect_cpu.py for a list")
+
+parser.add_argument("--cuda-arch", "--cuda_arch", help=
+"selects the cuda architecture target. (default: check by return value of nvidia-smi, sm_60 if not available)")
+
+parser.add_argument("--cuda-host-compiler", "--cuda_host_compiler", help=
+"selects the system compiler (and header files) used by nvcc (default: /usr/bin/gcc")
+
+parser.add_argument("--cuda-verbose", "--cuda_verbose", action="store_true", help=
+"enable verbose cuda compilation (default: %(default)s)")
+
+parser.add_argument("--cxx", help=
+"override default C++ compiler binary with absolute path to binary. This option does not replace the compiler tag in the build-id")
+
+parser.add_argument("--eickt", action="store_true", help=
+"explicitely instantiate common kernel templates")
+
+parser.add_argument("--finalize-resets-device", "--finalize_resets_device", action="store_true", help=(
+"controls whether the CUDA device is reset explicitly at the end of the runtime finalize call. "
+"This can mitigate false-positives for memory leaks and allow correct profiling, but might cause CUDA context errors in "
+"applications linking against FEAT"))
+
+parser.add_argument("--in-home", "--in_home", action="store_true", help=
+"allow in-home builds. Not recommended")
+
+parser.add_argument("--initial-cache-file", "--initial_cache_file", help=
+"Provide a CMake script to populate the cache. Options set by the script override options set here. Options set by the script are not included in any CMake presets")
+
+parser.add_argument("--in-source", "--in_source", action="store_true", help=
+"allow in-source builds. Not recommended")
+
+# TODO: Do what the help says
+parser.add_argument("--likwid-explicit-path", "--likwid_explicit_path", help=(
+"turns off the internal find_package mechanism of CMake and instead uses "
+"the provided prefix path to the install directory of likwid, i.e. .../prefix/include/likwid.h "
+"and .../prefix/lib/liblikwid.so must exist and in turn are guranteed to be used. "
+"This option will probably be removed in a future release with an internal find script."))
+
+parser.add_argument("--likwid-markers" "--likwid_markers", action="extend", nargs="+", choices = ["kernel", "app", "special", "cuda"], help=
+"list of performance markers to activate. Defaults to 'app'")
+
+parser.add_argument("--mkl-sparse-executor", "--mkl_sparse_executor", action="store_true", help=
+"use the Intel MKL sparse executor interface")
+
+parser.add_argument("--mpi-c", "--mpi_c", help=
+"set MPI C compiler wrapper")
+
+parser.add_argument("--mpi-cxx", "--mpi_cxx", help=
+"set MPI C++ compiler wrapper")
+
+parser.add_argument("--mpi-thread-multiple", "--mpi_thread_multiple", action="store_true", help=
+"use multiple threads for asynchronous mpi calls")
+
+parser.add_argument("--no-external-downloads", "--no_external_download", action="store_true", default=False, help=
+"do not download any thirdparty dependencies in the configure step. Will cause errors if requested dependencies can not be found by CMake (default: %(default)s)")
+
+parser.add_argument("--no-external-libs", "--no_external_libs", action="store_true", default=False, help =
+"always download thirdparty dependencies in the configure step (default: %(default)s)")
+
+parser.add_argument("--no-preset", action="store_true", default=False, help=
+"do not write a CMake preset to the repositories CMakeUserPresets.json")
+
+parser.add_argument("--no-thirdparty-cache", "--no_thirdparty_cache", action="store_true", default=False, help=
+"disable caching for thirdparty dependencies (default: %(default)s)")
+
+parser.add_argument("--override-mpi-ops", "--override_mpi_ops", "--ovr_mpi_ops", action="store_true", help=
+"override MPI operations with custom implementations. Automatically enabled if both quadmath and MPI are used")
+
+parser.add_argument("--package-install-dir", "--package_install_dir", help=
+"additional directory to search for installed thirdparty dependencies in")
+
+parser.add_argument("--preset-only", "--preset_only", action="store_true", default=False, help=
+"generate a CMake preset for the chosen configuration, but do not run CMake (default %(default)s)")
+
+parser.add_argument("--restrict-errors", "--restrict_errors", action="store_true", help=
+"abort compilation after an error is encountered")
+
+parser.add_argument("--set-testing-vc", "--set_testing_vc", action="store_true", help=
+"suppress debug prompts in Windows testing environment")
+
+parser.add_argument("--system-host-compiler", "--system_host_compiler", help=(
+"selects the system compiler (and header files) used by icc, icx and clang. "
+"Be aware that icc/icx needs the path to a gcc binary and clang needs the path to the folder "
+"containing the whole toolchain"))
+
+parser.add_argument("--thirdparty-cache-dir", "--thirdparty_cache_dir", default="", help=
+f"set cache directory for thirdparty dependencies (default: {trunk_dirname}/thirdparty/cache)")
+
+# TODO: Can this be covered by the --package-install-dir option?
+parser.add_argument("--trilinos-path", "--trilinos_path", help=
+"path to a FROSch compatible Trilinos installation")
+
+parser.add_argument("--unroll-banded", "--unroll_banded", action="store_true", help=
+"unroll SparseMatrixBanded kernels")
+
+args = parser.parse_args()
+
+# Emit warnings for deprecated flags
+for arg in sys.argv:
+  if arg.startswith("--") and "_" in arg and arg != "--ovr_mpi_ops":
+    warning("Flag", arg, "is deprecated. Use", arg.replace("_", "-"), "instead")
+  if arg == "--ovr_mpi_ops":
+    warning("Flag --ovr_mpi_ops is deprecated. Use --override-mpi-ops instead")
+
 
 # guess a fitting configuration and search for available compilers
-if len(sys.argv) == 1 or "guess" in sys.argv:
-  buildid_string = "opt"
+if args.buildid == "guess":
+  buildid = ["opt"]
   if is_found("mpic++") or is_found("mpicxx"):
-    buildid_string += "-mpi"
+    buildid.append("-mpi")
   if is_found("g++"):
-    buildid_string += "-gcc"
+    buildid.append("-gcc")
   elif is_found("icpc"):
-    buildid_string += "-icc"
+    buildid.append("-icc")
   elif is_found("icpx"):
-    buildid_string += "-icx"
+    buildid.append("-icx")
   elif is_found("clang++"):
-    buildid_string += "-clang"
+    buildid.append("-clang")
   else:
-    print("Error: no comptabile compiler found nor provided!")
-    sys.exit()
-
-# use provided build id
+    error("No compatible compiler found or provided")
 else:
-  # add every parameter to the build id that is no extra_option
-  buildid_string = ""
-  for i in range(1, len(sys.argv)):
-    if not (len(sys.argv[i]) > 2 and sys.argv[i][:2] == "--"):
-      buildid_string += sys.argv[i] + "-"
+  buildid = args.buildid.strip("-").split("-")
 
-buildid_string = buildid_string.strip("-")
-# generate handy build id array of tokens
-buildid = buildid_string.split("-")
-# list of buildid tokens, remove token when used, results in list of unused tokens
-unused_tokens = copy.deepcopy(buildid)
 
-# initialize variables
-cxxflags = ""
-ldflags = ""
-cmake_flags = "-DBUILD_ID:STRING=" + buildid_string
+# Validate buildid
+# Check for:
+# - exactly one compiler tag
+# - exactly one build mode tag
+# - dependencies among other tags
 
-# choose makefile generator. missing entry defaults to unix makefiles
-if "ninja" in buildid:
-  remove_string(unused_tokens, "ninja")
-  generator = "Ninja"
-elif "xcode" in buildid:
-  remove_string(unused_tokens, "xcode")
-  generator = "Xcode"
-#should not really be needed, as long as you add the appropriate path
-# elif "mingw" in buildid:
-#   remove_string(unused_tokens, "mingw")
-#   generator = "MinGW Makefiles"
-# elif "msys" in buildid:
-#   remove_string(unused_tokens, "msys")
-#   generator = "MSYS Makefiles"
-elif "unixmake" in buildid:
-  remove_string(unused_tokens, "unixmake")
-  generator = "Unix Makefiles"
-elif "vsproject" in buildid:
-  remove_string(unused_tokens, "vsproject")
-  generator = "Visual Studio 17 2022"
-else:
-  generator = "Unix Makefiles"
+valid_compiler_tags = [
+  "gcc", "gnu", "g++",
+  "icc", "intel", "icpc",
+  "icx", "icpx", "oneapi",
+  "clang", "llvm",
+  "cray",
+  "msvc",
+]
 
-# optimisation/debug mode aka build mode selection
-if "debug" in buildid:
-  remove_string(unused_tokens, "debug")
-  cmake_flags += " -DFEAT_DEBUG_MODE:BOOL=ON"
-elif "nopt" in buildid:
-  remove_string(unused_tokens, "nopt")
-  cmake_flags += " -DFEAT_DEBUG_MODE:BOOL=ON"
-elif "opt" in buildid:
-  remove_string(unused_tokens, "opt")
-  cmake_flags += " -DFEAT_DEBUG_MODE:BOOL=OFF"
-else:
-  print ("Error: No supported build mode (opt/debug/nopt) found in build id:")
-  print (buildid_string)
-  sys.exit(1)
+valid_mode_tags = ["debug", "nopt", "opt"]
 
-# parallelisation selection
-if "mpi" in buildid:
-  remove_string(unused_tokens, "mpi")
-  cmake_flags += " -DFEAT_HAVE_MPI:BOOL=TRUE"
+compiler_tags = [tag for tag in buildid if tag in valid_compiler_tags]
+mode_tags = [tag for tag in buildid if tag in valid_mode_tags]
 
-# evaluate extra options
-cputype = ""
-system_host_compiler = ""
-cuda_host_compiler = ""
-compiler_cxx = ""
-compiler_cc = ""
-cuda_arch = ""
-cuda_verbose = False
-restrict_errors = False
-trilinos_path = ""
-marker_options = ""
-explicit_likwid_path = ""
-tpl_path = ""
-cache_path = ""
-init_cache_file = ""
+if len(compiler_tags) == 0:
+  error("No compiler tag in build-id")
 
-unused_extra_options = copy.copy(extra_options)
-for option in extra_options:
-  if option.startswith("--cpu="):
-    unused_extra_options.remove(option)
-    if cputype:
-      print ("Error: multiple cpu parameters in\n" + "\n".join(extra_options))
-      exit(1)
-    cputype = option.replace("--cpu=", "", 1)
+if len(compiler_tags) > 1:
+  error("Too many compiler tags in build-id")
 
-  if option.startswith("--system_host_compiler="):
-    unused_extra_options.remove(option)
-    if system_host_compiler:
-      print ("Error: multiple system_host_compiler parameters in\n" + "\n".join(extra_options))
-      exit(1)
-    system_host_compiler = option.replace("--system_host_compiler=", "", 1)
-    if not os.path.exists(system_host_compiler):
-      print ("Error: system_host_compiler " + system_host_compiler + " does not exist!")
-    cmake_flags += " -DFEAT_SYSTEM_HOST_COMPILER=" + system_host_compiler
+if len(mode_tags) == 0:
+  error("No build mode tag in build-id")
 
-  if option.startswith("--cuda_host_compiler="):
-    unused_extra_options.remove(option)
-    if cuda_host_compiler:
-      print ("Error: multiple cuda_host_compiler parameters in\n" + "\n".join(extra_options))
-      exit(1)
-    cuda_host_compiler = option.replace("--cuda_host_compiler=", "", 1)
-    if not os.path.exists(cuda_host_compiler):
-      print ("Error: cuda_host_compiler " + cuda_host_compiler + " does not exist!")
+if len(mode_tags) > 1:
+  error("More than one build mode tag in build-id")
 
-  if option.startswith("--cxx="):
-    unused_extra_options.remove(option)
-    if compiler_cxx:
-      print ("Error: multiple cxx parameters in\n" + "\n".join(extra_options))
-      exit(1)
-    compiler_cxx = option.replace("--cxx=", "", 1)
-    if not os.path.exists(compiler_cxx):
-      print ("Error: compiler " + compiler_cxx + " does not exist!")
+if "half" in buildid and not "cuda" in buildid:
+  error("Tag 'half' requires tag 'cuda'")
 
-  if option.startswith("--cc="):
-    unused_extra_options.remove(option)
-    if compiler_cc:
-      print ("Error: multiple cc parameters in\n" + "\n".join(extra_options))
-      exit(1)
-    compiler_cc = option.replace("--cc=", "", 1)
-    if not os.path.exists(compiler_cc):
-      print ("Error: compiler " + compiler_cc + " does not exist!")
+# prevent parmetis without mpi enabled (needed by parmetis)
+if "mpi" not in buildid and "metis" in buildid:
+  error("Tag 'metis' requires tag 'mpi'")
 
-  if option.startswith("--cuda_arch="):
-    unused_extra_options.remove(option)
-    if cuda_arch:
-      print ("Error: multiple cuda_arch parameters in\n" + "\n".join(extra_options))
-      exit(1)
-    cuda_arch = option.replace("--cuda_arch=", "", 1)
-    cuda_arch_int = int(cuda_arch.split("sm_")[-1])
+if "mpi" not in buildid and "parmetis" in buildid:
+  error("Tag 'parmetis' requires tag 'mpi'")
 
-  if option.startswith("--cuda_verbose"):
-    unused_extra_options.remove(option)
-    cuda_verbose = True
+# SuperLU needs MPI, because we only use SuperLU_DIST
+if ("mpi" not in buildid) and ("superlu" in buildid):
+  error("Tag 'superlu' requires tag 'mpi'")
 
-  if option.startswith("--export_compile_commands"):
-    unused_extra_options.remove(option)
-    cmake_flags += " -DCMAKE_EXPORT_COMPILE_COMMANDS=ON"
+# SuperLU needs MPI, because we only use SuperLU_DIST
+if ("mpi" not in buildid) and ("zoltan" in buildid):
+  error("Tag 'zoltan' requires tag 'mpi'")
 
-  if option.startswith("--unroll_banded"):
-    unused_extra_options.remove(option)
-    cmake_flags += " -DFEAT_UNROLL_BANDED:BOOL=TRUE"
+if "lto" in buildid and not "opt" in buildid:
+  error("LTO is only usable in opt mode")
 
-  if option.startswith("--eickt"):
-    unused_extra_options.remove(option)
-    cmake_flags += " -DFEAT_EICKT:BOOL=TRUE"
+if "cudamemcheck" in buildid and not "cuda" in buildid:
+  error("Tag 'cudamemcheck' requires tag 'cuda'")
 
-  if option.startswith("--ovr_mpi_ops"):
-    unused_extra_options.remove(option)
-    cmake_flags += " -DFEAT_OVERRIDE_MPI_OPS:BOOL=TRUE"
+if "cudss" in buildid and not "cuda" in buildid:
+  error("Tag 'cudss' requires tag 'cuda'")
 
-  if option.startswith("--mpi_thread_multiple"):
-    unused_extra_options.remove(option)
-    cmake_flags +=" -DFEAT_MPI_THREAD_MULTIPLE:BOOL=TRUE"
+if "ccache" in buildid and "scorep" in buildid:
+  error("Tags 'ccache' and 'scorep' cannot be used together")
 
-  if option.startswith("--mpi_c="):
-    unused_extra_options.remove(option)
-    mpi_c = option.replace("--mpi_c=", "", 1)
-    cmake_flags += " -DFEAT_MPI_C:STRING=" + mpi_c
+config = FeatConfig()
 
-  if option.startswith("--mpi_cxx="):
-    unused_extra_options.remove(option)
-    mpi_cxx = option.replace("--mpi_cxx=", "", 1)
-    cmake_flags += " -DFEAT_MPI_CXX:STRING=" + mpi_cxx
+# print a warning that half/quadmath + mpi requires overriding of MPI operations to function properly if not given
+if (("half" in buildid) or ("quadmath" in buildid)) and ("mpi" in buildid) and not (args.override_mpi_ops):
+  warning(("'half' or 'quadmath' and 'mpi' are specified in build-id, but MPI operations were not overridden;\n"
+           "automatically enabling MPI operations overrides because MPI applications would crash otherwise.\n"
+           "Please manually add the '--override-mpi-ops' option to this configure script call when configuring with\n"
+           "'half' or 'quadmath' support enabled to suppress this warning message."))
+  config.cache_entry("FEAT_OVERRIDE_MPI_OPS", "ON", "BOOL")
 
-  if option.startswith("--mkl_sparse_executor"):
-    unused_extra_options.remove(option)
-    cmake_flags += " -DFEAT_USE_MKL_SPARSE_EXECUTOR:BOOL=TRUE"
+# Defaults we always want to set
+config.buildid = buildid
+config.cache_entry("BUILD_ID", "-".join(buildid), "STRING")
+config.cache_entry("CMAKE_EXPORT_COMPILE_COMMANDS", "ON", "BOOL")
+config.cputype = args.cpu or detect_cpu()
+config.cache_entry("FEAT_CPU_TYPE", config.cputype, "STRING")
+config.add_c_flags("-O3")
 
-  if option.startswith("--restrict_errors"):
-    unused_extra_options.remove(option)
-    restrict_errors = True
+# Handle command line arguments
 
-  if option.startswith("--trilinos_path="):
-    unused_extra_options.remove(option)
-    if trilinos_path:
-      print ("Error: multiple trilinos_path parameters in\n" + "\n".join(extra_options))
-      exit(1)
-    trilinos_path = option.replace("--trilinos_path=", "", 1)
-    if not os.path.exists(trilinos_path):
-      print ("Error: trilinos_path " + trilinos_path + " does not exist!")
-    cmake_flags += " -DFEAT_TRILINOS_PATH:FILEPATH=" + trilinos_path
+if args.allow_unsupported_compiler:
+  config.cache_entry("FEAT_ALLOW_UNSUPPORTED_COMPILER", "ON", "BOOL")
 
-  if option.startswith("--likwid_markers="):
-    unused_extra_options.remove(option)
-    if marker_options:
-      print ("Error: multiple likwid_markers parameters in\n" + "\n".join(extra_options))
-      exit(1)
-    tmp_marker = option.replace("--likwid_markers=", "", 1)
-    if(tmp_marker == ""):
-      print ("Error: No options given in " + option)
-      exit(1)
-    if(len(tmp_marker.split(",")) > 3):
-      print ("Error: Too many marker options in " + option)
-      exit(1)
-    marker_options = ""
-    for marker in tmp_marker.split(","):
-      if(marker == "app"):
-        marker_options += " -DFEAT_APPLICATION_MARKER_ACTIVATED:BOOL=ON"
-      if(marker == "kernel"):
-        marker_options += " -DFEAT_KERNEL_MARKER_ACTIVATED:BOOL=ON"
-      if(marker == "special"):
-        marker_options += " -DFEAT_SPECIAL_MARKER_ACTIVATED:BOOL=ON"
-      if(marker == "cuda"):
-        marker_options += " -DLIKWID_NVMON:BOOL=ON"
-    if(not marker_options):
-      print ("Error: No valid marker options in " + option)
-      print ("Valid options are: kernel app special")
-      exit(1)
+if args.cc:
+  if not os.path.exists(args.compiler_cc):
+    error("Could not find specified C compiler", args.compiler_cc)
+  config.set_compiler_cc(args.compiler_cc)
 
-  if option.startswith("--likwid_explicit_path="):
-    unused_extra_options.remove(option)
-    if explicit_likwid_path:
-      print ("Error: multiple likwid_explicit_path parameters in\n" + "\n".join(extra_options))
-      exit(1)
-    tmp_path = option.replace("--likwid_explicit_path=", "", 1)
-    if(tmp_path == ""):
-      print ("Error: No path given in " + option)
-      exit(1)
-    explicit_likwid_path = tmp_path
-    cmake_flags += " -DFEAT_EXPLICIT_LIKWID_PATH:FILEPATH=" + explicit_likwid_path
+if args.cuda_host_compiler:
+  if not os.path.exists(args.cuda_host_compiler):
+    error("Could not find specified cuda host compiler", args.cuda_host_compiler)
 
-  if option.startswith("--no_external_libs"):
-    unused_extra_options.remove(option)
-    cmake_flags += " -DFEAT_PREFER_EXTERNAL_TPL:BOOL=OFF"
+if args.cxx:
+  if not os.path.exists(args.compiler_cxx):
+    error("Could not find specified C++ compiler", args.compiler_cxx)
+  config.set_compiler_cxx(args.compiler_cxx)
 
-  if option.startswith("--package_install_dir="):
-    unused_extra_options.remove(option)
-    if tpl_path:
-      print ("Error: multiple install dir parameters in\n" + "\n".join(extra_options))
-      exit(1)
-    tpl_path = option.replace("--package_install_dir=", "", 1)
-    cmake_flags += " -DCMAKE_PREFIX_PATH:STRING=" + tpl_path
+if args.eickt:
+  config.cache_entry("FEAT_EICKT", "ON", "BOOL")
 
-  if option.startswith("--thirdparty_cache_dir="):
-    unused_extra_options.remove(option)
-    if cache_path:
-      print ("Error: multiple thirdparty_cache_dir parameters in\n" + "\n".join(extra_options))
-      exit(1)
-    cache_path = option.replace("--thirdparty_cache_dir=", "", 1)
-    cmake_flags += " -DFEAT_TPL_CACHE_DIRECTORY:STRING=" + os.path.abspath(cache_path)
+if args.finalize_resets_device:
+  config.cache_entry("FEAT_FINALIZE_RESETS_DEVICE", "ON", "BOOL")
 
-  if option.startswith("--no_thirdparty_cache"):
-    unused_extra_options.remove(option)
-    cmake_flags += " -DFEAT_TPL_CACHE_DIRECTORY:STRING=\"\""
+if args.likwid_explicit_path:
+  if not os.path.exists(args.likwid_explicit_path):
+    error("Likwid path", args.likwid_explicit_path, "does not exist")
+  config.cache_entry("FEAT_EXPLICIT_LIKWID_PATH", args.likwid_explicit_path, "FILEPATH")
 
-  if option.startswith("--no_external_download"):
-    unused_extra_options.remove(option)
-    cmake_flags += " -DFEAT_NO_EXTERNAL_DOWNLOAD:BOOL=ON"
+if args.mkl_sparse_executor:
+  config.cache_entry("FEAT_USE_MKL_SPARSE_EXECUTOR", "ON", "BOOL")
 
-  if option.startswith("--allow_unsupported_compiler"):
-    unused_extra_options.remove(option)
-    cmake_flags += " -DFEAT_ALLOW_UNSUPPORTED_COMPILER:BOOL=ON"
+if args.mpi_c:
+  if not os.path.exists(args.mpi_c):
+    error("Could not find specified MPI c compiler wrapper", args.mpi_c)
+  config.cache_entry("FEAT_MPI_C", args.mpi_c, "STRING")
 
-  if option.startswith("--finalize_resets_device"):
-    unused_extra_options.remove(option)
-    cmake_flags += " -DFEAT_FINALIZE_RESETS_DEVICE:BOOL=ON"
+if args.mpi_cxx:
+  if not os.path.exists(args.mpi_cxx):
+    error("Could not find specified MPI C++ compiler wrapper", args.mpi_cxx)
+  config.cache_entry("FEAT_MPI_CXX", args.mpi_cxx, "STRING")
 
-  if option.startswith("--initial-cache-file="):
-    unused_extra_options.remove(option)
-    init_cache_file = option.replace("--initial-cache-file=", "", 1)
+if args.mpi_thread_multiple:
+  config.cache_entry("FEAT_MPI_THREAD_MULTIPLE", "ON", "BOOL")
 
-  if option.startswith("--set-testing-vc"):
-    unused_extra_options.remove(option)
-    cmake_flags += " -DFEAT_TESTING_VC:BOOL=ON"
+if args.no_external_downloads:
+  config.cache_entry("FEAT_NO_EXTERNAL_DOWNLOAD", "ON", "BOOL")
 
+if args.no_external_libs:
+  config.cache_entry("FEAT_PREFER_EXTERNAL_TPL", "OFF", "BOOL")
+
+if args.no_thirdparty_cache:
+  config.cache_entry("FEAT_TPL_CACHE_DIRECTORY", "", "STRING")
+
+if args.override_mpi_ops:
+  config.cache_entry("FEAT_OVERRIDE_MPI_OPS", "ON", "BOOL")
+
+if args.package_install_dir:
+  if not os.path.exists(args.package_install_dir):
+    error("Package install directory", args.package_install_dir, "does not exist")
+  config.cache_entry("CMAKE_PREFIX_PATH", args.package_install_dir, "FILEPATH")
+
+if args.set_testing_vc:
+  config.cache_entry("FEAT_TESTING_VC", "ON", "BOOL")
+
+if args.system_host_compiler:
+  if not os.path.exists(args.system_host_compiler):
+    error("Could not find specified system host compiler", args.system_host_compiler)
+  config.system_host_compiler = args.system_host_compiler
+  config.cache_entry("FEAT_SYSTEM_HOST_COMPILER", args.system_host_compiler, "STRING")
+
+if args.thirdparty_cache_dir:
+  if not os.path.exists(args.thirdparty_cache_dir):
+    error("Thirdparty cache directory", args.thirdparty_cache_dir, "does not exist")
+  config.cache_entry("FEAT_TPL_CACHE_DIRECTORY", args.thirdparty_cache_dir, "FILEPATH")
+
+if args.trilinos_path:
+  if not os.path.exists(args.trilinos_path):
+    error("Trilinos path", args.trilinos_path, "does not exist")
+  if not "trilinos" in buildid:
+    warning("You have specified a trilinos path, but there is no trilinos tag in the build-id")
+  config.cache_entry("FEAT_TRILINOS_PATH", args.trilinos_path, "FILEPATH")
+
+if args.unroll_banded:
+  config.cache_entry("FEAT_UNROLL_BANDED", "ON", "BOOL")
+
+# Now that we have handled all optional arguments and overrides,
+# we can parse the actual build id and complete the configuration data
+
+for token in buildid:
+  if token == "ninja":
+    config.generator = "Ninja"
+  elif token == "xcode":
+    config.generator = "Xcode"
+  elif token == "unixmake":
+    config.generator = "Unix Makefiles"
+  elif token == "vsproject":
+    config.generator = "Visual Studio 17 2022"
+  elif token == "debug":
+    config.cache_entry("FEAT_DEBUG_MODE", "ON", "BOOL")
+    config.cache_entry("CMAKE_BUILD_TYPE", "Debug", "STRING")
+  elif token == "nopt":
+    config.cache_entry("FEAT_DEBUG_MODE", "ON", "BOOL")
+    config.cache_entry("CMAKE_BUILD_TYPE", "RelWithDebInfo", "STRING")
+  elif token == "opt":
+    config.cache_entry("FEAT_DEBUG_MODE", "OFF", "BOOL")
+    config.cache_entry("CMAKE_BUILD_TYPE", "Release", "STRING")
+  elif token == "gcc" or token == "gnu" or token == "g++":
+    config.set_compiler_cxx("g++")
+    config.set_compiler_cc("gcc")
+
+    cxxflags_tmp = configure_gcc(config.cputype, config.buildid, "g++", args.restrict_errors)
+    if cxxflags_tmp:
+      config.add_cxx_flags(*cxxflags_tmp.split(" "))
+
+    if "coverage" in config.buildid:
+      config.add_ld_flags("-fprofile-arcs", "-ftest-coverage")
+
+    if "lto" in config.buildid:
+      #use gcc provided binutils for lto
+      config.cache_entry("CMAKE_RANLIB_PATH", find_exe("gcc-ranlib"), "PATH")
+      config.cache_entry("CMAKE_AR", find_exe("gcc-ar"), "PATH")
+
+    config.cache_entry("FEAT_COMPILER_ID", "gcc", "STRING")
+  elif token == "icc" or token == "intel" or token == "icpc":
+    config.set_compiler_cxx("icpc")
+    config.set_compiler_cc("icc")
+
+    config.cache_entry("FEAT_COMPILER_ID", "icc", "STRING")
+
+    cxxflags_tmp = configure_icc(
+      config.cputype,
+      config.buildid,
+      "icpc",
+      config.system_host_compiler,
+      args.restrict_errors
+    )
+
+    if cxxflags_tmp:
+      config.add_cxx_flags(*cxxflags_tmp.split(" "))
+  elif token == "icx" or token == "icpx" or token == "oneapi":
+    config.set_compiler_cxx("icpx")
+    config.set_compiler_cc("icx")
+
+    config.cache_entry("FEAT_COMPILER_ID", "icx", "STRING")
+
+    cxxflags_tmp = configure_icx(
+      config.cputype,
+      config.buildid,
+      "icpx",
+      config.system_host_compiler,
+      args.restrict_errors
+    )
+    if cxxflags_tmp:
+      config.add_cxx_flags(*cxxflags_tmp.split(" "))
+  elif token == "clang" or token == "llvm":
+    config.set_compiler_cxx("clang++")
+    config.set_compiler_cc("clang")
+
+    config.cache_entry("FEAT_COMPILER_ID", "clang", "STRING")
+
+    cxxflags_tmp = configure_clang(
+      config.cputype,
+      config.buildid,
+      "clang",
+      config.system_host_compiler,
+      args.restrict_errors
+    )
+    if cxxflags_tmp:
+      config.add_cxx_flags(*cxxflags_tmp.split(" "))
+  elif token == "cray":
+    config.set_compiler_cxx("CC")
+    config.set_compiler_cc("cc")
+
+    config.cache_entry("FEAT_COMPILER_ID", "cray", "STRING")
+
+    cxxflags_tmp = configure_cray(
+      config.cputype,
+      config.buildid,
+      "CC",
+      args.restrict_errors
+    )
+    if cxxflags_tmp:
+      config.add_cxx_flags(*cxxflags_tmp.split(" "))
+  elif token == "msvc":
+    config.set_compiler_cxx("cl")
+    config.set_compiler_cc("cl")
+
+    config.cache_entry("FEAT_COMPILER_ID", "msvc", "STRING")
+
+    cxxflags_tmp = configure_msvc(
+      config.cputype,
+      config.buildid,
+      "cl",
+      args.restrict_errors
+    )
+    if cxxflags_tmp:
+      config.add_cxx_flags(*cxxflags_tmp.split(" "))
+  elif token == "mpi":
+    config.cache_entry("FEAT_HAVE_MPI", "ON", "BOOL")
+  elif token == "ccache":
+    config.set_compiler_wrapper("ccache")
+    config.cache_entry("FEAT_USE_COMPILER_WRAPPER", "ON", "BOOL")
+  elif token == "scorep":
+    config.set_compiler_wrapper("scorep")
+    config.cache_entry("FEAT_USE_COMPILER_WRAPPER", "ON", "BOOL")
+  elif token == "likwid":
+    config.cache_entry("FEAT_USE_LIKWID", "ON", "BOOL")
+    config.cache_entry("LIKWID_PERFMON", "ON", "BOOL")
+    if args.likwid_markers:
+      if "app" in args.likwid_markers:
+        config.cache_entry("FEAT_APPLICATION_MARKER_ACTIVATED", "ON", "BOOL")
+      if "kernel" in args.likwid_markers:
+        config.cache_entry("FEAT_KERNEL_MARKER_ACTIVATED", "ON", "BOOL")
+      if "special" in args.likwid_markers:
+        config.cache_entry("FEAT_SPECIAL_MARKER_ACTIVATED", "ON", "BOOL")
+      if "cuda" in args.likwid_markers:
+        config.cache_entry("LIKWID_NVMON", "ON", "BOOL")
+    else:
+      config.cache_entry("FEAT_APPLICATION_MARKER_ACTIVATED", "ON", "BOOL")
+  elif token == "sanitizer":
+    config.cache_entry("FEAT_SANITIZER", "ON", "BOOL")
+  elif token == "cuda":
+    config.cache_entry("FEAT_HAVE_CUDA", "ON", "BOOL")
+
+    if args.cuda_host_compiler:
+      cuda_host_compiler = args.cuda_host_compiler
+    else:
+      cuda_host_compiler = find_exe(config.get_compiler_cxx())
+    config.cache_entry("FEAT_CUDA_HOST_COMPILER", cuda_host_compiler, "FILEPATH")
+
+    if not args.cuda_arch:
+      cuda_arch, cuda_arch_int = detect_cuda_arch()
+    else:
+      cuda_arch = args.cuda_arch
+      cuda_arch_int = int(cuda_arch.split("sm_")[-1])
+
+    config.cache_entry("FEAT_CUDA_ARCH", cuda_arch, "STRING")
+    config.cache_entry("CMAKE_CUDA_ARCHITECTURES", str(cuda_arch_int), "STRING")
+    config.cuda_arch = cuda_arch
+    config.cuda_arch_int = cuda_arch_int
+
+    if args.cuda_verbose:
+      config.cache_entry("FEAT_CUDA_VERBOSE", "ON", "BOOL")
+  elif token == "cudamemcheck":
+    config.cache_entry("FEAT_CUDAMEMCHECK", "ON", "BOOL")
+  elif token == "cudss":
+    config.cache_entry("FEAT_HAVE_CUDSS", "ON", "BOOL")
+  elif token == "mkl":
+    config.cache_entry("FEAT_HAVE_MKL", "ON", "BOOL")
+    config.cxx_flags.append("-DMKL_ILP64")
+  elif token == "omp":
+    config.cache_entry("FEAT_HAVE_OMP", "ON", "BOOL")
+    # TODO: Is this required?
+    config.cxx_flags.append("-DMKL_ILP64")
+  elif token == "valgrind":
+    config.cache_entry("FEAT_VALGRIND", "ON", "BOOL")
+  elif token == "quadmath":
+    config.cache_entry("FEAT_HAVE_QUADMATH", "ON", "BOOL")
+    config.cache_entry("FEAT_OVERRIDE_MPI_OPS", "ON", "BOOL")
+  elif token == "half":
+    if (config.cuda_arch != "native") and (config.cuda_arch_int < 60):
+      warning("cuda arch " + config.cuda_arch + " is too low for half, which needs at least sm_60")
+    else:
+      config.cache_entry("FEAT_HAVE_HALFMATH", "ON", "BOOL")
+      config.cache_entry("FEAT_OVERRIDE_MPI_OPS", "ON", "BOOL")
+  elif token == "cotire":
+    config.cache_entry("FEAT_COTIRE", "ON", "BOOL")
+  elif token == "trilinos":
+    config.cache_entry("FEAT_HAVE_TRILINOS", "ON", "BOOL")
+  elif token == "lto":
+    # Valid token, but handled specially later
+    pass
+  elif token == "alglib":
+    config.cache_entry("FEAT_HAVE_ALGLIB", "ON", "BOOL")
+  elif token == "boost":
+    config.cache_entry("FEAT_HAVE_BOOST", "ON", "BOOL")
+  elif token == "cgal":
+    config.cache_entry("FEAT_HAVE_CGAL", "ON", "BOOL")
+  elif token == "cudss":
+    config.cache_entry("FEAT_HAVE_CUDSS", "ON", "BOOL")
+  elif token == "deathhandler":
+    config.cache_entry("FEAT_HAVE_DEATH_HANDLER", "ON", "BOOL")
+  elif token == "floatx":
+    config.cache_entry("FEAT_HAVE_FLOATX", "ON", "BOOL")
+  elif token == "hypre":
+    config.cache_entry("FEAT_HAVE_HYPRE", "ON", "BOOL")
+  elif token == "metis":
+    config.cache_entry("FEAT_HAVE_PARMETIS", "ON", "BOOL")
+  elif token == "pmp":
+    config.cache_entry("FEAT_HAVE_PMP", "ON", "BOOL")
+  elif token == "superlu":
+    config.cache_entry("FEAT_HAVE_SUPERLU_DIST", "ON", "BOOL")
+  elif token == "triangle":
+    config.cache_entry("FEAT_HAVE_TRIANGLE", "ON", "BOOL")
+  elif token == "umfpack":
+    config.cache_entry("FEAT_HAVE_UMFPACK", "ON", "BOOL")
+  elif token == "zfp":
+    config.cache_entry("FEAT_HAVE_ZFP", "ON", "BOOL")
+  elif token == "zlib":
+    config.cache_entry("FEAT_HAVE_ZLIB", "ON", "BOOL")
+  elif token == "zoltan":
+    config.cache_entry("FEAT_HAVE_ZOLTAN", "ON", "BOOL")
+  else:
+    warning("Unknown build-id token", token)
+
+# always set build flags offline
+config.env["CMAKE_CXX_FLAGS_DEBUG"] = ""
+config.env["CMAKE_CXX_FLAGS_RELEASE"] = ""
+config.env["CMAKE_CXX_FLAGS_MINSIZEREL"] = ""
+config.env["CMAKE_CXX_FLAGS_RELWITHDEBINFO"] = ""
+config.env["CMAKE_C_FLAGS_DEBUG"] = ""
+config.env["CMAKE_C_FLAGS_RELEASE"] = ""
+config.env["CMAKE_C_FLAGS_MINSIZEREL"] = ""
+config.env["CMAKE_C_FLAGS_RELWITHDEBINFO"] = ""
+
+# give cmake on macOS a hint to the openmp lib
+if (platform.system() == "Darwin") and ("omp" in buildid):
+  config.add_ld_flags("-L/usr/opt/local/opt/libomp/lib")
+  config.add_cxx_flags("-I/usr/opt/local/opt/libomp/include")
+
+if "lto" in buildid and "opt" in buildid:
+  config.add_ld_flags(*config.cxx_flags)
+
+# set system host compiler in cflags to pass cmake's c compiler check
+if "icc" in buildid or "intel" in buildid or "icpc" in buildid:
+  if config.system_host_compiler:
+    config.add_c_flags("-gcc-name=" + config.system_host_compiler)
+
+# print out choosen configuration
+header("============== configure_feat ===========")
+print("Build-ID: " + "-".join(config.buildid))
+print("")
+print("CPU Type: " + config.cputype)
+print("")
+print("cxx: " + config.get_compiler_cxx())
+print("")
+print("cxxflags: " + config.cxx_flags_str())
+print("")
+print("ldflags: " + config.ld_flags_str())
+print("")
+if (config.cuda_arch != ""):
+  print("cuda_arch: " + config.cuda_arch)
+  print("")
+print("Generator: " + config.generator)
+print("")
+print("Adding CMake preset to", trunk_dirname + "/CMakeUserPresets.json")
+
+if not args.no_preset:
+  try:
+    append_preset_to_file(trunk_dirname + "/CMakeUserPresets.json", config.as_configure_preset())
+  except OSError as e:
+    error(e)
+
+# Exit if we do not actually need to configure a build directory
+if args.preset_only:
+  sys.exit(0)
 
 # check for in-source configure
 # [:-9] strips the /configure from sys.argv[0]
 if is_subdirectory(os.getcwd(), sys.argv[0][:-9]):
-  if not "--in-source" in extra_options:
-    print("ERROR: You are trying to configure for an in-source build, which is a really bad idea.")
-    print("It is recommended that you call this configure script from a separate build directory.")
-    print("If you really insist on an in-source build, you need to specify the '--in-source' option.")
-    sys.exit(1)
-  else:
-    unused_extra_options.remove("--in-source")
+  if not args.in_source:
+    error(("You are trying to configure for an in-source build, which is a really bad idea.\n"
+          "It is recommended that you call this configure script from a separate build directory.\n"
+          "If you really insist on an in-source build, you need to specify the '--in-source' option."))
 
 # check for in-home configure
 if os.path.realpath(os.getcwd()) == os.path.realpath(os.path.expanduser("~")):
-  if not "--in-home" in extra_options:
-    print("ERROR: You are trying to configure for a build in your home directory, which is a really bad idea.")
-    print("It is recommended that you call this configure script from a separate build directory.")
-    print("If you really insist on a build in your home directory, you need to specify the '--in-home' option.")
-    sys.exit(1)
-  else:
-    unused_extra_options.remove("--in-home")
-
-if not cputype:
-  cputype = detect_cpu()
-cmake_flags += " -DFEAT_CPU_TYPE:STRING=" + cputype
-
-# compiler selection
-if "gcc" in buildid or "gnu" in buildid or "g++" in buildid:
-  if not compiler_cxx:
-    compiler_cxx="g++"
-  if not is_found(compiler_cxx):
-    print ("Error: Chosen cxx binary '" + compiler_cxx +"' not found!")
-    sys.exit(1)
-  if not compiler_cc:
-    compiler_cc="gcc"
-  if not is_found(compiler_cc):
-    print ("Error: Chosen cc binary '" + compiler_cc +"' not found!")
-    sys.exit(1)
-  remove_string(unused_tokens, "gcc")
-  remove_string(unused_tokens, "gnu")
-  os.environ["CC"] = compiler_cc
-  os.environ["CXX"] = compiler_cxx
-  os.environ["LD"] = compiler_cxx
-  cxxflags_temp, cmake_temp = configure_gcc (cputype, buildid, compiler_cxx, restrict_errors)
-  cxxflags += cxxflags_temp
-  cmake_flags += cmake_temp
-  if "coverage" in buildid:
-    remove_string(unused_tokens, "coverage")
-    ldflags += " -fprofile-arcs -ftest-coverage"
-  cmake_flags += " -DFEAT_COMPILER_ID:STRING=gcc"
-elif "icc" in buildid or "intel" in buildid or "icpc" in buildid:
-  if not compiler_cxx:
-    compiler_cxx = "icpc"
-  if not is_found(compiler_cxx):
-    print ("Error: Chosen cxx binary '" + compiler_cxx +"' not found!")
-    sys.exit(1)
-  if not compiler_cc:
-    compiler_cc = "icc"
-  if not is_found(compiler_cc):
-    print ("Error: Chosen cc binary '" + compiler_cc +"' not found!")
-    sys.exit(1)
-  remove_string(unused_tokens, "icc")
-  remove_string(unused_tokens, "icpc")
-  remove_string(unused_tokens, "intel")
-  os.environ["CC"] = compiler_cc
-  os.environ["CXX"] = compiler_cxx
-  os.environ["LD"] = compiler_cxx
-  cxxflags += " " + configure_icc (cputype, buildid, compiler_cxx, system_host_compiler, restrict_errors)
-  cmake_flags += " -DFEAT_COMPILER_ID:STRING=icc"
-elif "icx" in buildid or "icpx" in buildid or "oneapi" in buildid:
-  if not compiler_cxx:
-    compiler_cxx = "icpx"
-  if not is_found(compiler_cxx):
-    print ("Error: Chosen cxx binary '" + compiler_cxx +"' not found!")
-    sys.exit(1)
-  if not compiler_cc:
-    compiler_cc = "icx"
-  if not is_found(compiler_cc):
-    print ("Error: Chosen cc binary '" + compiler_cc +"' not found!")
-    sys.exit(1)
-  remove_string(unused_tokens, "icx")
-  remove_string(unused_tokens, "icpx")
-  remove_string(unused_tokens, "oneapi")
-  os.environ["CC"] = compiler_cc
-  os.environ["CXX"] = compiler_cxx
-  os.environ["LD"] = compiler_cxx
-  cxxflags += " " + configure_icx (cputype, buildid, compiler_cxx, system_host_compiler, restrict_errors)
-  cmake_flags += " -DFEAT_COMPILER_ID:STRING=icx"
-elif "clang" in buildid or "llvm" in buildid:
-  if not compiler_cxx:
-    compiler_cxx = "clang++"
-  if not is_found(compiler_cxx):
-    print ("Error: Chosen cxx binary '" + compiler_cxx +"' not found!")
-    sys.exit(1)
-  if not compiler_cc:
-    compiler_cc = "clang"
-  if not is_found(compiler_cc):
-    print ("Error: Chosen cc binary '" + compiler_cc +"' not found!")
-    sys.exit(1)
-  remove_string(unused_tokens, "clang")
-  remove_string(unused_tokens, "llvm")
-  os.environ["CC"] = compiler_cc
-  os.environ["CXX"] = compiler_cxx
-  os.environ["LD"] = compiler_cxx
-  cxxflags += " " + configure_clang (cputype, buildid, compiler_cxx, system_host_compiler, restrict_errors)
-  cmake_flags += " -DFEAT_COMPILER_ID:STRING=clang"
-elif "cray" in buildid:
-  if not compiler_cxx:
-    compiler_cxx = "CC"
-  if not is_found(compiler_cxx):
-    print ("Error: Chosen cxx binary '" + compiler_cxx +"' not found!")
-    sys.exit(1)
-  if not compiler_cc:
-    compiler_cc = "cc"
-  if not is_found(compiler_cc):
-    print ("Error: Chosen cc binary '" + compiler_cc +"' not found!")
-    sys.exit(1)
-  remove_string(unused_tokens, "cray")
-  os.environ["CC"] = compiler_cc
-  os.environ["CXX"] = compiler_cxx
-  os.environ["LD"] = compiler_cxx
-  cxxflags += " " + configure_cray (cputype, buildid, compiler_cxx, restrict_errors)
-  cmake_flags += " -DFEAT_COMPILER_ID:STRING=cray"
-elif "msvc" in buildid:
-  if not compiler_cxx:
-    compiler_cxx = "cl"
-  if not is_found(compiler_cxx):
-    print ("Error: Chosen cxx binary '" + compiler_cxx +"' not found!")
-    sys.exit(1)
-  if not compiler_cc:
-    compiler_cc = "cl"
-  if not is_found(compiler_cc):
-    print ("Error: Chosen cc binary '" + compiler_cc +"' not found!")
-    sys.exit(1)
-  remove_string(unused_tokens, "msvc")
-  os.environ["CC"] = compiler_cc
-  os.environ["CXX"] = compiler_cxx
-  os.environ["LD"] = compiler_cxx
-  cxxflags += " " + configure_msvc (cputype, buildid, compiler_cxx, restrict_errors)
-  cmake_flags += " -DFEAT_COMPILER_ID:STRING=msvc"
-else:
-  print ("Error: No supported compiler found in build id:")
-  print (buildid_string)
-  sys.exit(1)
-
-# additional options
-if "ccache" in buildid:
-  if not is_found("ccache"):
-    print ("Error: Choosen compiler frontend binary ccache not found!")
-    sys.exit(1)
-  if "scorep" in buildid:
-    print ("Error: ccache and scorep cannot be used together!")
-    sys.exit(1)
-  print("ccache version: " + get_output("ccache -V")[0].split()[2])
-  remove_string(unused_tokens, "ccache")
-  os.environ["CC"] = "ccache " + os.environ["CC"]
-  os.environ["CXX"] = "ccache " + os.environ["CXX"]
-  cmake_flags += " -DFEAT_USE_COMPILER_WRAPPER:BOOL=ON"
-
-if "scorep" in buildid:
-  if not is_found("scorep"):
-    print ("Error: Choosen compiler frontend binary scorep not found!")
-    sys.exit(1)
-  if "ccache" in buildid:
-    print ("Error: ccache and scorep cannot be used together!")
-    sys.exit(1)
-  remove_string(unused_tokens, "scorep")
-  os.environ["CC"] = "scorep " + os.environ["CC"]
-  os.environ["CXX"] = "scorep " + os.environ["CXX"]
-  cmake_flags += " -DFEAT_USE_COMPILER_WRAPPER:BOOL=ON"
-
-if "likwid" in buildid:
-  remove_string(unused_tokens, "likwid")
-  cmake_flags += " -DFEAT_USE_LIKWID:BOOL=ON -DLIKWID_PERFMON:BOOL=ON"
-  if(not marker_options):
-    marker_options = " -DFEAT_APPLICATION_MARKER_ACTIVATED:BOOL=ON"
-  cmake_flags += marker_options
+  if not args.in_home:
+    error(("You are trying to configure for a build in your home directory, which is a really bad idea.\n"
+          "It is recommended that you call this configure script from a separate build directory.\n"
+          "If you really insist on a build in your home directory, you need to specify the '--in-home' option."))
 
 
-if "sanitizer" in buildid:
-  remove_string(unused_tokens, "sanitizer")
-  cmake_flags += " -DFEAT_SANITIZER:BOOL=ON"
+# check for cmake binary
+if not is_found ("cmake"):
+  error("Could not find cmake binary")
 
-if "cuda" in buildid:
-  if not is_found("nvcc"):
-    print ("Error: Choosen backend compiler binary nvcc not found!")
-    sys.exit(1)
-  remove_string(unused_tokens, "cuda")
-  cmake_flags += " -DFEAT_HAVE_CUDA:BOOL=ON"
-  if not cuda_arch:
-    cuda_arch = "native"
-    call_args = ("nvidia-smi", "--query-gpu=compute_cap", "--format=csv,noheader")
-    popen = subprocess.Popen(call_args, stdout=subprocess.PIPE, text=True)
-    popen.wait()
-    output = popen.stdout.read()
-    cuda_arch_int = 10000000
-    if("command not found..." in output or "error" in output.lower()):
-      cuda_arch_int = 60
-    else:
-      output_split_glob = output.splitlines()
-      for output_str in output_split_glob:
-        output_split = output_str.split(".")
-        if(len(output_split) != 2):
-          print("ERROR: Could not parse output of nvidia-smi querry" + output)
-          sys.exit(1)
-        cuda_arch_int = min(cuda_arch_int, int(output_split[0])*10 + int(output_split[1]))
-    if(cuda_arch_int < 60):
-      print("Warning: Lowest device compute capability at " + str(cuda_arch_int) + "\n feat cuda will not work as expected")
-      cuda_arch_int = 60
-  cmake_flags += " -DFEAT_CUDA_ARCH:STRING=" + cuda_arch
-  cmake_flags += " -DCMAKE_CUDA_ARCHITECTURES=" + str(cuda_arch_int)
+if not is_found(config.compiler_cxx):
+  error("Could not find chosen cxx binary", config.compiler_cxx)
 
-  if cuda_verbose:
-    cmake_flags += " -DFEAT_CUDA_VERBOSE:BOOL=ON"
-
-  if "cudamemcheck" in buildid:
-    remove_string(unused_tokens, "cudamemcheck")
-    cmake_flags += " -DFEAT_CUDAMEMCHECK:BOOL=ON"
-
-  # if no cuda_host compiler is explicitly picked, we default to our base compiler
-  if not cuda_host_compiler:
-    cuda_host_compiler = find_exe(compiler_cxx)
-  cmake_flags += " -DFEAT_CUDA_HOST_COMPILER:FILEPATH=" + cuda_host_compiler
-
-  if "cudss" in buildid:
-    remove_string(unused_tokens, "cudss")
-    cmake_flags += " -DFEAT_HAVE_CUDSS:BOOL=ON"
-
-if "mkl" in buildid:
-  remove_string(unused_tokens, "mkl")
-  cmake_flags += " -DFEAT_HAVE_MKL:BOOL=ON"
-  cxxflags += " -DMKL_ILP64"
-
-if "omp" in buildid:
-  remove_string(unused_tokens, "omp")
-  cmake_flags += " -DFEAT_HAVE_OMP:BOOL=ON"
-  cxxflags += " -DMKL_ILP64"
+if not is_found(config.compiler_cc):
+  error("Could not find chosen cc binary", config.compiler_cc)
 
 if "valgrind" in buildid:
   if not is_found("valgrind"):
-    print ("Error: Choosen debugger valgrind not found!")
-    sys.exit(1)
+    error("Could not find valgrind")
   print("valgrind version: " + get_output("valgrind --version")[0])
-  remove_string(unused_tokens, "valgrind")
-  cmake_flags += " -DFEAT_VALGRIND:BOOL=ON"
 
-if "quadmath" in buildid:
-  remove_string(unused_tokens, "quadmath")
-  cmake_flags += " -DFEAT_HAVE_QUADMATH:BOOL=ON"
-
-if "half" in buildid:
-  if "cuda" not in buildid:
-    print("Error: Using half without cuda is not supported!")
-    sys.exit()
-  if (cuda_arch != "native") and (cuda_arch_int < 60):
-    print("Warning: cuda arch " + cuda_arch + " is too low for half, which needs at least sm_60!")
-  else:
-    remove_string(unused_tokens, "half")
-    cmake_flags += " -DFEAT_HAVE_HALFMATH:BOOL=ON"
-
-if "cotire" in buildid:
-  remove_string(unused_tokens, "cotire")
-  cmake_flags += " -DFEAT_COTIRE:BOOL=ON"
-
-# print a warning that half/quadmath + mpi requires overriding of MPI operations to function properly if not given
-if (("half" in buildid) or ("quadmath" in buildid)) and ("mpi" in buildid) and not ("--ovr_mpi_ops" in extra_options):
-  print("")
-  print("WARNING: 'half' or 'quadmath' and 'mpi' are specified in build-id, but MPI operations were not overridden;")
-  print("automatically enabling MPI operations overrides because MPI applications would crash otherwise.")
-  print("Please manually add the '--ovr_mpi_ops' option to this configure script call when configuring with")
-  print("'half' or 'quadmath' support enabled to suppress this warning message.")
-  print("")
-  cmake_flags += " -DFEAT_OVERRIDE_MPI_OPS:BOOL=TRUE"
-
-if "trilinos" in buildid:
-  remove_string(unused_tokens, "trilinos")
-  cmake_flags += " -DFEAT_HAVE_TRILINOS:BOOL=ON"
-
-# prevent trilinos_path set without active trilinos support
-if "trilinos" not in buildid and trilinos_path:
-  print("Error: You need to activate trilinos support via 'trilinos' in buildid to facilitate trilinos_path!")
-  sys.exit()
-
-# prevent parmetis without mpi enabled (needed by parmetis)
-if "mpi" not in buildid and ("parmetis" in buildid or "metis" in buildid):
-  print("Error: Using ParMETIS without mpi is not allowed!")
-  sys.exit()
-
-# SuperLU needs MPI, because we only use SuperLU_DIST
-if ("mpi" not in buildid) and ("superlu" in buildid):
-  print("Error: SuperLU can only be used in combination with mpi!")
-  sys.exit()
-
-# SuperLU needs MPI, because we only use SuperLU_DIST
-if ("mpi" not in buildid) and ("zoltan" in buildid):
-  print("Error: Zoltan can only be used in combination with MPI!")
-  sys.exit()
-
-# give cmake on macOS a hint to the openmp lib
-if (platform.system() == "Darwin") and ("omp" in buildid):
-  ldflags += " -L/usr/local/opt/libomp/lib" #-lomp
-  cxxflags += " -I/usr/local/opt/libomp/include"
-
-for option,flag in available_package_dict.items():
-  if option in buildid:
-    cmake_flags += f" -DFEAT_HAVE_{flag}:BOOL=ON"
-    remove_string(unused_tokens, option)
+if config.compiler_wrapper:
+  if not is_found(config.compiler_wrapper):
+    error("Could not find chosen compiler wrapper", config.compiler_wrapper)
 
 # clean up previous configurations
 clean = [ "CMakeCache.txt", trunk_dirname+os.sep+"CMakeCache.txt" ]
@@ -888,82 +938,38 @@ for i in clean:
   if os.path.exists(i):
     shutil.rmtree(i)
 
+# clear all related
+os.environ["CXXFLAGS"] = ""
+os.environ["CXX"] = ""
+os.environ["LD"] = ""
+os.environ["CC"] = ""
+os.environ["LDFLAGS"] = ""
+os.environ["OMP_CXX"] = ""
+os.environ["OMP_CC"] = ""
+os.environ["MPICH_CXX"] = ""
+os.environ["MPICH_CC"] = ""
+
 # export compiler/linker flags
-os.environ["CXXFLAGS"] = cxxflags
-if "lto" in buildid:
-  remove_string(unused_tokens, "lto")
-  if not "opt" in buildid:
-    print("Error: lto only usable in opt mode!")
-    sys.exit()
-  ldflags += cxxflags
-os.environ["LDFLAGS"] = ldflags
-os.environ["CFLAGS"] = "-O3"
-# set system host compiler in cflags to pass cmake's c compiler check
-if "icc" in buildid or "intel" in buildid or "icpc" in buildid:
-  if system_host_compiler:
-    os.environ["CFLAGS"] = "-O3  -gcc-name=" + system_host_compiler
+os.environ["CXXFLAGS"] = config.cxx_flags_str()
+os.environ["CXX"] = config.get_compiler_cxx()
+os.environ["LD"] = config.get_linker()
+os.environ["CC"] = config.get_compiler_c()
+os.environ["LDFLAGS"] = config.ld_flags_str()
+os.environ["CFLAGS"] = config.c_flags_str()
 
-# always set build flags offline
-cmake_flags += ' -DCMAKE_CXX_FLAGS_DEBUG="" -DCMAKE_CXX_FLAGS_RELEASE="" -DCMAKE_CXX_FLAGS_MINSIZEREL="" -DCMAKE_CXX_FLAGS_RELWITHDEBINFO=""'
-cmake_flags += ' -DCMAKE_C_FLAGS_DEBUG="" -DCMAKE_C_FLAGS_RELEASE="" -DCMAKE_C_FLAGS_MINSIZEREL="" -DCMAKE_C_FLAGS_RELWITHDEBINFO=""'
-# TODO: Check if actually want to install anything before setting this
-# cmake_flags += f' -DCMAKE_INSTALL_CMAKEDIR:STRING="zfp_cmakedir_artifact"'
-# for later
-# cmake_flags += f' -DCMAKE_INSTALL_CMAKEDIR:STRING="{install_dir}/cmake/zfp"'
-# cmake_flags += '-DBLA_VENDOR=Intel10_64lp'
-# cmake_flags += f' -DCMAKE_PREFIX_PATH="/home/user/messer/nobackup/feat_tpl_packages/install"'
+# Construct cmake call
+cmake_args = ["cmake", "--log-level=VERBOSE"]
+cmake_args += config.cmake_flags()
+cmake_args += ["-G", config.generator]
+cmake_args += ["-C", args.initial_cache_file] if args.initial_cache_file else []
+cmake_args += [trunk_dirname]
 
-cmake_version = get_output("cmake --version")[0].split()[2]
-print("cmake version: " + cmake_version)
-if int(cmake_version[:1]) < 3:
-  cmake_flags += " -Wno-dev"
-
-# # the potential path to the build source
-# rel_fetch_content_path = "_deps/boost-src"
-# fetch_content_dir = os.path.join(build_dirname, rel_fetch_content_path)
-# os.environ["PATH"] = f'{fetch_content_dir};{os.environ["PATH"]}'
-
-# print out choosen configuration
-print ("============== configure_feat ===========")
-print ("Build-ID: " + buildid_string)
-if len(unused_tokens) == 0:
-  #print ("Unused Build-ID tokens: none")
-  pass
-else:
-  print ("")
-  print ("Warning: Unused Build-ID tokens: " + "-".join(unused_tokens))
-if len(unused_extra_options) == 0:
-  #print ("Unused extra option tokens: none")
-  pass
-else:
-  print ("")
-  print ("Warning: Unused extra option tokens: " + " ".join(unused_extra_options))
-print ("")
-print ("Extra Options: " + " ".join(extra_options))
-print ("")
-print ("CPU Type: " + cputype)
-print ("")
-print ("cxx: " + os.environ["CXX"])
-print ("")
-print ("cxxflags: " + os.environ["CXXFLAGS"])
-print ("")
-print ("ldflags: " + os.environ["LDFLAGS"])
-print ("")
-if (cuda_arch != ""):
-  print ("cuda_arch: " + cuda_arch)
-print ("")
-print ("Generator: " + generator)
-print ("")
-if init_cache_file:
-  print ("cmake  %s -G\"%s\" -C\"%s\" \"%s\"" % (cmake_flags, generator, init_cache_file, trunk_dirname))
-else:
-  print ("cmake  %s -G\"%s\" \"%s\"" % (cmake_flags, generator, trunk_dirname))
-print ("")
+# print out cmake call
+print("")
+print(" ".join(map(shlex.quote, cmake_args)))
+print("")
 # start actual configuration
-print ("============== CMAKE =====================")
+header("============== CMAKE =====================")
 sys.stdout.flush()
 sys.stderr.flush()
-if init_cache_file:
-  subprocess.call("cmake --log-level=VERBOSE  %s -G\"%s\" -C\"%s\" \"%s\"" % (cmake_flags, generator, init_cache_file, trunk_dirname), shell=True)
-else:
-  subprocess.call("cmake --log-level=VERBOSE  %s -G\"%s\" \"%s\"" % (cmake_flags, generator, trunk_dirname), shell=True)
+subprocess.run(cmake_args)

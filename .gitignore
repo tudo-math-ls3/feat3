@@ -33,8 +33,10 @@
 *.swp
 
 # Ignore build system files
+CMakeUserPresets.json
 CMakeCache.txt
 cmake_install.cmake
+compile_commands.json
 Makefile
 CTestTestfile.cmake
 CMakeFiles/
@@ -46,6 +48,7 @@ kernel/util/Testing/
 test_system/CMakeFiles/
 test_system/Testing/
 /build
+/out
 /.vscode
 
 # Ignore FEAT test output files
@@ -76,6 +79,9 @@ thirdparty/zfp-*/
 thirdparty/zlib-*/
 thirdparty/Zoltan-*/
 thirdparty/cache/*
+
+# Ignore clangd cache
+.cache
 
 # Ignore Visual Studio symlinks
 build_system/vc*/kernel
