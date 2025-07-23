@@ -765,7 +765,7 @@ namespace StokesMultigridBench
 
     // set tolerance
     solver->set_plot_name("Multigrid-Vanka");
-    solver->skip_defect_calc(false);
+    solver->force_defect_norm_calc(true);
     //solver->set_tol_rel(1E-12);
     //solver->set_max_iter(1000);
 

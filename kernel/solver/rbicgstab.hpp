@@ -73,6 +73,9 @@ namespace FEAT
         _system_matrix(matrix),
         _system_filter(filter)
       {
+        // we always need to compute defect norms
+        this->_force_def_norm_calc = true;
+
         // set communicator by system matrix
         this->_set_comm_by_matrix(matrix);
       }
@@ -103,6 +106,9 @@ namespace FEAT
         _system_matrix(matrix),
         _system_filter(filter)
       {
+        // we always need to compute defect norms
+        this->_force_def_norm_calc = true;
+
         // set communicator by system matrix
         this->_set_comm_by_matrix(matrix);
       }
@@ -111,6 +117,17 @@ namespace FEAT
       virtual String name() const override
       {
         return "RBiCGStab";
+      }
+
+      /**
+       * \brief Forces the calculation of defect norms in every iteration (overridden)
+       *
+       * This solver always requires the calculation of defect norms, so this function has been
+       * overridden and calling it has no effect.
+       */
+      virtual void force_defect_norm_calc(bool DOXY(force)) override
+      {
+        // force is already applied in constructor
       }
 
       /// \copydoc SolverBase::init_symbolic()

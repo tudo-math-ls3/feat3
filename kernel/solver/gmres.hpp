@@ -18,19 +18,19 @@ namespace FEAT
     /**
      * \brief GMRES(k) solver implementation
      *
-     * This class implements the Restarted Generalized Minimal Residual solver (GMRES(k)), which is
-     * a standard preconditioned iterative method used to solve nonsymmetric linear systems. The solver
+     * This class implements the Restarted Generalized Minimal Residual solver (aka "GMRES(k)"), which is
+     * a standard preconditioned iterative method used to solve non-symmetric linear systems. The solver
      * assumes the use of a linear preconditioner, meaning the preconditioner \f$M^{-1}\f$ should satisfy the
      * linearity condition \f$M^{-1}(\alpha x + y) = \alpha M^{-1}x + M^{-1}y\f$.
      * If this condition holds, GMRES(k) can be applied effectively. However, if a nonlinear or varying
-     * preconditioner is needed one that does not satisfy the linearity condition the Flexible GMRES (FGMRES(k))
+     * preconditioner is needed one that does not satisfy the linearity condition the FGMRES
      * solver should be used instead, as it is designed to handle such cases.
      * If used with a preconditioner that does fulfill the linearity condition or if used without a preconditioner,
      * the FGMRES(k) and GMRES(k) solvers are equivalent with the exception of rounding errors, of course.
      *
      * <u><b>Details about the inner resolution scaling factor:</b></u>\n
      * In contrast to other popular iterative Krylov subspace methods like PCG or BiCGStab, the GMRES method and all
-     * of its variants -- including the FGMRES(k) solver implemented by this class -- do \b not compute or update the
+     * of its variants do \b not compute or update the
      * residual/defect vector after each iteration! This is not an oversight, but it is a fundamental property of the
      * GMRES methods that both the solution vector as well as the residual/defect vectors are only computed after the
      * GMRES method has terminated or, in the case of restarted [F]GMRES(k) variants, after each restart, which happens
@@ -128,6 +128,9 @@ namespace FEAT
         _system_filter(filter),
         _krylov_dim(krylov_dim)
       {
+        // we always need to compute defect norms
+        this->_force_def_norm_calc = true;
+
         // set communicator by system matrix
         this->_set_comm_by_matrix(matrix);
         set_inner_res_scale(inner_res_scale);
@@ -140,6 +143,9 @@ namespace FEAT
         _system_filter(filter),
         _inner_res_scale(DataType(0))
       {
+        // we always need to compute defect norms
+        this->_force_def_norm_calc = true;
+
         // set communicator by system matrix
         this->_set_comm_by_matrix(matrix);
 
@@ -170,6 +176,17 @@ namespace FEAT
       virtual String name() const override
       {
         return "GMRES";
+      }
+
+      /**
+       * \brief Forces the calculation of defect norms in every iteration (overridden)
+       *
+       * This solver always requires the calculation of defect norms, so this function has been
+       * overridden and calling it has no effect.
+       */
+      virtual void force_defect_norm_calc(bool DOXY(force)) override
+      {
+        // force is already applied in constructor
       }
 
       virtual void init_symbolic() override

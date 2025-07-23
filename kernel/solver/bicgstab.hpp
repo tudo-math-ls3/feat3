@@ -197,6 +197,10 @@ namespace FEAT
           _precon_variant(precon_variant)
         {
           XASSERT(precon_variant == BiCGStabPreconVariant::left || precon_variant == BiCGStabPreconVariant::right);
+
+          // we always need to compute defect norms
+          this->_force_def_norm_calc = true;
+
           // set communicator by system matrix
           this->_set_comm_by_matrix(matrix);
         }
@@ -229,6 +233,9 @@ namespace FEAT
           _system_filter(filter),
           _precon_variant(BiCGStabPreconVariant::left)
         {
+          // we always need to compute defect norms
+          this->_force_def_norm_calc = true;
+
           // set communicator by system matrix
           this->_set_comm_by_matrix(matrix);
           // Check if we have set _p_variant
@@ -241,6 +248,17 @@ namespace FEAT
         virtual String name() const override
         {
           return "BiCGStab";
+        }
+
+        /**
+         * \brief Forces the calculation of defect norms in every iteration (overridden)
+         *
+         * This solver always requires the calculation of defect norms, so this function has been
+         * overridden and calling it has no effect.
+         */
+        virtual void force_defect_norm_calc(bool DOXY(force)) override
+        {
+          // force is already applied in constructor
         }
 
         /// \copydoc SolverBase::init_symbolic()
@@ -436,6 +454,11 @@ namespace FEAT
               {
                 this->_def_cur = def_half;
                 status_half = Status::diverged;
+              }
+              // minimum iterations not reached yet?
+              else if(this->_num_iter < this->_min_iter)
+              {
+                status_half = Status::progress;
               }
               // is converged?
               else if(this->is_converged(def_half))

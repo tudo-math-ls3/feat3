@@ -1592,7 +1592,6 @@ int main(int argc, char* argv[])
       //smoother = Solver::new_descent(lvl.matrix_sys, lvl.filter_sys, Solver::DescentVariant::defect, schwarz);
       smoother->set_min_iter(smooth_steps);
       smoother->set_max_iter(smooth_steps);
-      smoother->skip_defect_calc(true); // skip defect calculation
       smoother->set_plot_name("Smoother[" + stringify(i) + "]");
       smoother->set_plot_mode(smooth_plot ? Solver::PlotMode::iter : Solver::PlotMode::none);
       // pre-/post-smoother?

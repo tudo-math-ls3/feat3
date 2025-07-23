@@ -374,7 +374,6 @@ namespace CCNDSimple
         auto smoother = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, smooth_damp, schwarz);
         smoother->set_min_iter(smooth_steps);
         smoother->set_max_iter(smooth_steps);
-        smoother->skip_defect_calc(true); // skip defect calculation
         multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, lvl.transfer_sys, smoother, smoother, smoother);
       }
 #ifdef FEAT_HAVE_UMFPACK

@@ -18,15 +18,15 @@ namespace FEAT
     /**
      * \brief FGMRES(k) solver implementation
      *
-     * This class implements the Restarted Flexible Generalized Minimal Residual solver (FGMRES(k)), which is
-     * a variation of the "normal" preconditioned Restarted GMRES (GMRES(k)) solver that supports varying
+     * This class implements the Restarted Flexible Generalized Minimal Residual solver (aka "FGMRES(k)"), which is
+     * a variation of the "normal" preconditioned Restarted GMRES (aka "GMRES(k)") solver that supports varying
      * preconditioners, i.e. it allows the use of preconditioner \f$M^{-1}\f$ which does not necessarily have to
      * fulfill the linearity condition \f$M^{-1}(\alpha x + y) = \alpha M^{-1}x + M^{-1}y\f$.
      * If used with a preconditioner that does fulfill the linearity condition or if used without a preconditioner,
      * the FGMRES(k) and GMRES(k) solvers are equivalent with the exception of rounding errors, of course.
      *
      * \note
-     * If you intend to use a preconditioner that fulfills the abovementioned linearity condititon, then it is
+     * If you intend to use a preconditioner that fulfills the above-mentioned linearity condition, then it is
      * recommended that you use the GMRES(k) solver instead of this FMGRES(k) solver, because the FGMRES(k) requires
      * almost \b twice the temporary memory as GMRES(k).
      *
@@ -129,6 +129,9 @@ namespace FEAT
         _system_filter(filter),
         _krylov_dim(krylov_dim)
       {
+        // we always need to compute defect norms
+        this->_force_def_norm_calc = true;
+
         // set communicator by system matrix
         this->_set_comm_by_matrix(matrix);
         set_inner_res_scale(inner_res_scale);
@@ -141,6 +144,9 @@ namespace FEAT
         _system_filter(filter),
         _inner_res_scale(DataType(0))
       {
+        // we always need to compute defect norms
+        this->_force_def_norm_calc = true;
+
         // set communicator by system matrix
         this->_set_comm_by_matrix(matrix);
 
@@ -171,6 +177,17 @@ namespace FEAT
       virtual String name() const override
       {
         return "FGMRES";
+      }
+
+      /**
+       * \brief Forces the calculation of defect norms in every iteration (overridden)
+       *
+       * This solver always requires the calculation of defect norms, so this function has been
+       * overridden and calling it has no effect.
+       */
+      virtual void force_defect_norm_calc(bool DOXY(force)) override
+      {
+        // force is already applied in constructor
       }
 
       virtual void init_symbolic() override

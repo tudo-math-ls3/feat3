@@ -203,12 +203,11 @@ namespace SaddlePointAssemblyBench
 
     asm_sym_vanka_watch.start();
     auto vanka = Solver::new_amavanka(matrix, filter, omega);
-    auto fgmres = Solver::new_gmres(matrix, filter, Index(std::min(num_solver_iterations,16)), DataType(0), vanka);
-    fgmres->set_min_iter(num_solver_iterations);
-    fgmres->set_max_iter(num_solver_iterations);
-    fgmres->skip_defect_calc(true);
-    fgmres->set_plot_mode(Solver::PlotMode::none);
-    fgmres->init_symbolic();
+    auto gmres = Solver::new_gmres(matrix, filter, Index(std::min(num_solver_iterations,16)), DataType(0), vanka);
+    gmres->set_min_iter(num_solver_iterations);
+    gmres->set_max_iter(num_solver_iterations);
+    gmres->set_plot_mode(Solver::PlotMode::none);
+    gmres->init_symbolic();
     asm_sym_vanka_watch.stop();
     bres.matrix_nnz = int(matrix.template used_elements<LAFEM::Perspective::pod>());
     bres.vanka_nnz = int(vanka->data_size());
@@ -222,22 +221,22 @@ namespace SaddlePointAssemblyBench
       voxel_defo.assemble_matrix1(mat_a, space_v, Cubature::DynamicFactory(cubature));
       asm_num_matrix_watch.stop();
       asm_num_vanka_watch.start();
-      fgmres->init_numeric();
+      gmres->init_numeric();
       asm_num_vanka_watch.stop();
       Backend::set_preferred_backend(backend_calc);
       solver_apply_watch.start();
       vec_sol.format();
-      fgmres->apply(vec_sol, vec_rhs);
+      gmres->apply(vec_sol, vec_rhs);
       vec_def.axpy(vec_sol, DataType(1));
       solver_apply_watch.stop();
       Backend::set_preferred_backend(backend_asm);
       asm_num_vanka_watch.start();
-      fgmres->done_numeric();
+      gmres->done_numeric();
       asm_num_vanka_watch.stop();
 
     }
 
-    fgmres->done_symbolic();
+    gmres->done_symbolic();
     all_watch.stop();
 
     bres.coloring_time = coloring_watch.elapsed();
@@ -350,12 +349,11 @@ namespace SaddlePointAssemblyBench
 
     asm_sym_vanka_watch.start();
     auto vanka = Solver::new_voxel_amavanka<MatrixType, FilterType, Adjacency::Coloring, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly, FEAT::Intern::VankaMacroPolicy::uniformMacros>(matrix, filter, col, omega);
-    auto fgmres = Solver::new_gmres(matrix, filter, Index(std::min(num_solver_iterations, 16)), DataType(0), vanka);
-    fgmres->set_min_iter(num_solver_iterations);
-    fgmres->set_max_iter(num_solver_iterations);
-    fgmres->skip_defect_calc(true);
-    fgmres->set_plot_mode(Solver::PlotMode::none);
-    fgmres->init_symbolic();
+    auto gmres = Solver::new_gmres(matrix, filter, Index(std::min(num_solver_iterations, 16)), DataType(0), vanka);
+    gmres->set_min_iter(num_solver_iterations);
+    gmres->set_max_iter(num_solver_iterations);
+    gmres->set_plot_mode(Solver::PlotMode::none);
+    gmres->init_symbolic();
     asm_sym_vanka_watch.stop();
     bres.matrix_nnz = int(matrix.template used_elements<LAFEM::Perspective::pod>());
     bres.vanka_nnz = int(vanka->data_size());
@@ -369,22 +367,22 @@ namespace SaddlePointAssemblyBench
       voxel_defo.assemble_matrix1(mat_a, space_v, Cubature::DynamicFactory(cubature));
       asm_num_matrix_watch.stop();
       asm_num_vanka_watch.start();
-      fgmres->init_numeric();
+      gmres->init_numeric();
       asm_num_vanka_watch.stop();
       Backend::set_preferred_backend(backend_calc);
       solver_apply_watch.start();
       vec_sol.format();
-      fgmres->apply(vec_sol, vec_rhs);
+      gmres->apply(vec_sol, vec_rhs);
       vec_def.axpy(vec_sol, DataType(1));
       solver_apply_watch.stop();
       Backend::set_preferred_backend(backend_asm);
       asm_num_vanka_watch.start();
-      fgmres->done_numeric();
+      gmres->done_numeric();
       asm_num_vanka_watch.stop();
 
     }
 
-    fgmres->done_symbolic();
+    gmres->done_symbolic();
     all_watch.stop();
 
     bres.coloring_time = coloring_watch.elapsed();

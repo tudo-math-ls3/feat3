@@ -1043,7 +1043,6 @@ namespace Stokes3Field
 
         smoother->set_min_iter(smooth_steps);
         smoother->set_max_iter(smooth_steps);
-        smoother->skip_defect_calc(true); // skip defect calculation
 
         //smoother->set_plot_name(String("SM:") + stringify(i));
         //smoother->set_plot_mode(Solver::PlotMode::iter);

@@ -152,7 +152,7 @@ namespace FEAT
          * Which preconditioning variant to use, defaults to left.
          */
         explicit BiCGStabL(const MatrixType& matrix, const FilterType& filter,
-          int l = 2,                                                             //default parameter 2 (1 would lead to standard BiCGStab algorithm)
+          int l = 2, //default parameter 2 (1 would lead to standard BiCGStab algorithm)
           std::shared_ptr<PrecondType> precond = nullptr,
           BiCGStabLPreconVariant precon_variant = BiCGStabLPreconVariant::left)
            :
@@ -162,10 +162,13 @@ namespace FEAT
           _precon_variant(precon_variant),
           _l(l)
         {
+          // we always need to compute defect norms
+          this->_force_def_norm_calc = true;
+
           // set communicator by system matrix
           this->_set_comm_by_matrix(matrix);
           XASSERT(precon_variant == BiCGStabLPreconVariant::left || precon_variant == BiCGStabLPreconVariant::right);
-          XASSERTM(_l > 0, "bicgstabl polynomial degree must be greather than zero!");
+          XASSERTM(_l > 0, "bicgstabl polynomial degree must be greater than zero!");
         }
 
 
@@ -198,6 +201,9 @@ namespace FEAT
           _system_filter(filter),
           _precon_variant(BiCGStabLPreconVariant::left)
         {
+          // we always need to compute defect norms
+          this->_force_def_norm_calc = true;
+
           // set communicator by system matrix
           this->_set_comm_by_matrix(matrix);
           // Check if we have set _p_variant
@@ -208,7 +214,7 @@ namespace FEAT
           //Check if we have set the solver parameter _l
           std::pair<String , bool> l_pair = section->query("polynomial_degree");
 
-          int l_pm = 2;                                                 //use default l, if the parameter is not given
+          int l_pm = 2; //use default l, if the parameter is not given
           if (l_pair.second && (!l_pair.first.parse(l_pm) || (l_pm <= 0)))
             throw ParseError(section_name + ".polynomial_degree", l_pair.first, "a positive integer");
 
@@ -220,6 +226,17 @@ namespace FEAT
         virtual String name() const override
         {
           return "BiCGStabL";
+        }
+
+        /**
+         * \brief Forces the calculation of defect norms in every iteration (overridden)
+         *
+         * This solver always requires the calculation of defect norms, so this function has been
+         * overridden and calling it has no effect.
+         */
+        virtual void force_defect_norm_calc(bool DOXY(force)) override
+        {
+          // force is already applied in constructor
         }
 
         /// \copydoc SolverBase::init_symbolic()

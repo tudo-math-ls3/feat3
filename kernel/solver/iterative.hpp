@@ -104,11 +104,91 @@ namespace FEAT
     /**
      * \brief Abstract base-class for iterative solvers.
      *
-     * This class template acts as an abstract base class for iterative solvers.
-     * It also implements various auxiliary features for convergence control.
+     * This class template acts as an abstract base class for iterative solvers and it implements various auxiliary
+     * features for convergence control, output formatting and a posteriori convergence analysis.
      *
      * \tparam Vector_
      * The class of the vector that is passed to the solver in the \c solve() method.
+     *
+     * <u><b>Details about the convergence control mechanisms offered by this class:</b></u>\n
+     * This class offers a wide variety of convergence control mechanisms and stopping criterions, which are summarized
+     * in this section.
+     *
+     * In the following, let \f$k\geq 0\f$ denote the current iteration and let \f$r_0 := b - Ax_0\f$ denote the initial
+     * defect/residual vector and let \f$r_k := b - Ax_k\f$ denote the defect/residual vector of the current iteration.
+     *
+     * <b>1. Divergence Criterion:</b>
+     * The first stopping criterion checks whether the residual vector norm has risen above a relative or absolute
+     * divergence tolerance and, if so, the solver stops and returns the status code Status::diverged.\n
+     * The divergence criterion is defined as follows:
+     * \f[ (\vert \vert r_k\vert\vert \geq \text{div\_abs}) \lor (\vert \vert r_k\vert\vert \geq \text{div\_rel}\cdot\vert \vert r_0\vert\vert) \f]
+     * By default, the divergence tolerances are chosen as
+     * - div_abs = 1/eps^2
+     * - dil_rel = 1/eps
+     *
+     * where eps is the machine precision constant for the solvers underlying data type, which evaluates to approximately
+     * div_abs = 1E+32 and div_rel = 1E+16 for double precision.
+     *
+     * <b>2. Maximum Iteration Number Criterion:</b>
+     * The second stopping criterion checks whether the solver has reached the maximum number of allowed
+     * iterations, i.e. whether k >= max_iter, and, if so, the solver returns the status code Status::max_iter.
+     *
+     * <b>3. Convergence Criterion:</b>
+     * The third stopping criterion checks whether the residual vector has fallen below a relative and/or absolute
+     * convergence tolerance and, if so, the solver returns the status code Status::converged.
+     * The convergence criterion consists of a relative tolerance and two absolute tolerances and is defined as follows:
+     *
+     * \f[ (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low})) \f]
+     * By default, the convergence tolerances are chosen as
+     * - tol_rel = sqrt(eps)
+     * - tol_abs = 1/eps^2
+     * - tol_abs_low = 0
+     *
+     * where eps is the machine precision constant for the solvers underlying data type, which evaluates to approximately
+     * tol_abs = 1E-8 and tol_rel = 1E+32 for double precision, which effectively "disables" both absolute tolerances
+     * therefore resulting in a convergence criterion that only depends on the relative tolerance.
+     *
+     * The tol_abs_low parameter can be used to "disarm" an overly strict relative tolerance tol_rel in the case where
+     * the initial defect is already quite small and therefore fulfilling the relative tolerance may become impossible
+     * due to finite precision arithmetic combined with a large condition number. A typical use case would be to set
+     * tol_abs to 1E-8 and tol_rel to 1E-5 (thus asking that the solver should gain 5 digits) and tol_abs_low to 1E-12,
+     * which will "disable" the tol_rel criterion if (and only if) the initial defect norm is less than 1E-7. If the
+     * initial defect norm is larger than 1E-7, then the tol_abs_low parameter will become irrelevant and the tol_abs
+     * and tol_rel criterions have to be fulfilled for convergence.
+     *
+     * - If you want the solver to fulfill <b>only a relative</b> tolerance, then set tol_rel to the corresponding
+     *   tolerance and leave tol_abs_low set to 0 and tol_abs to set a large value (1/eps^2 by default).
+     *
+     * - If you want the solver to fulfill <b>only an absolute</b> tolerance, then set both tol_abs and tol_abs_low
+     *   to the corresponding tolerance and set tol_rel to any value you like, e.g. 0.
+     *
+     * - If you want the solver to fulfill <b>either a relative or an absolute</b> tolerance, then set tol_rel and
+     *   tol_abs_low to the corresponding tolerances and leave tol_abs to set a large value (1/eps^2 by default).
+     *
+     * - If you want the solver to fulfill <b>both a relative and an absolute</b> tolerance, then set tol_rel and
+     *   tol_abs to the corresponding tolerances and leave tol_abs_low set to 0.
+     *
+     * <b>5. Stagnation Criterion:</b>
+     * The fifth stopping criterion checks whether the residual vector norms do not decrease by a minimum factor over
+     * the last few iterations, thus indicating that the solver seems to be stagnating and that further iterations
+     * will probably not improve the solution any further and, if so, the solver stops and returns the status code
+     * Status::stagnated.\n
+     * The stagnation criterion is fulfilled if min_stag_iter is set to a value > 0 and if
+     * \f[ \vert \vert r_k\vert\vert \geq \text{stag\_rate}\cdot\vert \vert r_{k-1}\vert\vert \f]
+     * for at least min_stag_iter consecutive iterations.
+     *
+     * By default, the stagnation criterion is disabled and its parameters are chosen as
+     * - stag_rate = 0.95
+     * - min_stag_iter = 0
+     *
+     * It is important to keep in mind that the stagnation criterion can usually only be helpful for simple fix-point
+     * type iterative solvers, which have more or less monotonous convergence behavior. Other types of solvers,
+     * especially Krylov subspace solvers, often show a somewhat "ballistic" convergence curve, where the defect norms
+     * seem to indicate divergence for the first few dozen/hundred iterations before the defect norms start falling
+     * down very quickly -- in this case, the stagnation criterion will trigger a false positive during the initial
+     * climb of the defect norms. Also, some solvers can run into a stagnation scenario where the defect norms
+     * oscillate, which will not be detected by the stagnation criterion because the defect norm drops every other
+     * iteration before rising back up again in the next iteration.
      *
      * \author Peter Zajac
      */
@@ -131,32 +211,11 @@ namespace FEAT
       String _plot_name;
       /// current status of the solver
       Status _status;
-      /**
-       * \brief relative tolerance parameter
-       *
-       * The solver is converged if\n
-       * the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init\n
-       * or\n
-       * the defect is smaller than _tol_abs and also smaller than _tol_abs_low\n
-       * As this might not be a sufficient description, the criterion that is checked is
-       * \f[
-       *   (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-       * \f]
-       * where \f$ r_k \f$ is the defect vector in the current iteration and \f$ r_0 \f$ the initial defect vector.
-       * Both _tol_rel and _tol_abs alone were not sufficient because of one practical case:
-       * If you have already a good initial solution so that the defect is 10^{-3}, it might be
-       * very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8}
-       * anyways. On the other hand, if you have a bad initial solution and your defect
-       * is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori
-       * you do not know the quality of the initial guess.
-       * The way it is now allows to say "I want the defect to be smaller than 10^{-3},
-       * and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
-       * did not gain 8 digits so far then I'm also happy"
-       */
+      /// relative tolerance parameter
       DataType _tol_rel;
-      /// absolute tolerance parameter \copydetails Solver::IterativeSolver::_tol_rel
+      /// absolute tolerance parameter
       DataType _tol_abs;
-      /// absolute tolerance parameter \copydetails Solver::IterativeSolver::_tol_rel
+      /// absolute low tolerance parameter
       DataType _tol_abs_low;
       /// relative divergence parameter
       DataType _div_rel;
@@ -187,7 +246,7 @@ namespace FEAT
       /// plot output interval
       Index _plot_interval;
       /// whether skipping of defect computation is allowed or not
-      bool _allow_skip_def_calc;
+      bool _force_def_norm_calc;
 
       /**
        * \brief Protected constructor
@@ -230,7 +289,7 @@ namespace FEAT
         _iter_digits(Math::ilog10(_max_iter)),
         _plot_mode(PlotMode::none),
         _plot_interval(1),
-        _allow_skip_def_calc(true)
+        _force_def_norm_calc(false)
       {
       }
 
@@ -418,19 +477,19 @@ namespace FEAT
       }
 
       /**
-       * \brief Specifies whether defect calculation is allowed to be skipped.
+       * \brief Forces the calculation of defect norms in every iteration
        *
-       * \warning
-       * Skipping defect calculation can lead to deadlocks in parallel solver implementations
-       * if one (but not all) processes need to compute the defect for some reason (like plotting) !\n
-       * Use this function only when you really know what you are doing!
+       * \note Please note that allowing the skipping of defect norm calculations is merely a hint and a derived class
+       * may override this function therefore always forcing the calculation of defect norms. One possible reason is
+       * that the derived solver class may require defect norms as part of its solver algorithm and therefore skipping
+       * the computation of the defect norms may break the solver; two examples are the BiCGStab and GMRES solvers.
        *
-       * \param[in] skip
-       * Specifies whether defect computation is allowed to be skipped.
+       * \param[in] force
+       * Specifies whether defect norm computation is to be enforced in every iteration
        */
-      void skip_defect_calc(bool skip)
+      virtual void force_defect_norm_calc(bool force)
       {
-        _allow_skip_def_calc = skip;
+        _force_def_norm_calc = force;
       }
 
       /**
@@ -468,7 +527,6 @@ namespace FEAT
 
       /**
        * \brief checks for convergence
-       * \details \copydetails Solver::IterativeSolver::_tol_rel
        *
        * \returns \c true, if converged, else \c false
        */
@@ -479,10 +537,9 @@ namespace FEAT
 
       /**
        * \brief checks for convergence
-       * \details \copydetails Solver::IterativeSolver::_tol_rel
        *
        * \param[in] def_cur
-       * The defect that is to be analyzed
+       * The defect norm that is to be analyzed
        *
        * \returns \c true, if converged, else \c false
        */
@@ -744,16 +801,16 @@ namespace FEAT
        */
       virtual Status _set_initial_defect(const VectorType& vec_def, const VectorType& vec_sol)
       {
-        // reset iteration counts
-        this->_def_init = DataType(0);
+        // reset iteration variables
+        this->_def_init = this->_def_prev = this->_def_cur = DataType(0);
         this->_num_iter = Index(0);
         this->_num_stag_iter = Index(0);
 
         // first, let's see if we have to compute the defect at all
-        bool calc_def = !_allow_skip_def_calc;
-        calc_def = calc_def || (this->_min_iter < this->_max_iter);
-        calc_def = calc_def || (this->_plot_iter() || this->_plot_summary());
-        calc_def = calc_def || (this->_min_stag_iter > Index(0));
+        bool calc_def = _force_def_norm_calc
+          || (this->_min_iter < this->_max_iter)
+          || (this->_plot_iter() || this->_plot_summary())
+          || (this->_min_stag_iter > Index(0));
 
         // if we don't have to compute the initial defect, we can exit here
         if(!calc_def)
@@ -816,6 +873,10 @@ namespace FEAT
         if(this->is_diverged(def_cur))
           return Status::diverged;
 
+        // maximum number of iterations performed?
+        if(num_iter >= this->_max_iter)
+          return Status::max_iter;
+
         // minimum number of iterations performed?
         if(num_iter < this->_min_iter)
           return Status::progress;
@@ -823,10 +884,6 @@ namespace FEAT
         // is converged?
         if(this->is_converged(def_cur))
           return Status::success;
-
-        // maximum number of iterations performed?
-        if(num_iter >= this->_max_iter)
-          return Status::max_iter;
 
         // check for stagnation?
         if(check_stag && (this->_min_stag_iter > Index(0)))
@@ -873,10 +930,10 @@ namespace FEAT
         this->_def_prev = this->_def_cur;
 
         // first, let's see if we have to compute the defect at all
-        bool calc_def = !_allow_skip_def_calc;
-        calc_def = calc_def || (this->_min_iter < this->_max_iter);
-        calc_def = calc_def || (this->_plot_iter());
-        calc_def = calc_def || (this->_min_stag_iter > Index(0));
+        bool calc_def = _force_def_norm_calc
+          || (this->_min_iter < this->_max_iter)
+          || (this->_plot_iter() || this->_plot_summary())
+          || (this->_min_stag_iter > Index(0));
 
         // compute new defect
         if(calc_def)
@@ -899,7 +956,7 @@ namespace FEAT
       /**
        * \brief Internal function: sets the new (next) defect norm
        *
-       * This function takes a precalculated defect vector's norm, increments the iteration count,
+       * This function takes a pre-calculated defect vector norm, increments the iteration count,
        * plots an output line to std::cout and checks whether any of the stopping criterions is fulfilled.
        *
        * \param[in] def_cur_norm
@@ -935,7 +992,7 @@ namespace FEAT
     }; // class IterativeSolver
 
     /**
-     * \brief Override of solve() for IterativeSolver solvers
+     * \brief Overload of solve() function for IterativeSolver solvers
      */
     template<
       typename Vector_,
