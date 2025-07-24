@@ -15,7 +15,7 @@
 #include <kernel/cubature/dynamic_factory.hpp>             // for DynamicFactory
 #include <kernel/analytic/common.hpp>                      // for ExpBubbleFunction
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
-#include <kernel/assembly/domain_assembler_helpers.hpp>    // for Assembly::assemble_***
+#include <kernel/assembly/domain_assembler_basic_jobs.hpp>    // for Assembly::assemble_***
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
 #include <kernel/lafem/sparse_matrix_csr.hpp>              // for SparseMatrixCSR
 

@@ -6,7 +6,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/assembly/domain_assembler.hpp>
 #include <kernel/assembly/error_computer.hpp>
-#include <kernel/assembly/function_integral_jobs.hpp>
+#include <kernel/assembly/domain_assembler_basic_jobs.hpp>
 #include <kernel/assembly/interpolator.hpp>
 #include <kernel/analytic/function.hpp>
 #include <kernel/analytic/common.hpp>
@@ -76,7 +76,7 @@ public:
     domain_assembler.compile_all_elements();
     {
       // Now create our intgeral jobs
-      Assembly::ErrorFunctionIntegralJob<ScalarFuncType, ScalarVectorType, SpaceType, 0> base_err_job(scalar_func, scalar_vec, space, cubature);
+      Assembly::DomainAssemblyErrorFunctionIntegralJob<ScalarFuncType, ScalarVectorType, SpaceType, 0> base_err_job(scalar_func, scalar_vec, space, cubature);
       Assembly::CellErrorFunctionIntegralJob<ScalarFuncType, ScalarVectorType, SpaceType, 0> cell_err_job(scalar_func, scalar_vec, space, cubature);
 
       domain_assembler.assemble(base_err_job);
@@ -98,7 +98,7 @@ public:
     }
     {
       // Now create our intgeral jobs
-      Assembly::ErrorFunctionIntegralJob<ScalarFuncType, ScalarVectorType, SpaceType, 2> base_err_job(scalar_func, scalar_vec, space, cubature);
+      Assembly::DomainAssemblyErrorFunctionIntegralJob<ScalarFuncType, ScalarVectorType, SpaceType, 2> base_err_job(scalar_func, scalar_vec, space, cubature);
       Assembly::CellErrorFunctionIntegralJob<ScalarFuncType, ScalarVectorType, SpaceType, 2> cell_err_job(scalar_func, scalar_vec, space, cubature);
 
       domain_assembler.assemble(base_err_job);
@@ -124,7 +124,7 @@ public:
     }
     {
       // Now create our intgeral jobs
-      Assembly::ErrorFunctionIntegralJob<VectorFuncType, BlockedVectorType, SpaceType, 0> base_err_job(vector_func, blocked_vec, space, cubature);
+      Assembly::DomainAssemblyErrorFunctionIntegralJob<VectorFuncType, BlockedVectorType, SpaceType, 0> base_err_job(vector_func, blocked_vec, space, cubature);
       Assembly::CellErrorFunctionIntegralJob<VectorFuncType, BlockedVectorType, SpaceType, 0> cell_err_job(vector_func, blocked_vec, space, cubature);
 
       domain_assembler.assemble(base_err_job);

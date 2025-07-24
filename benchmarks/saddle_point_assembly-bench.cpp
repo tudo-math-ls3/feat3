@@ -18,7 +18,6 @@
 #include <kernel/solver/amavanka.hpp>
 #include <kernel/solver/voxel_amavanka.hpp>
 #include <kernel/geometry/export_vtk.hpp>
-#include <kernel/assembly/function_integral_jobs.hpp>
 #include <kernel/voxel_assembly/defo_assembler.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/geometry/unit_cube_patch_generator.hpp>

@@ -78,7 +78,7 @@
 // FEAT-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
 #include <kernel/assembly/domain_assembler.hpp>            // for DomainAssembler
-#include <kernel/assembly/domain_assembler_helpers.hpp>    // for Assembly::assemble_***
+#include <kernel/assembly/domain_assembler_basic_jobs.hpp> // for Assembly::assemble_***
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator
 #include <kernel/assembly/common_functionals.hpp>          // for LaplaceFunctional
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
@@ -508,7 +508,7 @@ namespace Tutorial01
     );
 
     // The error_info structure, which is an instance of the Assembly::FunctionIntegralInfo class
-    // template defined in <kernel/assembly/function_integral_jobs.hpp>, contains all the computed
+    // template defined in <kernel/assembly/function_integral_info.hpp>, contains all the computed
     // norms and integrals as member functions, which we could access here individually. However,
     // we simply want to use the 'print_norms' function, which returns a formatted multi-line
     // string containing all the error norm values and

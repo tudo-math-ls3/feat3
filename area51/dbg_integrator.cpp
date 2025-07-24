@@ -18,7 +18,7 @@
 #include <kernel/analytic/common.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/domain_assembler.hpp>
-#include <kernel/assembly/domain_assembler_helpers.hpp>
+#include <kernel/assembly/domain_assembler_basic_jobs.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
@@ -105,7 +105,7 @@ namespace Tutorial01
       integrator.set_threading_strategy(Assembly::ThreadingStrategy::layered);
       integrator.compile_all_elements();
 
-      Assembly::BilinearOperatorMatrixAssemblyJob1<decltype(laplace_op), MatrixType, SpaceType>
+      Assembly::DomainAssemblyBilinearOperatorMatrixJob1<decltype(laplace_op), MatrixType, SpaceType>
         laplace_job(laplace_op, matrix, space, cub_name, 1.0);
 
       watch_2.start();
@@ -130,7 +130,7 @@ namespace Tutorial01
       integrator.set_threading_strategy(Assembly::ThreadingStrategy::colored);
       integrator.compile_all_elements();
 
-      Assembly::BilinearOperatorMatrixAssemblyJob1<decltype(laplace_op), MatrixType, SpaceType>
+      Assembly::DomainAssemblyBilinearOperatorMatrixJob1<decltype(laplace_op), MatrixType, SpaceType>
         laplace_job(laplace_op, matrix, space, cub_name, 1.0);
 
       watch_4.start();

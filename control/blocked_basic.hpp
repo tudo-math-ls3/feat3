@@ -22,7 +22,7 @@
 #include <kernel/global/transfer.hpp>
 #include <kernel/global/muxer.hpp>
 #include <kernel/assembly/common_operators.hpp>
-#include <kernel/assembly/domain_assembler_helpers.hpp>
+#include <kernel/assembly/domain_assembler_basic_jobs.hpp>
 
 #include <control/domain/domain_control.hpp>
 #include <control/asm/gate_asm.hpp>

@@ -21,7 +21,6 @@
 #include <kernel/assembly/domain_assembler.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/common_functionals.hpp>
-//#include <kernel/assembly/basic_assembly_jobs.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
 #include <kernel/assembly/linear_functional_assembler.hpp>
 #include <kernel/assembly/unit_filter_assembler.hpp>
@@ -91,7 +90,7 @@ namespace Tutorial01
 
       dump_1 = integrator.dump();
 
-      Assembly::BilinearOperatorMatrixAssemblyJob1<decltype(laplace_op), MatrixType, SpaceType>
+      Assembly::DomainAssemblyBilinearOperatorMatrixJob1<decltype(laplace_op), MatrixType, SpaceType>
         laplace_job(laplace_op, matrix, space, cub_name, 1.0);
 
       watch_2.start();
@@ -120,7 +119,7 @@ namespace Tutorial01
 
       dump_2 = integrator.dump();
 
-      Assembly::BilinearOperatorMatrixAssemblyJob1<decltype(laplace_op), MatrixType, SpaceType>
+      Assembly::DomainAssemblyBilinearOperatorMatrixJob1<decltype(laplace_op), MatrixType, SpaceType>
         laplace_job(laplace_op, matrix, space, cub_name, 1.0);
 
       watch_5.start();

@@ -77,7 +77,7 @@
 #include <kernel/assembly/interpolator.hpp>
 #include <kernel/assembly/domain_assembler.hpp>
 #include <kernel/assembly/common_operators.hpp>
-#include <kernel/assembly/domain_assembler_helpers.hpp>
+#include <kernel/assembly/domain_assembler_basic_jobs.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/vector_mirror.hpp>

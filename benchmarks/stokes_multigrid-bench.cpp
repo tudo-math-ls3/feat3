@@ -17,7 +17,6 @@
 #include <kernel/solver/multigrid.hpp>
 #include <kernel/solver/amavanka.hpp>
 #include <kernel/geometry/export_vtk.hpp>
-#include <kernel/assembly/function_integral_jobs.hpp>
 
 #include <control/domain/parti_domain_control.hpp>
 #include <control/stokes_blocked.hpp>

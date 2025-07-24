@@ -7,7 +7,7 @@
 
 #include <kernel/analytic/parsed_function.hpp>
 #include <kernel/assembly/interpolator.hpp>
-#include <kernel/assembly/domain_assembler_helpers.hpp>
+#include <kernel/assembly/domain_assembler_basic_jobs.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/solver/direct_stokes_solver.hpp>
 

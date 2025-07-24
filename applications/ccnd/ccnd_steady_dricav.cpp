@@ -206,17 +206,18 @@ namespace CCND
 
     virtual void perform_solution_analysis()
     {
-      Assembly::DiscreteFunctionIntegralJob<LocalVeloVector, SpaceVeloType, 1> velo_job(vec_sol.local().template at<0>(), domain.front()->space_velo, "gauss-legendre:3");
-      Assembly::DiscreteFunctionIntegralJob<LocalPresVector, SpacePresType, 0> pres_job(vec_sol.local().template at<1>(), domain.front()->space_pres, "gauss-legendre:2");
-      domain.front()->domain_asm.assemble(velo_job);
-      domain.front()->domain_asm.assemble(pres_job);
+      auto velo_info = Assembly::integrate_discrete_function<1>(domain.front()->domain_asm, vec_sol.local().template at<0>(), domain.front()->space_velo, "gauss-legendre:3");
+      auto pres_info = Assembly::integrate_discrete_function<0>(domain.front()->domain_asm, vec_sol.local().template at<1>(), domain.front()->space_pres, "gauss-legendre:2");
 
-      velo_job.result().synchronize(comm);
-      pres_job.result().synchronize(comm);
+      velo_info.synchronize(comm);
+      pres_info.synchronize(comm);
 
-      comm.print("Velocity Field Analysis:");
-      comm.print(velo_job.result().print_norms(15, pad_len));
-      comm.print(velo_job.result().print_field_info(15, pad_len));
+      comm.print("Velocity Analysis:");
+      comm.print(velo_info.print_norms(15, pad_len));
+      comm.print(velo_info.print_field_info(15, pad_len));
+
+      comm.print("Pressure Analysis:");
+      comm.print(pres_info.print_norms(15, pad_len));
     }
   }; // class Application
 

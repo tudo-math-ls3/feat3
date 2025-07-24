@@ -56,7 +56,7 @@
 // FEAT-Assembly includes
 #include <kernel/assembly/symbolic_assembler.hpp>          // for SymbolicAssembler
 #include <kernel/assembly/domain_assembler.hpp>            // for DomainAssembler
-#include <kernel/assembly/domain_assembler_helpers.hpp>    // for Assembly::assemble_***
+#include <kernel/assembly/domain_assembler_basic_jobs.hpp> // for Assembly::assemble_***
 #include <kernel/assembly/unit_filter_assembler.hpp>       // for UnitFilterAssembler
 #include <kernel/assembly/discrete_projector.hpp>          // for DiscreteVertexProjector
 #include <kernel/assembly/common_operators.hpp>            // for LaplaceOperator

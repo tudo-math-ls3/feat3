@@ -7,7 +7,7 @@
 #include <kernel/runtime.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/geometry/mesh_file_reader.hpp>
-#include <kernel/geometry/common_factories.hpp>            // for RefinedUnitCubeFactory
+#include <kernel/geometry/common_factories.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
 #include <kernel/space/lagrange2/element.hpp>
@@ -20,7 +20,7 @@
 #include <kernel/assembly/burgers_assembly_job.hpp>
 #include <kernel/assembly/interpolator.hpp>
 #include <kernel/assembly/domain_assembler.hpp>
-#include <kernel/assembly/basic_assembly_jobs.hpp>
+#include <kernel/assembly/domain_assembler_basic_jobs.hpp>
 #include <kernel/voxel_assembly/poisson_assembler.hpp>
 #include <kernel/voxel_assembly/burgers_assembler.hpp>
 #include <kernel/voxel_assembly/helper/voxel_coloring.hpp>
@@ -157,7 +157,7 @@ namespace MeshPermAssemblyBench
     // assemble matrix structure
     Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
     Assembly::Common::LaplaceOperator laplace_op;
-    Assembly::BilinearOperatorMatrixAssemblyJob1<Assembly::Common::LaplaceOperator, ScalarMatrixType, SpaceType>
+    Assembly::DomainAssemblyBilinearOperatorMatrixJob1<Assembly::Common::LaplaceOperator, ScalarMatrixType, SpaceType>
       asm_job(laplace_op, matrix, space, "gauss-legendre:3");
 
     bres.num_asm_count = 0;
