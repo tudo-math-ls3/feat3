@@ -217,7 +217,7 @@ namespace FEAT
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_assembly_field();
 
 
-        VoxelAssembly::Arch::template assemble_poisson_csr(space, mat_data, d_cub_data, d_mapping_data, mesh_data.get_coloring_maps(), mesh_data.get_color_map_sizes(), alpha);
+        VoxelAssembly::Arch::assemble_poisson_csr(space, mat_data, d_cub_data, d_mapping_data, mesh_data.get_coloring_maps(), mesh_data.get_color_map_sizes(), alpha);
         //free resources
         Util::cuda_free(cub_wg_device);
         Util::cuda_free(cub_pt_device);

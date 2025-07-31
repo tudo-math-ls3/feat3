@@ -1674,7 +1674,7 @@ namespace FEAT
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_assembly_field();
         auto burgers_params = wrap_burgers_params();
 
-        VoxelAssembly::Arch::template assemble_burgers_csr(space, mat_data, vec_data, d_cub_data,
+        VoxelAssembly::Arch::assemble_burgers_csr(space, mat_data, vec_data, d_cub_data,
                                                         d_mapping_data, mesh_data.get_coloring_maps(),
                                                         mesh_data.get_color_map_sizes(), alpha, burgers_params,
                                                         shared_mem, blocksize, gridsize, print_occupancy);
@@ -1702,7 +1702,7 @@ namespace FEAT
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_assembly_field();
         auto burgers_params = wrap_burgers_params();
 
-        VoxelAssembly::Arch::template assemble_burgers_defect(space, vec_data, conv_data, primal_data, d_cub_data, d_mapping_data,
+        VoxelAssembly::Arch::assemble_burgers_defect(space, vec_data, conv_data, primal_data, d_cub_data, d_mapping_data,
                                                               mesh_data.get_coloring_maps(), mesh_data.get_color_map_sizes(), alpha, burgers_params,
                                                               shared_mem, 32, gridsize, print_occupancy);
         Util::cuda_free(cub_wg_device);
