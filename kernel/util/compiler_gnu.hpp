@@ -38,7 +38,8 @@
   _Pragma("GCC diagnostic ignored \"-Wsuggest-override\"") \
   _Pragma("GCC diagnostic ignored \"-Wdouble-promotion\"") \
   _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
-  _Pragma("GCC diagnostic ignored \"-Wignored-qualifiers\"")
+  _Pragma("GCC diagnostic ignored \"-Wignored-qualifiers\"") \
+  _Pragma("GCC diagnostic ignored \"-Wduplicated-branches\"")
 #else
 #define FEAT_DISABLE_WARNINGS _Pragma("GCC diagnostic push") \
   _Pragma("GCC diagnostic ignored \"-Wunused-variable\"") \

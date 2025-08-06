@@ -15,6 +15,8 @@ if(NOT TARGET pmp::pmp)
 
   target_compile_features(feat-extern-pmp PRIVATE cxx_std_20)
 
+  target_compile_options(feat-extern-pmp PRIVATE -w)
+
   if(FEAT_HAVE_OMP)
     find_package(OpenMP)
     if(OpenMP_CXX_FOUND)
