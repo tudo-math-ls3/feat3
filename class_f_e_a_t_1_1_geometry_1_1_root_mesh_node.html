@@ -238,6 +238,10 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a2aec98e3766827f8f2279bda5ddbd36d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5893aa7adeb6a21a923013c7a67d3aeb"><td class="memItemLeft" align="right" valign="top">const std::map&lt; int, std::unique_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#ad7026bd4e549327583fb51f88b568494">MeshPartType</a> &gt; &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#a5893aa7adeb6a21a923013c7a67d3aeb">get_patch_map</a> () const</td></tr>
 <tr class="separator:a5893aa7adeb6a21a923013c7a67d3aeb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5eeaefda1bbbe243f6d83a327f717b9"><td class="memTemplParams" colspan="2">template&lt;typename TemplateSet_ , typename VertexMarker_ &gt; </td></tr>
+<tr class="memitem:ad5eeaefda1bbbe243f6d83a327f717b9"><td class="memTemplItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html">RootMeshNode</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#ad5eeaefda1bbbe243f6d83a327f717b9">refine_partial_unique</a> (const VertexMarker_ &amp;marker, <a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a797be214520f0316a0c7c0b5b57e61cb">AdaptMode</a> adapt_mode=AdaptMode::chart) const</td></tr>
+<tr class="memdesc:ad5eeaefda1bbbe243f6d83a327f717b9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Refines this node and its sub-tree partially.  <a href="class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#ad5eeaefda1bbbe243f6d83a327f717b9">More...</a><br /></td></tr>
+<tr class="separator:ad5eeaefda1bbbe243f6d83a327f717b9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae419963e335a0006958b8462b0b0a05"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html">RootMeshNode</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#aae419963e335a0006958b8462b0b0a05">refine_unique</a> (<a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a797be214520f0316a0c7c0b5b57e61cb">AdaptMode</a> adapt_mode=AdaptMode::chart) const</td></tr>
 <tr class="memdesc:aae419963e335a0006958b8462b0b0a05"><td class="mdescLeft">&#160;</td><td class="mdescRight">Refines this node and its sub-tree.  <a href="class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#aae419963e335a0006958b8462b0b0a05">More...</a><br /></td></tr>
 <tr class="separator:aae419963e335a0006958b8462b0b0a05"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -324,7 +328,7 @@ class FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;</div><p >Root mesh node cl
 <p >This class template is used for the root node of a mesh tree.</p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00744">744</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00746">746</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a1d4ce44bc1607e773b64a93f056a155a" name="a1d4ce44bc1607e773b64a93f056a155a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1d4ce44bc1607e773b64a93f056a155a">&#9670;&#160;</a></span>BaseClass</h2>
@@ -342,7 +346,7 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>base class typedef </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00749">749</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00751">751</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -362,7 +366,7 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>mesh atlas type </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00756">756</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00758">758</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -382,7 +386,7 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>mesh chart type </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00758">758</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00760">760</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -408,7 +412,7 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>submesh node const-iterator type </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00174">174</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00176">176</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -434,7 +438,7 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>submesh node bin container type </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00170">170</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00172">172</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -460,7 +464,7 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>submesh node iterator type </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00172">172</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00174">174</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -486,7 +490,7 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>submesh node reverse-iterator type </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00176">176</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00178">178</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -512,7 +516,7 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>the mesh part node type </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00125">125</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00127">127</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -532,7 +536,7 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>mesh part type </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00754">754</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00756">756</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -552,7 +556,7 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>this mesh type </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00752">752</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00754">754</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -578,7 +582,7 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>the root mesh type, has to be a Mesh </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00119">119</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00121">121</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -628,7 +632,7 @@ template&lt;typename RootMesh_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00802">802</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00804">804</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -659,7 +663,7 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>Virtual destructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00813">813</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00815">815</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -691,11 +695,11 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>helper function: applies the mesh permutation to all mesh parts, halos and patches </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l01461">1461</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l01553">1553</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00764">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_halos</a>, <a class="el" href="mesh__node_8hpp_source.html#l00180">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::_mesh</a>, <a class="el" href="mesh__node_8hpp_source.html#l00182">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::_mesh_part_nodes</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00766">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_patches</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00766">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_halos</a>, <a class="el" href="mesh__node_8hpp_source.html#l00182">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::_mesh</a>, <a class="el" href="mesh__node_8hpp_source.html#l00184">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::_mesh_part_nodes</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00768">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_patches</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l01419">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::create_permutation()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l01438">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::set_permutation()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l01511">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::create_permutation()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l01530">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::set_permutation()</a>.</p>
 
 </div>
 </div>
@@ -725,7 +729,7 @@ template&lt;typename RootMesh_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00769">769</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00771">771</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -762,7 +766,7 @@ template&lt;typename RootMesh_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00479">479</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00481">481</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -811,7 +815,7 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if this node was adapted successfully or <code>false</code> if no node is associated with <code>part_name</code> or if the node did not contain any chart. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00521">521</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00523">523</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -860,9 +864,9 @@ template&lt;typename RootMesh_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00872">872</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00874">874</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00764">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_halos</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00766">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_halos</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="voxel__domain__control_8hpp_source.html#l00927">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>.</p>
 
@@ -926,7 +930,7 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the newly created mesh-part node if the insertion was successful, otherwise <code>nullptr</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00314">314</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00316">316</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -988,7 +992,7 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>mesh_part_node.get() if the insertion was successful, otherwise <code>nullptr</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00279">279</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00281">281</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -1038,11 +1042,11 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the inserted patch mesh part. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00945">945</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00947">947</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00766">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_patches</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00768">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_patches</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l01393">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::create_patch_meshpart()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l01059">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::extract_patch()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l01485">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::create_patch_meshpart()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l01151">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::extract_patch()</a>.</p>
 
 </div>
 </div>
@@ -1072,9 +1076,9 @@ template&lt;typename RootMesh_ &gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The size of dynamically allocated memory in bytes. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00853">853</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00855">855</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00764">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_halos</a>, <a class="el" href="mesh__node_8hpp_source.html#l00766">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_patches</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00207">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::bytes()</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00766">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_halos</a>, <a class="el" href="mesh__node_8hpp_source.html#l00768">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_patches</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00209">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::bytes()</a>.</p>
 
 </div>
 </div>
@@ -1105,7 +1109,7 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>Deletes all halo meshparts from this mesh node. </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00900">900</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00902">902</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -1136,7 +1140,7 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>Deletes all patch meshparts from this mesh node. </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00973">973</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00975">975</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -1168,7 +1172,7 @@ template&lt;typename RootMesh_ &gt; </div>
 <p>Creates an independent clone of this object and returns a unique pointer to it. </p>
 <dl class="section return"><dt>Returns</dt><dd>A unique pointer to the newly created clone object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00845">845</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00847">847</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -1217,9 +1221,9 @@ template&lt;typename RootMesh_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l01393">1393</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l01485">1485</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00945">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::add_patch()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00223">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::get_mesh()</a>, and <a class="el" href="mesh__part_8hpp_source.html#l00638">FEAT::Geometry::Factory&lt; MeshPart&lt; MeshType_ &gt; &gt;::make_unique()</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00947">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::add_patch()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::get_mesh()</a>, and <a class="el" href="mesh__part_8hpp_source.html#l00638">FEAT::Geometry::Factory&lt; MeshPart&lt; MeshType_ &gt; &gt;::make_unique()</a>.</p>
 
 </div>
 </div>
@@ -1254,9 +1258,9 @@ template&lt;typename RootMesh_ &gt; </div>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_conformal_mesh.html#a96116e8891cf94396cab9e195c68404a" title="Creates a mesh permutation based on one of the standard permutation strategies.">ConformalMesh::create_permutation()</a></dd></dl>
 <dl class="section note"><dt>Note</dt><dd>If you want to use a custom permutation other than one of the standard permutation strategies then use <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html#accff3216c730c0fb1b5da1d094b5d0a3" title="Creates a mesh permutation.">set_permutation()</a> instead. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l01419">1419</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l01511">1511</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l01461">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_apply_mesh_perm_to_parts()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00180">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::_mesh</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l01553">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_apply_mesh_perm_to_parts()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00182">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::_mesh</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -1320,11 +1324,11 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A unique pointer to the new mesh node representing the extracted patch. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l01059">1059</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l01151">1151</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00945">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::add_patch()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00419">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::find_mesh_part_chart()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00435">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::find_mesh_part_chart_name()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00374">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::find_mesh_part_node()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00223">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::get_mesh()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00249">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::get_mesh_part_names()</a>, <a class="el" href="mesh__part_8hpp_source.html#l00638">FEAT::Geometry::Factory&lt; MeshPart&lt; MeshType_ &gt; &gt;::make_unique()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00835">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::make_unique()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00947">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::add_patch()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00421">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::find_mesh_part_chart()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00437">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::find_mesh_part_chart_name()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00376">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::find_mesh_part_node()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::get_mesh()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00251">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::get_mesh_part_names()</a>, <a class="el" href="mesh__part_8hpp_source.html#l00638">FEAT::Geometry::Factory&lt; MeshPart&lt; MeshType_ &gt; &gt;::make_unique()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00837">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::make_unique()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__domain__control_8hpp_source.html#l00879">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_mesh_node()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l01376">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::extract_patch()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__domain__control_8hpp_source.html#l00879">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_mesh_node()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l01468">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::extract_patch()</a>.</p>
 
 </div>
 </div>
@@ -1382,9 +1386,9 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A unique pointer to the new mesh node representing the extracted patch. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l01204">1204</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l01296">1296</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00945">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::add_patch()</a>, <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00081">FEAT::Geometry::PatchMeshPartFactory&lt; MeshType_ &gt;::empty()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00419">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::find_mesh_part_chart()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00435">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::find_mesh_part_chart_name()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00374">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::find_mesh_part_node()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00223">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::get_mesh()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00249">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::get_mesh_part_names()</a>, <a class="el" href="graph_8hpp_source.html#l00958">FEAT::Adjacency::Graph::image_begin()</a>, <a class="el" href="graph_8hpp_source.html#l00966">FEAT::Adjacency::Graph::image_end()</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a9be5e204da15ac0402c68831bac46978">FEAT::Adjacency::injectify</a>, <a class="el" href="mesh__part_8hpp_source.html#l00638">FEAT::Geometry::Factory&lt; MeshPart&lt; MeshType_ &gt; &gt;::make_unique()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00835">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::make_unique()</a>, <a class="el" href="string_8hpp_source.html#l00944">FEAT::stringify()</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>, <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00947">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::add_patch()</a>, <a class="el" href="patch__meshpart__factory_8hpp_source.html#l00081">FEAT::Geometry::PatchMeshPartFactory&lt; MeshType_ &gt;::empty()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00421">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::find_mesh_part_chart()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00437">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::find_mesh_part_chart_name()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00376">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::find_mesh_part_node()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::get_mesh()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00251">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::get_mesh_part_names()</a>, <a class="el" href="graph_8hpp_source.html#l00958">FEAT::Adjacency::Graph::image_begin()</a>, <a class="el" href="graph_8hpp_source.html#l00966">FEAT::Adjacency::Graph::image_end()</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a9be5e204da15ac0402c68831bac46978">FEAT::Adjacency::injectify</a>, <a class="el" href="mesh__part_8hpp_source.html#l00638">FEAT::Geometry::Factory&lt; MeshPart&lt; MeshType_ &gt; &gt;::make_unique()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00837">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::make_unique()</a>, <a class="el" href="string_8hpp_source.html#l00944">FEAT::stringify()</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>, <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -1442,9 +1446,9 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A unique pointer to the new mesh node representing the extracted patch. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l01376">1376</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l01468">1468</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l01059">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::extract_patch()</a>, and <a class="el" href="partition__set_8hpp_source.html#l00160">FEAT::Geometry::Partition::get_patches()</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l01151">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::extract_patch()</a>, and <a class="el" href="partition__set_8hpp_source.html#l00160">FEAT::Geometry::Partition::get_patches()</a>.</p>
 
 </div>
 </div>
@@ -1481,7 +1485,7 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the mesh_part associated with <code>part_name</code> or <code>nullptr</code> if no such node was found. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00396">396</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00398">398</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -1518,7 +1522,7 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the mesh_part associated with <code>part_name</code> or <code>nullptr</code> if no such node was found.  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00403">403</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00405">405</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -1555,7 +1559,7 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the chart associated with <code>part_name</code> of <code>nullptr</code> if no such node was found or if the corresponding node did not have a chart. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00419">419</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00421">421</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -1592,7 +1596,7 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The name of the chart associated with <code>part_name</code> or an empty string is no such node was found. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00435">435</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00437">437</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -1629,7 +1633,7 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the mesh_part node associated with <code>part_name</code> or <code>nullptr</code> if no such node was found. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00374">374</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00376">376</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -1666,7 +1670,7 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the mesh_part node associated with <code>part_name</code> or <code>nullptr</code> if no such node was found.  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00381">381</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00383">383</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -1696,9 +1700,9 @@ template&lt;typename RootMesh_ &gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the underlying mesh atlas; may return <code>nullptr</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00818">818</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00820">820</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00762">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_atlas</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00764">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_atlas</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="mesh__concentration__function_8hpp_source.html#l01377">FEAT::Meshopt::ChartDistanceFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_dist_add()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01413">FEAT::Meshopt::ChartDistanceFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_dist_max()</a>, and <a class="el" href="mesh__concentration__function_8hpp_source.html#l01447">FEAT::Meshopt::ChartDistanceFunction&lt; ElementalFunction_, Trafo_, RefCellTrafo_ &gt;::compute_dist_min()</a>.</p>
 
@@ -1739,9 +1743,9 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the halo mesh part for the neighbor or <code>nullptr</code>, if no halo for this neighbor rank exists. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00887">887</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00889">889</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00764">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_halos</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00766">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_halos</a>.</p>
 
 </div>
 </div>
@@ -1771,9 +1775,9 @@ template&lt;typename RootMesh_ &gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A reference to the internal neighbor-halo map. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00894">894</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00896">896</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00764">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_halos</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00766">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_halos</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="mesh__distortion_8hpp_source.html#l00397">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_calc_boundary_facets()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00418">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_calc_shortest_edge()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00497">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_calc_vertex_owners()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00879">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_mesh_node()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00927">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>, <a class="el" href="mesh__distortion_8hpp_source.html#l00522">FEAT::Geometry::DistributedMeshDistortion&lt; MeshType_ &gt;::_synchronize()</a>, and <a class="el" href="stokes__fbm__assembler_8hpp_source.html#l00190">FEAT::Assembly::StokesFBMAssembler&lt; MeshType_ &gt;::sync()</a>.</p>
 
@@ -1805,7 +1809,7 @@ template&lt;typename RootMesh_ &gt; </div>
 <p>Returns the mesh of this node. </p>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the mesh contained in this node. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00223">223</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00225">225</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -1835,7 +1839,7 @@ template&lt;typename RootMesh_ &gt; </div>
 <p>Returns the mesh of this node.  </p>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the mesh contained in this node.  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00229">229</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00231">231</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -1872,7 +1876,7 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A deque of all mesh-part names in this node. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00249">249</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00251">251</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -1911,9 +1915,9 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the patch mesh part for the child or <code>nullptr</code>, if no patch for this child rank exists. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00960">960</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00962">962</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00766">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_patches</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00768">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_patches</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="voxel__domain__control_8hpp_source.html#l01125">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_compute_base_mesh_coloring()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01248">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_compute_base_mesh_layering()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01180">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_compute_refined_mesh_coloring()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01298">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_compute_refined_mesh_layering()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00927">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01217">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_extract_patch_coloring()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01355">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_extract_patch_layering()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00941">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_split_basemesh_halos()</a>.</p>
 
@@ -1945,9 +1949,9 @@ template&lt;typename RootMesh_ &gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A reference to the internal child-patch map. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00967">967</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00969">969</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00766">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_patches</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00768">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_patches</a>.</p>
 
 </div>
 </div>
@@ -1997,9 +2001,9 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A unique pointer to the new <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html" title="Root mesh node class template.">RootMeshNode</a> object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00835">835</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00837">837</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l01059">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::extract_patch()</a>, <a class="el" href="mesh__file__reader_8hpp_source.html#l01757">FEAT::Geometry::MeshFileReader::parse()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00987">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::refine_unique()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l01151">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::extract_patch()</a>, <a class="el" href="mesh__file__reader_8hpp_source.html#l01757">FEAT::Geometry::MeshFileReader::parse()</a>, <a class="el" href="mesh__node_8hpp_source.html#l01050">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::refine_partial_unique()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00989">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::refine_unique()</a>.</p>
 
 </div>
 </div>
@@ -2031,7 +2035,7 @@ template&lt;typename RootMesh_ &gt; </div>
 <p>Returns the name of the class. </p>
 <dl class="section return"><dt>Returns</dt><dd>The name of the class as a <a class="el" href="class_f_e_a_t_1_1_string.html" title="String class implementation.">String</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l01454">1454</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l01546">1546</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -2067,7 +2071,7 @@ template&lt;typename RootMesh_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00563">563</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00565">565</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -2103,7 +2107,60 @@ template&lt;typename RootMesh_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00575">575</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00577">577</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ad5eeaefda1bbbe243f6d83a327f717b9" name="ad5eeaefda1bbbe243f6d83a327f717b9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5eeaefda1bbbe243f6d83a327f717b9">&#9670;&#160;</a></span>refine_partial_unique()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename RootMesh_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename TemplateSet_ , typename VertexMarker_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html">RootMeshNode</a> &gt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html">FEAT::Geometry::RootMeshNode</a>&lt; RootMesh_ &gt;::refine_partial_unique </td>
+          <td>(</td>
+          <td class="paramtype">const VertexMarker_ &amp;&#160;</td>
+          <td class="paramname"><em>marker</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a797be214520f0316a0c7c0b5b57e61cb">AdaptMode</a>&#160;</td>
+          <td class="paramname"><em>adapt_mode</em> = <code>AdaptMode::chart</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Refines this node and its sub-tree partially. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">adapt_mode</td><td>Mode for adaption, defaults to chart.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A unique pointer to a newly created <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html" title="Root mesh node class template.">RootMeshNode</a> containing the refined mesh tree. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l01050">1050</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00766">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_halos</a>, <a class="el" href="mesh__node_8hpp_source.html#l00182">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::_mesh</a>, <a class="el" href="mesh__node_8hpp_source.html#l00184">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::_mesh_part_nodes</a>, <a class="el" href="mesh__node_8hpp_source.html#l00768">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_patches</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00837">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::make_unique()</a>.</p>
 
 </div>
 </div>
@@ -2142,9 +2199,9 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A unique pointer to a newly created <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html" title="Root mesh node class template.">RootMeshNode</a> containing the refined mesh tree. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00987">987</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00989">989</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00764">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_halos</a>, <a class="el" href="mesh__node_8hpp_source.html#l00180">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::_mesh</a>, <a class="el" href="mesh__node_8hpp_source.html#l00766">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_patches</a>, <a class="el" href="mesh__node_8hpp_source.html#l00835">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::make_unique()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00563">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::refine_children()</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00766">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_halos</a>, <a class="el" href="mesh__node_8hpp_source.html#l00182">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::_mesh</a>, <a class="el" href="mesh__node_8hpp_source.html#l00768">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_patches</a>, <a class="el" href="mesh__node_8hpp_source.html#l00837">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::make_unique()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00565">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::refine_children()</a>.</p>
 
 </div>
 </div>
@@ -2173,7 +2230,7 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>Removes all mesh parts from this mesh node. </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00337">337</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00339">339</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -2210,7 +2267,7 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if a mesh-part with the corresponding name was removed, otherwise <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00331">331</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00333">333</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -2249,9 +2306,9 @@ template&lt;typename RootMesh_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00914">914</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00916">916</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00764">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_halos</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00766">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_halos</a>.</p>
 
 </div>
 </div>
@@ -2287,7 +2344,7 @@ template&lt;typename RootMesh_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00447">447</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00449">449</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -2315,7 +2372,7 @@ template&lt;typename RootMesh_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00234">234</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00236">236</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -2369,7 +2426,7 @@ template&lt;typename RootMesh_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the chart was assigned successfully or <code>false</code> if no mesh part with the specified name was found. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00355">355</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00357">357</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -2403,9 +2460,9 @@ template&lt;typename RootMesh_ &gt; </div>
 <p >This function creates a permutation based on one of the standards permutation strategies and also permutes the mesh parts, halos and patches stored in this mesh node.</p>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_conformal_mesh.html#ab8ae43728445aa59a3479accaf5beaa4" title="Sets a custom mesh permutation for this mesh.">ConformalMesh::set_permutation()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l01438">1438</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l01530">1530</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l01461">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_apply_mesh_perm_to_parts()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00180">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::_mesh</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l01553">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_apply_mesh_perm_to_parts()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00182">FEAT::Geometry::MeshNode&lt; RootMesh_, RootMesh_ &gt;::_mesh</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -2434,9 +2491,9 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>our atlas pointer </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00762">762</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00764">764</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l00818">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::get_atlas()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l00820">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::get_atlas()</a>.</p>
 
 </div>
 </div>
@@ -2464,9 +2521,9 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>a map of our halo mesh-parts </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00764">764</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00766">766</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l01461">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_apply_mesh_perm_to_parts()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00872">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::add_halo()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00853">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::bytes()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00887">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::get_halo()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00894">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::get_halo_map()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00987">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::refine_unique()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00914">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::rename_halos()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l01553">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_apply_mesh_perm_to_parts()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00874">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::add_halo()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00855">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::bytes()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00889">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::get_halo()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00896">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::get_halo_map()</a>, <a class="el" href="mesh__node_8hpp_source.html#l01050">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::refine_partial_unique()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00989">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::refine_unique()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00916">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::rename_halos()</a>.</p>
 
 </div>
 </div>
@@ -2492,7 +2549,7 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>a pointer to the mesh of this node </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00180">180</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00182">182</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -2518,7 +2575,7 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>child submesh nodes </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00182">182</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00184">184</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
 </div>
 </div>
@@ -2546,9 +2603,9 @@ template&lt;typename RootMesh_ &gt; </div>
 
 <p>a map of our patch mesh-parts </p>
 
-<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00766">766</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="mesh__node_8hpp_source.html#l00768">768</a> of file <a class="el" href="mesh__node_8hpp_source.html">mesh_node.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l01461">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_apply_mesh_perm_to_parts()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00945">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::add_patch()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00853">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::bytes()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00960">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::get_patch()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00967">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::get_patch_map()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00987">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::refine_unique()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mesh__node_8hpp_source.html#l01553">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::_apply_mesh_perm_to_parts()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00947">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::add_patch()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00855">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::bytes()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00962">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::get_patch()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00969">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::get_patch_map()</a>, <a class="el" href="mesh__node_8hpp_source.html#l01050">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::refine_partial_unique()</a>, and <a class="el" href="mesh__node_8hpp_source.html#l00989">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::refine_unique()</a>.</p>
 
 </div>
 </div>

@@ -176,6 +176,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac3d4c20660ee5abe661ae4635c4c762b"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#ac3d4c20660ee5abe661ae4635c4c762b">done_symbolic</a> () override</td></tr>
 <tr class="memdesc:ac3d4c20660ee5abe661ae4635c4c762b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Symbolic finalization method.  <a href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#ac3d4c20660ee5abe661ae4635c4c762b">More...</a><br /></td></tr>
 <tr class="separator:ac3d4c20660ee5abe661ae4635c4c762b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0fd9bce681b27352bb6a37c2ef10e300"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a0fd9bce681b27352bb6a37c2ef10e300">force_defect_norm_calc</a> (bool force)</td></tr>
+<tr class="memdesc:a0fd9bce681b27352bb6a37c2ef10e300"><td class="mdescLeft">&#160;</td><td class="mdescRight">Forces the calculation of defect norms in every iteration.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a0fd9bce681b27352bb6a37c2ef10e300">More...</a><br /></td></tr>
+<tr class="separator:a0fd9bce681b27352bb6a37c2ef10e300"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac6850204b9181f10a1221bebcf5a1b6b"><td class="memItemLeft" align="right" valign="top">DataType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ac6850204b9181f10a1221bebcf5a1b6b">get_def_final</a> () const</td></tr>
 <tr class="memdesc:ac6850204b9181f10a1221bebcf5a1b6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the final defect.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ac6850204b9181f10a1221bebcf5a1b6b">More...</a><br /></td></tr>
 <tr class="separator:ac6850204b9181f10a1221bebcf5a1b6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -276,7 +279,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a0f5f95eeb377ef784ac3224684fef393"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the plot name of the solver.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a0f5f95eeb377ef784ac3224684fef393">More...</a><br /></td></tr>
 <tr class="separator:a0f5f95eeb377ef784ac3224684fef393"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a576f7cf3e1c847ac5611e477bd551b73"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a576f7cf3e1c847ac5611e477bd551b73">set_stag_rate</a> (DataType rate)</td></tr>
-<tr class="memdesc:a576f7cf3e1c847ac5611e477bd551b73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the stagnation rate fot the solver.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a576f7cf3e1c847ac5611e477bd551b73">More...</a><br /></td></tr>
+<tr class="memdesc:a576f7cf3e1c847ac5611e477bd551b73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the stagnation rate for the solver.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a576f7cf3e1c847ac5611e477bd551b73">More...</a><br /></td></tr>
 <tr class="separator:a576f7cf3e1c847ac5611e477bd551b73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5079e20c7708d1409a0798b7a226e9de"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a5079e20c7708d1409a0798b7a226e9de">set_tol_abs</a> (DataType tol_abs)</td></tr>
 <tr class="memdesc:a5079e20c7708d1409a0798b7a226e9de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the absolute tolerance for the solver.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a5079e20c7708d1409a0798b7a226e9de">More...</a><br /></td></tr>
@@ -287,15 +290,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad8026d89fbcbd8d65ffdc207d15b06f6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ad8026d89fbcbd8d65ffdc207d15b06f6">set_tol_rel</a> (DataType tol_rel)</td></tr>
 <tr class="memdesc:ad8026d89fbcbd8d65ffdc207d15b06f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the relative tolerance for the solver.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ad8026d89fbcbd8d65ffdc207d15b06f6">More...</a><br /></td></tr>
 <tr class="separator:ad8026d89fbcbd8d65ffdc207d15b06f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26458def0ef8654e3fff8f444df8108f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a26458def0ef8654e3fff8f444df8108f">skip_defect_calc</a> (bool skip)</td></tr>
-<tr class="memdesc:a26458def0ef8654e3fff8f444df8108f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specifies whether defect calculation is allowed to be skipped.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a26458def0ef8654e3fff8f444df8108f">More...</a><br /></td></tr>
-<tr class="separator:a26458def0ef8654e3fff8f444df8108f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a50df7223074bef35a5a7cbd0c8ec9bec"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a50df7223074bef35a5a7cbd0c8ec9bec">_analyse_defect</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_iter, DataType def_cur, DataType def_prev, bool check_stag)</td></tr>
-<tr class="memdesc:a50df7223074bef35a5a7cbd0c8ec9bec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Internal function: analyse the current defect.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a50df7223074bef35a5a7cbd0c8ec9bec">More...</a><br /></td></tr>
-<tr class="separator:a50df7223074bef35a5a7cbd0c8ec9bec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b0b165b5aba580f1b68bd3c2a49933a"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a5b0b165b5aba580f1b68bd3c2a49933a">_analyze_defect</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_iter, DataType def_cur, DataType def_prev, bool check_stag)</td></tr>
+<tr class="memdesc:a5b0b165b5aba580f1b68bd3c2a49933a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Internal function: analyze the current defect.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a5b0b165b5aba580f1b68bd3c2a49933a">More...</a><br /></td></tr>
+<tr class="separator:a5b0b165b5aba580f1b68bd3c2a49933a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae30cb768050251fad6afcdc411b7d60"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#aae30cb768050251fad6afcdc411b7d60">_apply_intern</a> (VectorType &amp;vec_x)</td></tr>
 <tr class="separator:aae30cb768050251fad6afcdc411b7d60"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9920812266b8f49921c9b133dd1451b4"><td class="memItemLeft" align="right" valign="top">virtual DataType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a9920812266b8f49921c9b133dd1451b4">_calc_def_norm</a> (const VectorType &amp;vec_def, const VectorType &amp;vec_sol)</td></tr>
@@ -359,6 +359,9 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a731e6e902833e07bd086615675b51c31"><td class="memItemLeft" align="right" valign="top">DataType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a731e6e902833e07bd086615675b51c31">_div_rel</a></td></tr>
 <tr class="memdesc:a731e6e902833e07bd086615675b51c31"><td class="mdescLeft">&#160;</td><td class="mdescRight">relative divergence parameter  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a731e6e902833e07bd086615675b51c31">More...</a><br /></td></tr>
 <tr class="separator:a731e6e902833e07bd086615675b51c31"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ab9bef4ea22df32065a43399a990561"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a0ab9bef4ea22df32065a43399a990561">_force_def_norm_calc</a></td></tr>
+<tr class="memdesc:a0ab9bef4ea22df32065a43399a990561"><td class="mdescLeft">&#160;</td><td class="mdescRight">whether skipping of defect computation is allowed or not  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a0ab9bef4ea22df32065a43399a990561">More...</a><br /></td></tr>
+<tr class="separator:a0ab9bef4ea22df32065a43399a990561"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a794394b8f44f90ac46bc61b793fa8947"><td class="memItemLeft" align="right" valign="top">Intern::ILUCoreScalar&lt; DataType, IndexType &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#a794394b8f44f90ac46bc61b793fa8947">_ilu</a></td></tr>
 <tr class="memdesc:a794394b8f44f90ac46bc61b793fa8947"><td class="mdescLeft">&#160;</td><td class="mdescRight">ilu factorization data  <a href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#a794394b8f44f90ac46bc61b793fa8947">More...</a><br /></td></tr>
 <tr class="separator:a794394b8f44f90ac46bc61b793fa8947"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -392,9 +395,6 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a69fab2263b0c35bf03aa77d95e3a5917"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_string.html">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a69fab2263b0c35bf03aa77d95e3a5917">_plot_name</a></td></tr>
 <tr class="memdesc:a69fab2263b0c35bf03aa77d95e3a5917"><td class="mdescLeft">&#160;</td><td class="mdescRight">name of the solver in plots  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a69fab2263b0c35bf03aa77d95e3a5917">More...</a><br /></td></tr>
 <tr class="separator:a69fab2263b0c35bf03aa77d95e3a5917"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac59b69cc5fe017dd82287034e6a25a5a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ac59b69cc5fe017dd82287034e6a25a5a">_skip_def_calc</a></td></tr>
-<tr class="memdesc:ac59b69cc5fe017dd82287034e6a25a5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">whether to skip defect computation if possible  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ac59b69cc5fe017dd82287034e6a25a5a">More...</a><br /></td></tr>
-<tr class="separator:ac59b69cc5fe017dd82287034e6a25a5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f17cb192fab20b3591eafdafd7c5f6e"><td class="memItemLeft" align="right" valign="top">DataType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a1f17cb192fab20b3591eafdafd7c5f6e">_stag_rate</a></td></tr>
 <tr class="memdesc:a1f17cb192fab20b3591eafdafd7c5f6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">stagnation rate  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a1f17cb192fab20b3591eafdafd7c5f6e">More...</a><br /></td></tr>
 <tr class="separator:a1f17cb192fab20b3591eafdafd7c5f6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -411,7 +411,7 @@ Protected Attributes</h2></td></tr>
 <tr class="memdesc:aeeb10e81625c18084050c7cf00d25330"><td class="mdescLeft">&#160;</td><td class="mdescRight">absolute tolerance parameter  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#aeeb10e81625c18084050c7cf00d25330">More...</a><br /></td></tr>
 <tr class="separator:aeeb10e81625c18084050c7cf00d25330"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad355136ba5cd50b1f2ece6658ab1c0c8"><td class="memItemLeft" align="right" valign="top">DataType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ad355136ba5cd50b1f2ece6658ab1c0c8">_tol_abs_low</a></td></tr>
-<tr class="memdesc:ad355136ba5cd50b1f2ece6658ab1c0c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">absolute tolerance parameter  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ad355136ba5cd50b1f2ece6658ab1c0c8">More...</a><br /></td></tr>
+<tr class="memdesc:ad355136ba5cd50b1f2ece6658ab1c0c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">absolute low tolerance parameter  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ad355136ba5cd50b1f2ece6658ab1c0c8">More...</a><br /></td></tr>
 <tr class="separator:ad355136ba5cd50b1f2ece6658ab1c0c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa86287c6d142b78ac494420116688d66"><td class="memItemLeft" align="right" valign="top">DataType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#aa86287c6d142b78ac494420116688d66">_tol_rel</a></td></tr>
 <tr class="memdesc:aa86287c6d142b78ac494420116688d66"><td class="mdescLeft">&#160;</td><td class="mdescRight">relative tolerance parameter  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#aa86287c6d142b78ac494420116688d66">More...</a><br /></td></tr>
@@ -616,7 +616,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="pcgnrilu_8hpp_source.html#l00083">83</a> of file <a class="el" href="pcgnrilu_8hpp_source.html">pcgnrilu.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="iterative_8hpp_source.html#l00624">FEAT::Solver::IterativeSolver&lt; Matrix_::VectorTypeR &gt;::_set_comm_by_matrix()</a>.</p>
+<p class="reference">References <a class="el" href="iterative_8hpp_source.html#l00680">FEAT::Solver::IterativeSolver&lt; Matrix_::VectorTypeR &gt;::_set_comm_by_matrix()</a>.</p>
 
 </div>
 </div>
@@ -681,7 +681,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="pcgnrilu_8hpp_source.html#l00109">109</a> of file <a class="el" href="pcgnrilu_8hpp_source.html">pcgnrilu.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="pcgnrilu_8hpp_source.html#l00066">FEAT::Solver::PCGNRILU&lt; Matrix_, Filter_ &gt;::_ilu_p</a>, <a class="el" href="iterative_8hpp_source.html#l00624">FEAT::Solver::IterativeSolver&lt; Matrix_::VectorTypeR &gt;::_set_comm_by_matrix()</a>, and <a class="el" href="property__map_8cpp_source.html#l00123">FEAT::PropertyMap::query()</a>.</p>
+<p class="reference">References <a class="el" href="pcgnrilu_8hpp_source.html#l00066">FEAT::Solver::PCGNRILU&lt; Matrix_, Filter_ &gt;::_ilu_p</a>, <a class="el" href="iterative_8hpp_source.html#l00680">FEAT::Solver::IterativeSolver&lt; Matrix_::VectorTypeR &gt;::_set_comm_by_matrix()</a>, and <a class="el" href="property__map_8cpp_source.html#l00123">FEAT::PropertyMap::query()</a>.</p>
 
 </div>
 </div>
@@ -717,8 +717,8 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a50df7223074bef35a5a7cbd0c8ec9bec" name="a50df7223074bef35a5a7cbd0c8ec9bec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a50df7223074bef35a5a7cbd0c8ec9bec">&#9670;&#160;</a></span>_analyse_defect()</h2>
+<a id="a5b0b165b5aba580f1b68bd3c2a49933a" name="a5b0b165b5aba580f1b68bd3c2a49933a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b0b165b5aba580f1b68bd3c2a49933a">&#9670;&#160;</a></span>_analyze_defect()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -727,7 +727,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::_analyse_defect </td>
+          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::_analyze_defect </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
           <td class="paramname"><em>num_iter</em>, </td>
@@ -763,7 +763,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Internal function: analyse the current defect. </p>
+<p>Internal function: analyze the current defect. </p>
 <dl class="section note"><dt>Note</dt><dd>This function is called by <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#aa2b2f7492bf2c6b7d9f740b95e99969f" title="Internal function: sets the new (next) defect vector.">_set_new_defect()</a> and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a8fa021d1ba593ca3ac009c053192d6d4" title="Internal function: sets the new (next) defect norm.">_update_defect()</a>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -776,7 +776,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The updated status code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00797">797</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00866">866</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -809,7 +809,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="pcgnrilu_8hpp_source.html#l00248">248</a> of file <a class="el" href="pcgnrilu_8hpp_source.html">pcgnrilu.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="iterative_8hpp_source.html#l00746">FEAT::Solver::IterativeSolver&lt; Matrix_::VectorTypeR &gt;::_set_initial_defect()</a>, <a class="el" href="iterative_8hpp_source.html#l00855">FEAT::Solver::IterativeSolver&lt; Matrix_::VectorTypeR &gt;::_set_new_defect()</a>, <a class="el" href="iterative_8hpp_source.html#l00404">FEAT::Solver::IterativeSolver&lt; Matrix_::VectorTypeR &gt;::get_num_iter()</a>, <a class="el" href="pcgnrilu_8hpp_source.html#l00143">FEAT::Solver::PCGNRILU&lt; Matrix_, Filter_ &gt;::name()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda3c709b10a5d47ba33d85337dd9110917">FEAT::Solver::progress</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda5e543256c480ac577d30f76f9120eb74">FEAT::Solver::undefined</a>.</p>
+<p class="reference">References <a class="el" href="iterative_8hpp_source.html#l00802">FEAT::Solver::IterativeSolver&lt; Matrix_::VectorTypeR &gt;::_set_initial_defect()</a>, <a class="el" href="iterative_8hpp_source.html#l00924">FEAT::Solver::IterativeSolver&lt; Matrix_::VectorTypeR &gt;::_set_new_defect()</a>, <a class="el" href="iterative_8hpp_source.html#l00462">FEAT::Solver::IterativeSolver&lt; Matrix_::VectorTypeR &gt;::get_num_iter()</a>, <a class="el" href="pcgnrilu_8hpp_source.html#l00143">FEAT::Solver::PCGNRILU&lt; Matrix_, Filter_ &gt;::name()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda3c709b10a5d47ba33d85337dd9110917">FEAT::Solver::progress</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda5e543256c480ac577d30f76f9120eb74">FEAT::Solver::undefined</a>.</p>
 
 </div>
 </div>
@@ -856,7 +856,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00650">650</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00706">706</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -893,7 +893,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the plot mode is set to <code>iter</code> or <code>all</code> and the plot interval matches or the solver does not continue to the next iteration </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00664">664</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00720">720</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -947,7 +947,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00717">717</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00773">773</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -977,7 +977,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 <p>Plot summary? </p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the plot mode is set to <code>summary</code> or <code>all</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00675">675</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00731">731</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1093,7 +1093,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00696">696</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00752">752</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1123,7 +1123,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 <p>Progress iteration? </p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the solver should process, otherwise <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00685">685</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00741">741</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1159,7 +1159,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00611">611</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00667">667</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1195,7 +1195,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00624">624</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00680">680</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1231,7 +1231,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00636">636</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00692">692</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1279,7 +1279,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The updated Status code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00746">746</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00802">802</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1328,7 +1328,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The updated Status code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00855">855</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00924">924</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1357,7 +1357,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </div><div class="memdoc">
 
 <p>Internal function: sets the new (next) defect norm. </p>
-<p >This function takes a precalculated defect vector's norm, increments the iteration count, plots an output line to std::cout and checks whether any of the stopping criterions is fulfilled.</p>
+<p >This function takes a pre-calculated defect vector norm, increments the iteration count, plots an output line to std::cout and checks whether any of the stopping criterions is fulfilled.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">def_cur_norm</td><td>The new defect norm.</td></tr>
@@ -1367,7 +1367,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The updated Status code.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This function is preferred over _set_new_defect when using asynchronous mpi operations. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00901">901</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00970">970</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1491,7 +1491,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Computes the overall convergence rate: (defect_final / defect_initial) ^ (1 / number of iterations) </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00526">526</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00582">582</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1520,7 +1520,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Computes the overall defect reduction factor: (defect_final / defect_inital) </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00541">541</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00597">597</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1680,7 +1680,7 @@ template&lt;typename Vector_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00246">246</a> of file <a class="el" href="kernel_2solver_2base_8hpp_source.html">base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00283">FEAT::Solver::SolverBase&lt; Vector_ &gt;::done()</a>, <a class="el" href="bfbt_8hpp_source.html#l00180">FEAT::Solver::BFBT&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;::done_numeric()</a>, <a class="el" href="bfbt_8hpp_source.html#l00367">FEAT::Solver::BFBT&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;::done_numeric()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00084">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;::done_numeric()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00188">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;::done_numeric()</a>, <a class="el" href="hypre_8hpp_source.html#l00304">FEAT::Solver::ParaSailsPrecond&lt; Matrix_, Filter_ &gt;::done_numeric()</a>, <a class="el" href="iterative_8hpp_source.html#l01033">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::done_numeric()</a>, <a class="el" href="multigrid_8hpp_source.html#l01250">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;::done_numeric()</a>, <a class="el" href="pcgnr_8hpp_source.html#l00188">FEAT::Solver::PCGNR&lt; Matrix_, Filter_ &gt;::done_numeric()</a>, <a class="el" href="umfpack_8hpp_source.html#l00534">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::done_numeric()</a>, <a class="el" href="uzawa__precond_8hpp_source.html#l00199">FEAT::Solver::UzawaPrecond&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;::done_numeric()</a>, and <a class="el" href="uzawa__precond_8hpp_source.html#l00497">FEAT::Solver::UzawaPrecond&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;::done_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00283">FEAT::Solver::SolverBase&lt; Vector_ &gt;::done()</a>, <a class="el" href="bfbt_8hpp_source.html#l00180">FEAT::Solver::BFBT&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;::done_numeric()</a>, <a class="el" href="bfbt_8hpp_source.html#l00367">FEAT::Solver::BFBT&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;::done_numeric()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00084">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;::done_numeric()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00188">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;::done_numeric()</a>, <a class="el" href="hypre_8hpp_source.html#l00304">FEAT::Solver::ParaSailsPrecond&lt; Matrix_, Filter_ &gt;::done_numeric()</a>, <a class="el" href="iterative_8hpp_source.html#l01102">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::done_numeric()</a>, <a class="el" href="multigrid_8hpp_source.html#l01250">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;::done_numeric()</a>, <a class="el" href="pcgnr_8hpp_source.html#l00188">FEAT::Solver::PCGNR&lt; Matrix_, Filter_ &gt;::done_numeric()</a>, <a class="el" href="umfpack_8hpp_source.html#l00534">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::done_numeric()</a>, <a class="el" href="uzawa__precond_8hpp_source.html#l00199">FEAT::Solver::UzawaPrecond&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;::done_numeric()</a>, and <a class="el" href="uzawa__precond_8hpp_source.html#l00497">FEAT::Solver::UzawaPrecond&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;::done_numeric()</a>.</p>
 
 </div>
 </div>
@@ -1720,6 +1720,43 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 </div>
 </div>
+<a id="a0fd9bce681b27352bb6a37c2ef10e300" name="a0fd9bce681b27352bb6a37c2ef10e300"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0fd9bce681b27352bb6a37c2ef10e300">&#9670;&#160;</a></span>force_defect_norm_calc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::force_defect_norm_calc </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>force</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Forces the calculation of defect norms in every iteration. </p>
+<dl class="section note"><dt>Note</dt><dd>Please note that allowing the skipping of defect norm calculations is merely a hint and a derived class may override this function therefore always forcing the calculation of defect norms. One possible reason is that the derived solver class may require defect norms as part of its solver algorithm and therefore skipping the computation of the defect norms may break the solver; two examples are the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab.html" title="(Preconditioned) Bi-Conjugate Gradient Stabilized solver implementation">BiCGStab</a> and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html" title="GMRES(k) solver implementation.">GMRES</a> solvers.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">force</td><td>Specifies whether defect norm computation is to be enforced in every iteration </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00490">490</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+
+</div>
+</div>
 <a id="ac6850204b9181f10a1221bebcf5a1b6b" name="ac6850204b9181f10a1221bebcf5a1b6b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac6850204b9181f10a1221bebcf5a1b6b">&#9670;&#160;</a></span>get_def_final()</h2>
 
@@ -1745,7 +1782,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns the final defect. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00514">514</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00570">570</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1774,7 +1811,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns the initial defect. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00508">508</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00564">564</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1803,7 +1840,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns the absolute divergence. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00361">361</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00419">419</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1832,7 +1869,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns the relative divergence. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00355">355</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00413">413</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1861,7 +1898,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns the maximum number of iterations. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00416">416</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00474">474</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1890,7 +1927,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns the minimal number of iterations. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00410">410</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00468">468</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1919,7 +1956,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns the minimum stagnation iteration count. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00385">385</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00443">443</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1948,7 +1985,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns number of performed iterations. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00404">404</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00462">462</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1977,7 +2014,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns the plot name of the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00465">465</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00523">523</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2006,7 +2043,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns the stagnation rate. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00373">373</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00431">431</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2035,7 +2072,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns the status. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00520">520</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00576">576</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2064,7 +2101,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns a summary string. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00554">554</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00610">610</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2093,7 +2130,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns the absolute tolerance. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00330">330</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00389">389</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2122,7 +2159,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns the lower absolute tolerance. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00336">336</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00395">395</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2151,7 +2188,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns the relative tolerance. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00324">324</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00383">383</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2287,21 +2324,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </div><div class="memdoc">
 
 <p>checks for convergence </p>
-<p >The solver is converged if<br  />
-the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
-or<br  />
-the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
-As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]
-</p>
-<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
-and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
-did not gain 8 digits so far then I'm also happy" </p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if converged, else <code>false</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00476">476</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00533">533</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2330,27 +2355,15 @@ did not gain 8 digits so far then I'm also happy" </p>
 </div><div class="memdoc">
 
 <p>checks for convergence </p>
-<p >The solver is converged if<br  />
-the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
-or<br  />
-the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
-As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]
-</p>
-<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
-and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
-did not gain 8 digits so far then I'm also happy" </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">def_cur</td><td>The defect that is to be analysed</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">def_cur</td><td>The defect norm that is to be analyzed</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if converged, else <code>false</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00490">490</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00546">546</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2379,7 +2392,7 @@ did not gain 8 digits so far then I'm also happy" </p>
 
 <p>checks for divergence </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00496">496</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00552">552</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2409,7 +2422,7 @@ did not gain 8 digits so far then I'm also happy" </p>
 
 <p>checks for divergence </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00502">502</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00558">558</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2474,7 +2487,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Plot a summary of the last solver run. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00571">571</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00627">627</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2504,7 +2517,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Sets the absolute divergence for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00349">349</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00407">407</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2534,7 +2547,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Sets the relative divergence for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00343">343</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00401">401</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2604,7 +2617,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Sets the maximum iteration count for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00397">397</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00455">455</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2634,7 +2647,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Sets the minimum iteration count for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00391">391</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00449">449</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2664,7 +2677,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Sets the minimum stagnate iteration count for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00379">379</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00437">437</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2700,7 +2713,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00453">453</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00511">511</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2736,7 +2749,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00443">443</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00501">501</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2766,7 +2779,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Sets the plot name of the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00459">459</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00517">517</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2794,9 +2807,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Sets the stagnation rate fot the solver. </p>
+<p>Sets the stagnation rate for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00367">367</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00425">425</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2826,7 +2839,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Sets the absolute tolerance for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00312">312</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00371">371</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2856,7 +2869,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Sets the lower absolute tolerance for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00318">318</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00377">377</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2886,45 +2899,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Sets the relative tolerance for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00306">306</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a26458def0ef8654e3fff8f444df8108f" name="a26458def0ef8654e3fff8f444df8108f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a26458def0ef8654e3fff8f444df8108f">&#9670;&#160;</a></span>skip_defect_calc()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::skip_defect_calc </td>
-          <td>(</td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>skip</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Specifies whether defect calculation is allowed to be skipped. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Skipping defect calculation can lead to deadlocks in parallel solver implementations if one (but not all) processes need to compute the defect for some reason (like plotting) !<br  />
-Use this function only when you really know what you are doing!</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">skip</td><td>Specifies whether defect computation is allowed to be skipped. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00432">432</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00365">365</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2951,7 +2926,7 @@ Use this function only when you really know what you are doing!</dd></dl>
 
 <p>Communicator of the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00129">129</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00209">209</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2977,7 +2952,7 @@ Use this function only when you really know what you are doing!</dd></dl>
 
 <p>current defect </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00180">180</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00239">239</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3003,7 +2978,7 @@ Use this function only when you really know what you are doing!</dd></dl>
 
 <p>initial defect </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00178">178</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00237">237</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3029,7 +3004,7 @@ Use this function only when you really know what you are doing!</dd></dl>
 
 <p>previous iteration defect </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00182">182</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00241">241</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3055,7 +3030,7 @@ Use this function only when you really know what you are doing!</dd></dl>
 
 <p>absolute divergence parameter </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00164">164</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00223">223</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3081,7 +3056,33 @@ Use this function only when you really know what you are doing!</dd></dl>
 
 <p>relative divergence parameter </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00162">162</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00221">221</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a0ab9bef4ea22df32065a43399a990561" name="a0ab9bef4ea22df32065a43399a990561"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ab9bef4ea22df32065a43399a990561">&#9670;&#160;</a></span>_force_def_norm_calc</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::_force_def_norm_calc</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>whether skipping of defect computation is allowed or not </p>
+
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00249">249</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3167,7 +3168,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>iteration count digits for plotting </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00184">184</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00243">243</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3193,7 +3194,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>maximum number of iterations </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00170">170</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00229">229</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3219,7 +3220,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>minimum number of iterations </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00168">168</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00227">227</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3245,7 +3246,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>minimum number of stagnation iterations </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00174">174</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00233">233</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3271,7 +3272,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>number of performed iterations </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00172">172</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00231">231</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3297,7 +3298,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>number of consecutive stagnated iterations </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00176">176</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00235">235</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3323,7 +3324,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>plot output interval </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00188">188</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00247">247</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3349,7 +3350,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>whether to plot something </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00186">186</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00245">245</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3375,33 +3376,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>name of the solver in plots </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00131">131</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
-
-</div>
-</div>
-<a id="ac59b69cc5fe017dd82287034e6a25a5a" name="ac59b69cc5fe017dd82287034e6a25a5a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac59b69cc5fe017dd82287034e6a25a5a">&#9670;&#160;</a></span>_skip_def_calc</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::_skip_def_calc</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>whether to skip defect computation if possible </p>
-
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00190">190</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00211">211</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3427,7 +3402,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>stagnation rate </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00166">166</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00225">225</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3453,7 +3428,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>current status of the solver </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00133">133</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00213">213</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3536,20 +3511,8 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </div><div class="memdoc">
 
 <p>absolute tolerance parameter </p>
-<p >The solver is converged if<br  />
-the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
-or<br  />
-the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
-As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]
-</p>
-<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
-and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
-did not gain 8 digits so far then I'm also happy"  </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00158">158</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00217">217</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3573,21 +3536,9 @@ did not gain 8 digits so far then I'm also happy"  </p>
 </table>
 </div><div class="memdoc">
 
-<p>absolute tolerance parameter </p>
-<p >The solver is converged if<br  />
-the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
-or<br  />
-the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
-As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]
-</p>
-<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
-and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
-did not gain 8 digits so far then I'm also happy"  </p>
+<p>absolute low tolerance parameter </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00160">160</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00219">219</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3612,20 +3563,8 @@ did not gain 8 digits so far then I'm also happy"  </p>
 </div><div class="memdoc">
 
 <p>relative tolerance parameter </p>
-<p >The solver is converged if<br  />
-the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
-or<br  />
-the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
-As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]
-</p>
-<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
-and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
-did not gain 8 digits so far then I'm also happy" </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00156">156</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00215">215</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>

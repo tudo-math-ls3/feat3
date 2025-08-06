@@ -114,8 +114,7 @@ $(document).ready(function(){initNavTree('feat_for_win_vs17.html',''); initResiz
 </ul>
 </li>
 <li class="level1"><a href="#win_vs17_thirdparty">Additional Third-Party Libraries</a></li>
-<li class="level1"><a href="#win_vs17_vcgen_tool">Creating Visual Studio Project and Solution files</a><ul><li class="level2"><a href="#win_vs17_buildsys_vc_symlink">Creating Kernel Symlink</a></li>
-<li class="level2"><a href="#win_vs17_vcgen_use_empty">Generating Empty Application Projects</a></li>
+<li class="level1"><a href="#win_vs17_vcgen_tool">Creating Visual Studio Project and Solution files</a><ul><li class="level2"><a href="#win_vs17_vcgen_use_empty">Generating Empty Application Projects</a></li>
 <li class="level2"><a href="#win_vs17_vcgen_use_app_simple">Generating Simple Application Projects</a></li>
 <li class="level2"><a href="#win_vs17_vcgen_use_test">Generating Kernel Unit-Test Projects</a></li>
 <li class="level2"><a href="#win_vs17_kernel_project">The kernel Project file</a></li>
@@ -149,9 +148,7 @@ Microsoft MPI</h2>
 <li><a href="https://learn.microsoft.com/en-us/message-passing-interface/microsoft-mpi">https://learn.microsoft.com/en-us/message-passing-interface/microsoft-mpi</a></li>
 <li><b>Important:</b> You need to download and install <b>both</b> <code>MSMpiSetup.exe</code> and <code>msmpisdk.msi</code>.</li>
 </ul>
-<dl class="section note"><dt>Note</dt><dd>From MS-MPI Version 7 on, you will need to enable the <em>MS-MPI Launch Service</em> to <em>start automatically</em> on your windows machine, as otherwise MPI-based applications may not start. The easiest way to do so is to execute the following command in a console (with administrator rights): <pre class="fragment">sc config MsMpiLaunchSvc start= auto
-</pre></dd></dl>
-<p>Once you have installed MS-MPI and setup the launch service, there is nothing more to do, as the build-system will automatically detect that a MPI implementation is available.</p>
+<p >Once you have installed MS-MPI and setup the launch service, there is nothing more to do, as the build-system will automatically detect that a MPI implementation is available.</p>
 <h2><a class="anchor" id="win_vs17_prereqs_cuda"></a>
 Nvidia CUDA</h2>
 <p >The minimum supported version of Nvidia CUDA for <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> is version 12.0, which must be installed including its integration into Visual Studio 2022, of course. There is nothing else that has to be done manually to enable CUDA in <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a>; simply select a build configuration that contains the <code>cuda</code> tag to enable CUDA in <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a>.</p>
@@ -170,11 +167,7 @@ Creating Visual Studio Project and Solution files</h1>
 <p >Before you can compile any <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> application, test or tutorial with Visual Studio, you will first need generate a corresponding Visual Studio project and solution file. In contrast to the CMake-based build-system used under Linux, there is no "configure" script that will generate all required projects and solution in one step.</p>
 <p >Instead, you need to generate VS project and solution files for each desired application, tutorial or kernel test separately by using a Python script named <code>vc17-gen.py</code>, which is located in the root directory of <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a>.</p>
 <p >The usage and the behavior of the script depends on whether the desired target is a kernel test or any other sort of application (this includes tutorials and tools). The usage of the tool is also described in the following sub-sections.</p>
-<h2><a class="anchor" id="win_vs17_buildsys_vc_symlink"></a>
-Creating Kernel Symlink</h2>
-<p >Before you can use the Visual Studio build system, you first need to perform an inconvenient but necessary step to circumvent Visual Studio's internal limitations by creating a symbolic link for the kernel directory. To do this, open a command prompt in the <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> root directory and execute the following command (with administrator rights):</p>
-<pre class="fragment">mklink /D build_system\vc17\kernel ..\..\kernel
-</pre><h2><a class="anchor" id="win_vs17_vcgen_use_empty"></a>
+<h2><a class="anchor" id="win_vs17_vcgen_use_empty"></a>
 Generating Empty Application Projects</h2>
 <p >To generate a new empty project and solution file pair for any sort of application (this includes tutorials and tools), open a console in the <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> root directory and use the following command to specify the path to where the project file is to be created as well as its desired project name and, optionally, the list of all source files that are to be added to the newly created project file: </p><pre class="fragment">vc17-gen.py &lt;project-path&gt; &lt;project-name&gt; [&lt;source-files...&gt;]
 </pre><dl class="section note"><dt>Note</dt><dd>The script automatically detects the source file type by its file extension.</dd></dl>
@@ -219,10 +212,10 @@ To generate a project file for the <code>tiny_algebra-test</code>, which is impl
 </ol>
 <h2><a class="anchor" id="win_vs17_kernel_project"></a>
 The kernel Project file</h2>
-<p >All solution files generated by the <code>vc17-gen.py</code> tool contain two projects: one project for the actual target binary as well as one project for the <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> kernel library named <code>kernel.vc17</code>. This kernel project file is <em>not</em> generated by the <code>vc17-gen.py</code> tool &ndash; it is a hand-written project file that is located in the <code>build_system/vc17</code> directory and it is shared among all target applications.</p>
-<dl class="section attention"><dt>Attention</dt><dd>Do <u><b>not</b></u> add or remove files to/from the kernel project file. This project is configured to automatically include <em>all</em> relevant source and header files within the <code>kernel</code> directory, i.e. the project will detect new or deleted files automatically without any explicit modification from the user after it has been reloaded.</dd>
+<p >All solution files generated by the <code>vc17-gen.py</code> tool contain two projects: one project for the actual target binary as well as one project for the <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> kernel library named <code>kernel.vc17</code>. This kernel project file is <em>not</em> generated by the <code>vc17-gen.py</code> tool &ndash; it is a hand-written project file that is located in the <code>kernel</code> directory and it is shared among all target applications.</p>
+<dl class="section attention"><dt>Attention</dt><dd><u><b>Do not add or remove files to/from the kernel project file!</b></u> This project is configured to automatically include <em>all</em> relevant source and header files within the <code>kernel</code> directory, i.e. the project will detect new or deleted files automatically without any explicit modification from the user after it has been reloaded.</dd>
 <dd>
-Furthermore, it is highly recommended to leave the compiler options specified in the <code>kernel</code> project unchanged.</dd></dl>
+Furthermore, it is <b>highly</b> recommended to leave the compiler options specified in the <code>kernel</code> project unchanged.</dd></dl>
 <h1><a class="anchor" id="win_vs17_build_config"></a>
 Build Configurations and Platforms</h1>
 <p >The project and solution files generated by the <code>vc17-gen.py</code> script contain a set of supported build configurations and platforms, which can be selected in the Visual Studio IDE to specify the build target. Currently, the only supported platform is the <code>x64</code> platform; support for the 32-bit <code>x86</code> platform has been discontinued by <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> and the <code>ARM</code> platform is not yet supported.</p>

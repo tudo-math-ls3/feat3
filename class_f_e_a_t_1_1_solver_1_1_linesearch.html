@@ -177,6 +177,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8ed25011c486ac360b5705a54aa004e7"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#a8ed25011c486ac360b5705a54aa004e7">done_symbolic</a> () override</td></tr>
 <tr class="memdesc:a8ed25011c486ac360b5705a54aa004e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Symbolic finalization method.   <a href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#a8ed25011c486ac360b5705a54aa004e7">More...</a><br /></td></tr>
 <tr class="separator:a8ed25011c486ac360b5705a54aa004e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0fd9bce681b27352bb6a37c2ef10e300"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a0fd9bce681b27352bb6a37c2ef10e300">force_defect_norm_calc</a> (bool force)</td></tr>
+<tr class="memdesc:a0fd9bce681b27352bb6a37c2ef10e300"><td class="mdescLeft">&#160;</td><td class="mdescRight">Forces the calculation of defect norms in every iteration.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a0fd9bce681b27352bb6a37c2ef10e300">More...</a><br /></td></tr>
+<tr class="separator:a0fd9bce681b27352bb6a37c2ef10e300"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac6850204b9181f10a1221bebcf5a1b6b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#adf06d75d9c298dcf4bfcb1367fab105f">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ac6850204b9181f10a1221bebcf5a1b6b">get_def_final</a> () const</td></tr>
 <tr class="memdesc:ac6850204b9181f10a1221bebcf5a1b6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the final defect.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ac6850204b9181f10a1221bebcf5a1b6b">More...</a><br /></td></tr>
 <tr class="separator:ac6850204b9181f10a1221bebcf5a1b6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -298,7 +301,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a0f5f95eeb377ef784ac3224684fef393"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the plot name of the solver.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a0f5f95eeb377ef784ac3224684fef393">More...</a><br /></td></tr>
 <tr class="separator:a0f5f95eeb377ef784ac3224684fef393"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a576f7cf3e1c847ac5611e477bd551b73"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a576f7cf3e1c847ac5611e477bd551b73">set_stag_rate</a> (<a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#adf06d75d9c298dcf4bfcb1367fab105f">DataType</a> rate)</td></tr>
-<tr class="memdesc:a576f7cf3e1c847ac5611e477bd551b73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the stagnation rate fot the solver.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a576f7cf3e1c847ac5611e477bd551b73">More...</a><br /></td></tr>
+<tr class="memdesc:a576f7cf3e1c847ac5611e477bd551b73"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the stagnation rate for the solver.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a576f7cf3e1c847ac5611e477bd551b73">More...</a><br /></td></tr>
 <tr class="separator:a576f7cf3e1c847ac5611e477bd551b73"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5079e20c7708d1409a0798b7a226e9de"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a5079e20c7708d1409a0798b7a226e9de">set_tol_abs</a> (<a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#adf06d75d9c298dcf4bfcb1367fab105f">DataType</a> tol_abs)</td></tr>
 <tr class="memdesc:a5079e20c7708d1409a0798b7a226e9de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the absolute tolerance for the solver.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a5079e20c7708d1409a0798b7a226e9de">More...</a><br /></td></tr>
@@ -318,9 +321,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7fc0cca82272a85f64e9a2110366f6fe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#a7fc0cca82272a85f64e9a2110366f6fe">set_tol_step</a> (<a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#adf06d75d9c298dcf4bfcb1367fab105f">DataType</a> tol_step)</td></tr>
 <tr class="memdesc:a7fc0cca82272a85f64e9a2110366f6fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the step length tolerance.  <a href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#a7fc0cca82272a85f64e9a2110366f6fe">More...</a><br /></td></tr>
 <tr class="separator:a7fc0cca82272a85f64e9a2110366f6fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26458def0ef8654e3fff8f444df8108f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a26458def0ef8654e3fff8f444df8108f">skip_defect_calc</a> (bool skip)</td></tr>
-<tr class="memdesc:a26458def0ef8654e3fff8f444df8108f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Specifies whether defect calculation is allowed to be skipped.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a26458def0ef8654e3fff8f444df8108f">More...</a><br /></td></tr>
-<tr class="separator:a26458def0ef8654e3fff8f444df8108f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4274068c4e97f9636c48f4c932bfe7b1"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#a4274068c4e97f9636c48f4c932bfe7b1">trim_func_grad</a> (<a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#adf06d75d9c298dcf4bfcb1367fab105f">DataType</a> &amp;func)</td></tr>
 <tr class="memdesc:a4274068c4e97f9636c48f4c932bfe7b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Trims the function value and gradient according to some threshold.  <a href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#a4274068c4e97f9636c48f4c932bfe7b1">More...</a><br /></td></tr>
 <tr class="separator:a4274068c4e97f9636c48f4c932bfe7b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -333,9 +333,9 @@ Public Attributes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a50df7223074bef35a5a7cbd0c8ec9bec"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a50df7223074bef35a5a7cbd0c8ec9bec">_analyse_defect</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_iter, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#adf06d75d9c298dcf4bfcb1367fab105f">DataType</a> def_cur, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#adf06d75d9c298dcf4bfcb1367fab105f">DataType</a> def_prev, bool check_stag)</td></tr>
-<tr class="memdesc:a50df7223074bef35a5a7cbd0c8ec9bec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Internal function: analyse the current defect.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a50df7223074bef35a5a7cbd0c8ec9bec">More...</a><br /></td></tr>
-<tr class="separator:a50df7223074bef35a5a7cbd0c8ec9bec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b0b165b5aba580f1b68bd3c2a49933a"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a5b0b165b5aba580f1b68bd3c2a49933a">_analyze_defect</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_iter, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#adf06d75d9c298dcf4bfcb1367fab105f">DataType</a> def_cur, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#adf06d75d9c298dcf4bfcb1367fab105f">DataType</a> def_prev, bool check_stag)</td></tr>
+<tr class="memdesc:a5b0b165b5aba580f1b68bd3c2a49933a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Internal function: analyze the current defect.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a5b0b165b5aba580f1b68bd3c2a49933a">More...</a><br /></td></tr>
+<tr class="separator:a5b0b165b5aba580f1b68bd3c2a49933a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9920812266b8f49921c9b133dd1451b4"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#adf06d75d9c298dcf4bfcb1367fab105f">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a9920812266b8f49921c9b133dd1451b4">_calc_def_norm</a> (const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#a42d9aaccc185544ca228ee6f9e955086">VectorType</a> &amp;vec_def, const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#a42d9aaccc185544ca228ee6f9e955086">VectorType</a> &amp;vec_sol)</td></tr>
 <tr class="memdesc:a9920812266b8f49921c9b133dd1451b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the defect norm.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a9920812266b8f49921c9b133dd1451b4">More...</a><br /></td></tr>
 <tr class="separator:a9920812266b8f49921c9b133dd1451b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -413,6 +413,9 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:ac2ed9d06b8fc5632e175864d6b0aec6c"><td class="memItemLeft" align="right" valign="top">Filter_ &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#ac2ed9d06b8fc5632e175864d6b0aec6c">_filter</a></td></tr>
 <tr class="memdesc:ac2ed9d06b8fc5632e175864d6b0aec6c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The filter to be applied to the functional's gradient.  <a href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#ac2ed9d06b8fc5632e175864d6b0aec6c">More...</a><br /></td></tr>
 <tr class="separator:ac2ed9d06b8fc5632e175864d6b0aec6c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0ab9bef4ea22df32065a43399a990561"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a0ab9bef4ea22df32065a43399a990561">_force_def_norm_calc</a></td></tr>
+<tr class="memdesc:a0ab9bef4ea22df32065a43399a990561"><td class="mdescLeft">&#160;</td><td class="mdescRight">whether skipping of defect computation is allowed or not  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a0ab9bef4ea22df32065a43399a990561">More...</a><br /></td></tr>
+<tr class="separator:a0ab9bef4ea22df32065a43399a990561"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1678798c09d463bd121bf52812719ba9"><td class="memItemLeft" align="right" valign="top">Functional_ &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#a1678798c09d463bd121bf52812719ba9">_functional</a></td></tr>
 <tr class="memdesc:a1678798c09d463bd121bf52812719ba9"><td class="mdescLeft">&#160;</td><td class="mdescRight">The (nonlinear) functional.  <a href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#a1678798c09d463bd121bf52812719ba9">More...</a><br /></td></tr>
 <tr class="separator:a1678798c09d463bd121bf52812719ba9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -455,9 +458,6 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a69fab2263b0c35bf03aa77d95e3a5917"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_string.html">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a69fab2263b0c35bf03aa77d95e3a5917">_plot_name</a></td></tr>
 <tr class="memdesc:a69fab2263b0c35bf03aa77d95e3a5917"><td class="mdescLeft">&#160;</td><td class="mdescRight">name of the solver in plots  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a69fab2263b0c35bf03aa77d95e3a5917">More...</a><br /></td></tr>
 <tr class="separator:a69fab2263b0c35bf03aa77d95e3a5917"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac59b69cc5fe017dd82287034e6a25a5a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ac59b69cc5fe017dd82287034e6a25a5a">_skip_def_calc</a></td></tr>
-<tr class="memdesc:ac59b69cc5fe017dd82287034e6a25a5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">whether to skip defect computation if possible  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ac59b69cc5fe017dd82287034e6a25a5a">More...</a><br /></td></tr>
-<tr class="separator:ac59b69cc5fe017dd82287034e6a25a5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1f17cb192fab20b3591eafdafd7c5f6e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#adf06d75d9c298dcf4bfcb1367fab105f">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a1f17cb192fab20b3591eafdafd7c5f6e">_stag_rate</a></td></tr>
 <tr class="memdesc:a1f17cb192fab20b3591eafdafd7c5f6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">stagnation rate  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a1f17cb192fab20b3591eafdafd7c5f6e">More...</a><br /></td></tr>
 <tr class="separator:a1f17cb192fab20b3591eafdafd7c5f6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -468,7 +468,7 @@ Protected Attributes</h2></td></tr>
 <tr class="memdesc:aeeb10e81625c18084050c7cf00d25330"><td class="mdescLeft">&#160;</td><td class="mdescRight">absolute tolerance parameter  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#aeeb10e81625c18084050c7cf00d25330">More...</a><br /></td></tr>
 <tr class="separator:aeeb10e81625c18084050c7cf00d25330"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad355136ba5cd50b1f2ece6658ab1c0c8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#adf06d75d9c298dcf4bfcb1367fab105f">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ad355136ba5cd50b1f2ece6658ab1c0c8">_tol_abs_low</a></td></tr>
-<tr class="memdesc:ad355136ba5cd50b1f2ece6658ab1c0c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">absolute tolerance parameter  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ad355136ba5cd50b1f2ece6658ab1c0c8">More...</a><br /></td></tr>
+<tr class="memdesc:ad355136ba5cd50b1f2ece6658ab1c0c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">absolute low tolerance parameter  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ad355136ba5cd50b1f2ece6658ab1c0c8">More...</a><br /></td></tr>
 <tr class="separator:ad355136ba5cd50b1f2ece6658ab1c0c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a74d7d176a5ffdf55d5eb6144f3d9ce66"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#adf06d75d9c298dcf4bfcb1367fab105f">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#a74d7d176a5ffdf55d5eb6144f3d9ce66">_tol_curvature</a></td></tr>
 <tr class="memdesc:a74d7d176a5ffdf55d5eb6144f3d9ce66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tolerance for sufficient decrease in the norm of the gradient (Wolfe conditions)  <a href="class_f_e_a_t_1_1_solver_1_1_linesearch.html#a74d7d176a5ffdf55d5eb6144f3d9ce66">More...</a><br /></td></tr>
@@ -659,7 +659,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="linesearch_8hpp_source.html#l00110">110</a> of file <a class="el" href="linesearch_8hpp_source.html">linesearch.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="iterative_8hpp_source.html#l00624">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_set_comm_by_matrix()</a>, and <a class="el" href="linesearch_8hpp_source.html#l00091">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::iterates</a>.</p>
+<p class="reference">References <a class="el" href="iterative_8hpp_source.html#l00680">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_set_comm_by_matrix()</a>, and <a class="el" href="linesearch_8hpp_source.html#l00091">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::iterates</a>.</p>
 
 </div>
 </div>
@@ -769,8 +769,8 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a50df7223074bef35a5a7cbd0c8ec9bec" name="a50df7223074bef35a5a7cbd0c8ec9bec"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a50df7223074bef35a5a7cbd0c8ec9bec">&#9670;&#160;</a></span>_analyse_defect()</h2>
+<a id="a5b0b165b5aba580f1b68bd3c2a49933a" name="a5b0b165b5aba580f1b68bd3c2a49933a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b0b165b5aba580f1b68bd3c2a49933a">&#9670;&#160;</a></span>_analyze_defect()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -779,7 +779,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Functional_::VectorTypeR  &gt;::_analyse_defect </td>
+          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Functional_::VectorTypeR  &gt;::_analyze_defect </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
           <td class="paramname"><em>num_iter</em>, </td>
@@ -815,7 +815,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Internal function: analyse the current defect. </p>
+<p>Internal function: analyze the current defect. </p>
 <dl class="section note"><dt>Note</dt><dd>This function is called by <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#aa2b2f7492bf2c6b7d9f740b95e99969f" title="Internal function: sets the new (next) defect vector.">_set_new_defect()</a> and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a8fa021d1ba593ca3ac009c053192d6d4" title="Internal function: sets the new (next) defect norm.">_update_defect()</a>.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
@@ -828,7 +828,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The updated status code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00797">797</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00866">866</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -875,7 +875,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00650">650</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00706">706</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -941,7 +941,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="linesearch_8hpp_source.html#l00543">543</a> of file <a class="el" href="linesearch_8hpp_source.html">linesearch.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="iterative_8hpp_source.html#l00180">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_def_cur</a>, <a class="el" href="iterative_8hpp_source.html#l00178">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_def_init</a>, <a class="el" href="linesearch_8hpp_source.html#l00073">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_delta_0</a>, <a class="el" href="linesearch_8hpp_source.html#l00064">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_fval_0</a>, <a class="el" href="iterative_8hpp_source.html#l00184">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_iter_digits</a>, <a class="el" href="iterative_8hpp_source.html#l00170">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_max_iter</a>, <a class="el" href="iterative_8hpp_source.html#l00172">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_num_iter</a>, <a class="el" href="iterative_8hpp_source.html#l00664">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_plot_iter()</a>, <a class="el" href="iterative_8hpp_source.html#l00131">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_plot_name</a>, <a class="el" href="iterative_8hpp_source.html#l00696">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_print_line()</a>, <a class="el" href="linesearch_8hpp_source.html#l00080">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_tol_curvature</a>, <a class="el" href="linesearch_8hpp_source.html#l00082">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_tol_decrease</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edadfb7069bfc6e0064a6c667626eca07b4">FEAT::Solver::aborted</a>, <a class="el" href="math_8hpp_source.html#l00275">FEAT::Math::abs()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edadb5a93fff259ad3ff2017a64912fa156">FEAT::Solver::diverged</a>, <a class="el" href="iterative_8hpp_source.html#l00404">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::get_num_iter()</a>, <a class="el" href="iterative_8hpp_source.html#l00496">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::is_diverged()</a>, <a class="el" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">FEAT::Math::isfinite()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edaa520882cd714abbd1bf9f72d23990f0e">FEAT::Solver::max_iter</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ab7e792923921c7dbe2a1fefafd73ef0a">FEAT::Solver::SolverBase&lt; Vector_ &gt;::name()</a>, <a class="el" href="string_8hpp_source.html#l00392">FEAT::String::pad_front()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda3c709b10a5d47ba33d85337dd9110917">FEAT::Solver::progress</a>, <a class="el" href="string_8hpp_source.html#l00944">FEAT::stringify()</a>, <a class="el" href="string_8hpp_source.html#l01088">FEAT::stringify_fp_sci()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda260ca9dd8a4577fc00b7bd5810298076">FEAT::Solver::success</a>.</p>
+<p class="reference">References <a class="el" href="iterative_8hpp_source.html#l00239">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_def_cur</a>, <a class="el" href="iterative_8hpp_source.html#l00237">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_def_init</a>, <a class="el" href="linesearch_8hpp_source.html#l00073">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_delta_0</a>, <a class="el" href="linesearch_8hpp_source.html#l00064">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_fval_0</a>, <a class="el" href="iterative_8hpp_source.html#l00243">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_iter_digits</a>, <a class="el" href="iterative_8hpp_source.html#l00229">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_max_iter</a>, <a class="el" href="iterative_8hpp_source.html#l00231">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_num_iter</a>, <a class="el" href="iterative_8hpp_source.html#l00720">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_plot_iter()</a>, <a class="el" href="iterative_8hpp_source.html#l00211">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_plot_name</a>, <a class="el" href="iterative_8hpp_source.html#l00752">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_print_line()</a>, <a class="el" href="linesearch_8hpp_source.html#l00080">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_tol_curvature</a>, <a class="el" href="linesearch_8hpp_source.html#l00082">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_tol_decrease</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edadfb7069bfc6e0064a6c667626eca07b4">FEAT::Solver::aborted</a>, <a class="el" href="math_8hpp_source.html#l00275">FEAT::Math::abs()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edadb5a93fff259ad3ff2017a64912fa156">FEAT::Solver::diverged</a>, <a class="el" href="iterative_8hpp_source.html#l00462">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::get_num_iter()</a>, <a class="el" href="iterative_8hpp_source.html#l00552">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::is_diverged()</a>, <a class="el" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">FEAT::Math::isfinite()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edaa520882cd714abbd1bf9f72d23990f0e">FEAT::Solver::max_iter</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ab7e792923921c7dbe2a1fefafd73ef0a">FEAT::Solver::SolverBase&lt; Vector_ &gt;::name()</a>, <a class="el" href="string_8hpp_source.html#l00392">FEAT::String::pad_front()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda3c709b10a5d47ba33d85337dd9110917">FEAT::Solver::progress</a>, <a class="el" href="string_8hpp_source.html#l00944">FEAT::stringify()</a>, <a class="el" href="string_8hpp_source.html#l01088">FEAT::stringify_fp_sci()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda260ca9dd8a4577fc00b7bd5810298076">FEAT::Solver::success</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="mqc__linesearch_8hpp_source.html#l00201">FEAT::Solver::MQCLinesearch&lt; Functional_, Filter_ &gt;::_apply_intern()</a>, <a class="el" href="newton__raphson__linesearch_8hpp_source.html#l00155">FEAT::Solver::NewtonRaphsonLinesearch&lt; Functional_, Filter_ &gt;::_apply_intern()</a>, and <a class="el" href="secant__linesearch_8hpp_source.html#l00195">FEAT::Solver::SecantLinesearch&lt; Functional_, Filter_ &gt;::_apply_intern()</a>.</p>
 
@@ -980,7 +980,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the plot mode is set to <code>iter</code> or <code>all</code> and the plot interval matches or the solver does not continue to the next iteration </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00664">664</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00720">720</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1034,7 +1034,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00717">717</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00773">773</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1064,7 +1064,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 <p>Plot summary? </p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the plot mode is set to <code>summary</code> or <code>all</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00675">675</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00731">731</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1100,7 +1100,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00696">696</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00752">752</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1130,7 +1130,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 <p>Progress iteration? </p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the solver should process, otherwise <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00685">685</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00741">741</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1166,7 +1166,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00611">611</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00667">667</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1202,7 +1202,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00624">624</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00680">680</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1238,7 +1238,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00636">636</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00692">692</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1288,7 +1288,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Reimplemented in <a class="el" href="class_f_e_a_t_1_1_solver_1_1_q_penalty.html#ad4ef2095e84619a29292a37f078a877b">FEAT::Solver::QPenalty&lt; Functional_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00746">746</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00802">802</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1337,7 +1337,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The updated Status code. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00855">855</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00924">924</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1411,7 +1411,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="linesearch_8hpp_source.html#l00464">464</a> of file <a class="el" href="linesearch_8hpp_source.html">linesearch.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="linesearch_8hpp_source.html#l00069">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_alpha_0</a>, <a class="el" href="iterative_8hpp_source.html#l00178">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_def_init</a>, <a class="el" href="linesearch_8hpp_source.html#l00073">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_delta_0</a>, <a class="el" href="linesearch_8hpp_source.html#l00064">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_fval_0</a>, <a class="el" href="iterative_8hpp_source.html#l00184">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_iter_digits</a>, <a class="el" href="iterative_8hpp_source.html#l00172">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_num_iter</a>, <a class="el" href="iterative_8hpp_source.html#l00664">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_plot_iter()</a>, <a class="el" href="iterative_8hpp_source.html#l00131">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_plot_name</a>, <a class="el" href="iterative_8hpp_source.html#l00696">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_print_line()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edadfb7069bfc6e0064a6c667626eca07b4">FEAT::Solver::aborted</a>, <a class="el" href="math_8hpp_source.html#l00275">FEAT::Math::abs()</a>, <a class="el" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">FEAT::Math::isfinite()</a>, <a class="el" href="string_8hpp_source.html#l00392">FEAT::String::pad_front()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda3c709b10a5d47ba33d85337dd9110917">FEAT::Solver::progress</a>, <a class="el" href="string_8hpp_source.html#l00944">FEAT::stringify()</a>, <a class="el" href="string_8hpp_source.html#l01088">FEAT::stringify_fp_sci()</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
+<p class="reference">References <a class="el" href="linesearch_8hpp_source.html#l00069">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_alpha_0</a>, <a class="el" href="iterative_8hpp_source.html#l00237">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_def_init</a>, <a class="el" href="linesearch_8hpp_source.html#l00073">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_delta_0</a>, <a class="el" href="linesearch_8hpp_source.html#l00064">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_fval_0</a>, <a class="el" href="iterative_8hpp_source.html#l00243">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_iter_digits</a>, <a class="el" href="iterative_8hpp_source.html#l00231">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_num_iter</a>, <a class="el" href="iterative_8hpp_source.html#l00720">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_plot_iter()</a>, <a class="el" href="iterative_8hpp_source.html#l00211">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_plot_name</a>, <a class="el" href="iterative_8hpp_source.html#l00752">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_print_line()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edadfb7069bfc6e0064a6c667626eca07b4">FEAT::Solver::aborted</a>, <a class="el" href="math_8hpp_source.html#l00275">FEAT::Math::abs()</a>, <a class="el" href="namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a">FEAT::Math::isfinite()</a>, <a class="el" href="string_8hpp_source.html#l00392">FEAT::String::pad_front()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda3c709b10a5d47ba33d85337dd9110917">FEAT::Solver::progress</a>, <a class="el" href="string_8hpp_source.html#l00944">FEAT::stringify()</a>, <a class="el" href="string_8hpp_source.html#l01088">FEAT::stringify_fp_sci()</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="mqc__linesearch_8hpp_source.html#l00201">FEAT::Solver::MQCLinesearch&lt; Functional_, Filter_ &gt;::_apply_intern()</a>, <a class="el" href="newton__raphson__linesearch_8hpp_source.html#l00155">FEAT::Solver::NewtonRaphsonLinesearch&lt; Functional_, Filter_ &gt;::_apply_intern()</a>, and <a class="el" href="secant__linesearch_8hpp_source.html#l00195">FEAT::Solver::SecantLinesearch&lt; Functional_, Filter_ &gt;::_apply_intern()</a>.</p>
 
@@ -1442,7 +1442,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 </div><div class="memdoc">
 
 <p>Internal function: sets the new (next) defect norm. </p>
-<p >This function takes a precalculated defect vector's norm, increments the iteration count, plots an output line to std::cout and checks whether any of the stopping criterions is fulfilled.</p>
+<p >This function takes a pre-calculated defect vector norm, increments the iteration count, plots an output line to std::cout and checks whether any of the stopping criterions is fulfilled.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">def_cur_norm</td><td>The new defect norm.</td></tr>
@@ -1452,7 +1452,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The updated Status code.</dd></dl>
 <dl class="section note"><dt>Note</dt><dd>This function is preferred over _set_new_defect when using asynchronous mpi operations. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00901">901</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00970">970</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1536,7 +1536,7 @@ template&lt;typename Vector_ &gt; </div>
 
 <p>Computes the overall convergence rate: (defect_final / defect_initial) ^ (1 / number of iterations) </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00526">526</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00582">582</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1565,7 +1565,7 @@ template&lt;typename Vector_ &gt; </div>
 
 <p>Computes the overall defect reduction factor: (defect_final / defect_inital) </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00541">541</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00597">597</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1687,7 +1687,7 @@ template&lt;typename Vector_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00246">246</a> of file <a class="el" href="kernel_2solver_2base_8hpp_source.html">base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00283">FEAT::Solver::SolverBase&lt; Vector_ &gt;::done()</a>, <a class="el" href="bfbt_8hpp_source.html#l00180">FEAT::Solver::BFBT&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;::done_numeric()</a>, <a class="el" href="bfbt_8hpp_source.html#l00367">FEAT::Solver::BFBT&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;::done_numeric()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00084">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;::done_numeric()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00188">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;::done_numeric()</a>, <a class="el" href="hypre_8hpp_source.html#l00304">FEAT::Solver::ParaSailsPrecond&lt; Matrix_, Filter_ &gt;::done_numeric()</a>, <a class="el" href="iterative_8hpp_source.html#l01033">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::done_numeric()</a>, <a class="el" href="multigrid_8hpp_source.html#l01250">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;::done_numeric()</a>, <a class="el" href="pcgnr_8hpp_source.html#l00188">FEAT::Solver::PCGNR&lt; Matrix_, Filter_ &gt;::done_numeric()</a>, <a class="el" href="umfpack_8hpp_source.html#l00534">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::done_numeric()</a>, <a class="el" href="uzawa__precond_8hpp_source.html#l00199">FEAT::Solver::UzawaPrecond&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;::done_numeric()</a>, and <a class="el" href="uzawa__precond_8hpp_source.html#l00497">FEAT::Solver::UzawaPrecond&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;::done_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00283">FEAT::Solver::SolverBase&lt; Vector_ &gt;::done()</a>, <a class="el" href="bfbt_8hpp_source.html#l00180">FEAT::Solver::BFBT&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;::done_numeric()</a>, <a class="el" href="bfbt_8hpp_source.html#l00367">FEAT::Solver::BFBT&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;::done_numeric()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00084">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;::done_numeric()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00188">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;::done_numeric()</a>, <a class="el" href="hypre_8hpp_source.html#l00304">FEAT::Solver::ParaSailsPrecond&lt; Matrix_, Filter_ &gt;::done_numeric()</a>, <a class="el" href="iterative_8hpp_source.html#l01102">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::done_numeric()</a>, <a class="el" href="multigrid_8hpp_source.html#l01250">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;::done_numeric()</a>, <a class="el" href="pcgnr_8hpp_source.html#l00188">FEAT::Solver::PCGNR&lt; Matrix_, Filter_ &gt;::done_numeric()</a>, <a class="el" href="umfpack_8hpp_source.html#l00534">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::done_numeric()</a>, <a class="el" href="uzawa__precond_8hpp_source.html#l00199">FEAT::Solver::UzawaPrecond&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;::done_numeric()</a>, and <a class="el" href="uzawa__precond_8hpp_source.html#l00497">FEAT::Solver::UzawaPrecond&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;::done_numeric()</a>.</p>
 
 </div>
 </div>
@@ -1727,6 +1727,43 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 </div>
 </div>
+<a id="a0fd9bce681b27352bb6a37c2ef10e300" name="a0fd9bce681b27352bb6a37c2ef10e300"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0fd9bce681b27352bb6a37c2ef10e300">&#9670;&#160;</a></span>force_defect_norm_calc()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">virtual void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Functional_::VectorTypeR  &gt;::force_defect_norm_calc </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>force</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Forces the calculation of defect norms in every iteration. </p>
+<dl class="section note"><dt>Note</dt><dd>Please note that allowing the skipping of defect norm calculations is merely a hint and a derived class may override this function therefore always forcing the calculation of defect norms. One possible reason is that the derived solver class may require defect norms as part of its solver algorithm and therefore skipping the computation of the defect norms may break the solver; two examples are the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab.html" title="(Preconditioned) Bi-Conjugate Gradient Stabilized solver implementation">BiCGStab</a> and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html" title="GMRES(k) solver implementation.">GMRES</a> solvers.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">force</td><td>Specifies whether defect norm computation is to be enforced in every iteration </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00490">490</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+
+</div>
+</div>
 <a id="ac6850204b9181f10a1221bebcf5a1b6b" name="ac6850204b9181f10a1221bebcf5a1b6b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac6850204b9181f10a1221bebcf5a1b6b">&#9670;&#160;</a></span>get_def_final()</h2>
 
@@ -1752,7 +1789,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Returns the final defect. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00514">514</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00570">570</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1781,7 +1818,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Returns the initial defect. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00508">508</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00564">564</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1849,7 +1886,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Returns the absolute divergence. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00361">361</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00419">419</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1878,7 +1915,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Returns the relative divergence. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00355">355</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00413">413</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -1976,7 +2013,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Returns the maximum number of iterations. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00416">416</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00474">474</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2005,7 +2042,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Returns the minimal number of iterations. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00410">410</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00468">468</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2034,7 +2071,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Returns the minimum stagnation iteration count. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00385">385</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00443">443</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2063,7 +2100,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Returns number of performed iterations. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00404">404</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00462">462</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2092,7 +2129,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Returns the plot name of the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00465">465</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00523">523</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2168,7 +2205,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Returns the stagnation rate. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00373">373</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00431">431</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2197,7 +2234,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Returns the status. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00520">520</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00576">576</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2232,7 +2269,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="linesearch_8hpp_source.html#l00213">213</a> of file <a class="el" href="linesearch_8hpp_source.html">linesearch.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="linesearch_8hpp_source.html#l00071">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_alpha_min</a>, <a class="el" href="iterative_8hpp_source.html#l00180">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_def_cur</a>, <a class="el" href="iterative_8hpp_source.html#l00178">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_def_init</a>, <a class="el" href="linesearch_8hpp_source.html#l00048">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_functional</a>, <a class="el" href="linesearch_8hpp_source.html#l00064">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_fval_0</a>, <a class="el" href="linesearch_8hpp_source.html#l00062">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_fval_min</a>, <a class="el" href="iterative_8hpp_source.html#l00404">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::get_num_iter()</a>, <a class="el" href="iterative_8hpp_source.html#l00465">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::get_plot_name()</a>, <a class="el" href="iterative_8hpp_source.html#l00520">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::get_status()</a>, <a class="el" href="string_8hpp_source.html#l00944">FEAT::stringify()</a>, and <a class="el" href="string_8hpp_source.html#l01088">FEAT::stringify_fp_sci()</a>.</p>
+<p class="reference">References <a class="el" href="linesearch_8hpp_source.html#l00071">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_alpha_min</a>, <a class="el" href="iterative_8hpp_source.html#l00239">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_def_cur</a>, <a class="el" href="iterative_8hpp_source.html#l00237">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::_def_init</a>, <a class="el" href="linesearch_8hpp_source.html#l00048">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_functional</a>, <a class="el" href="linesearch_8hpp_source.html#l00064">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_fval_0</a>, <a class="el" href="linesearch_8hpp_source.html#l00062">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_fval_min</a>, <a class="el" href="iterative_8hpp_source.html#l00462">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::get_num_iter()</a>, <a class="el" href="iterative_8hpp_source.html#l00523">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::get_plot_name()</a>, <a class="el" href="iterative_8hpp_source.html#l00576">FEAT::Solver::IterativeSolver&lt; Functional_::VectorTypeR &gt;::get_status()</a>, <a class="el" href="string_8hpp_source.html#l00944">FEAT::stringify()</a>, and <a class="el" href="string_8hpp_source.html#l01088">FEAT::stringify_fp_sci()</a>.</p>
 
 </div>
 </div>
@@ -2261,7 +2298,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Returns the absolute tolerance. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00330">330</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00389">389</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2290,7 +2327,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Returns the lower absolute tolerance. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00336">336</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00395">395</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2319,7 +2356,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Returns the relative tolerance. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00324">324</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00383">383</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2391,7 +2428,7 @@ Before this function can be called, the symbolic initialization must be performe
 
 <p class="definition">Definition at line <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00237">237</a> of file <a class="el" href="kernel_2solver_2base_8hpp_source.html">base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00268">FEAT::Solver::SolverBase&lt; Vector_ &gt;::init()</a>, <a class="el" href="bfbt_8hpp_source.html#l00166">FEAT::Solver::BFBT&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;::init_numeric()</a>, <a class="el" href="bfbt_8hpp_source.html#l00359">FEAT::Solver::BFBT&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;::init_numeric()</a>, <a class="el" href="chebyshev_8hpp_source.html#l00176">FEAT::Solver::Chebyshev&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00077">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;::init_numeric()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00181">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;::init_numeric()</a>, <a class="el" href="hypre_8hpp_source.html#l00195">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_numeric()</a>, <a class="el" href="iterative_8hpp_source.html#l01025">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::init_numeric()</a>, <a class="el" href="multigrid_8hpp_source.html#l01233">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;::init_numeric()</a>, <a class="el" href="pcgnr_8hpp_source.html#l00174">FEAT::Solver::PCGNR&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, <a class="el" href="pcgnrilu_8hpp_source.html#l00179">FEAT::Solver::PCGNRILU&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, <a class="el" href="superlu_8hpp_source.html#l00149">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, <a class="el" href="umfpack_8hpp_source.html#l00459">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::init_numeric()</a>, <a class="el" href="uzawa__precond_8hpp_source.html#l00189">FEAT::Solver::UzawaPrecond&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;::init_numeric()</a>, <a class="el" href="uzawa__precond_8hpp_source.html#l00487">FEAT::Solver::UzawaPrecond&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;::init_numeric()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00589">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::init_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00268">FEAT::Solver::SolverBase&lt; Vector_ &gt;::init()</a>, <a class="el" href="bfbt_8hpp_source.html#l00166">FEAT::Solver::BFBT&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;::init_numeric()</a>, <a class="el" href="bfbt_8hpp_source.html#l00359">FEAT::Solver::BFBT&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;::init_numeric()</a>, <a class="el" href="chebyshev_8hpp_source.html#l00176">FEAT::Solver::Chebyshev&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00077">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;::init_numeric()</a>, <a class="el" href="convert__precond_8hpp_source.html#l00181">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;::init_numeric()</a>, <a class="el" href="hypre_8hpp_source.html#l00195">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_numeric()</a>, <a class="el" href="iterative_8hpp_source.html#l01094">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::init_numeric()</a>, <a class="el" href="multigrid_8hpp_source.html#l01233">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;::init_numeric()</a>, <a class="el" href="pcgnr_8hpp_source.html#l00174">FEAT::Solver::PCGNR&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, <a class="el" href="pcgnrilu_8hpp_source.html#l00179">FEAT::Solver::PCGNRILU&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, <a class="el" href="superlu_8hpp_source.html#l00149">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, <a class="el" href="umfpack_8hpp_source.html#l00459">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::init_numeric()</a>, <a class="el" href="uzawa__precond_8hpp_source.html#l00189">FEAT::Solver::UzawaPrecond&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;::init_numeric()</a>, <a class="el" href="uzawa__precond_8hpp_source.html#l00487">FEAT::Solver::UzawaPrecond&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;::init_numeric()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00589">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::init_numeric()</a>.</p>
 
 </div>
 </div>
@@ -2455,21 +2492,9 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 </div><div class="memdoc">
 
 <p>checks for convergence </p>
-<p >The solver is converged if<br  />
-the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
-or<br  />
-the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
-As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]
-</p>
-<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
-and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
-did not gain 8 digits so far then I'm also happy" </p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if converged, else <code>false</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00476">476</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00533">533</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2498,27 +2523,15 @@ did not gain 8 digits so far then I'm also happy" </p>
 </div><div class="memdoc">
 
 <p>checks for convergence </p>
-<p >The solver is converged if<br  />
-the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
-or<br  />
-the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
-As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]
-</p>
-<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
-and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
-did not gain 8 digits so far then I'm also happy" </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">def_cur</td><td>The defect that is to be analysed</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">def_cur</td><td>The defect norm that is to be analyzed</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if converged, else <code>false</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00490">490</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00546">546</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2547,7 +2560,7 @@ did not gain 8 digits so far then I'm also happy" </p>
 
 <p>checks for divergence </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00496">496</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00552">552</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2577,7 +2590,7 @@ did not gain 8 digits so far then I'm also happy" </p>
 
 <p>checks for divergence </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00502">502</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00558">558</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2611,7 +2624,7 @@ template&lt;typename Vector_ &gt; </div>
 
 <p>Implemented in <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_l_g_l_i_b_min_l_b_f_g_s.html#aba0d6e9259b5410b8c4c17598d155a28">FEAT::Solver::ALGLIBMinLBFGS&lt; Functional_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_l_g_l_i_b_min_c_g.html#a6b8cbe09f5b77adc90b428493eab2ba5">FEAT::Solver::ALGLIBMinCG&lt; Functional_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a0a4d513a3b85b917939eb25e7a2d9516">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_b_f_b_t.html#a9dc22631659ac99851404e439ee043ab">FEAT::Solver::BFBT&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_b_f_b_t_3_01_global_1_1_matrix_3_01_matrix_a___00_01_mirror_v___00_b78d0c70abd3b3b8f4e08d78d44fb7d6.html#aa0cc31e9c7af5c1de4ae5aa97d52d3d0">FEAT::Solver::BFBT&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab.html#a56debf534b4ca11f255cb0b9d80993d6">FEAT::Solver::BiCGStab&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab_l.html#a6bc0acbcac049c591f73a5f95e02f1fe">FEAT::Solver::BiCGStabL&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_chebyshev.html#ac04d93d72dd5027ef3312df5d933cf0c">FEAT::Solver::Chebyshev&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_convert_precond.html#a1d721c3e76874323f1bd535ad3f8a94c">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_convert_precond_3_01_global_1_1_vector_3_01_local_vector_outer___00120b74f43424364c71ee3ecd9deab297.html#a25fafb09e4368a228e2c225048f8b94d">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_c_u_d_s_s.html#aad5e786d3248215d63b20b5f5d42f696">FEAT::Solver::CUDSS</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_cu_solver_l_u.html#a6e63383617e529f37b4f352cc52aab40">FEAT::Solver::CuSolverLU</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_cu_solver_q_r.html#a98a1eb8ee76de30ca7e78404a2caa78c">FEAT::Solver::CuSolverQR</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_descent.html#ae8f22a33d059f5be61511622a5f7a29c">FEAT::Solver::Descent&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_diagonal_precond.html#a2be9f4c549b31693fb60a242b2deca00">FEAT::Solver::DiagonalPrecond&lt; Vector_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_maf2bb55a50c59e69123dfd500b5d8c62b.html#ad77c5eabdf0566a660cd0e762a1e2cde">FEAT::Solver::DirectStokesSolver&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, LAFEM::TupleFilter&lt; FilterV_, FilterP_ &gt; &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver_3_01_global_1_1_matrix_3_01_local_matrix___00_12c7f8d5d38cd40f20a5510074419a06.html#a8594096f377696992d8834f41cb8b7a7">FEAT::Solver::DirectStokesSolver&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_f_g_m_r_e_s.html#ac518cae238344e4ca0863aed3cb7e18c">FEAT::Solver::FGMRES&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_fixed_step_linesearch.html#a4c02e52db1ed27f9f9d38f26f7c65e5c">FEAT::Solver::FixedStepLinesearch&lt; Functional_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html#a15b72909d6cab79d0dc98880d32b1c5a">FEAT::Solver::GMRES&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_gropp_p_c_g.html#ae04ecfad45529af48fbbf83dee90b070">FEAT::Solver::GroppPCG&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_para_sails_precond.html#ad74946469f16b5d9c972955ca5d9adca">FEAT::Solver::ParaSailsPrecond&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#a91a6a7dd5097ac5efb121aa69d176c5e">FEAT::Solver::EuclidPrecond&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_boomer_a_m_g.html#aaf8287085a27e77d8f47fe24682c4d88">FEAT::Solver::BoomerAMG&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_i_d_r_s.html#a51506aabd6f318336b982901b667f8a8">FEAT::Solver::IDRS&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_i_l_u_precond.html#afb37522e051886c9a6946b06f7926e22">FEAT::Solver::ILUPrecond&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_jacobi_precond.html#aa7652a3f7e27f7d5aef7ce19b203d7e7">FEAT::Solver::JacobiPrecond&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_matrix_precond.html#ad0f65bbe800bcef97fbd1e9de0079d53">FEAT::Solver::MatrixPrecond&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_m_k_l_d_s_s.html#a20b59da5bf326f3897215ad6285d38d8">FEAT::Solver::MKLDSS</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_m_q_c_linesearch.html#a2d8c159cd4fdfd1d9908d52d17b4666c">FEAT::Solver::MQCLinesearch&lt; Functional_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_multi_grid.html#ab2baa13f1742032a591fb8c3d41c7ecd">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_newton_raphson_linesearch.html#ac02848dd60681bea54ded7b365d5d5f9">FEAT::Solver::NewtonRaphsonLinesearch&lt; Functional_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_c_g.html#a8745174971dd6922c55cae4d4cf939f4">FEAT::Solver::NLCG&lt; Functional_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_nonlinear_operator_precond_wrapper.html#a48e58d139b5f63c879e061ab6877b305">FEAT::Solver::NonlinearOperatorPrecondWrapper&lt; NonlinearOperator_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_s_d.html#a7c4043949cc3cc6f3b17f23b9dca51d8">FEAT::Solver::NLSD&lt; Functional_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g.html#ada62278f10483dd04172bd9115a8884a">FEAT::Solver::PCG&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#aed3c11b1edebf5eadd830e2912ddc941">FEAT::Solver::PCGNR&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#aa2914fd9983ea99233775ff9dd8eb30a">FEAT::Solver::PCGNRILU&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_r.html#a5727479b3eb78d0a0c8e1124470ae0f3">FEAT::Solver::PCR&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_pipe_p_c_g.html#a6516a121dc5d12827528002613789e80">FEAT::Solver::PipePCG&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_m_r.html#ac93b8a3ec65386e4ba33600ff83c0139">FEAT::Solver::PMR&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_polynomial_precond.html#a4f73bd7d6649475770d297270031ddde">FEAT::Solver::PolynomialPrecond&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_precon_wrapper.html#a62bdee40c308639af1d69ff0e4714b72">FEAT::Solver::PreconWrapper&lt; Matrix_, Filter_, Precon_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_s_d.html#a52d587444f07faa3bd49fd846f635dd9">FEAT::Solver::PSD&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_q_penalty.html#a7c433026a3a43c96f6bf04a474e5b163">FEAT::Solver::QPenalty&lt; Functional_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_r_bi_c_g_stab.html#a26c2873f682cb9f1722ab827d4f04a92">FEAT::Solver::RBiCGStab&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_r_g_c_r.html#ae0ecc3adc98c16bcfe9819a79d669af8">FEAT::Solver::RGCR&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_richardson.html#a637e1a73e3e2fba8ff18614948c292f0">FEAT::Solver::Richardson&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_scale_precond.html#add60033b63d44d7a36cfe857b758faf3">FEAT::Solver::ScalePrecond&lt; Vector_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_schwarz_precond_3_01_global_1_1_vector_3_01_local_vector___00_01_mic9e5dece21cb7735a0bc194fb3569eb4.html#a3f5b58da8284242c6aaa03e20aa77ed9">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_secant_linesearch.html#afd72e12c72969b6fe3f25ec4cb582fae">FEAT::Solver::SecantLinesearch&lt; Functional_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_s_o_r_precond.html#ac2b6df62f294e8957571425020e3dcc6">FEAT::Solver::SORPrecond&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond.html#af513f0b3a23a450609db8e887de91c1e">FEAT::Solver::SSORPrecond&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_super_l_u.html#a38b619f96dd684b78c67d9794081a0de">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_umfpack.html#acad1834ef4b7ca9567d2089d4c88ece3">FEAT::Solver::Umfpack</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_umfpack_mean.html#a62488b56e9de5e61911f25258bfa3785">FEAT::Solver::UmfpackMean</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_saddle_umfpack_mean.html#ab2829d34f5d83b9e9664bef0db386630">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html#a540ba041bdc7ce1edc48511f7e1a3f69">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_uzawa_precond.html#a897dcaf9584fe8afece6ca452165d309">FEAT::Solver::UzawaPrecond&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_uzawa_precond_3_01_global_1_1_matrix_3_01_matrix_a___00_01_mirror_v267746ef0d8b831732ecfa70b7d32300.html#a578e6cb417fd9dc7dbde62a9a883287b">FEAT::Solver::UzawaPrecond&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_vanka_3_01_l_a_f_e_m_1_1_saddle_point_matrix_3_01_matrix_a___00_01_9ced3bd73ff865688c51cd8e1ad52f3a.html#a8de1787692d3240775f3fb34f3504202">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#ac003a2bddc7ba5401c99161463e35902">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#a466d07fad209727943213dcc5e41f2bb">FEAT::Solver::NLOptPrecond&lt; VectorType_, FilterType_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#a466d07fad209727943213dcc5e41f2bb">FEAT::Solver::NLOptPrecond&lt; OperatorType_::VectorType, Filter &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#a466d07fad209727943213dcc5e41f2bb">FEAT::Solver::NLOptPrecond&lt; Operator_::VectorType, Filter_ &gt;</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#a466d07fad209727943213dcc5e41f2bb">FEAT::Solver::NLOptPrecond&lt; NonlinearOperator_::SystemLevelType::GlobalSystemVectorR, NonlinearOperator_::SystemLevelType::GlobalSystemFilter &gt;</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="iterative_8hpp_source.html#l01071">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::_apply_precond()</a>, <a class="el" href="linesearch_8hpp_source.html#l00543">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_check_convergence()</a>, <a class="el" href="iterative_8hpp_source.html#l00746">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_set_initial_defect()</a>, <a class="el" href="nloptls_8hpp_source.html#l00267">FEAT::Solver::NLOptLS&lt; Functional_, Filter_ &gt;::_set_initial_defect()</a>, <a class="el" href="iterative_8hpp_source.html#l00855">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_set_new_defect()</a>, <a class="el" href="nloptls_8hpp_source.html#l00325">FEAT::Solver::NLOptLS&lt; Functional_, Filter_ &gt;::_set_new_defect()</a>, and <a class="el" href="iterative_8hpp_source.html#l00901">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_update_defect()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="iterative_8hpp_source.html#l01140">FEAT::Solver::PreconditionedIterativeSolver&lt; Vector_ &gt;::_apply_precond()</a>, <a class="el" href="linesearch_8hpp_source.html#l00543">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_check_convergence()</a>, <a class="el" href="iterative_8hpp_source.html#l00802">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_set_initial_defect()</a>, <a class="el" href="nloptls_8hpp_source.html#l00267">FEAT::Solver::NLOptLS&lt; Functional_, Filter_ &gt;::_set_initial_defect()</a>, <a class="el" href="iterative_8hpp_source.html#l00924">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_set_new_defect()</a>, <a class="el" href="nloptls_8hpp_source.html#l00325">FEAT::Solver::NLOptLS&lt; Functional_, Filter_ &gt;::_set_new_defect()</a>, and <a class="el" href="iterative_8hpp_source.html#l00970">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_update_defect()</a>.</p>
 
 </div>
 </div>
@@ -2640,7 +2653,7 @@ template&lt;typename Vector_ &gt; </div>
 
 <p>Plot a summary of the last solver run. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00571">571</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00627">627</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2742,7 +2755,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Sets the absolute divergence for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00349">349</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00407">407</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2772,7 +2785,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Sets the relative divergence for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00343">343</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00401">401</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2882,7 +2895,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Sets the maximum iteration count for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00397">397</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00455">455</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2912,7 +2925,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Sets the minimum iteration count for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00391">391</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00449">449</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2942,7 +2955,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Sets the minimum stagnate iteration count for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00379">379</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00437">437</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -2978,7 +2991,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00453">453</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00511">511</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3014,7 +3027,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00443">443</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00501">501</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3044,7 +3057,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Sets the plot name of the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00459">459</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00517">517</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3072,9 +3085,9 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p>Sets the stagnation rate fot the solver. </p>
+<p>Sets the stagnation rate for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00367">367</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00425">425</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3104,7 +3117,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Sets the absolute tolerance for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00312">312</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00371">371</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3134,7 +3147,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Sets the lower absolute tolerance for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00318">318</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00377">377</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3236,7 +3249,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Sets the relative tolerance for the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00306">306</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00365">365</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3273,44 +3286,6 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 <p class="reference">References <a class="el" href="linesearch_8hpp_source.html#l00084">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_tol_step</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="linesearch_8hpp_source.html#l00157">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::Linesearch()</a>.</p>
-
-</div>
-</div>
-<a id="a26458def0ef8654e3fff8f444df8108f" name="a26458def0ef8654e3fff8f444df8108f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a26458def0ef8654e3fff8f444df8108f">&#9670;&#160;</a></span>skip_defect_calc()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Functional_::VectorTypeR  &gt;::skip_defect_calc </td>
-          <td>(</td>
-          <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>skip</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Specifies whether defect calculation is allowed to be skipped. </p>
-<dl class="section warning"><dt>Warning</dt><dd>Skipping defect calculation can lead to deadlocks in parallel solver implementations if one (but not all) processes need to compute the defect for some reason (like plotting) !<br  />
-Use this function only when you really know what you are doing!</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">skip</td><td>Specifies whether defect computation is allowed to be skipped. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00432">432</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3450,7 +3425,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>Communicator of the solver. </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00129">129</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00209">209</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3476,7 +3451,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>current defect </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00180">180</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00239">239</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3502,7 +3477,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>initial defect </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00178">178</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00237">237</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3528,7 +3503,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>previous iteration defect </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00182">182</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00241">241</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3613,7 +3588,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>absolute divergence parameter </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00164">164</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00223">223</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3639,7 +3614,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>relative divergence parameter </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00162">162</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00221">221</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3670,6 +3645,32 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 <p class="definition">Definition at line <a class="el" href="linesearch_8hpp_source.html#l00050">50</a> of file <a class="el" href="linesearch_8hpp_source.html">linesearch.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="mqc__linesearch_8hpp_source.html#l00201">FEAT::Solver::MQCLinesearch&lt; Functional_, Filter_ &gt;::_apply_intern()</a>, <a class="el" href="newton__raphson__linesearch_8hpp_source.html#l00155">FEAT::Solver::NewtonRaphsonLinesearch&lt; Functional_, Filter_ &gt;::_apply_intern()</a>, <a class="el" href="secant__linesearch_8hpp_source.html#l00195">FEAT::Solver::SecantLinesearch&lt; Functional_, Filter_ &gt;::_apply_intern()</a>, <a class="el" href="fixed__step__linesearch_8hpp_source.html#l00140">FEAT::Solver::FixedStepLinesearch&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="mqc__linesearch_8hpp_source.html#l00153">FEAT::Solver::MQCLinesearch&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="newton__raphson__linesearch_8hpp_source.html#l00108">FEAT::Solver::NewtonRaphsonLinesearch&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="secant__linesearch_8hpp_source.html#l00147">FEAT::Solver::SecantLinesearch&lt; Functional_, Filter_ &gt;::apply()</a>, <a class="el" href="fixed__step__linesearch_8hpp_source.html#l00163">FEAT::Solver::FixedStepLinesearch&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="mqc__linesearch_8hpp_source.html#l00176">FEAT::Solver::MQCLinesearch&lt; Functional_, Filter_ &gt;::correct()</a>, <a class="el" href="newton__raphson__linesearch_8hpp_source.html#l00131">FEAT::Solver::NewtonRaphsonLinesearch&lt; Functional_, Filter_ &gt;::correct()</a>, and <a class="el" href="secant__linesearch_8hpp_source.html#l00170">FEAT::Solver::SecantLinesearch&lt; Functional_, Filter_ &gt;::correct()</a>.</p>
+
+</div>
+</div>
+<a id="a0ab9bef4ea22df32065a43399a990561" name="a0ab9bef4ea22df32065a43399a990561"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0ab9bef4ea22df32065a43399a990561">&#9670;&#160;</a></span>_force_def_norm_calc</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Functional_::VectorTypeR  &gt;::_force_def_norm_calc</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>whether skipping of defect computation is allowed or not </p>
+
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00249">249</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3785,7 +3786,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>iteration count digits for plotting </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00184">184</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00243">243</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3811,7 +3812,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>maximum number of iterations </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00170">170</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00229">229</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3837,7 +3838,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>minimum number of iterations </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00168">168</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00227">227</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3863,7 +3864,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>minimum number of stagnation iterations </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00174">174</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00233">233</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3949,7 +3950,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>number of performed iterations </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00172">172</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00231">231</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -3975,7 +3976,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>number of consecutive stagnated iterations </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00176">176</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00235">235</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -4001,7 +4002,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>plot output interval </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00188">188</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00247">247</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -4027,7 +4028,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>whether to plot something </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00186">186</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00245">245</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -4053,33 +4054,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>name of the solver in plots </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00131">131</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
-
-</div>
-</div>
-<a id="ac59b69cc5fe017dd82287034e6a25a5a" name="ac59b69cc5fe017dd82287034e6a25a5a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac59b69cc5fe017dd82287034e6a25a5a">&#9670;&#160;</a></span>_skip_def_calc</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Functional_::VectorTypeR  &gt;::_skip_def_calc</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>whether to skip defect computation if possible </p>
-
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00190">190</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00211">211</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -4105,7 +4080,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>stagnation rate </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00166">166</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00225">225</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -4131,7 +4106,7 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 
 <p>current status of the solver </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00133">133</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00213">213</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -4156,20 +4131,8 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 </div><div class="memdoc">
 
 <p>absolute tolerance parameter </p>
-<p >The solver is converged if<br  />
-the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
-or<br  />
-the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
-As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]
-</p>
-<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
-and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
-did not gain 8 digits so far then I'm also happy"  </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00158">158</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00217">217</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -4193,21 +4156,9 @@ did not gain 8 digits so far then I'm also happy"  </p>
 </table>
 </div><div class="memdoc">
 
-<p>absolute tolerance parameter </p>
-<p >The solver is converged if<br  />
-the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
-or<br  />
-the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
-As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]
-</p>
-<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
-and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
-did not gain 8 digits so far then I'm also happy"  </p>
+<p>absolute low tolerance parameter </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00160">160</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00219">219</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>
@@ -4292,20 +4243,8 @@ template&lt;typename Functional_ , typename Filter_ &gt; </div>
 </div><div class="memdoc">
 
 <p>relative tolerance parameter </p>
-<p >The solver is converged if<br  />
-the defect is smaller than _tol_abs and smaller than _tol_rel*_def_init<br  />
-or<br  />
-the defect is smaller than _tol_abs and also smaller than _tol_abs_low<br  />
-As this might not be a sufficent description, the criterion that is checked is  </p><p class="formulaDsp">
-\[
-  (\vert \vert r_k\vert\vert \leq \text{tol\_abs}) \land ((\vert \vert r_k\vert\vert \leq \text{tol\_rel}\cdot\vert \vert r_0\vert\vert) \lor (\vert \vert r_k\vert\vert \leq \text{tol\_abs\_low}))
-\]
-</p>
-<p> where \( r_k \) is the defect vector in the current iteration and \( r_0 \) the initial defect vector. Both _tol_rel and _tol_abs alone were not sufficent because of one practical case: If you have already a good initial solution so that the defect is 10^{-3}, it might be very hard to gain 8 digits and you might be happy with a defect of the order 10^{-8} anyways. On the other hand, if you have a bad initial solution and your defect is on the order of 10^{4}, you might be unhappy if you only gain 8 digits - but a priori you do not know the quality of the intial guess. The way it is now allows to say "I want the defect to be smaller than 10^{-3},
-and I want to gain 8 digits - but if I manage to put the defect down to 10^{-7} and
-did not gain 8 digits so far then I'm also happy" </p>
 
-<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00156">156</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="iterative_8hpp_source.html#l00215">215</a> of file <a class="el" href="iterative_8hpp_source.html">iterative.hpp</a>.</p>
 
 </div>
 </div>

@@ -118,6 +118,10 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:adec89457924f710897f0b5b7eb6eb0de"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_discrete_vertex_projector.html#adec89457924f710897f0b5b7eb6eb0de">project</a> (VectorOut_ &amp;vector, const VectorIn_ &amp;coeff, const Space_ &amp;space)</td></tr>
 <tr class="memdesc:adec89457924f710897f0b5b7eb6eb0de"><td class="mdescLeft">&#160;</td><td class="mdescRight">Projects a discrete function into the vertices.  <a href="class_f_e_a_t_1_1_assembly_1_1_discrete_vertex_projector.html#adec89457924f710897f0b5b7eb6eb0de">More...</a><br /></td></tr>
 <tr class="separator:adec89457924f710897f0b5b7eb6eb0de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b1b4d55da3f005eafbda9cecc4a85e2"><td class="memTemplParams" colspan="2">template&lt;typename VectorOut_ , typename VectorIn_ , typename Space_ &gt; </td></tr>
+<tr class="memitem:a9b1b4d55da3f005eafbda9cecc4a85e2"><td class="memTemplItemLeft" align="right" valign="top">static void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_discrete_vertex_projector.html#a9b1b4d55da3f005eafbda9cecc4a85e2">project_gradient</a> (VectorOut_ &amp;vector, const VectorIn_ &amp;coeff, const Space_ &amp;space)</td></tr>
+<tr class="memdesc:a9b1b4d55da3f005eafbda9cecc4a85e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Projects the gradient of a scalar discrete function into the vertices.  <a href="class_f_e_a_t_1_1_assembly_1_1_discrete_vertex_projector.html#a9b1b4d55da3f005eafbda9cecc4a85e2">More...</a><br /></td></tr>
+<tr class="separator:a9b1b4d55da3f005eafbda9cecc4a85e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Discrete vertex projector class. </p>
@@ -179,6 +183,64 @@ template&lt;typename VectorOut_ , typename VectorIn_ , typename Space_ &gt; </di
 </dl>
 
 <p class="definition">Definition at line <a class="el" href="discrete__projector_8hpp_source.html#l00044">44</a> of file <a class="el" href="discrete__projector_8hpp_source.html">discrete_projector.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l03044">FEAT::Tiny::axpy()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
+
+</div>
+</div>
+<a id="a9b1b4d55da3f005eafbda9cecc4a85e2" name="a9b1b4d55da3f005eafbda9cecc4a85e2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b1b4d55da3f005eafbda9cecc4a85e2">&#9670;&#160;</a></span>project_gradient()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename VectorOut_ , typename VectorIn_ , typename Space_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void FEAT::Assembly::DiscreteVertexProjector::project_gradient </td>
+          <td>(</td>
+          <td class="paramtype">VectorOut_ &amp;&#160;</td>
+          <td class="paramname"><em>vector</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const VectorIn_ &amp;&#160;</td>
+          <td class="paramname"><em>coeff</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Space_ &amp;&#160;</td>
+          <td class="paramname"><em>space</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Projects the gradient of a scalar discrete function into the vertices. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to a vector object that shall receive the vertex interpolation of the discrete function's gradient. Must be an instance of <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html" title="Blocked Dense data vector class template.">LAFEM::DenseVectorBlocked</a>.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coeff</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the coefficient vector of the finite-element function. Must be an instance of <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html" title="Dense data vector class template.">LAFEM::DenseVector</a></td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">space</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the finite-element space. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="discrete__projector_8hpp_source.html#l00202">202</a> of file <a class="el" href="discrete__projector_8hpp_source.html">discrete_projector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l03044">FEAT::Tiny::axpy()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
 
