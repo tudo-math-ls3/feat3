@@ -97,6 +97,18 @@ class FeatConfig:
       "type": kind
     }
 
+  def append_entry(self, var, value, kind="STRING"):
+    """Adds or appends a CMake cache entry. Warns if the type changed"""
+    if var in self.cmake_cache and self.cmake_cache[var]["type"] != kind:
+      error("Duplicate CMake cache entry for", var, "with different type")
+    if var in self.cmake_cache:
+      self.cmake_cache[var]["value"] += ";" + value
+    else:
+      self.cmake_cache[var] = {
+        "value": value,
+        "type": kind
+      }
+
   def add_c_flags(self, *args):
     """Add CC compiler flags. Warns on duplicate flags"""
     for flag in args:
@@ -406,7 +418,6 @@ parser.add_argument("--system-host-compiler", "--system_host_compiler", help=(
 parser.add_argument("--thirdparty-cache-dir", "--thirdparty_cache_dir", default="", help=
 f"set cache directory for thirdparty dependencies (default: {trunk_dirname}/thirdparty/cache)")
 
-# TODO: Can this be covered by the --package-install-dir option?
 parser.add_argument("--trilinos-path", "--trilinos_path", help=
 "path to a FROSch compatible Trilinos installation")
 
@@ -421,6 +432,8 @@ for arg in sys.argv:
     warning("Flag", arg, "is deprecated. Use", arg.replace("_", "-"), "instead")
   if arg == "--ovr_mpi_ops":
     warning("Flag --ovr_mpi_ops is deprecated. Use --override-mpi-ops instead")
+  if arg == "--trilinos_path":
+    warning("Flag --trilinos_path is deprecated. Use --package-install-dir instead")
 
 
 # guess a fitting configuration and search for available compilers
@@ -581,9 +594,10 @@ if args.override_mpi_ops:
   config.cache_entry("FEAT_OVERRIDE_MPI_OPS", "ON", "BOOL")
 
 if args.package_install_dir:
-  if not os.path.exists(args.package_install_dir):
-    error("Package install directory", args.package_install_dir, "does not exist")
-  config.cache_entry("CMAKE_PREFIX_PATH", args.package_install_dir, "FILEPATH")
+  for path in args.package_install_dir.split(";"):
+    if not os.path.exists(path):
+      error("Package install directory", path, "does not exist")
+  config.append_entry("CMAKE_PREFIX_PATH", args.package_install_dir, "FILEPATH")
 
 if args.set_testing_vc:
   config.cache_entry("FEAT_TESTING_VC", "ON", "BOOL")
@@ -604,7 +618,7 @@ if args.trilinos_path:
     error("Trilinos path", args.trilinos_path, "does not exist")
   if not "trilinos" in buildid:
     warning("You have specified a trilinos path, but there is no trilinos tag in the build-id")
-  config.cache_entry("FEAT_TRILINOS_PATH", args.trilinos_path, "FILEPATH")
+  config.append_entry("CMAKE_PREFIX_PATH", args.trilinos_path, "FILEPATH")
 
 if args.unroll_banded:
   config.cache_entry("FEAT_UNROLL_BANDED", "ON", "BOOL")
@@ -776,8 +790,6 @@ for token in buildid:
     config.cxx_flags.append("-DMKL_ILP64")
   elif token == "omp":
     config.cache_entry("FEAT_HAVE_OMP", "ON", "BOOL")
-    # TODO: Is this required?
-    config.cxx_flags.append("-DMKL_ILP64")
   elif token == "valgrind":
     config.cache_entry("FEAT_VALGRIND", "ON", "BOOL")
   elif token == "quadmath":
@@ -868,10 +880,10 @@ if (config.cuda_arch != ""):
   print("cuda_arch: " + config.cuda_arch)
   print("")
 print("Generator: " + config.generator)
-print("")
-print("Adding CMake preset to", trunk_dirname + "/CMakeUserPresets.json")
 
 if not args.no_preset:
+  print("")
+  print("Adding CMake preset to", trunk_dirname + "/CMakeUserPresets.json")
   try:
     append_preset_to_file(trunk_dirname + "/CMakeUserPresets.json", config.as_configure_preset())
   except OSError as e:
