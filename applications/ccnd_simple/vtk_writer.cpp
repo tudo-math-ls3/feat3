@@ -42,7 +42,8 @@ namespace CCNDSimple
   /// parse arguments from command line
   bool VtkWriter::parse_args(SimpleArgParser& args)
   {
-    args.parse("vtk", name_prefix);
+    if(args.parse("vtk", name_prefix) >= 0)
+      stepping = 1;
     args.parse("vtk-step", stepping);
     return true;
   }
