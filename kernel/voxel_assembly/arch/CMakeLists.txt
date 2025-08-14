@@ -37,6 +37,7 @@ if (FEAT_HAVE_CUDA)
     feat-dependency
   PRIVATE
     feat-kernel-util-cuda)
+
   ## get openmp flags and convert (potential list with ; to list with ,)
   set(CUDA_TMP_FLAGS "")
   if(OpenMP_CXX_FOUND)

@@ -53,6 +53,7 @@ if (FEAT_HAVE_CUDA)
   if (FEAT_HAVE_CUDSS)
     target_link_libraries(feat-kernel-solver-cuda PRIVATE cuDSS::cuDSS)
   endif (FEAT_HAVE_CUDSS)
+
   target_link_libraries(feat-kernel-solver-cuda PRIVATE ${CUDA_cusparse_LIBRARY} ${CUDA_cusolver_LIBRARY} ${CUDA_cublas_LIBRARY} feat-kernel-util-cuda)
   target_link_libraries(feat-kernel-solver PRIVATE feat-kernel-solver-cuda)
 endif (FEAT_HAVE_CUDA)

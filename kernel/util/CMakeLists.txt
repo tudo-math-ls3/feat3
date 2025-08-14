@@ -6,6 +6,7 @@ set(KERNEL_LIBRARY_FILES
   dist_file_io.cpp
   hash.cpp
   memory_pool.cpp
+  pack.cpp
   property_map.cpp
   statistics.cpp
   xml_scanner.cpp
