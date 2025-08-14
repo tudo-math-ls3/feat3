@@ -7,6 +7,7 @@
 
 // includes, FEAT
 #include <kernel/assembly/bilinear_operator.hpp>
+#include <iostream>
 
 namespace FEAT
 {
@@ -957,6 +958,144 @@ namespace FEAT
           }*/
         }; // class DuDvOperatorBlocked::Evaluator<...>
       }; // class DuDVOperatorBlocked
+
+      /**
+       * \brief (gradu*n)*v operator implementation
+       *
+       * \tparam dimension_ The dimension of the blocks of the FE functions
+       *
+       * This functor implements the weak formulation of the bilinear trace gradient trial operator, i.e.
+       * \f[
+       *   \nabla \varphi \cdot n \psi
+       * \f]
+       *
+       * This functor can be used with the BilinearOperator TraceAssembly class template to assemble a
+       * vector valued FE matrix.
+       *
+       * \note This operator expects the trafo eval object to have an assembled normal vector, which the wrapper traceassembly job
+       *       needs to provide.
+       *
+       * \author Maximilian Esser
+       */
+      template<int dimension_>
+      class NormalGradientTrialOperatorBlocked :
+        public BilinearOperator
+      {
+      public:
+        static constexpr int BlockHeight = dimension_;
+        static constexpr int BlockWidth = dimension_;
+
+        static constexpr TrafoTags trafo_config = TrafoTags::normal;
+        static constexpr SpaceTags test_config = SpaceTags::value;
+        static constexpr SpaceTags trial_config = SpaceTags::grad;
+
+        template<typename AsmTraits_>
+        class Evaluator :
+          public BilinearOperator::Evaluator<AsmTraits_>
+        {
+        public:
+          /// the data type to be used
+          typedef typename AsmTraits_::DataType DataType;
+          /// the data type for the block system
+          typedef Tiny::Matrix<DataType, dimension_, dimension_> ValueType;
+          /// the assembler's trafo data type
+          typedef typename AsmTraits_::TrafoData TrafoData;
+          /// the assembler's test-function data type
+          typedef typename AsmTraits_::TestBasisData TestBasisData;
+          /// the assembler's trial-function data type
+          typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+
+        protected:
+          Tiny::Vector<DataType, dimension_> _normal;
+
+        public:
+          explicit Evaluator(const NormalGradientTrialOperatorBlocked&) : _normal(DataType(0))
+          {
+          }
+
+          void set_point(const TrafoData& tau)
+          {
+            _normal = tau.normal;
+          }
+
+          ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
+          {
+            ValueType r(DataType(0));
+            r.add_scalar_main_diag(Tiny::dot(_normal, phi.grad) * psi.value);
+
+            return r;
+          }
+        }; // class NormalGradientTrialOperatorBlocked::Evaluator<...>
+      }; // class NormalGradientTrialOperatorBlocked
+
+      /**
+       * \brief (gradu^T*n)*v operator implementation
+       *
+       * \tparam dimension_ The dimension of the blocks of the FE functions
+       *
+       * This functor implements the weak formulation of the bilinear trace transposed gradient trial operator, i.e.
+       * \f[
+       *   \nabla \varphi^T \cdot n \psi
+       * \f]
+       *
+       * This functor can be used with the BilinearOperator TraceAssembly class template to assemble a
+       * vector valued FE matrix.
+       *
+       * \note This operator expects the trafo eval object to have an assembled normal vector, which the wrapper traceassembly job
+       *       needs to provide.
+       *
+       * \author Maximilian Esser
+       */
+      template<int dimension_>
+      class NormalTransposedGradientTrialOperatorBlocked :
+        public BilinearOperator
+      {
+      public:
+        static constexpr int BlockHeight = dimension_;
+        static constexpr int BlockWidth = dimension_;
+
+        static constexpr TrafoTags trafo_config = TrafoTags::normal;
+        static constexpr SpaceTags test_config = SpaceTags::value;
+        static constexpr SpaceTags trial_config = SpaceTags::grad;
+
+        template<typename AsmTraits_>
+        class Evaluator :
+          public BilinearOperator::Evaluator<AsmTraits_>
+        {
+        public:
+          /// the data type to be used
+          typedef typename AsmTraits_::DataType DataType;
+          /// the data type for the block system
+          typedef Tiny::Matrix<DataType, dimension_, dimension_> ValueType;
+          /// the assembler's trafo data type
+          typedef typename AsmTraits_::TrafoData TrafoData;
+          /// the assembler's test-function data type
+          typedef typename AsmTraits_::TestBasisData TestBasisData;
+          /// the assembler's trial-function data type
+          typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+
+        protected:
+          Tiny::Vector<DataType, dimension_> _normal;
+
+        public:
+          explicit Evaluator(const NormalTransposedGradientTrialOperatorBlocked&) : _normal(DataType(0))
+          {
+          }
+
+          void set_point(const TrafoData& tau)
+          {
+            _normal = tau.normal;
+          }
+
+          ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
+          {
+            ValueType r(DataType(0));
+            r.add_outer_product(phi.grad, _normal, psi.value);
+            return r;
+          }
+        }; // class NormalTransposedGradientTrialOperatorBlocked::Evaluator<...>
+
+      }; // class NormalTransposedGradientTrialOperatorBlocked
 
       /**
        * \brief Gradient operator applied onto the trial function

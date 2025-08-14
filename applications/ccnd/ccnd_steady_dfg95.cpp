@@ -31,12 +31,18 @@
 // Enables the fictitious boundary method (FBM) to enforce the boundary conditions for the circular
 // or cylindrical obstacle.
 //
+// --transform-outflow
+// Transform the force free outflow of deformation formulation to a normal outflow corresponding to the laplace
+// formulation.
+//
 // \author Peter Zajac
 //
 
 // include common CCND header
 #include "ccnd_common.hpp"
 #include "ccnd_common_dfg95.hpp"
+#include <kernel/assembly/common_operators.hpp>
+#include <kernel/assembly/trace_assembler_basic_jobs.hpp>
 
 // open the namespace and define the DomainLevel and SystemLevel classes
 namespace CCND
@@ -71,12 +77,15 @@ namespace CCND
     /// DFG95 benchmark summary
     DFG95::BenchmarkAnalysis bench_analysis;
 
+    bool transform_outflow = false;
+
     explicit Application(const Dist::Comm& comm_, SimpleArgParser& args_) :
       BaseClass(comm_, args_)
     {
       args.support("bench");
       args.support("v-max");
       args.support("fbm");
+      args.support("transform-outflow");
 
       // this application always has homogeneous RHS
       homogeneous_rhs = true;
@@ -111,6 +120,8 @@ namespace CCND
       if(enable_fbm)
         default_filename += "-fbm";
 
+      transform_outflow = (args.check("transform-outflow") >= 0);
+
       // parse remaining arguments
       BaseClass::parse_args();
     }
@@ -121,6 +132,7 @@ namespace CCND
       comm.print("\nDFG95 Benchmark Parameters:");
       comm.print(String("Benchmark").pad_back(pad_len, pad_char) + ": bench " + stringify(bench));
       comm.print(String("V-Max").pad_back(pad_len, pad_char) + ": " + stringify(v_max));
+      comm.print(String("Transform Outflow").pad_back(pad_len, pad_char) + ": " + (transform_outflow ? "Yes" : "No"));
     }
 
     virtual void create_domain() override
@@ -148,6 +160,31 @@ namespace CCND
           domain.at(i)->create_fbm_assembler(domain.at(i).layer().comm(), "fbm");
         }
       }
+    }
+
+    virtual void compile_system_matrices() override
+    {
+      watch_create_system.start();
+      if(transform_outflow)
+      {
+        for(std::size_t i(0); i < domain.size_physical(); ++i)
+        {
+          const auto* meshpart_node = domain.at(i)->get_mesh_node()->find_mesh_part_node("bnd:r");
+          XASSERTM(meshpart_node, "Could not find bnd:out");
+          if(const auto* mesh_part = meshpart_node->get_mesh())
+          {
+            Assembly::Common::NormalTransposedGradientTrialOperatorBlocked<dim> spinrate_op;
+            Assembly::TraceAssemblyBilinearOperatorMatrixJob1 asm_job(spinrate_op, system.at(i)->matrix_a.local(), domain.at(i)->space_velo,
+                                                                cubature_matrix_a, deformation ? -this->nu : this->nu);
+            Assembly::TraceAssembler trace_asm(domain.at(i)->trafo);
+            trace_asm.add_mesh_part(*mesh_part);
+            trace_asm.compile();
+            trace_asm.assemble(asm_job);
+          }
+        }
+      }
+      watch_create_system.stop();
+      BaseClass::compile_system_matrices();
     }
 
     virtual void create_benchmark_analysis()
@@ -236,6 +273,32 @@ namespace CCND
       // apply filters
       system.front()->filter_sys.filter_sol(vec_sol);
       system.front()->filter_sys.filter_rhs(vec_rhs);
+    }
+
+    virtual void initialize_nonlinear_defect() override
+    {
+      if(!homogeneous_rhs)
+      {
+        vec_def.copy(vec_rhs);
+        vec_def.from_1_to_0();
+      }
+      else
+        vec_def.format();
+      BaseClass::initialize_nonlinear_defect();
+      if(transform_outflow)
+      {
+        const auto* meshpart_node = domain.front()->get_mesh_node()->find_mesh_part_node("bnd:r");
+        XASSERTM(meshpart_node, "Could not find bnd:out");
+        if(const auto* mesh_part = meshpart_node->get_mesh())
+        {
+          Assembly::Common::NormalTransposedGradientTrialOperatorBlocked<dim> bin_op;
+          Assembly::TraceAssembler trace_asm(domain.front()->trafo);
+          trace_asm.add_mesh_part(*mesh_part);
+          trace_asm.compile();
+          Assembly::assemble_bilinear_operator_apply_vector_1(trace_asm, vec_def.local().template at<0>(), vec_sol.local().template at<0>(), bin_op, domain.front()->space_velo,
+                                                              cubature_matrix_a, deformation ? this->nu : -this->nu);
+        }
+      }
     }
 
     virtual void perform_solution_analysis()

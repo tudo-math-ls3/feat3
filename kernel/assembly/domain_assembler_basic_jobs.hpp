@@ -814,7 +814,7 @@ namespace FEAT
        * The scaling factor for the assembly.
        */
       explicit DomainAssemblyLinearFunctionalVectorJob(const LinearFunctional_& linear_functional_,
-        Vector_& vector_, const Space_& space_, String cubature_, DataType alpha_ = DataType(1)) :
+        Vector_& vector_, const Space_& space_, const String& cubature_, DataType alpha_ = DataType(1)) :
         linear_functional(linear_functional_),
         vector(vector_),
         space(space_),
@@ -955,7 +955,7 @@ namespace FEAT
        * The scaling factor for the assembly.
        */
       explicit DomainAssemblyForceFunctionalVectorJob(const Function_& function_,
-        Vector_& vector_, const Space_& space_, String cubature_, DataType alpha_ = DataType(1)) :
+        Vector_& vector_, const Space_& space_, const String& cubature_, DataType alpha_ = DataType(1)) :
         function(function_),
         vector(vector_),
         space(space_),
@@ -1102,7 +1102,7 @@ namespace FEAT
        * The scaling factor for the assembly.
        */
       explicit DomainAssemblyBilinearOperatorMatrixJob1(const BilinearOperator_& bilinear_operator_,
-        Matrix_& matrix_, const Space_& space_, String cubature_, DataType alpha_ = DataType(1)) :
+        Matrix_& matrix_, const Space_& space_, const String& cubature_, DataType alpha_ = DataType(1)) :
         bilinear_operator(bilinear_operator_),
         matrix(matrix_),
         space(space_),
@@ -1260,7 +1260,7 @@ namespace FEAT
        */
       explicit DomainAssemblyBilinearOperatorMatrixJob2(const BilinearOperator_& bilinear_operator_,
         Matrix_& matrix_, const TestSpace_& test_space_, const TrialSpace_& trial_space_,
-        String cubature_, DataType alpha_ = DataType(1)) :
+        const String& cubature_, DataType alpha_ = DataType(1)) :
         bilinear_operator(bilinear_operator_),
         matrix(matrix_),
         test_space(test_space_),
@@ -1308,6 +1308,228 @@ namespace FEAT
 
       DomainAssemblyBilinearOperatorMatrixJob2<BilOp_, Matrix_, TestSpace_, TrialSpace_> job(
         bilinear_operator, matrix, test_space, trial_space, cubature, alpha);
+      dom_asm.assemble(job);
+    }
+
+    /**
+     * \brief Vector assembly job for BilinearOperator and identical test-/trial-spaces
+     *
+     * This class implements the DomainAssemblyJob interface to assemble a vector that is
+     * calculated by
+     *
+     * \f$ \int_\Omega \tilde{v} \psi = \int_\Omega A(v, \psi) dx, m=1,\dots,d \f$
+     * where \f$ A(\cdot, \cdot) \f$ is provided by a BilinearOperator interface and
+     * \f$v\f$ is a finite element vector.
+     *
+     * \tparam BilinearOperator_
+     * The bilinear operator that is to be assembled
+     *
+     * \tparam Vector_
+     * The vector that is to be assembled.
+     *
+     * \tparam VectorSol_
+     * The vector that the biliniear operator is to be applied to.
+     *
+     * \tparam Space_
+     * The finite element space to be used as test- and trial-space.
+     *
+     * \author Maximilian Esser
+     */
+    template<typename BilinearOperator_, typename Vector_, typename VectorSol_, typename Space_>
+    class DomainAssemblyBilinearOperatorApplyVectorJob1
+    {
+    public:
+      typedef typename Vector_::DataType DataType;
+      typedef typename Vector_::ValueType ValueType;
+
+      static constexpr TrafoTags trafo_config = BilinearOperator_::trafo_config;
+      static constexpr SpaceTags space_config = BilinearOperator_::test_config | BilinearOperator_::trial_config;
+
+      class Task :
+        public DomainAssemblyBasicVectorTaskCRTP<Task, Vector_, Space_, trafo_config, space_config>
+      {
+      protected:
+        /// our base-class typedef
+        typedef DomainAssemblyBasicVectorTaskCRTP<Task, Vector_, Space_, trafo_config, space_config> BaseClass;
+
+        /// our assembly traits
+        typedef typename BaseClass::AsmTraits AsmTraits;
+        typedef typename BilinearOperator_::template Evaluator<AsmTraits>::ValueType MatValType;
+
+        /// the bilinear operator evaluator
+        typename BilinearOperator_::template Evaluator<AsmTraits> oper_eval;
+
+        /// the local solution vector that the bilinear operator is applied to
+        const VectorSol_& vec_sol;
+
+        /// the gather axpy for the local solution vector
+        typename VectorSol_::GatherAxpy sol_gather;
+
+        /// the local matrix that is used to assemble the local vector
+        typename AsmTraits::template TLocalMatrix<MatValType> local_matrix;
+        typename AsmTraits::template TLocalVector<ValueType> local_vec_sol;
+
+
+      public:
+        explicit Task(DomainAssemblyBilinearOperatorApplyVectorJob1& job) :
+          BaseClass(job.vector, job.space, job.cubature_factory, job.alpha),
+          oper_eval(job.bilinear_operator),
+          vec_sol(job.vec_sol),
+          sol_gather(vec_sol)
+        {
+        }
+
+        void prepare(Index cell)
+        {
+          BaseClass::prepare(cell);
+          oper_eval.prepare(this->trafo_eval);
+          local_vec_sol.format();
+          sol_gather(local_vec_sol, this->dof_mapping);
+        }
+
+        void set_point(typename AsmTraits::TrafoEvalData& tau)
+        {
+          oper_eval.set_point(tau);
+        }
+
+        void eval(MatValType& val, const DataType& weight,
+          typename AsmTraits::TrialBasisData& phi, typename AsmTraits::TestBasisData& psi)
+        {
+          val += weight * oper_eval.eval(phi, psi);
+        }
+
+        /**
+        * \brief Performs the local assembly.
+        */
+        void assemble()
+        {
+          // format local matrix
+          local_matrix.format();
+          this->local_vector.format();
+
+          // fetch number of local dofs
+          const int num_loc_dofs = this->space_eval.get_num_local_dofs();
+
+          // loop over all quadrature points and integrate
+          for(int k(0); k < this->cubature_rule.get_num_points(); ++k)
+          {
+            // compute trafo data
+            this->trafo_eval(this->trafo_data, this->cubature_rule.get_point(k));
+
+            // compute basis function data
+            this->space_eval(this->space_data, this->trafo_data);
+
+            // evaluate operator
+            this->set_point(this->trafo_data);
+
+            // test function loop
+            for(int i(0); i < num_loc_dofs; ++i)
+            {
+              // trial function loop
+              for(int j(0); j < num_loc_dofs; ++j)
+              {
+                // evaluate operator and integrate
+                this->eval(local_matrix(i,j),
+                  this->trafo_data.jac_det * this->cubature_rule.get_weight(k),
+                  this->space_data.phi[j], this->space_data.phi[i]);
+                // continue with next trial function
+              }
+              // continue with next test function
+            }
+            // continue with next cubature point
+          }
+          // apply to local vector
+          for(int i(0); i < num_loc_dofs; ++i)
+            for(int j(0); j < num_loc_dofs; ++j)
+              this->local_vector[i].add_mat_vec_mult(this->local_matrix(i,j), this->local_vec_sol[j]);
+        }
+
+        void finish()
+        {
+          oper_eval.finish();
+          BaseClass::finish();
+        }
+      }; // class Task
+
+    protected:
+      /// a reference to the bilinear operator that is to be assembled
+      const BilinearOperator_& bilinear_operator;
+      /// a reference to the vector that is to be assembled
+      Vector_& vector;
+      /// a reference to the vector the biliniear operator is applied on
+      const VectorSol_& vec_sol;
+      /// a reference to the finite element space to be used as test-/trial-space
+      const Space_& space;
+      /// the cubature factory to be used for integration
+      Cubature::DynamicFactory cubature_factory;
+      /// the scaling factor for the assembly.
+      DataType alpha;
+
+    public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] bilinear_operator_
+       * A \resident reference to the bilinear operator that is to be assembled.
+       *
+       * \param[inout] matrix_
+       * A \resident reference to the matrix that is to be assembled.
+       *
+       * \param[in] space_
+       * A \resident reference to the test/trial space to be used for the discretization.
+       *
+       * \param[in] cubature_
+       * The name of the cubature rule that is to be used for integration.
+       *
+       * \param[in] alpha_
+       * The scaling factor for the assembly.
+       */
+      explicit DomainAssemblyBilinearOperatorApplyVectorJob1(const BilinearOperator_& bilinear_operator_,
+        Vector_& vector_, const VectorSol_& vec_sol_, const Space_& space_, const String& cubature_, DataType alpha_ = DataType(1)) :
+        bilinear_operator(bilinear_operator_),
+        vector(vector_),
+        vec_sol(vec_sol_),
+        space(space_),
+        cubature_factory(cubature_),
+        alpha(alpha_)
+      {
+      }
+    }; // class DomainAssemblyBilinearOperatorApplyVectorJob1<...>
+
+    /**
+     * \brief Assembles the application of a bilinear operator into a vector with identical test- and trial-spaces.
+     *
+     * \param[inout] dom_asm
+     * A \transient reference to the domain assembler that is to be used for the assembly.
+     *
+     * \param[inout] vector
+     * The \transient vector that is to be assembled.
+     *
+     * \param[in] vector_sol
+     * The \transient vector that is to be applied upon.
+     *
+     * \param[in] bilinear_operator
+     * A \transient reference to the operator implementing the BilinearOperator interface to be assembled.
+     *
+     * \param[in] space
+     * A \transient reference to the finite-element to be used as the test- and trial-space.
+     *
+     * \param[in] cubature
+     * The name of the cubature rule that is to be used for the assembly.
+     *
+     * \param[in] alpha
+     * The scaling factor for the assembly.
+     */
+    template<typename Trafo_, typename Vector_, typename VectorSol_, typename BilOp_, typename Space_>
+    void assemble_bilinear_operator_apply_vector_1(DomainAssembler<Trafo_>& dom_asm, Vector_& vector,
+      const VectorSol_& vec_sol, const BilOp_& bilinear_operator, const Space_& space, const String& cubature,
+      const typename Vector_::DataType alpha = typename Vector_::DataType(1))
+    {
+      XASSERTM(dom_asm.get_trafo() == space.get_trafo(), "domain assembler and space have different trafos");
+      XASSERTM(vector.size() == space.get_num_dofs(), "invalid vector size");
+
+      DomainAssemblyBilinearOperatorApplyVectorJob1<BilOp_, Vector_, VectorSol_, Space_> job(
+        bilinear_operator, vector, vec_sol, space, cubature, alpha);
       dom_asm.assemble(job);
     }
 
