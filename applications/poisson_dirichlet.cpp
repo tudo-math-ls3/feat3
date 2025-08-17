@@ -12,6 +12,7 @@
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange1/element.hpp>
+#include <kernel/space/lagrange2/element.hpp>
 #include <kernel/analytic/common.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/assembly/common_functionals.hpp>
@@ -101,6 +102,16 @@ namespace PoissonDirichlet
     {
       system_levels.at(i)->assemble_laplace_matrix(domain.at(i)->domain_asm, domain.at(i)->space, cubature);
     }
+
+    //write out synced laplace matrix of first rank
+    auto synced_mat = system_levels.front()->matrix_sys.convert_to_1();
+    if(comm.rank() == 0)
+    {
+      comm.print("Write out matrix size of " + stringify_fp_sci(synced_mat.bytes()/1E9) + " GB");
+      synced_mat.write_out(LAFEM::FileMode::fm_mtx, "synced_matrix_lvl_" + stringify(domain.size_virtual()) + ".mtx");
+    }
+
+
 
     /* ***************************************************************************************** */
 
@@ -324,6 +335,7 @@ namespace PoissonDirichlet
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Space::Lagrange1::Element<TrafoType> SpaceType;
+    typedef Space::Lagrange2::Element<TrafoType> SpaceType2;
 
     // create a time-stamp
     TimeStamp time_stamp;

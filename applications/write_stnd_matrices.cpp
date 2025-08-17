@@ -187,7 +187,7 @@ namespace MatrixCreator
     if(args.num_args() <= 1)
     {
       std::cout << "\n";
-      std::cout << "Info: For this tutorial, you need to specify at least one\n";
+      std::cout << "Info: For this application, you need to specify one\n";
       std::cout << "input mesh file via the '--mesh <filenames...>' option.\n";
       std::cout << "\n";
 
@@ -222,25 +222,6 @@ namespace MatrixCreator
       Runtime::abort();
     }
 
-    // At this point, you may ask why one should supply more than one mesh file here.
-    // The reason for this is that the FEAT mesh file(s) do not only contain a mesh but
-    // also possibly other additional important data such as
-    // 1) charts for describing the analytic domain boundaries
-    // 2) mesh-parts for describing the discrete domain boundary parts
-    // 3) partitionings for parallel simulations
-
-    // Now all these parts are usually combined in a single mesh file for the sake of
-    // convenience, but it is also possible to split this data among several disjoint
-    // files. This is especially interesting if you have several different meshes that
-    // discretize the same analytic domain and you want to "outsource" the common
-    // analytic domain description into a separate common file.
-
-    // Therefore, we always have to expect that the user does not supply just one filename,
-    // but a set of filenames that we have to pass to the MeshFileReader, so thus we are
-    // always dealing with a deque of filename strings instead of a single string.
-
-    // Due to the above check we know that the user supplied the '--mesh' option, so
-    // we can query the deque of strings that represent the parameters of the option:
     const std::deque<String>& filenames = args.query("mesh")->second;
 
     // For convenience, we'll print the filenames to the console by utilizing the
@@ -358,9 +339,6 @@ int main(int argc, char* argv[])
 {
   // Initialize the runtime
   FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
-
-  // Print a welcome message
-  std::cout << "Welcome to FEAT's tutorial #08: MeshFileReader\n";
 
   // call the tutorial's main function
   MatrixCreator::main(argc, argv);
