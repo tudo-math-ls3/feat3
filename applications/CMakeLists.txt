@@ -30,6 +30,7 @@ set(app_list
   stokes_simple
   stokes_vortex_2d
   stokes_voxel_ypipe
+  write_stnd_matrices
   )
 
 foreach (app ${app_list} )
