@@ -27,6 +27,7 @@
 #include <kernel/util/likwid_marker.hpp>
 
 #include <fstream>
+#include <set>
 
 namespace FEAT
 {
@@ -506,6 +507,112 @@ namespace FEAT
       void convert(const SparseMatrixBCSR<DT2_, IT2_, BlockHeight_, BlockWidth_> & other)
       {
         this->assign(other);
+      }
+
+      template <typename DT2_, typename IT2_>
+      void convert(const SparseMatrixCSR<DT2_, IT2_>& other)
+      {
+        this->clear();
+        // setup internal sizes
+        Index n_rows = Index(other.rows()) / Index(BlockHeight);
+        Index n_cols = Index(other.columns()) / Index(BlockWidth);
+
+        // temprorary arrays for row and column ptr
+        std::vector<IndexType> tmp_row_ptr(n_rows+1u);
+        std::vector<IndexType> tmp_col_ptr;
+
+        // ptrs of csr matrix
+        const IT2_* _crs_row = other.row_ptr();
+        const IT2_* _crs_col = other.col_ind();
+        const DT2_ * _crs_val = other.val();
+
+        // reserve to sensical size, we will have at most used_element blocks
+        tmp_col_ptr.reserve(other.used_elements());
+
+        // for each block row, gather which blocks should be actually allocated
+        std::set<IndexType> tmp_uni_col;
+
+        tmp_row_ptr[0] = IndexType(0);
+        for(Index b_row = 0; b_row < n_rows; ++b_row)
+        {
+          for(Index l_row = b_row*Index(BlockHeight); l_row < (b_row+1)*Index(BlockHeight); ++l_row)
+          {
+            for(IT2_ idx = _crs_row[l_row]; idx < _crs_row[l_row+1]; ++idx)
+            {
+              tmp_uni_col.insert(IndexType(_crs_col[idx])/IndexType(BlockWidth));
+            }
+          }
+          tmp_row_ptr[b_row+1] = tmp_uni_col.size() + tmp_row_ptr[b_row];
+          std::for_each(tmp_uni_col.begin(), tmp_uni_col.end(), [&](const auto& ele){tmp_col_ptr.push_back(ele);});
+          // std::printf("Brow %i:  ", int(b_row));
+          // std::for_each(tmp_uni_col.begin(), tmp_uni_col.end(), [&](const auto& ele){std::cout << ele << ", ";});
+          // std::cout << "\n";
+          tmp_uni_col.clear();
+        }
+
+        Index elements_size = tmp_col_ptr.size();
+        // std::printf("Elements size %i\n", int(elements_size));
+        // std::printf("Tmp col ptr:\n");
+        // std::for_each(tmp_col_ptr.begin(), tmp_col_ptr.end(), [&](const auto& ele){std::cout << ele << ", ";});
+        // std::cout << "\n";
+
+        // allocate actual matrix data
+        this->_scalar_index.push_back(n_rows*n_cols);
+        this->_scalar_index.push_back(n_rows);
+        this->_scalar_index.push_back(n_cols);
+        this->_scalar_index.push_back(elements_size);
+
+        this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(_used_elements()));
+        this->_indices_size.push_back(_used_elements());
+
+        this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(_rows() + 1));
+        this->_indices_size.push_back(_rows() + 1);
+
+        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(used_elements<Perspective::pod>()));
+        this->_elements_size.push_back(used_elements<Perspective::pod>());
+
+        auto* row_ptr = this->_indices.at(1);
+        auto* col = this->_indices.at(0);
+        auto* val = this->_elements.at(0);
+        // now, fill up array data
+        std::copy(tmp_row_ptr.begin(), tmp_row_ptr.end(), row_ptr);
+        std::copy(tmp_col_ptr.begin(), tmp_col_ptr.end(), col);
+        // std::printf("Row ptr:\n");
+        // std::for_each(row_ptr, row_ptr+n_rows+1, [&](const auto& ele){std::cout << ele << ", ";});
+        // std::cout << "\n";
+        // std::printf("Col ptr:\n");
+        // std::for_each(col, col+elements_size, [&](const auto& ele){std::cout << ele << ", ";});
+        // std::cout << "\n";
+
+        // clear temprorary arrays
+        tmp_row_ptr.clear();
+        tmp_col_ptr.clear();
+
+        // format data
+        this->format();
+
+        // run through crs data and simply write to the correct location, this can be done
+        // in parallel
+        FEAT_PRAGMA_OMP(parallel for)
+        for(Index b_row = Index(0); b_row < n_rows; ++b_row)
+        {
+          for(Index l_row = Index(0); l_row < Index(BlockHeight); ++l_row)
+          {
+            IndexType b_idx = row_ptr[b_row];
+            for(IT2_ idx = _crs_row[b_row*Index(BlockHeight) + l_row]; idx < _crs_row[b_row*Index(BlockHeight) + l_row + Index(1)]; ++idx)
+            {
+              //advance block row index until we find our current row
+              while(col[b_idx] != IndexType(_crs_col[idx]/BlockWidth))
+              {
+                ++b_idx;
+              }
+              ASSERTM(col[b_idx] == IndexType(_crs_col[idx]/BlockWidth), "Blocked Column Array does not fit csr columns");
+              // write data
+              val[b_idx*BlockHeight*BlockWidth + BlockWidth*l_row + (_crs_col[idx]%BlockWidth)] = DT_(_crs_val[idx]);
+            }
+          }
+        }
+        //done
       }
 
       /**

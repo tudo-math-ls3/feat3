@@ -9,6 +9,7 @@
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/util/binary_stream.hpp>
 #include <kernel/adjacency/cuthill_mckee.hpp>
+#include <kernel/lafem/sparse_matrix_factory.hpp>
 
 using namespace FEAT;
 using namespace FEAT::LAFEM;
@@ -1455,4 +1456,67 @@ SparseMatrixBCSRMinElementTest <float, std::uint32_t> cuda_sm_bcsr_min_element_t
 SparseMatrixBCSRMinElementTest <double, std::uint32_t> cuda_sm_bcsr_min_element_test_double_uint32(PreferredBackend::cuda);
 SparseMatrixBCSRMinElementTest <float, std::uint64_t> cuda_sm_bcsr_min_element_test_float_uint64(PreferredBackend::cuda);
 SparseMatrixBCSRMinElementTest <double, std::uint64_t> cuda_sm_bcsr_min_element_test_double_uint64(PreferredBackend::cuda);
+#endif
+
+template<
+  typename DT_,
+  typename IT_>
+  class SparseMatrixBCSRConvertTest
+  : public UnitTest
+{
+public:
+  SparseMatrixBCSRConvertTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRConvertTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~SparseMatrixBCSRConvertTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    SparseMatrixFactory<DT_, IT_> b_fac(IT_(6), IT_(4));
+
+    b_fac.add(IT_(0), IT_(0), DT_(2));
+    b_fac.add(IT_(0), IT_(1), DT_(3));
+    b_fac.add(IT_(1), IT_(0), DT_(4));
+    b_fac.add(IT_(1), IT_(2), DT_(5));
+    b_fac.add(IT_(2), IT_(1), DT_(6));
+    b_fac.add(IT_(2), IT_(2), DT_(7));
+    b_fac.add(IT_(5), IT_(2), DT_(8));
+    b_fac.add(IT_(5), IT_(3), DT_(9));
+
+    SparseMatrixCSR<DT_, IT_> crs(b_fac.make_csr());
+
+    constexpr int height = 3;
+    constexpr int width = 2;
+
+    SparseMatrixBCSR<DT_, IT_, height, width> bcrs;
+    bcrs.convert(crs);
+
+    for(Index r = 0; r < bcrs.rows(); ++r)
+    {
+      for(Index c = 0; c < bcrs.columns(); ++c)
+      {
+        for(int i = 0; i < height; ++i)
+        {
+          for(int j = 0; j < width; ++j)
+          {
+            TEST_CHECK_EQUAL_WITHIN_EPS(crs(r*height+i, c*width+j), bcrs(r, c)[i][j], tol);
+          }
+        }
+      }
+    }
+  }
+};
+
+SparseMatrixBCSRConvertTest <float, std::uint32_t> sm_bcsr_convert_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRConvertTest <double, std::uint32_t> sm_bcsr_convert_test_double_uint32(PreferredBackend::generic);
+SparseMatrixBCSRConvertTest <float, std::uint64_t> sm_bcsr_convert_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRConvertTest <double, std::uint64_t> sm_bcsr_convert_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBCSRConvertTest <__float128, std::uint32_t> sm_bcsr_convert_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixBCSRConvertTest <__float128, std::uint64_t> sm_bcsr_convert_test_float128_uint64(PreferredBackend::generic);
 #endif
