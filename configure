@@ -820,6 +820,8 @@ for token in buildid:
     config.cache_entry("FEAT_HAVE_DEATH_HANDLER", "ON", "BOOL")
   elif token == "floatx":
     config.cache_entry("FEAT_HAVE_FLOATX", "ON", "BOOL")
+  elif token == "fparser":
+    config.cache_entry("FEAT_HAVE_FPARSER", "ON", "BOOL")
   elif token == "hypre":
     config.cache_entry("FEAT_HAVE_HYPRE", "ON", "BOOL")
   elif token == "metis":
