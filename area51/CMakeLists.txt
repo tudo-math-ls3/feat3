@@ -104,6 +104,9 @@ target_link_libraries(dbg-tuple-matrix feat)
 add_executable(dbg-vanka dbg_vanka.cpp)
 target_link_libraries(dbg-vanka feat)
 
+add_executable(dbg-vtk-export dbg_vtk_export.cpp)
+target_link_libraries(dbg-vtk-export feat)
+
 add_executable(dbg-parti-domain-control dbg_parti_domain_control.cpp)
 target_link_libraries(dbg-parti-domain-control feat)
 

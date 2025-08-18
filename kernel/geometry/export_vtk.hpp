@@ -6,16 +6,20 @@
 #pragma once
 
 // includes, FEAT
+#include "kernel/shape.hpp"
+#include "kernel/util/assertion.hpp"
 #include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/mesh_part.hpp>
 #include <kernel/geometry/structured_mesh.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/util/dist_file_io.hpp>
 #include <kernel/util/exception.hpp>
 
 // includes, STL
-#include <fstream>
-#include <vector>
 #include <deque>
+#include <fstream>
+#include <functional>
+#include <vector>
 
 namespace FEAT
 {
@@ -28,7 +32,7 @@ namespace FEAT
       struct VTKShape;
 
       template<>
-      struct VTKShape< Shape::Simplex<1> >
+      struct VTKShape<Shape::Simplex<1>>
       {
         static constexpr int type = 3; // VTK_LINE
         static inline int map(int i)
@@ -38,7 +42,7 @@ namespace FEAT
       };
 
       template<>
-      struct VTKShape< Shape::Simplex<2> >
+      struct VTKShape<Shape::Simplex<2>>
       {
         static constexpr int type = 5; // VTK_TRIANGLE
         static inline int map(int i)
@@ -48,7 +52,7 @@ namespace FEAT
       };
 
       template<>
-      struct VTKShape< Shape::Simplex<3> >
+      struct VTKShape<Shape::Simplex<3>>
       {
         static constexpr int type = 10; // VTK_TETRA
         static inline int map(int i)
@@ -58,7 +62,7 @@ namespace FEAT
       };
 
       template<>
-      struct VTKShape< Shape::Hypercube<1> >
+      struct VTKShape<Shape::Hypercube<1>>
       {
         static constexpr int type = 3; // VTK_LINE
         static inline int map(int i)
@@ -68,7 +72,7 @@ namespace FEAT
       };
 
       template<>
-      struct VTKShape< Shape::Hypercube<2> >
+      struct VTKShape<Shape::Hypercube<2>>
       {
         static constexpr int type = 9; // VTK_QUAD
         static inline int map(int i)
@@ -79,7 +83,7 @@ namespace FEAT
       };
 
       template<>
-      struct VTKShape< Shape::Hypercube<3> >
+      struct VTKShape<Shape::Hypercube<3>>
       {
         static constexpr int type = 12; // VTK_HEXAHEDRON
         static inline int map(int i)
@@ -105,25 +109,37 @@ namespace FEAT
      * \tparam Mesh_
      * The type of the mesh to be exported.
      *
+     * \tparam cell_dim_
+     * The dimension of the mesh entities to be exported.
+     *
      * \author Peter Zajac
      */
-    template<typename Mesh_>
+    template<typename Mesh_, int cell_dim_ = Mesh_::ShapeType::dimension>
     class ExportVTK
     {
     public:
       /// mesh type
-      typedef Mesh_ MeshType;
+      using MeshType = Mesh_;
       /// our shape type
-      typedef typename MeshType::ShapeType ShapeType;
+      using ShapeType = typename MeshType::ShapeType;
+      /// shape type of exported cells
+      using CellShapeType = typename Shape::FaceTraits<ShapeType, cell_dim_>::ShapeType;
       /// our VTK shape type
-      typedef Intern::VTKShape<ShapeType> VTKShapeType;
+      using VTKShapeType = Intern::VTKShape<CellShapeType>;
 
     protected:
       /// our variable container
-      typedef std::deque<std::pair<String, std::vector<double>>> VarDeque;
+      using VarDeque = std::deque<std::pair<String, std::vector<double>>>;
 
-      /// reference to mesh to be exported
-      const MeshType& _mesh;
+      // NOTE(mmuegge): Depending on wether we are writing a mesh or a meshpart,
+      // we may need to do some additional handling of indices.
+      // The accessor functions allow us to do so,
+      // while presenting a consistent interface to the actual file writing logic.
+
+      /// Accessor function for vertices
+      std::function<double(Index, int)> _vertices;
+      /// Accessor function for cells
+      std::function<Index(Index, int)> _cells;
       /// number of vertices in mesh
       Index _num_verts;
       /// number of cells in mesh
@@ -152,17 +168,87 @@ namespace FEAT
        * See the \p precision parameter of the #stringify_fp_sci() function for details.
        */
       explicit ExportVTK(const MeshType& mesh, int var_prec = 0) :
-        _mesh(mesh),
         _num_verts(mesh.get_num_entities(0)),
-        _num_cells(mesh.get_num_entities(MeshType::shape_dim)),
+        _num_cells(mesh.get_num_entities(cell_dim_)),
         _var_prec(Math::max(0, var_prec))
       {
+        const auto& vertex_set = mesh.get_vertex_set();
+        const auto& index_set = mesh.template get_index_set<cell_dim_, 0>();
+
+        _vertices = [&](Index i, int j) { return vertex_set[i][j]; };
+        _cells = [&](Index i, int j) { return index_set(i, j); };
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] mesh
+       * A \resident reference to the mesh that \c part was created from.
+       * Must remain unchanged for the lifetime of this exporter.
+       *
+       * \param[in] part
+       * A \resident reference to the meshpart that is to be exported.
+       * Must remain unchanged for the lifetime of this exporter.
+       *
+       * \param[in] var_prec
+       * Specifies the precision of the variable entries. If set to 0, the runtime's default precision is used.
+       * See the \p precision parameter of the #stringify_fp_sci() function for details.
+       */
+      explicit ExportVTK(const MeshType& mesh, const MeshPart<MeshType>& part, int var_prec = 0) :
+        _num_verts(part.get_num_entities(0)),
+        _num_cells(part.get_num_entities(cell_dim_)),
+        _var_prec(Math::max(0, var_prec))
+      {
+        const auto& vertex_set = mesh.get_vertex_set();
+        const auto& vertex_target_set = part.template get_target_set<0>();
+        const auto& cell_target_set = part.template get_target_set<cell_dim_>();
+
+        _vertices = [&](Index i, int j) { return vertex_set[vertex_target_set[i]][j]; };
+
+        if(part.has_topology())
+        {
+          // The meshpart has its own topology. Use that.
+          const auto& index_set = part.template get_index_set<cell_dim_, 0>();
+          _cells = [&](Index i, int j) { return index_set(i, j); };
+        }
+        else
+        {
+          // The meshpart has no own topology. Use the mesh topology.
+          const auto& index_set = mesh.template get_index_set<cell_dim_, 0>();
+
+          // The mesh index-set returns indices of vertices the mesh's index-space,
+          // but the .vtu will be written in the meshparts index-space.
+          // We thus need to search for the corresponding index on the meshpart for any vertex index.
+          _cells = [&](Index i, int j)
+          {
+            const Index vertex = index_set(cell_target_set[i], j);
+            for(Index k(0); k < vertex_target_set.get_num_entities(); k++)
+            {
+              if(vertex_target_set[k] == vertex)
+              {
+                return k;
+              }
+            }
+
+            XABORTM("Lookup of vertex index failed!");
+          };
+        }
       }
 
       /// destructor
-      virtual ~ExportVTK()
-      {
-      }
+      virtual ~ExportVTK() = default;
+
+      /// Copy constructor
+      ExportVTK(const ExportVTK& other) = default;
+
+      /// Move constructor
+      ExportVTK(ExportVTK&& other) noexcept = default;
+
+      /// Copy-assignment constructor
+      ExportVTK& operator=(const ExportVTK& other) = default;
+
+      /// Move-assignment constructor
+      ExportVTK& operator=(ExportVTK&& other) = default;
 
       /**
        * \brief Clears all vertex and cell variables in the exporter.
@@ -193,7 +279,7 @@ namespace FEAT
        * can be deleted or overwritten after the return of this function.
        */
       template<typename T_>
-      void add_vertex_scalar(const String& name, const T_* data, double scaling_factor = double(1.))
+      void add_vertex_scalar(const String& name, const T_* data, double scaling_factor = 1.0)
       {
         XASSERTM(data != nullptr, "data array is nullptr");
         std::vector<double> d(_num_verts);
@@ -201,7 +287,7 @@ namespace FEAT
         {
           d[i] = scaling_factor * double(data[i]);
         }
-        _vertex_scalars.push_back(std::make_pair(name, std::move(d)));
+        _vertex_scalars.emplace_back(name, std::move(d));
       }
 
       /**
@@ -224,39 +310,44 @@ namespace FEAT
        * can be deleted or overwritten after the return of this function.
        */
       template<typename T_>
-      void add_vertex_vector(const String& name, const T_* x, const T_* y = nullptr, const T_* z = nullptr, double scaling_factor = double(1.))
+      void add_vertex_vector(
+        const String& name,
+        const T_* x,
+        const T_* y = nullptr,
+        const T_* z = nullptr,
+        double scaling_factor = 1.0)
       {
         XASSERTM(x != nullptr, "x-data array is nullptr");
-        std::vector<double> d(3*_num_verts);
+        std::vector<double> d(3 * _num_verts);
 
-        if(y!= nullptr && z != nullptr)
+        if(y != nullptr && z != nullptr)
         {
           for(Index i(0); i < _num_verts; ++i)
           {
-            d[3*i+0] = scaling_factor * double(x[i]);
-            d[3*i+1] = scaling_factor * double(y[i]);
-            d[3*i+2] = scaling_factor * double(z[i]);
+            d[(3 * i) + 0] = scaling_factor * double(x[i]);
+            d[(3 * i) + 1] = scaling_factor * double(y[i]);
+            d[(3 * i) + 2] = scaling_factor * double(z[i]);
           }
         }
         else if(y != nullptr)
         {
           for(Index i(0); i < _num_verts; ++i)
           {
-            d[3*i+0] = scaling_factor * double(x[i]);
-            d[3*i+1] = scaling_factor * double(y[i]);
-            d[3*i+2] = 0.0;
+            d[(3 * i) + 0] = scaling_factor * double(x[i]);
+            d[(3 * i) + 1] = scaling_factor * double(y[i]);
+            d[(3 * i) + 2] = 0.0;
           }
         }
         else
         {
           for(Index i(0); i < _num_verts; ++i)
           {
-            d[3*i+0] = scaling_factor * double(x[i]);
-            d[3*i+1] = 0.0;
-            d[3*i+2] = 0.0;
+            d[(3 * i) + 0] = scaling_factor * double(x[i]);
+            d[(3 * i) + 1] = 0.0;
+            d[(3 * i) + 2] = 0.0;
           }
         }
-        _vertex_vectors.push_back(std::make_pair(name, std::move(d)));
+        _vertex_vectors.emplace_back(name, std::move(d));
       }
 
       /**
@@ -280,20 +371,23 @@ namespace FEAT
        * This function creates a (deep) copy of the vector data.
        */
       template<typename VectorType_>
-      void add_vertex_vector(const String& name, const VectorType_& v, double scaling_factor = double(1.))
+      void add_vertex_vector(const String& name, const VectorType_& v, double scaling_factor = 1.0)
       {
-        std::vector<double> d(3*_num_verts);
+        std::vector<double> d(3 * _num_verts);
 
         for(Index i(0); i < _num_verts; ++i)
         {
           for(Index j(0); j < 3; ++j)
-            d[Index(3)*i+j] = double(0);
+          {
+            d[(Index(3) * i) + j] = double(0);
+          }
 
           for(int j(0); j < v.BlockSize; ++j)
-            d[Index(3)*i+Index(j)] = scaling_factor * double(v(i)[j]);
-
+          {
+            d[(Index(3) * i) + Index(j)] = scaling_factor * double(v(i)[j]);
+          }
         }
-        _vertex_vectors.push_back(std::make_pair(name, std::move(d)));
+        _vertex_vectors.emplace_back(name, std::move(d));
       }
 
       /**
@@ -314,7 +408,7 @@ namespace FEAT
        * can be deleted or overwritten after the return of this function.
        */
       template<typename T_>
-      void add_cell_scalar(const String& name, const T_* data, double scaling_factor = double(1.))
+      void add_cell_scalar(const String& name, const T_* data, double scaling_factor = 1.0)
       {
         XASSERTM(data != nullptr, "data array is nullptr");
         std::vector<double> d(_num_cells);
@@ -322,7 +416,7 @@ namespace FEAT
         {
           d[i] = scaling_factor * double(data[i]);
         }
-        _cell_scalars.push_back(std::make_pair(name, std::move(d)));
+        _cell_scalars.emplace_back(name, std::move(d));
       }
 
       /**
@@ -345,39 +439,44 @@ namespace FEAT
        * can be deleted or overwritten after the return of this function.
        */
       template<typename T_>
-      void add_cell_vector(const String& name, const T_* x, const T_* y = nullptr, const T_* z = nullptr, double scaling_factor = double(1.))
+      void add_cell_vector(
+        const String& name,
+        const T_* x,
+        const T_* y = nullptr,
+        const T_* z = nullptr,
+        double scaling_factor = 1.0)
       {
         XASSERTM(x != nullptr, "x-data array is nullptr");
-        std::vector<double> d(3*_num_cells);
+        std::vector<double> d(3 * _num_cells);
 
         if(y != nullptr && z != nullptr)
         {
           for(Index i(0); i < _num_cells; ++i)
           {
-            d[3*i+0] = scaling_factor * double(x[i]);
-            d[3*i+1] = scaling_factor * double(y[i]);
-            d[3*i+2] = scaling_factor * double(z[i]);
+            d[(3 * i) + 0] = scaling_factor * double(x[i]);
+            d[(3 * i) + 1] = scaling_factor * double(y[i]);
+            d[(3 * i) + 2] = scaling_factor * double(z[i]);
           }
         }
         else if(y != nullptr)
         {
           for(Index i(0); i < _num_cells; ++i)
           {
-            d[3*i+0] = scaling_factor * double(x[i]);
-            d[3*i+1] = scaling_factor * double(y[i]);
-            d[3*i+2] = 0.0;
+            d[(3 * i) + 0] = scaling_factor * double(x[i]);
+            d[(3 * i) + 1] = scaling_factor * double(y[i]);
+            d[(3 * i) + 2] = 0.0;
           }
         }
         else
         {
           for(Index i(0); i < _num_cells; ++i)
           {
-            d[3*i+0] = scaling_factor * double(x[i]);
-            d[3*i+1] = 0.0;
-            d[3*i+2] = 0.0;
+            d[(3 * i) + 0] = scaling_factor * double(x[i]);
+            d[(3 * i) + 1] = 0.0;
+            d[(3 * i) + 2] = 0.0;
           }
         }
-        _cell_vectors.push_back(std::make_pair(name, std::move(d)));
+        _cell_vectors.emplace_back(name, std::move(d));
       }
 
       /**
@@ -401,20 +500,23 @@ namespace FEAT
        * This function creates a (deep) copy of the vector data.
        */
       template<typename VectorType_>
-      void add_cell_vector(const String& name, const VectorType_& v, double scaling_factor = double(1.))
+      void add_cell_vector(const String& name, const VectorType_& v, double scaling_factor = 1.0)
       {
-        std::vector<double> d(3*_num_cells);
+        std::vector<double> d(3 * _num_cells);
 
         for(Index i(0); i < _num_cells; ++i)
         {
           for(Index j(0); j < 3; ++j)
-            d[Index(3)*i+j] = double(0);
+          {
+            d[(Index(3) * i) + j] = double(0);
+          }
 
           for(int j(0); j < v.BlockSize; ++j)
-            d[Index(3)*i+Index(j)] = scaling_factor * double(v(i)[j]);
-
+          {
+            d[(Index(3) * i) + Index(j)] = scaling_factor * double(v(i)[j]);
+          }
         }
-        _cell_vectors.push_back(std::make_pair(name, std::move(d)));
+        _cell_vectors.emplace_back(name, std::move(d));
       }
 
       /**
@@ -429,7 +531,9 @@ namespace FEAT
         String vtu_name(filename + ".vtu");
         std::ofstream ofs(vtu_name.c_str());
         if(!(ofs.is_open() && ofs.good()))
+        {
           throw FileError("Failed to create '" + vtu_name + "'");
+        }
 
         // write
         write_vtu(ofs);
@@ -474,24 +578,28 @@ namespace FEAT
         add_cell_scalar("rank", rank_array.data());
 
         // compute number of non-zero digits in (nparts-1) for padding
-        const std::size_t ndigits = Math::ilog10(std::size_t(nparts-1));
+        const std::size_t ndigits = Math::ilog10(std::size_t(nparts - 1));
 
         // write serial VTU file: "filename.#rank.vtu"
         write(filename + "." + stringify(rank).pad_front(ndigits, '0'));
 
         // we're done unless we have rank = 0
         if(rank != 0)
+        {
           return;
+        }
 
         // try to open our output file
         String pvtu_name(filename + ".pvtu");
         std::ofstream ofs(pvtu_name.c_str());
         if(!(ofs.is_open() && ofs.good()))
+        {
           throw FileError("Failed to create '" + pvtu_name + "'");
+        }
 
         // extract the file title from our filename
         std::size_t p = filename.find_last_of("\\/");
-        String file_title = filename.substr(p == filename.npos ? 0 : ++p);
+        String file_title = filename.substr(p == FEAT::String::npos ? 0 : ++p);
 
         // write PVTU file
         write_pvtu(ofs, file_title, nparts);
@@ -519,7 +627,7 @@ namespace FEAT
         add_cell_scalar("rank", rank_array.data());
 
         // compute number of non-zero digits in (nparts-1) for padding
-        const std::size_t ndigits = std::size_t(Math::max(Math::ilog10(comm.size()-1), 1));
+        const auto ndigits = std::size_t(Math::max(Math::ilog10(comm.size() - 1), 1));
 
         // write serial VTU file into a stringstream
         std::stringstream stream;
@@ -533,17 +641,21 @@ namespace FEAT
 
         // we're done unless we have rank = 0
         if(comm.rank() != 0)
+        {
           return;
+        }
 
         // try to open our output file
         String pvtu_name(filename + ".pvtu");
         std::ofstream ofs(pvtu_name.c_str());
         if(!(ofs.is_open() && ofs.good()))
+        {
           throw FileError("Failed to create '" + pvtu_name + "'");
+        }
 
         // extract the file title from our filename
         std::size_t p = filename.find_last_of("\\/");
-        String file_title = filename.substr(p == filename.npos ? 0 : ++p);
+        String file_title = filename.substr(p == FEAT::String::npos ? 0 : ++p);
 
         // write PVTU file
         write_pvtu(ofs, file_title, comm.size());
@@ -562,10 +674,10 @@ namespace FEAT
       {
         // fetch basic information
         const int num_coords = MeshType::world_dim;
-        const int verts_per_cell = Shape::FaceTraits<ShapeType,0>::count;
+        const int verts_per_cell = Shape::FaceTraits<CellShapeType, 0>::count;
 
         // write VTK header
-        os << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\">\n";
+        os << "<VTKFile type=\"UnstructuredGrid\" version=\"0.1\">\n)";
         os << "<!-- Generated by FEAT v" << version_major << "." << version_minor;
         os << "." << version_patch << " -->\n";
 
@@ -579,10 +691,9 @@ namespace FEAT
           os << "<PointData>\n";
 
           // write vertex variables
-          for(Index i(0); i < Index(_vertex_scalars.size()); ++i)
+          for(const auto& var : _vertex_scalars)
           {
-            const auto& var(_vertex_scalars[i]);
-            os << "<DataArray type=\"Float64\" Name=\"" << var.first <<"\" Format=\"ascii\">\n";
+            os << "<DataArray type=\"Float64\" Name=\"" << var.first << "\" Format=\"ascii\">\n";
             for(Index j(0); j < _num_verts; ++j)
             {
               os << stringify_fp_sci(var.second[j], _var_prec) << "\n";
@@ -590,16 +701,15 @@ namespace FEAT
             os << "</DataArray>\n";
           }
           // write vertex fields
-          for(Index i(0); i < Index(_vertex_vectors.size()); ++i)
+          for(const auto& var : _vertex_vectors)
           {
-            const auto& var(_vertex_vectors[i]);
             os << "<DataArray type=\"Float64\" Name=\"" << var.first;
-            os <<"\" NumberOfComponents=\"3\" Format=\"ascii\">\n";
+            os << "\" NumberOfComponents=\"3\" Format=\"ascii\">\n";
             for(Index j(0); j < _num_verts; ++j)
             {
-              os << stringify_fp_sci(var.second[3*j+0], _var_prec) << " ";
-              os << stringify_fp_sci(var.second[3*j+1], _var_prec) << " ";
-              os << stringify_fp_sci(var.second[3*j+2], _var_prec) << "\n";
+              os << stringify_fp_sci(var.second[(3 * j) + 0], _var_prec) << " ";
+              os << stringify_fp_sci(var.second[(3 * j) + 1], _var_prec) << " ";
+              os << stringify_fp_sci(var.second[(3 * j) + 2], _var_prec) << "\n";
             }
             os << "</DataArray>\n";
           }
@@ -613,10 +723,9 @@ namespace FEAT
           os << "<CellData>\n";
           if(!_cell_scalars.empty())
           {
-            for(Index i(0); i < Index(_cell_scalars.size()); ++i)
+            for(const auto& var : _cell_scalars)
             {
-              const auto& var(_cell_scalars[i]);
-              os << "<DataArray type=\"Float64\" Name=\"" << var.first <<"\" Format=\"ascii\">\n";
+              os << "<DataArray type=\"Float64\" Name=\"" << var.first << "\" Format=\"ascii\">\n";
               for(Index j(0); j < _num_cells; ++j)
               {
                 os << stringify_fp_sci(var.second[j], _var_prec) << "\n";
@@ -628,16 +737,15 @@ namespace FEAT
           if(!_cell_vectors.empty())
           {
             // write cell fields
-            for(Index i(0); i < Index(_cell_vectors.size()); ++i)
+            for(const auto& var : _cell_vectors)
             {
-              const auto& var(_cell_vectors[i]);
               os << "<DataArray type=\"Float64\" Name=\"" << var.first;
-              os <<"\" NumberOfComponents=\"3\" Format=\"ascii\">\n";
+              os << "\" NumberOfComponents=\"3\" Format=\"ascii\">\n";
               for(Index j(0); j < _num_cells; ++j)
               {
-                os << stringify_fp_sci(var.second[3*j+0], _var_prec) << " ";
-                os << stringify_fp_sci(var.second[3*j+1], _var_prec) << " ";
-                os << stringify_fp_sci(var.second[3*j+2], _var_prec) << "\n";
+                os << stringify_fp_sci(var.second[(3 * j) + 0], _var_prec) << " ";
+                os << stringify_fp_sci(var.second[(3 * j) + 1], _var_prec) << " ";
+                os << stringify_fp_sci(var.second[(3 * j) + 2], _var_prec) << "\n";
               }
               os << "</DataArray>\n";
             }
@@ -646,15 +754,14 @@ namespace FEAT
         }
 
         // write vertices
-        const auto& vtx = _mesh.get_vertex_set();
         os << "<Points>\n";
         os << "<DataArray type=\"Float32\" NumberOfComponents=\"3\" Format=\"ascii\">\n";
         for(Index i(0); i < _num_verts; ++i)
         {
-          os << vtx[i][0];
+          os << _vertices(i, 0);
           for(int j(1); j < num_coords; ++j)
           {
-            os << " " << vtx[i][j];
+            os << " " << _vertices(i, j);
           }
           for(int j(num_coords); j < 3; ++j)
           {
@@ -666,15 +773,14 @@ namespace FEAT
         os << "</Points>\n";
 
         // write cells
-        const auto& idx = _mesh.template get_index_set<MeshType::shape_dim, 0>();
         os << "<Cells>\n";
         os << "<DataArray type=\"UInt32\" Name=\"connectivity\">\n";
         for(Index i(0); i < _num_cells; ++i)
         {
-          os << idx(i, VTKShapeType::map(0));
+          os << _cells(i, VTKShapeType::map(0));
           for(int j(1); j < verts_per_cell; ++j)
           {
-            os << " " << idx(i, VTKShapeType::map(j));
+            os << " " << _cells(i, VTKShapeType::map(j));
           }
           os << "\n";
         }
@@ -682,7 +788,7 @@ namespace FEAT
         os << "<DataArray type=\"UInt32\" Name=\"offsets\">\n";
         for(Index i(0); i < _num_cells; ++i)
         {
-          os << ((i+1) * verts_per_cell) << "\n";
+          os << ((i + 1) * verts_per_cell) << "\n";
         }
         os << "</DataArray>\n";
         os << "<DataArray type=\"UInt32\" Name=\"types\">\n";
@@ -725,15 +831,15 @@ namespace FEAT
           os << "<PPointData>\n";
 
           // write vertex variables
-          for(Index i(0); i < Index(_vertex_scalars.size()); ++i)
+          for(const auto& vertex_scalar : _vertex_scalars)
           {
-            os << "<PDataArray type=\"Float64\" Name=\"" << _vertex_scalars[i].first <<"\" />\n";
+            os << "<PDataArray type=\"Float64\" Name=\"" << vertex_scalar.first << "\" />\n";
           }
           // write vertex fields
-          for(Index i(0); i < Index(_vertex_vectors.size()); ++i)
+          for(const auto& vertex_vector : _vertex_vectors)
           {
-            os << "<PDataArray type=\"Float64\" Name=\"" << _vertex_vectors[i].first;
-            os <<"\" NumberOfComponents=\"3\" />\n";
+            os << "<PDataArray type=\"Float64\" Name=\"" << vertex_vector.first;
+            os << "\" NumberOfComponents=\"3\" />\n";
           }
 
           os << "</PPointData>\n";
@@ -744,15 +850,15 @@ namespace FEAT
         {
           os << "<PCellData>\n";
           // write cell scalars
-          for(Index i(0); i < Index(_cell_scalars.size()); ++i)
+          for(const auto& cell_scalar : _cell_scalars)
           {
-            os << "<PDataArray type=\"Float64\" Name=\"" << _cell_scalars[i].first <<"\" />\n";
+            os << "<PDataArray type=\"Float64\" Name=\"" << cell_scalar.first << "\" />\n";
           }
           // write cell fields
-          for(Index i(0); i < Index(_cell_vectors.size()); ++i)
+          for(const auto& cell_vector : _cell_vectors)
           {
-            os << "<PDataArray type=\"Float64\" Name=\"" << _cell_vectors[i].first;
-            os <<"\" NumberOfComponents=\"3\" />\n";
+            os << "<PDataArray type=\"Float64\" Name=\"" << cell_vector.first;
+            os << "\" NumberOfComponents=\"3\" />\n";
           }
           os << "</PCellData>\n";
         }
@@ -763,7 +869,7 @@ namespace FEAT
         os << "</PPoints>\n";
 
         // compute number of non-zero digits in (nparts-1) for padding
-        const std::size_t ndigits = Math::ilog10(std::size_t(nparts-1));
+        const std::size_t ndigits = Math::ilog10(std::size_t(nparts - 1));
 
         // now let's write our piece data
         for(int i(0); i < nparts; ++i)
