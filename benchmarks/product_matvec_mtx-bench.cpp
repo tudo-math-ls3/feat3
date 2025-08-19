@@ -99,15 +99,15 @@ int main(int argc, char ** argv)
   if(parser.check("backend") > 0)
   {
     backend_string = parser.query("backend")->second.front();
-    if(backend_string.compare_no_case("generic"))
+    if(backend_string.compare_no_case("generic") == 0)
     {
       backend = PreferredBackend::generic;
     }
-    else if(backend_string.compare_no_case("cuda"))
+    else if(backend_string.compare_no_case("cuda") == 0)
     {
       backend = PreferredBackend::cuda;
     }
-    else if(backend_string.compare_no_case("mkl"))
+    else if(backend_string.compare_no_case("mkl") == 0)
     {
       backend = PreferredBackend::mkl;
     }
