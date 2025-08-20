@@ -440,5 +440,49 @@ namespace FEAT
         send_reqs.wait_all();
       }
     }; // class GlobalMaskedBoundaryFactory<...>
+
+    /**
+     * \brief Creates a new boundary mesh-part for a given partitioned mesh
+     *
+     * \param[in] mesh
+     * A \transient reference to the mesh for which a boundary mesh-part is to be created.
+     *
+     * \returns
+     * A mesh-part containing all entities for which lie on the mesh boundary
+     */
+    template<typename MeshNode_>
+    MeshPart<typename MeshNode_::MeshType> make_boundary_meshpart(const MeshNode_& node, const Dist::Comm& comm)
+    {
+      GlobalMaskedBoundaryFactory<typename MeshNode_::MeshType> boundary_factory(*node.get_mesh());
+
+      for(const auto& pair : node.get_halo_map())
+      {
+        boundary_factory.add_halo(pair.first, *pair.second);
+      }
+      boundary_factory.compile(comm);
+      return boundary_factory.make();
+    }
+
+    /**
+     * \brief Creates a new boundary mesh-part for a given partitioned mesh
+     *
+     * \param[in] mesh
+     * A \transient reference to the mesh for which a boundary mesh-part is to be created.
+     *
+     * \returns
+     * A mesh-part containing all entities for which lie on the mesh boundary
+     */
+    template<typename MeshNode_>
+    std::unique_ptr<MeshPart<typename MeshNode_::MeshType>> make_unique_boundary_meshpart(const MeshNode_& node, const Dist::Comm& comm)
+    {
+      GlobalMaskedBoundaryFactory<typename MeshNode_::MeshType> boundary_factory(*node.get_mesh());
+
+      for(const auto& pair : node.get_halo_map())
+      {
+        boundary_factory.add_halo(pair.first, *pair.second);
+      }
+      boundary_factory.compile(comm);
+      return boundary_factory.make_unique();
+    }
   } // namespace Geometry
 } // namespace FEAT
