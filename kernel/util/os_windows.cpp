@@ -120,7 +120,7 @@ namespace FEAT
         addr = stack_frame.AddrPC.Offset;
 
         // print stack address
-        fprintf(stream, "0x%0*I64X", 2*sizeof(void*), addr);
+        fprintf(stream, "0x%0*I64X", 2*int(sizeof(void*)), addr);
 
         // get symbol info to obtain function name
         if(SymFromAddr(prc, addr, 0, &sim.si) != FALSE)
@@ -163,7 +163,7 @@ namespace FEAT
     {
       // print an error header
       fprintf(stderr, "\n>>>>> FATAL ERROR <<<<<\n\n");
-      fprintf(stderr, "Exception at 0x%0*I64X: ", 2*sizeof(void*), (DWORD64)p->ExceptionRecord->ExceptionAddress);
+      fprintf(stderr, "Exception at 0x%0*I64X: ", 2*int(sizeof(void*)), (DWORD64)p->ExceptionRecord->ExceptionAddress);
 
       // print exception info
       switch(p->ExceptionRecord->ExceptionCode)
@@ -176,7 +176,7 @@ namespace FEAT
           fprintf(stderr, "reading from");
         else
           fprintf(stderr, "writing to");
-        fprintf(stderr, " 0x%0*I64X\n", 2*sizeof(void*), (DWORD64)p->ExceptionRecord->ExceptionInformation[1]);
+        fprintf(stderr, " 0x%0*I64X\n", 2*int(sizeof(void*)), (DWORD64)p->ExceptionRecord->ExceptionInformation[1]);
         break;
       case EXCEPTION_ILLEGAL_INSTRUCTION:
         fprintf(stderr, "Illegal Instruction\n");
