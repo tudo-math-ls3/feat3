@@ -116,20 +116,27 @@ target_include_directories(feat-dependency INTERFACE ${FEAT_SOURCE_DIR} ${FEAT_B
 option(FEAT_DEBUG_MODE "Debug modus?" OFF)
 
 # find and enable core dependencies
+# TODO: More general blas support
 option(FEAT_HAVE_MKL "Support MKL backend for FEAT?" OFF)
 if(FEAT_HAVE_MKL)
-  # TODO: More general blas support
-  set(BLA_VENDOR Intel10_64ilp_seq)
-  find_package(BLAS REQUIRED)
-  target_link_libraries(feat-dependency INTERFACE BLAS::BLAS) #TODO: necessary here? Should it not be enough
-  #to link the actual implementations???
+  set(MKL_ARCH intel64)
+  set(MKL_THREADING sequential)
+  set(MKL_INTERFACE ilp64)
+  if(WIN32)
+    set(MKL_MPI msmpi)
+  else()
+    set(MKL_MPI openmpi)
+  endif()
+
+  find_package(MKL CONFIG REQUIRED)
+  #TODO: necessary here? Should it not be enough to link the actual implementations???
+  target_link_libraries(feat-dependency INTERFACE MKL::MKL)
 endif(FEAT_HAVE_MKL)
 
 # cuda support?
 option(FEAT_HAVE_CUDA "Enable cuda language and cuda backend?" OFF)
 if(FEAT_HAVE_CUDA)
   # since we call this before enable_language, this should be set as long as the user does not provide them
-  set(CMAKE_CUDA_FLAGS "-std=c++17 --restrict --compiler-options -Wall,-g,-Wno-deprecated-declarations" CACHE STRING "General CUDA FLAGS")
   set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "-g -O3" CACHE STRING "Cuda rel with deb")
   set(CMAKE_CUDA_FLAGS_RELEASE "-O3" CACHE STRING "Cuda rel with deb")
   set(CMAKE_CUDA_FLAGS_DEBUG "-g -O1" CACHE STRING "Cuda rel with deb")
@@ -140,11 +147,11 @@ if(FEAT_HAVE_CUDA)
     target_compile_options(feat-dependency INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:-v -Xptxas=-v>)
   endif(FEAT_CUDA_VERBOSE)
 
-  if(FEAT_DEBUG_MODUS)
+  if(FEAT_DEBUG_MODE)
     target_compile_options(feat-dependency INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:-G --compiler-options=-rdynamic>)
-  else(FEAT_DEBUG_MODUS)
+  else(FEAT_DEBUG_MODE)
     target_compile_options(feat-dependency INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:-lineinfo>)
-  endif(FEAT_DEBUG_MODUS)
+  endif(FEAT_DEBUG_MODE)
 
   ## host compiler <- thios should be done another way, correct, since this can simply be done
   # by setting CMAKE_CUDA_HOST_COMPILER
@@ -196,6 +203,14 @@ if(FEAT_HAVE_MPI)
 
   #set ctest runner to single process mpiexec execution
   set(FEAT_CTEST_RUNNER ${MPIEXEC} ${MPIEXEC_NUMPROC_FLAG} 1 ${MPIEXEC_PREFLAGS})
+
+  # MPI on windows does not support the "--map-by node" flag
+  # The flag chosen here is then used by the MPI unit tests
+  if(WIN32)
+    set(FEAT_MPI_MAPPING_FLAG "")
+  else()
+    set(FEAT_MPI_MAPPING_FLAG "--map-by" "node")
+  endif()
 endif(FEAT_HAVE_MPI)
 
 if(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")

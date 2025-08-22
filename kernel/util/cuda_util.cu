@@ -370,6 +370,8 @@ template void FEAT::Util::cuda_convert<unsigned int, double>(unsigned int *, con
 template void FEAT::Util::cuda_convert<unsigned long, double>(unsigned long *, const double *, const Index);
 template void FEAT::Util::cuda_convert<unsigned int, float>(unsigned int *, const float *, const Index);
 template void FEAT::Util::cuda_convert<unsigned long, float>(unsigned long *, const float *, const Index);
+// For msvc only
+template void FEAT::Util::cuda_convert<unsigned long long, double>(unsigned long long*, const double*, const Index);
 
 int FEAT::Util::cuda_get_device_count()
 {

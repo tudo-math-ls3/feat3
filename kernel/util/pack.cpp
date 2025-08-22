@@ -100,6 +100,18 @@ namespace FEAT::Pack
   }
 
   /**
+  * \brief bitmask for zfp header
+  *
+  * //0x1u HEADER_MAGIC -> for version control--> only checks codec... in last 8
+  * bits of first 32 bits...
+  * //0x2u HEADER_META
+  * //0x4u HEADER_MODE
+  */
+  #ifdef FEAT_HAVE_ZFP
+    static constexpr uint zfp_header_mask = 7u;
+  #endif // FEAT_HAVE_ZFP
+
+  /**
    * \brief Encodes an array by converting each of its elements to a desired type
    *
    * Effectively, this function performs <c>((X_*)buf)[i] = X_(src[i])</c> for all
@@ -1043,6 +1055,8 @@ namespace FEAT::Pack
   template Pack::Type deduct_type<f128>();
 #endif
 
+  template Pack::Type deduct_type<long long>();
+
   template std::size_t encode<i8>(void*, const i8*, std::size_t, std::size_t, Pack::Type, bool, double);
   template std::size_t encode<i16>(void*, const i16*, std::size_t, std::size_t, Pack::Type, bool, double);
   template std::size_t encode<i32>(void*, const i32*, std::size_t, std::size_t, Pack::Type, bool, double);
@@ -1052,8 +1066,6 @@ namespace FEAT::Pack
   template std::size_t encode<u16>(void*, const u16*, std::size_t, std::size_t, Pack::Type, bool, double);
   template std::size_t encode<u32>(void*, const u32*, std::size_t, std::size_t, Pack::Type, bool, double);
   template std::size_t encode<u64>(void*, const u64*, std::size_t, std::size_t, Pack::Type, bool, double);
-
-  template std::size_t encode<long long>(void*, const long long*, std::size_t, std::size_t, Pack::Type, bool, double);
 
 #if defined(FEAT_HAVE_PACK_TYPE_F16)
   template std::size_t encode<f16>(void*, const f16*, std::size_t, std::size_t, Pack::Type, bool, double);
@@ -1065,6 +1077,8 @@ namespace FEAT::Pack
   template std::size_t encode<f128>(void*, const f128*, std::size_t, std::size_t, Pack::Type, bool, double);
 #endif
 
+  template std::size_t encode<long long>(void*, const long long*, std::size_t, std::size_t, Pack::Type, bool, double);
+
   template std::size_t decode<i8>(i8*, void*, std::size_t, std::size_t, Pack::Type, bool);
   template std::size_t decode<i16>(i16*, void*, std::size_t, std::size_t, Pack::Type, bool);
   template std::size_t decode<i32>(i32*, void*, std::size_t, std::size_t, Pack::Type, bool);
@@ -1075,8 +1089,6 @@ namespace FEAT::Pack
   template std::size_t decode<u32>(u32*, void*, std::size_t, std::size_t, Pack::Type, bool);
   template std::size_t decode<u64>(u64*, void*, std::size_t, std::size_t, Pack::Type, bool);
 
-  template std::size_t decode<long long>(long long*, void*, std::size_t, std::size_t, Pack::Type, bool);
-
 #if defined(FEAT_HAVE_PACK_TYPE_F16)
   template std::size_t decode<f16>(f16*, void*, std::size_t, std::size_t, Pack::Type, bool);
 #endif
@@ -1085,5 +1097,13 @@ namespace FEAT::Pack
 
 #if defined(FEAT_HAVE_PACK_TYPE_F128)
   template std::size_t decode<f128>(f128*, void*, std::size_t, std::size_t, Pack::Type, bool);
+#endif
+
+  template std::size_t decode<long long>(long long*, void*, std::size_t, std::size_t, Pack::Type, bool);
+
+#if defined(_WIN32)
+  template Pack::Type deduct_type<unsigned long>();
+  template std::size_t encode<unsigned long>(void*, const unsigned long*, std::size_t, std::size_t, Pack::Type, bool, double);
+  template std::size_t decode<unsigned long>(unsigned long*, void*, std::size_t, std::size_t, Pack::Type, bool);
 #endif
 } // namespace FEAT::Pack

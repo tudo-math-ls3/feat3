@@ -74,8 +74,15 @@ mark_as_advanced(MAKE_AVAIL_LIST)
 set(CMAKE_CXX_FLAGS_BACKUP ${CMAKE_CXX_FLAGS})
 set(CMAKE_C_FLAGS_BACKUP ${CMAKE_C_FLAGS})
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+if(WIN32)
+  # Setting /w causes warnings about supressing higher warning levels
+  # Setting /wd9025 supresses that warning
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /w")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /w")
+else()
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
+endif()
 
 if(FEAT_TPL_CACHE_DIRECTORY)
   file(MAKE_DIRECTORY ${FEAT_TPL_CACHE_DIRECTORY})

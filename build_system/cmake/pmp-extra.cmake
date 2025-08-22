@@ -17,6 +17,11 @@ if(NOT TARGET pmp::pmp)
 
   target_compile_options(feat-extern-pmp PRIVATE -w)
 
+  if(WIN32)
+    # NOTE(mmuegge): Windows does not define M_PI by default
+    target_compile_definitions(feat-extern-pmp PRIVATE _USE_MATH_DEFINES)
+  endif()
+
   if(FEAT_HAVE_OMP)
     find_package(OpenMP)
     if(OpenMP_CXX_FOUND)

@@ -6,19 +6,74 @@ import platform
 from build_system.feat_util import get_output
 
 def configure_msvc(cpu, buildid, compiler, restrict_errors):
+  ldflags = []
 
-  cxxflags = " /bigobj"
-  #cxxflags = " -std=c++17"
+  cxxflags = [
+    "/Zi",
+    "/nologo",
+    "/W4",
+    "/WX-",
+    "/diagnostics:column",
+    "/Gm-",
+    "/EHsc",
+    "/fp:except",
+    #"/Za",
+    "/Zc:wchar_t",
+    "/Zc:forScope",
+    "/Zc:inline",
+    "/GR",
+    "/std:c++17",
+    "/permissive-",
+    "/external:W4",
+    "/Gd",
+    "/TP",
+    "/FC",
+    "/errorReport:queue",
+    "/bigobj"
+  ]
 
-  #if "debug" in buildid:
-  #  cxxflags += " -O0 -g"
+  if "debug" in buildid:
+    cxxflags += [
+      "/JMC",
+      "/Od",
+      "/Ob1",
+      "/Oy-",
+      "/RTC1",
+      "/MDd",
+      "/GS",
+      "/Gy"
+    ]
 
-  #elif "opt" in buildid:
-  #  cxxflags += " -O3"
+  if "opt" in buildid:
+    cxxflags += [
+      "/MP",
+      "/Ox",
+      "/Ob2",
+      "/Oi",
+      "/Ot",
+      "/Oy",
+      #"/GL",
+      "/MD",
+      "/GS-",
+      "/Gy-"
+    ]
+
+  if "lto" in buildid:
+    cxxflags.append("/GL")
+    ldflags.append("/LTCG")
 
   if "omp" in buildid:
-    cxxflags += " /openmp:llvm"
+    cxxflags.append("/openmp:llvm")
   else:
-    cxxflags += " /openmp-"
+    cxxflags.append("/openmp-")
 
-  return cxxflags
+  cudaflags = []
+  if "cuda" in buildid:
+    ldflags.append("/NODEFAULTLIB:libcmt")
+    cudaflags += [
+      "--std=c++17",
+      "--ptxas-options",
+      "-suppress-stack-size-warning"
+    ]
+
+  return cxxflags, ldflags, cudaflags

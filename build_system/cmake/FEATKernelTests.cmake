@@ -65,56 +65,28 @@ function(add_feat_kernel_tests)
       target_link_libraries(${test} PRIVATE ${target})
     endforeach()
 
-    add_test(${test}_all ${CMAKE_CTEST_COMMAND}
-      --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-      --build-generator ${CMAKE_GENERATOR}
-      --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-      --build-target ${test}
-      --build-nocmake
-      --build-noclean
-      --test-command ${FEAT_CTEST_RUNNER} ${CMAKE_CURRENT_BINARY_DIR}/${test})
-    set_property(TEST ${test}_all PROPERTY LABELS "all")
+    add_test(NAME ${test}_all COMMAND ${FEAT_CTEST_RUNNER} $<TARGET_FILE:${test}>)
+    set_tests_properties(${test}_all PROPERTIES LABELS "all")
 
     if (FEAT_VALGRIND)
-      add_test(${test}_valgrind ${CMAKE_CTEST_COMMAND}
-        --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-        --build-generator ${CMAKE_GENERATOR}
-        --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-        --build-target ${test}
-        --build-nocmake
-        --build-noclean
-        --test-command ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} ${CMAKE_CURRENT_BINARY_DIR}/${test} generic)
-      set_property(TEST ${test}_valgrind PROPERTY LABELS "valgrind")
-      set_property(TEST ${test}_valgrind PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
-      set_property(TEST ${test}_valgrind PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
+      add_test(NAME ${test}_valgrind COMMAND ${FEAT_CTEST_RUNNER} ${VALGRIND_EXE} $<TARGET_FILE:${test}> generic)
+      set_tests_properties(${test}_valgrind PROPERTIES LABELS "valgrind")
+      set_tests_properties(${test}_valgrind PROPERTIES PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors from")
+      set_tests_properties(${test}_valgrind PROPERTIES FAIL_REGULAR_EXPRESSION "FAILED")
     endif (FEAT_VALGRIND)
 
     if(PARSED_ARGS_CUDA)
       if(FEAT_HAVE_CUDA)
-        add_test(${test}_cuda ${CMAKE_CTEST_COMMAND}
-          --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-          --build-generator ${CMAKE_GENERATOR}
-          --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-          --build-target ${test}
-          --build-nocmake
-          --build-noclean
-          --test-command ${FEAT_CTEST_RUNNER} ${CMAKE_CURRENT_BINARY_DIR}/${test} cuda)
-        set_property(TEST ${test}_cuda PROPERTY LABELS "cuda")
+        add_test(NAME ${test}_cuda COMMAND ${FEAT_CTEST_RUNNER} $<TARGET_FILE:${test}> cuda)
+        set_tests_properties(${test}_cuda PROPERTIES LABELS "cuda")
       endif()
 
       if (FEAT_CUDAMEMCHECK AND FEAT_HAVE_CUDA)
-        add_test(${test}_cuda_memcheck ${CMAKE_CTEST_COMMAND}
-          --build-and-test "${FEAT_SOURCE_DIR}" "${FEAT_BINARY_DIR}"
-          --build-generator ${CMAKE_GENERATOR}
-          --build-makeprogram ${CMAKE_MAKE_PROGRAM}
-          --build-target ${test}
-          --build-nocmake
-          --build-noclean
-          --test-command ${FEAT_CTEST_RUNNER} ${CUDA_MEMCHECK_EXE} ${CMAKE_CURRENT_BINARY_DIR}/${test} cuda)
-        set_property(TEST ${test}_cuda_memcheck PROPERTY LABELS "cuda_memcheck")
-        set_property(TEST ${test}_cuda_memcheck PROPERTY PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors")
-        set_property(TEST ${test}_cuda_memcheck PROPERTY FAIL_REGULAR_EXPRESSION "FAILED")
-        set_property(TEST ${test}_cuda_memcheck PROPERTY FAIL_REGULAR_EXPRESSION "= Leaked")
+        add_test(NAME ${test}_cuda_memcheck COMMAND ${FEAT_CTEST_RUNNER} ${CUDA_MEMCHECK_EXE} $<TARGET_FILE:${test}> cuda)
+        set_tests_properties(${test}_cuda_memcheck PROPERTIES LABELS "cuda_memcheck")
+        set_tests_properties(${test}_cuda_memcheck PROPERTIES PASS_REGULAR_EXPRESSION "ERROR SUMMARY: 0 errors")
+        set_tests_properties(${test}_cuda_memcheck PROPERTIES FAIL_REGULAR_EXPRESSION "FAILED")
+        set_tests_properties(${test}_cuda_memcheck PROPERTIES FAIL_REGULAR_EXPRESSION "= Leaked")
       endif (FEAT_CUDAMEMCHECK AND FEAT_HAVE_CUDA)
     endif(PARSED_ARGS_CUDA)
 

@@ -99,7 +99,7 @@ list(APPEND sources
 # endif()
 
 if (MSVC)
-  list(APPEND sources pred-independent/wingetopt.c)
+  list(APPEND sources prec-independent/wingetopt.c)
 endif ()
 
 set_source_files_properties(superlu_timer.c PROPERTIES COMPILE_FLAGS -O0)

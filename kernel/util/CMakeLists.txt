@@ -20,7 +20,7 @@ endif (WIN32)
 add_library(feat-kernel-util STATIC ${KERNEL_LIBRARY_FILES})
 
 if (WIN32)
-  target_link_libraries(feat-kernel-util PRIVATE -limagehlp)
+  #target_link_libraries(feat-kernel-util PRIVATE -limagehlp)
   if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
     target_link_libraries(feat-kernel-util PRIVATE -lmsvcr120)
   endif (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU")
@@ -53,6 +53,8 @@ target_link_libraries(feat-kernel-util PUBLIC feat-dependency)
 
 if (FEAT_HAVE_ZLIB)
   find_package(zlib 1.2.13 REQUIRED)
+  get_target_property(ZLIB_INCLUDES zlib::zlib INTERFACE_INCLUDE_DIRECTORIES)
+  message(STATUS "zlib include directories: ${ZLIB_INCLUDES}")
   target_link_libraries(feat-kernel-util PUBLIC zlib::zlib)
 endif (FEAT_HAVE_ZLIB)
 
@@ -63,6 +65,8 @@ endif()
 
 if(FEAT_HAVE_ZFP)
   find_package(zfp 1.0.0 REQUIRED)
+  get_target_property(ZFP_INCLUDES zfp::zfp INTERFACE_INCLUDE_DIRECTORIES)
+  message(STATUS "zfp include directories: ${ZFP_INCLUDES}")
   target_link_libraries(feat-kernel-util PUBLIC zfp::zfp)
 endif()
 

@@ -87,7 +87,7 @@ namespace DbgAdaptiveMesh
       for(int i = 0; i < 8; i++)
       {
         v_at_c[type][i] = indices[i];
-        levels[indices[i]] = (type & (1UL << (std::uint64_t) i)) > 0 ? 1 : 0;
+        levels[indices[i]] = (type & (1ULL << (std::uint64_t) i)) > 0 ? 1 : 0;
       }
     }
 
@@ -140,7 +140,7 @@ namespace DbgAdaptiveMesh
         v_at_e[4 * type + i][0] = indices[EdgeMap::map(i, 0)];
         v_at_e[4 * type + i][1] = indices[EdgeMap::map(i, 1)];
         e_at_f[type][i] = 4 * type + i;
-        levels[indices[i]] = (type & (1UL << (std:: uint64_t)i)) > 0 ? 1 : 0;
+        levels[indices[i]] = (type & (1ULL << (std:: uint64_t)i)) > 0 ? 1 : 0;
       }
     }
 

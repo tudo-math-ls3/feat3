@@ -26,6 +26,10 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
   if(platform.system() != "Windows"):
     cxxflags += " -pthread"
 
+  cudaflags = ""
+
+  if "cuda" in buildid:
+    cudaflags = "-std=c++17 --restrict --compiler-options -Wall,-g,-Wno-deprecated-declarations"
 
   if restrict_errors:
     cxxflags += " -Wfatal-errors"
@@ -229,4 +233,4 @@ def configure_clang(cpu, buildid, compiler, system_host_compiler, restrict_error
       cxxflags += " -march=native"
       print ("Warning: Detected cpu type not supported by configure_clang.py, using -march=native instead.")
 
-  return cxxflags
+  return cxxflags, cudaflags

@@ -63,17 +63,6 @@ namespace FEAT::Pack
   static_assert(sizeof(f128) == 16, "128-bit float is assumed to have exactly 128 bits");
 #endif
 
-/**
- * \brief bitmask for zfp header
- *
- * //0x1u HEADER_MAGIC -> for version control--> only checks codec... in last 8
- * bits of first 32 bits...
- * //0x2u HEADER_META
- * //0x4u HEADER_MODE
- */
-#ifdef FEAT_HAVE_ZFP
-  static constexpr uint zfp_header_mask = 7u;
-#endif // FEAT_HAVE_ZFP
   /**
    * \brief Type enumeration
    */

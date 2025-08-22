@@ -19,6 +19,11 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
 
   cxxflags = "-std=c++17 -g -Wall -Wextra -Wcheck -Wdeprecated -Wnon-virtual-dtor -Wpointer-arith -Wreturn-type -Wshadow -Wp64 -Wshorten-64-to-32 -Wuninitialized -diag-disable 2304,2305"
 
+  cudaflags = ""
+
+  if "cuda" in buildid:
+    cudaflags = "-std=c++17 --restrict --compiler-options -Wall,-g,-Wno-deprecated-declarations"
+
   if restrict_errors:
     cxxflags += " -diag-error-limit1"
 
@@ -155,4 +160,4 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
       # generate code for every simd unit, existing so far
       cxxflags += " -axCORE-AVX512"
 
-  return cxxflags
+  return cxxflags, cudaflags

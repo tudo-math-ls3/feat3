@@ -16,6 +16,11 @@ def configure_icx(cpu, buildid, compiler, system_host_compiler, restrict_errors)
 
   cxxflags = "-std=c++17 -g -Wall -Wextra -Wdeprecated -Wnon-virtual-dtor -Wpointer-arith -Wreturn-type -Wshadow -Wshorten-64-to-32 -Wuninitialized"
 
+  cudaflags = ""
+
+  if "cuda" in buildid:
+    cudaflags = "-std=c++17 --restrict --compiler-options -Wall,-g,-Wno-deprecated-declarations"
+
   if restrict_errors:
     cxxflags += " -diag-error-limit1"
 
@@ -36,6 +41,9 @@ def configure_icx(cpu, buildid, compiler, system_host_compiler, restrict_errors)
       # generate code for every simd unit, existing so far
       cxxflags += " -xhost"
       print ("Warning: cpu type not detected, using -xhost instead.")
+    elif cpu == "any":
+      # Do not set any architecture flags
+      pass
 
     # INTEL
     elif cpu == "haswell":
@@ -75,4 +83,4 @@ def configure_icx(cpu, buildid, compiler, system_host_compiler, restrict_errors)
       # generate code for every simd unit, existing so far
       cxxflags += " -mavx2 -mfma -axCORE-AVX2,CORE-AVX512"
 
-  return cxxflags
+  return cxxflags, cudaflags

@@ -49,6 +49,8 @@ class FeatConfig:
     self.cxx_flags = []
     # List of linker flags
     self.ld_flags = []
+    # List of cuda flags
+    self.cuda_flags = []
     # Set of environment variables
     self.env = {}
     # Chosen C++ compiler
@@ -133,6 +135,14 @@ class FeatConfig:
       else:
         self.ld_flags.append(flag)
 
+  def add_cuda_flags(self, *args):
+    """Add cuda flags. Warns on duplicate flags"""
+    for flag in args:
+      if flag in self.cuda_flags:
+        warning("Linker flag", flag, "is set twice")
+      else:
+        self.cuda_flags.append(flag)
+
   def cmake_flags(self):
     """Return the CMake flags as a list"""
     flags = []
@@ -161,6 +171,10 @@ class FeatConfig:
   def ld_flags_str(self):
     """Return the linker flags as a string that can be passed to the compiler."""
     return " ".join(self.ld_flags)
+
+  def cuda_flags_str(self):
+    """Return the cuda flags as a string that can be passed to the compiler."""
+    return " ".join(self.cuda_flags)
 
   def get_compiler_cxx(self):
     """Return the CXX compiler for this configuration. Handles compiler wrappers."""
@@ -193,6 +207,7 @@ class FeatConfig:
     environment["CC"] = self.get_compiler_c()
     environment["LDFLAGS"] = self.ld_flags_str()
     environment["CFLAGS"] = self.c_flags_str()
+    environment["CUDAFLAGS"] = self.cuda_flags_str()
 
     return {
       "name": "-".join(self.buildid),
@@ -533,7 +548,7 @@ config.cache_entry("BUILD_ID", "-".join(buildid), "STRING")
 config.cache_entry("CMAKE_EXPORT_COMPILE_COMMANDS", "ON", "BOOL")
 config.cputype = args.cpu or detect_cpu()
 config.cache_entry("FEAT_CPU_TYPE", config.cputype, "STRING")
-config.add_c_flags("-O3")
+config.add_c_flags("/O2" if "msvc" in buildid else "-O3")
 
 # Handle command line arguments
 
@@ -648,9 +663,13 @@ for token in buildid:
     config.set_compiler_cxx("g++")
     config.set_compiler_cc("gcc")
 
-    cxxflags_tmp = configure_gcc(config.cputype, config.buildid, "g++", args.restrict_errors)
+    cxxflags_tmp, cudaflags_tmp = configure_gcc(config.cputype, config.buildid, "g++", args.restrict_errors)
+
     if cxxflags_tmp:
       config.add_cxx_flags(*cxxflags_tmp.split(" "))
+
+    if cudaflags_tmp:
+      config.add_cuda_flags(*cudaflags_tmp.split(" "))
 
     if "coverage" in config.buildid:
       config.add_ld_flags("-fprofile-arcs", "-ftest-coverage")
@@ -667,7 +686,7 @@ for token in buildid:
 
     config.cache_entry("FEAT_COMPILER_ID", "icc", "STRING")
 
-    cxxflags_tmp = configure_icc(
+    cxxflags_tmp, cudaflags_tmp = configure_icc(
       config.cputype,
       config.buildid,
       "icpc",
@@ -677,28 +696,35 @@ for token in buildid:
 
     if cxxflags_tmp:
       config.add_cxx_flags(*cxxflags_tmp.split(" "))
+
+    if cudaflags_tmp:
+      config.add_cuda_flags(*cudaflags_tmp.split(" "))
   elif token == "icx" or token == "icpx" or token == "oneapi":
     config.set_compiler_cxx("icpx")
     config.set_compiler_cc("icx")
 
     config.cache_entry("FEAT_COMPILER_ID", "icx", "STRING")
 
-    cxxflags_tmp = configure_icx(
+    cxxflags_tmp, cudaflags_tmp = configure_icx(
       config.cputype,
       config.buildid,
       "icpx",
       config.system_host_compiler,
       args.restrict_errors
     )
+
     if cxxflags_tmp:
       config.add_cxx_flags(*cxxflags_tmp.split(" "))
+
+    if cudaflags_tmp:
+      config.add_cuda_flags(*cudaflags_tmp.split(" "))
   elif token == "clang" or token == "llvm":
     config.set_compiler_cxx("clang++")
     config.set_compiler_cc("clang")
 
     config.cache_entry("FEAT_COMPILER_ID", "clang", "STRING")
 
-    cxxflags_tmp = configure_clang(
+    cxxflags_tmp, cudaflags_tmp = configure_clang(
       config.cputype,
       config.buildid,
       "clang",
@@ -707,6 +733,9 @@ for token in buildid:
     )
     if cxxflags_tmp:
       config.add_cxx_flags(*cxxflags_tmp.split(" "))
+
+    if cudaflags_tmp:
+      config.add_cuda_flags(*cudaflags_tmp.split(" "))
   elif token == "cray":
     config.set_compiler_cxx("CC")
     config.set_compiler_cc("cc")
@@ -727,14 +756,22 @@ for token in buildid:
 
     config.cache_entry("FEAT_COMPILER_ID", "msvc", "STRING")
 
-    cxxflags_tmp = configure_msvc(
+    cxxflags, ldflags, cudaflags = configure_msvc(
       config.cputype,
       config.buildid,
       "cl",
       args.restrict_errors
     )
-    if cxxflags_tmp:
-      config.add_cxx_flags(*cxxflags_tmp.split(" "))
+
+    if cxxflags:
+      config.add_cxx_flags(*cxxflags)
+
+    if ldflags:
+      config.add_ld_flags(*ldflags)
+
+    if cudaflags:
+      config.add_cuda_flags(*cudaflags)
+
   elif token == "mpi":
     config.cache_entry("FEAT_HAVE_MPI", "ON", "BOOL")
   elif token == "ccache":
@@ -952,6 +989,9 @@ for i in clean:
   if os.path.exists(i):
     shutil.rmtree(i)
 
+for var, value in config.env.items():
+  os.environ[var] = value
+
 # clear all related
 os.environ["CXXFLAGS"] = ""
 os.environ["CXX"] = ""
@@ -970,6 +1010,7 @@ os.environ["LD"] = config.get_linker()
 os.environ["CC"] = config.get_compiler_c()
 os.environ["LDFLAGS"] = config.ld_flags_str()
 os.environ["CFLAGS"] = config.c_flags_str()
+os.environ["CUDAFLAGS"] = config.cuda_flags_str()
 
 # Construct cmake call
 cmake_args = ["cmake", "--log-level=VERBOSE"]

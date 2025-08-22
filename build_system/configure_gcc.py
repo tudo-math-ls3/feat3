@@ -23,6 +23,11 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
 
   cxxflags += " -pthread"
 
+  cudaflags = ""
+
+  if "cuda" in buildid:
+    cudaflags = "-std=c++17 --restrict --compiler-options -Wall,-g,-Wno-deprecated-declarations"
+
   if restrict_errors:
     cxxflags += " -Wfatal-errors"
 
@@ -288,4 +293,4 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
       cxxflags += " -march=native"
       print ("Warning: Detected cpu type not supported by configure_gcc.py, using -march=native instead.")
 
-  return cxxflags
+  return cxxflags, cudaflags

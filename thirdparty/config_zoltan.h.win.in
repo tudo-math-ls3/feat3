@@ -1,0 +1,5 @@
+// generated from thirdparty/config_zoltan.h.in
+#define HAVE_MPI
+#define UNSIGNED_LONG_LONG_GLOBAL_IDS 1
+#define strcasecmp _stricmp
+#define strncasecmp _strnicmp
