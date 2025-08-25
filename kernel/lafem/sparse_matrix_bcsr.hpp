@@ -542,7 +542,7 @@ namespace FEAT
               tmp_uni_col.insert(IndexType(_crs_col[idx])/IndexType(BlockWidth));
             }
           }
-          tmp_row_ptr[b_row+1] = tmp_uni_col.size() + tmp_row_ptr[b_row];
+          tmp_row_ptr[b_row+1] = IndexType(tmp_uni_col.size()) + tmp_row_ptr[b_row];
           std::for_each(tmp_uni_col.begin(), tmp_uni_col.end(), [&](const auto& ele){tmp_col_ptr.push_back(ele);});
           // std::printf("Brow %i:  ", int(b_row));
           // std::for_each(tmp_uni_col.begin(), tmp_uni_col.end(), [&](const auto& ele){std::cout << ele << ", ";});
