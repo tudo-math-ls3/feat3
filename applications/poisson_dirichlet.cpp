@@ -325,7 +325,6 @@ namespace PoissonDirichlet
     typedef Geometry::ConformalMesh<ShapeType> MeshType;
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
     typedef Space::Lagrange1::Element<TrafoType> SpaceType;
-    typedef Space::Lagrange2::Element<TrafoType> SpaceType2;
 
     // create a time-stamp
     TimeStamp time_stamp;
