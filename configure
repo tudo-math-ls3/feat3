@@ -657,7 +657,7 @@ for token in buildid:
 
     if "lto" in config.buildid:
       #use gcc provided binutils for lto
-      config.cache_entry("CMAKE_RANLIB_PATH", find_exe("gcc-ranlib"), "PATH")
+      config.cache_entry("CMAKE_RANLIB", find_exe("gcc-ranlib"), "PATH")
       config.cache_entry("CMAKE_AR", find_exe("gcc-ar"), "PATH")
 
     config.cache_entry("FEAT_COMPILER_ID", "gcc", "STRING")
