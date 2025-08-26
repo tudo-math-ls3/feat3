@@ -111,16 +111,16 @@ namespace FEAT
 #ifdef FEAT_MPI_THREAD_MULTIPLE
       XASSERTM((bool)!already_initialized, "MPI was already initialized by another library, we cannot ensure MPI_THREAD_MULTIPLE support!");
       int required = MPI_THREAD_MULTIPLE;
-      int provided = MPI_THREAD_SINGLE;
-      if (::MPI_Init_thread(&argc, &argv, required, &provided) != MPI_SUCCESS)
-        return false;
-      if (provided != MPI_THREAD_MULTIPLE)
-        return false;
 #else
-      // initialize MPI runtime, if not already done by another library
-      if (!already_initialized && ::MPI_Init(&argc, &argv) != MPI_SUCCESS)
-        return false;
+      int required = MPI_THREAD_SERIALIZED;
 #endif //FEAT_MPI_THREAD_MULTIPLE
+      int provided = MPI_THREAD_SINGLE;
+      // if mpi is not already initialized, check if we are able to
+      if (!already_initialized && ::MPI_Init_thread(&argc, &argv, required, &provided) != MPI_SUCCESS)
+        return false;
+      // also, if we initialize ourselves, check if we at least get our required features
+      if (!already_initialized && (provided < required))
+        return false;
 
 #ifdef FEAT_HAVE_QUADMATH
       // Create a custom MPI datatype for '__float128'
