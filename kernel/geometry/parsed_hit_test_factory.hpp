@@ -136,13 +136,14 @@ namespace FEAT
           default: // ???
             throw ParseError("Error in ParsedScalarFunction evaluation: unknown error");
           }
-          //Returns true, if point is in the "inner" part of the Mesh
-          //Otherwise returns false
-          return (val>=0.0);
+
+          // return true, if point is in the "inner" part of the mesh, otherwise return false
+          return (val > 0.0);
         }
       };
+
       //Member Variables of ParsedHitTestFactory
-      ///class for parsed_hit_fuction
+      /// class for parsed_hit_fuction
       ParsedHitFunction _hit_func;
       /// reference to the input mesh
       const Mesh_& _mesh;
@@ -160,7 +161,7 @@ namespace FEAT
        * \brief Creates the ParsedHitTestFactory.
        *
        * The formula dictates the Meshpart.
-       * Every point, for which the formula equals >= 0 is in a "inner" point weighted with 1.
+       * Every point, for which the formula equals > 0 is in a "inner" point weighted with 1.
        * Otherwise the point will be weighted zero.
        *
        * \param[in] mesh
@@ -208,5 +209,5 @@ namespace FEAT
     }; // class ParsedHitTestFactory
 
   } // namespace Geometry
-}//namespace FEAT
+} //namespace FEAT
 #endif // defined(FEAT_HAVE_FPARSER) || defined(DOXYGEN)

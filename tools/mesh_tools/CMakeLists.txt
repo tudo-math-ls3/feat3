@@ -10,6 +10,9 @@ target_link_libraries(mesh-indexer feat)
 add_executable(mesh-extruder mesh_extruder.cpp)
 target_link_libraries(mesh-extruder feat)
 
+add_executable(mesh-part-gen mesh_part_gen.cpp)
+target_link_libraries(mesh-part-gen feat)
+
 add_executable(mesh-partitioner mesh_partitioner.cpp)
 target_link_libraries(mesh-partitioner feat)
 
