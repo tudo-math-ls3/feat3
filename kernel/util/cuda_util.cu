@@ -329,8 +329,8 @@ void FEAT::Util::cuda_set_memory(DT_ * address, const DT_ val, const Index count
   grid.x = (unsigned)ceil((count)/(double)(block.x));
   FEAT::Util::Intern::cuda_set_memory<<<grid, block>>>(address, val, count);
 
-#ifdef FEAT_DEBUG_MODE
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG_MODE
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_set_memory failed!\n" + stringify(cudaGetErrorString(last_error)));
@@ -358,8 +358,8 @@ void FEAT::Util::cuda_convert(DT1_ * dest, const DT2_ * src, const Index count)
   grid.x = (unsigned)ceil((count)/(double)(block.x));
   FEAT::Util::Intern::cuda_convert<<<grid, block>>>(dest, src, count);
 
-#ifdef FEAT_DEBUG
   cudaDeviceSynchronize();
+#ifdef FEAT_DEBUG
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_convert failed!\n" + stringify(cudaGetErrorString(last_error)));
