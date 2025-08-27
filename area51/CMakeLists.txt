@@ -119,6 +119,12 @@ target_link_libraries(dbg-graph-asm feat)
 add_executable(dbg-adaptive-mesh dbg_adaptive_mesh.cpp)
 target_link_libraries(dbg-adaptive-mesh feat)
 
+add_executable(dbg-umbrella-smoother dbg_umbrella_smoother.cpp)
+target_link_libraries(dbg-umbrella-smoother feat)
+
+add_executable(dbg-dist-umbrella-smoother dbg_dist_umbrella_smoother.cpp)
+target_link_libraries(dbg-dist-umbrella-smoother feat)
+
 if (FEAT_HAVE_UMFPACK)
    add_executable(feti-seq-usquare feti_seq_usquare.cpp)
    target_link_libraries(feti-seq-usquare feat)
