@@ -903,7 +903,7 @@ namespace FEAT::Geometry
         _layer(layer),
         _domain_node(domain_node),
         _next(next),
-        _inverse_face_permutation(inverse_face_permutation)
+        _inverse_face_permutation(std::move(inverse_face_permutation))
       {
       }
 
