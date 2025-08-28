@@ -110,6 +110,9 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
     if cpu == "unknown":
       cxxflags += " -march=native"
       print ("Warning: cpu type not detected, using -march=native instead.")
+    elif cpu == "any":
+      # Do not set any architecture flags
+      pass
 
     # INTEL
     elif cpu == "i486":

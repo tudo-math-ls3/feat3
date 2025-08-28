@@ -47,6 +47,9 @@ def configure_icc(cpu, buildid, compiler, system_host_compiler, restrict_errors)
       # generate code for every simd unit, existing so far
       cxxflags += " -axCORE-AVX512"
       print ("Warning: cpu type not detected, using generic vectorisation support instead.")
+    elif cpu == "any":
+      # Do not set any architecture flags
+      pass
 
     # INTEL
     elif cpu == "i486":

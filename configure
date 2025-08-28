@@ -538,7 +538,7 @@ config.add_c_flags("-O3")
 # Handle command line arguments
 
 if args.allow_unsupported_compiler:
-  config.cache_entry("FEAT_ALLOW_UNSUPPORTED_COMPILER", "ON", "BOOL")
+  config.cache_entry("FEAT_CUDA_ALLOW_UNSUPPORTED_COMPILER", "ON", "BOOL")
 
 if args.cc:
   if not os.path.exists(args.compiler_cc):
