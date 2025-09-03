@@ -25,6 +25,12 @@ class HitTestFactoryTest
   : public UnitTest
 {
 public:
+  typedef Shape::Quadrilateral ShapeType;
+  typedef Geometry::ConformalMesh<ShapeType> MeshType;
+  typedef Geometry::MeshPart<MeshType> BoundaryType;
+  typedef Geometry::RefinedUnitCubeFactory<MeshType> MeshFactoryType;
+  typedef Geometry::StandardRefinery<MeshType> RefineryType;
+
   HitTestFactoryTest() :
     UnitTest("hit_test_factory-test")
   {
@@ -36,12 +42,6 @@ public:
 
   void test_0() const
   {
-    typedef Shape::Quadrilateral ShapeType;
-    typedef Geometry::ConformalMesh<ShapeType> MeshType;
-    typedef Geometry::MeshPart<MeshType> BoundaryType;
-    typedef Geometry::RefinedUnitCubeFactory<MeshType> MeshFactoryType;
-    typedef Geometry::StandardRefinery<MeshType> RefineryType;
-
     // some parameters for this special test
     Index level(6);
     double radius(0.3);
@@ -89,10 +89,31 @@ public:
     }
   } // test_0
 
+  void test_filtered_factory() const
+  {
+    MeshFactoryType factory(1);
+    MeshType mesh(factory);
+
+    const auto top_half_pred = [](double /*x*/, double y) { return y > 0.4999; };
+    const auto right_half_pred = [](double x, double /*y*/) { return x > 0.4999; };
+
+    const auto top_half_part = make_meshpart_by_lambda_hit_test(mesh, top_half_pred);
+    const auto quadrant_one = make_meshpart_by_filtered_lambda_hit_test(mesh, top_half_part, right_half_pred);
+
+    // quadrant_one should contain one face and its facets
+    TEST_CHECK_EQUAL(quadrant_one.get_num_entities(0), 4);
+    TEST_CHECK_EQUAL(quadrant_one.get_num_entities(1), 4);
+    TEST_CHECK_EQUAL(quadrant_one.get_num_entities(2), 1);
+
+    // quadrant one should contain face 3 of the mesh
+    TEST_CHECK_EQUAL(quadrant_one.get_target_set<2>()[0], 3);
+  }
+
   virtual void run() const override
   {
     // run test #0
     test_0();
+    test_filtered_factory();
   }
 };
 

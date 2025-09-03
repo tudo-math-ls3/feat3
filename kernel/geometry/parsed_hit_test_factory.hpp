@@ -178,10 +178,41 @@ namespace FEAT
         parse(formula);
       }
 
+      /**
+       * \brief Creates the ParsedHitTestFactory.
+       *
+       * The formula dictates the Meshpart.
+       * Every point, for which the formula equals >= 0 is in a "inner" point weighted with 1.
+       * Otherwise the point will be weighted zero.
+       *
+       * \param[in] mesh
+       * A \resident reference to the mesh for which the mesh part is to be computed.
+       *
+       * \param[in] filter
+       * A \resident reference to a filter meshpart. Only mesh entities of the filter
+       * meshpart are tested. All other entities are considered as outside the region.
+       *
+       * \param[in] formula for hit function
+       * A string of the hit function.
+       */
+      explicit ParsedHitTestFactory(const Mesh_& mesh, const MeshType& filter, const String& formula) :
+        _hit_func(),
+        _mesh(mesh),
+        _target_data(std::size_t(_mesh.shape_dim + 1))
+      {
+        parse_filtered(formula, filter);
+      }
+
       void parse(const String& formula)
       {
         _hit_func.parse(formula);
-        Intern::HitTestCompute<const ParsedHitFunction, Mesh_, ShapeType>::wrap(_target_data, _mesh, _hit_func);
+        Intern::hittest_compute_target_data<ParsedHitFunction, Mesh_>(_target_data, _mesh, _hit_func);
+      }
+
+      void parse_filtered(const String& formula, const MeshType& filter)
+      {
+        _hit_func.parse(formula);
+        Intern::hittest_compute_filtered_target_data<ParsedHitFunction, Mesh_>(_target_data, _mesh, filter, _hit_func);
       }
 
       /// \copydoc Factory::get_num_entities()
@@ -192,9 +223,7 @@ namespace FEAT
 
       virtual void fill_target_sets(TargetSetHolderType& target_set_holder) override
       {
-        // call wrapper
-        Intern::HitTestTargeter<ShapeType>::wrap(target_set_holder, _target_data);
-        //includes functions apply, wrap
+        Intern::write_to_target_set<ShapeType>(target_set_holder, _target_data);
       }
 
       virtual void fill_attribute_sets(typename MeshType::AttributeSetContainer&) override
@@ -208,6 +237,89 @@ namespace FEAT
       }
     }; // class ParsedHitTestFactory
 
+    /**
+     * \brief Creates a new mesh-part from a formula hit-test function
+     *
+     * \param[in] mesh
+     * A \transient reference to the mesh for which a mesh-part is to be created.
+     *
+     * \param[in] formula
+     * A string of the hit function
+     *
+     * \returns
+     * A mesh-part containing all entities for which the formula is >= 0
+     */
+    template<typename Mesh_>
+    MeshPart<Mesh_> make_meshpart_by_formula_hit_test(const Mesh_& mesh, const String& formula)
+    {
+      ParsedHitTestFactory<Mesh_> factory(mesh, formula);
+      return factory.make();
+    }
+
+    /**
+     * \brief Creates a new mesh-part from a formula hit-test function
+     *
+     * \param[in] mesh
+     * A \transient reference to the mesh for which a mesh-part is to be created.
+     *
+     * \param[in] filter
+     * A \resident reference to a filter meshpart. Only mesh entities of the filter
+     * meshpart are tested. All other entities are considered as outside the region.
+     *
+     * \param[in] formula
+     * A string of the hit function
+     *
+     * \returns
+     * A mesh-part containing all entities of filter for which the formula is >= 0
+     */
+    template<typename Mesh_>
+    MeshPart<Mesh_> make_meshpart_by_filtered_formula_hit_test(const Mesh_& mesh, const MeshPart<Mesh_>& filter, const String& formula)
+    {
+      ParsedHitTestFactory<Mesh_> factory(mesh, filter, formula);
+      return factory.make();
+    }
+
+    /**
+     * \brief Creates a new mesh-part from a formula hit-test function
+     *
+     * \param[in] mesh
+     * A \transient reference to the mesh for which a mesh-part is to be created.
+     *
+     * \param[in] formula
+     * A string of the hit function
+     *
+     * \returns
+     * A unique-pointer to mesh-part containing all entities for which the formula is >= 0
+     */
+    template<typename Mesh_>
+    std::unique_ptr<MeshPart<Mesh_>> make_unique_meshpart_by_formula_hit_test(const Mesh_& mesh, const String& formula)
+    {
+      ParsedHitTestFactory<Mesh_> factory(mesh, formula);
+      return factory.make_unique();
+    }
+
+    /**
+     * \brief Creates a new mesh-part from a formula hit-test function
+     *
+     * \param[in] mesh
+     * A \transient reference to the mesh for which a mesh-part is to be created.
+     *
+     * \param[in] filter
+     * A \resident reference to a filter meshpart. Only mesh entities of the filter
+     * meshpart are tested. All other entities are considered as outside the region.
+     *
+     * \param[in] formula
+     * A string of the hit function
+     *
+     * \returns
+     * A unique-pointer to a mesh-part containing all entities of filter for which the formula is >= 0
+     */
+    template<typename Mesh_>
+    std::unique_ptr<MeshPart<Mesh_>> make_unique_meshpart_by_filtered_formula_hit_test(const Mesh_& mesh, const MeshPart<Mesh_>& filter, const String& formula)
+    {
+      ParsedHitTestFactory<Mesh_> factory(mesh, filter, formula);
+      return factory.make_unique();
+    }
   } // namespace Geometry
 } //namespace FEAT
 #endif // defined(FEAT_HAVE_FPARSER) || defined(DOXYGEN)
