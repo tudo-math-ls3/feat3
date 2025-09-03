@@ -66,8 +66,8 @@ class FeatConfig:
     # Chosen (or determined) cpu type
     self.cputype = ""
     # Cuda architecture
-    self.cuda_arch = ""
-    self.cuda_arch_int = 0
+    self.cuda_architectures = []
+    self.cuda_architectures_int = []
 
   def set_compiler_cxx(self, compiler):
     """Set CXX compiler. Will abort if a different compiler is already set."""
@@ -347,7 +347,7 @@ parser.add_argument("--cc", help=
 parser.add_argument("--cpu", help=
 "override cpu auto detection with provided string. See build_system/detect_cpu.py for a list")
 
-parser.add_argument("--cuda-arch", "--cuda_arch", help=
+parser.add_argument("--cuda-arch", "--cuda_arch", action="append", dest="cuda_architectures", help=
 "selects the cuda architecture target. (default: check by return value of nvidia-smi, sm_60 if not available)")
 
 parser.add_argument("--cuda-host-compiler", "--cuda_host_compiler", help=
@@ -443,8 +443,11 @@ args = parser.parse_args()
 
 # Emit warnings for deprecated flags
 for arg in sys.argv:
+  if "=" in arg:
+    arg = arg.split("=")[0]
   if arg.startswith("--") and "_" in arg and arg != "--ovr_mpi_ops":
-    warning("Flag", arg, "is deprecated. Use", arg.replace("_", "-"), "instead")
+    if "=" not in arg or ("=" in arg and "_" in arg.split("=")[0]):
+      warning("Flag", arg, "is deprecated. Use", arg.replace("_", "-"), "instead")
   if arg == "--ovr_mpi_ops":
     warning("Flag --ovr_mpi_ops is deprecated. Use --override-mpi-ops instead")
   if arg == "--trilinos_path":
@@ -805,16 +808,16 @@ for token in buildid:
       cuda_host_compiler = find_exe(config.get_compiler_cxx())
     config.cache_entry("FEAT_CUDA_HOST_COMPILER", cuda_host_compiler, "FILEPATH")
 
-    if not args.cuda_arch:
+    if not args.cuda_architectures:
       cuda_arch, cuda_arch_int = detect_cuda_arch()
+      config.cuda_architectures = [cuda_arch]
+      config.cuda_architectures_int = [cuda_arch_int]
     else:
-      cuda_arch = args.cuda_arch
-      cuda_arch_int = int(cuda_arch.split("sm_")[-1])
+      config.cuda_architectures = args.cuda_architectures
+      config.cuda_architectures_int = [int(cuda_arch.split("sm_")[-1]) for cuda_arch in args.cuda_architectures]
 
-    config.cache_entry("FEAT_CUDA_ARCH", cuda_arch, "STRING")
-    config.cache_entry("CMAKE_CUDA_ARCHITECTURES", str(cuda_arch_int), "STRING")
-    config.cuda_arch = cuda_arch
-    config.cuda_arch_int = cuda_arch_int
+    config.cache_entry("FEAT_CUDA_ARCH", ";".join(config.cuda_architectures), "STRING")
+    config.cache_entry("CMAKE_CUDA_ARCHITECTURES", ";".join(map(str, config.cuda_architectures_int)), "STRING")
 
     if args.cuda_verbose:
       config.cache_entry("FEAT_CUDA_VERBOSE", "ON", "BOOL")
@@ -833,8 +836,15 @@ for token in buildid:
     config.cache_entry("FEAT_HAVE_QUADMATH", "ON", "BOOL")
     config.cache_entry("FEAT_OVERRIDE_MPI_OPS", "ON", "BOOL")
   elif token == "half":
-    config.cache_entry("FEAT_HAVE_HALFMATH", "ON", "BOOL")
-    config.cache_entry("FEAT_OVERRIDE_MPI_OPS", "ON", "BOOL")
+    invalid_cuda_architectures = [arch for arch in config.cuda_architectures_int if arch < 60]
+    if invalid_cuda_architectures:
+      if len(invalid_cuda_architectures) == 1:
+        error("cuda architecture " + str(invalid_cuda_architectures[0]) + " is too low for half, which needs at least sm_60")
+      else:
+        error("cuda architectures " + ", ".join(map(str, invalid_cuda_architectures)) + " are too low for half, which needs at least sm_60")
+    else:
+      config.cache_entry("FEAT_HAVE_HALFMATH", "ON", "BOOL")
+      config.cache_entry("FEAT_OVERRIDE_MPI_OPS", "ON", "BOOL")
   elif token == "cotire":
     config.cache_entry("FEAT_COTIRE", "ON", "BOOL")
   elif token == "trilinos":
@@ -915,8 +925,12 @@ print("cxxflags: " + config.cxx_flags_str())
 print("")
 print("ldflags: " + config.ld_flags_str())
 print("")
-if (config.cuda_arch != ""):
-  print("cuda_arch: " + config.cuda_arch)
+
+if config.cuda_architectures:
+  if len(config.cuda_architectures) > 1:
+    print("cuda_architectures: " + ", ".join(map(str, config.cuda_architectures)))
+  else:
+    print("cuda_architecture: " + str(config.cuda_architectures[0]))
   print("")
 print("Generator: " + config.generator)
 
