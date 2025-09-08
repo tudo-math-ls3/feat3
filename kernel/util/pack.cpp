@@ -55,8 +55,8 @@ namespace FEAT::Pack
     static void swap(void* x)
     {
       u32& v = *reinterpret_cast<u32*>(x);
-      v = ((v & 0x000000FFULL) << 24) | ((v & 0x0000FF00ULL) << 8) | ((v & 0x00FF0000ULL) >> 8) |
-          ((v & 0xFF000000ULL) >> 24);
+      v = u32(((v & 0x000000FFULL) << 24) | ((v & 0x0000FF00ULL) <<  8) |
+              ((v & 0x00FF0000ULL) >>  8) | ((v & 0xFF000000ULL) >> 24));
     }
   };
 
