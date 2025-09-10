@@ -81,21 +81,37 @@ public:
     Assembly::Interpolator::project(vec_q1, func_q1, space_q1);
     Assembly::Interpolator::project(vec_q2, func_q1, space_q2);
 
-    // project Q1 vector into Q2 space
-    VectorType vec_q2t = matrix_q1_to_q2.create_vector_l();
-    matrix_q1_to_q2.apply(vec_q2t, vec_q1);
+    // project Q1 vector into Q2 space with matrix
+    VectorType vec_q2t_1 = matrix_q1_to_q2.create_vector_l();
+    matrix_q1_to_q2.apply(vec_q2t_1, vec_q1);
+
+    // project Q1 vector into Q2 space directly
+    VectorType vec_q2t_2 = matrix_q1_to_q2.create_vector_l();
+    vec_q2t_2.format();
+    Assembly::SpaceTransfer::transfer_vector_direct(vec_q2t_2, vec_q1, space_q2, space_q1, cubature);
 
     // compare vectors
-    vec_q2t.axpy(vec_q2, -DataType_(1));
-    TEST_CHECK(vec_q2t.norm2() < eps);
+    vec_q2t_1.axpy(vec_q2, -DataType_(1));
+    TEST_CHECK(vec_q2t_1.norm2() < eps);
 
-    // project Q2 vector into Q1 space
-    VectorType vec_q1t = matrix_q2_to_q1.create_vector_l();
-    matrix_q2_to_q1.apply(vec_q1t, vec_q2);
+    vec_q2t_2.axpy(vec_q2, -DataType_(1));
+    TEST_CHECK(vec_q2t_2.norm2() < eps);
+
+    // project Q2 vector into Q1 space with matrix
+    VectorType vec_q1t_1 = matrix_q2_to_q1.create_vector_l();
+    matrix_q2_to_q1.apply(vec_q1t_1, vec_q2);
+
+    // project Q2 vector into Q1 space directly
+    VectorType vec_q1t_2 = matrix_q2_to_q1.create_vector_l();
+    vec_q1t_2.format();
+    Assembly::SpaceTransfer::transfer_vector_direct(vec_q1t_2, vec_q2, space_q1, space_q2, cubature);
 
     // compare vectors
-    vec_q1t.axpy(vec_q1, -DataType_(1));
-    TEST_CHECK(vec_q1t.norm2() < eps);
+    vec_q1t_1.axpy(vec_q1, -DataType_(1));
+    TEST_CHECK(vec_q1t_1.norm2() < eps);
+
+    vec_q1t_2.axpy(vec_q1, -DataType_(1));
+    TEST_CHECK(vec_q1t_2.norm2() < eps);
   }
 };
 

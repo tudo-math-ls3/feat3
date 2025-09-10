@@ -17,6 +17,7 @@ set(test_list
   linear_functional-test
   mean_filter_assembler-test
   rew_projector-test
+  space_transfer-test
 )
 
 include(FEATKernelTests)
