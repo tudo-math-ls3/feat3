@@ -111,7 +111,7 @@ namespace FEAT
   /// FEAT minor version number
   static constexpr int version_minor = 2025;
   /// FEAT patch version number
-  static constexpr int version_patch = 8;
+  static constexpr int version_patch = 9;
 
   /**
    * \brief Index data type.
