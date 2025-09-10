@@ -4,6 +4,9 @@ var searchData=
   ['xabortm_1',['XABORTM',['../assertion_8hpp.html#a33180af240360ec61a3968af89731f12',1,'assertion.hpp']]],
   ['xassert_2',['XASSERT',['../assertion_8hpp.html#af5c647b0786db55f57452bfc26726bde',1,'assertion.hpp']]],
   ['xassertm_3',['XASSERTM',['../assertion_8hpp.html#afa48e2beb6db8fae75edc24466481965',1,'assertion.hpp']]],
-  ['xor_5fmult_4',['xor_mult',['../class_f_e_a_t_1_1_random.html#ae94d8cf9ce83659a3b009881171e67cb',1,'FEAT::Random']]],
-  ['xyplanerotation_5',['XYPlaneRotation',['../class_f_e_a_t_1_1_analytic_1_1_common_1_1_x_y_plane_rotation.html',1,'FEAT::Analytic::Common::XYPlaneRotation&lt; DT_, dim_ &gt;'],['../class_f_e_a_t_1_1_analytic_1_1_common_1_1_x_y_plane_rotation.html#a41b5d735da3e9ac07447cad92d55a688',1,'FEAT::Analytic::Common::XYPlaneRotation::XYPlaneRotation()']]]
+  ['xdecode_4',['xdecode',['../namespace_f_e_a_t_1_1_pack.html#a059501e5d01bd34c4ce4453e989fa0bf',1,'FEAT::Pack']]],
+  ['xencode_5',['xencode',['../namespace_f_e_a_t_1_1_pack.html#afd649ae63c7e5efcbf1dda6755eb4dc5',1,'FEAT::Pack']]],
+  ['xor_5fmult_6',['xor_mult',['../class_f_e_a_t_1_1_random.html#ae94d8cf9ce83659a3b009881171e67cb',1,'FEAT::Random']]],
+  ['xswap_7',['xswap',['../namespace_f_e_a_t_1_1_pack.html#af89b200b1b541f2b0c59da1c35b30aef',1,'FEAT::Pack']]],
+  ['xyplanerotation_8',['XYPlaneRotation',['../class_f_e_a_t_1_1_analytic_1_1_common_1_1_x_y_plane_rotation.html',1,'FEAT::Analytic::Common::XYPlaneRotation&lt; DT_, dim_ &gt;'],['../class_f_e_a_t_1_1_analytic_1_1_common_1_1_x_y_plane_rotation.html#a41b5d735da3e9ac07447cad92d55a688',1,'FEAT::Analytic::Common::XYPlaneRotation::XYPlaneRotation()']]]
 ];

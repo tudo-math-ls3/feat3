@@ -1,5 +1,6 @@
 var class_f_e_a_t_1_1_space_1_1_basis_data =
 [
+    [ "DataType", "class_f_e_a_t_1_1_space_1_1_basis_data.html#aa394707a1671d9afe932bdf44115c76a", null ],
     [ "grad", "class_f_e_a_t_1_1_space_1_1_basis_data.html#aab365bd59d99001b1066903eb5aa3b66", null ],
     [ "hess", "class_f_e_a_t_1_1_space_1_1_basis_data.html#a9b2fa7a54cb622122bf20ab86511e568", null ],
     [ "ref_grad", "class_f_e_a_t_1_1_space_1_1_basis_data.html#ac08ff82afd9dcbd154cb2b78c0cd4766", null ],

@@ -225,7 +225,7 @@ $(document).ready(function(){initNavTree('os__windows_8cpp_source.html',''); ini
 <div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        addr = stack_frame.AddrPC.Offset;</div>
 <div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span> </div>
 <div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        <span class="comment">// print stack address</span></div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>        fprintf(stream, <span class="stringliteral">&quot;0x%0*I64X&quot;</span>, 2*<span class="keyword">sizeof</span>(<span class="keywordtype">void</span>*), addr);</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>        fprintf(stream, <span class="stringliteral">&quot;0x%0*I64X&quot;</span>, 2*<span class="keywordtype">int</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">void</span>*)), addr);</div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span> </div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>        <span class="comment">// get symbol info to obtain function name</span></div>
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>        <span class="keywordflow">if</span>(SymFromAddr(prc, addr, 0, &amp;sim.si) != FALSE)</div>
@@ -268,7 +268,7 @@ $(document).ready(function(){initNavTree('os__windows_8cpp_source.html',''); ini
 <div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>    {</div>
 <div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>      <span class="comment">// print an error header</span></div>
 <div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>      fprintf(stderr, <span class="stringliteral">&quot;\n&gt;&gt;&gt;&gt;&gt; FATAL ERROR &lt;&lt;&lt;&lt;&lt;\n\n&quot;</span>);</div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>      fprintf(stderr, <span class="stringliteral">&quot;Exception at 0x%0*I64X: &quot;</span>, 2*<span class="keyword">sizeof</span>(<span class="keywordtype">void</span>*), (DWORD64)p-&gt;ExceptionRecord-&gt;ExceptionAddress);</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>      fprintf(stderr, <span class="stringliteral">&quot;Exception at 0x%0*I64X: &quot;</span>, 2*<span class="keywordtype">int</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">void</span>*)), (DWORD64)p-&gt;ExceptionRecord-&gt;ExceptionAddress);</div>
 <div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span> </div>
 <div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>      <span class="comment">// print exception info</span></div>
 <div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>      <span class="keywordflow">switch</span>(p-&gt;ExceptionRecord-&gt;ExceptionCode)</div>
@@ -281,7 +281,7 @@ $(document).ready(function(){initNavTree('os__windows_8cpp_source.html',''); ini
 <div class="line"><a id="l00176" name="l00176"></a><span class="lineno">  176</span>          fprintf(stderr, <span class="stringliteral">&quot;reading from&quot;</span>);</div>
 <div class="line"><a id="l00177" name="l00177"></a><span class="lineno">  177</span>        <span class="keywordflow">else</span></div>
 <div class="line"><a id="l00178" name="l00178"></a><span class="lineno">  178</span>          fprintf(stderr, <span class="stringliteral">&quot;writing to&quot;</span>);</div>
-<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>        fprintf(stderr, <span class="stringliteral">&quot; 0x%0*I64X\n&quot;</span>, 2*<span class="keyword">sizeof</span>(<span class="keywordtype">void</span>*), (DWORD64)p-&gt;ExceptionRecord-&gt;ExceptionInformation[1]);</div>
+<div class="line"><a id="l00179" name="l00179"></a><span class="lineno">  179</span>        fprintf(stderr, <span class="stringliteral">&quot; 0x%0*I64X\n&quot;</span>, 2*<span class="keywordtype">int</span>(<span class="keyword">sizeof</span>(<span class="keywordtype">void</span>*)), (DWORD64)p-&gt;ExceptionRecord-&gt;ExceptionInformation[1]);</div>
 <div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>        <span class="keywordflow">break</span>;</div>
 <div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>      <span class="keywordflow">case</span> EXCEPTION_ILLEGAL_INSTRUCTION:</div>
 <div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>        fprintf(stderr, <span class="stringliteral">&quot;Illegal Instruction\n&quot;</span>);</div>

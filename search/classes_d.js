@@ -46,10 +46,12 @@ var searchData=
   ['nonlinearsystemlevel_43',['NonlinearSystemLevel',['../class_f_e_a_t_1_1_control_1_1_meshopt_1_1_nonlinear_system_level.html',1,'FEAT::Control::Meshopt']]],
   ['norm2_44',['Norm2',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_norm2.html',1,'FEAT::LAFEM::Arch']]],
   ['norm2sqr_45',['Norm2Sqr',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_norm2_sqr.html',1,'FEAT::LAFEM::Arch']]],
-  ['nullimageiterator_46',['NullImageIterator',['../class_f_e_a_t_1_1_adjacency_1_1_adjactor_1_1_null_image_iterator.html',1,'FEAT::Adjacency::Adjactor']]],
-  ['nullmatrix_47',['NullMatrix',['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_null_matrix.html',1,'FEAT::LAFEM']]],
-  ['nullmatrix_3c_20real_2c_20index_2c_201_2c_201_20_3e_48',['NullMatrix&lt; Real, Index, 1, 1 &gt;',['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_null_matrix.html',1,'FEAT::LAFEM']]],
-  ['nullmatrix_3c_20real_2c_20index_2c_201_2c_20nsc_20_3e_49',['NullMatrix&lt; Real, Index, 1, nsc &gt;',['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_null_matrix.html',1,'FEAT::LAFEM']]],
-  ['nullmatrix_3c_20real_2c_20index_2c_20nsc_2c_201_20_3e_50',['NullMatrix&lt; Real, Index, nsc, 1 &gt;',['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_null_matrix.html',1,'FEAT::LAFEM']]],
-  ['nvsbdfq_51',['NvsBdfQ',['../class_f_e_a_t_1_1_control_1_1_time_1_1_nvs_bdf_q.html',1,'FEAT::Control::Time']]]
+  ['normalgradienttrialoperatorblocked_46',['NormalGradientTrialOperatorBlocked',['../class_f_e_a_t_1_1_assembly_1_1_common_1_1_normal_gradient_trial_operator_blocked.html',1,'FEAT::Assembly::Common']]],
+  ['normaltransposedgradienttrialoperatorblocked_47',['NormalTransposedGradientTrialOperatorBlocked',['../class_f_e_a_t_1_1_assembly_1_1_common_1_1_normal_transposed_gradient_trial_operator_blocked.html',1,'FEAT::Assembly::Common']]],
+  ['nullimageiterator_48',['NullImageIterator',['../class_f_e_a_t_1_1_adjacency_1_1_adjactor_1_1_null_image_iterator.html',1,'FEAT::Adjacency::Adjactor']]],
+  ['nullmatrix_49',['NullMatrix',['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_null_matrix.html',1,'FEAT::LAFEM']]],
+  ['nullmatrix_3c_20real_2c_20index_2c_201_2c_201_20_3e_50',['NullMatrix&lt; Real, Index, 1, 1 &gt;',['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_null_matrix.html',1,'FEAT::LAFEM']]],
+  ['nullmatrix_3c_20real_2c_20index_2c_201_2c_20nsc_20_3e_51',['NullMatrix&lt; Real, Index, 1, nsc &gt;',['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_null_matrix.html',1,'FEAT::LAFEM']]],
+  ['nullmatrix_3c_20real_2c_20index_2c_20nsc_2c_201_20_3e_52',['NullMatrix&lt; Real, Index, nsc, 1 &gt;',['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_null_matrix.html',1,'FEAT::LAFEM']]],
+  ['nvsbdfq_53',['NvsBdfQ',['../class_f_e_a_t_1_1_control_1_1_time_1_1_nvs_bdf_q.html',1,'FEAT::Control::Time']]]
 ];

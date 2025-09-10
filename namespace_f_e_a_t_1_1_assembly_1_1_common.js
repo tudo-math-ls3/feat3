@@ -12,6 +12,8 @@ var namespace_f_e_a_t_1_1_assembly_1_1_common =
     [ "LaplaceFunctional", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_functional.html", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_functional" ],
     [ "LaplaceOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_operator.html", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_operator" ],
     [ "LaplaceOperatorBlocked", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_operator_blocked.html", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_operator_blocked" ],
+    [ "NormalGradientTrialOperatorBlocked", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_normal_gradient_trial_operator_blocked.html", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_normal_gradient_trial_operator_blocked" ],
+    [ "NormalTransposedGradientTrialOperatorBlocked", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_normal_transposed_gradient_trial_operator_blocked.html", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_normal_transposed_gradient_trial_operator_blocked" ],
     [ "StrainRateTensorOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_strain_rate_tensor_operator.html", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_strain_rate_tensor_operator" ],
     [ "StressDivergenceOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_stress_divergence_operator.html", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_stress_divergence_operator" ],
     [ "TestDerivativeOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_test_derivative_operator.html", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_test_derivative_operator" ],

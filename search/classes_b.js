@@ -24,10 +24,9 @@ var searchData=
   ['limits_21',['Limits',['../class_f_e_a_t_1_1_math_1_1_limits.html',1,'FEAT::Math']]],
   ['linearfunctional_22',['LinearFunctional',['../class_f_e_a_t_1_1_assembly_1_1_linear_functional.html',1,'FEAT::Assembly']]],
   ['linearfunctionalassembler_23',['LinearFunctionalAssembler',['../class_f_e_a_t_1_1_assembly_1_1_linear_functional_assembler.html',1,'FEAT::Assembly']]],
-  ['linearfunctionalassemblyjob_24',['LinearFunctionalAssemblyJob',['../class_f_e_a_t_1_1_assembly_1_1_linear_functional_assembly_job.html',1,'FEAT::Assembly']]],
-  ['linesearch_25',['Linesearch',['../class_f_e_a_t_1_1_solver_1_1_linesearch.html',1,'FEAT::Solver']]],
-  ['localmassmatrixsingularexception_26',['LocalMassMatrixSingularException',['../class_f_e_a_t_1_1_assembly_1_1_grid_transfer_1_1_local_mass_matrix_singular_exception.html',1,'FEAT::Assembly::GridTransfer::LocalMassMatrixSingularException'],['../class_f_e_a_t_1_1_assembly_1_1_space_transfer_1_1_local_mass_matrix_singular_exception.html',1,'FEAT::Assembly::SpaceTransfer::LocalMassMatrixSingularException']]],
-  ['loopunroller_27',['LoopUnroller',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_intern_1_1_loop_unroller.html',1,'FEAT::LAFEM::Arch::Intern']]],
-  ['loopunroller_3c_20start_2c_20start_2c_20step_20_3e_28',['LoopUnroller&lt; Start, Start, Step &gt;',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_intern_1_1_loop_unroller_3_01_start_00_01_start_00_01_step_01_4.html',1,'FEAT::LAFEM::Arch::Intern']]],
-  ['lumping_29',['Lumping',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_lumping.html',1,'FEAT::LAFEM::Arch']]]
+  ['linesearch_24',['Linesearch',['../class_f_e_a_t_1_1_solver_1_1_linesearch.html',1,'FEAT::Solver']]],
+  ['localmassmatrixsingularexception_25',['LocalMassMatrixSingularException',['../class_f_e_a_t_1_1_assembly_1_1_grid_transfer_1_1_local_mass_matrix_singular_exception.html',1,'FEAT::Assembly::GridTransfer::LocalMassMatrixSingularException'],['../class_f_e_a_t_1_1_assembly_1_1_space_transfer_1_1_local_mass_matrix_singular_exception.html',1,'FEAT::Assembly::SpaceTransfer::LocalMassMatrixSingularException']]],
+  ['loopunroller_26',['LoopUnroller',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_intern_1_1_loop_unroller.html',1,'FEAT::LAFEM::Arch::Intern']]],
+  ['loopunroller_3c_20start_2c_20start_2c_20step_20_3e_27',['LoopUnroller&lt; Start, Start, Step &gt;',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_intern_1_1_loop_unroller_3_01_start_00_01_start_00_01_step_01_4.html',1,'FEAT::LAFEM::Arch::Intern']]],
+  ['lumping_28',['Lumping',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_lumping.html',1,'FEAT::LAFEM::Arch']]]
 ];

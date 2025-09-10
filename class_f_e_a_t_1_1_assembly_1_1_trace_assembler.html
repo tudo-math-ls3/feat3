@@ -111,7 +111,7 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_assembly_1_1_trace_a
 </div><!--header-->
 <div class="contents">
 
-<p>Assembler for operators/functionals on boundaries and other sub-dimensional mesh parts.  
+<p>Trace Integral Assembler class template.  
  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>&gt;</code></p>
@@ -136,70 +136,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a454e673affb37be022143f9e1d3878f4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a454e673affb37be022143f9e1d3878f4">add_mesh_part</a> (const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">Geometry::MeshPart</a>&lt; MeshType &gt; &amp;mesh_part)</td></tr>
 <tr class="memdesc:a454e673affb37be022143f9e1d3878f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds all facets of a mesh part to the assembler.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a454e673affb37be022143f9e1d3878f4">More...</a><br /></td></tr>
 <tr class="separator:a454e673affb37be022143f9e1d3878f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a92168e5537609dda849ceabd1f129d19"><td class="memTemplParams" colspan="2">template&lt;typename DataType_ , typename IndexType_ , typename Space_ , typename CubatureFactory_ &gt; </td></tr>
-<tr class="memitem:a92168e5537609dda849ceabd1f129d19"><td class="memTemplItemLeft" align="right" valign="top">DataType_&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a92168e5537609dda849ceabd1f129d19">assemble_discrete_integral</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; DataType_, IndexType_ &gt; &amp;vector, const Space_ &amp;space, const CubatureFactory_ &amp;cubature_factory)</td></tr>
-<tr class="memdesc:a92168e5537609dda849ceabd1f129d19"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles the surface integral of a discrete function.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a92168e5537609dda849ceabd1f129d19">More...</a><br /></td></tr>
-<tr class="separator:a92168e5537609dda849ceabd1f129d19"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6452e29db1ffefaf1502d510a0d3c101"><td class="memTemplParams" colspan="2">template&lt;typename DataType_ , typename IndexType_ , typename Space_ &gt; </td></tr>
-<tr class="memitem:a6452e29db1ffefaf1502d510a0d3c101"><td class="memTemplItemLeft" align="right" valign="top">DataType_&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a6452e29db1ffefaf1502d510a0d3c101">assemble_discrete_integral</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; DataType_, IndexType_ &gt; &amp;vector, const Space_ &amp;space, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature_name)</td></tr>
-<tr class="memdesc:a6452e29db1ffefaf1502d510a0d3c101"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles the surface integral of a discrete function.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a6452e29db1ffefaf1502d510a0d3c101">More...</a><br /></td></tr>
-<tr class="separator:a6452e29db1ffefaf1502d510a0d3c101"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3abaddeb07b5bbd00a11a2825c1c1ee6"><td class="memTemplParams" colspan="2">template&lt;typename DataType_ , typename IndexType_ , typename Space_ , typename CubatureFactory_ , int dim_&gt; </td></tr>
-<tr class="memitem:a3abaddeb07b5bbd00a11a2825c1c1ee6"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DataType_, dim_ &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a3abaddeb07b5bbd00a11a2825c1c1ee6">assemble_discrete_integral</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">LAFEM::DenseVectorBlocked</a>&lt; DataType_, IndexType_, dim_ &gt; &amp;vector, const Space_ &amp;space, const CubatureFactory_ &amp;cubature_factory)</td></tr>
-<tr class="memdesc:a3abaddeb07b5bbd00a11a2825c1c1ee6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles the surface integral of a discrete function.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a3abaddeb07b5bbd00a11a2825c1c1ee6">More...</a><br /></td></tr>
-<tr class="separator:a3abaddeb07b5bbd00a11a2825c1c1ee6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aef34531ec764d3d588fc477ce01e3992"><td class="memTemplParams" colspan="2">template&lt;typename DataType_ , typename IndexType_ , typename Space_ , int dim_&gt; </td></tr>
-<tr class="memitem:aef34531ec764d3d588fc477ce01e3992"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DataType_, dim_ &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#aef34531ec764d3d588fc477ce01e3992">assemble_discrete_integral</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">LAFEM::DenseVectorBlocked</a>&lt; DataType_, IndexType_, dim_ &gt; &amp;vector, const Space_ &amp;space, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature_name)</td></tr>
-<tr class="memdesc:aef34531ec764d3d588fc477ce01e3992"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles the surface integral of a discrete function.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#aef34531ec764d3d588fc477ce01e3992">More...</a><br /></td></tr>
-<tr class="separator:aef34531ec764d3d588fc477ce01e3992"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a56bde240fc6892deb702a167eb3a3e20"><td class="memTemplParams" colspan="2">template&lt;typename Accum_ , typename DataType_ , typename IndexType_ , int dim_, typename SpaceV_ , typename SpaceP_ , typename CubatureFactory_ &gt; </td></tr>
-<tr class="memitem:a56bde240fc6892deb702a167eb3a3e20"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a56bde240fc6892deb702a167eb3a3e20">assemble_flow_accum</a> (Accum_ &amp;accum, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">LAFEM::DenseVectorBlocked</a>&lt; DataType_, IndexType_, dim_ &gt; &amp;vector_v, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; DataType_, IndexType_ &gt; &amp;vector_p, const SpaceV_ &amp;space_v, const SpaceP_ &amp;space_p, const CubatureFactory_ &amp;cubature_factory)</td></tr>
-<tr class="memdesc:a56bde240fc6892deb702a167eb3a3e20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles a flow accumulator.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a56bde240fc6892deb702a167eb3a3e20">More...</a><br /></td></tr>
-<tr class="separator:a56bde240fc6892deb702a167eb3a3e20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adeb9e358638d00d944c4d399ff1dff0d"><td class="memTemplParams" colspan="2">template&lt;typename Accum_ , typename DataType_ , typename IndexType_ , int dim_, typename SpaceV_ , typename SpaceP_ &gt; </td></tr>
-<tr class="memitem:adeb9e358638d00d944c4d399ff1dff0d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#adeb9e358638d00d944c4d399ff1dff0d">assemble_flow_accum</a> (Accum_ &amp;accum, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">LAFEM::DenseVectorBlocked</a>&lt; DataType_, IndexType_, dim_ &gt; &amp;vector_v, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; DataType_, IndexType_ &gt; &amp;vector_p, const SpaceV_ &amp;space_v, const SpaceP_ &amp;space_p, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature_name)</td></tr>
-<tr class="memdesc:adeb9e358638d00d944c4d399ff1dff0d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles a flow accumulator.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#adeb9e358638d00d944c4d399ff1dff0d">More...</a><br /></td></tr>
-<tr class="separator:adeb9e358638d00d944c4d399ff1dff0d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abb817e8b27489789b529e66be7f1469f"><td class="memTemplParams" colspan="2">template&lt;typename Vector_ , typename Functional_ , typename CubatureFactory_ , typename Space_ &gt; </td></tr>
-<tr class="memitem:abb817e8b27489789b529e66be7f1469f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#abb817e8b27489789b529e66be7f1469f">assemble_functional_vector</a> (Vector_ &amp;vector, const Functional_ &amp;functional, const Space_ &amp;space, const CubatureFactory_ &amp;cubature_factory, typename Vector_::DataType alpha=typename Vector_::DataType(1)) const</td></tr>
-<tr class="memdesc:abb817e8b27489789b529e66be7f1469f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles a linear functional into a vector.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#abb817e8b27489789b529e66be7f1469f">More...</a><br /></td></tr>
-<tr class="separator:abb817e8b27489789b529e66be7f1469f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad9158093e22e6a22dd4dd5debb2b4865"><td class="memTemplParams" colspan="2">template&lt;typename Vector_ , typename Functional_ , typename Space_ &gt; </td></tr>
-<tr class="memitem:ad9158093e22e6a22dd4dd5debb2b4865"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#ad9158093e22e6a22dd4dd5debb2b4865">assemble_functional_vector</a> (Vector_ &amp;vector, const Functional_ &amp;functional, const Space_ &amp;space, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature_name, typename Vector_::DataType alpha=typename Vector_::DataType(1)) const</td></tr>
-<tr class="memdesc:ad9158093e22e6a22dd4dd5debb2b4865"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles a linear functional into a vector.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#ad9158093e22e6a22dd4dd5debb2b4865">More...</a><br /></td></tr>
-<tr class="separator:ad9158093e22e6a22dd4dd5debb2b4865"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a567f666d8fb89319ecd769c3cc42d786"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Space_ , typename CubatureFactory_ &gt; </td></tr>
-<tr class="memitem:a567f666d8fb89319ecd769c3cc42d786"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a567f666d8fb89319ecd769c3cc42d786">assemble_jump_operator_matrix</a> (Matrix_ &amp;matrix, const Space_ &amp;space, const CubatureFactory_ &amp;cubature_factory, typename Matrix_::DataType alpha=typename Matrix_::DataType(1)) const</td></tr>
-<tr class="memdesc:a567f666d8fb89319ecd769c3cc42d786"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles the jump operator onto a matrix.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a567f666d8fb89319ecd769c3cc42d786">More...</a><br /></td></tr>
-<tr class="separator:a567f666d8fb89319ecd769c3cc42d786"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5aa327fd6aae3bd3ae255bc4d2ad1440"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Space_ &gt; </td></tr>
-<tr class="memitem:a5aa327fd6aae3bd3ae255bc4d2ad1440"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a5aa327fd6aae3bd3ae255bc4d2ad1440">assemble_jump_operator_matrix</a> (Matrix_ &amp;matrix, const Space_ &amp;space, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature_name, typename Matrix_::DataType alpha=typename Matrix_::DataType(1)) const</td></tr>
-<tr class="memdesc:a5aa327fd6aae3bd3ae255bc4d2ad1440"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles the jump operator onto a matrix.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a5aa327fd6aae3bd3ae255bc4d2ad1440">More...</a><br /></td></tr>
-<tr class="separator:a5aa327fd6aae3bd3ae255bc4d2ad1440"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a892151d8d1e7355fd8b89f4b8b7046be"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Space_ , typename CubatureFactory_ &gt; </td></tr>
-<tr class="memitem:a892151d8d1e7355fd8b89f4b8b7046be"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a892151d8d1e7355fd8b89f4b8b7046be">assemble_jump_stabil_operator_matrix</a> (Matrix_ &amp;matrix, const Space_ &amp;space, const CubatureFactory_ &amp;cubature_factory, typename Matrix_::DataType gamma=typename Matrix_::DataType(1), typename Matrix_::DataType jacdet_scal=typename Matrix_::DataType(2), typename Matrix_::DataType jacdet_expo=typename Matrix_::DataType(2)) const</td></tr>
-<tr class="memdesc:a892151d8d1e7355fd8b89f4b8b7046be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles the jump-stabilization operator onto a matrix.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a892151d8d1e7355fd8b89f4b8b7046be">More...</a><br /></td></tr>
-<tr class="separator:a892151d8d1e7355fd8b89f4b8b7046be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abec208ffab8105053efe348ff8f9fa44"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Space_ &gt; </td></tr>
-<tr class="memitem:abec208ffab8105053efe348ff8f9fa44"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#abec208ffab8105053efe348ff8f9fa44">assemble_jump_stabil_operator_matrix</a> (Matrix_ &amp;matrix, const Space_ &amp;space, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature_name, typename Matrix_::DataType gamma=typename Matrix_::DataType(1), typename Matrix_::DataType jacdet_scal=typename Matrix_::DataType(2), typename Matrix_::DataType jacdet_expo=typename Matrix_::DataType(2)) const</td></tr>
-<tr class="memdesc:abec208ffab8105053efe348ff8f9fa44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles the jump-stabilization operator onto a matrix.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#abec208ffab8105053efe348ff8f9fa44">More...</a><br /></td></tr>
-<tr class="separator:abec208ffab8105053efe348ff8f9fa44"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a52376f342b265c88766f5fbe3fa76c98"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Operator_ , typename Space_ , typename CubatureFactory_ &gt; </td></tr>
-<tr class="memitem:a52376f342b265c88766f5fbe3fa76c98"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a52376f342b265c88766f5fbe3fa76c98">assemble_operator_matrix1</a> (Matrix_ &amp;matrix, Operator_ &amp;operat, const Space_ &amp;space, const CubatureFactory_ &amp;cubature_factory, typename Matrix_::DataType alpha=typename Matrix_::DataType(1)) const</td></tr>
-<tr class="memdesc:a52376f342b265c88766f5fbe3fa76c98"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles a bilinear operator into a matrix.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a52376f342b265c88766f5fbe3fa76c98">More...</a><br /></td></tr>
-<tr class="separator:a52376f342b265c88766f5fbe3fa76c98"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2ed58a734a74a37cb09b829ac0187876"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Operator_ , typename Space_ &gt; </td></tr>
-<tr class="memitem:a2ed58a734a74a37cb09b829ac0187876"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a2ed58a734a74a37cb09b829ac0187876">assemble_operator_matrix1</a> (Matrix_ &amp;matrix, Operator_ &amp;operat, const Space_ &amp;space, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature_name, typename Matrix_::DataType alpha=typename Matrix_::DataType(1)) const</td></tr>
-<tr class="memdesc:a2ed58a734a74a37cb09b829ac0187876"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles a bilinear operator into a matrix.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a2ed58a734a74a37cb09b829ac0187876">More...</a><br /></td></tr>
-<tr class="separator:a2ed58a734a74a37cb09b829ac0187876"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae36d0a121062b0006da24ca0ac624a81"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Operator_ , typename TestSpace_ , typename TrialSpace_ , typename CubatureFactory_ &gt; </td></tr>
-<tr class="memitem:ae36d0a121062b0006da24ca0ac624a81"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#ae36d0a121062b0006da24ca0ac624a81">assemble_operator_matrix2</a> (Matrix_ &amp;matrix, Operator_ &amp;operat, const TestSpace_ &amp;test_space, const TrialSpace_ &amp;trial_space, const CubatureFactory_ &amp;cubature_factory, typename Matrix_::DataType alpha=typename Matrix_::DataType(1)) const</td></tr>
-<tr class="memdesc:ae36d0a121062b0006da24ca0ac624a81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles a bilinear operator into a matrix.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#ae36d0a121062b0006da24ca0ac624a81">More...</a><br /></td></tr>
-<tr class="separator:ae36d0a121062b0006da24ca0ac624a81"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c0c2d0087679b7ced924293860eea81"><td class="memTemplParams" colspan="2">template&lt;typename Matrix_ , typename Operator_ , typename TestSpace_ , typename TrialSpace_ &gt; </td></tr>
-<tr class="memitem:a0c0c2d0087679b7ced924293860eea81"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a0c0c2d0087679b7ced924293860eea81">assemble_operator_matrix2</a> (Matrix_ &amp;matrix, Operator_ &amp;operat, const TestSpace_ &amp;test_space, const TrialSpace_ &amp;trial_space, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature_name, typename Matrix_::DataType alpha=typename Matrix_::DataType(1)) const</td></tr>
-<tr class="memdesc:a0c0c2d0087679b7ced924293860eea81"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles a bilinear operator into a matrix.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a0c0c2d0087679b7ced924293860eea81">More...</a><br /></td></tr>
-<tr class="separator:a0c0c2d0087679b7ced924293860eea81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3084f0693c0377cf097a7d5ef58b28b8"><td class="memTemplParams" colspan="2">template&lt;typename Job_ &gt; </td></tr>
+<tr class="memitem:a3084f0693c0377cf097a7d5ef58b28b8"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a3084f0693c0377cf097a7d5ef58b28b8">assemble</a> (Job_ &amp;job)</td></tr>
+<tr class="memdesc:a3084f0693c0377cf097a7d5ef58b28b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Executes a trace assembly job.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a3084f0693c0377cf097a7d5ef58b28b8">More...</a><br /></td></tr>
+<tr class="separator:a3084f0693c0377cf097a7d5ef58b28b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae73dbb5f74d0e62e4b10cbf1b7148274"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#ae73dbb5f74d0e62e4b10cbf1b7148274">clear</a> ()</td></tr>
 <tr class="memdesc:ae73dbb5f74d0e62e4b10cbf1b7148274"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the assembler.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#ae73dbb5f74d0e62e4b10cbf1b7148274">More...</a><br /></td></tr>
 <tr class="separator:ae73dbb5f74d0e62e4b10cbf1b7148274"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -209,6 +149,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a82a98629c15d565ef5f51b3f70d9d1f5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a82a98629c15d565ef5f51b3f70d9d1f5">compile_all_facets</a> (bool inner, bool outer)</td></tr>
 <tr class="memdesc:a82a98629c15d565ef5f51b3f70d9d1f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compiles the assembler for all inner and/our outer facets of the underlying mesh.  <a href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a82a98629c15d565ef5f51b3f70d9d1f5">More...</a><br /></td></tr>
 <tr class="separator:a82a98629c15d565ef5f51b3f70d9d1f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab036982e38768a684184c26f0302f6cb"><td class="memItemLeft" align="right" valign="top">const TrafoType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#ab036982e38768a684184c26f0302f6cb">get_trafo</a> () const</td></tr>
+<tr class="separator:ab036982e38768a684184c26f0302f6cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -243,21 +185,23 @@ Protected Attributes</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename Trafo_&gt;<br />
-class FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;</div><p >Assembler for operators/functionals on boundaries and other sub-dimensional mesh parts. </p>
+class FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;</div><p >Trace Integral Assembler class template. </p>
 <p >This class can be used to assemble operators, functionals and various other quantities on (a part of) the boundary of a mesh or any other set of mesh facets.</p>
 <p >After you have constructed the trace assembler object, you still have to tell the assembler on which set of facets the assembly should take place before you can actually assemble anything. There are 2 ways to do this:</p><ul>
 <li>You can tell the assembler to assemble on all inner and/or outer facets of the mesh by calling the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a82a98629c15d565ef5f51b3f70d9d1f5" title="Compiles the assembler for all inner and/our outer facets of the underlying mesh.">compile_all_facets()</a> function.</li>
 <li>You can add individual facets or whole mesh parts to the assembler by calling the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a8977739ddfbcb24a7b957d9f0b117c0e" title="Adds a single facet to the assembler.">add_facet()</a> and <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a454e673affb37be022143f9e1d3878f4" title="Adds all facets of a mesh part to the assembler.">add_mesh_part()</a> functions. Afterwards, you need to compile the assembler by calling the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#acb383c8725c0cbcc5d2c3b1d42166d6d" title="Compiles the assembler for all facets that have been added manually.">compile()</a> function.</li>
 </ul>
+<dl class="section note"><dt>Note</dt><dd>Each trace assembler object is tied to the trafo object that is has been constructed on, i.e. if you have several different trafo objects (such as in a multigrid scenario) then you also need several trace assembler objects &ndash; one for each trafo object. Also, a trace assembler always assembles over the elements of its trafo, so all FE spaces used in the assembly have to be defined on the same trafo object as the trace assembler.</dd></dl>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">Trafo_</td><td>The transformation on whose underlying mesh the assembly should take place</td></tr>
   </table>
   </dd>
 </dl>
+<dl class="section note"><dt>Note</dt><dd>This class currently does not employ any sort of multi-threading, however, the documentation of the classes and functions related to this class may already be written as if this class already supported assembly with multiple threads &ndash; which it actually may do sometime in the future.</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00138">138</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00372">372</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a781bc39a0cbd1477a3cad39716ed3b8d" name="a781bc39a0cbd1477a3cad39716ed3b8d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a781bc39a0cbd1477a3cad39716ed3b8d">&#9670;&#160;</a></span>MeshType</h2>
@@ -273,7 +217,7 @@ template&lt;typename Trafo_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00142">142</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00376">376</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
 </div>
 </div>
@@ -291,7 +235,7 @@ template&lt;typename Trafo_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00143">143</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00377">377</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
 </div>
 </div>
@@ -309,7 +253,7 @@ template&lt;typename Trafo_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00141">141</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00375">375</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
 </div>
 </div>
@@ -348,7 +292,7 @@ template&lt;typename Trafo_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00163">163</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00397">397</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
 </div>
 </div>
@@ -413,11 +357,11 @@ template&lt;typename Trafo_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if the local facet was identified, or <code>false</code>, if <code>face</code> does not seem to be a facet of <code>cell</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l02137">2137</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00652">652</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00150">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_trafo</a>.</p>
+<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00384">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_trafo</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="trace__assembler_8hpp_source.html#l00217">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::compile()</a>, and <a class="el" href="trace__assembler_8hpp_source.html#l00268">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::compile_all_facets()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="trace__assembler_8hpp_source.html#l00457">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::compile()</a>, and <a class="el" href="trace__assembler_8hpp_source.html#l00508">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::compile_all_facets()</a>.</p>
 
 </div>
 </div>
@@ -455,9 +399,9 @@ template&lt;typename Trafo_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00188">188</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00428">428</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00152">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_facet_mask</a>, and <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00386">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_facet_mask</a>, and <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>.</p>
 
 </div>
 </div>
@@ -495,47 +439,31 @@ template&lt;typename Trafo_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00200">200</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00440">440</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00152">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_facet_mask</a>.</p>
+<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00386">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_facet_mask</a>.</p>
 
 </div>
 </div>
-<a id="a92168e5537609dda849ceabd1f129d19" name="a92168e5537609dda849ceabd1f129d19"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a92168e5537609dda849ceabd1f129d19">&#9670;&#160;</a></span>assemble_discrete_integral() <span class="overload">[1/4]</span></h2>
+<a id="a3084f0693c0377cf097a7d5ef58b28b8" name="a3084f0693c0377cf097a7d5ef58b28b8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3084f0693c0377cf097a7d5ef58b28b8">&#9670;&#160;</a></span>assemble()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename Trafo_ &gt; </div>
 <div class="memtemplate">
-template&lt;typename DataType_ , typename IndexType_ , typename Space_ , typename CubatureFactory_ &gt; </div>
+template&lt;typename Job_ &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">DataType_ <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::assemble_discrete_integral </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::assemble </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; DataType_, IndexType_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>vector</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
+          <td class="paramtype">Job_ &amp;&#160;</td>
+          <td class="paramname"><em>job</em></td><td>)</td>
           <td></td>
-          <td class="paramtype">const Space_ &amp;&#160;</td>
-          <td class="paramname"><em>space</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const CubatureFactory_ &amp;&#160;</td>
-          <td class="paramname"><em>cubature_factory</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -545,1177 +473,19 @@ template&lt;typename DataType_ , typename IndexType_ , typename Space_ , typenam
 </table>
 </div><div class="memdoc">
 
-<p>Assembles the surface integral of a discrete function. </p>
+<p>Executes a trace assembly job. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the vector that represents the function to be integrated</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">space</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the finite element space</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_factory</td><td>The cubature factory</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The surface integral of the discrete function </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l01236">1236</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l00444">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01548">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::format()</a>, <a class="el" href="container_8hpp_source.html#l01136">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
-
-</div>
-</div>
-<a id="a6452e29db1ffefaf1502d510a0d3c101" name="a6452e29db1ffefaf1502d510a0d3c101"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6452e29db1ffefaf1502d510a0d3c101">&#9670;&#160;</a></span>assemble_discrete_integral() <span class="overload">[2/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Trafo_ &gt; </div>
-<div class="memtemplate">
-template&lt;typename DataType_ , typename IndexType_ , typename Space_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">DataType_ <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::assemble_discrete_integral </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; DataType_, IndexType_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>vector</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Space_ &amp;&#160;</td>
-          <td class="paramname"><em>space</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
-          <td class="paramname"><em>cubature_name</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assembles the surface integral of a discrete function. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the vector that represents the function to be integrated</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">space</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the finite element space</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_nane</td><td>The name of the cubature rule to be used for integration</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The surface integral of the discrete function </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l01212">1212</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l01212">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_discrete_integral()</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="trace__assembler_8hpp_source.html#l01212">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_discrete_integral()</a>.</p>
-
-</div>
-</div>
-<a id="a3abaddeb07b5bbd00a11a2825c1c1ee6" name="a3abaddeb07b5bbd00a11a2825c1c1ee6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3abaddeb07b5bbd00a11a2825c1c1ee6">&#9670;&#160;</a></span>assemble_discrete_integral() <span class="overload">[3/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Trafo_ &gt; </div>
-<div class="memtemplate">
-template&lt;typename DataType_ , typename IndexType_ , typename Space_ , typename CubatureFactory_ , int dim_&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DataType_, dim_ &gt; <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::assemble_discrete_integral </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">LAFEM::DenseVectorBlocked</a>&lt; DataType_, IndexType_, dim_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>vector</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Space_ &amp;&#160;</td>
-          <td class="paramname"><em>space</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const CubatureFactory_ &amp;&#160;</td>
-          <td class="paramname"><em>cubature_factory</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assembles the surface integral of a discrete function. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the vector that represents the function to be integrated</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">space</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the finite element space</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_factory</td><td>The cubature factory</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The surface integral of the discrete function </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l01422">1422</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l00588">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::axpy()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00444">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01548">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::format()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00527">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
-
-</div>
-</div>
-<a id="aef34531ec764d3d588fc477ce01e3992" name="aef34531ec764d3d588fc477ce01e3992"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aef34531ec764d3d588fc477ce01e3992">&#9670;&#160;</a></span>assemble_discrete_integral() <span class="overload">[4/4]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Trafo_ &gt; </div>
-<div class="memtemplate">
-template&lt;typename DataType_ , typename IndexType_ , typename Space_ , int dim_&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DataType_, dim_ &gt; <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::assemble_discrete_integral </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">LAFEM::DenseVectorBlocked</a>&lt; DataType_, IndexType_, dim_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>vector</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Space_ &amp;&#160;</td>
-          <td class="paramname"><em>space</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
-          <td class="paramname"><em>cubature_name</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assembles the surface integral of a discrete function. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the vector that represents the function to be integrated</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">space</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the finite element space</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_nane</td><td>The name of the cubature rule to be used for integration</td></tr>
-  </table>
-  </dd>
-</dl>
-<dl class="section return"><dt>Returns</dt><dd>The surface integral of the discrete function </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l01398">1398</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l01212">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_discrete_integral()</a>.</p>
-
-</div>
-</div>
-<a id="a56bde240fc6892deb702a167eb3a3e20" name="a56bde240fc6892deb702a167eb3a3e20"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56bde240fc6892deb702a167eb3a3e20">&#9670;&#160;</a></span>assemble_flow_accum() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Trafo_ &gt; </div>
-<div class="memtemplate">
-template&lt;typename Accum_ , typename DataType_ , typename IndexType_ , int dim_, typename SpaceV_ , typename SpaceP_ , typename CubatureFactory_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::assemble_flow_accum </td>
-          <td>(</td>
-          <td class="paramtype">Accum_ &amp;&#160;</td>
-          <td class="paramname"><em>accum</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">LAFEM::DenseVectorBlocked</a>&lt; DataType_, IndexType_, dim_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>vector_v</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; DataType_, IndexType_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>vector_p</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const SpaceV_ &amp;&#160;</td>
-          <td class="paramname"><em>space_v</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const SpaceP_ &amp;&#160;</td>
-          <td class="paramname"><em>space_p</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const CubatureFactory_ &amp;&#160;</td>
-          <td class="paramname"><em>cubature_factory</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assembles a flow accumulator. </p>
-<p >This function assembles a so-called accumulator on a sub-dimensional mesh region, which can be used to assemble body forces on a boundary.</p>
-<dl class="section attention"><dt>Attention</dt><dd>This assembly function is somewhat provisional - use at own risk!</dd></dl>
-<p>The accumulator that is assembled by this function has to provide an overloaded "operator()" with the following function parameters:</p><ul>
-<li>cubature weight (scalar)</li>
-<li>mapped image point (<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html" title="Tiny Vector class template.">Tiny::Vector</a>)</li>
-<li>jacobi matrix (<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html" title="Tiny Matrix class template.">Tiny::Matrix</a>)</li>
-<li>velocity value (<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html" title="Tiny Vector class template.">Tiny::Vector</a>)</li>
-<li>velocity gradient (<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html" title="Tiny Matrix class template.">Tiny::Matrix</a>)</li>
-<li>pressure value (scalar)</li>
-</ul>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">accum</td><td>The accumulator to be assembled. The "operator()" of this object is called for each cubature point on each facet.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">vector_v</td><td>The velocity vector.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">vector_p</td><td>The pressure vector.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">space_v</td><td>The velocity space.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">space_p</td><td>The pressure space.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_factory</td><td>The cubature factory that is to be used for integration. </td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">job</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the job that is to be assembled. See <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembly_job.html" title="Interface description of a trace assembly job.">Assembly::TraceAssemblyJob</a> for details. </td></tr>
   </table>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l01011">1011</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00562">562</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l01881">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::add_outer_product()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00588">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::axpy()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00444">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01548">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::format()</a>, <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815ae37b6e74a3bd476dfde7e0577b9e81d6">FEAT::grad</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a2d68fb400ac4ae954f3e3120f03b17e3">FEAT::img_point</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74">FEAT::jac_det</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428aaaff6440f63c38bcfdc6816c4d85411b">FEAT::jac_mat</a>, <a class="el" href="container_8hpp_source.html#l01136">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::size()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00527">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00388">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_cells</a>.</p>
 
-</div>
-</div>
-<a id="adeb9e358638d00d944c4d399ff1dff0d" name="adeb9e358638d00d944c4d399ff1dff0d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adeb9e358638d00d944c4d399ff1dff0d">&#9670;&#160;</a></span>assemble_flow_accum() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Trafo_ &gt; </div>
-<div class="memtemplate">
-template&lt;typename Accum_ , typename DataType_ , typename IndexType_ , int dim_, typename SpaceV_ , typename SpaceP_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::assemble_flow_accum </td>
-          <td>(</td>
-          <td class="paramtype">Accum_ &amp;&#160;</td>
-          <td class="paramname"><em>accum</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">LAFEM::DenseVectorBlocked</a>&lt; DataType_, IndexType_, dim_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>vector_v</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; DataType_, IndexType_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>vector_p</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const SpaceV_ &amp;&#160;</td>
-          <td class="paramname"><em>space_v</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const SpaceP_ &amp;&#160;</td>
-          <td class="paramname"><em>space_p</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
-          <td class="paramname"><em>cubature_name</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assembles a flow accumulator. </p>
-<p >This function assembles a so-called accumulator on a sub-dimensional mesh region, which can be used to assemble body forces on a boundary.</p>
-<dl class="section attention"><dt>Attention</dt><dd>This assembly function is somewhat provisional - use at own risk!</dd></dl>
-<p>The accumulator that is assembled by this function has to provide an overloaded "operator()" with the following function parameters:</p><ul>
-<li>cubature weight (scalar)</li>
-<li>mapped image point (<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html" title="Tiny Vector class template.">Tiny::Vector</a>)</li>
-<li>jacobi matrix (<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html" title="Tiny Matrix class template.">Tiny::Matrix</a>)</li>
-<li>velocity value (<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html" title="Tiny Vector class template.">Tiny::Vector</a>)</li>
-<li>velocity gradient (<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html" title="Tiny Matrix class template.">Tiny::Matrix</a>)</li>
-<li>pressure value (scalar)</li>
-</ul>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">accum</td><td>The accumulator to be assembled. The "operator()" of this object is called for each cubature point on each facet.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">vector_v</td><td>The velocity vector.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">vector_p</td><td>The pressure vector.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">space_v</td><td>The velocity space.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">space_p</td><td>The pressure space.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_name</td><td>The name of the cubature rule that is to be used for integration. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00954">954</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00954">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_flow_accum()</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="trace__assembler_8hpp_source.html#l00954">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_flow_accum()</a>.</p>
-
-</div>
-</div>
-<a id="abb817e8b27489789b529e66be7f1469f" name="abb817e8b27489789b529e66be7f1469f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abb817e8b27489789b529e66be7f1469f">&#9670;&#160;</a></span>assemble_functional_vector() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Trafo_ &gt; </div>
-<div class="memtemplate">
-template&lt;typename Vector_ , typename Functional_ , typename CubatureFactory_ , typename Space_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::assemble_functional_vector </td>
-          <td>(</td>
-          <td class="paramtype">Vector_ &amp;&#160;</td>
-          <td class="paramname"><em>vector</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Functional_ &amp;&#160;</td>
-          <td class="paramname"><em>functional</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Space_ &amp;&#160;</td>
-          <td class="paramname"><em>space</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const CubatureFactory_ &amp;&#160;</td>
-          <td class="paramname"><em>cubature_factory</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">typename Vector_::DataType&#160;</td>
-          <td class="paramname"><em>alpha</em> = <code>typename&#160;Vector_::DataType(1)</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assembles a linear functional into a vector. </p>
-<dl class="section note"><dt>Note</dt><dd>The assembler automatically computes the normal vectors in the cubature points of each facet (even if the functional did not ask for this), which can be queried by <code>tau.normal</code> during the <code>set_point()</code> function call of the operator's evaluator.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the vector that is to be assembled.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">functional</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the linear functional implementing the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_linear_functional.html" title="Base class for Linear Functionals.">LinearFunctional</a> interface to be assembled.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">space</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the finite-element (test) space to be used.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_factory</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the cubature factory to be used for integration.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>The scaling factor for the linear functional. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00737">737</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00154">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_cells</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l03044">FEAT::Tiny::axpy()</a>, <a class="el" href="struct_f_e_a_t_1_1_shape_1_1_reference_cell.html#a44468d6589f97d5b946aa4cd5a648271">FEAT::Shape::ReferenceCell&lt; Shape_ &gt;::facet_orientation()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00444">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01548">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::format()</a>, <a class="el" href="namespace_f_e_a_t_1_1_tiny.html#a9344efef35bf6a53de992d9390f7f3a1">FEAT::Tiny::orthogonal()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
-
-</div>
-</div>
-<a id="ad9158093e22e6a22dd4dd5debb2b4865" name="ad9158093e22e6a22dd4dd5debb2b4865"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad9158093e22e6a22dd4dd5debb2b4865">&#9670;&#160;</a></span>assemble_functional_vector() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Trafo_ &gt; </div>
-<div class="memtemplate">
-template&lt;typename Vector_ , typename Functional_ , typename Space_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::assemble_functional_vector </td>
-          <td>(</td>
-          <td class="paramtype">Vector_ &amp;&#160;</td>
-          <td class="paramname"><em>vector</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Functional_ &amp;&#160;</td>
-          <td class="paramname"><em>functional</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Space_ &amp;&#160;</td>
-          <td class="paramname"><em>space</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
-          <td class="paramname"><em>cubature_name</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">typename Vector_::DataType&#160;</td>
-          <td class="paramname"><em>alpha</em> = <code>typename&#160;Vector_::DataType(1)</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assembles a linear functional into a vector. </p>
-<dl class="section note"><dt>Note</dt><dd>The assembler automatically computes the normal vectors in the cubature points of each facet (even if the functional did not ask for this), which can be queried by <code>tau.normal</code> during the <code>set_point()</code> function call of the operator's evaluator.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the vector that is to be assembled.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">functional</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the linear functional implementing the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_linear_functional.html" title="Base class for Linear Functionals.">LinearFunctional</a> interface to be assembled.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">space</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the finite-element (test) space to be used.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_name</td><td>The name of the cubature rule to be used for integration.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>The scaling factor for the linear functional. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00698">698</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00698">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_functional_vector()</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="trace__assembler_8hpp_source.html#l00698">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_functional_vector()</a>.</p>
-
-</div>
-</div>
-<a id="a567f666d8fb89319ecd769c3cc42d786" name="a567f666d8fb89319ecd769c3cc42d786"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a567f666d8fb89319ecd769c3cc42d786">&#9670;&#160;</a></span>assemble_jump_operator_matrix() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Trafo_ &gt; </div>
-<div class="memtemplate">
-template&lt;typename Matrix_ , typename Space_ , typename CubatureFactory_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::assemble_jump_operator_matrix </td>
-          <td>(</td>
-          <td class="paramtype">Matrix_ &amp;&#160;</td>
-          <td class="paramname"><em>matrix</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Space_ &amp;&#160;</td>
-          <td class="paramname"><em>space</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const CubatureFactory_ &amp;&#160;</td>
-          <td class="paramname"><em>cubature_factory</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">typename Matrix_::DataType&#160;</td>
-          <td class="paramname"><em>alpha</em> = <code>typename&#160;Matrix_::DataType(1)</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assembles the jump operator onto a matrix. </p>
-<p >This function assembles the jump operator: </p><p class="formulaDsp">
-\[J(\varphi,\psi) = \alpha \sum_E \int_E [\varphi]\cdot[\psi]\]
-</p>
-<dl class="section attention"><dt>Attention</dt><dd>The matrix must have an extended stencil, which must have been assembled by calling <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_symbolic_assembler.html#a8cd652d4a25615b6e59c64fd4a9741f1" title="Assembles an extended-facet matrix structure from a single space.">Assembly::SymbolicAssembler::assemble_matrix_ext_facet1()</a> !</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">matrix</td><td>The matrix that is to be assembled.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">space</td><td>The finite element space to be used.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_factory</td><td>The cubature rule for integration. Note that this is a cubature rule on the facets.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>The scaling factor alpha for the jump operator. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l01913">1913</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00154">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_cells</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02976">FEAT::Tiny::add_id()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00444">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01548">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::format()</a>, <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
-
-</div>
-</div>
-<a id="a5aa327fd6aae3bd3ae255bc4d2ad1440" name="a5aa327fd6aae3bd3ae255bc4d2ad1440"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5aa327fd6aae3bd3ae255bc4d2ad1440">&#9670;&#160;</a></span>assemble_jump_operator_matrix() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Trafo_ &gt; </div>
-<div class="memtemplate">
-template&lt;typename Matrix_ , typename Space_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::assemble_jump_operator_matrix </td>
-          <td>(</td>
-          <td class="paramtype">Matrix_ &amp;&#160;</td>
-          <td class="paramname"><em>matrix</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Space_ &amp;&#160;</td>
-          <td class="paramname"><em>space</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
-          <td class="paramname"><em>cubature_name</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">typename Matrix_::DataType&#160;</td>
-          <td class="paramname"><em>alpha</em> = <code>typename&#160;Matrix_::DataType(1)</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assembles the jump operator onto a matrix. </p>
-<p >This function assembles the jump operator: </p><p class="formulaDsp">
-\[J(\varphi,\psi) = \alpha \sum_E \int_E [\varphi]\cdot[\psi]\]
-</p>
-<dl class="section attention"><dt>Attention</dt><dd>The matrix must have an extended stencil, which must have been assembled by calling <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_symbolic_assembler.html#a8cd652d4a25615b6e59c64fd4a9741f1" title="Assembles an extended-facet matrix structure from a single space.">Assembly::SymbolicAssembler::assemble_matrix_ext_facet1()</a> !</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">matrix</td><td>The matrix that is to be assembled.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">space</td><td>The finite element space to be used.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_name</td><td>The cubature rule for integration. Note that this is a cubature rule on the facets.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>The scaling factor alpha for the jump operator. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l01877">1877</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l01877">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_jump_operator_matrix()</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="trace__assembler_8hpp_source.html#l01877">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_jump_operator_matrix()</a>.</p>
-
-</div>
-</div>
-<a id="a892151d8d1e7355fd8b89f4b8b7046be" name="a892151d8d1e7355fd8b89f4b8b7046be"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a892151d8d1e7355fd8b89f4b8b7046be">&#9670;&#160;</a></span>assemble_jump_stabil_operator_matrix() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Trafo_ &gt; </div>
-<div class="memtemplate">
-template&lt;typename Matrix_ , typename Space_ , typename CubatureFactory_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::assemble_jump_stabil_operator_matrix </td>
-          <td>(</td>
-          <td class="paramtype">Matrix_ &amp;&#160;</td>
-          <td class="paramname"><em>matrix</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Space_ &amp;&#160;</td>
-          <td class="paramname"><em>space</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const CubatureFactory_ &amp;&#160;</td>
-          <td class="paramname"><em>cubature_factory</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">typename Matrix_::DataType&#160;</td>
-          <td class="paramname"><em>gamma</em> = <code>typename&#160;Matrix_::DataType(1)</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">typename Matrix_::DataType&#160;</td>
-          <td class="paramname"><em>jacdet_scal</em> = <code>typename&#160;Matrix_::DataType(2)</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">typename Matrix_::DataType&#160;</td>
-          <td class="paramname"><em>jacdet_expo</em> = <code>typename&#160;Matrix_::DataType(2)</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assembles the jump-stabilization operator onto a matrix. </p>
-<p >This function assembles the jump stabilization operator: </p><p class="formulaDsp">
-\[J(\varphi,\psi) = \gamma \sum_E (s\cdot J_E)^{p} \int_E [\nabla \varphi]\cdot[\nabla\psi]\]
-</p>
-<dl class="section attention"><dt>Attention</dt><dd>The matrix must have an extended stencil, which must have been assembled by calling <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_symbolic_assembler.html#a8cd652d4a25615b6e59c64fd4a9741f1" title="Assembles an extended-facet matrix structure from a single space.">Assembly::SymbolicAssembler::assemble_matrix_ext_facet1()</a> !</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">matrix</td><td>The matrix that is to be assembled.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">space</td><td>The finite element space to be used.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_factory</td><td>The cubature for integration. Note that this is a cubature rule on the facets.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">gamma</td><td>The scaling factor gamma for the jump stabilization operator.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">jacdet_scal</td><td>The scaling factor <em>s</em> for the Jacobian determinant factor.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">jacdet_expo</td><td>The exponent <em>p</em> for the Jacobian determinant factor. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l01645">1645</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00154">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_cells</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02976">FEAT::Tiny::add_id()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02895">FEAT::Tiny::dot()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00444">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01548">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::format()</a>, <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815ae37b6e74a3bd476dfde7e0577b9e81d6">FEAT::grad</a>, <a class="el" href="math_8hpp_source.html#l00643">FEAT::Math::pow()</a>, <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
-
-</div>
-</div>
-<a id="abec208ffab8105053efe348ff8f9fa44" name="abec208ffab8105053efe348ff8f9fa44"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abec208ffab8105053efe348ff8f9fa44">&#9670;&#160;</a></span>assemble_jump_stabil_operator_matrix() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Trafo_ &gt; </div>
-<div class="memtemplate">
-template&lt;typename Matrix_ , typename Space_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::assemble_jump_stabil_operator_matrix </td>
-          <td>(</td>
-          <td class="paramtype">Matrix_ &amp;&#160;</td>
-          <td class="paramname"><em>matrix</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Space_ &amp;&#160;</td>
-          <td class="paramname"><em>space</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
-          <td class="paramname"><em>cubature_name</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">typename Matrix_::DataType&#160;</td>
-          <td class="paramname"><em>gamma</em> = <code>typename&#160;Matrix_::DataType(1)</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">typename Matrix_::DataType&#160;</td>
-          <td class="paramname"><em>jacdet_scal</em> = <code>typename&#160;Matrix_::DataType(2)</code>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">typename Matrix_::DataType&#160;</td>
-          <td class="paramname"><em>jacdet_expo</em> = <code>typename&#160;Matrix_::DataType(2)</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assembles the jump-stabilization operator onto a matrix. </p>
-<p >This function assembles the jump stabilization operator: </p><p class="formulaDsp">
-\[J(\varphi,\psi) = \gamma \sum_E (s\cdot J_E)^{p} \int_E [\nabla \varphi]\cdot[\nabla\psi]\]
-</p>
-<dl class="section attention"><dt>Attention</dt><dd>The matrix must have an extended stencil, which must have been assembled by calling <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_symbolic_assembler.html#a8cd652d4a25615b6e59c64fd4a9741f1" title="Assembles an extended-facet matrix structure from a single space.">Assembly::SymbolicAssembler::assemble_matrix_ext_facet1()</a> !</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">matrix</td><td>The matrix that is to be assembled.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">space</td><td>The finite element space to be used.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_name</td><td>The cubature for integration. Note that this is a cubature rule on the facets.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">gamma</td><td>The scaling factor gamma for the jump stabilization operator.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">jacdet_scal</td><td>The scaling factor <em>s</em> for the Jacobian determinant factor.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">jacdet_expo</td><td>The exponent <em>p</em> for the Jacobian determinant factor. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l01601">1601</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l01601">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_jump_stabil_operator_matrix()</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="trace__assembler_8hpp_source.html#l01601">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_jump_stabil_operator_matrix()</a>.</p>
-
-</div>
-</div>
-<a id="a52376f342b265c88766f5fbe3fa76c98" name="a52376f342b265c88766f5fbe3fa76c98"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a52376f342b265c88766f5fbe3fa76c98">&#9670;&#160;</a></span>assemble_operator_matrix1() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Trafo_ &gt; </div>
-<div class="memtemplate">
-template&lt;typename Matrix_ , typename Operator_ , typename Space_ , typename CubatureFactory_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::assemble_operator_matrix1 </td>
-          <td>(</td>
-          <td class="paramtype">Matrix_ &amp;&#160;</td>
-          <td class="paramname"><em>matrix</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Operator_ &amp;&#160;</td>
-          <td class="paramname"><em>operat</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Space_ &amp;&#160;</td>
-          <td class="paramname"><em>space</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const CubatureFactory_ &amp;&#160;</td>
-          <td class="paramname"><em>cubature_factory</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">typename Matrix_::DataType&#160;</td>
-          <td class="paramname"><em>alpha</em> = <code>typename&#160;Matrix_::DataType(1)</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assembles a bilinear operator into a matrix. </p>
-<p >This function is the version for identical test- and trial-spaces.</p>
-<dl class="section note"><dt>Note</dt><dd>The assembler automatically computes the normal vectors in the cubature points of each facet (even if the operator did not ask for this), which can be queried by <code>tau.normal</code> during the <code>set_point()</code> function call of the operator's evaluator.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">matrix</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> matrix that is to be assembled.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">operat</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the operator implementing the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_bilinear_operator.html" title="Base class for Bilinear Operators.">BilinearOperator</a> interface to be assembled.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">space</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the finite-element test-/trial-space to be used.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_factory</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the cubature factory to be used for integration.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>The scaling factor for the bilinear operator. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00430">430</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00388">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_operator_matrix2()</a>.</p>
-
-</div>
-</div>
-<a id="a2ed58a734a74a37cb09b829ac0187876" name="a2ed58a734a74a37cb09b829ac0187876"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2ed58a734a74a37cb09b829ac0187876">&#9670;&#160;</a></span>assemble_operator_matrix1() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Trafo_ &gt; </div>
-<div class="memtemplate">
-template&lt;typename Matrix_ , typename Operator_ , typename Space_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::assemble_operator_matrix1 </td>
-          <td>(</td>
-          <td class="paramtype">Matrix_ &amp;&#160;</td>
-          <td class="paramname"><em>matrix</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Operator_ &amp;&#160;</td>
-          <td class="paramname"><em>operat</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const Space_ &amp;&#160;</td>
-          <td class="paramname"><em>space</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
-          <td class="paramname"><em>cubature_name</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">typename Matrix_::DataType&#160;</td>
-          <td class="paramname"><em>alpha</em> = <code>typename&#160;Matrix_::DataType(1)</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assembles a bilinear operator into a matrix. </p>
-<p >This function is the version for identical test- and trial-spaces.</p>
-<dl class="section note"><dt>Note</dt><dd>The assembler automatically computes the normal vectors in the cubature points of each facet (even if the operator did not ask for this), which can be queried by <code>tau.normal</code> during the <code>set_point()</code> function call of the operator's evaluator.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">matrix</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> matrix that is to be assembled.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">operat</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the operator implementing the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_bilinear_operator.html" title="Base class for Bilinear Operators.">BilinearOperator</a> interface to be assembled.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">space</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the finite-element test-/trial-space to be used.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_name</td><td>The name of to the cubature rule to be used for integration.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>The scaling factor for the bilinear operator. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00343">343</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00388">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_operator_matrix2()</a>.</p>
-
-</div>
-</div>
-<a id="ae36d0a121062b0006da24ca0ac624a81" name="ae36d0a121062b0006da24ca0ac624a81"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ae36d0a121062b0006da24ca0ac624a81">&#9670;&#160;</a></span>assemble_operator_matrix2() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Trafo_ &gt; </div>
-<div class="memtemplate">
-template&lt;typename Matrix_ , typename Operator_ , typename TestSpace_ , typename TrialSpace_ , typename CubatureFactory_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::assemble_operator_matrix2 </td>
-          <td>(</td>
-          <td class="paramtype">Matrix_ &amp;&#160;</td>
-          <td class="paramname"><em>matrix</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Operator_ &amp;&#160;</td>
-          <td class="paramname"><em>operat</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const TestSpace_ &amp;&#160;</td>
-          <td class="paramname"><em>test_space</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const TrialSpace_ &amp;&#160;</td>
-          <td class="paramname"><em>trial_space</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const CubatureFactory_ &amp;&#160;</td>
-          <td class="paramname"><em>cubature_factory</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">typename Matrix_::DataType&#160;</td>
-          <td class="paramname"><em>alpha</em> = <code>typename&#160;Matrix_::DataType(1)</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assembles a bilinear operator into a matrix. </p>
-<p >This function is the version for different test- and trial-spaces.</p>
-<dl class="section note"><dt>Note</dt><dd>The assembler automatically computes the normal vectors in the cubature points of each facet (even if the operator did not ask for this), which can be queried by <code>tau.normal</code> during the <code>set_point()</code> function call of the operator's evaluator.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">matrix</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> matrix that is to be assembled.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">operat</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the operator implementing the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_bilinear_operator.html" title="Base class for Bilinear Operators.">BilinearOperator</a> interface to be assembled.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">test_space</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the finite-element test-space to be used.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">trial_space</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the finite-element trial-space to be used.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_factory</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the cubature factory to be used for integration.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>The scaling factor for the bilinear operator. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00475">475</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00154">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_cells</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l03044">FEAT::Tiny::axpy()</a>, <a class="el" href="struct_f_e_a_t_1_1_shape_1_1_reference_cell.html#a44468d6589f97d5b946aa4cd5a648271">FEAT::Shape::ReferenceCell&lt; Shape_ &gt;::facet_orientation()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00444">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01548">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::format()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428abeec8d89f2e70c451ea6229f64290d74">FEAT::jac_det</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428aaaff6440f63c38bcfdc6816c4d85411b">FEAT::jac_mat</a>, <a class="el" href="namespace_f_e_a_t_1_1_tiny.html#a9344efef35bf6a53de992d9390f7f3a1">FEAT::Tiny::orthogonal()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
-
-</div>
-</div>
-<a id="a0c0c2d0087679b7ced924293860eea81" name="a0c0c2d0087679b7ced924293860eea81"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0c0c2d0087679b7ced924293860eea81">&#9670;&#160;</a></span>assemble_operator_matrix2() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Trafo_ &gt; </div>
-<div class="memtemplate">
-template&lt;typename Matrix_ , typename Operator_ , typename TestSpace_ , typename TrialSpace_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::assemble_operator_matrix2 </td>
-          <td>(</td>
-          <td class="paramtype">Matrix_ &amp;&#160;</td>
-          <td class="paramname"><em>matrix</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">Operator_ &amp;&#160;</td>
-          <td class="paramname"><em>operat</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const TestSpace_ &amp;&#160;</td>
-          <td class="paramname"><em>test_space</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const TrialSpace_ &amp;&#160;</td>
-          <td class="paramname"><em>trial_space</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
-          <td class="paramname"><em>cubature_name</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">typename Matrix_::DataType&#160;</td>
-          <td class="paramname"><em>alpha</em> = <code>typename&#160;Matrix_::DataType(1)</code>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Assembles a bilinear operator into a matrix. </p>
-<p >This function is the version for different test- and trial-spaces.</p>
-<dl class="section note"><dt>Note</dt><dd>The assembler automatically computes the normal vectors in the cubature points of each facet (even if the operator did not ask for this), which can be queried by <code>tau.normal</code> during the <code>set_point()</code> function call of the operator's evaluator.</dd></dl>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">matrix</td><td>The <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> matrix that is to be assembled.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">operat</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the operator implementing the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_bilinear_operator.html" title="Base class for Bilinear Operators.">BilinearOperator</a> interface to be assembled.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">test_space</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the finite-element test-space to be used.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">trial_space</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the finite-element trial-space to be used.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">cubature_name</td><td>The name of to the cubature rule to be used for integration.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>The scaling factor for the bilinear operator. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00388">388</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00388">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_operator_matrix2()</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="trace__assembler_8hpp_source.html#l00343">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_operator_matrix1()</a>, and <a class="el" href="trace__assembler_8hpp_source.html#l00388">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_operator_matrix2()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="trace__assembler__basic__jobs_8hpp_source.html#l01562">FEAT::Assembly::assemble_bilinear_operator_apply_vector_1()</a>, <a class="el" href="trace__assembler__basic__jobs_8hpp_source.html#l01179">FEAT::Assembly::assemble_bilinear_operator_matrix_1()</a>, <a class="el" href="trace__assembler__basic__jobs_8hpp_source.html#l01340">FEAT::Assembly::assemble_bilinear_operator_matrix_2()</a>, <a class="el" href="trace__assembler__jump__jobs_8hpp_source.html#l00807">FEAT::Assembly::assemble_jump_mass_matrix()</a>, <a class="el" href="trace__assembler__jump__jobs_8hpp_source.html#l00689">FEAT::Assembly::assemble_jump_stabilization_matrix()</a>, <a class="el" href="trace__assembler__basic__jobs_8hpp_source.html#l00670">FEAT::Assembly::assemble_linear_functional_vector()</a>, <a class="el" href="trace__assembler__basic__jobs_8hpp_source.html#l01745">FEAT::Assembly::integrate_analytic_function()</a>, <a class="el" href="trace__assembler__basic__jobs_8hpp_source.html#l01927">FEAT::Assembly::integrate_discrete_function()</a>, and <a class="el" href="trace__assembler__basic__jobs_8hpp_source.html#l02140">FEAT::Assembly::integrate_error_function()</a>.</p>
 
 </div>
 </div>
@@ -1746,9 +516,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>Clears the assembler. </p>
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00172">172</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00412">412</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00154">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_cells</a>.</p>
+<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00388">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_cells</a>.</p>
 
 </div>
 </div>
@@ -1781,9 +551,9 @@ template&lt;typename Trafo_ &gt; </div>
 <p >This function compiles the assembler for all facets that have been added manually by previous calls of the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a8977739ddfbcb24a7b957d9f0b117c0e" title="Adds a single facet to the assembler.">add_facet</a> or <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a454e673affb37be022143f9e1d3878f4" title="Adds all facets of a mesh part to the assembler.">add_mesh_part</a> functions.</p>
 <dl class="section note"><dt>Note</dt><dd>If you want to compile the assembler for all facets of the trafo's underlying mesh, consider using the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html#a82a98629c15d565ef5f51b3f70d9d1f5" title="Compiles the assembler for all inner and/our outer facets of the underlying mesh.">compile_all_facets()</a> function instead. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00217">217</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00457">457</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00154">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_cells</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00152">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_facet_mask</a>, <a class="el" href="trace__assembler_8hpp_source.html#l02137">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_find_local_facet()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00150">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_trafo</a>, <a class="el" href="graph_8hpp_source.html#l00958">FEAT::Adjacency::Graph::image_begin()</a>, <a class="el" href="graph_8hpp_source.html#l00966">FEAT::Adjacency::Graph::image_end()</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a3da3f12b499670461abe3ad9228bcbda">FEAT::Adjacency::injectify_transpose</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
+<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00388">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_cells</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00386">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_facet_mask</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00652">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_find_local_facet()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00384">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_trafo</a>, <a class="el" href="graph_8hpp_source.html#l00958">FEAT::Adjacency::Graph::image_begin()</a>, <a class="el" href="graph_8hpp_source.html#l00966">FEAT::Adjacency::Graph::image_end()</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a3da3f12b499670461abe3ad9228bcbda">FEAT::Adjacency::injectify_transpose</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
 
 </div>
 </div>
@@ -1832,9 +602,43 @@ template&lt;typename Trafo_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00268">268</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00508">508</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00154">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_cells</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00152">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_facet_mask</a>, <a class="el" href="trace__assembler_8hpp_source.html#l02137">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_find_local_facet()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00150">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_trafo</a>, <a class="el" href="graph_8hpp_source.html#l00333">FEAT::Adjacency::Graph::degree()</a>, <a class="el" href="graph_8hpp_source.html#l00958">FEAT::Adjacency::Graph::image_begin()</a>, <a class="el" href="graph_8hpp_source.html#l00966">FEAT::Adjacency::Graph::image_end()</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a3da3f12b499670461abe3ad9228bcbda">FEAT::Adjacency::injectify_transpose</a>, <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00388">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_cells</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00386">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_facet_mask</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00652">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_find_local_facet()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00384">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_trafo</a>, <a class="el" href="graph_8hpp_source.html#l00333">FEAT::Adjacency::Graph::degree()</a>, <a class="el" href="graph_8hpp_source.html#l00958">FEAT::Adjacency::Graph::image_begin()</a>, <a class="el" href="graph_8hpp_source.html#l00966">FEAT::Adjacency::Graph::image_end()</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a3da3f12b499670461abe3ad9228bcbda">FEAT::Adjacency::injectify_transpose</a>, <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+
+</div>
+</div>
+<a id="ab036982e38768a684184c26f0302f6cb" name="ab036982e38768a684184c26f0302f6cb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab036982e38768a684184c26f0302f6cb">&#9670;&#160;</a></span>get_trafo()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Trafo_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const TrafoType &amp; <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html">FEAT::Assembly::TraceAssembler</a>&lt; Trafo_ &gt;::get_trafo </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>a reference to the trafo </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00404">404</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="trace__assembler_8hpp_source.html#l00384">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_trafo</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="trace__assembler__basic__jobs_8hpp_source.html#l01562">FEAT::Assembly::assemble_bilinear_operator_apply_vector_1()</a>, <a class="el" href="trace__assembler__basic__jobs_8hpp_source.html#l01179">FEAT::Assembly::assemble_bilinear_operator_matrix_1()</a>, <a class="el" href="trace__assembler__basic__jobs_8hpp_source.html#l01340">FEAT::Assembly::assemble_bilinear_operator_matrix_2()</a>, <a class="el" href="trace__assembler__jump__jobs_8hpp_source.html#l00807">FEAT::Assembly::assemble_jump_mass_matrix()</a>, <a class="el" href="trace__assembler__jump__jobs_8hpp_source.html#l00689">FEAT::Assembly::assemble_jump_stabilization_matrix()</a>, <a class="el" href="trace__assembler__basic__jobs_8hpp_source.html#l00670">FEAT::Assembly::assemble_linear_functional_vector()</a>, <a class="el" href="trace__assembler__basic__jobs_8hpp_source.html#l01745">FEAT::Assembly::integrate_analytic_function()</a>, <a class="el" href="trace__assembler__basic__jobs_8hpp_source.html#l01927">FEAT::Assembly::integrate_discrete_function()</a>, and <a class="el" href="trace__assembler__basic__jobs_8hpp_source.html#l02140">FEAT::Assembly::integrate_error_function()</a>.</p>
 
 </div>
 </div>
@@ -1861,7 +665,7 @@ template&lt;typename Trafo_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00152">152</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00386">386</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
 </div>
 </div>
@@ -1889,9 +693,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>the indices of all cells and facets to loop over during assembly </p>
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00154">154</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00388">388</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="trace__assembler_8hpp_source.html#l00737">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_functional_vector()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l01913">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_jump_operator_matrix()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l01645">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_jump_stabil_operator_matrix()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00475">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble_operator_matrix2()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00172">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::clear()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00217">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::compile()</a>, and <a class="el" href="trace__assembler_8hpp_source.html#l00268">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::compile_all_facets()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="trace__assembler_8hpp_source.html#l00562">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::assemble()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00412">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::clear()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00457">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::compile()</a>, and <a class="el" href="trace__assembler_8hpp_source.html#l00508">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::compile_all_facets()</a>.</p>
 
 </div>
 </div>
@@ -1919,9 +723,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>the facet masks, local cell facet indices and facet orientation codes </p>
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00152">152</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00386">386</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="trace__assembler_8hpp_source.html#l00188">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::add_facet()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00200">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::add_mesh_part()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00217">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::compile()</a>, and <a class="el" href="trace__assembler_8hpp_source.html#l00268">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::compile_all_facets()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="trace__assembler_8hpp_source.html#l00428">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::add_facet()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00440">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::add_mesh_part()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00457">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::compile()</a>, and <a class="el" href="trace__assembler_8hpp_source.html#l00508">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::compile_all_facets()</a>.</p>
 
 </div>
 </div>
@@ -1947,7 +751,7 @@ template&lt;typename Trafo_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00152">152</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00386">386</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
 </div>
 </div>
@@ -1973,7 +777,7 @@ template&lt;typename Trafo_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00154">154</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00388">388</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
 </div>
 </div>
@@ -2001,9 +805,9 @@ template&lt;typename Trafo_ &gt; </div>
 
 <p>a reference to the trafo </p>
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00150">150</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00384">384</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="trace__assembler_8hpp_source.html#l02137">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_find_local_facet()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00217">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::compile()</a>, and <a class="el" href="trace__assembler_8hpp_source.html#l00268">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::compile_all_facets()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="trace__assembler_8hpp_source.html#l00652">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::_find_local_facet()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00457">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::compile()</a>, <a class="el" href="trace__assembler_8hpp_source.html#l00508">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::compile_all_facets()</a>, and <a class="el" href="trace__assembler_8hpp_source.html#l00404">FEAT::Assembly::TraceAssembler&lt; Trafo_ &gt;::get_trafo()</a>.</p>
 
 </div>
 </div>
@@ -2029,7 +833,7 @@ template&lt;typename Trafo_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00146">146</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00380">380</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
 </div>
 </div>
@@ -2055,7 +859,7 @@ template&lt;typename Trafo_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00145">145</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="trace__assembler_8hpp_source.html#l00379">379</a> of file <a class="el" href="trace__assembler_8hpp_source.html">trace_assembler.hpp</a>.</p>
 
 </div>
 </div>

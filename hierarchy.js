@@ -13,16 +13,6 @@ var hierarchy =
     [ "FEAT::Global::AlgDofPartiMatrix< LocalMatrixType, MirrorType >", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_matrix.html", null ],
     [ "FEAT::Global::AlgDofPartiVector< LocalVectorType, MirrorType >", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html", null ],
     [ "FEAT::Assembly::AnalyticFunctionIntegral< DataType, Function_ >", "struct_f_e_a_t_1_1_assembly_1_1_analytic_function_integral.html", null ],
-    [ "FEAT::Assembly::BasicMatrixAssemblyTaskCRTP1< Task, Matrix_, Space_, trafo_config, space_config >", "class_f_e_a_t_1_1_assembly_1_1_basic_matrix_assembly_task_c_r_t_p1.html", [
-      [ "FEAT::Assembly::BilinearOperatorMatrixAssemblyJob1< BilinearOperator_, Matrix_, Space_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_bilinear_operator_matrix_assembly_job1_1_1_task.html", null ]
-    ] ],
-    [ "FEAT::Assembly::BasicMatrixAssemblyTaskCRTP2< Task, Matrix_, TestSpace_, TrialSpace_, trafo_config, test_config, trial_config >", "class_f_e_a_t_1_1_assembly_1_1_basic_matrix_assembly_task_c_r_t_p2.html", [
-      [ "FEAT::Assembly::BilinearOperatorMatrixAssemblyJob2< BilinearOperator_, Matrix_, TestSpace_, TrialSpace_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_bilinear_operator_matrix_assembly_job2_1_1_task.html", null ]
-    ] ],
-    [ "FEAT::Assembly::BasicVectorAssemblyTaskCRTP< Task, Vector_, Space_, trafo_config, test_config >", "class_f_e_a_t_1_1_assembly_1_1_basic_vector_assembly_task_c_r_t_p.html", [
-      [ "FEAT::Assembly::ForceFunctionalAssemblyJob< Function_, Vector_, Space_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_force_functional_assembly_job_1_1_task.html", null ],
-      [ "FEAT::Assembly::LinearFunctionalAssemblyJob< LinearFunctional_, Vector_, Space_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_linear_functional_assembly_job_1_1_task.html", null ]
-    ] ],
     [ "FEAT::Control::BlockedBasicSystemLevel< dim_, Real, Index, LAFEM::SparseMatrixBCSR< Real, Index, dim_, dim_ >, LAFEM::SparseMatrixBWrappedCSR< Real, Index, dim_ > >", "class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level.html", null ],
     [ "FEAT::Assembly::BurgersAssemblyJobBase< Matrix_::DataType, Space_, ConvVector_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html", [
       [ "FEAT::Assembly::BurgersScalarMatrixAssemblyJob< Matrix_, Space_, ConvVector_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_scalar_matrix_assembly_job.html", null ]
@@ -49,6 +39,19 @@ var hierarchy =
     [ "FEAT::Solver::DirectStokesCore< double, Index, MatrixA_, MatrixB_, MatrixD_ >", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_core.html", null ],
     [ "FEAT::Solver::DirectStokesSolver< LocalMatrix_, LocalFilter_ >", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver.html", null ],
     [ "FEAT::Assembly::DomainAssembler< TrafoType >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembler.html", null ],
+    [ "FEAT::Assembly::DomainAssemblyBasicMatrixTaskCRTP1< Task, Matrix_, Space_, trafo_config, space_config >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_basic_matrix_task_c_r_t_p1.html", [
+      [ "FEAT::Assembly::DomainAssemblyBilinearOperatorMatrixJob1< BilinearOperator_, Matrix_, Space_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_bilinear_operator_matrix_job1_1_1_task.html", null ]
+    ] ],
+    [ "FEAT::Assembly::DomainAssemblyBasicMatrixTaskCRTP2< Task, Matrix_, TestSpace_, TrialSpace_, trafo_config, test_config, trial_config >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_basic_matrix_task_c_r_t_p2.html", [
+      [ "FEAT::Assembly::DomainAssemblyBilinearOperatorMatrixJob2< BilinearOperator_, Matrix_, TestSpace_, TrialSpace_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_bilinear_operator_matrix_job2_1_1_task.html", null ]
+    ] ],
+    [ "FEAT::Assembly::DomainAssemblyBasicVectorTaskCRTP< Task, Vector_, Space_, trafo_config, space_config >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_basic_vector_task_c_r_t_p.html", [
+      [ "FEAT::Assembly::DomainAssemblyBilinearOperatorApplyVectorJob1< BilinearOperator_, Vector_, VectorSol_, Space_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_bilinear_operator_apply_vector_job1_1_1_task.html", null ]
+    ] ],
+    [ "FEAT::Assembly::DomainAssemblyBasicVectorTaskCRTP< Task, Vector_, Space_, trafo_config, test_config >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_basic_vector_task_c_r_t_p.html", [
+      [ "FEAT::Assembly::DomainAssemblyForceFunctionalVectorJob< Function_, Vector_, Space_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_force_functional_vector_job_1_1_task.html", null ],
+      [ "FEAT::Assembly::DomainAssemblyLinearFunctionalVectorJob< LinearFunctional_, Vector_, Space_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_linear_functional_vector_job_1_1_task.html", null ]
+    ] ],
     [ "FEAT::Control::Domain::DomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_control.html", [
       [ "FEAT::Control::Domain::HierarchUnitCubeDomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_hierarch_unit_cube_domain_control.html", null ],
       [ "FEAT::Control::Domain::HierarchUnitCubeDomainControl2< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_hierarch_unit_cube_domain_control2.html", null ],
@@ -317,12 +320,7 @@ var hierarchy =
     [ "FEAT::Analytic::StaticFunction< DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_static_function.html", null ],
     [ "FEAT::Assembly::AnalyticCellProjector", "class_f_e_a_t_1_1_assembly_1_1_analytic_cell_projector.html", null ],
     [ "FEAT::Assembly::AnalyticFunctionIntegral< DataType_, Function_ >", "struct_f_e_a_t_1_1_assembly_1_1_analytic_function_integral.html", null ],
-    [ "FEAT::Assembly::AnalyticFunctionIntegralJob< DataType_, Function_, Trafo_, max_der_ >", "class_f_e_a_t_1_1_assembly_1_1_analytic_function_integral_job.html", null ],
-    [ "FEAT::Assembly::AnalyticFunctionIntegralJob< DataType_, Function_, Trafo_, max_der_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_analytic_function_integral_job_1_1_task.html", null ],
     [ "FEAT::Assembly::AnalyticVertexProjector", "class_f_e_a_t_1_1_assembly_1_1_analytic_vertex_projector.html", null ],
-    [ "FEAT::Assembly::BasicMatrixAssemblyTaskCRTP1< Derived_, Matrix_, Space_, trafo_config_, space_config_ >", "class_f_e_a_t_1_1_assembly_1_1_basic_matrix_assembly_task_c_r_t_p1.html", null ],
-    [ "FEAT::Assembly::BasicMatrixAssemblyTaskCRTP2< Derived_, Matrix_, TestSpace_, TrialSpace_, trafo_config_, test_config_, trial_config_ >", "class_f_e_a_t_1_1_assembly_1_1_basic_matrix_assembly_task_c_r_t_p2.html", null ],
-    [ "FEAT::Assembly::BasicVectorAssemblyTaskCRTP< Derived_, Vector_, Space_, trafo_config_, space_config_ >", "class_f_e_a_t_1_1_assembly_1_1_basic_vector_assembly_task_c_r_t_p.html", null ],
     [ "FEAT::Assembly::BilinearOperator", "class_f_e_a_t_1_1_assembly_1_1_bilinear_operator.html", [
       [ "FEAT::Assembly::Common::DivDivOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_div_div_operator.html", null ],
       [ "FEAT::Assembly::Common::DuDvOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_du_dv_operator.html", null ],
@@ -334,6 +332,8 @@ var hierarchy =
       [ "FEAT::Assembly::Common::LaplaceBeltramiOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_beltrami_operator.html", null ],
       [ "FEAT::Assembly::Common::LaplaceOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_operator.html", null ],
       [ "FEAT::Assembly::Common::LaplaceOperatorBlocked< dimension_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_operator_blocked.html", null ],
+      [ "FEAT::Assembly::Common::NormalGradientTrialOperatorBlocked< dimension_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_normal_gradient_trial_operator_blocked.html", null ],
+      [ "FEAT::Assembly::Common::NormalTransposedGradientTrialOperatorBlocked< dimension_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_normal_transposed_gradient_trial_operator_blocked.html", null ],
       [ "FEAT::Assembly::Common::StrainRateTensorOperator< dim_, nsc_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_strain_rate_tensor_operator.html", null ],
       [ "FEAT::Assembly::Common::StressDivergenceOperator< dim_, nsc_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_stress_divergence_operator.html", null ],
       [ "FEAT::Assembly::Common::TestDerivativeOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_test_derivative_operator.html", null ],
@@ -350,14 +350,14 @@ var hierarchy =
       [ "FEAT::Assembly::Common::LaplaceBeltramiOperator::Evaluator< AsmTraits_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_beltrami_operator_1_1_evaluator.html", null ],
       [ "FEAT::Assembly::Common::LaplaceOperator::Evaluator< AsmTraits_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_operator_1_1_evaluator.html", null ],
       [ "FEAT::Assembly::Common::LaplaceOperatorBlocked< dimension_ >::Evaluator< AsmTraits_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_operator_blocked_1_1_evaluator.html", null ],
+      [ "FEAT::Assembly::Common::NormalGradientTrialOperatorBlocked< dimension_ >::Evaluator< AsmTraits_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_normal_gradient_trial_operator_blocked_1_1_evaluator.html", null ],
+      [ "FEAT::Assembly::Common::NormalTransposedGradientTrialOperatorBlocked< dimension_ >::Evaluator< AsmTraits_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_normal_transposed_gradient_trial_operator_blocked_1_1_evaluator.html", null ],
       [ "FEAT::Assembly::Common::StrainRateTensorOperator< dim_, nsc_ >::Evaluator< AsmTraits_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_strain_rate_tensor_operator_1_1_evaluator.html", null ],
       [ "FEAT::Assembly::Common::StressDivergenceOperator< dim_, nsc_ >::Evaluator< AsmTraits_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_stress_divergence_operator_1_1_evaluator.html", null ],
       [ "FEAT::Assembly::Common::TestDerivativeOperator::Evaluator< AsmTraits_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_test_derivative_operator_1_1_evaluator.html", null ],
       [ "FEAT::Assembly::Common::TrialDerivativeOperator::Evaluator< AsmTraits_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_trial_derivative_operator_1_1_evaluator.html", null ]
     ] ],
     [ "FEAT::Assembly::BilinearOperatorAssembler", "class_f_e_a_t_1_1_assembly_1_1_bilinear_operator_assembler.html", null ],
-    [ "FEAT::Assembly::BilinearOperatorMatrixAssemblyJob1< BilinearOperator_, Matrix_, Space_ >", "class_f_e_a_t_1_1_assembly_1_1_bilinear_operator_matrix_assembly_job1.html", null ],
-    [ "FEAT::Assembly::BilinearOperatorMatrixAssemblyJob2< BilinearOperator_, Matrix_, TestSpace_, TrialSpace_ >", "class_f_e_a_t_1_1_assembly_1_1_bilinear_operator_matrix_assembly_job2.html", null ],
     [ "FEAT::Assembly::BurgersAssembler< DataType_, IndexType_, dim_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembler.html", null ],
     [ "FEAT::Assembly::BurgersAssemblerCarreau< DataType_, IndexType_, dim_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembler_carreau.html", null ],
     [ "FEAT::Assembly::BurgersAssemblyJobBase< DataType_, Space_, ConvVector_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html", [
@@ -387,21 +387,30 @@ var hierarchy =
     [ "FEAT::Assembly::DiscreteFunctionIntegral< Vector_, Space_ >", "struct_f_e_a_t_1_1_assembly_1_1_discrete_function_integral.html", null ],
     [ "FEAT::Assembly::DiscreteFunctionIntegral< LAFEM::DenseVector< DT_, IT_ >, Space_ >", "struct_f_e_a_t_1_1_assembly_1_1_discrete_function_integral_3_01_l_a_f_e_m_1_1_dense_vector_3_01_a768f17c1eda786ac85c0b6fa08eaeae.html", null ],
     [ "FEAT::Assembly::DiscreteFunctionIntegral< LAFEM::DenseVectorBlocked< DT_, IT_, bs_ >, Space_ >", "struct_f_e_a_t_1_1_assembly_1_1_discrete_function_integral_3_01_l_a_f_e_m_1_1_dense_vector_block282ab9ff04649d6c90f61fc974e9149f.html", null ],
-    [ "FEAT::Assembly::DiscreteFunctionIntegralJob< Vector_, Space_, max_der_ >", "class_f_e_a_t_1_1_assembly_1_1_discrete_function_integral_job.html", null ],
-    [ "FEAT::Assembly::DiscreteFunctionIntegralJob< Vector_, Space_, max_der_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_discrete_function_integral_job_1_1_task.html", null ],
     [ "FEAT::Assembly::DiscreteVertexProjector", "class_f_e_a_t_1_1_assembly_1_1_discrete_vertex_projector.html", null ],
     [ "FEAT::Assembly::DomainAssembler< Trafo_ >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembler.html", null ],
     [ "FEAT::Assembly::DomainAssembler< Trafo_ >::ThreadStats", "class_f_e_a_t_1_1_assembly_1_1_domain_assembler_1_1_thread_stats.html", null ],
     [ "FEAT::Assembly::DomainAssembler< Trafo_ >::Worker< Job_ >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembler_1_1_worker.html", null ],
+    [ "FEAT::Assembly::DomainAssemblyAnalyticFunctionIntegralJob< DataType_, Function_, Trafo_, max_der_ >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_analytic_function_integral_job.html", null ],
+    [ "FEAT::Assembly::DomainAssemblyAnalyticFunctionIntegralJob< DataType_, Function_, Trafo_, max_der_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_analytic_function_integral_job_1_1_task.html", null ],
+    [ "FEAT::Assembly::DomainAssemblyBasicMatrixTaskCRTP1< Derived_, Matrix_, Space_, trafo_config_, space_config_ >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_basic_matrix_task_c_r_t_p1.html", null ],
+    [ "FEAT::Assembly::DomainAssemblyBasicMatrixTaskCRTP2< Derived_, Matrix_, TestSpace_, TrialSpace_, trafo_config_, test_config_, trial_config_ >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_basic_matrix_task_c_r_t_p2.html", null ],
+    [ "FEAT::Assembly::DomainAssemblyBasicVectorTaskCRTP< Derived_, Vector_, Space_, trafo_config_, space_config_ >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_basic_vector_task_c_r_t_p.html", null ],
+    [ "FEAT::Assembly::DomainAssemblyBilinearOperatorApplyVectorJob1< BilinearOperator_, Vector_, VectorSol_, Space_ >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_bilinear_operator_apply_vector_job1.html", null ],
+    [ "FEAT::Assembly::DomainAssemblyBilinearOperatorMatrixJob1< BilinearOperator_, Matrix_, Space_ >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_bilinear_operator_matrix_job1.html", null ],
+    [ "FEAT::Assembly::DomainAssemblyBilinearOperatorMatrixJob2< BilinearOperator_, Matrix_, TestSpace_, TrialSpace_ >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_bilinear_operator_matrix_job2.html", null ],
+    [ "FEAT::Assembly::DomainAssemblyDiscreteFunctionIntegralJob< Vector_, Space_, max_der_ >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_discrete_function_integral_job.html", null ],
+    [ "FEAT::Assembly::DomainAssemblyDiscreteFunctionIntegralJob< Vector_, Space_, max_der_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_discrete_function_integral_job_1_1_task.html", null ],
+    [ "FEAT::Assembly::DomainAssemblyErrorFunctionIntegralJob< Function_, Vector_, Space_, max_der_ >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_error_function_integral_job.html", null ],
+    [ "FEAT::Assembly::DomainAssemblyErrorFunctionIntegralJob< Function_, Vector_, Space_, max_der_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_error_function_integral_job_1_1_task.html", null ],
+    [ "FEAT::Assembly::DomainAssemblyForceFunctionalVectorJob< Function_, Vector_, Space_ >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_force_functional_vector_job.html", null ],
     [ "FEAT::Assembly::DomainAssemblyJob", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_job.html", null ],
     [ "FEAT::Assembly::DomainAssemblyJob::Task", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_job_1_1_task.html", null ],
-    [ "FEAT::Assembly::ErrorFunctionIntegralJob< Function_, Vector_, Space_, max_der_ >", "class_f_e_a_t_1_1_assembly_1_1_error_function_integral_job.html", null ],
-    [ "FEAT::Assembly::ErrorFunctionIntegralJob< Function_, Vector_, Space_, max_der_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_error_function_integral_job_1_1_task.html", null ],
+    [ "FEAT::Assembly::DomainAssemblyLinearFunctionalVectorJob< LinearFunctional_, Vector_, Space_ >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_linear_functional_vector_job.html", null ],
     [ "FEAT::Assembly::FEInterpolator< ToSpace_, FromSpace_ >", "struct_f_e_a_t_1_1_assembly_1_1_f_e_interpolator.html", null ],
     [ "FEAT::Assembly::FEInterpolator< Space::Lagrange1::Element< Trafo_ >, Space::Lagrange2::Element< Trafo_ > >", "struct_f_e_a_t_1_1_assembly_1_1_f_e_interpolator_3_01_space_1_1_lagrange1_1_1_element_3_01_trafo88bd382a0f92c8baea41863ea8ff4cff.html", null ],
     [ "FEAT::Assembly::FEInterpolator< Space::Lagrange2::Element< Trafo_ >, Space::Lagrange1::Element< Trafo_ > >", "struct_f_e_a_t_1_1_assembly_1_1_f_e_interpolator_3_01_space_1_1_lagrange2_1_1_element_3_01_trafoaad41beedc2a09129705ed54a155ebb0.html", null ],
     [ "FEAT::Assembly::FEInterpolator< Space_, Space_ >", "struct_f_e_a_t_1_1_assembly_1_1_f_e_interpolator_3_01_space___00_01_space___01_4.html", null ],
-    [ "FEAT::Assembly::ForceFunctionalAssemblyJob< Function_, Vector_, Space_ >", "class_f_e_a_t_1_1_assembly_1_1_force_functional_assembly_job.html", null ],
     [ "FEAT::Assembly::FunctionCellIntegralInfo< FuncIntInfo_, CellVector_ >", "class_f_e_a_t_1_1_assembly_1_1_function_cell_integral_info.html", null ],
     [ "FEAT::Assembly::FunctionIntegralInfo< DataType_, ValueType_, GradientType_, HessianType_ >", "class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html", null ],
     [ "FEAT::Assembly::GradOperatorAssembler", "class_f_e_a_t_1_1_assembly_1_1_grad_operator_assembler.html", null ],
@@ -421,7 +430,6 @@ var hierarchy =
       [ "FEAT::Assembly::Common::LaplaceFunctional< Function_ >::Evaluator< AsmTraits_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_laplace_functional_1_1_evaluator.html", null ]
     ] ],
     [ "FEAT::Assembly::LinearFunctionalAssembler", "class_f_e_a_t_1_1_assembly_1_1_linear_functional_assembler.html", null ],
-    [ "FEAT::Assembly::LinearFunctionalAssemblyJob< LinearFunctional_, Vector_, Space_ >", "class_f_e_a_t_1_1_assembly_1_1_linear_functional_assembly_job.html", null ],
     [ "FEAT::Assembly::MatrixDiscreteEvalData< DT_, dim_i_, dim_j_ >", "class_f_e_a_t_1_1_assembly_1_1_matrix_discrete_eval_data.html", null ],
     [ "FEAT::Assembly::MeanFilterAssembler", "class_f_e_a_t_1_1_assembly_1_1_mean_filter_assembler.html", null ],
     [ "FEAT::Assembly::MirrorAssembler", "class_f_e_a_t_1_1_assembly_1_1_mirror_assembler.html", null ],
@@ -436,6 +444,22 @@ var hierarchy =
     [ "FEAT::Assembly::StokesFBMAssembler< MeshType_ >", "class_f_e_a_t_1_1_assembly_1_1_stokes_f_b_m_assembler.html", null ],
     [ "FEAT::Assembly::SymbolicAssembler", "class_f_e_a_t_1_1_assembly_1_1_symbolic_assembler.html", null ],
     [ "FEAT::Assembly::TraceAssembler< Trafo_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembler.html", null ],
+    [ "FEAT::Assembly::TraceAssemblyAnalyticFunctionIntegralJob< DataType_, Function_, Trafo_, max_der_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_analytic_function_integral_job.html", null ],
+    [ "FEAT::Assembly::TraceAssemblyAnalyticFunctionIntegralJob< DataType_, Function_, Trafo_, max_der_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_analytic_function_integral_job_1_1_task.html", null ],
+    [ "FEAT::Assembly::TraceAssemblyBasicTaskBase1< DataType_, Space_, trafo_config_, facet_trafo_config_, space_config_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_basic_task_base1.html", null ],
+    [ "FEAT::Assembly::TraceAssemblyBasicTaskBase2< DataType_, TestSpace_, TrialSpace_, trafo_config_, facet_trafo_config_, test_config_, trial_config_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_basic_task_base2.html", null ],
+    [ "FEAT::Assembly::TraceAssemblyBilinearOperatorApplyVectorJob1< BilinearOperator_, Vector_, VectorSol_, Space_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_bilinear_operator_apply_vector_job1.html", null ],
+    [ "FEAT::Assembly::TraceAssemblyBilinearOperatorMatrixJob1< BilinearOperator_, Matrix_, Space_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_bilinear_operator_matrix_job1.html", null ],
+    [ "FEAT::Assembly::TraceAssemblyBilinearOperatorMatrixJob2< BilinearOperator_, Matrix_, TestSpace_, TrialSpace_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_bilinear_operator_matrix_job2.html", null ],
+    [ "FEAT::Assembly::TraceAssemblyDiscreteFunctionIntegralJob< Vector_, Space_, max_der_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_discrete_function_integral_job.html", null ],
+    [ "FEAT::Assembly::TraceAssemblyErrorFunctionIntegralJob< Function_, Vector_, Space_, max_der_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_error_function_integral_job.html", null ],
+    [ "FEAT::Assembly::TraceAssemblyJob", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_job.html", null ],
+    [ "FEAT::Assembly::TraceAssemblyJob::Task", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_job_1_1_task.html", null ],
+    [ "FEAT::Assembly::TraceAssemblyJumpMassMatrixJob< Matrix_, Space_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_jump_mass_matrix_job.html", null ],
+    [ "FEAT::Assembly::TraceAssemblyJumpStabilizationMatrixJob< Matrix_, Space_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_jump_stabilization_matrix_job.html", null ],
+    [ "FEAT::Assembly::TraceAssemblyJumpTaskBase1< DataType_, Space_, trafo_config_, facet_trafo_config_, space_config_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_jump_task_base1.html", null ],
+    [ "FEAT::Assembly::TraceAssemblyLinearFunctionalVectorJob< LinearFunctional_, Vector_, Space_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_linear_functional_vector_job.html", null ],
+    [ "FEAT::Assembly::TraceAssemblyStokesBodyForceAssemblyJob< VectorVelo_, VectorPres_, SpaceVelo_, SpacePres_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_stokes_body_force_assembly_job.html", null ],
     [ "FEAT::Assembly::UnitFilterAssembler< Mesh_ >", "class_f_e_a_t_1_1_assembly_1_1_unit_filter_assembler.html", null ],
     [ "FEAT::Assembly::VectorDiscreteEvalData< DT_, dim_ >", "class_f_e_a_t_1_1_assembly_1_1_vector_discrete_eval_data.html", null ],
     [ "FEAT::Assembly::VectorErrorComputer< max_norm_ >", "class_f_e_a_t_1_1_assembly_1_1_vector_error_computer.html", null ],
@@ -615,7 +639,7 @@ var hierarchy =
     [ "FEAT::Geometry::EntitySearchEntry< Shape_, num_coords_ >", "struct_f_e_a_t_1_1_geometry_1_1_entity_search_entry.html", null ],
     [ "FEAT::Geometry::ExportEPS", "class_f_e_a_t_1_1_geometry_1_1_export_e_p_s.html", null ],
     [ "FEAT::Geometry::ExportSVG", "class_f_e_a_t_1_1_geometry_1_1_export_s_v_g.html", null ],
-    [ "FEAT::Geometry::ExportVTK< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html", null ],
+    [ "FEAT::Geometry::ExportVTK< Mesh_, cell_dim_ >", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html", null ],
     [ "FEAT::Geometry::FacetFlipper< Shape_ >", "class_f_e_a_t_1_1_geometry_1_1_facet_flipper.html", null ],
     [ "FEAT::Geometry::Factory< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_factory.html", [
       [ "FEAT::Geometry::ReferenceCellFactory< Shape_, CoordType_ >", "class_f_e_a_t_1_1_geometry_1_1_reference_cell_factory.html", null ],
@@ -636,6 +660,9 @@ var hierarchy =
     [ "FEAT::Geometry::IndexTree< Shape_ >", "class_f_e_a_t_1_1_geometry_1_1_index_tree.html", null ],
     [ "FEAT::Geometry::IndexTree< Shape_ >::IndexVector", "class_f_e_a_t_1_1_geometry_1_1_index_tree_1_1_index_vector.html", null ],
     [ "FEAT::Geometry::IndexTuple< num_indices_ >", "struct_f_e_a_t_1_1_geometry_1_1_index_tuple.html", null ],
+    [ "FEAT::Geometry::Inner::DimVector< Shape_, T_ >", "class_f_e_a_t_1_1_geometry_1_1_inner_1_1_dim_vector.html", null ],
+    [ "FEAT::Geometry::Inner::DimVector< Shape::Vertex, T_ >", "class_f_e_a_t_1_1_geometry_1_1_inner_1_1_dim_vector_3_01_shape_1_1_vertex_00_01_t___01_4.html", null ],
+    [ "FEAT::Geometry::Inner::JoinEntry", "struct_f_e_a_t_1_1_geometry_1_1_inner_1_1_join_entry.html", null ],
     [ "FEAT::Geometry::Intern::AdaptiveElement< TemplateSet_, Shape_ >", "struct_f_e_a_t_1_1_geometry_1_1_intern_1_1_adaptive_element.html", null ],
     [ "FEAT::Geometry::Intern::AdaptiveMeshStorage< MeshShape_, TemplateSet_, VertexType_ >", "class_f_e_a_t_1_1_geometry_1_1_intern_1_1_adaptive_mesh_storage.html", null ],
     [ "FEAT::Geometry::Intern::AdaptiveVertex< VertexType >", "struct_f_e_a_t_1_1_geometry_1_1_intern_1_1_adaptive_vertex.html", null ],
@@ -701,6 +728,7 @@ var hierarchy =
     [ "FEAT::Geometry::MeshPart< MeshType_ >::IndexSet< cell_dim_, face_dim_ >", "struct_f_e_a_t_1_1_geometry_1_1_mesh_part_1_1_index_set.html", null ],
     [ "FEAT::Geometry::MeshPart< MeshType_ >::TargetSet< cell_dim_ >", "struct_f_e_a_t_1_1_geometry_1_1_mesh_part_1_1_target_set.html", null ],
     [ "FEAT::Geometry::MeshPartExtruderFactory< SourceMesh_ >", "class_f_e_a_t_1_1_geometry_1_1_mesh_part_extruder_factory.html", null ],
+    [ "FEAT::Geometry::MeshPartOperations< MeshType_ >", "class_f_e_a_t_1_1_geometry_1_1_mesh_part_operations.html", null ],
     [ "FEAT::Geometry::MeshPartSliceExtruderFactory< SourceMesh_ >", "class_f_e_a_t_1_1_geometry_1_1_mesh_part_slice_extruder_factory.html", null ],
     [ "FEAT::Geometry::MeshPermutation< Shape_ >", "class_f_e_a_t_1_1_geometry_1_1_mesh_permutation.html", null ],
     [ "FEAT::Geometry::MeshQualityHeuristic< Shape_ >", "struct_f_e_a_t_1_1_geometry_1_1_mesh_quality_heuristic.html", null ],
@@ -752,6 +780,9 @@ var hierarchy =
     [ "FEAT::Geometry::TopologyTemplate< Shape_, reference_dim_ >", "struct_f_e_a_t_1_1_geometry_1_1_topology_template.html", null ],
     [ "FEAT::Geometry::TopologyTemplate< Shape_, 0 >", "struct_f_e_a_t_1_1_geometry_1_1_topology_template_3_01_shape___00_010_01_4.html", null ],
     [ "FEAT::Geometry::TwoRefinementData", "class_f_e_a_t_1_1_geometry_1_1_two_refinement_data.html", null ],
+    [ "FEAT::Geometry::UmbrellaSmoother< MeshType_ >", "class_f_e_a_t_1_1_geometry_1_1_umbrella_smoother.html", [
+      [ "FEAT::Geometry::DistributedUmbrellaSmoother< MeshType_ >", "class_f_e_a_t_1_1_geometry_1_1_distributed_umbrella_smoother.html", null ]
+    ] ],
     [ "FEAT::Geometry::UnitCubeFactory< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_unit_cube_factory.html", null ],
     [ "FEAT::Geometry::UnitCubePatchGenerator< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_unit_cube_patch_generator.html", null ],
     [ "FEAT::Geometry::UnitSphereFactory< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_unit_sphere_factory.html", null ],
@@ -924,6 +955,16 @@ var hierarchy =
     [ "FEAT::MetaMath::Binomial< n_, k_ >", "struct_f_e_a_t_1_1_meta_math_1_1_binomial.html", null ],
     [ "FEAT::MetaMath::Factorial< n_, m_ >", "struct_f_e_a_t_1_1_meta_math_1_1_factorial.html", null ],
     [ "FEAT::mutable_priority_queue< _Key, _Value, _KeyComp, _ValueComp >", "class_f_e_a_t_1_1mutable__priority__queue.html", null ],
+    [ "FEAT::Pack::SwapHelper< bytes_ >", "struct_f_e_a_t_1_1_pack_1_1_swap_helper.html", null ],
+    [ "FEAT::Pack::SwapHelper< 1 >", "struct_f_e_a_t_1_1_pack_1_1_swap_helper_3_011_01_4.html", null ],
+    [ "FEAT::Pack::SwapHelper< 16 >", "struct_f_e_a_t_1_1_pack_1_1_swap_helper_3_0116_01_4.html", null ],
+    [ "FEAT::Pack::SwapHelper< 2 >", "struct_f_e_a_t_1_1_pack_1_1_swap_helper_3_012_01_4.html", null ],
+    [ "FEAT::Pack::SwapHelper< 4 >", "struct_f_e_a_t_1_1_pack_1_1_swap_helper_3_014_01_4.html", null ],
+    [ "FEAT::Pack::SwapHelper< 8 >", "struct_f_e_a_t_1_1_pack_1_1_swap_helper_3_018_01_4.html", null ],
+    [ "FEAT::Pack::TypeHelper< Tclass_, signed_ >", "struct_f_e_a_t_1_1_pack_1_1_type_helper.html", null ],
+    [ "FEAT::Pack::TypeHelper< FEAT::Type::FloatingClass, true >", "struct_f_e_a_t_1_1_pack_1_1_type_helper_3_01_f_e_a_t_1_1_type_1_1_floating_class_00_01true_01_4.html", null ],
+    [ "FEAT::Pack::TypeHelper< FEAT::Type::IntegralClass, false >", "struct_f_e_a_t_1_1_pack_1_1_type_helper_3_01_f_e_a_t_1_1_type_1_1_integral_class_00_01false_01_4.html", null ],
+    [ "FEAT::Pack::TypeHelper< FEAT::Type::IntegralClass, true >", "struct_f_e_a_t_1_1_pack_1_1_type_helper_3_01_f_e_a_t_1_1_type_1_1_integral_class_00_01true_01_4.html", null ],
     [ "FEAT::PropertyMap", "class_f_e_a_t_1_1_property_map.html", null ],
     [ "FEAT::Random", "class_f_e_a_t_1_1_random.html", null ],
     [ "FEAT::Runtime", "class_f_e_a_t_1_1_runtime.html", null ],
@@ -1459,6 +1500,7 @@ var hierarchy =
     [ "FEAT::Tiny::Matrix< CoordType, 3, 3 >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, 2, 2 >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, 21, 21 >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
+    [ "FEAT::Tiny::Matrix< DataType, 3, 2 >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, 3, image_dim >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, 4, 4 >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, 5, 5 >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
@@ -1468,8 +1510,10 @@ var hierarchy =
     [ "FEAT::Tiny::Matrix< DataType, 9, image_dim >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, conv_dim, conv_dim >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, dim, dim >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
+    [ "FEAT::Tiny::Matrix< DataType, facet_dim, facet_dim >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, image_dim, num_verts >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, max_local_dofs, max_local_dofs >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
+    [ "FEAT::Tiny::Matrix< DataType, shape_dim, facet_dim >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType, TrafoEvaluator::domain_dim, TrafoEvaluator::domain_dim >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType_, 27, 27 >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< DataType_, 3, 3 >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
@@ -1485,6 +1529,7 @@ var hierarchy =
     [ "FEAT::Global::Matrix< LocalSystemMatrix, SystemMirror, SystemMirror >", "class_f_e_a_t_1_1_global_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< MatrixValue, max_local_dofs, max_local_dofs >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< T_, m_, n_, m_, n_ >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
+    [ "FEAT::Tiny::Matrix< ValueType, max_common_dofs, max_common_dofs >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Geometry::MeshAtlas< MeshType >", "class_f_e_a_t_1_1_geometry_1_1_mesh_atlas.html", null ],
     [ "FEAT::Geometry::MeshAtlas< RootMesh_ >", "class_f_e_a_t_1_1_geometry_1_1_mesh_atlas.html", null ],
     [ "FEAT::Meshopt::MeshConcentrationFunctionBase< Trafo_, RumpfTrafo< Trafo_, typename Trafo_::CoordType > >", "class_f_e_a_t_1_1_meshopt_1_1_mesh_concentration_function_base.html", null ],
@@ -1661,6 +1706,44 @@ var hierarchy =
     ] ],
     [ "FEAT::Control::StokesBlockedSystemLevel< dim_, Real, Index, LAFEM::SparseMatrixBCSR< Real, Index, dim_, dim_ >, LAFEM::SparseMatrixBCSR< Real, Index, dim_, 1 >, LAFEM::SparseMatrixBCSR< Real, Index, 1, dim_ >, LAFEM::SparseMatrixCSR< Real, Index >, LAFEM::SparseMatrixBWrappedCSR< Real, Index, dim_ >, LAFEM::SparseMatrixCSR< Real, Index > >", "class_f_e_a_t_1_1_control_1_1_stokes_blocked_system_level.html", null ],
     [ "FEAT::Control::StokesPowerSystemLevel< dim_, Real, Index, LAFEM::SparseMatrixCSR< Real, Index > >", "struct_f_e_a_t_1_1_control_1_1_stokes_power_system_level.html", null ],
+    [ "FEAT::Assembly::TraceAssemblyBasicTaskBase1< DataType, Space_, trafo_config, facet_trafo_config, space_config >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_basic_task_base1.html", [
+      [ "FEAT::Assembly::TraceAssemblyDiscreteFunctionIntegralJob< Vector_, Space_, max_der_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_discrete_function_integral_job_1_1_task.html", null ],
+      [ "FEAT::Assembly::TraceAssemblyErrorFunctionIntegralJob< Function_, Vector_, Space_, max_der_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_error_function_integral_job_1_1_task.html", null ]
+    ] ],
+    [ "FEAT::Assembly::TraceAssemblyBasicTaskBase1< Matrix_::DataType, Space_, trafo_config_, facet_trafo_config_|TrafoTags::jac_det, space_config_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_basic_task_base1.html", [
+      [ "FEAT::Assembly::TraceAssemblyBasicMatrixTaskCRTP1< Task, Matrix_, Space_, trafo_config, TrafoTags::none, space_config >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_basic_matrix_task_c_r_t_p1.html", [
+        [ "FEAT::Assembly::TraceAssemblyBilinearOperatorMatrixJob1< BilinearOperator_, Matrix_, Space_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_bilinear_operator_matrix_job1_1_1_task.html", null ]
+      ] ],
+      [ "FEAT::Assembly::TraceAssemblyBasicMatrixTaskCRTP1< Derived_, Matrix_, Space_, trafo_config_, facet_trafo_config_, space_config_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_basic_matrix_task_c_r_t_p1.html", null ]
+    ] ],
+    [ "FEAT::Assembly::TraceAssemblyBasicTaskBase1< Vector_::DataType, Space_, trafo_config_, facet_trafo_config_|TrafoTags::jac_det, space_config_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_basic_task_base1.html", [
+      [ "FEAT::Assembly::TraceAssemblyBasicVectorTaskCRTP< Task, Vector_, Space_, trafo_config, TrafoTags::none, space_config >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_basic_vector_task_c_r_t_p.html", [
+        [ "FEAT::Assembly::TraceAssemblyBilinearOperatorApplyVectorJob1< BilinearOperator_, Vector_, VectorSol_, Space_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_bilinear_operator_apply_vector_job1_1_1_task.html", null ],
+        [ "FEAT::Assembly::TraceAssemblyLinearFunctionalVectorJob< LinearFunctional_, Vector_, Space_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_linear_functional_vector_job_1_1_task.html", null ]
+      ] ],
+      [ "FEAT::Assembly::TraceAssemblyBasicVectorTaskCRTP< Derived_, Vector_, Space_, trafo_config_, facet_trafo_config_, space_config_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_basic_vector_task_c_r_t_p.html", null ]
+    ] ],
+    [ "FEAT::Assembly::TraceAssemblyBasicTaskBase2< Matrix_::DataType, TestSpace_, TrialSpace_, trafo_config_, facet_trafo_config_|TrafoTags::jac_det, test_config_, trial_config_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_basic_task_base2.html", [
+      [ "FEAT::Assembly::TraceAssemblyBasicMatrixTaskCRTP2< Task, Matrix_, TestSpace_, TrialSpace_, trafo_config, TrafoTags::none, test_config, trial_config >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_basic_matrix_task_c_r_t_p2.html", [
+        [ "FEAT::Assembly::TraceAssemblyBilinearOperatorMatrixJob2< BilinearOperator_, Matrix_, TestSpace_, TrialSpace_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_bilinear_operator_matrix_job2_1_1_task.html", null ]
+      ] ],
+      [ "FEAT::Assembly::TraceAssemblyBasicMatrixTaskCRTP2< Derived_, Matrix_, TestSpace_, TrialSpace_, trafo_config_, facet_trafo_config_, test_config_, trial_config_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_basic_matrix_task_c_r_t_p2.html", null ]
+    ] ],
+    [ "FEAT::Assembly::TraceAssemblyBasicTaskBase2< VectorVelo_::DataType, SpaceVelo_, SpacePres_, trafo_config_, facet_trafo_config_|TrafoTags::jac_det, space_velo_config_, space_pres_config_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_basic_task_base2.html", [
+      [ "FEAT::Assembly::TraceAssemblyStokesVectorAnalysisTaskCRTP< Task, VectorVelo_, VectorPres_, SpaceVelo_, SpacePres_, trafo_config, facet_trafo_config, space_velo_config, space_pres_config >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_stokes_vector_analysis_task_c_r_t_p.html", [
+        [ "FEAT::Assembly::TraceAssemblyStokesBodyForceAssemblyJob< VectorVelo_, VectorPres_, SpaceVelo_, SpacePres_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_stokes_body_force_assembly_job_1_1_task.html", null ]
+      ] ],
+      [ "FEAT::Assembly::TraceAssemblyStokesVectorAnalysisTaskCRTP< Derived_, VectorVelo_, VectorPres_, SpaceVelo_, SpacePres_, trafo_config_, facet_trafo_config_, space_velo_config_, space_pres_config_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_stokes_vector_analysis_task_c_r_t_p.html", null ]
+    ] ],
+    [ "FEAT::Assembly::TraceAssemblyJumpTaskBase1< Matrix_::DataType, Space_, trafo_config_, facet_trafo_config_|TrafoTags::jac_det, space_config_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_jump_task_base1.html", [
+      [ "FEAT::Assembly::TraceAssemblyJumpMatrixTaskCRTP1< Task, Matrix_, Space_, TrafoTags::none, TrafoTags::none, SpaceTags::value >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_jump_matrix_task_c_r_t_p1.html", [
+        [ "FEAT::Assembly::TraceAssemblyJumpMassMatrixJob< Matrix_, Space_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_jump_mass_matrix_job_1_1_task.html", null ]
+      ] ],
+      [ "FEAT::Assembly::TraceAssemblyJumpMatrixTaskCRTP1< Task, Matrix_, Space_, TrafoTags::none, TrafoTags::jac_det, SpaceTags::grad >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_jump_matrix_task_c_r_t_p1.html", [
+        [ "FEAT::Assembly::TraceAssemblyJumpStabilizationMatrixJob< Matrix_, Space_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_jump_stabilization_matrix_job_1_1_task.html", null ]
+      ] ],
+      [ "FEAT::Assembly::TraceAssemblyJumpMatrixTaskCRTP1< Derived_, Matrix_, Space_, trafo_config_, facet_trafo_config_, space_config_ >", "class_f_e_a_t_1_1_assembly_1_1_trace_assembly_jump_matrix_task_c_r_t_p1.html", null ]
+    ] ],
     [ "FEAT::Global::Transfer< LocalPresTransfer, PresMirror >", "class_f_e_a_t_1_1_global_1_1_transfer.html", null ],
     [ "FEAT::Global::Transfer< LocalScalarTransfer, ScalarMirror >", "class_f_e_a_t_1_1_global_1_1_transfer.html", null ],
     [ "FEAT::Global::Transfer< LocalStressTransfer, StressMirror >", "class_f_e_a_t_1_1_global_1_1_transfer.html", null ],
@@ -1673,7 +1756,9 @@ var hierarchy =
     [ "FEAT::Tiny::Vector< DataType, 2 >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, conv_dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
+    [ "FEAT::Tiny::Vector< DataType, dimension_ >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, domain_dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
+    [ "FEAT::Tiny::Vector< DataType, facet_dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, image_dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, max_local_dofs >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, n_, n_ >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
@@ -1692,6 +1777,7 @@ var hierarchy =
     [ "FEAT::Tiny::Vector< Real, domain_dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< T_, n_, n_ >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< T_, n_, sn_ >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
+    [ "FEAT::Tiny::Vector< ValueType, n_, n_ >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Geometry::VertexSet< Shape_::dimension, Real >", "struct_f_e_a_t_1_1_geometry_1_1_vertex_set.html", null ],
     [ "FEAT::Geometry::VertexSet< shape_dim_, Real >", "struct_f_e_a_t_1_1_geometry_1_1_vertex_set.html", null ],
     [ "FEAT::Geometry::VoxelMasker< CoordType_, 3 >", "class_f_e_a_t_1_1_geometry_1_1_voxel_masker.html", [

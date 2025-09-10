@@ -214,16 +214,16 @@ $(document).ready(function(){initNavTree('dist_8cpp_source.html',''); initResiza
 <div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span><span class="preprocessor">#ifdef FEAT_MPI_THREAD_MULTIPLE</span></div>
 <div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>      <a class="code hl_define" href="assertion_8hpp.html#afa48e2beb6db8fae75edc24466481965">XASSERTM</a>((<span class="keywordtype">bool</span>)!already_initialized, <span class="stringliteral">&quot;MPI was already initialized by another library, we cannot ensure MPI_THREAD_MULTIPLE support!&quot;</span>);</div>
 <div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>      <span class="keywordtype">int</span> required = MPI_THREAD_MULTIPLE;</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>      <span class="keywordtype">int</span> provided = MPI_THREAD_SINGLE;</div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>      <span class="keywordflow">if</span> (::MPI_Init_thread(&amp;argc, &amp;argv, required, &amp;provided) != MPI_SUCCESS)</div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>      <span class="keywordflow">if</span> (provided != MPI_THREAD_MULTIPLE)</div>
-<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span><span class="preprocessor">#else</span></div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>      <span class="comment">// initialize MPI runtime, if not already done by another library</span></div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>      <span class="keywordflow">if</span> (!already_initialized &amp;&amp; ::MPI_Init(&amp;argc, &amp;argv) != MPI_SUCCESS)</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span><span class="preprocessor">#endif </span><span class="comment">//FEAT_MPI_THREAD_MULTIPLE</span></div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span><span class="preprocessor">#else</span></div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>      <span class="keywordtype">int</span> required = MPI_THREAD_SERIALIZED;</div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span><span class="preprocessor">#endif </span><span class="comment">//FEAT_MPI_THREAD_MULTIPLE</span></div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>      <span class="keywordtype">int</span> provided = MPI_THREAD_SINGLE;</div>
+<div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>      <span class="comment">// if mpi is not already initialized, check if we are able to</span></div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>      <span class="keywordflow">if</span> (!already_initialized &amp;&amp; ::MPI_Init_thread(&amp;argc, &amp;argv, required, &amp;provided) != MPI_SUCCESS)</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>      <span class="comment">// also, if we initialize ourselves, check if we at least get our required features</span></div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>      <span class="keywordflow">if</span> (!already_initialized &amp;&amp; (provided &lt; required))</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>        <span class="keywordflow">return</span> <span class="keyword">false</span>;</div>
 <div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span> </div>
 <div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span><span class="preprocessor">#ifdef FEAT_HAVE_QUADMATH</span></div>
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>      <span class="comment">// Create a custom MPI datatype for &#39;__float128&#39;</span></div>

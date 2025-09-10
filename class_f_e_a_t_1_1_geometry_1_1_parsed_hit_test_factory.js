@@ -6,6 +6,7 @@ var class_f_e_a_t_1_1_geometry_1_1_parsed_hit_test_factory =
     [ "ShapeType", "class_f_e_a_t_1_1_geometry_1_1_parsed_hit_test_factory.html#ac0f7547977bfb2e9e2691aa62686c12f", null ],
     [ "TargetSetHolderType", "class_f_e_a_t_1_1_geometry_1_1_parsed_hit_test_factory.html#a5955daf643f416e57b500bbcaeeabf62", null ],
     [ "ParsedHitTestFactory", "class_f_e_a_t_1_1_geometry_1_1_parsed_hit_test_factory.html#aaae353b3afedd79c1474560d1a52ac00", null ],
+    [ "ParsedHitTestFactory", "class_f_e_a_t_1_1_geometry_1_1_parsed_hit_test_factory.html#a1d9fc4b9eef160bd15d80658b6ad29c8", null ],
     [ "get_num_entities", "class_f_e_a_t_1_1_geometry_1_1_parsed_hit_test_factory.html#a95ec0f620977105e73d3faeec12e7d0c", null ],
     [ "_hit_func", "class_f_e_a_t_1_1_geometry_1_1_parsed_hit_test_factory.html#a03298ec54b3ad251b87a2866e172a86d", null ],
     [ "_mesh", "class_f_e_a_t_1_1_geometry_1_1_parsed_hit_test_factory.html#aaf66b418bce411f9776b86ab85247047", null ],
