@@ -73,7 +73,17 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     set(DOXYGEN_CITE_BIB_FILES "${FEAT_SOURCE_DIR}/doxy_in/references.bib")
     set(DOXYGEN_COLLABORATION_GRAPH NO)
     set(DOXYGEN_ENABLE_PREPROCESSING YES)
-    set(DOXYGEN_EXCLUDE_PATTERNS "*/applications/*" "*/area51/*" "*/benchmarks/*" "*/build_system/*" "*/data/*" "*/thirdparty/*" "*/tools/*" "*/tutorials/*" "*-test*.cpp")
+    set(DOXYGEN_EXCLUDE_PATTERNS
+      "${FEAT_SOURCE_DIR}/applications/*"
+      "${FEAT_SOURCE_DIR}/area51/*"
+      "${FEAT_SOURCE_DIR}/benchmarks/*"
+      "${FEAT_SOURCE_DIR}/build_system/*"
+      "${FEAT_SOURCE_DIR}/data/*"
+      "${FEAT_SOURCE_DIR}/thirdparty/*"
+      "${FEAT_SOURCE_DIR}/tools/*"
+      "${FEAT_SOURCE_DIR}/tutorials/*"
+      "${FEAT_SOURCE_DIR}/out/*"
+      "${FEAT_SOURCE_DIR}/*-test*.cpp")
     set(DOXYGEN_EXPAND_AS_DEFINED "DOXY" "static_assert")
     set(DOXYGEN_EXTRA_PACKAGES "amsmath" "amssymb")
     set(DOXYGEN_FILE_PATTERS "*.c" "*.cc" "*.cxx" "*.cpp" "*.c++" "*.cu" "*.dox" "*.py" "*.h" "*.hh" "*.hpp" "*.h++" "*.f90" "*.f")
