@@ -500,6 +500,17 @@ namespace FEAT
       }
 
       /**
+       * \brief Retrieve the maximum relative difference of this vector and another one
+       * y.max_rel_diff(x) returns  \f$ \max_{0\leq i < n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \f$
+       *
+       * \return The largest relative difference.
+       */
+      DataType max_rel_diff(const PowerVector & x) const
+      {
+        return Math::max(first().max_rel_diff(x.first()), rest().max_rel_diff(x.rest()));
+      }
+
+      /**
        * \brief Retrieve specific PowerVector element.
        *
        * \param[in] index The index of the vector element.

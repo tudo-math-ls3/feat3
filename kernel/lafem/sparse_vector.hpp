@@ -17,6 +17,8 @@
 #include <kernel/lafem/arch/min_abs_index.hpp>
 #include <kernel/lafem/arch/max_index.hpp>
 #include <kernel/lafem/arch/min_index.hpp>
+#include <kernel/lafem/arch/max_rel_diff.hpp>
+
 
 namespace FEAT
 {
@@ -526,6 +528,26 @@ namespace FEAT
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
         return result;
+      }
+
+      /**
+       * \brief Retrieve the maximum relative difference of this vector and another one
+       * y.max_rel_diff(x) returns  \f$ \max_{0\leq i < n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \f$
+       *
+       * \return The largest relative difference.
+       */
+      DT_ max_rel_diff(const SparseVector & x) const
+      {
+        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        TimeStamp ts_start;
+
+        DataType max_rel_diff = Arch::MaxRelDiff::value(this->template elements<Perspective::pod>(), x.template elements<Perspective::pod>(), this->template size<Perspective::pod>());
+        ASSERT(max_rel_diff < this->template size<Perspective::pod>());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return max_rel_diff;
       }
 
       /**

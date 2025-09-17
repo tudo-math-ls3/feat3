@@ -1779,3 +1779,72 @@ SparseMatrixCSRAddDoubleMatMultTest <float, std::uint32_t> sm_csr_add_double_mat
 SparseMatrixCSRAddDoubleMatMultTest <double, std::uint32_t> sm_csr_add_double_mat_mult_test_double_uint32(PreferredBackend::generic);
 SparseMatrixCSRAddDoubleMatMultTest <float, std::uint64_t> sm_csr_add_double_mat_mult_test_float_uint64(PreferredBackend::generic);
 SparseMatrixCSRAddDoubleMatMultTest <double, std::uint64_t> sm_csr_add_double_mat_mult_test_double_uint64(PreferredBackend::generic);
+
+template<
+  typename DT_,
+  typename IT_>
+class SparseMatrixCSRMaxRelDiffTest
+  : public UnitTest
+{
+public:
+  SparseMatrixCSRMaxRelDiffTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixCSRMaxRelDiffTest",
+               Type::Traits<DT_>::name(),
+               Type::Traits<IT_>::name(),
+               backend)
+  {
+  }
+
+  virtual ~SparseMatrixCSRMaxRelDiffTest() {}
+
+  virtual void run() const override
+  {
+    const DT_ eps   = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ delta = DT_(123.5);
+
+    for (Index size(4); size < Index(128); size *= 2)
+    {
+      SparseMatrixFactory<DT_, IT_> fac_a(size, size);
+      for (IT_ i = 0; i < IT_(size); ++i)
+        fac_a.add(i, i, DT_(i));
+      SparseMatrixCSR<DT_, IT_> a(fac_a.make_csr());
+
+      auto b = a.clone();
+
+      // add delta
+      a.val()[size / 2] += delta;
+
+      const DT_ ref = delta / (DT_(size) + delta);
+
+      // ||a-b||_inf
+      const DT_ diff1 = a.max_rel_diff(b);
+      TEST_CHECK_RELATIVE(diff1, ref, eps);
+
+      // ||b-a||_inf
+      const DT_ diff2 = b.max_rel_diff(a);
+      TEST_CHECK_RELATIVE(diff2, ref, eps);
+    }
+  }
+};
+SparseMatrixCSRMaxRelDiffTest <float,  std::uint32_t> sm_csr_max_rel_diff_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRMaxRelDiffTest <double, std::uint32_t> sm_csr_max_rel_diff_test_double_uint32(PreferredBackend::generic);
+SparseMatrixCSRMaxRelDiffTest <float,  std::uint64_t> sm_csr_max_rel_diff_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRMaxRelDiffTest <double, std::uint64_t> sm_csr_max_rel_diff_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixCSRMaxRelDiffTest <float,  std::uint64_t> mkl_sm_csr_max_rel_diff_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRMaxRelDiffTest <double, std::uint64_t> mkl_sm_csr_max_rel_diff_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixCSRMaxRelDiffTest <__float128, std::uint32_t> sm_csr_max_rel_diff_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixCSRMaxRelDiffTest <__float128, std::uint64_t> sm_csr_max_rel_diff_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixCSRMaxRelDiffTest <Half, std::uint32_t> sm_csr_max_rel_diff_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRMaxRelDiffTest <Half, std::uint64_t> sm_csr_max_rel_diff_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixCSRMaxRelDiffTest <float,  std::uint32_t> cuda_sm_csr_max_rel_diff_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRMaxRelDiffTest <double, std::uint32_t> cuda_sm_csr_max_rel_diff_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixCSRMaxRelDiffTest <float,  std::uint64_t> cuda_sm_csr_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRMaxRelDiffTest <double, std::uint64_t> cuda_sm_csr_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
+#endif

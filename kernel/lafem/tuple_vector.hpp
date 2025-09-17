@@ -407,6 +407,18 @@ namespace FEAT
         return Math::min(first().min_element(), rest().min_element());
       }
 
+      /**
+       * \brief Retrieve the maximum relative difference of this vector and another one
+       * y.max_rel_diff(x) returns  \f$ \max_{0\leq i < n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \f$
+       *
+       * \return The largest relative difference.
+       */
+      template <typename First2_, typename... Rest2_>
+      DataType max_rel_diff(const TupleVector<First2_, Rest2_...>& x) const
+      {
+        return Math::max(first().max_rel_diff(x.first()), rest().max_rel_diff(x.rest()));
+      }
+
       /// \cond internal
       /// Writes the vector-entries in an allocated array
       void set_vec(DataType * const pval_set) const

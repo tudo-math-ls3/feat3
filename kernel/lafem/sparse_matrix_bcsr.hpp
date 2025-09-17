@@ -1344,6 +1344,26 @@ namespace FEAT
       }
 
       /**
+       * \brief Retrieve the maximum relative difference of this matrix and another one
+       * y.max_rel_diff(x) returns  \f$ \max_{0\leq i < n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \f$
+       *
+       * \return The largest relative difference.
+       */
+      DT_ max_rel_diff(const SparseMatrixBCSR& x) const
+      {
+        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        TimeStamp ts_start;
+
+        DataType max_rel_diff = Arch::MaxRelDiff::value(this->template val<Perspective::pod>(), x.template val<Perspective::pod>(), this->template used_elements<Perspective::pod>());
+        ASSERT(max_rel_diff < this->template used_elements<Perspective::pod>());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return max_rel_diff;
+      }
+
+      /**
        * \brief Calculate \f$this^\top \f$
        *
        * \return The transposed matrix

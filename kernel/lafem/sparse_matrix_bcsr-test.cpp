@@ -1520,3 +1520,79 @@ SparseMatrixBCSRConvertTest <double, std::uint64_t> sm_bcsr_convert_test_double_
 SparseMatrixBCSRConvertTest <__float128, std::uint32_t> sm_bcsr_convert_test_float128_uint32(PreferredBackend::generic);
 SparseMatrixBCSRConvertTest <__float128, std::uint64_t> sm_bcsr_convert_test_float128_uint64(PreferredBackend::generic);
 #endif
+
+template<
+  typename DT_,
+  typename IT_>
+class SparseMatrixBCSRMaxRelDiffTest
+  : public UnitTest
+{
+public:
+  SparseMatrixBCSRMaxRelDiffTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRMaxRelDiffTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~SparseMatrixBCSRMaxRelDiffTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ delta = DT_(123.5);
+
+    DenseVector<DT_, IT_> dv1(18);
+    DenseVector<DT_, IT_> dv4(18);
+    for (Index i(0) ; i < dv1.size() ; ++i)
+    {
+      dv1(i, DT_(i));
+      dv4(i, DT_(0));
+      if(i == 5) dv4(i, delta);
+    }
+    DenseVector<IT_, IT_> dv2(2);
+    dv2(0, IT_(0));
+    dv2(1, IT_(1));
+    DenseVector<IT_, IT_> dv3(3);
+    dv3(0, IT_(0));
+    dv3(1, IT_(1));
+    dv3(2, IT_(2));
+    SparseMatrixBCSR<DT_, IT_, 3, 3> a(2, 2, dv2, dv1, dv3);
+    SparseMatrixBCSR<DT_, IT_, 3, 3> b = a.clone();
+    SparseMatrixBCSR<DT_, IT_, 3, 3> delta_mat(2, 2, dv2, dv4, dv3);
+
+    a.axpy(delta_mat);
+
+
+    const DT_ ref = delta / (DT_(10) + delta);
+
+    // test ||a-b||_infty
+    const DT_ diff_1 = a.max_rel_diff(b);
+    TEST_CHECK_RELATIVE(diff_1, ref, eps);
+
+    // test ||b-a||_infty
+    const DT_ diff_2 = b.max_rel_diff(a);
+    TEST_CHECK_RELATIVE(diff_2, ref, eps);
+  }
+};
+
+SparseMatrixBCSRMaxRelDiffTest <float, std::uint32_t> sm_bcsr_max_rel_diff_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMaxRelDiffTest <double, std::uint32_t> sm_bcsr_max_rel_diff_test_double_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMaxRelDiffTest <float, std::uint64_t> sm_bcsr_max_rel_diff_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRMaxRelDiffTest <double, std::uint64_t> sm_bcsr_max_rel_diff_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBCSRMaxRelDiffTest <float, std::uint64_t> mkl_sm_bcsr_max_rel_diff_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBCSRMaxRelDiffTest <double, std::uint64_t> mkl_sm_bcsr_max_rel_diff_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBCSRMaxRelDiffTest <__float128, std::uint32_t> sm_bcsr_max_rel_diff_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMaxRelDiffTest <__float128, std::uint64_t> sm_bcsr_max_rel_diff_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBCSRMaxRelDiffTest <Half, std::uint32_t> sm_bcsr_max_rel_diff_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBCSRMaxRelDiffTest <Half, std::uint64_t> sm_bcsr_max_rel_diff_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixBCSRMaxRelDiffTest <float, std::uint64_t> cuda_sm_bcsr_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRMaxRelDiffTest <double, std::uint64_t> cuda_sm_bcsr_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
+#endif

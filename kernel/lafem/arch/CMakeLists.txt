@@ -20,6 +20,7 @@ if (FEAT_EICKT)
     lumping_generic-eickt.cpp
     max_abs_index_generic-eickt.cpp
     max_index_generic-eickt.cpp
+    max_rel_diff_generic-eickt.cpp
     min_abs_index_generic-eickt.cpp
     min_index_generic-eickt.cpp
     norm_generic-eickt.cpp

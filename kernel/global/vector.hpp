@@ -594,6 +594,37 @@ namespace FEAT
         return _gate->min_async(_vector.min_element());
       }
 
+      /**
+       * \brief Retrieve the maximum relative difference of this vector and another one
+       * y.max_rel_diff(x) returns  \f$ \max_{0\leq i < n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \f$
+       *
+       * \returns The largest relative difference.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
+       */
+      DataType max_rel_diff(const Vector & x) const
+      {
+        ASSERTM(_gate, "Gate is not set!");
+        return _gate->max(_vector.max_rel_diff(x));
+      }
+
+      /**
+       * \brief Retrieve the maximum relative difference of this vector and another one
+       * y.max_rel_diff(x) returns  \f$ \max_{0\leq i < n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \f$
+       *
+       * \returns A scalar ticket that has to be waited upon to complete the operation.
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
+       */
+      SynchScalarTicket<DataType> max_rel_diff_async(const Vector & x) const
+      {
+        ASSERTM(_gate, "Gate is not set!");
+        return _gate->max_async(_vector.max_rel_diff(x));
+      }
+
+
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
       std::uint64_t get_checkpoint_size(LAFEM::SerialConfig& config)
       {

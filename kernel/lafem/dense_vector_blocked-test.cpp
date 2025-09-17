@@ -1324,3 +1324,77 @@ DenseVectorBlockedProjectTest <__float128, std::uint64_t, 3> dv_project_test_flo
 DenseVectorBlockedProjectTest <Half, std::uint32_t, 2> dv_blocked_project_test_half_uint32(PreferredBackend::generic);
 DenseVectorBlockedProjectTest <Half, std::uint64_t, 3> dv_blocked_project_test_half_uint64(PreferredBackend::generic);
 #endif
+
+template<
+  typename DT_,
+  typename IT_,
+  int block_size_>
+class DenseVectorBlockedMaxRelDiffTest
+  : public UnitTest
+{
+public:
+  DenseVectorBlockedMaxRelDiffTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedMaxRelDiffTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~DenseVectorBlockedMaxRelDiffTest() {}
+
+  virtual void run() const override
+  {
+    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+
+    for (Index size(2); size < Index(1e3); size *= 2)
+    {
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> b(size);
+
+      for (Index i(0); i < size; ++i)
+      {
+        Tiny::Vector<DT_, block_size_> tv;
+        for (int j = 0; j < block_size_; ++j)
+          tv[j] = DT_(i * block_size_ + j);
+        a(i, tv);
+        b(i, tv);
+      }
+
+      // add delta
+      Tiny::Vector<DT_, block_size_> tv = a(size / 2);
+      const DT_ delta = DT_(123.5);
+      tv[0] += delta;
+      a(size / 2, tv);
+
+      const DT_ ref = delta / (DT_(size) * DT_(block_size_) + delta);
+
+      // Test ||a-b||_inf
+      const DT_ diff1 = a.max_rel_diff(b);
+      TEST_CHECK_RELATIVE(diff1, ref, eps);
+
+      // Symmetrie: ||b-a||_inf
+      const DT_ diff2 = b.max_rel_diff(a);
+      TEST_CHECK_RELATIVE(diff2, ref, eps);
+    }
+  }
+};
+DenseVectorBlockedMaxRelDiffTest <float, std::uint32_t, 2> dv_max_rel_diff_test_float_uint32(PreferredBackend::generic);
+DenseVectorBlockedMaxRelDiffTest <double, std::uint32_t, 2> dv_max_rel_diff_test_double_uint32(PreferredBackend::generic);
+DenseVectorBlockedMaxRelDiffTest <float, std::uint64_t, 3> dv_max_rel_diff_test_float_uint64(PreferredBackend::generic);
+DenseVectorBlockedMaxRelDiffTest <double, std::uint64_t, 3> dv_max_rel_diff_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+DenseVectorBlockedMaxRelDiffTest <float, std::uint64_t, 2> mkl_dv_max_rel_diff_test_float_uint64(PreferredBackend::mkl);
+DenseVectorBlockedMaxRelDiffTest <double, std::uint64_t, 3> mkl_dv_max_rel_diff_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorBlockedMaxRelDiffTest <__float128, std::uint32_t, 2> dv_max_rel_diff_test_float128_uint32(PreferredBackend::generic);
+DenseVectorBlockedMaxRelDiffTest <__float128, std::uint64_t, 3> dv_max_rel_diff_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorBlockedMaxRelDiffTest <Half, std::uint32_t, 2> dv_max_rel_diff_test_half_uint32(PreferredBackend::generic);
+DenseVectorBlockedMaxRelDiffTest <Half, std::uint64_t, 3> dv_max_rel_diff_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseVectorBlockedMaxRelDiffTest <float, std::uint32_t, 2> cuda_dv_max_rel_diff_test_float_uint32(PreferredBackend::cuda);
+DenseVectorBlockedMaxRelDiffTest <double, std::uint32_t, 2> cuda_dv_max_rel_diff_test_double_uint32(PreferredBackend::cuda);
+DenseVectorBlockedMaxRelDiffTest <float, std::uint64_t, 3> cuda_dv_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
+DenseVectorBlockedMaxRelDiffTest <double, std::uint64_t, 3> cuda_dv_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
+#endif
