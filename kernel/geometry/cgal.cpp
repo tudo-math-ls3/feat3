@@ -54,6 +54,8 @@ static_assert(false, "Boost has no threads");
 #pragma warning(default: 4244)
 #endif // FEAT_COMPILER_MICROSOFT
 
+#undef FEAT_EICKT
+
 #include <kernel/geometry/cgal.hpp>
 
 #ifdef FEAT_HAVE_HALFMATH
