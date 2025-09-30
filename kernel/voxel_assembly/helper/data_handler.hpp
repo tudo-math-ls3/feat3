@@ -12,6 +12,8 @@
 #include <kernel/voxel_assembly/helper/cell_to_dof_helper.hpp>
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/adjacency/coloring.hpp>
+#include <kernel/util/time_stamp.hpp>
+#include <kernel/util/stop_watch.hpp>
 
 #ifdef FEAT_HAVE_CUDA
 #include <kernel/util/cuda_util.hpp>
@@ -60,6 +62,9 @@ namespace FEAT
 
       /// Datahanlder for the coloring data.
       Adjacency::ColoringDataHandler coloring_data;
+    public:
+      double time_off_load_mesh, time_off_load_color;
+      double time_init_mesh, time_init_color;
 
     public:
       inline AssemblyMappingData<DataType, IndexType> get_assembly_field() const
@@ -181,18 +186,24 @@ namespace FEAT
 
       void _fill_color(const std::vector<int>& coloring, int hint)
       {
+        TimeStamp stamp1;
         coloring_data.fill_color(coloring, hint);
         #ifdef DEBUG
         _test_coloring();
         #endif
+        TimeStamp stamp2;
+        time_init_color = stamp2.elapsed(stamp1);
       }
 
       void _fill_color(const Adjacency::Coloring& coloring, int hint)
       {
+        TimeStamp stamp1;
         coloring_data.fill_color(coloring, hint);
         #ifdef DEBUG
         _test_coloring();
         #endif
+        TimeStamp stamp2;
+        time_init_color = stamp2.elapsed(stamp1);
       }
 
     public:
@@ -204,8 +215,13 @@ namespace FEAT
       _cell_to_dof_sorter(nullptr),
       _cell_to_dof_size(Index(0)),
       _nodes(nullptr),
-      _nodes_size(Index(0))
+      _nodes_size(Index(0)),
+      time_off_load_mesh(0.),
+      time_off_load_color(0.),
+      time_init_mesh(0.),
+      time_init_color(0.)
       {
+        TimeStamp stamp1;
         if constexpr(std::is_same<ColoringType_, Adjacency::Coloring>::value)
         {
           ASSERTM(space.get_mesh().get_num_entities(dim) == coloring.get_num_nodes(), "Coloring and space do not fit!");
@@ -227,6 +243,8 @@ namespace FEAT
         // for this iterate through our target_sets and parse them in
         VoxelAssembly::fill_cell_to_dof(_cell_to_dof, space);
         VoxelAssembly::fill_sorter(_cell_to_dof_sorter, _cell_to_dof, space);
+        TimeStamp stamp2;
+        time_init_mesh = stamp2.elapsed(stamp1);
 
         // for(int cell = 0; cell < space.get_mesh().get_num_elements(); ++cell)
         // {
@@ -253,7 +271,11 @@ namespace FEAT
       _cell_to_dof_size(other._cell_to_dof_size),
       _nodes(other._nodes),
       _nodes_size(other._nodes_size),
-      coloring_data(std::move(other.coloring_data))
+      coloring_data(std::move(other.coloring_data)),
+      time_off_load_mesh(other.time_off_load_mesh),
+      time_off_load_color(other.time_off_load_color),
+      time_init_mesh(other.time_init_mesh),
+      time_init_color(other.time_init_color)
       {
         MemoryPool::increase_memory(_cell_to_dof);
         MemoryPool::increase_memory(_cell_to_dof_sorter);
@@ -264,6 +286,10 @@ namespace FEAT
       {
         if(this == &other)
           return *this;
+        time_off_load_mesh = other.time_off_load_mesh;
+        time_off_load_color = other.time_off_load_color;
+        time_init_mesh = other.time_init_mesh;
+        time_init_color = other.time_init_color;
         coloring_data = std::move(other.coloring_data);
         MemoryPool::release_memory(_nodes);
         MemoryPool::release_memory(_cell_to_dof_sorter);

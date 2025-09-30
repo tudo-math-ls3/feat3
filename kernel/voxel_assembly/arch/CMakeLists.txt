@@ -5,6 +5,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 if (NOT FEAT_HAVE_CUDA)
 set(kernel-voxel-assembly-arch-list
   burgers_assembler.cpp
+  burgers_velo_material_assembler.cpp
   defo_assembler.cpp
   poisson_assembler.cpp
 )
@@ -13,10 +14,6 @@ set(kernel-voxel-assembly-arch-list
   empty_arch.cpp
 )
 endif (NOT FEAT_HAVE_CUDA)
-
-if (NOT FEAT_HAVE_OMP)
-  message(STATUS "OMP not found, missing CPU threading capability of voxel assembly.")
-endif ()
 
 add_library(feat-kernel-voxel-assembly-arch STATIC ${kernel-voxel-assembly-arch-list})
 target_link_libraries(feat-kernel-voxel-assembly-arch PUBLIC feat-dependency feat-kernel-util)
@@ -29,6 +26,7 @@ target_link_libraries(feat-kernel-voxel-assembly-arch PRIVATE feat-kernel-util)
 if (FEAT_HAVE_CUDA)
   add_library(feat-kernel-voxel-assembly-arch-cuda STATIC
     burgers_assembler.cu
+    burgers_velo_material_assembler.cu
     defo_assembler.cu
     poisson_assembler.cu
   )

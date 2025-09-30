@@ -247,5 +247,183 @@ namespace FEAT
 
     #endif
 
+    /**
+     * \brief Data for material burgers assembler
+     *
+     * \tparam DT_ The datatype.
+     */
+    template<typename DT_>
+    struct AssemblyMaterialData
+    {
+      DT_ frechet_material;
+      DT_ reg_eps;
+      DT_ mu_0;
+      DT_ exp;
+      DT_ lambda;
+      DT_ a_T;
+      DT_ yasuda_a;
+      DT_ mu_inf;
+      bool need_frechet_material;
+    };
+
+    /**
+     * \brief Enum for different material types
+     */
+    enum MaterialType
+    {
+      carreau = 0,
+      carreauYasuda = 1
+    };
+
+    namespace Intern
+    {
+      template<typename DT_, MaterialType mat_type>
+      struct ViscoFunctor;
+
+      template<typename DT_, MaterialType mat_type>
+      struct ViscoFunctorNew;
+
+      template<typename DT_>
+      struct ViscoFunctorNew<DT_, MaterialType::carreau>
+      {
+        DT_ mu_0, exp, lambda;
+
+        CUDA_HOST_DEVICE DT_ operator()(DT_ gamma_dot, DT_ a_T) const
+        {
+        #ifdef __CUDACC__
+          return a_T * mu_0 * CudaMath::cuda_pow(DT_(1) + lambda * a_T * gamma_dot, - exp);
+        #else
+          return a_T * mu_0 * Math::pow(DT_(1) + lambda * a_T * gamma_dot, - exp);
+        #endif
+        }
+      };
+
+      template<typename DT_>
+      struct ViscoFunctor<DT_, MaterialType::carreau>
+      {
+        DT_ mu_0, exp, lambda, a_T;
+
+        CUDA_HOST_DEVICE DT_ operator()(DT_ gamma_dot) const
+        {
+        #ifdef __CUDACC__
+          return a_T * mu_0 * CudaMath::cuda_pow(DT_(1) + lambda * a_T * gamma_dot, - exp);
+        #else
+          return a_T * mu_0 * Math::pow(DT_(1) + lambda * a_T * gamma_dot, - exp);
+        #endif
+        }
+      };
+
+      template<typename DT_>
+      struct ViscoFunctorNew<DT_, MaterialType::carreauYasuda>
+      {
+        DT_ mu_0, exp, lambda, yasuda_a, mu_inf;
+
+        CUDA_HOST_DEVICE DT_ operator()(DT_ gamma_dot, DT_ a_T) const
+        {
+        #ifdef __CUDACC__
+          return a_T * mu_inf + a_T * (mu_0 - mu_inf) *
+                  CudaMath::cuda_pow(DT_(1) + CudaMath::cuda_pow(lambda * a_T * gamma_dot, yasuda_a), (exp - 1) / yasuda_a);
+        #else
+          return a_T * mu_inf + a_T * (mu_0 - mu_inf) *
+                  Math::pow(DT_(1) + Math::pow(lambda * a_T * gamma_dot, yasuda_a), (exp - 1) / yasuda_a);
+        #endif
+        }
+      };
+
+      template<typename DT_>
+      struct ViscoFunctor<DT_, MaterialType::carreauYasuda>
+      {
+        DT_ mu_0, exp, lambda, a_T, yasuda_a, mu_inf;
+
+        CUDA_HOST_DEVICE DT_ operator()(DT_ gamma_dot) const
+        {
+        #ifdef __CUDACC__
+          return a_T * mu_inf + a_T * (mu_0 - mu_inf) *
+                  CudaMath::cuda_pow(DT_(1) + CudaMath::cuda_pow(lambda * a_T * gamma_dot, yasuda_a), (exp - 1) / yasuda_a);
+        #else
+          return a_T * mu_inf + a_T * (mu_0 - mu_inf) *
+                  Math::pow(DT_(1) + Math::pow(lambda * a_T * gamma_dot, yasuda_a), (exp - 1) / yasuda_a);
+        #endif
+        }
+      };
+
+      template<typename DT_, MaterialType mat_type>
+      struct ViscoDFunctor;
+
+      template<typename DT_, MaterialType mat_type>
+      struct ViscoDFunctorNew;
+
+      template<typename DT_>
+      struct ViscoDFunctorNew<DT_, MaterialType::carreau>
+      {
+        DT_ mu_0, exp, lambda;
+
+        CUDA_HOST_DEVICE DT_ operator()(DT_ gamma_dot, DT_ a_T) const
+        {
+        #ifdef __CUDACC__
+          return - a_T * a_T * mu_0 * lambda * exp *
+                CudaMath::cuda_pow(DT_(1) + lambda * a_T * gamma_dot, - exp - DT_(1));
+        #else
+          return - a_T * a_T * mu_0 * lambda * exp *
+                Math::pow(DT_(1) + lambda * a_T * gamma_dot, - exp - DT_(1));
+        #endif
+        }
+      };
+
+      template<typename DT_>
+      struct ViscoDFunctor<DT_, MaterialType::carreau>
+      {
+        DT_ mu_0, exp, lambda, a_T;
+
+        CUDA_HOST_DEVICE DT_ operator()(DT_ gamma_dot) const
+        {
+        #ifdef __CUDACC__
+          return - a_T * a_T * mu_0 * lambda * exp *
+                CudaMath::cuda_pow(DT_(1) + lambda * a_T * gamma_dot, - exp - DT_(1));
+        #else
+          return - a_T * a_T * mu_0 * lambda * exp *
+                Math::pow(DT_(1) + lambda * a_T * gamma_dot, - exp - DT_(1));
+        #endif
+        }
+      };
+
+      template<typename DT_>
+      struct ViscoDFunctorNew<DT_, MaterialType::carreauYasuda>
+      {
+        DT_ mu_0, exp, lambda, yasuda_a, mu_inf;
+
+        CUDA_HOST_DEVICE DT_ operator()(DT_ gamma_dot, DT_ a_T) const
+        {
+        #ifdef __CUDACC__
+        return a_T * (mu_0 - mu_inf) * ((exp-DT_(1.0)) / yasuda_a) *
+                CudaMath::cuda_pow( DT_(1.0) + CudaMath::cuda_pow(lambda * gamma_dot, yasuda_a), ((exp - DT_(1.0) - yasuda_a) / yasuda_a)) *
+                yasuda_a * lambda * a_T * CudaMath::cuda_pow(lambda * gamma_dot * a_T, yasuda_a-DT_(1.0));
+        #else
+        return a_T * (mu_0 - mu_inf) * ((exp-DT_(1.0)) / yasuda_a) *
+                Math::pow( DT_(1.0) + Math::pow(lambda * gamma_dot, yasuda_a), ((exp - DT_(1.0) - yasuda_a) / yasuda_a)) *
+                yasuda_a * lambda * a_T * Math::pow(lambda * gamma_dot * a_T, yasuda_a-DT_(1.0));
+        #endif
+        }
+      };
+
+      template<typename DT_>
+      struct ViscoDFunctor<DT_, MaterialType::carreauYasuda>
+      {
+        DT_ mu_0, exp, lambda, a_T, yasuda_a, mu_inf;
+
+        CUDA_HOST_DEVICE DT_ operator()(DT_ gamma_dot) const
+        {
+        #ifdef __CUDACC__
+        return a_T * (mu_0 - mu_inf) * ((exp-DT_(1.0)) / yasuda_a) *
+                CudaMath::cuda_pow( DT_(1.0) + CudaMath::cuda_pow(lambda * gamma_dot, yasuda_a), ((exp - DT_(1.0) - yasuda_a) / yasuda_a)) *
+                yasuda_a * lambda * a_T * CudaMath::cuda_pow(lambda * gamma_dot * a_T, yasuda_a-DT_(1.0));
+        #else
+        return a_T * (mu_0 - mu_inf) * ((exp-DT_(1.0)) / yasuda_a) *
+                Math::pow( DT_(1.0) + Math::pow(lambda * gamma_dot, yasuda_a), ((exp - DT_(1.0) - yasuda_a) / yasuda_a)) *
+                yasuda_a * lambda * a_T * Math::pow(lambda * gamma_dot * a_T, yasuda_a-DT_(1.0));
+        #endif
+        }
+      };
+    }
   }
 }

@@ -1,0 +1,209 @@
+### This is a base template for a valid config file for a (carreau)-based
+### gendie type fluid simulation run with the steady-voxel-gendie app.
+### All parameters above optional in each section are vital to the succesful and
+### correct simulation of a gendie case and should be picked with care.
+### All values below optional in each section are optional parameters, which are
+### set correctly by the default value and should not be an entry in a standard
+### application.
+### If a parameter is not present it is either interpreted as false or as a default value.
+### It is entirely possible to distribute the config parameters across multiple files, since
+### all given config files will be parsed into one large parser tree.
+
+[partition]
+#################### optional ####################################
+#the partition type to be used, default is naive ordering
+parti-type = naive  ### or other partition type, like parmetis
+
+
+# Base setup of domain, mesh and fbm
+[problem-setup]
+
+# Dimensions for the background mesh, not necessary with base-mesh given
+background-mesh = Xmin Ymin [Zmin] Xmax Ymax [Zmax] n_x n_y [n_z]
+
+# Optional preassembled voxel map file
+voxel-map = path/to/voxel-map-filename
+
+# The level hirarchie, see ccnd_steady_appbase.hpp for details
+level = fine-level [sub-level:num_processes ... ] coarse-level
+
+#################### optional ####################################
+# Use base mesh instead of boundingbox
+use-base-mesh = true or false # default false
+
+# Used if use-base-mesh is true
+base-mesh = path/to/mesh/filename
+
+# Use cgal to determine fbm meshparts, else internal voxel map is used
+meshpart-by-cgal-wrapper = false  # or true
+
+################### problem params #######################################
+## problem definition
+[problem_params]
+surface_mesh_filename=fbm-filename
+
+## list of materials, has to be sequentielly enumerated beginning with 0
+[problem_params/list_materials/0/]
+density = float
+
+[problem_params/list_materials/0/temperature_model]
+model=STRING  # isotherm or tsbts or other options
+reference_temperature=float
+
+[problem_params/list_materials/0/viscosity_model]
+model=STRING #modeltype, carreau, powerlaw etc.
+value_a=FLOAT
+value_b=FLOAT
+value_c=FLOAT
+
+[problem_params/list_inflows/0]
+throughput=FLOAT
+material_id=INT  # refernces above indices of material list
+
+[problem_params/list_inflows/0/inflow_params]
+type=STRING #inflow geometry
+center=FLOAT,FLOAT,FLOAT
+flow_normal=FLOAT,FLOAT,FLOAT
+face_normal=FLOAT,FLOAT,FLOAT # will be ignored
+radius=FLOAT # other specific inflow variables
+
+# Define the problem to be solved
+[special-problem-definition]
+# use q2 dofs for fbm filter?
+use-q2-fbm = true # or false
+
+#################### optional ####################################
+
+# A regularisation parameter for the newton term.
+reg-eps = float                #default 1E-100
+
+# Parameter for streamline diffusion. Should not be reuqired.
+upsam = float                  #default 0.
+
+# Parameter describing the min resolution of the voxel-map
+# If false or not provided min-gap is calculated from the mesh resolution
+min-gap = float  # or false
+
+
+# Define the solver
+[solver-params]
+# Use full jacobian for the convection part?
+nl-solver = pseudo-ts or picard or newton or alpine
+
+# Use full jacobian for the carreau part?
+material-newton = float  ## if 0 switches of Picard, if 1 full Newton
+
+# Plot a multigrid summary in each nl step?
+plot_mg_iter = true or false
+
+# Absolute Tolerance to be reached by non linear solver
+nl-tol-abs = float
+
+# Relative Tolerance to be reached by non linear solver
+nl-tol-rel = float
+
+#################### optional ####################################
+# Force nonlinear solver to aboard here, even if other criteria not reached yet
+nl-tol-abs-low = float
+
+# Use a fixed relative tolerance for the linear solver if greater 0
+fixed-ls-tol = float # or false
+
+# The internal solver datatype, careful, float prec can lead do precision problems
+datatype = double # or float or same
+
+# Always use a GMRES(Vanka) type iterative solver for the coarse grid
+coarse-gmres = true or false        #default false
+
+# Use a gmres type smoother
+smooth-gmres = int        #default 0, if 0 richardson will be used
+
+# Use a gmres solver with a multigrid preconditioner as solver
+solve-gmres = int         #default 0
+
+# Minimal number of outer non linear iterations
+min-nl-iter = uint                #default 1
+
+# Maximum number of outer non-linear iterations
+max-nl-iter = uint                #default 20
+
+# Minimum number of mg iterations in each nl-step
+min-mg-iter = uint                #default 1
+
+# Maximum number of mg iterations in each nl-step
+max-mg-iter = uint                #default 20
+
+# Number of smoothing steps
+smooth-steps = uint               #default 8
+
+# The dampening parameter of the smoother. Only for non krylov-type smoothers
+smooth-damp = float                 #default 0.5
+
+# Choose the preferred backend
+backend = generic or cuda or mkl   #default generic
+
+# Choose the preferred backend
+assembly-backend = generic or cuda or mkl   #default generic
+
+# Do we want to use voxel assembler?
+voxel-assembly = true or false     #default false
+
+# Do we want to use voxel assembler?
+voxel-vanka = true or false     #default false
+
+# Do we use f-cycle multigrid?
+multigrid-f-cycle = true or false  #default false
+
+# Do we want to solve stokes beforehand?
+init-with-stokes = true or false
+
+# Minimum number of Picard steps before using full jacobian
+min-picard-steps = uint
+
+### Special options for pseudo-ts solver
+# Use an adaptive strategy, default true ?
+adaptive-step-size = true  or false  #default true
+
+# Initial Pseudo time step size
+pseudo-ts-size = float  #default 1E-3
+
+# Value to increase time step size, if linear growth is no longer fullfilled
+adapt-factor = float  #default 5.
+
+# Tolerance to discern if we have a stable linear convergence
+stability-tol = float #default 0.8
+
+# Number of previous defects to check fo stability
+stability-smaple-size = uint #default 4
+
+# Set postprocessing flags, mainly for paraview
+[postproc-params]
+# Write out refined vtk file?
+refine-vtk = true or false
+
+# Write out vtk file? If set to something other then true or false it will be interpreted as filepath
+vtk = true or false or /path/to/filename
+
+
+# Scaling factor for velocities
+velo-scale = float
+
+# Scaling factor for pressure
+pres-scale = float
+
+# Scaling factor for viscosity
+visc-scale = float
+
+
+#################### optional ####################################
+# Use vtk name without any adaption to level, etc.
+vtk-use-true-name = true or false ###default false
+
+# Add debugging info to vtk output?
+vtk-debug-data = true or false  ##default false
+
+# Print out mesh hirarchy?
+mesh-hirarchy-vtk = false or pathname
+
+# Print extended statistics?
+ext-stats = true or false                   #default false

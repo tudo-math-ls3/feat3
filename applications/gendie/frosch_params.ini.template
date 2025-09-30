@@ -1,0 +1,47 @@
+[solver-params/frosch-parameters]
+# gmres dimension, if 0, we use a richardson, default is 16
+frosch-gmres-dim = 16
+
+# min iterations of outer iterative solver
+frosch-min-iter = 1
+
+# max iterations of outer iterative solver
+frosch-max-iter = 50
+
+# absolute path to xml config file, contents of file override below parameters, either do not specify, false or absolute path
+frosch-xml = false
+# frosch-xml = path/to/frosch/xml/config/file
+
+# nlevels, for now, only 1 allowed, use an xml file if you want more specific things
+# todo: allow for parsing of more than one level
+frosch-nlevels = 1
+
+# overlap, some int value larger 0
+frosch-overlap = 1
+
+# directsolver, umfpack, mumps, ilu or klu
+frosch-direct-solver = umfpack
+
+# precond type, onelevel, twolevel or twolevelblock
+frosch-precond-type = twolevelblock
+
+# partition type, phg, parmetis or block
+frosch-partition-type = parmetis
+
+# partition approach, partition or repartition
+frosch-partition-approach = repartition
+
+# combine overlap type, restricted, full or averaging
+frosch-combine-overlap = restricted
+
+# ipou for velocity, you should do 2d gdsw, 3d gdswstar
+frosch-ipou-velocity = gdswstar
+
+# ipou for pressure, gdsw, gdswstar, rgdsw
+frosch-ipou-pressure = rgdsw
+
+# use internal timers of trilinos?
+frosch-use-timers = false
+
+# print internal debug states of frosch?
+frosch-print-internal =  false

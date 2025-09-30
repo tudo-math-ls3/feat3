@@ -1032,14 +1032,14 @@ namespace FEAT
 
         if(print_occupancy)
         {
-          int numBlocksWarp = Util::cuda_get_occupancy(VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_warp_based<Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper>, blocksize, shared_mem);
+          int numBlocksWarp = Util::cuda_get_occupancy(VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_warp_based<Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps>, blocksize, shared_mem);
           const int max_blocks_per_sm = int(Util::cuda_get_max_blocks_per_sm());
           printf("Numblocks/Occupancy per SM for device number %i: %i, %f\n", Util::cuda_device_number, numBlocksWarp, double(numBlocksWarp*(blocksize/32))/double(max_blocks_per_sm));
         }
 
         if(shared_mem > 48000)
         {
-          if(cudaSuccess != cudaFuncSetAttribute(VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_warp_based<Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper>,
+          if(cudaSuccess != cudaFuncSetAttribute(VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_warp_based<Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps>,
             cudaFuncAttributeMaxDynamicSharedMemorySize, shared_mem))
           {
             XABORTM("cudaFuncSetAttribute failed.");
@@ -1057,7 +1057,7 @@ namespace FEAT
           //   grid.x = (unsigned int)ceil(double(coloring_map_sizes[col])/double(block.x));
 
 
-          VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_warp_based<Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper><<< grid, block, shared_mem >>>(
+          VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_warp_based<Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps><<< grid, block, shared_mem >>>(
               matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,
               (const typename Tiny::Vector<DT_, Space_::world_dim>*) cubature.cub_pt,
               cubature.cub_wg, cubature.num_cubs, alpha,
@@ -1067,7 +1067,7 @@ namespace FEAT
               burgers_params, loc_block_size
           );
           // todo: test if this is faster if we have to assemble streamline difussion...
-          // VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_warp_based_alt<Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper><<< grid, block, actual_shared_mem >>>(
+          // VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_warp_based_alt<Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps><<< grid, block, actual_shared_mem >>>(
           //     matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,
           //     (const typename Tiny::Vector<DT_, Space_::world_dim>*) cubature.cub_pt,
           //     cubature.cub_wg, cubature.num_cubs, alpha,
