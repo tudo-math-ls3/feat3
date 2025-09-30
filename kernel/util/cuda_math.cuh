@@ -34,7 +34,7 @@ namespace FEAT
    */
   namespace CudaMath
   {
-    /** \brief Calcultes the square root of a value.
+    /** \brief Calculates the square root of a value.
      *
      * \tparam DT_ The used dataytpe.
      *
@@ -69,7 +69,7 @@ namespace FEAT
     }
     #endif
 
-    /** \brief Calcultes the inverse square root of a value.
+    /** \brief Calculates the inverse square root of a value.
      *
      * \tparam DT_ The used dataytpe.
      *
@@ -104,7 +104,7 @@ namespace FEAT
     }
     #endif
 
-    /** \brief Calcultes the square of a value.
+    /** \brief Calculates the square of a value.
      *
      * \tparam DT_ The used dataytpe.
      *
@@ -149,6 +149,39 @@ namespace FEAT
     __host__ __device__ __forceinline__ Half cuda_abs<Half>(Half val)
     {
       return __habs(val);
+    }
+    #endif
+
+    /** \brief Calculates the power operation of two values.
+     *
+     * \tparam DT_ The used dataytpe.
+     *
+     * \param[in] val The base value.
+     *
+     * \param[in] exp The exponent.
+     *
+     * \return The value of val^(exp).
+     */
+    template<typename DT_>
+    __host__ __device__ DT_ cuda_pow(DT_ val, DT_ exp);
+
+    // /** \copydoc cuda_pow() */
+    template<> __host__ __device__ __forceinline__ double cuda_pow<double>(double val, double exp)
+    {
+      return pow(val, exp);
+    }
+
+    // /** \copydoc cuda_pow() */
+    template<> __host__ __device__ __forceinline__ float cuda_pow<float>(float val, float exp)
+    {
+      return powf(val, exp);
+    }
+
+    #ifdef FEAT_HAVE_HALFMATH
+    // /** \copydoc cuda_pow() */
+    template<> __host__ __device__ __forceinline__ Half cuda_pow<Half>(Half val, Half exp)
+    {
+      return __float2half(powf(__half2float(val), __half2float(exp)));
     }
     #endif
 

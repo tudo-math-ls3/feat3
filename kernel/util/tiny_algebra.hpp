@@ -248,6 +248,27 @@ namespace FEAT
         }
       }
 
+      /// convert function, not callable with non convertable inner type
+      template<typename Tx_, int sx_>
+      CUDA_HOST_DEVICE static Vector convert_new(const Vector<Tx_, n_, sx_>& x)
+      {
+        Vector v;
+        for(int i(0); i < n_; ++i)
+        {
+          if constexpr(std::is_same<T_, DataType>::value)
+            v[i] = T_(x.v[i]);
+          else
+            v[i] = T_::convert(x.v[i]);
+        }
+        return v;
+      }
+
+      /// overload for moveable rvalue type
+      CUDA_HOST_DEVICE static Vector convert_new(Vector&& x)
+      {
+        return std::move(x);
+      }
+
       /**
        * \brief Initializer list constructor
        *
@@ -1143,6 +1164,14 @@ namespace FEAT
       }
 
       /**
+       * \brief Return if the vector is normalized
+       */
+      CUDA_HOST_DEVICE bool normalized() const
+      {
+        return Math::abs(DataType(1) - norm_euclid()) < Math::pow(Math::Limits<DataType>::epsilon(), DataType(0.9));
+      }
+
+      /**
        * \brief Tiny::Vector streaming operator
        *
        * \param[in] lhs The target stream.
@@ -1161,7 +1190,6 @@ namespace FEAT
       }
     }; // class Vector
 
-    /*
     template<typename T_, int sx_, int sa_>
     inline void cross(Vector<T_, 2, sx_>& x, const Vector<T_, 2, sa_>& a)
     {
@@ -1175,7 +1203,7 @@ namespace FEAT
       x.v[0] = a.v[1]*b.v[2] - a.v[2]*b.v[1];
       x.v[1] = a.v[2]*b.v[0] - a.v[0]*b.v[2];
       x.v[2] = a.v[0]*b.v[1] - a.v[1]*b.v[0];
-    }*/
+    }
 
     /// scalar-left-multiplication operator
     template<typename T_, int n_, int s_>
