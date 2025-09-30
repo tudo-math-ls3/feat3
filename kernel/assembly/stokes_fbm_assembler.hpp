@@ -438,16 +438,21 @@ namespace FEAT
        */
       template<typename DT_, typename IT_, typename Space_>
       void assemble_interface_filter(LAFEM::UnitFilter<DT_, IT_>& filter, const Space_& space,
-        const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix_a, const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix_m) const
+        const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix_a, const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix_m, bool no_scale = false) const
       {
         XASSERTM(_compiled, "FBM assembler must be compiled first!");
         this->_unit_asm_interface->assemble(filter, space);
 
-        auto diag_a = matrix_a.create_vector_l();
-        auto diag_m = matrix_m.create_vector_l();
-        matrix_a.extract_diag(diag_a, true);
-        matrix_m.extract_diag(diag_m, true);
-        filter.get_filter_vector().format(diag_a.max_abs_element() / diag_m.max_abs_element());
+        if(no_scale)
+          filter.get_filter_vector().format(DT_(1));
+        else
+        {
+          auto diag_a = matrix_a.create_vector_l();
+          auto diag_m = matrix_m.create_vector_l();
+          matrix_a.extract_diag(diag_a, true);
+          matrix_m.extract_diag(diag_m, true);
+          filter.get_filter_vector().format(diag_a.max_abs_element() / diag_m.max_abs_element());
+        }
       }
 
       /**
@@ -473,16 +478,21 @@ namespace FEAT
        */
       template<typename DT_, typename IT_, typename Space_, int bh_, int bw_>
       void assemble_interface_filter(LAFEM::UnitFilterBlocked<DT_, IT_, bh_>& filter, const Space_& space,
-        const LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix_a, const LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix_m) const
+        const LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix_a, const LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix_m, bool no_scale = false) const
       {
         XASSERTM(_compiled, "FBM assembler must be compiled first!");
         this->_unit_asm_interface->assemble(filter, space);
 
-        auto diag_a = matrix_a.create_vector_l();
-        auto diag_m = matrix_m.create_vector_l();
-        matrix_a.extract_diag(diag_a);
-        matrix_m.extract_diag(diag_m);
-        filter.get_filter_vector().format(diag_a.max_abs_element() / diag_m.max_abs_element());
+        if(no_scale)
+          filter.get_filter_vector().format(DT_(1));
+        else
+        {
+          auto diag_a = matrix_a.create_vector_l();
+          auto diag_m = matrix_m.create_vector_l();
+          matrix_a.extract_diag(diag_a);
+          matrix_m.extract_diag(diag_m);
+          filter.get_filter_vector().format(diag_a.max_abs_element() / diag_m.max_abs_element());
+        }
       }
 
       /**
@@ -505,16 +515,21 @@ namespace FEAT
       template<typename DT_, typename IT_, typename Space_, typename Mirror_>
       void assemble_interface_filter(LAFEM::UnitFilter<DT_, IT_>& filter, const Space_& space,
         const Global::Matrix<LAFEM::SparseMatrixCSR<DT_, IT_>, Mirror_, Mirror_>& matrix_a,
-        const Global::Matrix<LAFEM::SparseMatrixCSR<DT_, IT_>, Mirror_, Mirror_>& matrix_m) const
+        const Global::Matrix<LAFEM::SparseMatrixCSR<DT_, IT_>, Mirror_, Mirror_>& matrix_m, bool no_scale = false) const
       {
         XASSERTM(_compiled, "FBM assembler must be compiled first!");
         this->_unit_asm_interface->assemble(filter, space);
 
-        auto diag_a = matrix_a.create_vector_l();
-        auto diag_m = matrix_m.create_vector_l();
-        matrix_a.extract_diag(diag_a, true);
-        matrix_m.extract_diag(diag_m, true);
-        filter.get_filter_vector().format(diag_a.max_abs_element() / diag_m.max_abs_element());
+        if(no_scale)
+          filter.get_filter_vector().format(DT_(1));
+        else
+        {
+          auto diag_a = matrix_a.create_vector_l();
+          auto diag_m = matrix_m.create_vector_l();
+          matrix_a.extract_diag(diag_a, true);
+          matrix_m.extract_diag(diag_m, true);
+          filter.get_filter_vector().format(diag_a.max_abs_element() / diag_m.max_abs_element());
+        }
       }
 
       /**
@@ -537,16 +552,21 @@ namespace FEAT
       template<typename DT_, typename IT_, typename Space_, typename Mirror_, int bh_, int bw_>
       void assemble_interface_filter(LAFEM::UnitFilterBlocked<DT_, IT_, bh_>& filter, const Space_& space,
         const Global::Matrix<LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>, Mirror_, Mirror_>& matrix_a,
-        const Global::Matrix<LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>, Mirror_, Mirror_>& matrix_m) const
+        const Global::Matrix<LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>, Mirror_, Mirror_>& matrix_m, bool no_scale = false) const
       {
         XASSERTM(_compiled, "FBM assembler must be compiled first!");
         this->_unit_asm_interface->assemble(filter, space);
 
-        auto diag_a = matrix_a.create_vector_l();
-        auto diag_m = matrix_m.create_vector_l();
-        matrix_a.extract_diag(diag_a, true);
-        matrix_m.extract_diag(diag_m, true);
-        filter.get_filter_vector().format(diag_a.max_abs_element() / diag_m.max_abs_element());
+        if(no_scale)
+          filter.get_filter_vector().format(DT_(1));
+        else
+        {
+          auto diag_a = matrix_a.create_vector_l();
+          auto diag_m = matrix_m.create_vector_l();
+          matrix_a.extract_diag(diag_a, true);
+          matrix_m.extract_diag(diag_m, true);
+          filter.get_filter_vector().format(diag_a.max_abs_element() / diag_m.max_abs_element());
+        }
       }
 
     protected:
