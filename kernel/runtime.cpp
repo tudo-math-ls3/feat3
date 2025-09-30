@@ -82,7 +82,7 @@ void Runtime::initialize(int& argc, char**& argv)
 
 #ifdef FEAT_HAVE_CUDA
   // initialize memory pool for CUDA memory
-  Util::cuda_initialize(my_rank, 1, 1, 1);
+  Util::cuda_initialize(my_rank, 1, 1, Util::cuda_get_device_count());
   Util::cuda_set_blocksize(256, 256, 256, 256, 256, 128);
 #endif
 

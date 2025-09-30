@@ -527,6 +527,53 @@ namespace FEAT
         #endif
       }
 
+      // rule of 5
+      VoxelAmaVanka(const VoxelAmaVanka&) = delete;
+
+      VoxelAmaVanka& operator=(const VoxelAmaVanka&) = delete;
+
+      // VoxelAmaVanka(VoxelAmaVanka&& other) noexcept :
+      //   BaseClass(std::move(other)),
+      //   _coloring_data(std::move(other._coloring_data)),
+      //   _d_macro_dofs(std::move(other._d_macro_dofs)),
+      //   _d_dof_macros(std::move(other._d_dof_macros)),
+      //   _max_degree_dofs(std::move(other._max_degree_dofs)),
+      //   _max_degree_macros(std::move(other._max_degree_macros)),
+      //   _d_macro_mask(other._d_macro_mask),
+      //   _allocate_device(other._allocate_device)
+      // {
+      //   other._d_macro_dofs.clear();
+      //   other._d_dof_macros.clear();
+      //   other._max_degree_dofs.clear();
+      //   other._max_degree_macros.clear();
+      //   other._d_macro_mask = nullptr;
+      // }
+
+      // VoxelAmaVanka& operator=(VoxelAmaVanka&& other) noexcept
+      // {
+      //   if(this == &other)
+      //     return *this;
+      //   this->_free_device();
+      //   BaseClass::operator=(std::move(other));
+      //   _coloring_data = std::move(other._coloring_data);
+      //   _d_macro_dofs = std::move(other._d_macro_dofs);
+      //   _d_dof_macros = std::move(other._d_dof_macros);
+      //   _max_degree_dofs = std::move(other._max_degree_dofs);
+      //   _max_degree_macros = std::move(other._max_degree_macros);
+      //   _d_macro_mask = other._d_macro_mask;
+      //   _allocate_device = other._allocate_device;
+      //   other._d_macro_dofs.clear();
+      //   other._d_dof_macros.clear();
+      //   other._max_degree_dofs.clear();
+      //   other._max_degree_macros.clear();
+      //   other._d_macro_mask = nullptr;
+      // }
+
+      VoxelAmaVanka(VoxelAmaVanka&&) noexcept = delete;
+
+
+      VoxelAmaVanka& operator=(VoxelAmaVanka&&) noexcept = delete;
+
       // /**
       //  * \brief Sets whether device ptr should be allocated.
       //  *

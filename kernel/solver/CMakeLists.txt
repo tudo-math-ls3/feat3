@@ -40,6 +40,9 @@ if(FEAT_HAVE_ALGLIB)
   target_link_libraries(feat-kernel-solver PUBLIC Alglib::Alglib)
 endif()
 
+if (FEAT_HAVE_TRILINOS)
+  target_link_libraries(kernel-solver PUBLIC TRILINOS_TPL)
+endif (FEAT_HAVE_TRILINOS)
 
 if (FEAT_HAVE_CUDA)
   add_library(feat-kernel-solver-cuda STATIC

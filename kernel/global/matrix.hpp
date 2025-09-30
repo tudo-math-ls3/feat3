@@ -625,6 +625,45 @@ namespace FEAT
         return locmat;
       }
 
+      /**
+       * \brief Computes and returns the type-1 conversion of this matrix as a local matrix
+       *
+       * This function performs a type-0 to type-1 conversion of this matrix, which is effectively
+       * the matrix counterpart of the type-0 synchronization of a vector, i.e. all matrix entries,
+       * which are shared by multiple processes, are replaced by the sum of all contributions from
+       * all processes which share the corresponding row/column DOFs. This converted matrix is
+       * required for Schwarz-like solver approaches.
+       *
+       * \attention
+       * The resulting matrix may (and usually will) have a larger stencil than the original underlying
+       * patch-local LAFEM matrix, which is stored in this object's _matrix variable. The reason is that
+       * a neighbor process may have additional couplings between DOFs that this process does not have,
+       * and these additional coupling are also included in this process's type-1 matrix. However, the
+       * stencil of the returned matrix is never smaller than the original local matrix stencil, i.e.
+       * the stencil of the patch-local type-0 matrix is always a sub-stencil of the returned type-1
+       * matrix.
+       *
+       * \param[in/out] matrix_sync_1
+       * The matrix the type 1 conversion should be written into. Has to be allocated to hold at least
+       * the stencil of this type-0 matrix.
+       *
+       * \param[in] full_copy
+       * Also copy index arrays?
+       *
+       * \attention This function must be called by all processes participating in the gate's
+       * communicator, otherwise the application might deadlock.
+       */
+      void convert_to_1(LocalMatrix_& matrix_sync_1, bool full_copy = true) const
+      {
+        matrix_sync_1.copy(this->local(), full_copy);
+        if((_row_gate != nullptr) && (_col_gate != nullptr))
+        {
+          SynchMatrix<LocalMatrix_, RowMirror_> synch(*_row_gate->_comm, _row_gate->_ranks, _row_gate->_mirrors, _col_gate->_mirrors);
+          synch.init(matrix_sync_1);
+          synch.exec(matrix_sync_1);
+        }
+      }
+
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
       std::uint64_t get_checkpoint_size(LAFEM::SerialConfig& config)
       {

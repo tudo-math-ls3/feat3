@@ -1181,7 +1181,6 @@ namespace FEAT
 #ifdef FEAT_HAVE_MKL
         // create a MKL DSS solver if this is the desired backend or if the desired backend is not available
         if((backend == PreferredBackend::mkl) ||
-          ((backend == PreferredBackend::cuda) && !have_backend_cudss) ||
           ((backend == PreferredBackend::generic) && !have_backend_umfpack))
         {
           _mkldss_solver = Solver::new_mkl_dss(_stokes_core.get_solver_matrix());
