@@ -19,6 +19,7 @@
 #include <kernel/lafem/arch/min_index.hpp>
 #include <kernel/lafem/arch/max_rel_diff.hpp>
 #include <kernel/adjacency/permutation.hpp>
+#include <array>
 
 namespace FEAT
 {
@@ -101,6 +102,20 @@ namespace FEAT
       Index & _sorted()
       {
         return this->_scalar_index.at(4);
+      }
+
+      bool _remove_element(IT_ ind)
+      {
+        IT_* pindices = this->_indices.at(0);
+        IT_* ptr = std::find(pindices, pindices + _used_elements(), ind);
+        if(ptr == pindices + _used_elements())
+        {
+          return false;
+        }
+        _sorted() = 0;
+        *ptr = std::numeric_limits<IT_>::max();
+        sort();
+        return true;
       }
 
     public:
@@ -520,6 +535,29 @@ namespace FEAT
         this->template _deserialize<DT2_, IT2_>(FileMode::fm_svb, input);
       }
 
+
+      template<typename IndexContainer>
+      bool remove_elements(const IndexContainer& inds)
+      {
+        bool success = true;
+        for(auto i : inds)
+        {
+          success &= _remove_element(IndexType(i));
+        }
+        return success;
+      }
+
+      bool remove_element(IndexType ind)
+      {
+        return  _remove_element(ind);
+      }
+
+      bool element_exists(IndexType ind) const
+      {
+        const IT_* pindices = this->_indices.at(0);
+        return std::find(pindices, pindices + this->_scalar_index.at(1), ind) != pindices + this->_scalar_index.at(1);
+      }
+
       /**
        * \brief Serialization of complete container entity.
        *
@@ -578,14 +616,22 @@ namespace FEAT
        */
       void write_out(FileMode mode, const String& filename) const
       {
+        std::ios_base::openmode bin = std::ofstream::out | std::ofstream::binary;
+        if(mode == FileMode::fm_mtx)
+          bin = std::ofstream::out;
         std::ofstream file;
-        char buff[LAFEM::FileOutStreamBufferSize];
-        file.rdbuf()->pubsetbuf(buff, LAFEM::FileOutStreamBufferSize);
-        file.open(filename.c_str(), std::ofstream::out | std::ofstream::binary);
-        if (! file.is_open())
-          XABORTM("Unable to open Vector file " + filename);
+        char* buff = nullptr;
+        if(mode == FileMode::fm_mtx)
+        {
+          buff = new char[LAFEM::FileOutStreamBufferSize];
+          file.rdbuf()->pubsetbuf(buff, LAFEM::FileOutStreamBufferSize);
+        }
+        file.open(filename.c_str(), bin);
+        if(! file.is_open())
+          XABORTM("Unable to open Matrix file " + filename);
         write_out(mode, file);
         file.close();
+        delete[] buff;
       }
 
       /**
@@ -598,6 +644,23 @@ namespace FEAT
       {
         switch(mode)
         {
+          case FileMode::fm_mtx:
+          {
+
+            file << "%%MatrixMarket matrix coordinate real general\n";
+            file << this->size()*BlockSize << " " << 1 << " " << this->used_elements()*BlockSize << "\n";
+
+            const Index u_elem(this->used_elements());
+            const IT_ * pind(this->indices());
+            const DT_ * pval(this->elements<Perspective::pod>());
+            for (Index i(0) ; i < u_elem ; ++i, ++pind, pval+=BlockSize)
+            {
+              for(Index k(0); k < BlockSize; ++k)
+                file << (*pind)*BlockSize+k+1 << " " << 1 << " " << stringify_fp_sci(*(pval+k)) << "\n";
+            }
+            break;
+          }
+
           case FileMode::fm_binary:
           case FileMode::fm_svb:
             this->template _serialize<double, std::uint64_t>(FileMode::fm_svb, file);

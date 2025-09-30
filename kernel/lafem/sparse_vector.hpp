@@ -84,6 +84,20 @@ namespace FEAT
         return this->_scalar_index.at(4);
       }
 
+      bool _remove_element(IT_ ind)
+      {
+        IT_* pindices = this->_indices.at(0);
+        IT_* ptr = std::find(pindices, pindices + _used_elements(), ind);
+        if(ptr == pindices + _used_elements())
+        {
+          return false;
+        }
+        _sorted() = 0;
+        *ptr = std::numeric_limits<IT_>::max();
+        sort();
+        return true;
+      }
+
     public:
       /// Our datatype
       typedef DT_ DataType;
@@ -450,6 +464,28 @@ namespace FEAT
             ++junk;
           _used_elements() -= junk;
         }
+      }
+
+      template<typename IndexContainer>
+      bool remove_elements(const IndexContainer& inds)
+      {
+        bool success = true;
+        for(auto i : inds)
+        {
+          success &= _remove_element(IndexType(i));
+        }
+        return success;
+      }
+
+      bool remove_element(IndexType ind)
+      {
+        return  _remove_element(ind);
+      }
+
+      bool element_exists(IndexType ind) const
+      {
+        const IT_* pindices = this->_indices.at(0);
+        return std::find(pindices, pindices + this->_scalar_index.at(1), ind) != pindices + this->_scalar_index.at(1);
       }
 
       /**
