@@ -50,6 +50,10 @@ namespace CCND
   /// define our system level
   typedef CCND::SystemLevelBase SystemLevel;
 
+  /// our partidomaincontrol
+  template<typename DomainLevel_>
+  using PartitionControl = Control::Domain::PartiDomainControl<DomainLevel_>;
+
 } //  namespace CCND
 
   // include unsteady application base header

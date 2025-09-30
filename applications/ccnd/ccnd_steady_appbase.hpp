@@ -197,6 +197,26 @@
 //
 #pragma once
 
+// Give clangd more information about the type used here... this can lead to an error, since the idea is
+// to define DomainLevel and SystemLevel on a application basis
+#if defined(_CLANGD) && !defined(_CLANGD_DOMAINDEF)
+  // open the namespace and define the DomainLevel and SystemLevel classes
+  namespace CCND
+  {
+    /// our domain level
+    typedef DomainLevelBase DomainLevel;
+
+    /// our system level
+    typedef SystemLevelBase SystemLevel;
+
+    /// our partidomaincontrol
+    template<typename DomainLevel_>
+    using PartitionControl = Control::Domain::PartiDomainControl<DomainLevel_>;
+
+  } //  namespace CCND
+#endif
+
+
 namespace CCND
 {
   typedef typename SystemLevel::GlobalSystemMatrix GlobalSystemMatrix;
@@ -243,7 +263,7 @@ namespace CCND
     SimpleArgParser& args;
 
     /// our domain control
-    Control::Domain::PartiDomainControl<DomainLevel> domain;
+    PartitionControl<DomainLevel> domain;
     /// our system levels
     std::deque<std::unique_ptr<SystemLevel>> system;
 
@@ -329,6 +349,8 @@ namespace CCND
     /// current nonlinear iteration
     Index nl_step = Index(0);
 
+    /// Selected hardware backend
+    String backend = "generic";
     /// default filename for all kinds of output files (VTK, checkpoints, etc)
     String default_filename;
 
@@ -359,7 +381,7 @@ namespace CCND
     /// a handful of stopwatches
     StopWatch watch_create_domain, watch_create_system, watch_create_solver;
     StopWatch watch_stokes_solve, watch_nonlin_loop, watch_nonlin_def_asm, watch_nonlin_mat_asm, watch_nonlin_solver_init, watch_nonlin_solver_apply;
-    StopWatch watch_sol_init_read, watch_sol_final_write, watch_sol_analysis, watch_total_run, watch_vtk;
+    StopWatch watch_sol_init_read, watch_sol_final_write, watch_sol_analysis, watch_total_run, watch_vtk, watch_filter_fbm;
 
     /// our global vectors
     GlobalSystemVector vec_sol, vec_rhs, vec_def, vec_cor, vec_def_unsynced;
@@ -381,6 +403,9 @@ namespace CCND
 
     /// vector of all non-linear defects
     std::vector<DataType> nonlinear_defects;
+
+    /// number of worker threads to be used
+    Index num_worker_threads = 0;
 
   public:
     explicit SteadyAppBase(const Dist::Comm& comm_, SimpleArgParser& args_) :
@@ -421,6 +446,9 @@ namespace CCND
       args.support("load-initial-sol-joined");
       args.support("save-final-sol");
       args.support("save-final-sol-joined");
+      args.support("backend", "<generic|cuda|mkl>\n"
+          "Specifies which backend to use for the actual GMG solution process; default: generic");
+      args.support("num-worker-threads");
     }
 
     virtual ~SteadyAppBase()
@@ -468,6 +496,8 @@ namespace CCND
       ext_stats = (args.check("ext-stats") >= 0);
       plot_mg_iter = (args.check("plot-mg-iter") >= 0);
       coarse_gmres = (args.check("coarse-gmres") >= 0);
+
+      args.parse("num-worker-threads", num_worker_threads);
 
       // parse streamline diffusion parameters
       args.parse("adapt-upsam", adapt_upsam);
@@ -556,10 +586,33 @@ namespace CCND
       // keep base levels if we need to save/load joined solution vectors
       if(need_base_splitter)
         domain.keep_base_levels();
+
+      // choose backend
+      args.parse("backend", backend);
+      if(backend.compare_no_case("cuda") == 0)
+      {
+#ifndef FEAT_HAVE_CUDA
+        comm.print(std::cerr, "ERROR: 'cuda' backend is only available when FEAT is configured with CUDA support enabled");
+        Runtime::abort();
+#endif // not FEAT_HAVE_CUDA
+      }
+      else if(backend.compare_no_case("mkl") == 0)
+      {
+#ifndef FEAT_HAVE_MKL
+        comm.print(std::cerr, "ERROR: 'mkl' backend is only available when FEAT is configured with MKL support enabled");
+        Runtime::abort();
+#endif // FEAT_HAVE_MKL
+      }
+      else if(backend.compare_no_case("generic") != 0)
+      {
+        comm.print(std::cerr, "ERROR: unknown backend '" + backend + "'");
+        Runtime::abort();
+      }
     }
 
     virtual void print_problem()
     {
+      comm.print(String("Preferred Backend").pad_back(pad_len, pad_char) + ": " + stringify(backend));
       comm.print("\nProblem Parameters:");
       comm.print(String("Dimension").pad_back(pad_len, pad_char) + ": " + stringify(dim));
       comm.print(String("Mesh Files").pad_back(pad_len, pad_char) + ": '" + stringify_join(mesh_file_names, "' , '") + "'");
@@ -608,6 +661,7 @@ namespace CCND
         comm.print(String("Smoother Iteration").pad_back(pad_len, pad_char) + ": FGMRES[" + stringify(smooth_gmres_dim) + "]-AmaVanka");
       else
         comm.print(String("Smoother Iteration").pad_back(pad_len, pad_char) + ": Richardson-AmaVanka");
+      comm.print(String("Number of worker threads").pad_back(pad_len, pad_char) + ": " + stringify(num_worker_threads));
       comm.print_flush();
     }
 
@@ -703,6 +757,8 @@ namespace CCND
         DomainLevel& dom_lvl = *domain.at(i);
         SystemLevel& sys_lvl = *system.at(i);
 
+        dom_lvl.domain_asm.set_max_worker_threads(std::size_t(num_worker_threads));
+
         // compile domain assembler
         dom_lvl.domain_asm.compile_all_elements();
 
@@ -791,7 +847,9 @@ namespace CCND
       {
         if(enable_fbm)
         {
+          watch_filter_fbm.start();
           system.at(i)->filter_interface_fbm.filter_weak_matrix_rows(system.at(i)->matrix_a.local(), system.at(i)->velo_mass_matrix.local());
+          watch_filter_fbm.stop();
         }
         system.at(i)->compile_system_matrix();
         system.at(i)->compile_local_matrix();
@@ -1096,7 +1154,7 @@ namespace CCND
           auto coarse_solver = Solver::new_gmres(lvl.matrix_sys, lvl.filter_sys, 16, 0.0, schwarz);
           coarse_solver->set_max_iter(500);
           coarse_solver->set_tol_rel(1e-3);
-          //coarse_solver->set_plot_mode(Solver::PlotMode::summary);
+          // coarse_solver->set_plot_mode(Solver::PlotMode::summary);
 
           multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, coarse_solver);
         }
@@ -1166,8 +1224,13 @@ namespace CCND
     virtual bool solve_stokes()
     {
       comm.print("\nSolving Stokes system...");
-
       init_solver_numeric();
+
+      // from here on, we can switch to another backend if the user desires this
+      if(backend.compare_no_case("cuda") == 0)
+        Backend::set_preferred_backend(FEAT::PreferredBackend::cuda);
+      else if(backend.compare_no_case("mkl") == 0)
+        Backend::set_preferred_backend(FEAT::PreferredBackend::mkl);
 
       Solver::Status stokes_status = Solver::Status::undefined;
 
@@ -1191,6 +1254,7 @@ namespace CCND
         // compute defect after solve manually
         system.front()->matrix_sys.apply(vec_def, vec_sol, vec_rhs, -DataType(1));
         system.front()->filter_sys.filter_def(vec_def);
+        //TODO: necessary?
         //if(enable_fbm)
           //system.front()->filter_interface_fbm.filter_def(vec_def.local().first());
 
@@ -1198,6 +1262,8 @@ namespace CCND
 
         watch_stokes_solve.stop();
       }
+      // reset backend to generic
+      Backend::set_preferred_backend(PreferredBackend::generic);
 
       // release solvers
       done_solver_numeric();
@@ -1421,7 +1487,8 @@ namespace CCND
             // Also make sure that we gain at least 2 digits.
             solver_iterative->set_tol_rel(1E-2);
           }
-          else if(nl_step % 2 > 0)
+          //TODO: this does nothing
+          else if((nl_step % 2 > 0) && (nl_step > 3))
           {
             DataType def_prev_imp = nonlinear_defects.at(nonlinear_defects.size()-2)/nonlinear_defects.at(nonlinear_defects.size()-3);
             DataType abs_tol = def_nl * def_prev_imp * def_prev_imp * def_improve * DataType(0.1);

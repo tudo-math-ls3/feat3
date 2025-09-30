@@ -58,17 +58,17 @@ namespace CCND
 {
   using namespace FEAT;
 
-  // define application dimension
+  /// define application dimension
   static constexpr int dim = FEAT_CCND_APP_DIM;
   static_assert((dim == 2) || (dim == 3), "invalid dimension");
 
-  // output padding length
+  /// output padding length
   static constexpr std::size_t pad_len = 30u;
 
-  // output padding character
+  /// output padding character
   static constexpr char pad_char = '.';
 
-  // helper function to parse arguments
+  /// helper function to parse arguments
   template<typename T_>
   T_ parse(SimpleArgParser& args, const String& name, T_ default_value)
   {
@@ -76,7 +76,27 @@ namespace CCND
     return default_value;
   }
 
-  // our one and only index type
+  /// helper to parse backend string
+  PreferredBackend parse_backend(const String& backend_string)
+  {
+    if(backend_string.compare_no_case("cuda") == 0)
+    {
+      return PreferredBackend::cuda;
+    }
+    else if(backend_string.compare_no_case("mkl") == 0)
+    {
+      return PreferredBackend::mkl;
+    }
+    else if(backend_string.compare_no_case("generic") == 0)
+    {
+      return PreferredBackend::generic;
+    }
+    XABORTM("Unknown backend " + backend_string);
+    return PreferredBackend::generic;
+
+  }
+
+  /// our one and only index type
   typedef Index IndexType;
 
   // depending on whether FEAT_CCND_APP_QUADMATH is defined,
@@ -236,10 +256,17 @@ namespace CCND
 
     void compile_local_matrix()
     {
-      // convert local matrices
-      this->local_matrix_sys.block_a() = this->matrix_a.convert_to_1();
-      this->local_matrix_sys.block_b() = this->matrix_b.local().clone(LAFEM::CloneMode::Weak);
-      this->local_matrix_sys.block_d() = this->matrix_d.local().clone(LAFEM::CloneMode::Weak);
+      // do we have to allocate the structures?
+      if(this->local_matrix_sys.block_a().empty())
+      {
+        this->local_matrix_sys.block_a() = this->matrix_a.local().clone(LAFEM::CloneMode::Layout);
+        this->local_matrix_sys.block_b() = this->matrix_b.local().clone(LAFEM::CloneMode::Layout);
+        this->local_matrix_sys.block_d() = this->matrix_d.local().clone(LAFEM::CloneMode::Layout);
+      }
+      // copy local matrices (and sync 1 if necessary)
+      this->matrix_a.convert_to_1(this->local_matrix_sys.block_a(), false);
+      this->local_matrix_sys.block_b().copy(this->matrix_b.local());
+      this->local_matrix_sys.block_d().copy(this->matrix_d.local());
 
       // apply velocity unit filters to A and B
       for(const auto& filter : this->get_local_velo_unit_filter_seq())
@@ -467,28 +494,28 @@ namespace CCND
       // append timing info
       s += String("\nTiming Statistics:\n");
       s += String("Total Runtime").pad_back(padlen, pc) + ": " + stringify_fp_fix(times[Times::total_run], 3, 10) + " sec\n";
-      s += format_subtime("Domain Create", times[Times::create_domain]);
-      s += format_subtime("System Create", times[Times::create_system]);
-      s += format_subtime("Solver Create", times[Times::create_solver]);
-      s += format_subtime("Initial Stokes Solver", times[Times::stokes_solve]);
-      s += format_subtime("Navier-Stokes Solver Total", times[Times::nonlin_total]);
-      s += format_subtime("Nonlinear Defect Assembly", times[Times::nonlin_asm_def]);
-      s += format_subtime("Nonlinear Matrix Assembly", times[Times::nonlin_asm_mat]);
-      s += format_subtime("Nonlinear Precond Initialize", times[Times::linsol_init]);
-      s += format_subtime("Nonlinear Precond Apply", times[Times::linsol_apply]);
-      s += format_subtime("Multigrid Defect Compute", times[Times::mg_defect]);
-      s += format_subtime("Multigrid Smooth Apply", times[Times::mg_smooth]);
-      s += format_subtime("Multigrid Coarse Solve", times[Times::mg_coarse]);
+      s += format_subtime_mm("Domain Create", times[Times::create_domain], times_min[Times::create_domain], times_max[Times::create_domain]);
+      s += format_subtime_mm("System Create", times[Times::create_system], times_min[Times::create_system], times_max[Times::create_system]);
+      s += format_subtime_mm("Solver Create", times[Times::create_solver], times_min[Times::create_solver], times_max[Times::create_solver]);
+      s += format_subtime_mm("Initial Stokes Solver", times[Times::stokes_solve], times_min[Times::stokes_solve], times_max[Times::stokes_solve]);
+      s += format_subtime_mm("Navier-Stokes Solver Total", times[Times::nonlin_total], times_min[Times::nonlin_total], times_max[Times::nonlin_total]);
+      s += format_subtime_mm("Nonlinear Defect Assembly", times[Times::nonlin_asm_def], times_min[Times::nonlin_asm_def], times_max[Times::nonlin_asm_def]);
+      s += format_subtime_mm("Nonlinear Matrix Assembly", times[Times::nonlin_asm_mat], times_min[Times::nonlin_asm_mat], times_max[Times::nonlin_asm_mat]);
+      s += format_subtime_mm("Nonlinear Precond Initialize", times[Times::linsol_init], times_min[Times::linsol_init], times_max[Times::linsol_init]);
+      s += format_subtime_mm("Nonlinear Precond Apply", times[Times::linsol_apply], times_min[Times::linsol_apply], times_max[Times::linsol_apply]);
+      s += format_subtime_mm("Multigrid Defect Compute", times[Times::mg_defect], times_min[Times::mg_defect], times_max[Times::mg_defect]);
+      s += format_subtime_mm("Multigrid Smooth Apply", times[Times::mg_smooth], times_min[Times::mg_smooth], times_max[Times::mg_smooth]);
+      s += format_subtime_mm("Multigrid Coarse Solve", times[Times::mg_coarse], times_min[Times::mg_coarse], times_max[Times::mg_coarse]);
       s += format_subtime_mm("Multigrid Transfer Apply", times[Times::mg_transfer], times_min[Times::mg_transfer], times_max[Times::mg_transfer]);
       s += format_subtime_mm("Vanka Symbolic Initialize", times[Times::vanka_init_sym], times_min[Times::vanka_init_sym], times_max[Times::vanka_init_sym]);
       s += format_subtime_mm("Vanka Numeric Initialize", times[Times::vanka_init_num], times_min[Times::vanka_init_num], times_max[Times::vanka_init_num]);
       s += format_subtime_mm("Vanka Local Apply", times[Times::vanka_apply], times_min[Times::vanka_apply], times_max[Times::vanka_apply]);
-      s += format_subtime("Solution Analysis", times[Times::sol_analysis]);
-      s += format_subtime("VTK Write", times[Times::vtk_write]);
-      s += format_subtime("Initial Solution Read", times[Times::sol_init_read]);
-      s += format_subtime("Final Solution Write", times[Times::sol_final_write]);
-      s += format_subtime("Checkpoint Save", times[Times::checkpoint_save]);
-      s += format_subtime("Checkpoint Load", times[Times::checkpoint_load]);
+      s += format_subtime_mm("Solution Analysis", times[Times::sol_analysis], times_min[Times::sol_analysis], times_max[Times::sol_analysis]);
+      s += format_subtime_mm("VTK Write", times[Times::vtk_write], times_min[Times::vtk_write], times_max[Times::vtk_write]);
+      s += format_subtime_mm("Initial Solution Read", times[Times::sol_init_read], times_min[Times::sol_init_read], times_max[Times::sol_init_read]);
+      s += format_subtime_mm("Final Solution Write", times[Times::sol_final_write], times_min[Times::sol_final_write], times_max[Times::sol_final_write]);
+      s += format_subtime_mm("Checkpoint Save", times[Times::checkpoint_save], times_min[Times::checkpoint_save], times_max[Times::checkpoint_save]);
+      s += format_subtime_mm("Checkpoint Load", times[Times::checkpoint_load], times_min[Times::checkpoint_load], times_max[Times::checkpoint_load]);
 
       // append memory info
       s += String("\nMemory Statistics:\n");
