@@ -461,8 +461,8 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        Index max_abs_index = Arch::MaxAbsIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
-        ASSERT(max_abs_index < this->template size<Perspective::pod>());
+        Index max_abs_index = Arch::MaxAbsIndex::value(this->template elements<Perspective::pod>(), this->template  used_elements<Perspective::pod>());
+        ASSERT(max_abs_index < this->template  used_elements<Perspective::pod>());
         DT_ result(this->template elements<Perspective::pod>()[max_abs_index]);
         result = Math::abs(result);
 
@@ -481,8 +481,8 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        Index min_abs_index = Arch::MinAbsIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
-        ASSERT(min_abs_index < this->template size<Perspective::pod>());
+        Index min_abs_index = Arch::MinAbsIndex::value(this->template elements<Perspective::pod>(), this->template  used_elements<Perspective::pod>());
+        ASSERT(min_abs_index < this->template  used_elements<Perspective::pod>());
         DT_ result(this->template elements<Perspective::pod>()[min_abs_index]);
         result = Math::abs(result);
 
@@ -501,8 +501,8 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        Index max_index = Arch::MaxIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
-        ASSERT(max_index < this->template size<Perspective::pod>());
+        Index max_index = Arch::MaxIndex::value(this->template elements<Perspective::pod>(), this->template  used_elements<Perspective::pod>());
+        ASSERT(max_index < this->template  used_elements<Perspective::pod>());
         DT_ result(this->template elements<Perspective::pod>()[max_index]);
 
         TimeStamp ts_stop;
@@ -520,8 +520,8 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        Index min_index = Arch::MinIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
-        ASSERT(min_index < this->template size<Perspective::pod>());
+        Index min_index = Arch::MinIndex::value(this->template elements<Perspective::pod>(), this->template  used_elements<Perspective::pod>());
+        ASSERT(min_index < this->template used_elements<Perspective::pod>());
         DT_ result(this->template elements<Perspective::pod>()[min_index]);
 
         TimeStamp ts_stop;
