@@ -541,8 +541,9 @@ namespace FEAT
         XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
         TimeStamp ts_start;
 
-        DataType max_rel_diff = Arch::MaxRelDiff::value(this->template elements<Perspective::pod>(), x.template elements<Perspective::pod>(), this->template size<Perspective::pod>());
-        ASSERT(max_rel_diff < this->template size<Perspective::pod>());
+        DataType max_rel_diff = Arch::MaxRelDiff::value(this->template elements<Perspective::pod>(),
+          x.template elements<Perspective::pod>(), this->template used_elements<Perspective::pod>());
+        ASSERT(max_rel_diff < this->template used_elements<Perspective::pod>());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
