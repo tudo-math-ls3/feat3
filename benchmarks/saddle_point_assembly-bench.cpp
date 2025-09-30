@@ -15,10 +15,12 @@
 #include <kernel/space/cro_rav_ran_tur/element.hpp>
 #include <kernel/analytic/common.hpp>
 #include <kernel/solver/gmres.hpp>
+#include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/amavanka.hpp>
 #include <kernel/solver/voxel_amavanka.hpp>
 #include <kernel/geometry/export_vtk.hpp>
-#include <kernel/voxel_assembly/defo_assembler.hpp>
+#include <kernel/assembly/function_integral_info.hpp>
+#include <kernel/voxel_assembly/burgers_velo_material_assembler.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/geometry/unit_cube_patch_generator.hpp>
 
@@ -156,13 +158,36 @@ namespace SaddlePointAssemblyBench
     // assemble A, B and D
     asm_sym_matrix_watch.start();
     Assembly::SymbolicAssembler::assemble_matrix_std1(mat_a, space_v);
-    VoxelAssembly::VoxelDefoAssembler<SpaceVeloType, DataType, IndexType> voxel_defo(space_v, col);
-    voxel_defo.nu = DataType(2.3);
+    asm_sym_matrix_watch.stop();
+    Random::SeedType seed(Random::SeedType(time(nullptr)));
+    Random rng(seed);
+    typedef typename MatrixTypeA::VectorTypeL VectorTypeA;
+    VectorTypeA dummy_conv = VectorTypeA(rng, matrix.rows(), DataType(-1), DataType(1));
+    asm_sym_matrix_watch.start();
+    VoxelAssembly::VoxelBurgersVeloMaterialAssembler<SpaceVeloType, DataType, IndexType> voxel_defo(space_v, col);
+    voxel_defo.deformation = true;
+    voxel_defo.nu = DataType(1.3);
+    voxel_defo.sd_nu = voxel_defo.nu;
+    voxel_defo.beta = DataType(0.4);
+    voxel_defo.frechet_beta = DataType(1.);
+    voxel_defo.theta = DataType(0.1);
+    voxel_defo.sd_delta = DataType(0);
+    // voxel_defo.set_sd_v_norm(dummy_conv);
+    voxel_defo.reg_eps = DataType(1E-20);
+    voxel_defo.frechet_material = DataType(1.);
+    voxel_defo.mu_0 = voxel_defo.nu;
+    voxel_defo.exp = DataType(1.1);
+    voxel_defo.lambda = DataType(0.35);
+    voxel_defo.a_T = DataType(0.1);
+    voxel_defo.yasuda_a = DataType(1.9);
+    voxel_defo.mu_inf = DataType(0.001);
+    voxel_defo.material_type = VoxelAssembly::MaterialType::carreauYasuda;
+    voxel_defo.blocksize = 64;
     asm_sym_matrix_watch.stop();
 
     asm_num_matrix_watch.start();
     // Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_a, dudv_op, space_v, cubature);
-    voxel_defo.assemble_matrix1(mat_a, space_v, Cubature::DynamicFactory(cubature));
+    voxel_defo.assemble_matrix1(mat_a, dummy_conv, space_v, Cubature::DynamicFactory(cubature));
     Assembly::GradPresDivVeloAssembler::assemble(mat_b, mat_d, space_v, space_p, cubature);
     asm_num_matrix_watch.stop();
 
@@ -217,7 +242,7 @@ namespace SaddlePointAssemblyBench
       Backend::set_preferred_backend(backend_asm);
       asm_num_matrix_watch.start();
       mat_a.format();
-      voxel_defo.assemble_matrix1(mat_a, space_v, Cubature::DynamicFactory(cubature));
+      voxel_defo.assemble_matrix1(mat_a, dummy_conv, space_v, Cubature::DynamicFactory(cubature));
       asm_num_matrix_watch.stop();
       asm_num_vanka_watch.start();
       gmres->init_numeric();
@@ -242,7 +267,7 @@ namespace SaddlePointAssemblyBench
     bres.num_asm_mat_time = asm_num_matrix_watch.elapsed();
     bres.num_asm_vanka_time = asm_num_vanka_watch.elapsed();
     bres.sym_vanka_asm_time = asm_sym_vanka_watch.elapsed();
-    bres.sym_mat_asm_time = asm_sym_vanka_watch.elapsed();
+    bres.sym_mat_asm_time = asm_sym_matrix_watch.elapsed();
     bres.solver_apply_time = solver_apply_watch.elapsed();
     bres.all_time = all_watch.elapsed();
   }
@@ -302,13 +327,32 @@ namespace SaddlePointAssemblyBench
     // assemble A, B and D
     asm_sym_matrix_watch.start();
     Assembly::SymbolicAssembler::assemble_matrix_std1(mat_a, space_v);
-    VoxelAssembly::VoxelDefoAssembler<SpaceVeloType, DataType, IndexType> voxel_defo(space_v, col);
-    voxel_defo.nu = DataType(2.3);
+    typedef typename MatrixTypeA::VectorTypeL VectorTypeA;
+    VectorTypeA dummy_conv(matrix.rows(), DataType(1));
+    VoxelAssembly::VoxelBurgersVeloMaterialAssembler<SpaceVeloType, DataType, IndexType> voxel_defo(space_v, col);
+    voxel_defo.deformation = true;
+    voxel_defo.nu = DataType(1.3);
+    voxel_defo.sd_nu = voxel_defo.nu;
+    voxel_defo.beta = DataType(0.4);
+    voxel_defo.frechet_beta = DataType(1.);
+    voxel_defo.theta = DataType(0.1);
+    voxel_defo.sd_delta = DataType(0);
+    // voxel_defo.set_sd_v_norm(dummy_conv);
+    voxel_defo.reg_eps = DataType(1E-20);
+    voxel_defo.frechet_material = DataType(1.);
+    voxel_defo.mu_0 = voxel_defo.nu;
+    voxel_defo.exp = DataType(1.1);
+    voxel_defo.lambda = DataType(0.35);
+    voxel_defo.a_T = DataType(0.1);
+    voxel_defo.yasuda_a = DataType(1.9);
+    voxel_defo.mu_inf = DataType(0.001);
+    voxel_defo.material_type = VoxelAssembly::MaterialType::carreauYasuda;
+    voxel_defo.blocksize = 64;
     asm_sym_matrix_watch.stop();
 
     asm_num_matrix_watch.start();
     // Assembly::BilinearOperatorAssembler::assemble_matrix1(mat_a, dudv_op, space_v, cubature);
-    voxel_defo.assemble_matrix1(mat_a, space_v, Cubature::DynamicFactory(cubature));
+    voxel_defo.assemble_matrix1(mat_a, dummy_conv, space_v, Cubature::DynamicFactory(cubature));
     Assembly::GradPresDivVeloAssembler::assemble(mat_b, mat_d, space_v, space_p, cubature);
     asm_num_matrix_watch.stop();
 
@@ -363,7 +407,7 @@ namespace SaddlePointAssemblyBench
       Backend::set_preferred_backend(backend_asm);
       asm_num_matrix_watch.start();
       mat_a.format();
-      voxel_defo.assemble_matrix1(mat_a, space_v, Cubature::DynamicFactory(cubature));
+      voxel_defo.assemble_matrix1(mat_a, dummy_conv, space_v, Cubature::DynamicFactory(cubature));
       asm_num_matrix_watch.stop();
       asm_num_vanka_watch.start();
       gmres->init_numeric();
@@ -388,7 +432,7 @@ namespace SaddlePointAssemblyBench
     bres.num_asm_mat_time = asm_num_matrix_watch.elapsed();
     bres.num_asm_vanka_time = asm_num_vanka_watch.elapsed();
     bres.sym_vanka_asm_time = asm_sym_vanka_watch.elapsed();
-    bres.sym_mat_asm_time = asm_sym_vanka_watch.elapsed();
+    bres.sym_mat_asm_time = asm_sym_matrix_watch.elapsed();
     bres.solver_apply_time = solver_apply_watch.elapsed();
     bres.all_time = all_watch.elapsed();
   }
@@ -489,6 +533,7 @@ namespace SaddlePointAssemblyBench
         {
           PreferredBackend backend_asm = PreferredBackend::generic;
           PreferredBackend backend_calc = PreferredBackend::mkl;
+          // PreferredBackend backend_calc = PreferredBackend::generic;
           omp_set_num_threads(int(num_threads[i]));
           run_bench_amavanka<Space_, DT_ , IT_, dim_>(int(lvl), result.at(i).at(0), backend_asm, backend_calc);
           run_bench_voxel_amavanka<Space_, DT_ , IT_, dim_>(int(lvl), result.at(i).at(1), backend_asm, backend_calc);
@@ -664,6 +709,124 @@ namespace SaddlePointAssemblyBench
         {
           const auto& b = results.at(2*(run_size/3) + lvl-lvl_min).at(i).at(1);
           double t = b.all_time;
+          std::cout << stringify_fp_fix(t, 6, 10).pad_front(10).pad_back(20);
+        }
+        std::cout << "\n";
+      }
+    }
+#endif // FEAT_HAVE_CUDA
+
+    {
+      std::cout << "\n------------------------------------\n";
+      if(generic_run)
+      {
+        std::cout << "Generic Generic Asm Matrix Asm Timings:\n";
+        String line_h = String("       ") + String("Vanka").pad_front(num_threads.size()*10).pad_back(num_threads.size()*20)
+                    + String("Voxel-Vanka").pad_front(num_threads.size()*10).pad_back(num_threads.size()*10);
+        std::cout << line_h << "\n";
+        String line_v = String(" LVL   ");
+        for(auto h : num_threads)
+        {
+          line_v += String(stringify(h) + "threads").pad_front(10).pad_back(20);
+        }
+        for(auto h : num_threads)
+        {
+          line_v += String(stringify(h) + "threads").pad_front(10).pad_back(20);
+        }
+        std::cout << line_v << "\n";
+
+
+        for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+        {
+          std::cout << stringify(lvl).pad_front(2) << ":    ";
+
+          for(std::size_t i = 0; i < num_threads.size(); ++i)
+          {
+            const auto& b = results.at(lvl-lvl_min).at(i).at(0);
+            double t = b.sym_mat_asm_time;
+            std::cout << stringify_fp_fix(t, 6, 10).pad_front(10).pad_back(20);
+          }
+          for(std::size_t i = 0; i < num_threads.size(); ++i)
+          {
+            const auto& b = results.at(lvl-lvl_min).at(i).at(1);
+            double t = b.sym_mat_asm_time;
+            std::cout << stringify_fp_fix(t, 6, 10).pad_front(10).pad_back(20);
+          }
+          std::cout << "\n";
+        }
+      }
+    }
+#ifdef FEAT_HAVE_CUDA
+    {
+      // std::cout << "\n------------------------------------\n";
+      std::cout << "\nGeneric CUDA Asm Matrix Sym Timings:\n";
+      String line_h = String("       ") + String("Vanka").pad_front(num_threads.size()*10).pad_back(num_threads.size()*20)
+                   + String("Voxel-Vanka").pad_front(num_threads.size()*10).pad_back(num_threads.size()*10);
+      std::cout << line_h << "\n";
+      String line_v = String(" LVL   ");
+      for(auto h : num_threads)
+      {
+        line_v += String(stringify(h) + "threads").pad_front(10).pad_back(20);
+      }
+      for(auto h : num_threads)
+      {
+        line_v += String(stringify(h) + "threads").pad_front(10).pad_back(20);
+      }
+      std::cout << line_v << "\n";
+
+
+      for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+      {
+        std::cout << stringify(lvl).pad_front(2) << ":    ";
+
+        for(std::size_t i = 0; i < num_threads.size(); ++i)
+        {
+          const auto& b = results.at((run_size/3)+lvl-lvl_min).at(i).at(0);
+            double t = b.sym_mat_asm_time;
+          std::cout << stringify_fp_fix(t, 6, 10).pad_front(10).pad_back(20);
+        }
+        for(std::size_t i = 0; i < num_threads.size(); ++i)
+        {
+          const auto& b = results.at((run_size/3) + lvl-lvl_min).at(i).at(1);
+            double t = b.sym_mat_asm_time;
+          std::cout << stringify_fp_fix(t, 6, 10).pad_front(10).pad_back(20);
+        }
+        std::cout << "\n";
+      }
+    }
+
+    {
+      // std::cout << "\n------------------------------------\n";
+      std::cout << "\nCUDA CUDA Asm Mat Sym Timings:\n";
+      String line_h = String("       ") + String("Vanka").pad_front(num_threads.size()*10).pad_back(num_threads.size()*20)
+                   + String("Voxel-Vanka").pad_front(num_threads.size()*10).pad_back(num_threads.size()*10);
+      std::cout << line_h << "\n";
+      String line_v = String(" LVL   ");
+      for(auto h : num_threads)
+      {
+        line_v += String(stringify(h) + "threads").pad_front(10).pad_back(20);
+      }
+      for(auto h : num_threads)
+      {
+        line_v += String(stringify(h) + "threads").pad_front(10).pad_back(20);
+      }
+      std::cout << line_v << "\n";
+
+
+      for(Index lvl(lvl_min); lvl <= lvl_max; ++lvl)
+      {
+        std::cout << stringify(lvl).pad_front(2) << ":    ";
+
+        for(std::size_t i = 0; i < num_threads.size(); ++i)
+        {
+          const auto& b = results.at(2*(run_size/3)+lvl-lvl_min).at(i).at(0);
+            double t = b.sym_mat_asm_time;
+          std::cout << stringify_fp_fix(t, 6, 10).pad_front(10).pad_back(20);
+        }
+        for(std::size_t i = 0; i < num_threads.size(); ++i)
+        {
+          const auto& b = results.at(2*(run_size/3) + lvl-lvl_min).at(i).at(1);
+            double t = b.sym_mat_asm_time;
           std::cout << stringify_fp_fix(t, 6, 10).pad_front(10).pad_back(20);
         }
         std::cout << "\n";
@@ -1051,11 +1214,11 @@ namespace SaddlePointAssemblyBench
 
     if(dim == 2)
     {
-      run<Q2P1, double, Index, 2>(args);
+      run<Q2P1, double, std::uint32_t, 2>(args);
     }
     else if(dim == 3)
     {
-      run<Q2P1, double, Index, 3>(args);
+      run<Q2P1, double, std::uint32_t, 3>(args);
     }
     else
     {
