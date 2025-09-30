@@ -9,6 +9,8 @@
 #include <fstream>
 #include <stack>
 
+#include <algorithm>
+
 namespace FEAT
 {
   PropertyMap::PropertyMap(PropertyMap* parent) :
@@ -488,5 +490,37 @@ namespace FEAT
       // closing brace, including section name as comment
       os << prefix << "} # end of [" << (*sit).first << "]\n";
     }
+  }
+
+  PropertyMap* _add_sections(PropertyMap* out, const std::deque<String>& deq)
+  {
+    for(const auto& sec : deq)
+    {
+      out = out->add_section(sec);
+    }
+    return out;
+  }
+
+  void _treeify(PropertyMap* out, const PropertyMap* in)
+  {
+    for(auto iter = in->begin_section(); iter != in->end_section(); ++iter)
+    {
+      std::deque<String> key_deq = iter->first.split_by_charset("/");
+      auto curr_sec = _add_sections(out, key_deq);
+      for(auto iter_entry = iter->second->begin_entry(); iter_entry != iter->second->end_entry(); ++iter_entry)
+      {
+        curr_sec->add_entry(iter_entry->first, iter_entry->second);
+      }
+      _treeify(curr_sec, iter->second.get());
+    }
+  }
+
+  std::unique_ptr<PropertyMap> PropertyMap::treeify_structures() const
+  {
+    auto base_prop = std::make_unique<PropertyMap>();
+    PropertyMap* ptr = base_prop.get();
+
+    _treeify(ptr, this);
+    return base_prop;
   }
 } //namespace FEAT

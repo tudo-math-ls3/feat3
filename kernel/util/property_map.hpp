@@ -466,5 +466,20 @@ namespace FEAT
      * caller.
      */
     void write(std::ostream& os, String::size_type indent = 0) const;
+
+    /**
+     * \brief Builds a new property map by inserting subsection based on section names
+     *
+     * This function transforms a all sections consisting of "sec1/sec2" into real subsections.
+     * i.e. transform
+     * [sec1]                       \                        [sec1]
+     *  key1=val1                === \                       {  key1=val1
+     * [sec1/sec2]               === /                          [sec2]
+     *  key2=val2                   /                              key2=val2
+     *                                                       }
+     *
+     * This appears to be necessary due to the oversight?! that "/" is not a reserved charset in sections.
+     */
+    std::unique_ptr<PropertyMap> treeify_structures() const;
   }; // class PropertyMap
 } // namespace FEAT
