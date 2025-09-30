@@ -36,3 +36,8 @@ target_link_libraries (mesh2tri feat)
 
 add_executable(tri2mesh tri_to_mesh.cpp)
 target_link_libraries (tri2mesh feat)
+
+# copy calculate_bounding_box.py to build dir
+file (COPY ${CMAKE_CURRENT_SOURCE_DIR}/calculate_bounding_box.py DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+# copy mesh_gen_3d_hexa_cube.py to build dir
+file (COPY ${CMAKE_CURRENT_SOURCE_DIR}/mesh_gen_3d_hexa_cube.py DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

@@ -81,6 +81,10 @@ int main(int argc, char ** argv)
       sscaling.parse(scaling);
     }
 
+    std::cout << "tri2mesh: reading project file: " << input << std::endl;
+    std::cout << "tri2mesh: writing mesh file: " << output << std::endl;
+    std::cout << "tri2mesh: using scaling factor: " << scaling << std::endl;
+
     std::list<String> file_list;
     std::ifstream file_prj(input);
     if (!file_prj)
@@ -90,7 +94,7 @@ int main(int argc, char ** argv)
     }
     for (String line ; getline(file_prj, line); )
     {
-      file_list.push_back(line);
+      file_list.push_back(line.trim_me());
     }
     file_prj.close();
 
@@ -110,6 +114,7 @@ int main(int argc, char ** argv)
     {
       std::cerr<<"file " << *it << " not found!\n";
     }
+    std::cout << "tri2mesh: found mesh file: " << *it << std::endl;
 
     file_list.erase(it);
 
@@ -190,8 +195,6 @@ int main(int argc, char ** argv)
       add_mesh_part(rmesh.get(), file);
     }
 
-    //Geometry::ExportVTK<CMESH> exporter(*(rmesh->get_mesh()));
-    //exporter.write("test.vtk");
     std::ofstream mesh_out(output);
     Geometry::MeshFileWriter mesh_writer(mesh_out);
     mesh_writer.write(rmesh.get());
