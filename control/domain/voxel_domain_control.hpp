@@ -14,6 +14,7 @@
 #include <kernel/util/property_map.hpp>
 #include <kernel/util/statistics.hpp>
 #include <kernel/geometry/mesh_node.hpp>
+#include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/geometry/partition_set.hpp>
 #include <kernel/geometry/parti_2lvl.hpp>
 #include <kernel/geometry/parti_iterative.hpp>
@@ -142,6 +143,9 @@ namespace FEAT
         /// specifies whether to keep the voxel map after hierarchy creation
         bool _keep_voxel_map;
 
+        /// specifies whether we use a non voxel base mesh
+        bool _unstructered_mesh = false;
+
       public:
         /**
          * \brief Constructor
@@ -155,7 +159,8 @@ namespace FEAT
         explicit VoxelDomainControl(const Dist::Comm& comm_, bool support_multi_layered) :
           BaseClass(comm_, support_multi_layered),
           _create_stage(0),
-          _keep_voxel_map(false)
+          _keep_voxel_map(false),
+          _unstructered_mesh(false)
         {
         }
 
@@ -179,6 +184,16 @@ namespace FEAT
         void keep_voxel_map()
         {
           this->_keep_voxel_map = true;
+        }
+
+        Tiny::Vector<CoordType, shape_dim> get_bounding_box_min() const
+        {
+          return _bbox_min;
+        }
+
+        Tiny::Vector<CoordType, shape_dim> get_bounding_box_max() const
+        {
+          return _bbox_max;
         }
 
         /**
@@ -312,6 +327,47 @@ namespace FEAT
 
           // update creation stage
           this->_create_stage = 1;
+
+          // return the base-mesh node
+          return *_base_mesh_node.get();
+        }
+
+        MeshNodeType& set_base_mesh(std::unique_ptr<MeshNodeType>&& mesh_node)
+        {
+          XASSERTM(_create_stage == 0, "base mesh already created!");
+
+          _watch_create_base_mesh.start();
+          _base_mesh_node = std::move(mesh_node);
+
+          for(int k = 0; k < shape_dim; ++k)
+          {
+            _base_slices[k] = Math::Limits<Index>::max();
+          }
+
+          for(int k = 0; k < shape_dim; ++k)
+          {
+            _bbox_min[k] = Math::Limits<CoordType>::max();
+            _bbox_max[k] = Math::Limits<CoordType>::lowest();
+          }
+
+          auto& vtx = _base_mesh_node->get_mesh()->get_vertex_set();
+          Index n = vtx.get_num_vertices();
+          for(Index i(0); i < n; ++i)
+          {
+            for(int k = 0; k < shape_dim; ++k)
+            {
+              _bbox_min[k] = Math::min(_bbox_min[k], vtx[i][k]);
+              _bbox_max[k] = Math::max(_bbox_max[k], vtx[i][k]);
+            }
+          }
+
+          _watch_create_base_mesh.stop();
+
+          // update creation stage
+          this->_create_stage = 1;
+
+          // update unstructered mesh flag
+          this->_unstructered_mesh = true;
 
           // return the base-mesh node
           return *_base_mesh_node.get();
@@ -721,6 +777,47 @@ namespace FEAT
           return msg;
         }
 
+        /**
+         * \brief Creates a domain control from a list of filenames.
+         *
+         * \param[in] filenames
+         * A list of mesh filenames from which the domain control is to be created.
+         *
+         * \param[in] dirpath
+         * The path in which the mesh files are located.
+         */
+        virtual void create(const std::deque<String>& filenames, String dirpath = "")
+        {
+          //dummy implementation
+          ASSERTM(false, "Thou shall not arrive here!");
+          (void) filenames;
+          (void) dirpath;
+        }
+
+        /**
+         * \brief Creates a domain control from a MeshFileReader.
+         *
+         * \param[inout] mesh_reader
+         * A \transient reference to the mesh reader from which the domain control is to be created.
+         */
+        virtual void create(Geometry::MeshFileReader&)
+        {
+          //dummy implementation
+          ASSERTM(false, "Thou shall not arrive here!");
+        }
+
+        /**
+         * \brief Creates a domain control from a base-mesh node
+         *
+         * \param[in] base_mesh_node
+         * The base-mesh node that the domain control is to be created from
+         */
+        virtual void create(std::unique_ptr<MeshNodeType>&)
+        {
+          //dummy implementation
+          ASSERTM(false, "Thou shall not arrive here!");
+        }
+
       protected:
         /**
          * \brief Pre-creates the voxel map by setting the bounding box and resolution
@@ -740,7 +837,12 @@ namespace FEAT
             this->_voxel_map->set_resolution(resolution);
             return;
           }
+          else if(_unstructered_mesh)
+          {
+            XABORTM("Required to provide resolution for voxel map");
+          }
 
+          XASSERTM(this->_base_slices[0] != Math::Limits<Index>::max(), "Set Resolution explicitly");
           // compute the mesh width on the base mesh level
           Real base_res = (this->_bbox_max[0] - this->_bbox_min[0]) / Real(this->_base_slices[0]);
           for(int i(1); i < shape_dim; ++i)
@@ -1113,6 +1215,33 @@ namespace FEAT
           }
         }
 
+        // virtual bool _parse_parti_type(const String& type) override
+        // {
+        //   if(type.compare_no_case("extern") == 0)
+        //     return this->_allow_parti_extern = true;
+        //   // else if(type.compare_no_case("2level") == 0)
+        //   //   return _allow_parti_2level = true;
+        //   else
+        //     return BaseClass::_parse_parti_type(type);
+        // }
+
+        Adjacency::Coloring _compute_unstructered_coloring(const MeshNodeType& base_node) const
+        {
+          const auto& verts_at_elem = base_node.get_mesh()->template get_index_set<MeshType::shape_dim, 0>();
+          Adjacency::Graph elems_at_vert(Adjacency::RenderType::transpose, verts_at_elem);
+          Adjacency::Graph elems_at_elem(Adjacency::RenderType::injectify, verts_at_elem, elems_at_vert);
+          return Adjacency::Coloring(elems_at_elem);
+        }
+
+        Adjacency::Coloring _compute_unstructered_layering(const MeshNodeType& DOXY(base_node)) const
+        {
+          // ASSERTM(false, "Unstructured layering computation not implemented yet!");
+          #ifdef FEAT_DEBUG_MODE
+            std::cout << "Unstructered Layering Computation not implemented yet!";
+          #endif
+          return Adjacency::Coloring();
+        }
+
         /**
          * \brief Computes the coloring for the unpartitioned base mesh
          *
@@ -1222,7 +1351,7 @@ namespace FEAT
           const Geometry::TargetSet& patch_target = patch_part->template get_target_set<MeshType::shape_dim>();
 
           // number of colors = 2^shape_dim
-          const Index num_colors = Index(1) << MeshType::shape_dim;
+          const Index num_colors = parent_coloring.get_num_colors();
           const Index num_elems = patch_target.get_num_entities();
 
           // allocate coloring
@@ -1297,6 +1426,10 @@ namespace FEAT
          */
         Adjacency::Coloring _compute_refined_mesh_layering(const MeshNodeType& slag_node, const Adjacency::Coloring& coarse_layering) const
         {
+          if(_unstructered_mesh)
+          {
+            return Adjacency::Coloring();
+          }
           // get element target set of slag patch
           const Geometry::MeshPart<MeshType>* slag_part = slag_node.get_patch(-1);
           XASSERT(slag_part != nullptr);
@@ -1354,6 +1487,8 @@ namespace FEAT
          */
         Adjacency::Coloring _extract_patch_layering(const MeshNodeType& slag_node, const Adjacency::Coloring& parent_layering, int child_rank) const
         {
+          if(_unstructered_mesh)
+            return Adjacency::Coloring();
           // get element target set of patch
           const Geometry::MeshPart<MeshType>* patch_part = slag_node.get_patch(child_rank);
           XASSERT(patch_part != nullptr);
@@ -1413,12 +1548,11 @@ namespace FEAT
 
           // save slagged base mesh node
           std::unique_ptr<MeshNodeType> base_slag_node = std::move(base_mesh_node);
-
           // deslag base mesh node
           base_mesh_node = this->_deslag_mesh_node(*base_slag_node);
 
           // compute base-mesh layering
-          Adjacency::Coloring base_layering = this->_compute_base_mesh_layering(*base_slag_node);
+          Adjacency::Coloring base_layering = _unstructered_mesh ? this->_compute_unstructered_layering(*base_mesh_node) : this->_compute_base_mesh_layering(*base_slag_node);
 
           // refine and deslag up to desired minimum level
           int lvl = 0;
@@ -1426,15 +1560,22 @@ namespace FEAT
           {
             base_slag_node = base_mesh_node->refine_unique(this->_adapt_mode);
             base_mesh_node = this->_deslag_mesh_node(*base_slag_node);
-            base_layering = this->_compute_refined_mesh_layering(*base_slag_node, base_layering);
+            base_layering = _unstructered_mesh ? this->_compute_unstructered_layering(*base_mesh_node) : this->_compute_refined_mesh_layering(*base_slag_node, base_layering);
           }
 
           // compute coloring for the coarse level
           Adjacency::Coloring base_coloring;
-          if(lvl == 0)
-            base_coloring = this->_compute_base_mesh_coloring(*base_slag_node);
+          if(_unstructered_mesh)
+          {
+            base_coloring = this->_compute_unstructered_coloring(*base_mesh_node);
+          }
           else
-            base_coloring = this->_compute_refined_mesh_coloring(*base_slag_node);
+          {
+            if(lvl == 0)
+              base_coloring = this->_compute_base_mesh_coloring(*base_slag_node);
+            else
+              base_coloring = this->_compute_refined_mesh_coloring(*base_slag_node);
+          }
 
           // save chosen minimum level if it is not equal to the desired maximum level
           if(lvl < ancestor.desired_level_max)
@@ -1454,8 +1595,8 @@ namespace FEAT
             // continue with refined node
             base_slag_node = std::move(refined_node);
             base_mesh_node = this->_deslag_mesh_node(*base_slag_node);
-            base_coloring = this->_compute_refined_mesh_coloring(*base_slag_node);
-            base_layering = this->_compute_refined_mesh_layering(*base_slag_node, level_ptr->element_layering);
+            base_coloring = _unstructered_mesh ? this->_compute_unstructered_coloring(*base_mesh_node) : this->_compute_refined_mesh_coloring(*base_slag_node);
+            base_layering = _unstructered_mesh ? this->_compute_unstructered_layering(*base_mesh_node) : this->_compute_refined_mesh_layering(*base_slag_node, level_ptr->element_layering);
           }
 
           // save chosen maximum level
@@ -1495,7 +1636,7 @@ namespace FEAT
           // deslag base mesh node
           base_mesh_node = this->_deslag_mesh_node(*base_slag_node);
           Adjacency::Coloring base_coloring;
-          Adjacency::Coloring base_layering = this->_compute_base_mesh_layering(*base_slag_node);
+          Adjacency::Coloring base_layering = _unstructered_mesh ? this->_compute_unstructered_layering(*base_mesh_node) : this->_compute_base_mesh_layering(*base_slag_node);
 
           // refine up to chosen partition level
           int lvl = 0;
@@ -1512,8 +1653,8 @@ namespace FEAT
             // refine and deslag base mesh node
             base_slag_node = base_mesh_node->refine_unique(this->_adapt_mode);
             base_mesh_node = this->_deslag_mesh_node(*base_slag_node);
-            base_coloring = this->_compute_refined_mesh_coloring(*base_slag_node);
-            base_layering = this->_compute_refined_mesh_layering(*base_slag_node, base_layering);
+            base_coloring = _unstructered_mesh ? this->_compute_unstructered_coloring(*base_mesh_node) : this->_compute_refined_mesh_coloring(*base_slag_node);
+            base_layering = _unstructered_mesh ? this->_compute_unstructered_layering(*base_mesh_node) : this->_compute_refined_mesh_layering(*base_slag_node, base_layering);
           }
 
           // no valid partitioning found?
@@ -1524,7 +1665,9 @@ namespace FEAT
 
           // compute coloring if we're still on level 0; otherwise the coloring has been computed in the loop above
           if(lvl == 0)
-            base_coloring = this->_compute_base_mesh_coloring(*base_slag_node);
+          {
+            base_coloring = _unstructered_mesh ? this->_compute_unstructered_coloring(*base_mesh_node) : this->_compute_refined_mesh_coloring(*base_slag_node);
+          }
 
           // extract our patch
           std::vector<int> neighbor_ranks;
@@ -1551,12 +1694,12 @@ namespace FEAT
             // refine the patch mesh
             patch_slag_node = patch_mesh_node->refine_unique(this->_adapt_mode);
             patch_mesh_node = this->_deslag_mesh_node(*patch_slag_node, ancestor, false);
-            patch_layering = this->_compute_refined_mesh_layering(*patch_slag_node, patch_layering);
+            patch_layering = _unstructered_mesh ? this->_compute_unstructered_layering(*patch_mesh_node) : this->_compute_refined_mesh_layering(*patch_slag_node, patch_layering);
           }
 
           // compute coloring if we don't have one yet
           if(patch_coloring.empty())
-            patch_coloring = this->_compute_refined_mesh_coloring(*patch_slag_node);
+            patch_coloring = _unstructered_mesh ? this->_compute_unstructered_coloring(*patch_mesh_node) : this->_compute_refined_mesh_coloring(*patch_slag_node);
 
           // save chosen minimum level
           if(lvl < ancestor.desired_level_max)
@@ -1578,8 +1721,8 @@ namespace FEAT
             // continue with refined node
             patch_slag_node = std::move(refined_node);
             patch_mesh_node = this->_deslag_mesh_node(*patch_slag_node, ancestor, false);
-            patch_coloring = this->_compute_refined_mesh_coloring(*patch_slag_node);
-            patch_layering = this->_compute_refined_mesh_layering(*patch_slag_node, level_ptr->element_layering);
+            patch_coloring = _unstructered_mesh ? this->_compute_unstructered_coloring(*patch_mesh_node) : this->_compute_refined_mesh_coloring(*patch_slag_node);
+            patch_layering = _unstructered_mesh ? this->_compute_unstructered_layering(*patch_mesh_node) : this->_compute_refined_mesh_layering(*patch_slag_node, level_ptr->element_layering);
           }
 
           // save chosen maximum level
@@ -1615,8 +1758,8 @@ namespace FEAT
           std::unique_ptr<MeshNodeType> parent_mesh_node = this->_deslag_mesh_node(*base_mesh_node);
 
           // create the coloring and layering for the unrefined base mesh
-          Adjacency::Coloring parent_coloring = this->_compute_base_mesh_coloring(*base_mesh_node);
-          Adjacency::Coloring parent_layering = this->_compute_base_mesh_layering(*base_mesh_node);
+          Adjacency::Coloring parent_coloring = _unstructered_mesh ? this->_compute_unstructered_coloring(*parent_mesh_node) : this->_compute_base_mesh_coloring(*base_mesh_node);
+          Adjacency::Coloring parent_layering = _unstructered_mesh ? this->_compute_unstructered_layering(*parent_mesh_node) : this->_compute_base_mesh_layering(*base_mesh_node);
 
           base_mesh_node.reset();
 
@@ -1693,8 +1836,8 @@ namespace FEAT
               // continue with refined node
               parent_slag_node = std::move(refined_node);
               parent_mesh_node = this->_deslag_mesh_node(*parent_slag_node, ancestor, !is_base_layer);
-              parent_coloring = this->_compute_refined_mesh_coloring(*parent_slag_node);
-              parent_layering = this->_compute_refined_mesh_layering(*parent_slag_node,
+              parent_coloring = _unstructered_mesh ? this->_compute_unstructered_coloring(*parent_mesh_node) : this->_compute_refined_mesh_coloring(*parent_slag_node);
+              parent_layering = _unstructered_mesh ? this->_compute_unstructered_layering(*parent_mesh_node) : this->_compute_refined_mesh_layering(*parent_slag_node,
                 level_ptr ? level_ptr->element_layering : parent_layering);
             }
 
@@ -1834,8 +1977,8 @@ namespace FEAT
             // continue with refined node
             parent_slag_node = std::move(refined_node);
             parent_mesh_node = this->_deslag_mesh_node(*parent_slag_node, this->_ancestry.front(), false);
-            parent_coloring = this->_compute_refined_mesh_coloring(*parent_slag_node);
-            parent_layering = this->_compute_refined_mesh_layering(*parent_slag_node, level_ptr->element_layering);
+            parent_coloring = _unstructered_mesh ? this->_compute_unstructered_coloring(*parent_mesh_node) : this->_compute_refined_mesh_coloring(*parent_slag_node);
+            parent_layering = _unstructered_mesh ? this->_compute_unstructered_layering(*parent_mesh_node) : this->_compute_refined_mesh_layering(*parent_slag_node, level_ptr->element_layering);
           }
 
           // set chosen maximum level for finest layer

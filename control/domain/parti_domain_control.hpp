@@ -156,7 +156,7 @@ namespace FEAT
          * \c true, if the parsing was successful, or \c false,
          * if at least one option was invalid.
          */
-        virtual bool parse_property_map(PropertyMap& pmap) override
+        virtual bool parse_property_map(const PropertyMap& pmap) override
         {
           if(!BaseClass::parse_property_map(pmap))
             return false;

@@ -417,6 +417,34 @@ namespace FEAT
         this->matrix_d.local().transpose(this->matrix_b.local());
       }
 
+      template<typename Trafo_, typename SpaceVelo_, typename SpacePres_, typename AsmDT_>
+      void assemble_grad_div_matrices_high_prec(Assembly::DomainAssembler<Trafo_>& dom_asm,
+        const SpaceVelo_& space_velo, const SpacePres_& space_pres, const String& cubature, const AsmDT_ asm_weight)
+      {
+        // assemble matrix structure of B
+        if(this->matrix_b.local().empty())
+          Assembly::SymbolicAssembler::assemble_matrix_std2(this->matrix_b.local(), space_velo, space_pres);
+
+        // assemble matrix B
+        this->matrix_b.local().format();
+        {
+          // create local matrix with asm datatype
+          typename LocalMatrixBlockB::template ContainerTypeByDI<AsmDT_, IndexType_> tmp_mat_b;
+          tmp_mat_b.convert(this->matrix_b.local());
+          tmp_mat_b.format();
+
+          Assembly::Common::GradientTestOperatorBlocked<dim_> grad_op;
+          Assembly::assemble_bilinear_operator_matrix_2(
+            dom_asm, tmp_mat_b, grad_op, space_velo, space_pres, cubature, -asm_weight);
+
+          // convert matrix
+          this->matrix_b.local().convert(tmp_mat_b);
+        }
+
+        // transpose to obtain matrix D
+        this->matrix_d.local().transpose(this->matrix_b.local());
+      }
+
       template<typename SpaceVelo_>
       void assemble_velo_struct(const SpaceVelo_& space_velo)
       {
@@ -818,7 +846,7 @@ namespace FEAT
       }
 
       template<typename D_, typename I_, typename SM_>
-      void convert(const StokesBlockedUnitVeloMeanPresSystemLevel<dim_, D_, I_, SM_> & other)
+      void convert(const StokesBlockedCombinedSystemLevel<dim_, D_, I_, SM_> & other)
       {
         BaseClass::convert(other);
         filter_velo.convert(other.filter_velo);

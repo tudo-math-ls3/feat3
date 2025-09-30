@@ -229,7 +229,7 @@ namespace FEAT
          * \c true, if the parsing was successful, or \c false,
          * if at least one option was invalid.
          */
-        virtual bool parse_property_map(PropertyMap& pmap)
+        virtual bool parse_property_map(const PropertyMap& pmap)
         {
           XASSERTM(!_was_created, "This function has to be called before domain control creation!");
           auto parti_type_p = pmap.query("parti-type");
