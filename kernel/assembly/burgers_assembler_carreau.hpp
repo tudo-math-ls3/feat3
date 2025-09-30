@@ -380,7 +380,7 @@ namespace FEAT
               XASSERT(deformation);
               const DataType_ mu_prime = (mu_0 - mu_inf) * ((n-DataType_(1.0)) / a) *
                 Math::pow( DataType(1.0) + Math::pow(lambda*gamma_dot, a), ((n-DataType_(1.0) -a) / a)) *
-                a * Math::pow(lambda*gamma_dot, a-DataType(1.0));
+                a * lambda * Math::pow(lambda*gamma_dot, a-DataType(1.0));
               const DataType fac =  mu_prime / (gamma_dot + reg_eps);
               //std::cout << fac ;
               // test function loop
