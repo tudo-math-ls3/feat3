@@ -124,6 +124,7 @@ public:
     test_closest_point(tol);
     test_transform(tol);
     test_squared_distance();
+    test_intersect_lines();
     test_feature_detection(tol);
     test_mesh_constructor(tol);
   }
@@ -254,6 +255,35 @@ public:
     // closest point is on a face
     DT_ d3 = cw.squared_distance(DT_(0.0), DT_(0.0), DT_(-1.0));
     TEST_CHECK_EQUAL_WITHIN_EPS(d3, DT_(0.111110888889), DT_(1E-3));
+  }
+
+  void test_intersect_lines() const
+  {
+      std::stringstream mts;
+      mts<<"OFF\n";
+      mts<<"4 4 6\n";
+      mts<<"0.0 0.0 2.0\n";
+      mts<<"1.632993 -0.942809 -0.666667\n";
+      mts<<"0.000000 1.885618 -0.666667\n";
+      mts<<"-1.632993 -0.942809 -0.666667\n";
+      mts<<"3 1 0 3\n";
+      mts<<"3 2 0 1\n";
+      mts<<"3 3 0 2\n";
+      mts<<"3 3 2 1\n";
+
+      CGALWrapper<DT_> cw(mts, CGALFileMode::fm_off);
+
+      // segment goes through geomerty
+      TEST_CHECK(cw.intersects_line(Tiny::Vector<DT_,3>{DT_(-3.0), DT_(0), DT_(0)}, Tiny::Vector<DT_,3>{DT_(3.0), DT_(0), DT_(0)}));
+
+      // segment starts and ends in geomerty, without intersection a wall, this does not count as intersection!
+      TEST_CHECK(!cw.intersects_line(Tiny::Vector<DT_,3>{DT_(0.0), DT_(0), DT_(0)}, Tiny::Vector<DT_,3>{DT_(.2), DT_(.2), DT_(0.1)}));
+
+      // segment starts in geomerty, but goes outside, so this intersects
+      TEST_CHECK(cw.intersects_line(Tiny::Vector<DT_,3>{DT_(0.0), DT_(0), DT_(0)}, Tiny::Vector<DT_,3>{DT_(3.2), DT_(1.2), DT_(-5.1)}));
+
+      // segment outside geomerty
+      TEST_CHECK(!cw.intersects_line(Tiny::Vector<DT_,3>{DT_(0.3), DT_(1.9), DT_(-0.4)}, Tiny::Vector<DT_,3>{DT_(1.7), DT_(2.1), DT_(-0.5)}));
   }
 
   void test_feature_detection(DT_ tol) const

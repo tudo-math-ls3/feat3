@@ -122,6 +122,9 @@ namespace FEAT
       /// Returns a vector of all feature vertices defined at objects' construction.
       CGALFeatureNetwork detect_features(DataType critical_angle);
 
+      /// tests whether the cgal mesh intersects with the line segment a->b
+      bool intersects_line(const PointType& a, const PointType& b) const;
+
       /// Applies an affine transformation to the underlying polyhedron and reinitializes the AABB tree
       /// see https://doc.cgal.org/5.5.3/Kernel_23/classCGAL_1_1Aff__transformation__3.html for definition
       /// of transformation matrix and translation

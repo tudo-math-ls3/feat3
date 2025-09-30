@@ -70,6 +70,7 @@ namespace FEAT::Geometry
     typedef DT_ CGALDT_;
     typedef typename CGAL::Simple_cartesian<DT_> K;
     typedef typename K::Point_3 Point_;
+    typedef typename K::Segment_3 Segment_;
     typedef typename CGAL::Surface_mesh<Point_> Polyhedron_;
     typedef typename CGAL::AABB_face_graph_triangle_primitive<Polyhedron_> Primitive_;
     typedef typename CGAL::AABB_traits<K, Primitive_> Traits_;
@@ -77,6 +78,7 @@ namespace FEAT::Geometry
     typedef typename CGAL::Side_of_triangle_mesh<Polyhedron_, K> Point_inside_;
     typedef typename CGAL::Aff_transformation_3<K> Transformation_;
     typedef typename CGAL::AABB_traits<K, Primitive_>::Point_and_primitive_id Point_and_primitive_id_;
+    typedef std::optional< typename Tree_::template Intersection_and_primitive_id<Segment_>::Type > Segment_intersection_;
   };
 
   template<typename DT_>
@@ -135,6 +137,7 @@ namespace FEAT::Geometry
     typedef double CGALDT_;
     typedef typename CGAL::Simple_cartesian<double> K;
     typedef typename K::Point_3 Point_;
+    typedef typename K::Segment_3 Segment_;
     typedef typename CGAL::Surface_mesh<Point_> Polyhedron_;
     typedef typename CGAL::AABB_face_graph_triangle_primitive<Polyhedron_> Primitive_;
     typedef typename CGAL::AABB_traits<K, Primitive_> Traits_;
@@ -142,6 +145,7 @@ namespace FEAT::Geometry
     typedef typename CGAL::Side_of_triangle_mesh<Polyhedron_, K> Point_inside_;
     typedef typename CGAL::Aff_transformation_3<K> Transformation_;
     typedef typename CGAL::AABB_traits<K, Primitive_>::Point_and_primitive_id Point_and_primitive_id_;
+    typedef std::optional< typename Tree_::template Intersection_and_primitive_id<Segment_>::Type > Segment_intersection_;
   };
   #endif
 
@@ -602,17 +606,27 @@ namespace FEAT::Geometry
     return *this;
   }
 
-  // explicitly instantiate templates for all sensible datatype
+  template<typename DT_>
+  bool FEAT::Geometry::CGALWrapper<DT_>::intersects_line(const FEAT::Geometry::CGALWrapper<DT_>::PointType& a, const FEAT::Geometry::CGALWrapper<DT_>::PointType& b) const
+  {
+    typename CGALTypeWrapper<DT_>::Point_ t(a[0], a[1], a[2]), z(b[0], b[1], b[2]);
+    typename CGALTypeWrapper<DT_>::Segment_ seg(t,z);
+    return static_cast<CGALWrapperData<DT_>*>(this->_cgal_data)->_tree->do_intersect(seg);
+  }
 
-  template class CGALWrapper<double>;
-  template class CGALWrapper<float>;
-  #ifdef FEAT_HAVE_HALFMATH
-  template class CGALWrapper<Half>;
-  #endif
-  #ifdef FEAT_HAVE_QUADMATH
-  template class CGALWrapper<__float128>;
-  #endif
-} // namespace FEAT::Geometry
+} // namespace Geometry
+
+
+// explicitly instantiate templates for all sensible datatype
+
+template class FEAT::Geometry::CGALWrapper<double>;
+template class FEAT::Geometry::CGALWrapper<float>;
+#ifdef FEAT_HAVE_HALFMATH
+template class FEAT::Geometry::CGALWrapper<Half>;
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+template class FEAT::Geometry::CGALWrapper<__float128>;
+#endif
 
 #elif !defined(DOXYGEN)
 
