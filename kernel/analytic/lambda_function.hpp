@@ -1278,6 +1278,158 @@ namespace FEAT
     }
 
     /**
+     * \brief Simpler 2D vector version of the general LambdaFunction interface
+     *
+     * \tparam Callable_ A callable with a call signature of Tiny::Vector<DT_, 2>(Tiny::Vector<DT_, 2>)
+     *
+     * This class provides an Analytic::Function interface for creating a vector valued evaluator based on a callable,
+     * that, in contrast to the LambdaVectorFunction class, directly operates on Tiny::Vector as in and output instead of
+     * multiple datatype arguments. This leads to a more simplified constructor. Also it provides an advantage, if the same
+     * vector valued calculations have to be performed for each output argument, due to a single call.
+     *
+     * \note Only provides value . If gradients or hessians are required, refer to the standard LambdaVectorFunction.
+     */
+    template<typename Callable_>
+    class SimplifiedLambdaVectorFunction2D : public Analytic::Function
+    {
+    public:
+      /// this is a 2D function
+      static constexpr int domain_dim = 2;
+      /// this is a vector field
+      typedef Analytic::Image::Vector<domain_dim> ImageType;
+      typedef typename std::invoke_result_t<Callable_, Tiny::Vector<double,domain_dim>>::DataType CallableInnerType;
+
+      /// we can always compute values
+      static constexpr bool can_value =  true;
+      /// we can always compute gradients (either directly or by Richardson extrapolation)
+      static constexpr bool can_grad = false;
+      /// we can always compute hessians (either directly or by Richardson extrapolation)
+      static constexpr bool can_hess = false;
+
+      Callable_ call_func;
+
+      SimplifiedLambdaVectorFunction2D(Callable_&& call_func_) :
+       call_func(std::move(call_func_))
+      {
+      }
+
+      SimplifiedLambdaVectorFunction2D(const Callable_& call_func_) :
+       call_func(call_func_)
+      {
+      }
+
+      template<typename EvalTraits_>
+      class Evaluator :
+        public Analytic::Function::Evaluator<EvalTraits_>
+      {
+      public:
+        /// coefficient data type
+        typedef typename EvalTraits_::DataType DataType;
+        /// evaluation point type
+        typedef typename EvalTraits_::PointType PointType;
+        /// value type
+        typedef typename EvalTraits_::ValueType ValueType;
+
+        typedef typename SimplifiedLambdaVectorFunction2D::CallableInnerType InnerType;
+        static constexpr int domain_dim = SimplifiedLambdaVectorFunction2D::domain_dim;
+        typedef Tiny::Vector<InnerType, domain_dim> InnerPointType;
+
+        Callable_ call_func;
+
+      public:
+        explicit Evaluator(const SimplifiedLambdaVectorFunction2D& function) :
+          call_func(function.call_func)
+        {
+        }
+
+        ValueType value(const PointType& point)
+        {
+          return ValueType::convert(call_func(InnerPointType::convert(point)));
+        }
+
+      }; // class SimplifiedVectorFunction2D::Evaluator<...>
+    }; // class SimplifiedVectorFuntion2D
+
+    /**
+     * \brief Simpler 3D vector version of the general LambdaFunction interface
+     *
+     * \tparam Callable_ A callable with a call signature of Tiny::Vector<DT_, 3>(Tiny::Vector<DT_, 3>)
+     *
+     * This class provides an Analytic::Function interface for creating a vector valued evaluator based on a callable,
+     * that, in contrast to the LambdaVectorFunction class, directly operates on Tiny::Vector as in and output instead of
+     * multiple datatype arguments. This leads to a more simplified constructor. Also it provides an advantage, if the same
+     * vector valued calculations have to be performed for each output argument, due to a single call.
+     *
+     * \warning If the Callable is initialized, the internal types of the evaluator have to fit the internal type
+     *          of the Tiny::Vector . It is highly advised to use auto lambda deduction where possible.
+     *
+     * \note Only provides value . If gradients or hessians are required, refer to the standard LambdaVectorFunction.
+     */
+    template<typename Callable_>
+    class SimplifiedLambdaVectorFunction3D : public Analytic::Function
+    {
+    public:
+      /// this is a 2D function
+      static constexpr int domain_dim = 3;
+      /// this is a vector field
+      typedef Analytic::Image::Vector<domain_dim> ImageType;
+
+      /// we can always compute values
+      static constexpr bool can_value =  true;
+      /// we can always compute gradients (either directly or by Richardson extrapolation)
+      static constexpr bool can_grad = false;
+      /// we can always compute hessians (either directly or by Richardson extrapolation)
+      static constexpr bool can_hess = false;
+
+      Callable_ call_func;
+
+      SimplifiedLambdaVectorFunction3D(Callable_&& call_func_) :
+       call_func(std::move(call_func_))
+      {
+      }
+
+      SimplifiedLambdaVectorFunction3D(const Callable_& call_func_) :
+       call_func(call_func_)
+      {
+      }
+
+      template<typename EvalTraits_>
+      class Evaluator :
+        public Analytic::Function::Evaluator<EvalTraits_>
+      {
+      public:
+        /// coefficient data type
+        typedef typename EvalTraits_::DataType DataType;
+        /// evaluation point type
+        typedef typename EvalTraits_::PointType PointType;
+        /// value type
+        typedef typename EvalTraits_::ValueType ValueType;
+        static constexpr int domain_dim = SimplifiedLambdaVectorFunction3D::domain_dim;
+
+        // typedef typename std::invoke_result_t<Callable_, Tiny::Vector<DataType,domain_dim>>::DataType CallableInnerType;
+
+        // typedef CallableInnerType InnerType;
+
+        typedef Tiny::Vector<DataType, domain_dim> InnerPointType;
+
+        Callable_ call_func;
+
+      public:
+        explicit Evaluator(const SimplifiedLambdaVectorFunction3D& function) :
+          call_func(function.call_func)
+        {
+        }
+
+        ValueType value(const PointType& point)
+        {
+          // required ? probably not...
+          // return ValueType::convert(call_func(InnerPointType::convert(point)));
+          return call_func(point);
+        }
+      }; // class SimplifiedVectorFunction3D::Evaluator<...>
+    }; // class SimplifiedVectorFuntion3D
+
+    /**
      * \brief Analytic 2D vector-valued lambda expression function implementation
      *
      * This class template acts as a wrapper class that implements the Analytic::Function interface for a

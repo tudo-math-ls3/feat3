@@ -628,6 +628,38 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(hess_1[2][2][2], DT_(24), tol);
   }
 
+  void test_simplified_2d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    SimplifiedLambdaVectorFunction2D simple_a([](Tiny::Vector<DT_, 2> a) -> Tiny::Vector<DT_, 2>{return DT_(2)*a;});
+    auto res = Analytic::eval_value_x(simple_a, DT_(1.4), DT_(5.3));
+    TEST_CHECK_EQUAL_WITHIN_EPS(res[0], DT_(2.8), tol);
+    auto lam = [](Tiny::Vector<DT_, 3> a) -> Tiny::Vector<DT_, 3>{return DT_(2)*a;};
+    SimplifiedLambdaVectorFunction2D simple_b(lam);
+    auto res2 = Analytic::eval_value_x(simple_b, DT_(1.4), DT_(4.9));
+    TEST_CHECK_EQUAL_WITHIN_EPS(res2[1], DT_(9.8), tol);
+    auto res3 = Analytic::eval_value_x(simple_b, float(1.4), float(4.9));
+    TEST_CHECK_EQUAL_WITHIN_EPS(res3[0], float(2.8), float(tol));
+  }
+
+  void test_simplified_3d() const
+  {
+    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    SimplifiedLambdaVectorFunction3D simple_a([](Tiny::Vector<DT_, 3> a) -> Tiny::Vector<DT_, 3>{return DT_(2)*a;});
+    auto res = Analytic::eval_value_x(simple_a, DT_(1.4), DT_(5.3), DT_(0.1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(res[0], DT_(2.8), tol);
+    auto lam = [](auto a) -> auto{return typename decltype(a)::DataType(2)*a;};
+    SimplifiedLambdaVectorFunction3D simple_b(lam);
+    auto res2 = Analytic::eval_value_x(simple_b, DT_(1.4), DT_(4.9), DT_(0.1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(res2[1], DT_(9.8), tol);
+    SimplifiedLambdaVectorFunction3D simple_d([](auto a){return typename decltype(a)::DataType(2.f)*a;});
+    auto res3 = Analytic::eval_value_x(simple_d, float(1.4), float(4.9), float(0.1));
+    auto res4 = Analytic::eval_value_x(simple_d, double(1.4), double(4.9), double(0.1));
+    TEST_CHECK_EQUAL_WITHIN_EPS(res3[2], float(0.2), float(tol));
+    TEST_CHECK_EQUAL_WITHIN_EPS(res4[2], double(0.2), double(tol));
+
+  }
+
   virtual void run() const override
   {
     test_scalar_1d_a();
@@ -650,6 +682,8 @@ public:
     test_vector_3d_a();
     test_vector_3d_b();
     test_vector_3d_c();
+
+    test_simplified_3d();
   }
 };
 
