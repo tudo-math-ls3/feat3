@@ -796,11 +796,8 @@ for token in buildid:
     config.cache_entry("FEAT_HAVE_QUADMATH", "ON", "BOOL")
     config.cache_entry("FEAT_OVERRIDE_MPI_OPS", "ON", "BOOL")
   elif token == "half":
-    if (config.cuda_arch != "native") and (config.cuda_arch_int < 60):
-      warning("cuda arch " + config.cuda_arch + " is too low for half, which needs at least sm_60")
-    else:
-      config.cache_entry("FEAT_HAVE_HALFMATH", "ON", "BOOL")
-      config.cache_entry("FEAT_OVERRIDE_MPI_OPS", "ON", "BOOL")
+    config.cache_entry("FEAT_HAVE_HALFMATH", "ON", "BOOL")
+    config.cache_entry("FEAT_OVERRIDE_MPI_OPS", "ON", "BOOL")
   elif token == "cotire":
     config.cache_entry("FEAT_COTIRE", "ON", "BOOL")
   elif token == "trilinos":
@@ -842,6 +839,9 @@ for token in buildid:
     config.cache_entry("FEAT_HAVE_ZOLTAN", "ON", "BOOL")
   else:
     warning("Unknown build-id token", token)
+
+if "half" in buildid and (config.cuda_arch != "native") and (config.cuda_arch_int < 60):
+  error("cuda arch " + config.cuda_arch + " is too low for half, which needs at least sm_60")
 
 # always set build flags offline
 config.env["CMAKE_CXX_FLAGS_DEBUG"] = ""
