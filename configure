@@ -501,7 +501,7 @@ if "mpi" not in buildid and "parmetis" in buildid:
 if ("mpi" not in buildid) and ("superlu" in buildid):
   error("Tag 'superlu' requires tag 'mpi'")
 
-# SuperLU needs MPI, because we only use SuperLU_DIST
+# Zoltan needs MPI
 if ("mpi" not in buildid) and ("zoltan" in buildid):
   error("Tag 'zoltan' requires tag 'mpi'")
 

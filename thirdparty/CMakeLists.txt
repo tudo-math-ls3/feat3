@@ -304,16 +304,16 @@ endif()
 option(FEAT_HAVE_CUDSS "Enable cuDSS" OFF)
 if(FEAT_HAVE_CUDSS)
   if(WIN32)
-    set(cudss_url "https://developer.download.nvidia.com/compute/cudss/redist/libcudss/windows-x86_64/libcudss-windows-x86_64-0.5.0.16_cuda12-archive.zip")
-    set(cudss_hash "2ea2f64901db68c0e0e7f419ab60bef1")
+    set(cudss_url "https://developer.download.nvidia.com/compute/cudss/redist/libcudss/windows-x86_64/libcudss-windows-x86_64-0.6.0.5_cuda12-archive.zip")
+    set(cudss_hash "c1036a4cbadc7b201e08acaac13fcac6")
   else()
-    set(cudss_url "https://developer.download.nvidia.com/compute/cudss/redist/libcudss/linux-x86_64/libcudss-linux-x86_64-0.5.0.16_cuda12-archive.tar.xz")
-    set(cudss_hash "cb438f906120c01d062bd5db40244cd2")
+    set(cudss_url "https://developer.download.nvidia.com/compute/cudss/redist/libcudss/linux-x86_64/libcudss-linux-x86_64-0.6.0.5_cuda12-archive.tar.xz")
+    set(cudss_hash "4ac17f5b35a4ecc550c4d7c479a5c5b5")
   endif()
 
   feat_get_tpl(
     PACKAGE_NAME cudss
-    VERSION 0.5.0.16
+    VERSION 0.6.0.5
     URL ${cudss_url}
     URL_HASH MD5=${cudss_hash}
   )

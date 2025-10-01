@@ -10,6 +10,8 @@
 #include <kernel/util/cuda_util.hpp>
 #include <kernel/solver/cudss.hpp>
 
+#include <cudss.h>
+
 namespace FEAT
 {
   namespace Solver
@@ -18,6 +20,7 @@ namespace FEAT
     {
       struct CUDSSCore
       {
+        cudssHandle_t handle;
         cudssConfig_t config;
         cudssData_t data;
         cudssMatrix_t matrix;
@@ -34,10 +37,10 @@ namespace FEAT
       _cudss_core(new Intern::CUDSSCore)
     {
       Intern::CUDSSCore& core = *reinterpret_cast<Intern::CUDSSCore*>(_cudss_core);
-
+      core.handle = reinterpret_cast<cudssHandle_t>(Runtime::get_cudss_handle());
       if(CUDSS_STATUS_SUCCESS != cudssConfigCreate(&core.config))
         throw InternalError(__func__, __FILE__, __LINE__, "cudssConfigCreate failed!");
-      if(CUDSS_STATUS_SUCCESS != cudssDataCreate(Util::Intern::cudss_handle, &core.data))
+      if(CUDSS_STATUS_SUCCESS != cudssDataCreate(core.handle, &core.data))
         throw InternalError(__func__, __FILE__, __LINE__, "cudssDataCreate failed!");
     }
 
@@ -46,7 +49,7 @@ namespace FEAT
       Intern::CUDSSCore* core = reinterpret_cast<Intern::CUDSSCore*>(_cudss_core);
       if(core)
       {
-        cudssDataDestroy(Util::Intern::cudss_handle, core->data);
+        cudssDataDestroy(core->handle, core->data);
         cudssConfigDestroy(core->config);
         delete core;
       }
@@ -136,7 +139,7 @@ namespace FEAT
 
       // perform symbolic factorization
       ret = cudssExecute(
-        Util::Intern::cudss_handle,
+        core.handle,
         CUDSS_PHASE_ANALYSIS,
         core.config,
         core.data,
@@ -185,7 +188,7 @@ namespace FEAT
 
       // perform numeric factorization
       cudssStatus_t ret = cudssExecute(
-        Util::Intern::cudss_handle,
+        core.handle,
         CUDSS_PHASE_FACTORIZATION,
         core.config,
         core.data,
@@ -223,7 +226,7 @@ namespace FEAT
 
       // solve
       ret = cudssExecute(
-        Util::Intern::cudss_handle,
+        core.handle,
         CUDSS_PHASE_SOLVE,
         core.config,
         core.data,

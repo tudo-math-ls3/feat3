@@ -145,5 +145,10 @@ namespace FEAT
      * An exit code (<c>EXIT_SUCCESS</c>) that can be returned by the \p main function.
      */
     static int finalize();
+
+    /**
+     * \brief Returns the unique cuDSS third-party library handle
+     */
+    static void* get_cudss_handle();
   }; // class Runtime
 } // namespace FEAT

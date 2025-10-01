@@ -3,6 +3,7 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 
 # list of lafem source files
 set(kernel-solver-list
+  cudss.cpp
   hypre.cpp
   mkl_dss.cpp
   superlu.cpp
@@ -14,11 +15,18 @@ add_library(feat-kernel-solver STATIC ${kernel-solver-list})
 if (FEAT_COTIRE)
   cotire(feat-kernel-solver)
 endif (FEAT_COTIRE)
+
 target_link_libraries(feat-kernel-solver
 PUBLIC
   feat-dependency
 PRIVATE
   feat-kernel-lafem feat-kernel-util feat-kernel-adjacency)
+
+
+if(FEAT_HAVE_CUDSS)
+  target_link_libraries(feat-kernel-solver PRIVATE cuDSS::cuDSS)
+  target_include_directories(feat-kernel-solver PRIVATE "${CUDAToolkit_INCLUDE_DIRS}")
+endif()
 
 if (FEAT_HAVE_UMFPACK)
   find_package(UMFPACK 6.3.5 REQUIRED)
@@ -46,7 +54,6 @@ endif (FEAT_HAVE_TRILINOS)
 
 if (FEAT_HAVE_CUDA)
   add_library(feat-kernel-solver-cuda STATIC
-    cudss.cu
     cusolver.cu
     ilu_precond.cu
     sor_precond.cu

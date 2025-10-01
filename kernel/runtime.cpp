@@ -33,12 +33,20 @@
 #include <kernel/util/cuda_util.hpp>
 #endif
 
+#ifdef FEAT_HAVE_CUDSS
+#include <cudss.h>
+#endif
+
 using namespace FEAT;
 
 // static member initialization
 bool Runtime::_initialized = false;
 bool Runtime::_finalized = false;
 bool Runtime::SyncGuard::sync_on = true;
+
+#ifdef FEAT_HAVE_CUDSS
+static cudssHandle_t feat_cudss_handle = nullptr;
+#endif
 
 void Runtime::initialize(int& argc, char**& argv)
 {
@@ -84,6 +92,15 @@ void Runtime::initialize(int& argc, char**& argv)
   // initialize memory pool for CUDA memory
   Util::cuda_initialize(my_rank, 1, 1, Util::cuda_get_device_count());
   Util::cuda_set_blocksize(256, 256, 256, 256, 256, 128);
+#endif
+
+#ifdef FEAT_HAVE_CUDSS
+  if(CUDSS_STATUS_SUCCESS != cudssCreate(&feat_cudss_handle))
+  {
+    std::cerr << "ERROR: Failed to initialize cuDSS handle!\n";
+    std::cerr.flush();
+    Runtime::abort();
+  }
 #endif
 
   // check whether '---debug [<ranks...>]' option is given
@@ -441,6 +458,11 @@ int Runtime::finalize()
   }
 
   MemoryPool::finalize();
+
+#ifdef FEAT_HAVE_CUDSS
+  cudssDestroy(feat_cudss_handle);
+#endif
+
 #ifdef FEAT_HAVE_CUDA
   Util::cuda_finalize();
 #endif
@@ -461,4 +483,13 @@ int Runtime::finalize()
 
   // return successful exit code
   return EXIT_SUCCESS;
+}
+
+void* Runtime::get_cudss_handle()
+{
+#ifdef FEAT_HAVE_CUDSS
+  return feat_cudss_handle;
+#else
+  return nullptr;
+#endif
 }

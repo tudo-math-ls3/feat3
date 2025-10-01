@@ -59,6 +59,11 @@ target_link_libraries(feat INTERFACE
   feat-kernel-root
 )
 
+if(FEAT_HAVE_CUDSS)
+  target_link_libraries(feat-kernel-root PRIVATE cuDSS::cuDSS)
+  target_include_directories(feat-kernel-root PRIVATE "${CUDAToolkit_INCLUDE_DIRS}")
+endif()
+
 if (FEAT_HAVE_DEATH_HANDLER)
   find_package(death_handler REQUIRED)
   target_link_libraries(feat-kernel-root PRIVATE deathhandler::deathhandler)
