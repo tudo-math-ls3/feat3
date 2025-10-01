@@ -81,36 +81,17 @@ namespace FEAT
       explicit CGALWrapper(std::istream & file, CGALFileMode file_mode);
 
       /**
-       * \brief Create a new CGALWrapper Instance from a mesh and meshpart
+       * \brief Create a new CGALWrapper Instance from vertices and faces
        *
-       * \param[in] mesh Mesh to convert to wrapper
-       * \param[in] part Meshpart to select elements of mesh
+       * \param[in] vertices Array of vertices
+       * \param[in] faces Array of faces
        *
-       * \returns A CGALWrapper for a surface mesh containing all faces in \c part
-       *
-       * Quad faces are assumed to be bilinear and will be split into two triangles.
+       * \returns A CGALWrapper for a surface mesh containing the given vertices and faces
        *
        * \warning CGAL expects faces to be wound counter-clockwise.
        * This constructor will abort the program if that is not the case.
-       * Call \c ConformalMesh::reorient_boundary_facets() if you are not sure
-       * your mesh fulfills this property.
        */
-      explicit CGALWrapper(const ConformalMesh<Shape::Hexahedron, 3, DT_>& mesh, const MeshPart<ConformalMesh<Shape::Hexahedron, 3, DT_>>& part);
-
-      /**
-       * \brief Create a new CGALWrapper Instance from a mesh and meshpart
-       *
-       * \param[in] mesh Mesh to convert to wrapper
-       * \param[in] part Meshpart to select elements of mesh
-       *
-       * \returns A CGALWrapper for a surface mesh containing all faces in \c part
-       *
-       * \warning CGAL expects faces to be wound counter-clockwise.
-       * This constructor will abort the program if that is not the case.
-       * Call \c ConformalMesh::reorient_boundary_facets() if you are not sure
-       * your mesh fulfills this property.
-       */
-      explicit CGALWrapper(const ConformalMesh<Shape::Tetrahedron, 3, DT_>& mesh, const MeshPart<ConformalMesh<Shape::Tetrahedron, 3, DT_>>& part);
+      explicit CGALWrapper(const std::vector<PointType>& vertices, const std::vector<std::array<Index, 3>>& faces);
 
       /// Check whether a point is inside the Polyhedron defined at objects' construction.
       bool point_inside(DataType x, DataType y, DataType z) const;
@@ -157,6 +138,81 @@ namespace FEAT
       void _init_wrapper();
 
     }; // class CGALWrapper<typename DT_>
+
+    template<typename MeshType_>
+    static CGALWrapper<typename MeshType_::CoordType> cgal_wrapper_from_mesh(const MeshType_& mesh, const MeshPart<MeshType_>& part)
+    {
+      using MeshType = MeshType_;
+      using DT = typename MeshType::CoordType;
+      using ShapeType = typename MeshType::ShapeType;
+      using FaceType = typename Shape::FaceTraits<ShapeType, 2>::ShapeType;
+      using PointType = typename CGALWrapper<DT>::PointType;
+
+      constexpr int vertices_per_face = Shape::FaceTraits<FaceType, 0>::count;
+
+      static_assert(ShapeType::dimension == 3);
+
+      std::vector<PointType> vertices;
+      vertices.reserve(part.get_num_entities(0));
+
+      // Prepare vertices
+      const auto& vertex_set = mesh.get_vertex_set();
+      const TargetSet& vts = part.template get_target_set<0>();
+      for(Index i(0); i < part.get_num_entities(0); i++)
+      {
+        vertices.push_back(vertex_set[vts[i]]);
+      }
+
+      // Prepare faces
+      std::vector<std::array<Index, 3>> faces;
+
+      const auto& v_at_f = mesh.template get_index_set<2, 0>();
+      const TargetSet& fts = part.template get_target_set<2>();
+      const Index num_mesh_faces = part.get_num_entities(2);
+
+      if constexpr(std::is_same_v<ShapeType, Shape::Hexahedron>)
+      {
+        // Quad faces get split into triangles
+        faces.reserve(2 * num_mesh_faces);
+      }
+      if constexpr(std::is_same_v<ShapeType, Shape::Tetrahedron>)
+      {
+        // Triangle faces do not need to be split
+        faces.reserve(num_mesh_faces);
+      }
+
+      std::array<Index, vertices_per_face> vs;
+      for(Index i(0); i < num_mesh_faces; i++)
+      {
+        for(int j(0); j < vertices_per_face; j++)
+        {
+          // Get mesh index
+          Index v = v_at_f(fts[i], j);
+
+          // Find corresponding index in vertex target set
+          for(Index k(0); k < vts.get_num_entities(); k++)
+          {
+            if(vts[k] == v)
+            {
+              vs[j] = k;
+              break;
+            }
+          }
+        }
+
+        if constexpr(std::is_same_v<ShapeType, Shape::Hexahedron>)
+        {
+          faces.push_back({vs[0], vs[1], vs[2]});
+          faces.push_back({vs[3], vs[2], vs[1]});
+        }
+        if constexpr(std::is_same_v<ShapeType, Shape::Tetrahedron>)
+        {
+          faces.push_back({vs[0], vs[1], vs[2]});
+        }
+      }
+
+      return CGALWrapper<DT>(vertices, faces);
+    }
   } // namespace Geometry
 } // namespace FEAT
 #endif //defined(FEAT_HAVE_CGAL) || defined(DOXYGEN)

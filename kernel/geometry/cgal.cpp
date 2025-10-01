@@ -168,84 +168,43 @@ namespace FEAT::Geometry
     file.close();
   }
 
-  template<typename MeshType_>
-  static CGALWrapperData<typename MeshType_::CoordType>* wrapper_from_mesh(const MeshType_& mesh, const MeshPart<MeshType_>& part)
+  template <typename DT_>
+  static CGALWrapperData<DT_> *from_topology(
+      const std::vector<typename CGALWrapper<DT_>::PointType> &vertices,
+      const std::vector<std::array<Index, 3>> &faces)
   {
-    static_assert(MeshType_::world_dim == 3);
-
-    using DT = typename MeshType_::CoordType;
-    using ShapeType = typename MeshType_::ShapeType;
-    using FeatVertexType = typename MeshType_::VertexType;
-
-    using PointType = typename CGALTypeWrapper<DT>::Point_;
-    using SurfaceMesh = typename CGALTypeWrapper<DT>::Polyhedron_;
+    using VertexType = typename CGALTypeWrapper<DT_>::Point_;
+    using SurfaceMesh = typename CGALTypeWrapper<DT_>::Polyhedron_;
     using VertexIndex = typename SurfaceMesh::Vertex_index;
     using FaceIndex = typename SurfaceMesh::Face_index;
 
-    CGALWrapperData<DT>* result = new CGALWrapperData<DT>;
+    auto* result = new CGALWrapperData<DT_>;
     result->_polyhedron = new SurfaceMesh;
 
-    // Copy vertices of mesh part into surface mesh
-    std::vector<VertexIndex> vertices(part.get_num_entities(0));
-    const auto& vertex_set = mesh.get_vertex_set();
-    const TargetSet& vertex_target_set = part.template get_target_set<0>();
-    const auto& v_at_f = mesh.template get_index_set<2, 0>();
-    const TargetSet& face_target_set = part.template get_target_set<2>();
-
-    for(Index i(0); i < part.get_num_entities(0); i++)
+    // Add vertices to surface mesh
+    std::vector<VertexIndex> vs(vertices.size());
+    for(Index i(0); i < vertices.size(); i++)
     {
-      const FeatVertexType v = vertex_set[vertex_target_set[i]];
-      vertices[i] = result->_polyhedron->add_vertex(PointType(v[0], v[1], v[2]));
+      VertexType vertex(vertices[i][0], vertices[i][1], vertices[i][2]);
+      vs[i] = result->_polyhedron->add_vertex(vertex);
     }
 
-    if constexpr(std::is_same_v<ShapeType, Shape::Hexahedron>)
+    // Add faces to surface mesh
+    for(const std::array<Index, 3>& face : faces)
     {
-      std::array<VertexIndex, 4> indices;
-      for(Index i(0); i < part.get_num_entities(2); i++)
-      {
-        for(int j(0); j < 4; j++)
-        {
-          indices[j] = vertices[vertex_target_set[v_at_f(face_target_set[i], j)]];
-        }
+      FaceIndex i = result->_polyhedron->add_face(vs[face[0]], vs[face[1]], vs[face[2]]);
 
-        FaceIndex f0 = result->_polyhedron->add_face(indices[0], indices[1], indices[2]);
-        FaceIndex f1 = result->_polyhedron->add_face(indices[3], indices[2], indices[1]);
-
-        ASSERTM(f0 != SurfaceMesh::null_face(), "Failed to add face to surface mesh!");
-        ASSERTM(f1 != SurfaceMesh::null_face(), "Failed to add face to surface mesh!");
-      }
-    }
-
-    if constexpr(std::is_same_v<ShapeType, Shape::Tetrahedron>)
-    {
-      std::array<VertexIndex, 3> indices;
-
-      for(Index i(0); i < part.get_num_entities(2); i++)
-      {
-        for(int j(0); j < 3; j++)
-        {
-          indices[j] = vertices[vertex_target_set[v_at_f(face_target_set[i], j)]];
-        }
-
-        FaceIndex f0 = result->_polyhedron->add_face(indices[0], indices[1], indices[2]);
-
-        ASSERTM(f0 != SurfaceMesh::null_face(), "Failed to add face to surface mesh!");
-      }
+      XASSERTM(i != SurfaceMesh::null_face(), "Failed to add face to surface mesh!");
     }
 
     return result;
   }
 
   template<typename DT_>
-  CGALWrapper<DT_>::CGALWrapper(const ConformalMesh<Shape::Hexahedron, 3, DT_>& mesh, const MeshPart<ConformalMesh<Shape::Hexahedron, 3, DT_>>& part) :
-    _cgal_data(wrapper_from_mesh(mesh, part))
-  {
-    _init_wrapper();
-  }
-
-  template<typename DT_>
-  CGALWrapper<DT_>::CGALWrapper(const ConformalMesh<Shape::Tetrahedron, 3, DT_>& mesh, const MeshPart<ConformalMesh<Shape::Tetrahedron, 3, DT_>>& part) :
-    _cgal_data(wrapper_from_mesh(mesh, part))
+  CGALWrapper<DT_>::CGALWrapper(
+    const std::vector<typename CGALWrapper<DT_>::PointType> &vertices,
+    const std::vector<std::array<Index, 3>> &faces) :
+    _cgal_data(from_topology<DT_>(vertices, faces))
   {
     _init_wrapper();
   }

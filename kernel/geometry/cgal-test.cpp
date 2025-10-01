@@ -353,7 +353,7 @@ public:
     mesh.reorient_boundary_facets();
     MeshPart<MeshType> boundary = make_boundary_meshpart(mesh);
 
-    CGALWrapper<DT_> wrapper(mesh, boundary);
+    CGALWrapper<DT_> wrapper = cgal_wrapper_from_mesh(mesh, boundary);
 
     TEST_CHECK(wrapper.point_inside(0.5, 0.5, 0.5));
     TEST_CHECK(!wrapper.point_inside(2.0, 2.0, 2.0));
