@@ -89,9 +89,20 @@ function(feat_get_tpl)
       set(ARCHIVE_NAME ${TPL_PACKAGE_NAME}-${ARCHIVE_NAME})
       set(ARCHIVE_PATH ${FEAT_TPL_CACHE_DIRECTORY}/${ARCHIVE_NAME})
 
-      if(NOT EXISTS ${ARCHIVE_PATH})
-        message(STATUS "Archive ${ARCHIVE_NAME} not in cache. Downloading...")
-        file(DOWNLOAD ${TPL_URL} ${ARCHIVE_PATH} SHOW_PROGRESS EXPECTED_HASH ${TPL_URL_HASH})
+      if(EXISTS ${ARCHIVE_PATH})
+        file(MD5 ${ARCHIVE_PATH} ARCHIVE_HASH)
+      endif()
+
+      if(NOT EXISTS ${ARCHIVE_PATH} OR NOT "MD5=${ARCHIVE_HASH}" STREQUAL ${TPL_URL_HASH})
+        message(STATUS "Archive ${ARCHIVE_NAME} not in cache or hash does not match. Downloading...")
+        file(DOWNLOAD ${TPL_URL} ${ARCHIVE_PATH} SHOW_PROGRESS EXPECTED_HASH ${TPL_URL_HASH} STATUS DOWNLOAD_STATUS)
+
+        list(GET DOWNLOAD_STATUS 0 STATUS_CODE)
+        list(GET DOWNLOAD_STATUS 1 ERROR_MESSAGE)
+
+        if(NOT ${STATUS_CODE} EQUAL 0)
+          message(FATAL_ERROR "Error occured when downloading TPL ${TPL_PACKAGE_NAME}: ${ERROR_MESSAGE} (Status Code: ${STATUS_CODE})")
+        endif()
       else()
         message(STATUS "Found archive ${ARCHIVE_NAME} in cache. Reusing archive")
       endif()
