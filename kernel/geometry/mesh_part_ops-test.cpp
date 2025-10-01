@@ -178,6 +178,14 @@ public:
         TEST_CHECK_EQUAL(attribute_set->operator()(i, 0), DataType(4));
       }
     }
+
+    TEST_CHECK(union_part.has_topology());
+
+    const MeshPartType left_no_topo = make_mesh_part(mesh, std::bitset<3>(0b100), DataType(1), false);
+    const MeshPartType union_no_topo =
+      MeshPartOps::meshpart_union(left_no_topo, middle, [&](DataType l, DataType r) { return l + r; });
+
+    TEST_CHECK(!union_no_topo.has_topology());
   }
 
   void test_disjoint_union(const MeshType& mesh) const

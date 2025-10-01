@@ -259,7 +259,10 @@ namespace FEAT::Geometry
     meshpart_intersection(const MeshPartType& left, const MeshPartType& right, const AttributeFn_& attribute_merge)
     {
       const auto join_pred = [](const JoinEntry& e) { return e.left.has_value() && e.right.has_value(); };
-      return meshpart_op(left, right, attribute_merge, join_pred);
+
+      // The result meshpart has a topology as long as any of the inputs have a topology
+      const bool create_topology = left.has_topology() || right.has_topology();
+      return meshpart_op(left, right, attribute_merge, join_pred, create_topology);
     }
 
     /**
@@ -303,7 +306,9 @@ namespace FEAT::Geometry
     meshpart_union(const MeshPartType& left, const MeshPartType& right, const AttributeFn_& attribute_merge)
     {
       const auto join_pred = [](const JoinEntry& e) { return e.left.has_value() || e.right.has_value(); };
-      return meshpart_op(left, right, attribute_merge, join_pred);
+      // The result meshpart has a topology as long as both of the inputs have a topology
+      const bool create_topology = left.has_topology() && right.has_topology();
+      return meshpart_op(left, right, attribute_merge, join_pred, create_topology);
     }
 
     /**
@@ -357,7 +362,7 @@ namespace FEAT::Geometry
 
       const auto merge = [](AttributeDataType& a, AttributeDataType& /*b*/) { return a; };
       const auto join_pred = [](const JoinEntry& e) { return e.left.has_value() && !e.right.has_value(); };
-      return meshpart_op(left, right, merge, join_pred);
+      return meshpart_op(left, right, merge, join_pred, false);
     }
 
     /**
@@ -397,7 +402,7 @@ namespace FEAT::Geometry
       const auto merge = [](AttributeDataType& a, AttributeDataType& /*b*/) { return a; };
       MeshPartType a = meshpart_difference(left, right, merge);
       MeshPartType b = meshpart_difference(right, left, merge); // NOLINT
-      return meshpart_union(a, b, merge);
+      return meshpart_union(a, b, merge, false);
     }
 
   private:
@@ -423,7 +428,8 @@ namespace FEAT::Geometry
       const MeshPartType& left,
       const MeshPartType& right,
       const AttributeFn_& attribute_merge,
-      const PredFn_& join_pred)
+      const PredFn_& join_pred,
+      const bool create_topology)
     {
       // Determine join of mesh parts
       // The join tracks which indices belong to the same entity on the left, right, and result meshparts.
@@ -441,8 +447,6 @@ namespace FEAT::Geometry
         size[i] = tsh.get_num_entities(i);
       }
 
-      // The result meshpart has a topology as long as any of the inputs have a topology
-      const bool create_topology = left.has_topology() || right.has_topology();
 
       // Create result mesh part
       MeshPartType result(size.data(), create_topology);
