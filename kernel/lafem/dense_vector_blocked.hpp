@@ -1288,7 +1288,6 @@ namespace FEAT
         TimeStamp ts_start;
 
         DataType max_rel_diff = Arch::MaxRelDiff::value(this->template elements<Perspective::pod>(), x.template elements<Perspective::pod>(), this->template size<Perspective::pod>());
-        ASSERT(max_rel_diff < this->template size<Perspective::pod>());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1323,43 +1322,6 @@ namespace FEAT
       }
       /// \endcond
 
-      /**
-       * \brief DenseVectorBlocked comparison operator
-       *
-       * \param[in] a A vector to compare with.
-       * \param[in] b A vector to compare with.
-       */
-      friend bool operator== (const DenseVectorBlocked & a, const DenseVectorBlocked & b)
-      {
-        if (a.size() != b.size())
-          return false;
-        if (a.get_elements().size() != b.get_elements().size())
-          return false;
-        if (a.get_indices().size() != b.get_indices().size())
-          return false;
-
-        if (a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && b.get_elements().size() == 0)
-          return true;
-
-        bool ret(true);
-
-        DT_ * ta;
-        DT_ * tb;
-
-        ta = const_cast<DT_*>(a.template elements<Perspective::pod>());
-        tb = const_cast<DT_*>(b.template elements<Perspective::pod>());
-
-        for (Index i(0); i < a.template size<Perspective::pod>(); ++i)
-        {
-          if (ta[i] != tb[i])
-          {
-            ret = false;
-            break;
-          }
-        }
-
-        return ret;
-      }
 
       /**
        * \brief DenseVectorBlocked streaming operator

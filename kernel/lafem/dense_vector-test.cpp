@@ -43,15 +43,15 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
-    DenseVector<DT_, IT_> zero1;
-    DenseVector<DT_, IT_> zero2;
-    TEST_CHECK_EQUAL(zero1, zero2);
-    zero2.convert(zero1);
+    DenseVector<DT_, IT_> zero;
+    TEST_CHECK(zero.empty());
 
     DenseVector<DT_, IT_> a(16, DT_(7)); //use multiple of 4 to circumanivate memory padding in MemoryPool
+    TEST_CHECK(!a.empty());
     TEST_CHECK_EQUAL(a.bytes(), 16 * sizeof(DT_) + 1 * sizeof(Index));
 
     TEST_CHECK_EQUAL(MemoryPool::allocated_memory(), a.bytes() - sizeof(Index));
@@ -71,18 +71,18 @@ public:
     TEST_CHECK_EQUAL(c.size(), b.size());
     for (Index i(0) ; i < c.size() ; ++i)
       TEST_CHECK_EQUAL(c(i), b(i));
-    TEST_CHECK_EQUAL(c, b);
+    TEST_CHECK_LESS_THAN(c.max_rel_diff(b), eps);
     c.convert(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
     TEST_CHECK_EQUAL(c(7), b(7));
-    TEST_CHECK_EQUAL(c, b);
+    TEST_CHECK_LESS_THAN(c.max_rel_diff(b), eps);
     DenseVector<float, unsigned int> d;
     d.convert(c);
     DenseVector<float, unsigned int> e;
     e.convert(b);
     TEST_CHECK_EQUAL(e.size(), d.size());
     TEST_CHECK_EQUAL(e(7), d(7));
-    TEST_CHECK_EQUAL(e, d);
+    TEST_CHECK_LESS_THAN(e.max_rel_diff(d), float(eps));
     e.clone(a);
     for (Index i(0) ; i < a.size() ; ++i)
       TEST_CHECK_EQUAL(DT_(e(i)), a(i));
@@ -91,10 +91,10 @@ public:
     TEST_CHECK_NOT_EQUAL((void*)b.elements(), (void*)a.elements());
     c.convert(a);
     TEST_CHECK_EQUAL((void*)c.elements(), (void*)a.elements());
-    TEST_CHECK_EQUAL(b, c);
+    TEST_CHECK_LESS_THAN(b.max_rel_diff(c), eps);
 
     DenseVector<DT_, IT_> g(b.size(), b.elements());
-    TEST_CHECK_EQUAL(g, b);
+    TEST_CHECK_LESS_THAN(g.max_rel_diff(b), eps);
     TEST_CHECK_EQUAL((void*)g.elements(), (void*)b.elements());
 
     DenseVector<DT_, IT_> ap(a.clone());
@@ -104,7 +104,7 @@ public:
     ap.permute(prm_rnd);
     prm_rnd = prm_rnd.inverse();
     ap.permute(prm_rnd);
-    TEST_CHECK_EQUAL(ap, a);
+    TEST_CHECK_LESS_THAN(ap.max_rel_diff(a), eps);
 
     // random constructor check
     DT_ rnd_range[2];
@@ -121,23 +121,23 @@ public:
 
     // new clone testing
     auto clone1 = a.clone(CloneMode::Deep);
-    TEST_CHECK_EQUAL(clone1, a);
+    TEST_CHECK_LESS_THAN(clone1.max_rel_diff(a), eps);
     clone1(7, DT_(132));
-    TEST_CHECK_NOT_EQUAL(clone1, a);
+    TEST_CHECK_LESS_THAN(eps, clone1.max_rel_diff(a));
     TEST_CHECK_NOT_EQUAL((void*)clone1.elements(), (void*)a.elements());
     DenseVector<DT_, IT_> clone2 = clone1.clone(CloneMode::Layout);
     MemoryPool::set_memory(clone2.elements(), DT_(4713), clone2.size());
     TEST_CHECK_NOT_EQUAL(clone2(7), clone1(7));
     TEST_CHECK_NOT_EQUAL((void*)clone2.elements(), (void*)clone1.elements());
     DenseVector<DT_, IT_> clone3 = clone1.clone(CloneMode::Weak);
-    TEST_CHECK_EQUAL(clone3, clone1);
+    TEST_CHECK_LESS_THAN(clone3.max_rel_diff(clone1), eps);
     clone3(7, DT_(133));
-    TEST_CHECK_NOT_EQUAL(clone3, clone1);
+    TEST_CHECK_LESS_THAN(eps, clone3.max_rel_diff(clone1));
     TEST_CHECK_NOT_EQUAL((void*)clone3.elements(), (void*)clone1.elements());
     DenseVector<DT_, IT_> clone4 = clone1.clone(CloneMode::Shallow);
-    TEST_CHECK_EQUAL(clone4, clone1);
+    TEST_CHECK_LESS_THAN(clone4.max_rel_diff(clone1), eps);
     clone4(7, DT_(134));
-    TEST_CHECK_EQUAL(clone4, clone1);
+    TEST_CHECK_LESS_THAN(clone4.max_rel_diff(clone1), eps);
     TEST_CHECK_EQUAL((void*)clone4.elements(), (void*)clone1.elements());
     auto clone5 = a.clone(CloneMode::Allocate);
     TEST_CHECK_NOT_EQUAL((void*)clone5.elements(), (void*)a.elements());
@@ -609,6 +609,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DT_ s(DT_(4.321));
@@ -622,10 +623,10 @@ public:
 
       DenseVector<DT_, IT_> b(size);
       b.scale(a, s);
-      TEST_CHECK_EQUAL(b, ref);
+      TEST_CHECK_LESS_THAN(b.max_rel_diff(ref), eps);
 
       a.scale(a, s);
-      TEST_CHECK_EQUAL(a, ref);
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref), eps);
     }
   }
 };

@@ -100,7 +100,7 @@ public:
     MT_ mat_sys_scalar2;
     mat_sys_scalar2.convert(mat_sys2);
 
-    TEST_CHECK_EQUAL(mat_sys_scalar, mat_sys_scalar2);
+    TEST_CHECK_LESS_THAN(mat_sys_scalar.max_rel_diff(mat_sys_scalar2), tol);
 
     /**
      * check VecMetaToScalar and "VecScalarToMeta"
@@ -200,6 +200,7 @@ public:
 
   virtual void run() const override
   {
+    const DataType tol(Math::pow(Math::eps<DataType>(), DataType(0.7)));
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
@@ -257,7 +258,7 @@ public:
     MT_ c7;
     c7.convert(c4);
 
-    TEST_CHECK_EQUAL(c6, c7);
+    TEST_CHECK_LESS_THAN(c6.max_rel_diff(c7), tol);
 
     c4.format();
     c5.convert_reverse(c4);
@@ -267,7 +268,7 @@ public:
     c6.convert(c5);
     c7.convert(c4);
 
-    TEST_CHECK_EQUAL(c6, c7);
+    TEST_CHECK_LESS_THAN(c6.max_rel_diff(c7), tol);
   }
 };
 

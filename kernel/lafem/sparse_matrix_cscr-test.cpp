@@ -47,10 +47,9 @@ public:
 
   virtual void run() const override
   {
-    SparseMatrixCSCR<DT_, IT_> zero1;
-    SparseMatrixCSCR<DT_, IT_> zero2;
-    TEST_CHECK_EQUAL(zero1, zero2);
-    zero2.convert(zero1);
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    SparseMatrixCSCR<DT_, IT_> zero;
+    TEST_CHECK(zero.empty());
 
     SparseMatrixCSCR<DT_, IT_> zero3(10, 11, 12, 3);
     TEST_CHECK_EQUAL(zero3.used_elements(), 12);
@@ -78,7 +77,7 @@ public:
     TEST_CHECK_EQUAL(empty5.columns(), empty5.columns());
     TEST_CHECK_EQUAL(empty5.used_elements(), empty5.used_elements());
     TEST_CHECK_EQUAL(empty5.used_rows(), empty5.used_rows());
-    empty5.convert(zero1);
+    empty5.convert(zero);
     TEST_CHECK_EQUAL(empty5.rows(), 0);
     TEST_CHECK_EQUAL(empty5.columns(), 0);
     TEST_CHECK_EQUAL(empty5.used_elements(), 0);
@@ -102,6 +101,7 @@ public:
     row_numbers(2, IT_(8));
 
     SparseMatrixCSCR<DT_, IT_> a(10, 10, col_ind, val, row_ptr, row_numbers);
+    TEST_CHECK(!a.empty());
     TEST_CHECK_EQUAL(a.used_elements(), 7);
     TEST_CHECK_EQUAL(a.size(), 100);
     TEST_CHECK_EQUAL(a.rows(), 10);
@@ -115,12 +115,12 @@ public:
 
     SparseMatrixCSCR<DT_, IT_> b;
     b.convert(a);
-    TEST_CHECK_EQUAL(b, a);
+    TEST_CHECK_LESS_THAN(b.max_rel_diff(a), eps);
     SparseMatrixCSCR<DT_, IT_> c;
     c.convert(b);
-    TEST_CHECK_EQUAL(c, b);
+    TEST_CHECK_LESS_THAN(c.max_rel_diff(b), eps);
     SparseMatrixCSCR<DT_, IT_> d(a.clone());
-    TEST_CHECK_EQUAL(d, c);
+    TEST_CHECK_LESS_THAN(d.max_rel_diff(c), eps);
 
 
     SparseMatrixFactory<DT_, IT_> fac(IT_(10), IT_(10));
@@ -451,4 +451,96 @@ SparseMatrixCSCRApplyTest <float, std::uint64_t> cuda_sm_cscr_apply_test_float_u
 SparseMatrixCSCRApplyTest <double, std::uint64_t> cuda_sm_cscr_apply_test_double_uint64(PreferredBackend::cuda);
 SparseMatrixCSCRApplyTest <float, std::uint32_t> cuda_sm_cscr_apply_test_float_uint32(PreferredBackend::cuda);
 SparseMatrixCSCRApplyTest <double, std::uint32_t> cuda_sm_cscr_apply_test_double_uint32(PreferredBackend::cuda);
+#endif
+
+template<
+  typename DT_,
+  typename IT_>
+class SparseMatrixCSCRMaxRelDiffTest
+  : public UnitTest
+{
+public:
+  SparseMatrixCSCRMaxRelDiffTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixCSCRMaxRelDiffTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~SparseMatrixCSCRMaxRelDiffTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ delta = DT_(123.5);
+
+    const Index size = 10;
+    const Index diff_row = 4;
+    const Index diff_col = 6;
+    const DT_ initial_value = DT_(10.0);
+
+    // ref matrix b
+    SparseMatrixFactory<DT_, IT_> fac_b(size, size);
+
+    // b(4, 6) = 10
+    fac_b.add(diff_row, diff_col, initial_value);
+
+    // convert to SparseMatrixCSCR
+    SparseMatrixCSR<DT_, IT_> b_csr(size, size);
+    b_csr.convert(fac_b.make_csr());
+    DenseVector<DT_, IT_> val_b(b_csr.used_elements(), b_csr.val());
+    DenseVector<IT_, IT_> col_ind_b(b_csr.used_elements(), b_csr.col_ind());
+    DenseVector<IT_, IT_> row_ptr_b(b_csr.rows() + 1, b_csr.row_ptr());
+    DenseVector<IT_, IT_> row_numbers_b(b_csr.rows());
+    SparseMatrixCSCR<DT_, IT_> b(b_csr.rows(), b_csr.columns(), col_ind_b, val_b, row_ptr_b, row_numbers_b);
+
+    // copy b into a
+    SparseMatrixCSCR<DT_, IT_> a = b.clone();
+
+    // delta matrix with delta(4, 6) = 123.5
+    SparseMatrixFactory<DT_, IT_> fac_delta(size, size);
+    fac_delta.add(diff_row, diff_col, delta);
+    SparseMatrixCSR<DT_, IT_> delta_mat_csr(size, size);
+    delta_mat_csr.convert(fac_delta.make_csr());
+    DenseVector<DT_, IT_> val_delta(delta_mat_csr.used_elements(), delta_mat_csr.val());
+    DenseVector<IT_, IT_> col_ind_delta(delta_mat_csr.used_elements(), delta_mat_csr.col_ind());
+    DenseVector<IT_, IT_> row_ptr_delta(delta_mat_csr.rows() + 1, delta_mat_csr.row_ptr());
+    DenseVector<IT_, IT_> row_numbers_delta(delta_mat_csr.rows());
+    SparseMatrixCSCR<DT_, IT_> delta_mat(delta_mat_csr.rows(), delta_mat_csr.columns(), col_ind_delta, val_delta, row_ptr_delta, row_numbers_delta);
+
+
+    // a = a + 1.0 * delta_mat
+    a.axpy(delta_mat, DT_(1.0));
+
+    // reference value
+    const DT_ ref = delta / (DT_(2) * initial_value + delta);
+
+    // test ||a-b||_infty
+    const DT_ diff_1 = a.max_rel_diff(b);
+    TEST_CHECK_RELATIVE(diff_1, ref, eps);
+
+    // test ||b-a||_infty
+    const DT_ diff_2 = b.max_rel_diff(a);
+    TEST_CHECK_RELATIVE(diff_2, ref, eps);
+  }
+};
+SparseMatrixCSCRMaxRelDiffTest <float, std::uint32_t> sm_cscr_max_rel_diff_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSCRMaxRelDiffTest <double, std::uint32_t> sm_cscr_max_rel_diff_test_double_uint32(PreferredBackend::generic);
+SparseMatrixCSCRMaxRelDiffTest <float, std::uint64_t> sm_cscr_max_rel_diff_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSCRMaxRelDiffTest <double, std::uint64_t> sm_cscr_max_rel_diff_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixCSCRMaxRelDiffTest <float, std::uint64_t> mkl_sm_cscr_max_rel_diff_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSCRMaxRelDiffTest <double, std::uint64_t> mkl_sm_cscr_max_rel_diff_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixCSCRMaxRelDiffTest <__float128, std::uint32_t> sm_cscr_max_rel_diff_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixCSCRMaxRelDiffTest <__float128, std::uint64_t> sm_cscr_max_rel_diff_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixCSCRMaxRelDiffTest <Half, std::uint32_t> sm_cscr_max_rel_diff_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSCRMaxRelDiffTest <Half, std::uint64_t> sm_cscr_max_rel_diff_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixCSCRMaxRelDiffTest <float, std::uint64_t> cuda_sm_cscr_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSCRMaxRelDiffTest <double, std::uint64_t> cuda_sm_cscr_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
 #endif

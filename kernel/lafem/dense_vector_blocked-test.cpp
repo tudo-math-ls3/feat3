@@ -48,15 +48,16 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
-    DenseVectorBlocked<DT_, IT_, 2> zero1;
-    DenseVectorBlocked<DT_, IT_, 2> zero2;
-    TEST_CHECK_EQUAL(zero1, zero2);
+    DenseVectorBlocked<DT_, IT_, 2> zero;
+    TEST_CHECK(zero.empty());
 
     DenseVectorBlocked<DT_, IT_, 2> a(10, DT_(7));
-    TEST_CHECK_EQUAL(a, a);
+    TEST_CHECK(!a.empty());
+    TEST_CHECK_LESS_THAN(a.max_rel_diff(a), eps);
     TEST_CHECK_EQUAL(a.bytes(), 20 * sizeof(DT_) + 1 * sizeof(Index));
     DenseVectorBlocked<DT_, IT_, 2> b(10, DT_(5));
     Tiny::Vector<DT_, 2> tv(42);
@@ -79,7 +80,7 @@ public:
       TEST_CHECK_EQUAL(t1.v[i], t2.v[i]);
       TEST_CHECK_EQUAL(tp1[7].v[i], t2.v[i]);
     }
-    TEST_CHECK_EQUAL(c, b);
+    TEST_CHECK_LESS_THAN(c.max_rel_diff(b), eps);
     c.convert(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
     //TEST_CHECK_EQUAL(c(7), b(7));
@@ -87,7 +88,7 @@ public:
     t2 = b(7);
     for (Index i(0) ; i < 2 ; ++i)
       TEST_CHECK_EQUAL(t1.v[i], t2.v[i]);
-    TEST_CHECK_EQUAL(c, b);
+    TEST_CHECK_LESS_THAN(c.max_rel_diff(b), eps);
     DenseVectorBlocked<float, unsigned int, 2> d;
     d.convert(c);
     DenseVectorBlocked<float, unsigned int, 2> e;
@@ -98,17 +99,17 @@ public:
     t2 = b(7);
     for (Index i(0) ; i < 2 ; ++i)
       TEST_CHECK_EQUAL(t1.v[i], t2.v[i]);
-    TEST_CHECK_EQUAL(e, d);
+    TEST_CHECK_LESS_THAN(e.max_rel_diff(d), float(eps));
 
     b.clone(a);
     TEST_CHECK_NOT_EQUAL((void*)b.elements(), (void*)a.elements());
     c.convert(a);
     TEST_CHECK_EQUAL((void*)c.elements(), (void*)a.elements());
-    TEST_CHECK_EQUAL(b, c);
+    TEST_CHECK_LESS_THAN(b.max_rel_diff(c), eps);
     Tiny::Vector<DT_, 2> tv2(23);
     a(3, tv2);
-    TEST_CHECK_EQUAL(a, c);
-    TEST_CHECK_NOT_EQUAL(a, b);
+    TEST_CHECK_LESS_THAN(a.max_rel_diff(c), eps);
+    TEST_CHECK_LESS_THAN(eps, a.max_rel_diff(b));
 
     DenseVector<DT_, IT_> dv(12, DT_(2));
     dv(7, DT_(3));
@@ -118,11 +119,11 @@ public:
     TEST_CHECK_EQUAL(t3.v[1], DT_(3));
     TEST_CHECK_EQUAL((void*)f.elements(), (void*)dv.elements());
     DenseVector<DT_, IT_> dv2(f);
-    TEST_CHECK_EQUAL(dv2, dv);
+    TEST_CHECK_LESS_THAN(dv2.max_rel_diff(dv), eps);
     TEST_CHECK_EQUAL((void*)dv2.elements(), (void*)dv.elements());
 
     DenseVectorBlocked<DT_, IT_, 3> g(f.size(), f.template elements<Perspective::pod>());
-    TEST_CHECK_EQUAL(g, f);
+    TEST_CHECK_LESS_THAN(g.max_rel_diff(f), eps);
     TEST_CHECK_EQUAL((void*)g.template elements<Perspective::pod>(), (void*)f.template elements<Perspective::pod>());
 
     // random constructor check
@@ -181,6 +182,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     DenseVector<DT_, IT_> dv(12, DT_(2));
     dv(7, DT_(3));
     DenseVectorBlocked<DT_, IT_, 3> g(dv);
@@ -188,14 +190,14 @@ public:
     std::stringstream mts;
     g.write_out(FileMode::fm_mtx, mts);
     DenseVectorBlocked<DT_, IT_, 3> l(FileMode::fm_mtx, mts);
-    TEST_CHECK_EQUAL(l, g);
+    TEST_CHECK_LESS_THAN(l.max_rel_diff(g), eps);
     //for (Index i(0) ; i < g.template size<Perspective::pod>() ; ++i)
     //  TEST_CHECK_EQUAL_WITHIN_EPS(l.template elements<Perspective::pod>()[i], g.template elements<Perspective::pod>()[i], DT_(1e-4));
 
     std::stringstream ts;
     g.write_out(FileMode::fm_exp, ts);
     DenseVectorBlocked<DT_, IT_, 3> m(FileMode::fm_exp, ts);
-    TEST_CHECK_EQUAL(m, g);
+    TEST_CHECK_LESS_THAN(m.max_rel_diff(g), eps);
     //for (Index i(0) ; i < k.size() ; ++i)
     //  TEST_CHECK_EQUAL_WITHIN_EPS(m(i), k(i), DT_(1e-4));
 
@@ -203,7 +205,7 @@ public:
     g.write_out(FileMode::fm_dvb, bs);
     bs.seekg(0);
     DenseVectorBlocked<DT_, IT_, 3> n(FileMode::fm_dvb, bs);
-    TEST_CHECK_EQUAL(n, g);
+    TEST_CHECK_LESS_THAN(n.max_rel_diff(g), eps);
     //for (Index i(0) ; i < k.size() ; ++i)
     //  TEST_CHECK_EQUAL_WITHIN_EPS(n(i), k(i), DT_(1e-5));
 
@@ -215,11 +217,11 @@ public:
     DenseVectorBlocked<DT_, IT_, 5> tester_blocked(zfp_tester);
     auto op = g.serialize(LAFEM::SerialConfig(false, false));
     DenseVectorBlocked<DT_, IT_, 3> o(op);
-    TEST_CHECK_EQUAL(o, g);
+    TEST_CHECK_LESS_THAN(o.max_rel_diff(g), eps);
 #ifdef FEAT_HAVE_ZLIB
     auto zb = tester_blocked.serialize(LAFEM::SerialConfig(true,false));
     DenseVectorBlocked<DT_, IT_, 5> zlib(zb);
-    TEST_CHECK_EQUAL(zlib, tester_blocked);
+    TEST_CHECK_LESS_THAN(zlib.max_rel_diff(tester_blocked), eps);
 #endif
 #ifdef FEAT_HAVE_ZFP
     auto zp = tester_blocked.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
@@ -750,6 +752,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DT_ s(DT_(4.321));
@@ -773,13 +776,13 @@ public:
       DenseVectorBlocked<DT_, IT_, block_size_> b(size);
 
       b.scale(a, s);
-      TEST_CHECK_EQUAL(b, ref);
+      TEST_CHECK_LESS_THAN(b.max_rel_diff(ref), eps);
 
       a.scale(a, s);
-      TEST_CHECK_EQUAL(a, ref);
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref), eps);
 
       a.scale_blocked(a, bs);
-      TEST_CHECK_EQUAL(a, ref_bs);
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref_bs), eps);
 
     }
   }
@@ -1198,6 +1201,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     bool one_error(false);
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
@@ -1220,7 +1224,7 @@ public:
       a.permute(prm_rnd);
 
       //allow identity permutation once per test due to rng...
-      if (a==ref)
+      if (a.max_rel_diff(ref) < eps)
       {
         if(one_error)
         {
@@ -1234,7 +1238,7 @@ public:
 
       auto prm_inv = prm_rnd.inverse();
       a.permute(prm_inv);
-      TEST_CHECK_EQUAL(a, ref);
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref), eps);
     }
   }
 };
@@ -1376,25 +1380,29 @@ public:
     }
   }
 };
-DenseVectorBlockedMaxRelDiffTest <float, std::uint32_t, 2> dv_max_rel_diff_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedMaxRelDiffTest <double, std::uint32_t, 2> dv_max_rel_diff_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedMaxRelDiffTest <float, std::uint64_t, 3> dv_max_rel_diff_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedMaxRelDiffTest <double, std::uint64_t, 3> dv_max_rel_diff_test_double_uint64(PreferredBackend::generic);
+DenseVectorBlockedMaxRelDiffTest <float, std::uint32_t, 2> dense_vector_blocked_max_rel_diff_test_float_uint32(PreferredBackend::generic);
+DenseVectorBlockedMaxRelDiffTest <double, std::uint32_t, 2> dense_vector_blocked_max_rel_diff_test_double_uint32(PreferredBackend::generic);
+DenseVectorBlockedMaxRelDiffTest <float, std::uint64_t, 3> dense_vector_blocked_max_rel_diff_test_float_uint64(PreferredBackend::generic);
+DenseVectorBlockedMaxRelDiffTest <double, std::uint64_t, 3> dense_vector_blocked_max_rel_diff_test_double_uint64(PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseVectorBlockedMaxRelDiffTest <float, std::uint64_t, 2> mkl_dv_max_rel_diff_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedMaxRelDiffTest <double, std::uint64_t, 3> mkl_dv_max_rel_diff_test_double_uint64(PreferredBackend::mkl);
+DenseVectorBlockedMaxRelDiffTest <float, std::uint64_t, 2> mkl_dense_vector_blocked_max_rel_diff_test_float_uint64(PreferredBackend::mkl);
+DenseVectorBlockedMaxRelDiffTest <double, std::uint64_t, 3> mkl_dense_vector_blocked_max_rel_diff_test_double_uint64(PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedMaxRelDiffTest <__float128, std::uint32_t, 2> dv_max_rel_diff_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedMaxRelDiffTest <__float128, std::uint64_t, 3> dv_max_rel_diff_test_float128_uint64(PreferredBackend::generic);
+DenseVectorBlockedMaxRelDiffTest <__float128, std::uint32_t, 2> dense_vector_blocked_max_rel_diff_test_float128_uint32(PreferredBackend::generic);
+DenseVectorBlockedMaxRelDiffTest <__float128, std::uint64_t, 3> dense_vector_blocked_max_rel_diff_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedMaxRelDiffTest <Half, std::uint32_t, 2> dv_max_rel_diff_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedMaxRelDiffTest <Half, std::uint64_t, 3> dv_max_rel_diff_test_half_uint64(PreferredBackend::generic);
+DenseVectorBlockedMaxRelDiffTest <Half, std::uint32_t, 2> dense_vector_blocked_max_rel_diff_test_half_uint32(PreferredBackend::generic);
+DenseVectorBlockedMaxRelDiffTest <Half, std::uint64_t, 3> dense_vector_blocked_max_rel_diff_test_half_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseVectorBlockedMaxRelDiffTest <Half, std::uint32_t, 2> cuda_dense_vector_blocked_max_rel_diff_test_half_uint32(PreferredBackend::cuda);
+DenseVectorBlockedMaxRelDiffTest <Half, std::uint64_t, 3> cuda_dense_vector_blocked_max_rel_diff_test_half_uint64(PreferredBackend::cuda);
+#endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedMaxRelDiffTest <float, std::uint32_t, 2> cuda_dv_max_rel_diff_test_float_uint32(PreferredBackend::cuda);
-DenseVectorBlockedMaxRelDiffTest <double, std::uint32_t, 2> cuda_dv_max_rel_diff_test_double_uint32(PreferredBackend::cuda);
-DenseVectorBlockedMaxRelDiffTest <float, std::uint64_t, 3> cuda_dv_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
-DenseVectorBlockedMaxRelDiffTest <double, std::uint64_t, 3> cuda_dv_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
+DenseVectorBlockedMaxRelDiffTest <float, std::uint32_t, 2> cuda_dense_vector_blocked_max_rel_diff_test_float_uint32(PreferredBackend::cuda);
+DenseVectorBlockedMaxRelDiffTest <double, std::uint32_t, 2> cuda_dense_vector_blocked_max_rel_diff_test_double_uint32(PreferredBackend::cuda);
+DenseVectorBlockedMaxRelDiffTest <float, std::uint64_t, 3> cuda_dense_vector_blocked_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
+DenseVectorBlockedMaxRelDiffTest <double, std::uint64_t, 3> cuda_dense_vector_blocked_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
 #endif

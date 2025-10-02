@@ -46,6 +46,7 @@ public:
 
   virtual void run() const override
   {
+    DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
     // String directory("meta_matrix-io-test.directory/");
     String directory ("./");
 
@@ -56,7 +57,7 @@ public:
     mat_diag_write.write_out(FileMode::fm_mtx, directory + "mat_diag.write.mtx");
     typename BaseClass::SystemDiagMatrix mat_diag_read(FileMode::fm_mtx, directory + "mat_diag.write.mtx");
 
-    TEST_CHECK_MSG(mat_diag_write == mat_diag_read, "mat_diag_write and mat_diag_read are not the same matrices!");
+    TEST_CHECK_MSG(mat_diag_write.max_rel_diff(mat_diag_read) < eps, "mat_diag_write and mat_diag_read are not the same matrices!");
 
     // generate a test system with PowerFullMatrix
     typename BaseClass::SystemFullMatrix mat_full_write;
@@ -64,7 +65,7 @@ public:
     mat_full_write.write_out(FileMode::fm_mtx, directory + "mat_full.write.mtx");
     typename BaseClass::SystemFullMatrix mat_full_read(FileMode::fm_mtx, directory + "mat_full.write.mtx");
 
-    TEST_CHECK_MSG(mat_full_write == mat_full_read, "mat_full_write and mat_full_read are not the same matrices!");
+    TEST_CHECK_MSG(mat_full_write.max_rel_diff(mat_full_read) < eps, "mat_full_write and mat_full_read are not the same matrices!");
   }
 };
 

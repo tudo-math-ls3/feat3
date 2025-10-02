@@ -47,11 +47,11 @@ public:
   virtual void run() const override
   {
     DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
-    DenseMatrix<DT_, IT_> zero1;
-    DenseMatrix<DT_, IT_> zero2;
-    TEST_CHECK_EQUAL(zero1, zero2);
+    DenseMatrix<DT_, IT_> zero;
+    TEST_CHECK(zero.empty());
 
     DenseMatrix<DT_, IT_> a(10, 11);
+    TEST_CHECK(!a.empty());
     TEST_CHECK_EQUAL(a.rows(), 10);
     TEST_CHECK_EQUAL(a.columns(), 11);
     TEST_CHECK_EQUAL(a.size(), 110);
@@ -62,7 +62,7 @@ public:
     TEST_CHECK_EQUAL(c.size(), b.size());
     TEST_CHECK_EQUAL(c.rows(), b.rows());
     TEST_CHECK_EQUAL(c(7, 6), b(7, 6));
-    TEST_CHECK_EQUAL(c, b);
+    TEST_CHECK_LESS_THAN(c.max_rel_diff(b), eps);
 
     DenseMatrix<DT_, IT_> e(11, 12, 5.);
     TEST_CHECK_EQUAL(e.rows(), 11ul);
@@ -70,9 +70,9 @@ public:
 
     DenseMatrix<DT_, IT_> h;
     h.clone(c);
-    TEST_CHECK_EQUAL(h, c);
+    TEST_CHECK_LESS_THAN(h.max_rel_diff(c), eps);
     h(1, 2, 3);
-    TEST_CHECK_NOT_EQUAL(h, c);
+    TEST_CHECK_LESS_THAN(eps, h.max_rel_diff(c));
     TEST_CHECK_NOT_EQUAL((void*)h.elements(), (void*)c.elements());
 
     // Lehmer matrix inverse test
@@ -154,11 +154,11 @@ public:
     }
     auto kp = test_mat.serialize(LAFEM::SerialConfig(false, false));
     DenseMatrix<DT_, IT_> k(kp);
-    TEST_CHECK_EQUAL(k, test_mat);
+    TEST_CHECK_LESS_THAN(k.max_rel_diff(test_mat), eps);
 #ifdef FEAT_HAVE_ZLIB
     auto zl = test_mat.serialize(LAFEM::SerialConfig(true, false));
     DenseMatrix<DT_, IT_> k1(zl);
-    TEST_CHECK_EQUAL(k1, test_mat);
+    TEST_CHECK_LESS_THAN(k1.max_rel_diff(test_mat), eps);
 #endif
 #ifdef FEAT_HAVE_ZFP
     auto zfp = test_mat.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-6)));
@@ -1089,4 +1089,85 @@ DenseMatrixTranposeTest <float, std::uint32_t> cuda_dense_matrix_transpose_test_
 DenseMatrixTranposeTest <double, std::uint32_t> cuda_dense_matrix_transpose_test_double_uint32(PreferredBackend::cuda, 1e-6);
 DenseMatrixTranposeTest <float, std::uint64_t> cuda_dense_matrix_transpose_test_float_uint64(PreferredBackend::cuda, 1e-1);
 DenseMatrixTranposeTest <double, std::uint64_t> cuda_dense_matrix_transpose_test_double_uint64(PreferredBackend::cuda, 1e-6);
+#endif
+
+template<
+  typename DT_,
+  typename IT_>
+class DenseMatrixMaxRelDiffTest
+  : public UnitTest
+{
+public:
+  DenseMatrixMaxRelDiffTest(PreferredBackend backend)
+    : UnitTest("DenseMatrixMaxRelDiffTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~DenseMatrixMaxRelDiffTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ delta = DT_(123.5);
+
+    // Initialize matrices
+    const Index rows = 5;
+    const Index cols = 6;
+    const Index diff_row = 3;
+    const Index diff_col = 4;
+    const DT_ initial_value = DT_(10);
+
+    // only initial value in a
+    DenseMatrix<DT_, IT_> a(rows, cols, initial_value);
+
+    // copy a into b
+    DenseMatrix<DT_, IT_> b = a.clone();
+
+    // delta_mat(diff_row, diff_col) = delta
+    DenseMatrix<DT_, IT_> delta_mat(rows, cols, DT_(0));
+    delta_mat(diff_row, diff_col, delta);
+
+    // a = a + 1.0 * delta_mat
+    a.axpy(delta_mat, DT_(1.0));
+
+    // reference value
+    const DT_ ref = delta / (DT_(2) * initial_value + delta);
+
+    // test ||a-b||_infty
+    const DT_ diff_1 = a.max_rel_diff(b);
+    TEST_CHECK_RELATIVE(diff_1, ref, eps);
+
+    // test ||b-a||_infty
+    const DT_ diff_2 = b.max_rel_diff(a);
+    TEST_CHECK_RELATIVE(diff_2, ref, eps);
+  }
+};
+
+DenseMatrixMaxRelDiffTest <float, std::uint32_t> dense_matrix_max_rel_diff_test_float_uint32(PreferredBackend::generic);
+DenseMatrixMaxRelDiffTest <double, std::uint32_t> dense_matrix_max_rel_diff_test_double_uint32(PreferredBackend::generic);
+DenseMatrixMaxRelDiffTest <float, std::uint64_t> dense_matrix_max_rel_diff_test_float_uint64(PreferredBackend::generic);
+DenseMatrixMaxRelDiffTest <double, std::uint64_t> dense_matrix_max_rel_diff_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+DenseMatrixMaxRelDiffTest <float, std::uint64_t> mkl_dense_matrix_max_rel_diff_test_float_uint64(PreferredBackend::mkl);
+DenseMatrixMaxRelDiffTest <double, std::uint64_t> mkl_dense_matrix_max_rel_diff_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+DenseMatrixMaxRelDiffTest <__float128, std::uint32_t> dense_matrix_max_rel_diff_test_float128_uint32(PreferredBackend::generic);
+DenseMatrixMaxRelDiffTest <__float128, std::uint64_t> dense_matrix_max_rel_diff_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseMatrixMaxRelDiffTest <Half, std::uint32_t> dense_matrix_max_rel_diff_test_half_uint32(PreferredBackend::generic);
+DenseMatrixMaxRelDiffTest <Half, std::uint64_t> dense_matrix_max_rel_diff_test_half_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixMaxRelDiffTest <Half, std::uint32_t> cuda_dense_matrix_max_rel_diff_test_half_uint32(PreferredBackend::cuda);
+DenseMatrixMaxRelDiffTest <Half, std::uint64_t> cuda_dense_matrix_max_rel_diff_test_half_uint64(PreferredBackend::cuda);
+#endif
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixMaxRelDiffTest <float, std::uint32_t> cuda_dense_matrix_max_rel_diff_test_float_uint32(PreferredBackend::cuda);
+DenseMatrixMaxRelDiffTest <double, std::uint32_t> cuda_dense_matrix_max_rel_diff_test_double_uint32(PreferredBackend::cuda);
+DenseMatrixMaxRelDiffTest <float, std::uint64_t> cuda_dense_matrix_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
+DenseMatrixMaxRelDiffTest <double, std::uint64_t> cuda_dense_matrix_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
 #endif

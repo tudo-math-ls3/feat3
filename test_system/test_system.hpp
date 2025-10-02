@@ -384,6 +384,12 @@ namespace FEAT
         + ", with " #a "=" + FEAT::stringify(a) + " and " #b "=" + FEAT::stringify(b))\
   } while (false)
 
+/// checks if a < b
+#define TEST_CHECK_LESS_THAN(a, b) \
+  do { \
+    CHECK_INTERNAL((a) < (b), this->_id + "\n" +  "Expected '" #a "' to be less than \n'" + FEAT::stringify(b) + "'\nbut got\n'" + FEAT::stringify(a) + "'")\
+  } while (false)
+
 /// runs the given test with pre- and postprocessing
 #define TEST(pre, test, post) \
   do { \

@@ -48,6 +48,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
@@ -137,7 +138,7 @@ public:
 
     SparseMatrixBanded<DT_, IT_> z;
     z.convert(a);
-    TEST_CHECK_EQUAL(a, z);
+    TEST_CHECK_LESS_THAN(a.max_rel_diff(z), eps);
 
 
     TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)a.val());
@@ -149,13 +150,13 @@ public:
     DenseVector<IT_, IT_> offsets_d(c.num_of_offsets(), c.offsets());
     DenseVector<DT_, IT_> val_d(c.num_of_offsets() * c.rows(), c.val());
     SparseMatrixBanded<DT_, IT_> d(c.rows(), c.columns(), val_d, offsets_d);
-    TEST_CHECK_EQUAL(d, c);
+    TEST_CHECK_LESS_THAN(d.max_rel_diff(c), eps);
 
     SparseMatrixBanded<DT_, IT_> e;
     e.convert(c);
-    TEST_CHECK_EQUAL(e, c);
+    TEST_CHECK_LESS_THAN(e.max_rel_diff(c), eps);
     e.copy(c);
-    TEST_CHECK_EQUAL(e, c);
+    TEST_CHECK_LESS_THAN(e.max_rel_diff(c), eps);
   }
 };
 
@@ -202,6 +203,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
@@ -229,16 +231,16 @@ public:
     c.write_out(FileMode::fm_bm, bs);
     bs.seekg(0);
     SparseMatrixBanded<DT_, IT_> f(FileMode::fm_bm, bs);
-    TEST_CHECK_EQUAL(f, c);
+    TEST_CHECK_LESS_THAN(f.max_rel_diff(c), eps);
 
     auto kp = c.serialize(LAFEM::SerialConfig(false, false));
     SparseMatrixBanded<DT_, IT_> k(kp);
-    TEST_CHECK_EQUAL(k, c);
+    TEST_CHECK_LESS_THAN(k.max_rel_diff(c), eps);
 
 #ifdef FEAT_HAVE_ZLIB
     auto zl = c.serialize(LAFEM::SerialConfig(true, false));
     SparseMatrixBanded<DT_, IT_> zlib(zl);
-    TEST_CHECK_EQUAL(zlib, c);
+    TEST_CHECK_LESS_THAN(zlib.max_rel_diff(c), eps);
 #endif
 #ifdef FEAT_HAVE_ZFP
     auto zf = c.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
@@ -448,6 +450,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
@@ -486,10 +489,10 @@ public:
     b.clone(a);
 
     b.scale(a, s);
-    TEST_CHECK_EQUAL(b, ref);
+    TEST_CHECK_LESS_THAN(b.max_rel_diff(ref), eps);
 
     a.scale(a, s);
-    TEST_CHECK_EQUAL(a, ref);
+    TEST_CHECK_LESS_THAN(a.max_rel_diff(ref), eps);
   }
 };
 
@@ -622,4 +625,91 @@ SparseMatrixBandedAxpyTest <float, std::uint64_t> cuda_sparse_matrix_banded_axpy
 SparseMatrixBandedAxpyTest <double, std::uint64_t> cuda_sparse_matrix_banded_axpy_test_double_uint64(PreferredBackend::cuda);
 SparseMatrixBandedAxpyTest <float, std::uint32_t> cuda_sparse_matrix_banded_axpy_test_float_uint32(PreferredBackend::cuda);
 SparseMatrixBandedAxpyTest <double, std::uint32_t> cuda_sparse_matrix_banded_axpy_test_double_uint32(PreferredBackend::cuda);
+#endif
+template<
+  typename DT_,
+  typename IT_>
+class SparseMatrixBandedMaxRelDiffTest
+  : public UnitTest
+{
+public:
+  SparseMatrixBandedMaxRelDiffTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBandedMaxRelDiffTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~SparseMatrixBandedMaxRelDiffTest()
+  {
+  }
+
+  typedef SparseMatrixBanded<DT_, IT_> MatrixType;
+
+  virtual void run() const override
+  {
+    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ delta = DT_(123.5);
+    const DT_ initial_value = DT_(10.0);
+
+    const Index rows = 50;
+    const Index columns = 50;
+    const Index num_of_offsets = 3;
+
+    DenseVector<IT_, IT_> vec_offsets(num_of_offsets);
+    vec_offsets(0, IT_(rows - 1));
+    vec_offsets(1, IT_(rows));
+    vec_offsets(2, IT_(rows + 1));
+
+    const Index vec_val_size = num_of_offsets * rows;
+    DenseVector<DT_, IT_> vec_val_b(vec_val_size, initial_value);
+
+    // create reference matrix b
+    MatrixType b(rows, columns, vec_val_b, vec_offsets);
+
+    // copy b into a
+    MatrixType a = b.clone();
+
+    // create delta matrix with only one value
+    const Index diff_offset_idx = 1;
+    const Index diff_row_idx = 20;
+    const Index diff_val_index = (diff_offset_idx * rows) + diff_row_idx;
+    DenseVector<DT_, IT_> vec_val_delta(vec_val_size, DT_(0.));
+    vec_val_delta(diff_val_index, delta);
+    MatrixType delta_mat(rows, columns, vec_val_delta, vec_offsets);
+
+    // a = a + 1.0 * delta_mat
+    a.axpy(delta_mat, DT_(1.0));
+
+    // reference value
+    const DT_ ref = delta / (DT_(2) * initial_value + delta);
+
+    // test ||a-b||_infty
+    const DT_ diff_1 = a.max_rel_diff(b);
+    TEST_CHECK_RELATIVE(diff_1, ref, eps);
+
+    // test ||b-a||_infty
+    const DT_ diff_2 = b.max_rel_diff(a);
+    TEST_CHECK_RELATIVE(diff_2, ref, eps);
+  }
+};
+SparseMatrixBandedMaxRelDiffTest <float, std::uint64_t> cpu_sparse_matrix_banded_max_rel_diff_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBandedMaxRelDiffTest <double, std::uint64_t> cpu_sparse_matrix_banded_max_rel_diff_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBandedMaxRelDiffTest <float, std::uint32_t> cpu_sparse_matrix_banded_max_rel_diff_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBandedMaxRelDiffTest <double, std::uint32_t> cpu_sparse_matrix_banded_max_rel_diff_test_double_uint32(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBandedMaxRelDiffTest <float, std::uint64_t> mkl_cpu_sparse_matrix_banded_max_rel_diff_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBandedMaxRelDiffTest <double, std::uint64_t> mkl_cpu_sparse_matrix_banded_max_rel_diff_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBandedMaxRelDiffTest <__float128, std::uint64_t> cpu_sparse_matrix_banded_max_rel_diff_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBandedMaxRelDiffTest <__float128, std::uint32_t> cpu_sparse_matrix_banded_max_rel_diff_test_float128_uint32(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBandedMaxRelDiffTest <Half, std::uint32_t> cpu_sparse_matrix_banded_max_rel_diff_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBandedMaxRelDiffTest <Half, std::uint64_t> cpu_sparse_matrix_banded_max_rel_diff_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixBandedMaxRelDiffTest <float, std::uint64_t> cuda_sparse_matrix_banded_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBandedMaxRelDiffTest <double, std::uint64_t> cuda_sparse_matrix_banded_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixBandedMaxRelDiffTest <float, std::uint32_t> cuda_sparse_matrix_banded_max_rel_diff_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBandedMaxRelDiffTest <double, std::uint32_t> cuda_sparse_matrix_banded_max_rel_diff_test_double_uint32(PreferredBackend::cuda);
 #endif

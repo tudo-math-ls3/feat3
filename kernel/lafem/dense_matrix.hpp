@@ -715,6 +715,25 @@ namespace FEAT
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
 
+      /**
+       * \brief Retrieve the maximum relative difference of this matrix and another one
+       * y.max_rel_diff(x) returns  \f$ \max_{0\leq i < n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \f$
+       *
+       * \return The largest relative difference.
+       */
+      DT_ max_rel_diff(const DenseMatrix& x) const
+      {
+        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        TimeStamp ts_start;
+
+        DataType max_rel_diff = Arch::MaxRelDiff::value(this->elements(), x.elements(), this->used_elements());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return max_rel_diff;
+      }
+
 
       /**
        * \brief Calculate \f$ this \leftarrow x \cdot y \f$
@@ -909,48 +928,6 @@ namespace FEAT
         }
       }
       /// \endcond
-
-      /**
-       * \brief DenseMatrix comparison operator
-       *
-       * \param[in] a A matrix to compare with.
-       * \param[in] b A matrix to compare with.
-       */
-      friend bool operator== (const DenseMatrix & a, const DenseMatrix<DT_, IT_> & b)
-      {
-        if (a.size() != b.size())
-          return false;
-        if (a.get_elements().size() != b.get_elements().size())
-          return false;
-        if (a.get_indices().size() != b.get_indices().size())
-          return false;
-        if (a.rows() != b.rows())
-          return false;
-        if (a.columns() != b.columns())
-          return false;
-
-        if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && b.get_elements().size() == 0)
-          return true;
-
-        bool ret(true);
-
-        DT_ * ta;
-        DT_ * tb;
-
-        ta = const_cast<DT_*>(a.elements());
-        tb = const_cast<DT_*>(b.elements());
-
-        for (Index i(0) ; i < a.size() ; ++i)
-        {
-          if (ta[i] != tb[i])
-          {
-            ret = false;
-            break;
-          }
-        }
-
-        return ret;
-      }
 
       /**
        * \brief DenseMatrix streaming operator

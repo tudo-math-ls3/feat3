@@ -51,6 +51,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     SparseMatrixFactory<DT_, IT_> a(4, 4);
     for (Index row(0) ; row < a.rows() ; ++row)
     {
@@ -70,14 +71,14 @@ public:
     TEST_CHECK_EQUAL(csr_m1.used_elements(), banded_m1.used_elements());
     TEST_CHECK_EQUAL(csr_m2.used_elements(), banded_m1.used_elements());
     TEST_CHECK_EQUAL(csr_m2.used_elements(), csr_m1.used_elements());
-    TEST_CHECK_EQUAL(csr_m2, csr_m1);
+    TEST_CHECK_LESS_THAN(csr_m2.max_rel_diff(csr_m1), eps);
     SparseMatrixCSR<DT_, IT_> csr_m3(banded_m1);
-    TEST_CHECK_EQUAL(csr_m3, csr_m1);
+    TEST_CHECK_LESS_THAN(csr_m3.max_rel_diff(csr_m1), eps);
     csr_m1.format();
     csr_m2.format();
     csr_m3.convert_reverse(csr_m2);
     csr_m2.convert_reverse(csr_m1);
-    TEST_CHECK_EQUAL(csr_m1, csr_m3);
+    TEST_CHECK_LESS_THAN(csr_m1.max_rel_diff(csr_m3), eps);
   }
 };
 SparseMatrixConversionTest <float, std::uint32_t> sparse_matrix_conversion_test_float_uint32(PreferredBackend::generic);

@@ -764,7 +764,6 @@ namespace FEAT
 
         DataType max_rel_diff = Arch::MaxRelDiff::value(this->template elements<Perspective::pod>(),
           x.template elements<Perspective::pod>(), this->template used_elements<Perspective::pod>());
-        ASSERT(max_rel_diff < this->template used_elements<Perspective::pod>());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -856,37 +855,6 @@ namespace FEAT
       static String name()
       {
         return "SparseVectorBlocked";
-      }
-
-
-      /**
-       * \brief SparseVectorBlocked comparison operator
-       *
-       * \param[in] a A vector to compare with.
-       * \param[in] b A vector to compare with.
-       */
-      friend bool operator== (const SparseVectorBlocked & a, const SparseVectorBlocked & b)
-      {
-        if (a.size() != b.size())
-          return false;
-        if (a.get_elements().size() != b.get_elements().size())
-          return false;
-        if (a.get_indices().size() != b.get_indices().size())
-          return false;
-
-        if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && b.get_elements().size() == 0)
-          return true;
-
-        for (Index i(0) ; i < a.size() ; ++i)
-        {
-          auto ta = a(i);
-          auto tb = b(i);
-          for (int j(0) ; j < BlockSize_ ; ++j)
-            if (ta[j] != tb[j])
-              return false;
-        }
-
-        return true;
       }
 
       /**

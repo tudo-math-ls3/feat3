@@ -59,6 +59,7 @@ public:
 
     //simple test
     {
+      DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
       auto comm = Dist::Comm::world();
       Control::CheckpointControl cp(comm);
       LAFEM::SerialConfig config(false, false);
@@ -74,7 +75,7 @@ public:
       cp.load(bs);
       LAFEM::DenseVector<DT_, IT_> dv2;
       cp.restore_object(String("dv1"), dv2, false);
-      TEST_CHECK_EQUAL(dv1, dv2);
+      TEST_CHECK_LESS_THAN(dv1.max_rel_diff(dv2), eps);
       TEST_CHECK_NOT_EQUAL(cp.get_identifier_list().find("dv1"), std::string::npos);
 #ifdef FEAT_HAVE_ZLIB
       LAFEM::SerialConfig config2(true, false);
@@ -91,7 +92,7 @@ public:
       cp.load(bs2);
       LAFEM::DenseVector<DT_, IT_> dv3;
       cp.restore_object(String("dv1"), dv3, false);
-      TEST_CHECK_EQUAL(dv1, dv3);
+      TEST_CHECK_LESS_THAN(dv1.max_rel_diff(dv3), eps);
 #ifdef FEAT_HAVE_ZFP
       LAFEM::SerialConfig config3(true, true, 1e-4);
       cp.clear_input();
@@ -138,7 +139,7 @@ public:
 
   virtual void run() const override
   {
-
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     LAFEM::PowerRowMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, 2> powrow;
     LAFEM::PointstarFactoryFD<DT_, IT_> five_star(40,2);
     LAFEM::PointstarFactoryFD<DT_, IT_> nine_star(40,3);
@@ -157,8 +158,8 @@ public:
     cp.load(bs);
     LAFEM::PowerRowMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, 2> powrow2;
     cp.restore_object(String("powrow"), powrow2, false);
-    TEST_CHECK_EQUAL(powrow.get(0,0), powrow2.get(0,0));
-    TEST_CHECK_EQUAL(powrow.get(0,1), powrow2.get(0,1));
+    TEST_CHECK_LESS_THAN(powrow.get(0,0).max_rel_diff(powrow2.get(0,0)), eps);
+    TEST_CHECK_LESS_THAN(powrow.get(0,1).max_rel_diff(powrow2.get(0,1)), eps);
     TEST_CHECK_NOT_EQUAL(cp.get_identifier_list().find("powrow"), std::string::npos);
   }
 };
@@ -184,6 +185,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     LAFEM::PowerColMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, 2> powcol;
     LAFEM::PointstarFactoryFD<DT_, IT_> five_star(40,2);
     LAFEM::PointstarFactoryFD<DT_, IT_> nine_star(40,3);
@@ -202,8 +204,8 @@ public:
     cp.load(bs);
     LAFEM::PowerColMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, 2> powcol2;
     cp.restore_object(String("powcol"), powcol2, false);
-    TEST_CHECK_EQUAL(powcol.get(0,0), powcol2.get(0,0));
-    TEST_CHECK_EQUAL(powcol.get(1,0), powcol2.get(1,0));
+    TEST_CHECK_LESS_THAN(powcol.get(0,0).max_rel_diff(powcol2.get(0,0)), eps);
+    TEST_CHECK_LESS_THAN(powcol.get(1,0).max_rel_diff(powcol2.get(1,0)), eps);
     TEST_CHECK_NOT_EQUAL(cp.get_identifier_list().find("powcol"), std::string::npos);
   }
 };
@@ -229,6 +231,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     LAFEM::PowerFullMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, 2,2> powful;
     LAFEM::PointstarFactoryFD<DT_, IT_> five_star(40,2);
     LAFEM::PointstarFactoryFD<DT_, IT_> nine_star(40,3);
@@ -253,10 +256,10 @@ public:
     cp.load(bs);
     LAFEM::PowerFullMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, 2,2> powful2;
     cp.restore_object(String("powful"), powful2, false);
-    TEST_CHECK_EQUAL(powful.get(0,0), powful2.get(0,0));
-    TEST_CHECK_EQUAL(powful.get(1,0), powful2.get(1,0));
-    TEST_CHECK_EQUAL(powful.get(0,1), powful2.get(0,1));
-    TEST_CHECK_EQUAL(powful.get(1,1), powful2.get(1,1));
+    TEST_CHECK_LESS_THAN(powful.get(0,0).max_rel_diff(powful2.get(0,0)), eps);
+    TEST_CHECK_LESS_THAN(powful.get(1,0).max_rel_diff(powful2.get(1,0)), eps);
+    TEST_CHECK_LESS_THAN(powful.get(0,1).max_rel_diff(powful2.get(0,1)), eps);
+    TEST_CHECK_LESS_THAN(powful.get(1,1).max_rel_diff(powful2.get(1,1)), eps);
     TEST_CHECK_NOT_EQUAL(cp.get_identifier_list().find("powful"), std::string::npos);
   }
 };
@@ -282,6 +285,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     LAFEM::DenseVector<DT_, IT_> dv1(1234);
     for (Index i(0) ; i < dv1.size() ; ++i)
       dv1(i, DT_(i) / DT_(12));
@@ -303,8 +307,8 @@ public:
     cp.load(bs);
     LAFEM::PowerVector<LAFEM::DenseVector<DT_, IT_>, 2> powvec2;
     cp.restore_object(String("powvec"), powvec2, false);
-    TEST_CHECK_EQUAL(powvec.get(0), powvec2.get(0));
-    TEST_CHECK_EQUAL(powvec.get(1), powvec2.get(1));
+    TEST_CHECK_LESS_THAN(powvec.get(0).max_rel_diff(powvec2.get(0)), eps);
+    TEST_CHECK_LESS_THAN(powvec.get(1).max_rel_diff(powvec2.get(1)), eps);
     TEST_CHECK_NOT_EQUAL(cp.get_identifier_list().find("powvec"), std::string::npos);
   }
 };
@@ -330,6 +334,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     LAFEM::SaddlePointMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, LAFEM::SparseMatrixCSCR<DT_, IT_>> saddle;
     LAFEM::PointstarFactoryFD<DT_, IT_> five_star(40,2);
     LAFEM::SparseMatrixCSR<DT_, IT_> star1 = five_star.matrix_csr();
@@ -349,9 +354,9 @@ public:
     cp.load(bs);
     LAFEM::SaddlePointMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, LAFEM::SparseMatrixCSCR<DT_, IT_>> saddle2;
     cp.restore_object(String("saddle"), saddle2, false);
-    TEST_CHECK_EQUAL(saddle.block_a(), saddle2.block_a());
-    TEST_CHECK_EQUAL(saddle.block_b(), saddle2.block_b());
-    TEST_CHECK_EQUAL(saddle.block_d(), saddle2.block_d());
+    TEST_CHECK_LESS_THAN(saddle.block_a().max_rel_diff(saddle2.block_a()), eps);
+    TEST_CHECK_LESS_THAN(saddle.block_b().max_rel_diff(saddle2.block_b()), eps);
+    TEST_CHECK_LESS_THAN(saddle.block_d().max_rel_diff(saddle2.block_d()), eps);
     TEST_CHECK_NOT_EQUAL(cp.get_identifier_list().find("saddle"), std::string::npos);
   }
 };
@@ -377,6 +382,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     LAFEM::TupleDiagMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, LAFEM::SparseMatrixCSCR<DT_, IT_>> tuple1;
     LAFEM::PointstarFactoryFD<DT_, IT_> five_star(40,2);
     LAFEM::SparseMatrixCSR<DT_, IT_> star1 = five_star.matrix_csr();
@@ -396,8 +402,8 @@ public:
     cp.restore_object(String("tuple"), tuple2, false);
     LAFEM::SparseMatrixCSR<DT_, IT_> star_temp = tuple2.template at<0,0>().clone();
     LAFEM::SparseMatrixCSCR<DT_, IT_> star_temp2 = tuple2.template at<1,1>().clone();
-    TEST_CHECK_EQUAL(star1, star_temp);
-    TEST_CHECK_EQUAL(star2, star_temp2);
+    TEST_CHECK_LESS_THAN(star1.max_rel_diff(star_temp), eps);
+    TEST_CHECK_LESS_THAN(star2.max_rel_diff(star_temp2), eps);
     //Question: why does TEST_CHECK_EQUAL(tuple2.template at<0,0>(), tuple1.template at<0,0>()) not work?
     TEST_CHECK_NOT_EQUAL(cp.get_identifier_list().find("tuple"), std::string::npos);
   }
@@ -424,6 +430,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     typedef LAFEM::TupleMatrixRow<LAFEM::SparseMatrixCSR<DT_, IT_>,LAFEM::SparseMatrixCSCR<DT_, IT_>> tuprow;
     LAFEM::TupleMatrix<tuprow, tuprow> tuple1;
     LAFEM::PointstarFactoryFD<DT_, IT_> five_star(40,2);
@@ -451,10 +458,10 @@ public:
     LAFEM::SparseMatrixCSCR<DT_, IT_> star_temp2 = tuple2.template at<0,1>().clone();
     LAFEM::SparseMatrixCSR<DT_, IT_> star_temp3 = tuple2.template at<1,0>().clone();
     LAFEM::SparseMatrixCSCR<DT_, IT_> star_temp4 = tuple2.template at<1,1>().clone();
-    TEST_CHECK_EQUAL(star1, star_temp);
-    TEST_CHECK_EQUAL(star2, star_temp2);
-    TEST_CHECK_EQUAL(star3, star_temp3);
-    TEST_CHECK_EQUAL(star4, star_temp4);
+    TEST_CHECK_LESS_THAN(star1.max_rel_diff(star_temp), eps);
+    TEST_CHECK_LESS_THAN(star2.max_rel_diff(star_temp2), eps);
+    TEST_CHECK_LESS_THAN(star3.max_rel_diff(star_temp3), eps);
+    TEST_CHECK_LESS_THAN(star4.max_rel_diff(star_temp4), eps);
     TEST_CHECK_NOT_EQUAL(cp.get_identifier_list().find("tuple"), std::string::npos);
   }
 };
@@ -481,6 +488,7 @@ public:
   virtual void run() const override
   {
     //Does not function with sparse_vector, as Containertype is missing <-- should we add that?
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     LAFEM::TupleVector<LAFEM::DenseVector<DT_, IT_>, LAFEM::DenseVector<DT_, IT_>> tuple1;
     LAFEM::DenseVector<DT_, IT_> dv1(1234);
     for (Index i(0) ; i < dv1.size() ; ++i)
@@ -504,8 +512,8 @@ public:
     cp.restore_object(String("tuple"), tuple2, false);
     LAFEM::DenseVector<DT_, IT_> temp1 = tuple2.template at<0>().clone();
     LAFEM::DenseVector<DT_, IT_> temp2 = tuple2.template at<1>().clone();
-    TEST_CHECK_EQUAL(dv1, temp1);
-    TEST_CHECK_EQUAL(a, temp2);
+    TEST_CHECK_LESS_THAN(dv1.max_rel_diff(temp1), eps);
+    TEST_CHECK_LESS_THAN(a.max_rel_diff(temp2), eps);
     TEST_CHECK_NOT_EQUAL(cp.get_identifier_list().find("tuple"), std::string::npos);
 
   }

@@ -1130,6 +1130,25 @@ namespace FEAT
       }
 
       /**
+       * \brief Retrieve the maximum relative difference of this matrix and another one
+       * y.max_rel_diff(x) returns  \f$ \max_{0\leq i < n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \f$
+       *
+       * \return The largest relative difference.
+       */
+      DT_ max_rel_diff(const SparseMatrixBanded& x) const
+      {
+        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        TimeStamp ts_start;
+
+        DataType max_rel_diff = Arch::MaxRelDiff::value(this->val(), x.val(), this->used_elements());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return max_rel_diff;
+      }
+
+      /**
        * \brief Serialization of complete container entity.
        *
        * \param[in] config LAFEM::SerialConfig, a struct describing the serialize configuration.
@@ -1293,61 +1312,6 @@ namespace FEAT
           }
         }
         return ImageIterator(tnum_of_offsets, domain_node + 1 - trows, toffsets);
-      }
-
-
-      /**
-       * \brief SparseMatrixBanded comparison operator
-       *
-       * \param[in] a A matrix to compare with.
-       * \param[in] b A matrix to compare with.
-       */
-      friend bool operator== (const SparseMatrixBanded & a, const SparseMatrixBanded & b)
-      {
-        if (a.rows() != b.rows())
-          return false;
-        if (a.columns() != b.columns())
-          return false;
-        if (a.num_of_offsets() != b.num_of_offsets())
-          return false;
-        if (a.used_elements() != b.used_elements())
-          return false;
-
-        if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && a.get_indices().size() == 0 && b.get_elements().size() == 0 && b.get_indices().size() == 0)
-          return true;
-
-        IT_ * offsets_a;
-        IT_ * offsets_b;
-        DT_ * val_a;
-        DT_ * val_b;
-
-        offsets_a = const_cast<IT_*>(a.offsets());
-        val_a = const_cast<DT_*>(a.val());
-
-        offsets_b = const_cast<IT_*>(b.offsets());
-        val_b = const_cast<DT_*>(b.val());
-
-        bool ret(true);
-
-        for (Index i(0); i < a.num_of_offsets(); ++i)
-        {
-          if (offsets_a[i] != offsets_b[i])
-          {
-            ret = false;
-            break;
-          }
-        }
-
-        for (Index i(0) ; i < a.num_of_offsets() * a.rows() ; ++i)
-        {
-          if (val_a[i] != val_b[i])
-          {
-            ret = false;
-            break;
-          }
-        }
-
-        return ret;
       }
 
       /**

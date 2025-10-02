@@ -48,10 +48,9 @@ public:
 
   virtual void run() const override
   {
-    SparseMatrixCSR<DT_, IT_> zero1;
-    SparseMatrixCSR<DT_, IT_> zero2;
-    TEST_CHECK_EQUAL(zero1, zero2);
-    zero2.convert(zero1);
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    SparseMatrixCSR<DT_, IT_> zero;
+    TEST_CHECK(zero.empty());
 
     SparseMatrixCSR<DT_, IT_> zero3(10, 11, 12);
     TEST_CHECK_EQUAL(zero3.used_elements(), 12);
@@ -76,7 +75,7 @@ public:
     TEST_CHECK_EQUAL(empty5.rows(), empty5.rows());
     TEST_CHECK_EQUAL(empty5.columns(), empty5.columns());
     TEST_CHECK_EQUAL(empty5.used_elements(), empty5.used_elements());
-    empty5.convert(zero1);
+    empty5.convert(zero);
     TEST_CHECK_EQUAL(empty5.rows(), 0);
     TEST_CHECK_EQUAL(empty5.columns(), 0);
     TEST_CHECK_EQUAL(empty5.used_elements(), 0);
@@ -94,6 +93,7 @@ public:
     a.add(IT_(5), IT_(7), DT_(3));
     a.add(IT_(5), IT_(2), DT_(4));
     SparseMatrixCSR<DT_, IT_> b(a.make_csr());
+    TEST_CHECK(!b.empty());
     TEST_CHECK_EQUAL(b.used_elements(), a.used_elements());
     TEST_CHECK_EQUAL(b.size(), a.size());
     TEST_CHECK_EQUAL(b(1, 2), DT_(7));
@@ -165,23 +165,23 @@ public:
     DenseVector<DT_, IT_> val(c.used_elements(), c.val());
     DenseVector<IT_, IT_> row_ptr(c.rows() + 1, c.row_ptr());
     SparseMatrixCSR<DT_, IT_> d(c.rows(), c.columns(), col_ind, val, row_ptr);
-    TEST_CHECK_EQUAL(d, c);
+    TEST_CHECK_LESS_THAN(d.max_rel_diff(c), eps);
 
     SparseMatrixCSR<DT_, IT_> e;
     e.convert(c);
-    TEST_CHECK_EQUAL(e, c);
+    TEST_CHECK_LESS_THAN(e.max_rel_diff(c), eps);
     e.copy(c);
-    TEST_CHECK_EQUAL(e, c);
+    TEST_CHECK_LESS_THAN(e.max_rel_diff(c), eps);
     e.clone(c);
     b.clone(e);
-    TEST_CHECK_EQUAL(b, c);
+    TEST_CHECK_LESS_THAN(b.max_rel_diff(c), eps);
 
 
     // new clone testing
     auto clone1 = b.clone(CloneMode::Deep);
-    TEST_CHECK_EQUAL(clone1, b);
+    TEST_CHECK_LESS_THAN(clone1.max_rel_diff(b), eps);
     MemoryPool::set_memory(clone1.val() + 1, DT_(132));
-    TEST_CHECK_NOT_EQUAL(clone1, b);
+    TEST_CHECK_LESS_THAN(eps, clone1.max_rel_diff(b));
     TEST_CHECK_NOT_EQUAL((void*)clone1.val(), (void*)b.val());
     TEST_CHECK_NOT_EQUAL((void*)clone1.row_ptr(), (void*)b.row_ptr());
     auto clone2 = clone1.clone(CloneMode::Layout);
@@ -190,15 +190,15 @@ public:
     TEST_CHECK_NOT_EQUAL((void*)clone2.val(), (void*)clone1.val());
     TEST_CHECK_EQUAL((void*)clone2.row_ptr(), (void*)clone1.row_ptr());
     auto clone3 = clone1.clone(CloneMode::Weak);
-    TEST_CHECK_EQUAL(clone3, clone1);
+    TEST_CHECK_LESS_THAN(clone3.max_rel_diff(clone1), eps);
     MemoryPool::set_memory(clone3.val() + 1, DT_(133));
-    TEST_CHECK_NOT_EQUAL(clone3, clone1);
+    TEST_CHECK_LESS_THAN(eps, clone3.max_rel_diff(clone1));
     TEST_CHECK_NOT_EQUAL((void*)clone3.val(), (void*)clone1.val());
     TEST_CHECK_EQUAL((void*)clone3.row_ptr(), (void*)clone1.row_ptr());
     auto clone4 = clone1.clone(CloneMode::Shallow);
-    TEST_CHECK_EQUAL(clone4, clone1);
+    TEST_CHECK_LESS_THAN(clone4.max_rel_diff(clone1), eps);
     MemoryPool::set_memory(clone4.val() + 1, DT_(134));
-    TEST_CHECK_EQUAL(clone4, clone1);
+    TEST_CHECK_LESS_THAN(clone4.max_rel_diff(clone1), eps);
     TEST_CHECK_EQUAL((void*)clone4.val(), (void*)clone1.val());
     TEST_CHECK_EQUAL((void*)clone4.row_ptr(), (void*)clone1.row_ptr());
 
@@ -264,6 +264,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     SparseMatrixFactory<DT_, IT_> ffac(IT_(10), IT_(10));
     for (IT_ row(0); row < ffac.rows(); ++row)
     {
@@ -282,26 +283,26 @@ public:
     //TEST_CHECK_EQUAL(bs.tellg(), std::streampos(696));
     bs.seekg(0);
     SparseMatrixCSR<DT_, IT_> g(FileMode::fm_csr, bs);
-    TEST_CHECK_EQUAL(g, f);
+    TEST_CHECK_LESS_THAN(g.max_rel_diff(f), eps);
     //TEST_CHECK_EQUAL(bs.tellg(), std::streampos(696));
 
     std::stringstream ts;
     f.write_out(FileMode::fm_mtx, ts);
     SparseMatrixCSR<DT_, IT_> j(FileMode::fm_mtx, ts);
-    TEST_CHECK_EQUAL(j, f);
+    TEST_CHECK_LESS_THAN(j.max_rel_diff(f), eps);
 
     std::stringstream ts2;
     f.write_out(FileMode::fm_mtx, ts2, true);
     SparseMatrixCSR<DT_, IT_> j2(FileMode::fm_mtx, ts2);
-    TEST_CHECK_EQUAL(j2, f);
+    TEST_CHECK_LESS_THAN(j2.max_rel_diff(f), eps);
 
     auto kp = f.serialize(LAFEM::SerialConfig(false, false));
     SparseMatrixCSR<DT_, IT_> k(kp);
-    TEST_CHECK_EQUAL(k, f);
+    TEST_CHECK_LESS_THAN(k.max_rel_diff(f), eps);
 #ifdef FEAT_HAVE_ZLIB
     auto zl = f.serialize(LAFEM::SerialConfig(true, false));
     SparseMatrixCSR<DT_, IT_> zlib(zl);
-    TEST_CHECK_EQUAL(zlib, f);
+    TEST_CHECK_LESS_THAN(zlib.max_rel_diff(f), eps);
 #endif
 #ifdef FEAT_HAVE_ZFP
     auto zf = f.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
@@ -624,6 +625,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     for (Index size(2); size < Index(3e2); size *= 2)
     {
       DT_ s(DT_(4.321));
@@ -652,10 +654,10 @@ public:
       b.clone(a);
 
       b.scale(a, s);
-      TEST_CHECK_EQUAL(b, ref);
+      TEST_CHECK_LESS_THAN(b.max_rel_diff(ref), eps);
 
       a.scale(a, s);
-      TEST_CHECK_EQUAL(a, ref);
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref), eps);
     }
   }
 };
@@ -796,6 +798,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     for (Index size(2); size < Index(3e2); size *= 4)
     {
       SparseMatrixFactory<DT_, IT_> a_fac(IT_(size), IT_(size + 2));
@@ -828,7 +831,7 @@ public:
 
       b = b.transpose();
 
-      TEST_CHECK_EQUAL(a, b);
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(b), eps);
     }
   }
 };
@@ -874,6 +877,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     for (IT_ size(25); size < IT_(1e3); size *= IT_(2))
     {
       SparseMatrixFactory<DT_, IT_> a_fac(size, size);
@@ -930,7 +934,7 @@ public:
       auto perm_inv = perm.inverse();
       a.permute(perm_inv, perm);
       a.permute(perm, perm_inv);
-      TEST_CHECK_EQUAL(a, a_backup);
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(a_backup), eps);
     }
   }
 };
@@ -976,6 +980,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     for (IT_ size(2); size < IT_(3e2); size *= IT_(2))
     {
       SparseMatrixFactory<DT_, IT_> a_fac(size, size);
@@ -999,7 +1004,7 @@ public:
       }
 
       auto diag = a.extract_diag();
-      TEST_CHECK_EQUAL(diag, ref);
+      TEST_CHECK_LESS_THAN(diag.max_rel_diff(ref), eps);
     }
 
     SparseMatrixFactory<DT_, IT_> b_fac(16, 16);
@@ -1017,7 +1022,7 @@ public:
     ref(3, DT_(3.0));
     ref(7, DT_(7.0));
     auto diag = b.extract_diag();
-    TEST_CHECK_EQUAL(diag, ref);
+    TEST_CHECK_LESS_THAN(diag.max_rel_diff(ref), eps);
   }
 };
 
@@ -1062,6 +1067,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     for (Index size(2); size < Index(3e2); size *= 2)
     {
       DT_ s(DT_(4.321));
@@ -1101,11 +1107,11 @@ public:
       // r != x
       a.scale(a, s);
       a.axpy(b); /// \todo use axpby here
-      TEST_CHECK_EQUAL(a, ref);
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref), eps);
 
       // r == x
       b.axpy(b, s);
-      TEST_CHECK_EQUAL(b, ref2);
+      TEST_CHECK_LESS_THAN(b.max_rel_diff(ref2), eps);
     }
   }
 };

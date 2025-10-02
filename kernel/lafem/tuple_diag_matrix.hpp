@@ -662,18 +662,6 @@ namespace FEAT
         this->first().convert_reverse(other.first());
         this->rest().convert_reverse(other.rest());
       }
-
-      /**
-       * \brief TupleDiagMatrix comparison operator
-       *
-       * \param[in] a A matrix to compare with.
-       * \param[in] b A matrix to compare with.
-       *
-       */
-      friend bool operator== (const TupleDiagMatrix & a, const TupleDiagMatrix & b)
-      {
-        return (a.name() == b.name()) && (a.first() == b.first()) && (a.rest() == b.rest());
-      }
     };
 
     /// \cond internal
@@ -1003,17 +991,6 @@ namespace FEAT
       void convert_reverse(TupleDiagMatrix<First2_>& other) const
       {
         this->first().convert_reverse(other.first());
-      }
-
-      /**
-       * \brief TupleDiagMatrix comparison operator
-       *
-       * \param[in] a A matrix to compare with.
-       * \param[in] b A matrix to compare with.
-       */
-      friend bool operator== (const TupleDiagMatrix & a, const TupleDiagMatrix & b)
-      {
-        return (a.name() == b.name()) && (a.first() == b.first());
       }
     };
     /// \endcond

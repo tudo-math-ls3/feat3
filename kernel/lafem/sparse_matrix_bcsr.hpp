@@ -1355,7 +1355,6 @@ namespace FEAT
         TimeStamp ts_start;
 
         DataType max_rel_diff = Arch::MaxRelDiff::value(this->template val<Perspective::pod>(), x.template val<Perspective::pod>(), this->template used_elements<Perspective::pod>());
-        ASSERT(max_rel_diff < this->template used_elements<Perspective::pod>());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -2739,77 +2738,6 @@ namespace FEAT
             }
           }
         }
-      }
-
-      /**
-       * \brief SparseMatrixBCSR comparison operator
-       *
-       * \param[in] a A matrix to compare with.
-       * \param[in] b A matrix to compare with.
-       */
-      friend bool operator== (const SparseMatrixBCSR & a, const SparseMatrixBCSR & b)
-      {
-        if (a.rows() != b.rows())
-          return false;
-        if (a.columns() != b.columns())
-          return false;
-        if (a.used_elements() != b.used_elements())
-          return false;
-
-        if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && a.get_indices().size() == 0 && b.get_elements().size() == 0 && b.get_indices().size() == 0)
-          return true;
-
-        IT_ * col_ind_a;
-        IT_ * col_ind_b;
-        DT_ * val_a;
-        DT_ * val_b;
-        IT_ * row_ptr_a;
-        IT_ * row_ptr_b;
-
-        bool ret(true);
-
-        col_ind_a = const_cast<IT_*>(a.col_ind());
-        val_a = const_cast<DT_*>(a.template val<Perspective::pod>());
-        row_ptr_a = const_cast<IT_*>(a.row_ptr());
-
-        col_ind_b = const_cast<IT_*>(b.col_ind());
-        val_b = const_cast<DT_*>(b.template val<Perspective::pod>());
-        row_ptr_b = const_cast<IT_*>(b.row_ptr());
-
-        for (Index i(0) ; i < a.used_elements() ; ++i)
-        {
-          if (col_ind_a[i] != col_ind_b[i])
-          {
-            ret = false;
-            break;
-          }
-        }
-
-        if (ret)
-        {
-          for (Index i(0) ; i < a.template used_elements<Perspective::pod>() ; ++i)
-          {
-            if (val_a[i] != val_b[i])
-            {
-              ret = false;
-              break;
-            }
-          }
-        }
-
-        if (ret)
-        {
-          for (Index i(0) ; i < a.rows() + 1; ++i)
-          {
-            if (row_ptr_a[i] != row_ptr_b[i])
-            {
-              ret = false;
-              break;
-            }
-          }
-        }
-
-        return ret;
       }
 
       /**

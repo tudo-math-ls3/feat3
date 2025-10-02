@@ -395,6 +395,17 @@ namespace FEAT
         _container.apply_transposed(r, x, y, alpha);
       }
 
+      /**
+      * \brief Retrieve the maximum relative difference of this matrix and another one
+      * y.max_rel_diff(x) returns  \f$ \max_{0\leq i < n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \f$
+      *
+      * \return The largest relative difference.
+      */
+      DataType max_rel_diff(const PowerFullMatrix& x) const
+      {
+        return this->_container.max_rel_diff(x._container);
+      }
+
       template <typename SubType2_>
       void convert(const PowerFullMatrix<SubType2_, width_, height_> & other)
       {
@@ -423,17 +434,6 @@ namespace FEAT
       std::uint64_t set_checkpoint_data(std::vector<char>& data, SerialConfig& config)
       {
         return _container.set_checkpoint_data(data, config);
-      }
-
-      /**
-       * \brief PowerFullMatrix comparison operator
-       *
-       * \param[in] a A matrix to compare with.
-       * \param[in] b A matrix to compare with.
-       */
-      friend bool operator== (const PowerFullMatrix & a, const PowerFullMatrix & b)
-      {
-        return a._container == b._container;
       }
     }; // class PowerFullMatrix
 

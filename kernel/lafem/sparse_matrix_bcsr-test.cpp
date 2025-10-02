@@ -59,12 +59,11 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     test_vector_types();
 
-    SparseMatrixBCSR<DT_, IT_, 2, 3> zero1;
-    SparseMatrixBCSR<DT_, IT_, 2, 3> zero2;
-    TEST_CHECK_EQUAL(zero2, zero1);
-    zero2.convert(zero1);
+    SparseMatrixBCSR<DT_, IT_, 2, 3> zero;
+    TEST_CHECK(zero.empty());
 
     DenseVector<DT_, IT_> dv1(12);
     for (Index i(0) ; i < dv1.size() ; ++i)
@@ -78,6 +77,7 @@ public:
     dv3(2, IT_(2));
     SparseMatrixBCSR<DT_, IT_, 2, 3> c(2, 2, dv2, dv1, dv3);
 
+    TEST_CHECK(!c.empty());
     TEST_CHECK_EQUAL(c(1,0)(0,0), DT_(0));
     TEST_CHECK_EQUAL(c(1,1)(1,1), DT_(10+1)/DT_(7*10+1));
 
@@ -86,16 +86,16 @@ public:
     TEST_CHECK_EQUAL(d.rows(), c.rows());
     TEST_CHECK_EQUAL(d.columns(), c.columns());
     TEST_CHECK_EQUAL(d.used_elements(), c.used_elements());
-    TEST_CHECK_EQUAL(d, c);
+    TEST_CHECK_LESS_THAN(d.max_rel_diff(c), eps);
     TEST_CHECK_EQUAL((void*)d.template val<Perspective::pod>(), (void*)c.template val<Perspective::pod>());
     TEST_CHECK_EQUAL((void*)d.row_ptr(), (void*)c.row_ptr());
     SparseMatrixBCSR<DT_, IT_, 2, 3> e;
     e.clone(c);
-    TEST_CHECK_EQUAL(e, c);
+    TEST_CHECK_LESS_THAN(e.max_rel_diff(c), eps);
     TEST_CHECK_NOT_EQUAL((void*)e.template val<Perspective::pod>(), (void*)c.template val<Perspective::pod>());
     TEST_CHECK_EQUAL((void*)e.row_ptr(), (void*)c.row_ptr());
     e = c.clone(CloneMode::Deep);
-    TEST_CHECK_EQUAL(e, c);
+    TEST_CHECK_LESS_THAN(e.max_rel_diff(c), eps);
     TEST_CHECK_NOT_EQUAL((void*)e.template val<Perspective::pod>(), (void*)c.template val<Perspective::pod>());
     TEST_CHECK_NOT_EQUAL((void*)e.row_ptr(), (void*)c.row_ptr());
 
@@ -148,6 +148,7 @@ public:
   }
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     DenseVector<DT_, IT_> dv1(12);
     for (Index i(0) ; i < dv1.size() ; ++i)
       dv1(i, DT_(i+1)/DT_(7*i+1));
@@ -164,7 +165,7 @@ public:
     c.write_out(FileMode::fm_bcsr, bs);
     bs.seekg(0);
     SparseMatrixBCSR<DT_, IT_, 2, 3> g(FileMode::fm_bcsr, bs);
-    TEST_CHECK_EQUAL(g, c);
+    TEST_CHECK_LESS_THAN(g.max_rel_diff(c), eps);
 
     //std::stringstream ts;
     //f.write_out(FileMode::fm_mtx, ts);
@@ -178,12 +179,12 @@ public:
 
     auto kp = c.serialize(LAFEM::SerialConfig(false, false));
     SparseMatrixBCSR<DT_, IT_, 2, 3> k(kp);
-    TEST_CHECK_EQUAL(k, c);
+    TEST_CHECK_LESS_THAN(k.max_rel_diff(c), eps);
 
 #ifdef FEAT_HAVE_ZLIB
     auto zl = c.serialize(LAFEM::SerialConfig(true, false));
     SparseMatrixBCSR<DT_, IT_, 2, 3> zlib(zl);
-    TEST_CHECK_EQUAL(k, c);
+    TEST_CHECK_LESS_THAN(k.max_rel_diff(c), eps);
 #endif
 #ifdef FEAT_HAVE_ZFP
     auto zf = c.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
@@ -290,39 +291,39 @@ public:
 
     c.apply(r, x);
 
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply(rb, x);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply(r, xb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply(rb, xb);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     //defect
     DT_ alpha(-1);
     csr.apply(ref, x, y, alpha);
     c.apply(r, x, y, alpha);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply(rb, x, yb, alpha);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply(r, xb, y, alpha);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply(rb, xb, yb, alpha);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply(rb, xb, y, alpha);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     //axpy
     alpha = DT_(1.234);
@@ -442,39 +443,39 @@ public:
 
     c.apply_transposed(r, x);
 
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply_transposed(rb, x);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply_transposed(r, xb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply_transposed(rb, xb);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     //defect
     DT_ alpha(-1);
     csr.apply_transposed(ref, x, y, alpha);
     c.apply_transposed(r, x, y, alpha);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply_transposed(rb, x, yb, alpha);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply_transposed(r, xb, y, alpha);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply_transposed(rb, xb, yb, alpha);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply_transposed(rb, xb, y, alpha);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     //axpy
     alpha = DT_(1.234);
@@ -593,44 +594,44 @@ public:
     csr.apply(ref, x);
 
     c.apply(r, x);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply(rb, x);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply(r, xb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply(rb, xb);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     // defect
     DT_ alpha(-1);
     csr.apply(ref, x, y, alpha);
     c.apply(r, x, y, alpha);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     // &r == &y
     r.copy(y);
     c.apply(r, x, r, alpha);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply(rb, x, yb, alpha);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply(r, xb, y, alpha);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply(rb, xb, yb, alpha);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     c.apply(rb, xb, y, alpha);
     r.convert(rb);
-    TEST_CHECK_EQUAL(r, ref);
+    TEST_CHECK_LESS_THAN(r.max_rel_diff(ref), eps);
 
     // axpy
     alpha = DT_(1.234);
@@ -778,6 +779,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     DenseVector<DT_, IT_> dv1(12);
     for (Index i(0) ; i < dv1.size() ; ++i)
     {
@@ -803,11 +805,11 @@ public:
 
     c.scale(a, scal);
     result_csr.convert(c);
-    TEST_CHECK_EQUAL(result_csr, ref);
+    TEST_CHECK_LESS_THAN(result_csr.max_rel_diff(ref), eps);
 
     a.scale(a, scal);
     result_csr.convert(a);
-    TEST_CHECK_EQUAL(result_csr, ref);
+    TEST_CHECK_LESS_THAN(result_csr.max_rel_diff(ref), eps);
   }
 };
 SparseMatrixBCSRScaleTest <float, std::uint64_t> cpu_sm_bcsr_scale_test_float_uint64(PreferredBackend::generic);
@@ -1053,6 +1055,7 @@ public:
 
   virtual void run() const override
   {
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     DenseVector<DT_, IT_> dv1(12);
     for (Index i(0) ; i < dv1.size() ; ++i)
     {
@@ -1086,11 +1089,11 @@ public:
     // r != x
     a.scale(a, scal);
     a.axpy(b); /// \todo use axpby here
-    TEST_CHECK_EQUAL(a, ref);
+    TEST_CHECK_LESS_THAN(a.max_rel_diff(ref), eps);
 
     // r == x
     b.axpy(b, scal);
-    TEST_CHECK_EQUAL(b, ref2);
+    TEST_CHECK_LESS_THAN(b.max_rel_diff(ref2), eps);
   }
 };
 SparseMatrixBCSRAxpyTest <float, std::uint64_t> cpu_sm_bcsr_axpy_test_float_uint64(PreferredBackend::generic);
@@ -1187,7 +1190,7 @@ public:
     auto perm_inv = perm.inverse();
     a.permute(perm_inv, perm);
     a.permute(perm, perm_inv);
-    TEST_CHECK_EQUAL(a, a_backup);
+    TEST_CHECK_LESS_THAN(a.max_rel_diff(a_backup), eps);
   }
 };
 SparseMatrixBCSRPermuteTest <float, std::uint64_t> cpu_sm_bcsr_permute_test_float_uint64(PreferredBackend::generic);

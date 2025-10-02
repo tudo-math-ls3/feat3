@@ -40,9 +40,9 @@ public:
 
   virtual void run() const override
   {
-    SparseVector<DT_, IT_> zero1;
-    SparseVector<DT_, IT_> zero2;
-    TEST_CHECK_EQUAL(zero1, zero2);
+    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    SparseVector<DT_, IT_> zero;
+    TEST_CHECK(zero.empty());
 
     SparseVector<DT_, IT_> a(10);
     a(3, DT_(7));
@@ -50,6 +50,7 @@ public:
     a(6, DT_(1));
     a(5, DT_(6));
     a(6, DT_(8));
+    TEST_CHECK(!a.empty());
     TEST_CHECK_EQUAL(a.used_elements(), Index(3));
     TEST_CHECK_EQUAL(a(3), DT_(3));
     TEST_CHECK_EQUAL(a(2), DT_(0));
@@ -63,17 +64,17 @@ public:
     ap.permute(prm_rnd);
     prm_rnd = prm_rnd.inverse();
     ap.permute(prm_rnd);
-    TEST_CHECK_EQUAL(ap, a);
+    TEST_CHECK_LESS_THAN(ap.max_rel_diff(a), eps);
     TEST_CHECK_EQUAL(ap.used_elements(), Index(3));
 
     SparseVector<DT_, IT_> b;
     b.convert(a);
-    TEST_CHECK_EQUAL(a, b);
+    TEST_CHECK_LESS_THAN(a.max_rel_diff(b), eps);
     b(6, DT_(1));
-    TEST_CHECK_NOT_EQUAL(a, b);
+    TEST_CHECK_LESS_THAN(eps, a.max_rel_diff(b));
     b.clone(a);
     b(6, DT_(3));
-    TEST_CHECK_NOT_EQUAL(a, b);
+    TEST_CHECK_LESS_THAN(eps, a.max_rel_diff(b));
     TEST_CHECK_NOT_EQUAL((void*)a.elements(), (void*)b.elements());
     TEST_CHECK_NOT_EQUAL((void*)a.indices(), (void*)b.indices());
     b = a.clone();
@@ -86,9 +87,9 @@ public:
     d.clone(c);
     SparseVector<float, unsigned int> e;
     e.convert(a);
-    TEST_CHECK_EQUAL(d, e);
+    TEST_CHECK_LESS_THAN(d.max_rel_diff(e), float(eps));
     c(6, DT_(1));
-    TEST_CHECK_NOT_EQUAL(c, e);
+    TEST_CHECK_LESS_THAN(float(eps), c.max_rel_diff(e));
 
     a.format();
     TEST_CHECK_EQUAL(a.used_elements(), Index(3));
@@ -155,13 +156,13 @@ public:
     std::stringstream ts;
     a.write_out(FileMode::fm_mtx, ts);
     SparseVector<DT_, IT_> j(FileMode::fm_mtx, ts);
-    TEST_CHECK_EQUAL(j, a);
+    TEST_CHECK_LESS_THAN(j.max_rel_diff(a), eps);
 
     BinaryStream bs;
     a.write_out(FileMode::fm_sv, bs);
     bs.seekg(0);
     SparseVector<DT_, IT_> bin(FileMode::fm_sv, bs);
-    TEST_CHECK_EQUAL(bin, a);
+    TEST_CHECK_LESS_THAN(bin.max_rel_diff(a), eps);
 
     auto op = a.serialize(LAFEM::SerialConfig(false, false));
     SparseVector<DT_, IT_> o(op);
@@ -202,4 +203,76 @@ SparseVectorSerializeTest <float, std::uint32_t> cuda_sparse_vector_serialize_te
 SparseVectorSerializeTest <double, std::uint32_t> cuda_sparse_vector_serialize_test_double_uint32(PreferredBackend::cuda);
 SparseVectorSerializeTest <float, std::uint64_t> cuda_sparse_vector_serialize_test_float_uint64(PreferredBackend::cuda);
 SparseVectorSerializeTest <double, std::uint64_t> cuda_sparse_vector_serialize_test_double_uint64(PreferredBackend::cuda);
+#endif
+
+template<
+  typename DT_,
+  typename IT_>
+class SparseVectorMaxRelDiffTest
+  : public UnitTest
+{
+public:
+  SparseVectorMaxRelDiffTest(PreferredBackend backend)
+    : UnitTest("SparseVectorMaxRelDiffTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~SparseVectorMaxRelDiffTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ delta = DT_(123.5);
+    const DT_ initial_value = DT_(10.0);
+
+    const Index size = 100;
+    const Index diff_index = 42;
+
+    // reference vector b
+    SparseVector<DT_, IT_> b(size);
+
+    // b(42) = 10
+    b(diff_index, initial_value);
+
+    // copy b into a
+    SparseVector<DT_, IT_> a = b.clone();
+
+    // a(diff_index) = initial_value + delta
+    a(diff_index, delta + a(diff_index));
+
+    // reference value
+    const DT_ ref = delta / (DT_(2) * initial_value + delta);
+
+    // test ||a-b||_infty
+    const DT_ diff_1 = a.max_rel_diff(b);
+    TEST_CHECK_RELATIVE(diff_1, ref, eps);
+
+    // test ||b-a||_infty
+    const DT_ diff_2 = b.max_rel_diff(a);
+    TEST_CHECK_RELATIVE(diff_2, ref, eps);
+  }
+};
+SparseVectorMaxRelDiffTest <float, std::uint32_t> cpu_sparse_vector_max_rel_diff_test_float_uint32(PreferredBackend::generic);
+SparseVectorMaxRelDiffTest <double, std::uint32_t> cpu_sparse_vector_max_rel_diff_test_double_uint32(PreferredBackend::generic);
+SparseVectorMaxRelDiffTest <float, std::uint64_t> cpu_sparse_vector_max_rel_diff_test_float_uint64(PreferredBackend::generic);
+SparseVectorMaxRelDiffTest <double, std::uint64_t> cpu_sparse_vector_max_rel_diff_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseVectorMaxRelDiffTest <float, std::uint64_t> mkl_cpu_sparse_vector_max_rel_diff_test_float_uint64(PreferredBackend::mkl);
+SparseVectorMaxRelDiffTest <double, std::uint64_t> mkl_cpu_sparse_vector_max_rel_diff_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseVectorMaxRelDiffTest <__float128, std::uint64_t> cpu_sparse_vector_max_rel_diff_test_float128_uint64(PreferredBackend::generic);
+SparseVectorMaxRelDiffTest <__float128, std::uint32_t> cpu_sparse_vector_max_rel_diff_test_float128_uint32(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseVectorMaxRelDiffTest <Half, std::uint32_t> sparse_vector_max_rel_diff_test_half_uint32(PreferredBackend::generic);
+SparseVectorMaxRelDiffTest <Half, std::uint64_t> sparse_vector_max_rel_diff_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseVectorMaxRelDiffTest <float, std::uint32_t> cuda_sparse_vector_max_rel_diff_test_float_uint32(PreferredBackend::cuda);
+SparseVectorMaxRelDiffTest <double, std::uint32_t> cuda_sparse_vector_max_rel_diff_test_double_uint32(PreferredBackend::cuda);
+SparseVectorMaxRelDiffTest <float, std::uint64_t> cuda_sparse_vector_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
+SparseVectorMaxRelDiffTest <double, std::uint64_t> cuda_sparse_vector_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
 #endif

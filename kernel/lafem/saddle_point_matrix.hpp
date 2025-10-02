@@ -589,6 +589,20 @@ namespace FEAT
         block_b().apply_transposed(r_rest, x_first, y_rest, alpha);
       }
 
+      /**
+       * \brief Retrieve the maximum relative difference of this matrix and another one
+       * y.max_rel_diff(x) returns  \f$ \max_{0\leq i < n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \f$
+       *
+       * \return The largest relative difference.
+       */
+      DataType max_rel_diff(const SaddlePointMatrix& x) const
+      {
+        DataType max_rel_diff = Math::max(this->block_a().max_rel_diff(x.block_a()), this->block_b().max_rel_diff(x.block_b()));
+        max_rel_diff = Math::max(max_rel_diff, this->block_d().max_rel_diff(x.block_d()));
+
+        return max_rel_diff;
+      }
+
       /// Returns a new compatible L-Vector.
       VectorTypeL create_vector_l() const
       {
@@ -727,18 +741,6 @@ namespace FEAT
         this->block_a().convert_reverse(other.block_a());
         this->block_b().convert_reverse(other.block_b());
         this->block_d().convert_reverse(other.block_d());
-      }
-
-      /**
-       * \brief SaddlePointMatrix comparison operator
-       *
-       * \param[in] a A matrix to compare with.
-       * \param[in] b A matrix to compare with.
-       */
-      friend bool operator== (const SaddlePointMatrix & a, const SaddlePointMatrix & b)
-      {
-        return (a.name() == b.name()) && (a.block_a() == b.block_a())
-          && (a.block_b() == b.block_b()) && (a.block_d() == b.block_d());
       }
     }; // class SaddlePointMatrix<...>
 

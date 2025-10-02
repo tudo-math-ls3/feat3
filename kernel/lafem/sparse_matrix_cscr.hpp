@@ -955,6 +955,25 @@ namespace FEAT
       }
 
       /**
+       * \brief Retrieve the maximum relative difference of this matrix and another one
+       * y.max_rel_diff(x) returns  \f$ \max_{0\leq i < n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \f$
+       *
+       * \return The largest relative difference.
+       */
+      DT_ max_rel_diff(const SparseMatrixCSCR& x) const
+      {
+        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        TimeStamp ts_start;
+
+        DataType max_rel_diff = Arch::MaxRelDiff::value(this->val(), x.val(), this->used_elements());
+
+        TimeStamp ts_stop;
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+
+        return max_rel_diff;
+      }
+
+      /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
        * \param[out] r The vector that receives the result.
@@ -1133,84 +1152,6 @@ namespace FEAT
       }
 
       /// \endcond
-
-      /**
-       * \brief SparseMatrixCSCR comparison operator
-       *
-       * \param[in] a A matrix to compare with.
-       * \param[in] b A matrix to compare with.
-       */
-      friend bool operator== (const SparseMatrixCSCR & a, const SparseMatrixCSCR & b)
-      {
-        if (a.rows() != b.rows())
-          return false;
-        if (a.columns() != b.columns())
-          return false;
-        if (a.used_elements() != b.used_elements())
-          return false;
-        if (a.used_rows() != b.used_rows())
-          return false;
-
-        if(a.size() == 0 && b.size() == 0 && a.get_elements().size() == 0 && a.get_indices().size() == 0 && b.get_elements().size() == 0 && b.get_indices().size() == 0)
-          return true;
-
-        IT_ * col_ind_a;
-        IT_ * col_ind_b;
-        DT_ * val_a;
-        DT_ * val_b;
-        IT_ * row_ptr_a;
-        IT_ * row_ptr_b;
-        IT_ * row_numbers_a;
-        IT_ * row_numbers_b;
-
-        bool ret(true);
-
-        col_ind_a = const_cast<IT_*>(a.col_ind());
-        val_a = const_cast<DT_*>(a.val());
-        row_ptr_a = const_cast<IT_*>(a.row_ptr());
-        row_numbers_a = const_cast<IT_*>(a.row_numbers());
-        col_ind_b = const_cast<IT_*>(b.col_ind());
-        val_b = const_cast<DT_*>(b.val());
-        row_ptr_b = const_cast<IT_*>(b.row_ptr());
-        row_numbers_b = const_cast<IT_*>(b.row_numbers());
-        for (Index i(0) ; i < a.used_elements() ; ++i)
-        {
-          if (col_ind_a[i] != col_ind_b[i])
-          {
-            ret = false;
-            break;
-          }
-          if (val_a[i] != val_b[i])
-          {
-            ret = false;
-            break;
-          }
-        }
-        if (ret)
-        {
-          for (Index i(0) ; i < a.used_rows() + 1; ++i)
-          {
-            if (row_ptr_a[i] != row_ptr_b[i])
-            {
-              ret = false;
-              break;
-            }
-          }
-        }
-        if (ret)
-        {
-          for (Index i(0) ; i < a.used_rows(); ++i)
-          {
-            if (row_numbers_a[i] != row_numbers_b[i])
-            {
-              ret = false;
-              break;
-            }
-          }
-        }
-
-        return ret;
-      }
 
       /**
        * \brief SparseMatrixCSCR streaming operator

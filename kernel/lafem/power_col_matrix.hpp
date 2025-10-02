@@ -547,6 +547,19 @@ namespace FEAT
         rest().apply_transposed(r, x_rest, r, alpha);
       }
 
+      /**
+      * \brief Retrieve the maximum relative difference of this matrix and another one
+      * y.max_rel_diff(x) returns  \f$ \max_{0\leq i < n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \f$
+      *
+      * \return The largest relative difference.
+      */
+      template <typename SubType2_>
+      DataType max_rel_diff(const PowerColMatrix<SubType2_, blocks_>& x) const
+      {
+        DataType max_rel_diff = Math::max(this->first().max_rel_diff(x.first()), this->rest().max_rel_diff(x.rest()));
+        return max_rel_diff;
+      }
+
       /// Returns a new compatible L-Vector.
       VectorTypeL create_vector_l() const
       {
@@ -659,17 +672,6 @@ namespace FEAT
       {
         this->first().convert_reverse(other.first());
         this->rest().convert_reverse(other.rest());
-      }
-
-      /**
-       * \brief PowerColMatrix comparison operator
-       *
-       * \param[in] a A matrix to compare with.
-       * \param[in] b A matrix to compare with.
-       */
-      friend bool operator== (const PowerColMatrix & a, const PowerColMatrix & b)
-      {
-        return (a.name() == b.name()) && (a.first() == b.first()) && (a.rest() == b.rest());
       }
     };
 
@@ -958,6 +960,18 @@ namespace FEAT
         first().apply_transposed(r, x, y, alpha);
       }
 
+      /**
+      * \brief Retrieve the maximum relative difference of this matrix and another one
+      * y.max_rel_diff(x) returns  \f$ \max_{0\leq i < n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \f$
+      *
+      * \return The largest relative difference.
+      */
+      template <typename SubType2_>
+      DataType max_rel_diff(const PowerColMatrix<SubType2_, 1>& x) const
+      {
+        return this->first().max_rel_diff(x.first());
+      }
+
       /// Returns a new compatible L-Vector.
       VectorTypeL create_vector_l() const
       {
@@ -1023,17 +1037,6 @@ namespace FEAT
       void convert_reverse(PowerColMatrix<SubType2_, 1> & other) const
       {
         this->first().convert_reverse(other.first());
-      }
-
-      /**
-       * \brief PowerColMatrix comparison operator
-       *
-       * \param[in] a A matrix to compare with.
-       * \param[in] b A matrix to compare with.
-       */
-      friend bool operator== (const PowerColMatrix & a, const PowerColMatrix & b)
-      {
-        return (a.name() == b.name()) && (a.first() == b.first());
       }
     };
     /// \endcond

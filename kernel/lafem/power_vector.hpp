@@ -674,17 +674,6 @@ namespace FEAT
             XABORTM("Filemode not supported!");
         }
       }
-
-      /**
-       * \brief PowerVector comparison operator
-       *
-       * \param[in] a A vector to compare with.
-       * \param[in] b A vector to compare with.
-       */
-      friend bool operator== (const PowerVector & a, const PowerVector & b)
-      {
-        return (a.name() == b.name()) && (a.first() == b.first()) && (a.rest() == b.rest());
-      }
     }; // class PowerVector<...>
 
     /// \cond internal
@@ -1147,17 +1136,6 @@ namespace FEAT
         file.write(result.data(), long(result.size()));
 
         _write_out_binary(file);
-      }
-
-      /**
-       * \brief PowerVector comparison operator
-       *
-       * \param[in] a A vector to compare with.
-       * \param[in] b A vector to compare with.
-       */
-      friend bool operator== (const PowerVector & a, const PowerVector & b)
-      {
-        return (a.name() == b.name()) && (a.first() == b.first());
       }
     }; // class PowerVector<...,1>
 

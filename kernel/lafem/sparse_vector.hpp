@@ -579,7 +579,6 @@ namespace FEAT
 
         DataType max_rel_diff = Arch::MaxRelDiff::value(this->template elements<Perspective::pod>(),
           x.template elements<Perspective::pod>(), this->template used_elements<Perspective::pod>());
-        ASSERT(max_rel_diff < this->template used_elements<Perspective::pod>());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -922,28 +921,6 @@ namespace FEAT
         }
 
         // okay, arrays are identical
-        return true;
-      }
-
-      /**
-       * \brief SparseVector comparison operator
-       *
-       * \param[in] a A vector to compare with.
-       * \param[in] b A vector to compare with.
-       */
-      friend bool operator== (const SparseVector & a, const SparseVector & b)
-      {
-        if (a.size() != b.size())
-          return false;
-        if (a.get_elements().size() != b.get_elements().size())
-          return false;
-        if (a.get_indices().size() != b.get_indices().size())
-          return false;
-
-        for (Index i(0) ; i < a.size() ; ++i)
-          if (a(i) != b(i))
-            return false;
-
         return true;
       }
 
