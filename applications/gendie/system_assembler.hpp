@@ -75,7 +75,7 @@ namespace Gendie
     }
 
     template<typename LevelType_>
-    void _assemble_matrices_isotrop(std::deque<std::shared_ptr<LevelType_>>& system_levels) const
+    void _assemble_matrices_isotrop(std::deque<std::shared_ptr<LevelType_>>& DOXY(system_levels)) const
     {
       XABORTM("Specialization has to be assembled by base class");
     }
