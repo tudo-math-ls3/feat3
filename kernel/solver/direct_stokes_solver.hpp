@@ -781,7 +781,7 @@ namespace FEAT
           UnitFilterTypeV& old_filter = this->_unit_filters_v.at(fuc->at(0u)++);
 
           // compare layout of old and new filter
-          if(!old_filter.get_filter_vector().compare_layout(filter.get_filter_vector()))
+          if(!old_filter.get_filter_vector().same_layout(filter.get_filter_vector()))
             XABORTM("velocity unit filter layout has changed");
 
           // update the filter
@@ -803,7 +803,7 @@ namespace FEAT
           SlipFilterTypeV& old_filter = this->_slip_filters_v.at(fuc->at(1u)++);
 
           // compare layout of old and new filter
-          if(!old_filter.get_filter_vector().compare_layout(filter.get_filter_vector()))
+          if(!old_filter.get_filter_vector().same_layout(filter.get_filter_vector()))
             XABORTM("velocity slip filter layout has changed");
 
           // update the filter
@@ -863,7 +863,7 @@ namespace FEAT
           UnitFilterTypeP& old_filter = this->_unit_filters_p.at(fuc->at(2u)++);
 
           // compare layout of old and new filter
-          if(!old_filter.get_filter_vector().compare_layout(filter.get_filter_vector()))
+          if(!old_filter.get_filter_vector().same_layout(filter.get_filter_vector()))
             XABORTM("pressure unit filter layout has changed");
 
           // update the filter

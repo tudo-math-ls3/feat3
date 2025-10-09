@@ -1124,3 +1124,85 @@ DenseVectorMaxRelDiffTest <double, std::uint32_t> cuda_dv_max_rel_diff_test_doub
 DenseVectorMaxRelDiffTest <float,  std::uint64_t> cuda_dv_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
 DenseVectorMaxRelDiffTest <double, std::uint64_t> cuda_dv_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
 #endif
+
+template<
+  typename DT_,
+  typename IT_>
+class DenseVectorSameLayoutTest
+  : public UnitTest
+{
+public:
+  DenseVectorSameLayoutTest(PreferredBackend backend)
+    : UnitTest("DenseVectorSameLayoutTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~DenseVectorSameLayoutTest() {}
+
+  virtual void run() const override
+  {
+    for (Index size(2); size < Index(1e3); size *= 2)
+    {
+      const Index diff_elem = size / 2;
+
+      DenseVector<DT_, IT_> a(size);
+
+      // a = i
+      for (Index i(0); i < size; ++i)
+      {
+        a(i, DT_(i));
+      }
+
+      // weak copy
+      DenseVector<DT_, IT_> b = a.clone(CloneMode::Weak);
+      TEST_CHECK(a.same_layout(b));
+
+      // shallow copy
+      DenseVector<DT_, IT_> c = a.clone(CloneMode::Shallow);
+      TEST_CHECK(a.same_layout(c));
+
+      // change one element
+      c(diff_elem, DT_(0.5));
+      TEST_CHECK(a.same_layout(c));
+
+      // different sizes
+      DenseVector<DT_, IT_> d(size + 2, DT_(10));
+      DenseVector<DT_, IT_> e(size, DT_(10));
+      TEST_CHECK(!d.same_layout(e));
+
+      // one different element
+      DenseVector<DT_, IT_> f(size);
+      f(diff_elem, DT_(10));
+      DenseVector<DT_, IT_> g(size);
+      g(diff_elem, DT_(0.5));
+      TEST_CHECK(f.same_layout(g));
+    }
+  }
+};
+
+DenseVectorSameLayoutTest <float,  std::uint32_t> dv_same_layout_test_float_uint32(PreferredBackend::generic);
+DenseVectorSameLayoutTest <double, std::uint32_t> dv_same_layout_test_double_uint32(PreferredBackend::generic);
+DenseVectorSameLayoutTest <float,  std::uint64_t> dv_same_layout_test_float_uint64(PreferredBackend::generic);
+DenseVectorSameLayoutTest <double, std::uint64_t> dv_same_layout_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorSameLayoutTest <__float128, std::uint32_t> dv_same_layout_test_float128_uint32(PreferredBackend::generic);
+DenseVectorSameLayoutTest <__float128, std::uint64_t> dv_same_layout_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_MKL
+DenseVectorSameLayoutTest <float,  std::uint64_t> mkl_dv_same_layout_test_float_uint64(PreferredBackend::mkl);
+DenseVectorSameLayoutTest <double, std::uint64_t> mkl_dv_same_layout_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorSameLayoutTest <Half, std::uint32_t> dv_same_layout_test_half_uint32(PreferredBackend::generic);
+DenseVectorSameLayoutTest <Half, std::uint64_t> dv_same_layout_test_half_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseVectorSameLayoutTest <Half, std::uint32_t> cuda_dv_same_layout_test_half_uint32(PreferredBackend::cuda);
+DenseVectorSameLayoutTest <Half, std::uint64_t> cuda_dv_same_layout_test_half_uint64(PreferredBackend::cuda);
+#endif
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseVectorSameLayoutTest <float,  std::uint32_t> cuda_dv_same_layout_test_float_uint32(PreferredBackend::cuda);
+DenseVectorSameLayoutTest <double, std::uint32_t> cuda_dv_same_layout_test_double_uint32(PreferredBackend::cuda);
+DenseVectorSameLayoutTest <float,  std::uint64_t> cuda_dv_same_layout_test_float_uint64(PreferredBackend::cuda);
+DenseVectorSameLayoutTest <double, std::uint64_t> cuda_dv_same_layout_test_double_uint64(PreferredBackend::cuda);
+#endif

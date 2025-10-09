@@ -511,6 +511,19 @@ namespace FEAT
       }
 
       /**
+       * \brief Checks if the structural layout of this vector matches that of another vector.
+       * This excludes comparison of the actual data values.
+       *
+       * \param[in] x The vector to compare this vector to
+       *
+       * \returns true if the layouts match, false otherwise.
+       */
+      bool same_layout(const PowerVector& x) const
+      {
+        return (first().same_layout(x.first())) && (rest().same_layout(x.rest()));
+      }
+
+      /**
        * \brief Retrieve specific PowerVector element.
        *
        * \param[in] index The index of the vector element.

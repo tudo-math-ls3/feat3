@@ -1406,3 +1406,90 @@ DenseVectorBlockedMaxRelDiffTest <double, std::uint32_t, 2> cuda_dense_vector_bl
 DenseVectorBlockedMaxRelDiffTest <float, std::uint64_t, 3> cuda_dense_vector_blocked_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
 DenseVectorBlockedMaxRelDiffTest <double, std::uint64_t, 3> cuda_dense_vector_blocked_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
 #endif
+
+template<
+  typename DT_,
+  typename IT_,
+  int block_size_>
+class DenseVectorBlockedSameLayoutTest
+  : public UnitTest
+{
+public:
+  DenseVectorBlockedSameLayoutTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedSameLayoutTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~DenseVectorBlockedSameLayoutTest() {}
+
+  virtual void run() const override
+  {
+    for (Index size(2); size < Index(1e3); size *= 2)
+    {
+      const Index diff_elem = size / 2;
+
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+
+      // a = i
+      for (Index i(0); i < size; ++i)
+      {
+        Tiny::Vector<DT_, block_size_> tv;
+        for (int j = 0; j < block_size_; ++j)
+          tv[j] = DT_(i * block_size_ + j);
+        a(i, tv);
+      }
+
+      // weak copy
+      DenseVectorBlocked<DT_, IT_, block_size_> b = a.clone(CloneMode::Weak);
+      TEST_CHECK(a.same_layout(b));
+
+      // shallow copy
+      DenseVectorBlocked<DT_, IT_, block_size_> c = a.clone(CloneMode::Shallow);
+      TEST_CHECK(a.same_layout(c));
+
+      // change one element
+      Tiny::Vector<DT_, block_size_> diff1(DT_(0.5));
+      c(diff_elem, diff1);
+      TEST_CHECK(a.same_layout(c));
+
+      // different sizes
+      DenseVectorBlocked<DT_, IT_, block_size_> d(size + 2, DT_(10));
+      DenseVectorBlocked<DT_, IT_, block_size_> e(size, DT_(10));
+      TEST_CHECK(!d.same_layout(e));
+
+      // one different element
+      DenseVectorBlocked<DT_, IT_, block_size_> f(size);
+      Tiny::Vector<DT_, block_size_> diff2(DT_(10));
+      f(diff_elem, diff2);
+      DenseVectorBlocked<DT_, IT_, block_size_> g(size);
+      g(diff_elem, diff1);
+      TEST_CHECK(f.same_layout(g));
+    }
+  }
+};
+DenseVectorBlockedSameLayoutTest <float, std::uint32_t, 2> dense_vector_blocked_same_layout_test_float_uint32(PreferredBackend::generic);
+DenseVectorBlockedSameLayoutTest <double, std::uint32_t, 2> dense_vector_blocked_same_layout_test_double_uint32(PreferredBackend::generic);
+DenseVectorBlockedSameLayoutTest <float, std::uint64_t, 3> dense_vector_blocked_same_layout_test_float_uint64(PreferredBackend::generic);
+DenseVectorBlockedSameLayoutTest <double, std::uint64_t, 3> dense_vector_blocked_same_layout_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+DenseVectorBlockedSameLayoutTest <float, std::uint64_t, 2> mkl_dense_vector_blocked_same_layout_test_float_uint64(PreferredBackend::mkl);
+DenseVectorBlockedSameLayoutTest <double, std::uint64_t, 3> mkl_dense_vector_blocked_same_layout_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+DenseVectorBlockedSameLayoutTest <__float128, std::uint32_t, 2> dense_vector_blocked_same_layout_test_float128_uint32(PreferredBackend::generic);
+DenseVectorBlockedSameLayoutTest <__float128, std::uint64_t, 3> dense_vector_blocked_same_layout_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseVectorBlockedSameLayoutTest <Half, std::uint32_t, 2> dense_vector_blocked_same_layout_test_half_uint32(PreferredBackend::generic);
+DenseVectorBlockedSameLayoutTest <Half, std::uint64_t, 3> dense_vector_blocked_same_layout_test_half_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseVectorBlockedSameLayoutTest <Half, std::uint32_t, 2> cuda_dense_vector_blocked_same_layout_test_half_uint32(PreferredBackend::cuda);
+DenseVectorBlockedSameLayoutTest <Half, std::uint64_t, 3> cuda_dense_vector_blocked_same_layout_test_half_uint64(PreferredBackend::cuda);
+#endif
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseVectorBlockedSameLayoutTest <float, std::uint32_t, 2> cuda_dense_vector_blocked_same_layout_test_float_uint32(PreferredBackend::cuda);
+DenseVectorBlockedSameLayoutTest <double, std::uint32_t, 2> cuda_dense_vector_blocked_same_layout_test_double_uint32(PreferredBackend::cuda);
+DenseVectorBlockedSameLayoutTest <float, std::uint64_t, 3> cuda_dense_vector_blocked_same_layout_test_float_uint64(PreferredBackend::cuda);
+DenseVectorBlockedSameLayoutTest <double, std::uint64_t, 3> cuda_dense_vector_blocked_same_layout_test_double_uint64(PreferredBackend::cuda);
+#endif

@@ -586,6 +586,7 @@ namespace FEAT
         return max_rel_diff;
       }
 
+
       /**
        * \brief Deserialization of complete container entity.
        *
@@ -895,7 +896,7 @@ namespace FEAT
        * \returns
        * \c true, if both vectors have the same layout, otherwise \c false.
        */
-      bool compare_layout(const SparseVector& other) const
+      bool same_layout(const SparseVector& other) const
       {
         if(this->size() != other.size())
           return false;
@@ -907,7 +908,7 @@ namespace FEAT
           return true; // both vectors are empty
 
         const IT_* a = this->indices();
-        const IT_* b = this->indices();
+        const IT_* b = other.indices();
 
         // shallow copy? (aka same array)
         if(a == b)

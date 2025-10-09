@@ -974,6 +974,61 @@ namespace FEAT
       }
 
       /**
+       * \brief Checks if the structural layout of this matrix matches that of another matrix.
+       * This excludes comparison of the actual data values.
+       *
+       * \param[in] x The matrix to compare this matrix to
+       *
+       * \returns true if the layouts match, false otherwise.
+       */
+      bool same_layout(const SparseMatrixCSCR& x) const
+      {
+        if(this->size() == 0 && x.size() == 0 && this->get_elements().size() == 0 && this->get_indices().size() == 0 && x.get_elements().size() == 0 && x.get_indices().size() == 0)
+          return true;
+        if (this->rows() != x.rows())
+          return false;
+        if (this->columns() != x.columns())
+          return false;
+        if (this->used_elements() != x.used_elements())
+          return false;
+        if (this->used_rows() != x.used_rows())
+          return false;
+
+        IT_ * col_ind_a;
+        IT_ * col_ind_b;
+        IT_ * row_ptr_a;
+        IT_ * row_ptr_b;
+
+        bool ret(true);
+
+        col_ind_a = const_cast<IT_*>(this->col_ind());
+        row_ptr_a = const_cast<IT_*>(this->row_ptr());
+        col_ind_b = const_cast<IT_*>(x.col_ind());
+        row_ptr_b = const_cast<IT_*>(x.row_ptr());
+        for (Index i(0) ; i < this->used_elements() ; ++i)
+        {
+          if (col_ind_a[i] != col_ind_b[i])
+          {
+            ret = false;
+            break;
+          }
+        }
+        if (ret)
+        {
+          for (Index i(0) ; i < this->used_rows() + 1; ++i)
+          {
+            if (row_ptr_a[i] != row_ptr_b[i])
+            {
+              ret = false;
+              break;
+            }
+          }
+        }
+
+        return ret;
+      }
+
+      /**
        * \brief Calculate \f$ r \leftarrow this\cdot x \f$
        *
        * \param[out] r The vector that receives the result.

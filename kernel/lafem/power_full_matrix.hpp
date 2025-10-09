@@ -406,6 +406,19 @@ namespace FEAT
         return this->_container.max_rel_diff(x._container);
       }
 
+      /**
+       * \brief Checks if the structural layout of this matrix matches that of another matrix.
+       * This excludes comparison of the actual data values.
+       *
+       * \param[in] x The matrix to compare this matrix to
+       *
+       * \returns true if the layouts match, false otherwise.
+       */
+      bool same_layout(const PowerFullMatrix& x) const
+      {
+        return this->_container.same_layout(x._container);
+      }
+
       template <typename SubType2_>
       void convert(const PowerFullMatrix<SubType2_, width_, height_> & other)
       {

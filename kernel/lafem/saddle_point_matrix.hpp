@@ -603,6 +603,20 @@ namespace FEAT
         return max_rel_diff;
       }
 
+      /**
+       * \brief Checks if the structural layout of this matrix matches that of another matrix.
+       * This excludes comparison of the actual data values.
+       *
+       * \param[in] x The matrix to compare this matrix to
+       *
+       * \returns true if the layouts match, false otherwise.
+       */
+      bool same_layout(const SaddlePointMatrix& x) const
+      {
+        return (this->name() == x.name()) && (this->block_a().same_layout(x.block_a()))
+          && (this->block_b().same_layout(x.block_b())) && (this->block_d().same_layout(x.block_d()));
+      }
+
       /// Returns a new compatible L-Vector.
       VectorTypeL create_vector_l() const
       {

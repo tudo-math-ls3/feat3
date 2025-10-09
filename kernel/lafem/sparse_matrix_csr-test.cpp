@@ -1854,3 +1854,83 @@ SparseMatrixCSRMaxRelDiffTest <double, std::uint32_t> cuda_sm_csr_max_rel_diff_t
 SparseMatrixCSRMaxRelDiffTest <float,  std::uint64_t> cuda_sm_csr_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
 SparseMatrixCSRMaxRelDiffTest <double, std::uint64_t> cuda_sm_csr_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
 #endif
+
+template<
+  typename DT_,
+  typename IT_>
+class SparseMatrixCSRSameLayoutTest
+  : public UnitTest
+{
+public:
+  SparseMatrixCSRSameLayoutTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixCSRSameLayoutTest",
+               Type::Traits<DT_>::name(),
+               Type::Traits<IT_>::name(),
+               backend)
+  {
+  }
+
+  virtual ~SparseMatrixCSRSameLayoutTest() {}
+
+  virtual void run() const override
+  {
+    for (Index size(4); size < Index(128); size *= 2)
+    {
+      SparseMatrixFactory<DT_, IT_> fac_a(size, size);
+      for (IT_ i = 0; i < IT_(size); ++i)
+        fac_a.add(i, i, DT_(i));
+      SparseMatrixCSR<DT_, IT_> a(fac_a.make_csr());
+
+      // weak copy
+      auto b = a.clone(CloneMode::Weak);
+      TEST_CHECK(a.same_layout(b));
+
+      // shallow copy
+      auto c = a.clone(CloneMode::Shallow);
+      TEST_CHECK(a.same_layout(c));
+
+      // different values at same position
+      SparseMatrixFactory<DT_, IT_> fac_d(size, size);
+        for (IT_ i = 0; i < IT_(size); ++i)
+          fac_d.add(i, i , DT_(i + 1));
+      SparseMatrixCSR<DT_, IT_> d(fac_d.make_csr());
+      TEST_CHECK(a.same_layout(d));
+
+      // values at different position
+      SparseMatrixFactory<DT_, IT_> fac_e(size, size);
+        for (IT_ i = 0; i < IT_(size - 1); ++i)
+          fac_e.add(i + 1, i + 1, DT_(i));
+      SparseMatrixCSR<DT_, IT_> e(fac_e.make_csr());
+      TEST_CHECK(!a.same_layout(e));
+
+      // different sizes
+      SparseMatrixFactory<DT_, IT_> fac_f(size + 2, size + 2);
+        for (IT_ i = 0; i < IT_(size + 2); ++i)
+          fac_f.add(i, i, DT_(i));
+      SparseMatrixCSR<DT_, IT_> f(fac_f.make_csr());
+      TEST_CHECK(!a.same_layout(f));
+    }
+  }
+};
+SparseMatrixCSRSameLayoutTest <float,  std::uint32_t> sm_csr_same_layout_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSRSameLayoutTest <double, std::uint32_t> sm_csr_same_layout_test_double_uint32(PreferredBackend::generic);
+SparseMatrixCSRSameLayoutTest <float,  std::uint64_t> sm_csr_same_layout_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSRSameLayoutTest <double, std::uint64_t> sm_csr_same_layout_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixCSRSameLayoutTest <float,  std::uint64_t> mkl_sm_csr_same_layout_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSRSameLayoutTest <double, std::uint64_t> mkl_sm_csr_same_layout_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixCSRSameLayoutTest <__float128, std::uint32_t> sm_csr_same_layout_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixCSRSameLayoutTest <__float128, std::uint64_t> sm_csr_same_layout_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixCSRSameLayoutTest <Half, std::uint32_t> sm_csr_same_layout_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSRSameLayoutTest <Half, std::uint64_t> sm_csr_same_layout_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixCSRSameLayoutTest <float,  std::uint32_t> cuda_sm_csr_same_layout_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixCSRSameLayoutTest <double, std::uint32_t> cuda_sm_csr_same_layout_test_double_uint32(PreferredBackend::cuda);
+SparseMatrixCSRSameLayoutTest <float,  std::uint64_t> cuda_sm_csr_same_layout_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSRSameLayoutTest <double, std::uint64_t> cuda_sm_csr_same_layout_test_double_uint64(PreferredBackend::cuda);
+#endif

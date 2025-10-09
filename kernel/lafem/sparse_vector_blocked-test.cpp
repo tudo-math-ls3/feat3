@@ -207,7 +207,7 @@ public:
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     const DT_ delta = DT_(123.5);
     const DT_ initial_value = DT_(10.0);
-    static constexpr int block_size = 2;
+    const int block_size = 2;
 
     const Index size = 100;
     const Index diff_index = 42;
@@ -263,4 +263,83 @@ SparseVectorBlockedMaxRelDiffTest <float, std::uint32_t> cuda_sparse_vector_bloc
 SparseVectorBlockedMaxRelDiffTest <double, std::uint32_t> cuda_sparse_vector_blocked_max_rel_diff_test_double_uint32(PreferredBackend::cuda);
 SparseVectorBlockedMaxRelDiffTest <float, std::uint64_t> cuda_sparse_vector_blocked_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
 SparseVectorBlockedMaxRelDiffTest <double, std::uint64_t> cuda_sparse_vector_blocked_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
+#endif
+
+template<
+  typename DT_,
+  typename IT_>
+class SparseVectorBlockedSameLayoutTest
+  : public UnitTest
+{
+public:
+  SparseVectorBlockedSameLayoutTest(PreferredBackend backend)
+    : UnitTest("SparseVectorBlockedSameLayoutTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~SparseVectorBlockedSameLayoutTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    const int block_size = 2;
+    const Index size = 100;
+    const Index diff_index = 42;
+    const DT_ initial_value = DT_(10.0);
+
+    Tiny::Vector<DT_, block_size> initial_block(initial_value);
+    SparseVectorBlocked<DT_, IT_, block_size> a(size);
+    a(diff_index, initial_block);
+
+    // weak copy
+    SparseVectorBlocked<DT_, IT_, block_size> b = a.clone(CloneMode::Weak);
+    TEST_CHECK(a.same_layout(b));
+
+    // shallow copy
+    SparseVectorBlocked<DT_, IT_, block_size> c = a.clone(CloneMode::Shallow);
+    TEST_CHECK(a.same_layout(c));
+
+    // insert different value at same position
+    Tiny::Vector<DT_, block_size> initial_block_2(initial_value + DT_(1));
+    SparseVectorBlocked<DT_, IT_, block_size> d(size);
+    d(diff_index, initial_block_2);
+    TEST_CHECK(a.same_layout(d));
+
+    // insert same value at different position
+    d(diff_index + 1, initial_block);
+    TEST_CHECK(!a.same_layout(d));
+
+    // different sizes
+    SparseVectorBlocked<DT_, IT_, block_size> e(size + 2);
+    e(diff_index, initial_block_2);
+    TEST_CHECK(!a.same_layout(e));
+
+  }
+};
+SparseVectorBlockedSameLayoutTest <float, std::uint32_t> cpu_sparse_vector_blocked_same_layout_test_float_uint32(PreferredBackend::generic);
+SparseVectorBlockedSameLayoutTest <double, std::uint32_t> cpu_sparse_vector_blocked_same_layout_test_double_uint32(PreferredBackend::generic);
+SparseVectorBlockedSameLayoutTest <float, std::uint64_t> cpu_sparse_vector_blocked_same_layout_test_float_uint64(PreferredBackend::generic);
+SparseVectorBlockedSameLayoutTest <double, std::uint64_t> cpu_sparse_vector_blocked_same_layout_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseVectorBlockedSameLayoutTest <float, std::uint64_t> mkl_cpu_sparse_vector_blocked_same_layout_test_float_uint64(PreferredBackend::mkl);
+SparseVectorBlockedSameLayoutTest <double, std::uint64_t> mkl_cpu_sparse_vector_blocked_same_layout_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseVectorBlockedSameLayoutTest <__float128, std::uint64_t> cpu_sparse_vector_blocked_same_layout_test_float128_uint64(PreferredBackend::generic);
+SparseVectorBlockedSameLayoutTest <__float128, std::uint32_t> cpu_sparse_vector_blocked_same_layout_test_float128_uint32(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseVectorBlockedSameLayoutTest <Half, std::uint32_t> cpu_sparse_vector_blocked_same_layout_test_half_uint32(PreferredBackend::generic);
+SparseVectorBlockedSameLayoutTest <Half, std::uint64_t> cpu_sparse_vector_blocked_same_layout_test_half_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+SparseVectorBlockedSameLayoutTest <Half, std::uint32_t> cuda_sparse_vector_blocked_same_layout_test_half_uint32(PreferredBackend::cuda);
+SparseVectorBlockedSameLayoutTest <Half, std::uint64_t> cuda_sparse_vector_blocked_same_layout_test_half_uint64(PreferredBackend::cuda);
+#endif
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseVectorBlockedSameLayoutTest <float, std::uint32_t> cuda_sparse_vector_blocked_same_layout_test_float_uint32(PreferredBackend::cuda);
+SparseVectorBlockedSameLayoutTest <double, std::uint32_t> cuda_sparse_vector_blocked_same_layout_test_double_uint32(PreferredBackend::cuda);
+SparseVectorBlockedSameLayoutTest <float, std::uint64_t> cuda_sparse_vector_blocked_same_layout_test_float_uint64(PreferredBackend::cuda);
+SparseVectorBlockedSameLayoutTest <double, std::uint64_t> cuda_sparse_vector_blocked_same_layout_test_double_uint64(PreferredBackend::cuda);
 #endif

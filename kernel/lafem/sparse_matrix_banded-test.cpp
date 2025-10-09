@@ -626,6 +626,7 @@ SparseMatrixBandedAxpyTest <double, std::uint64_t> cuda_sparse_matrix_banded_axp
 SparseMatrixBandedAxpyTest <float, std::uint32_t> cuda_sparse_matrix_banded_axpy_test_float_uint32(PreferredBackend::cuda);
 SparseMatrixBandedAxpyTest <double, std::uint32_t> cuda_sparse_matrix_banded_axpy_test_double_uint32(PreferredBackend::cuda);
 #endif
+
 template<
   typename DT_,
   typename IT_>
@@ -712,4 +713,92 @@ SparseMatrixBandedMaxRelDiffTest <float, std::uint64_t> cuda_sparse_matrix_bande
 SparseMatrixBandedMaxRelDiffTest <double, std::uint64_t> cuda_sparse_matrix_banded_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
 SparseMatrixBandedMaxRelDiffTest <float, std::uint32_t> cuda_sparse_matrix_banded_max_rel_diff_test_float_uint32(PreferredBackend::cuda);
 SparseMatrixBandedMaxRelDiffTest <double, std::uint32_t> cuda_sparse_matrix_banded_max_rel_diff_test_double_uint32(PreferredBackend::cuda);
+#endif
+
+template<
+  typename DT_,
+  typename IT_>
+class SparseMatrixBandedSameLayoutTest
+  : public UnitTest
+{
+public:
+  SparseMatrixBandedSameLayoutTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBandedSameLayoutTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~SparseMatrixBandedSameLayoutTest()
+  {
+  }
+
+  typedef SparseMatrixBanded<DT_, IT_> MatrixType;
+
+  virtual void run() const override
+  {
+    const DT_ initial_value = DT_(10.0);
+    const Index rows = 50;
+    const Index columns = 50;
+    const Index num_of_offsets = 3;
+
+    DenseVector<IT_, IT_> vec_offsets(num_of_offsets);
+    vec_offsets(0, IT_(rows - 1));
+    vec_offsets(1, IT_(rows));
+    vec_offsets(2, IT_(rows + 1));
+
+    const Index vec_val_size = num_of_offsets * rows;
+    DenseVector<DT_, IT_> vec_val_a(vec_val_size, initial_value);
+
+    // create reference matrix a
+    MatrixType a(rows, columns, vec_val_a, vec_offsets);
+
+    // weak copy
+    auto b = a.clone(CloneMode::Weak);
+    TEST_CHECK(a.same_layout(b));
+
+    // shallow copy
+    auto c = a.clone(CloneMode::Shallow);
+    TEST_CHECK(a.same_layout(c));
+
+    // different values at same position
+    DenseVector<DT_, IT_> vec_val_d(vec_val_size, DT_(0.5));
+    MatrixType d(rows, columns, vec_val_d, vec_offsets);
+    TEST_CHECK(a.same_layout(d));
+
+    // values at different position
+    vec_offsets(0, IT_(rows + 1));
+    vec_offsets(1, IT_(rows + 2));
+    vec_offsets(2, IT_(rows + 3));
+    MatrixType e(rows, columns, vec_val_a, vec_offsets);
+    TEST_CHECK(!a.same_layout(e));
+
+    // different sizes
+    vec_offsets(0, IT_(rows - 1));
+    vec_offsets(1, IT_(rows));
+    vec_offsets(2, IT_(rows + 1));
+    DenseVector<DT_, IT_> vec_val_f(num_of_offsets * (rows - 2), initial_value);
+    MatrixType f(rows - 2, columns - 2, vec_val_f, vec_offsets);
+    TEST_CHECK(!a.same_layout(f));
+  }
+};
+SparseMatrixBandedSameLayoutTest <float, std::uint64_t> cpu_sparse_matrix_banded_same_layout_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBandedSameLayoutTest <double, std::uint64_t> cpu_sparse_matrix_banded_same_layout_test_double_uint64(PreferredBackend::generic);
+SparseMatrixBandedSameLayoutTest <float, std::uint32_t> cpu_sparse_matrix_banded_same_layout_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBandedSameLayoutTest <double, std::uint32_t> cpu_sparse_matrix_banded_same_layout_test_double_uint32(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBandedSameLayoutTest <float, std::uint64_t> mkl_cpu_sparse_matrix_banded_same_layout_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBandedSameLayoutTest <double, std::uint64_t> mkl_cpu_sparse_matrix_banded_same_layout_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBandedSameLayoutTest <__float128, std::uint64_t> cpu_sparse_matrix_banded_same_layout_test_float128_uint64(PreferredBackend::generic);
+SparseMatrixBandedSameLayoutTest <__float128, std::uint32_t> cpu_sparse_matrix_banded_same_layout_test_float128_uint32(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBandedSameLayoutTest <Half, std::uint32_t> cpu_sparse_matrix_banded_same_layout_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBandedSameLayoutTest <Half, std::uint64_t> cpu_sparse_matrix_banded_same_layout_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixBandedSameLayoutTest <float, std::uint64_t> cuda_sparse_matrix_banded_same_layout_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBandedSameLayoutTest <double, std::uint64_t> cuda_sparse_matrix_banded_same_layout_test_double_uint64(PreferredBackend::cuda);
+SparseMatrixBandedSameLayoutTest <float, std::uint32_t> cuda_sparse_matrix_banded_same_layout_test_float_uint32(PreferredBackend::cuda);
+SparseMatrixBandedSameLayoutTest <double, std::uint32_t> cuda_sparse_matrix_banded_same_layout_test_double_uint32(PreferredBackend::cuda);
 #endif

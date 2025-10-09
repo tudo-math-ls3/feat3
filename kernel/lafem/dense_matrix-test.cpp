@@ -1112,36 +1112,36 @@ public:
     const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
     const DT_ delta = DT_(123.5);
 
-    // Initialize matrices
-    const Index rows = 5;
-    const Index cols = 6;
-    const Index diff_row = 3;
-    const Index diff_col = 4;
-    const DT_ initial_value = DT_(10);
+    for (Index size(1); size < 100; size *= 2)
+    {
+      const Index diff_row = size / 2;
+      const Index diff_col = size - 1;
+      const DT_ initial_value = DT_(10);
 
-    // only initial value in a
-    DenseMatrix<DT_, IT_> a(rows, cols, initial_value);
+      // only initial value in a
+      DenseMatrix<DT_, IT_> a(size, size + 2, initial_value);
 
-    // copy a into b
-    DenseMatrix<DT_, IT_> b = a.clone();
+      // copy a into b
+      DenseMatrix<DT_, IT_> b = a.clone();
 
-    // delta_mat(diff_row, diff_col) = delta
-    DenseMatrix<DT_, IT_> delta_mat(rows, cols, DT_(0));
-    delta_mat(diff_row, diff_col, delta);
+      // delta_mat(diff_row, diff_col) = delta
+      DenseMatrix<DT_, IT_> delta_mat(size, size + 2, DT_(0));
+      delta_mat(diff_row, diff_col, delta);
 
-    // a = a + 1.0 * delta_mat
-    a.axpy(delta_mat, DT_(1.0));
+      // a = a + 1.0 * delta_mat
+      a.axpy(delta_mat, DT_(1.0));
 
-    // reference value
-    const DT_ ref = delta / (DT_(2) * initial_value + delta);
+      // reference value
+      const DT_ ref = delta / (DT_(2) * initial_value + delta);
 
-    // test ||a-b||_infty
-    const DT_ diff_1 = a.max_rel_diff(b);
-    TEST_CHECK_RELATIVE(diff_1, ref, eps);
+      // test ||a-b||_infty
+      const DT_ diff_1 = a.max_rel_diff(b);
+      TEST_CHECK_RELATIVE(diff_1, ref, eps);
 
-    // test ||b-a||_infty
-    const DT_ diff_2 = b.max_rel_diff(a);
-    TEST_CHECK_RELATIVE(diff_2, ref, eps);
+      // test ||b-a||_infty
+      const DT_ diff_2 = b.max_rel_diff(a);
+      TEST_CHECK_RELATIVE(diff_2, ref, eps);
+    }
   }
 };
 
@@ -1170,4 +1170,85 @@ DenseMatrixMaxRelDiffTest <float, std::uint32_t> cuda_dense_matrix_max_rel_diff_
 DenseMatrixMaxRelDiffTest <double, std::uint32_t> cuda_dense_matrix_max_rel_diff_test_double_uint32(PreferredBackend::cuda);
 DenseMatrixMaxRelDiffTest <float, std::uint64_t> cuda_dense_matrix_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
 DenseMatrixMaxRelDiffTest <double, std::uint64_t> cuda_dense_matrix_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
+#endif
+
+template<
+  typename DT_,
+  typename IT_>
+class DenseMatrixSameLayoutTest
+  : public UnitTest
+{
+public:
+  DenseMatrixSameLayoutTest(PreferredBackend backend)
+    : UnitTest("DenseMatrixSameLayoutTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~DenseMatrixSameLayoutTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    for (Index size(2); size < 100; size *= 2)
+    {
+      const Index diff_row = size / 2;
+      const Index diff_col = size - 1;
+      const DT_ initial_value = DT_(10);
+
+      // only initial value in a
+      DenseMatrix<DT_, IT_> a(size, size + 2, initial_value);
+
+      // weak copy
+      DenseMatrix<DT_, IT_> b = a.clone(CloneMode::Weak);
+      TEST_CHECK(a.same_layout(b));
+
+      // shallow copy
+      DenseMatrix<DT_, IT_> c = a.clone(CloneMode::Shallow);
+      TEST_CHECK(a.same_layout(c));
+
+      // change one element
+      c(diff_row, diff_col, DT_(0.5));
+      TEST_CHECK(a.same_layout(c));
+
+      // different sizes
+      DenseMatrix<DT_, IT_> d(size, size + 2, initial_value);
+      DenseMatrix<DT_, IT_> e(size, size, initial_value);
+      TEST_CHECK(!d.same_layout(e));
+
+      // one different element
+      DenseMatrix<DT_, IT_> f(size, size + 2);
+      f(diff_row, diff_col, initial_value);
+      DenseMatrix<DT_, IT_> g(size, size + 2);
+      g(diff_row, diff_col, DT_(0.5));
+      TEST_CHECK(f.same_layout(g));
+    }
+  }
+};
+
+DenseMatrixSameLayoutTest <float, std::uint32_t> dense_matrix_same_layout_test_float_uint32(PreferredBackend::generic);
+DenseMatrixSameLayoutTest <double, std::uint32_t> dense_matrix_same_layout_test_double_uint32(PreferredBackend::generic);
+DenseMatrixSameLayoutTest <float, std::uint64_t> dense_matrix_same_layout_test_float_uint64(PreferredBackend::generic);
+DenseMatrixSameLayoutTest <double, std::uint64_t> dense_matrix_same_layout_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+DenseMatrixSameLayoutTest <float, std::uint64_t> mkl_dense_matrix_same_layout_test_float_uint64(PreferredBackend::mkl);
+DenseMatrixSameLayoutTest <double, std::uint64_t> mkl_dense_matrix_same_layout_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+DenseMatrixSameLayoutTest <__float128, std::uint32_t> dense_matrix_same_layout_test_float128_uint32(PreferredBackend::generic);
+DenseMatrixSameLayoutTest <__float128, std::uint64_t> dense_matrix_same_layout_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+DenseMatrixSameLayoutTest <Half, std::uint32_t> dense_matrix_same_layout_test_half_uint32(PreferredBackend::generic);
+DenseMatrixSameLayoutTest <Half, std::uint64_t> dense_matrix_same_layout_test_half_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixSameLayoutTest <Half, std::uint32_t> cuda_dense_matrix_same_layout_test_half_uint32(PreferredBackend::cuda);
+DenseMatrixSameLayoutTest <Half, std::uint64_t> cuda_dense_matrix_same_layout_test_half_uint64(PreferredBackend::cuda);
+#endif
+#endif
+#ifdef FEAT_HAVE_CUDA
+DenseMatrixSameLayoutTest <float, std::uint32_t> cuda_dense_matrix_same_layout_test_float_uint32(PreferredBackend::cuda);
+DenseMatrixSameLayoutTest <double, std::uint32_t> cuda_dense_matrix_same_layout_test_double_uint32(PreferredBackend::cuda);
+DenseMatrixSameLayoutTest <float, std::uint64_t> cuda_dense_matrix_same_layout_test_float_uint64(PreferredBackend::cuda);
+DenseMatrixSameLayoutTest <double, std::uint64_t> cuda_dense_matrix_same_layout_test_double_uint64(PreferredBackend::cuda);
 #endif

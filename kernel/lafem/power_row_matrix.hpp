@@ -559,6 +559,19 @@ namespace FEAT
         return max_rel_diff;
       }
 
+      /**
+       * \brief Checks if the structural layout of this matrix matches that of another matrix.
+       * This excludes comparison of the actual data values.
+       *
+       * \param[in] x The matrix to compare this matrix to
+       *
+       * \returns true if the layouts match, false otherwise.
+       */
+      bool same_layout(const PowerRowMatrix& x) const
+      {
+        return (this->name() == x.name()) && (this->first().same_layout(x.first())) && (this->rest().same_layout(x.rest()));
+      }
+
       /// Returns a new compatible L-Vector.
       VectorTypeL create_vector_l() const
       {
@@ -948,6 +961,19 @@ namespace FEAT
       DataType max_rel_diff(const PowerRowMatrix& x) const
       {
         return this->first().max_rel_diff(x.first());
+      }
+
+      /**
+       * \brief Checks if the structural layout of this matrix matches that of another matrix.
+       * This excludes comparison of the actual data values.
+       *
+       * \param[in] x The matrix to compare this matrix to
+       *
+       * \returns true if the layouts match, false otherwise.
+       */
+      bool same_layout(const PowerRowMatrix& x) const
+      {
+        return (this->name() == x.name()) && (this->first().same_layout(x.first()));
       }
 
       /// Returns a new compatible L-Vector.

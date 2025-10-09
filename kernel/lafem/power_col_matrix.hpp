@@ -553,11 +553,23 @@ namespace FEAT
       *
       * \return The largest relative difference.
       */
-      template <typename SubType2_>
-      DataType max_rel_diff(const PowerColMatrix<SubType2_, blocks_>& x) const
+      DataType max_rel_diff(const PowerColMatrix& x) const
       {
         DataType max_rel_diff = Math::max(this->first().max_rel_diff(x.first()), this->rest().max_rel_diff(x.rest()));
         return max_rel_diff;
+      }
+
+      /**
+       * \brief Checks if the structural layout of this matrix matches that of another matrix.
+       * This excludes comparison of the actual data values.
+       *
+       * \param[in] x The matrix to compare this matrix to
+       *
+       * \returns true if the layouts match, false otherwise.
+       */
+      bool same_layout(const PowerColMatrix& x) const
+      {
+        return (this->name() == x.name()) && (this->first().same_layout(x.first())) && (this->rest().same_layout(x.rest()));
       }
 
       /// Returns a new compatible L-Vector.
@@ -966,8 +978,7 @@ namespace FEAT
       *
       * \return The largest relative difference.
       */
-      template <typename SubType2_>
-      DataType max_rel_diff(const PowerColMatrix<SubType2_, 1>& x) const
+      DataType max_rel_diff(const PowerColMatrix& x) const
       {
         return this->first().max_rel_diff(x.first());
       }
@@ -1037,6 +1048,19 @@ namespace FEAT
       void convert_reverse(PowerColMatrix<SubType2_, 1> & other) const
       {
         this->first().convert_reverse(other.first());
+      }
+
+      /**
+       * \brief Checks if the structural layout of this matrix matches that of another matrix.
+       * This excludes comparison of the actual data values.
+       *
+       * \param[in] x The matrix to compare this matrix to
+       *
+       * \returns true if the layouts match, false otherwise.
+       */
+      bool same_layout(const PowerColMatrix& x) const
+      {
+        return (this->name() == x.name()) && (this->first().same_layout(x.first()));
       }
     };
     /// \endcond

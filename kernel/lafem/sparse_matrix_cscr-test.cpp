@@ -544,3 +544,105 @@ SparseMatrixCSCRMaxRelDiffTest <Half, std::uint64_t> sm_cscr_max_rel_diff_test_h
 SparseMatrixCSCRMaxRelDiffTest <float, std::uint64_t> cuda_sm_cscr_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
 SparseMatrixCSCRMaxRelDiffTest <double, std::uint64_t> cuda_sm_cscr_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
 #endif
+
+template<
+  typename DT_,
+  typename IT_>
+class SparseMatrixCSCRSameLayoutTest
+  : public UnitTest
+{
+public:
+  SparseMatrixCSCRSameLayoutTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixCSCRSameLayoutTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~SparseMatrixCSCRSameLayoutTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    const Index size = 10;
+    const Index diff_row = 4;
+    const Index diff_col = 6;
+    const DT_ initial_value = DT_(10.0);
+
+    // ref matrix a
+    SparseMatrixFactory<DT_, IT_> fac_a(size, size);
+    fac_a.add(diff_row, diff_col, initial_value);
+
+    // convert to SparseMatrixCSCR
+    SparseMatrixCSR<DT_, IT_> a_csr(size, size);
+    a_csr.convert(fac_a.make_csr());
+    DenseVector<DT_, IT_> val_a(a_csr.used_elements(), a_csr.val());
+    DenseVector<IT_, IT_> col_ind_a(a_csr.used_elements(), a_csr.col_ind());
+    DenseVector<IT_, IT_> row_ptr_a(a_csr.rows() + 1, a_csr.row_ptr());
+    DenseVector<IT_, IT_> row_numbers_a(a_csr.rows());
+    SparseMatrixCSCR<DT_, IT_> a(a_csr.rows(), a_csr.columns(), col_ind_a, val_a, row_ptr_a, row_numbers_a);
+
+    // weak copy
+    auto b = a.clone(CloneMode::Weak);
+    TEST_CHECK(a.same_layout(b));
+
+    // shallow copy
+    auto c = a.clone(CloneMode::Shallow);
+    TEST_CHECK(a.same_layout(c));
+
+    // different values at same position
+    SparseMatrixFactory<DT_, IT_> fac_d(size, size);
+    fac_d.add(diff_row, diff_col, DT_(0.5));
+    SparseMatrixCSR<DT_, IT_> d_csr(size, size);
+    d_csr.convert(fac_d.make_csr());
+    DenseVector<DT_, IT_> val_d(d_csr.used_elements(), d_csr.val());
+    DenseVector<IT_, IT_> col_ind_d(d_csr.used_elements(), d_csr.col_ind());
+    DenseVector<IT_, IT_> row_ptr_d(d_csr.rows() + 1, d_csr.row_ptr());
+    DenseVector<IT_, IT_> row_numbers_d(d_csr.rows());
+    SparseMatrixCSCR<DT_, IT_> d(d_csr.rows(), d_csr.columns(), col_ind_d, val_d, row_ptr_d, row_numbers_d);
+    TEST_CHECK(a.same_layout(d));
+
+    // value at different position
+    SparseMatrixFactory<DT_, IT_> fac_e(size, size);
+    fac_e.add(diff_row + 1, diff_col, initial_value);
+    SparseMatrixCSR<DT_, IT_> e_csr(size, size);
+    e_csr.convert(fac_e.make_csr());
+    DenseVector<DT_, IT_> val_e(e_csr.used_elements(), e_csr.val());
+    DenseVector<IT_, IT_> col_ind_e(e_csr.used_elements(), e_csr.col_ind());
+    DenseVector<IT_, IT_> row_ptr_e(e_csr.rows() + 1, e_csr.row_ptr());
+    DenseVector<IT_, IT_> row_numbers_e(e_csr.rows());
+    SparseMatrixCSCR<DT_, IT_> e(e_csr.rows(), e_csr.columns(),col_ind_e, val_e, row_ptr_e, row_numbers_e);
+    TEST_CHECK(!a.same_layout(e));
+
+    // different sizes
+    SparseMatrixFactory<DT_, IT_> fac_f(size + 2, size);
+    fac_f.add(diff_row, diff_col, initial_value);
+    SparseMatrixCSR<DT_, IT_> f_csr(size + 2, size);
+    f_csr.convert(fac_f.make_csr());
+    DenseVector<DT_, IT_> val_f(f_csr.used_elements(), f_csr.val());
+    DenseVector<IT_, IT_> col_ind_f(f_csr.used_elements(), f_csr.col_ind());
+    DenseVector<IT_, IT_> row_ptr_f(f_csr.rows() + 1, f_csr.row_ptr());
+    DenseVector<IT_, IT_> row_numbers_f(f_csr.rows());
+    SparseMatrixCSCR<DT_, IT_> f(f_csr.rows(), f_csr.columns(), col_ind_f, val_f, row_ptr_f, row_numbers_f);
+    TEST_CHECK(!a.same_layout(f));
+  }
+};
+SparseMatrixCSCRSameLayoutTest <float, std::uint32_t> sm_cscr_same_layout_test_float_uint32(PreferredBackend::generic);
+SparseMatrixCSCRSameLayoutTest <double, std::uint32_t> sm_cscr_same_layout_test_double_uint32(PreferredBackend::generic);
+SparseMatrixCSCRSameLayoutTest <float, std::uint64_t> sm_cscr_same_layout_test_float_uint64(PreferredBackend::generic);
+SparseMatrixCSCRSameLayoutTest <double, std::uint64_t> sm_cscr_same_layout_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixCSCRSameLayoutTest <float, std::uint64_t> mkl_sm_cscr_same_layout_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixCSCRSameLayoutTest <double, std::uint64_t> mkl_sm_cscr_same_layout_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixCSCRSameLayoutTest <__float128, std::uint32_t> sm_cscr_same_layout_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixCSCRSameLayoutTest <__float128, std::uint64_t> sm_cscr_same_layout_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixCSCRSameLayoutTest <Half, std::uint32_t> sm_cscr_same_layout_test_half_uint32(PreferredBackend::generic);
+SparseMatrixCSCRSameLayoutTest <Half, std::uint64_t> sm_cscr_same_layout_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixCSCRSameLayoutTest <float, std::uint64_t> cuda_sm_cscr_same_layout_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixCSCRSameLayoutTest <double, std::uint64_t> cuda_sm_cscr_same_layout_test_double_uint64(PreferredBackend::cuda);
+#endif

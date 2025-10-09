@@ -662,6 +662,19 @@ namespace FEAT
         this->first().convert_reverse(other.first());
         this->rest().convert_reverse(other.rest());
       }
+
+      /**
+       * \brief Checks if the structural layout of this matrix matches that of another matrix.
+       * This excludes comparison of the actual data values.
+       *
+       * \param[in] x The matrix to compare this matrix to
+       *
+       * \returns true if the layouts match, false otherwise.
+       */
+      bool same_layout(const TupleDiagMatrix& x) const
+      {
+        return (this->name() == x.name()) && (this->first().same_layout(x.first())) && (this->rest().same_layout(x.rest()));
+      }
     };
 
     /// \cond internal
@@ -991,6 +1004,19 @@ namespace FEAT
       void convert_reverse(TupleDiagMatrix<First2_>& other) const
       {
         this->first().convert_reverse(other.first());
+      }
+
+      /**
+       * \brief Checks if the structural layout of this matrix matches that of another matrix.
+       * This excludes comparison of the actual data values.
+       *
+       * \param[in] x The matrix to compare this matrix to
+       *
+       * \returns true if the layouts match, false otherwise.
+       */
+      bool same_layout(const TupleDiagMatrix& x) const
+      {
+        return (this->name() == x.name()) && (this->first().same_layout(x.first()));
       }
     };
     /// \endcond

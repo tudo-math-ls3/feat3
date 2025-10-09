@@ -866,7 +866,7 @@ namespace FEAT
        * \returns
        * \c true, if both vectors have the same layout, otherwise \c false.
        */
-      bool compare_layout(const SparseVectorBlocked& other) const
+      bool same_layout(const SparseVectorBlocked& other) const
       {
         if(this->size() != other.size())
           return false;
@@ -878,7 +878,7 @@ namespace FEAT
           return true; // both vectors are empty
 
         const IT_* a = this->indices();
-        const IT_* b = this->indices();
+        const IT_* b = other.indices();
 
         // shallow copy? (aka same array)
         if(a == b)

@@ -1295,6 +1295,28 @@ namespace FEAT
         return max_rel_diff;
       }
 
+      /**
+       * \brief Checks if the structural layout of this vector matches that of another vector.
+       * This excludes comparison of the actual data values.
+       *
+       * \param[in] x The vector to compare this vector to
+       *
+       * \returns true if the layouts match, false otherwise.
+       */
+      bool same_layout(const DenseVectorBlocked& x) const
+      {
+        if (this->size() == 0 && x.size() == 0 && this->get_elements().size() == 0 && x.get_elements().size() == 0)
+          return true;
+        if (this->size() != x.size())
+          return false;
+        if (this->get_elements().size() != x.get_elements().size())
+          return false;
+        if (this->get_indices().size() != x.get_indices().size())
+          return false;
+
+        return true;
+      }
+
       ///@}
 
       /// Permutate vector according to the given Permutation

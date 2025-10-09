@@ -1599,3 +1599,94 @@ SparseMatrixBCSRMaxRelDiffTest <Half, std::uint64_t> sm_bcsr_max_rel_diff_test_h
 SparseMatrixBCSRMaxRelDiffTest <float, std::uint64_t> cuda_sm_bcsr_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
 SparseMatrixBCSRMaxRelDiffTest <double, std::uint64_t> cuda_sm_bcsr_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
 #endif
+
+template<
+  typename DT_,
+  typename IT_>
+class SparseMatrixBCSRSameLayoutTest
+  : public UnitTest
+{
+public:
+  SparseMatrixBCSRSameLayoutTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixBCSRSameLayoutTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual ~SparseMatrixBCSRSameLayoutTest()
+  {
+  }
+
+  virtual void run() const override
+  {
+    DenseVector<DT_, IT_> dv1(18);
+    for (Index i(0) ; i < dv1.size() ; ++i)
+    {
+      dv1(i, DT_(i));
+    }
+    DenseVector<IT_, IT_> dv2(2);
+    dv2(0, IT_(0));
+    dv2(1, IT_(1));
+    DenseVector<IT_, IT_> dv3(3);
+    dv3(0, IT_(0));
+    dv3(1, IT_(1));
+    dv3(2, IT_(2));
+    SparseMatrixBCSR<DT_, IT_, 3, 3> a(2, 2, dv2, dv1, dv3);
+
+    // weak copy
+    auto b = a.clone(CloneMode::Weak);
+    TEST_CHECK(a.same_layout(b));
+
+    // shallow copy
+    auto c = a.clone(CloneMode::Shallow);
+    TEST_CHECK(a.same_layout(c));
+
+    // different values at same position
+    DenseVector<DT_, IT_> dv4(18);
+    for (Index i(0) ; i < dv4.size() ; ++i)
+    {
+      dv4(i, DT_(i + 1));
+    }
+    SparseMatrixBCSR<DT_, IT_, 3, 3> d(2, 2, dv2, dv4, dv3);
+    TEST_CHECK(a.same_layout(d));
+
+    // values at different position
+    DenseVector<IT_, IT_> dv5(2);
+    dv5(0, IT_(1));
+    DenseVector<IT_, IT_> dv6(3);
+    dv6(0, IT_(0));
+    dv6(1, IT_(1));
+    dv6(2, IT_(1));
+    SparseMatrixBCSR<DT_, IT_, 3, 3> e(2, 2, dv5, dv1, dv6);
+    TEST_CHECK(!a.same_layout(e));
+
+    // different sizes
+    DenseVector<IT_, IT_> dv7(4);
+    dv7(0, IT_(0));
+    dv7(1, IT_(1));
+    dv7(2, IT_(2));
+    dv7(3, IT_(3));
+    SparseMatrixBCSR<DT_, IT_, 3, 3> f(3, 2, dv2, dv1, dv7);
+    TEST_CHECK(!a.same_layout(f));
+  }
+};
+
+SparseMatrixBCSRSameLayoutTest <float, std::uint32_t> sm_bcsr_same_layout_test_float_uint32(PreferredBackend::generic);
+SparseMatrixBCSRSameLayoutTest <double, std::uint32_t> sm_bcsr_same_layout_test_double_uint32(PreferredBackend::generic);
+SparseMatrixBCSRSameLayoutTest <float, std::uint64_t> sm_bcsr_same_layout_test_float_uint64(PreferredBackend::generic);
+SparseMatrixBCSRSameLayoutTest <double, std::uint64_t> sm_bcsr_same_layout_test_double_uint64(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SparseMatrixBCSRSameLayoutTest <float, std::uint64_t> mkl_sm_bcsr_same_layout_test_float_uint64(PreferredBackend::mkl);
+SparseMatrixBCSRSameLayoutTest <double, std::uint64_t> mkl_sm_bcsr_same_layout_test_double_uint64(PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SparseMatrixBCSRSameLayoutTest <__float128, std::uint32_t> sm_bcsr_same_layout_test_float128_uint32(PreferredBackend::generic);
+SparseMatrixBCSRSameLayoutTest <__float128, std::uint64_t> sm_bcsr_same_layout_test_float128_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SparseMatrixBCSRSameLayoutTest <Half, std::uint32_t> sm_bcsr_same_layout_test_half_uint32(PreferredBackend::generic);
+SparseMatrixBCSRSameLayoutTest <Half, std::uint64_t> sm_bcsr_same_layout_test_half_uint64(PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SparseMatrixBCSRSameLayoutTest <float, std::uint64_t> cuda_sm_bcsr_same_layout_test_float_uint64(PreferredBackend::cuda);
+SparseMatrixBCSRSameLayoutTest <double, std::uint64_t> cuda_sm_bcsr_same_layout_test_double_uint64(PreferredBackend::cuda);
+#endif

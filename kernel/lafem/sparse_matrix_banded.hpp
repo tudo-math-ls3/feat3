@@ -1149,6 +1149,47 @@ namespace FEAT
       }
 
       /**
+       * \brief Checks if the structural layout of this matrix matches that of another matrix.
+       * This excludes comparison of the actual data values.
+       *
+       * \param[in] x The matrix to compare this matrix to
+       *
+       * \returns true if the layouts match, false otherwise.
+       */
+      bool same_layout(const SparseMatrixBanded& x) const
+      {
+        if(this->size() == 0 && x.size() == 0 && this->get_elements().size() == 0 && this->get_indices().size() == 0 && x.get_elements().size() == 0 && x.get_indices().size() == 0)
+          return true;
+        if (this->rows() != x.rows())
+          return false;
+        if (this->columns() != x.columns())
+          return false;
+        if (this->num_of_offsets() != x.num_of_offsets())
+          return false;
+        if (this->used_elements() != x.used_elements())
+          return false;
+
+        IT_ * offsets_a;
+        IT_ * offsets_b;
+
+        offsets_a = const_cast<IT_*>(this->offsets());
+        offsets_b = const_cast<IT_*>(x.offsets());
+
+        bool ret(true);
+
+        for (Index i(0); i < this->num_of_offsets(); ++i)
+        {
+          if (offsets_a[i] != offsets_b[i])
+          {
+            ret = false;
+            break;
+          }
+        }
+
+        return ret;
+      }
+
+      /**
        * \brief Serialization of complete container entity.
        *
        * \param[in] config LAFEM::SerialConfig, a struct describing the serialize configuration.
