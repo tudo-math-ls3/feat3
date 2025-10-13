@@ -11,6 +11,7 @@
 #include <kernel/util/stop_watch.hpp>
 
 #include "format_helper.hpp"
+#include "kernel/assembly/burgers_assembly_job.hpp"
 
 #include <memory>
 
@@ -25,6 +26,7 @@ namespace Gendie
     typedef typename Domain_::WeightType SystemDataType;
     static constexpr int padlen = 30;
     static constexpr char pc = '.';
+    String _cubature = "gauss-legendre:5";
     mutable FEAT::StopWatch watch_total, watch_restrict, watch_restrict_alloc;
     DomainType* domain;
     SystemDataType stiffness_factor = SystemDataType(1);
@@ -147,6 +149,11 @@ namespace Gendie
       return FEAT::String{};
     }
 
+    void _set_cubature(const String& cubature)
+    {
+      _cubature = cubature;
+    }
+
     public:
 
     SystemFlowAssemblerBaseCRTP() = default;
@@ -252,6 +259,11 @@ namespace Gendie
     double get_total_time_elapsed() const
     {
       return this->watch_total.elapsed();
+    }
+
+    void set_cubature(const String& cubature)
+    {
+      this->cast()._set_cubature(cubature);
     }
 
   }; //class SystemFlowAssemblerBaseCRTP
@@ -414,7 +426,6 @@ namespace Gendie
 
     const Material<SystemDataType>* _material;
     mutable FEAT::StopWatch watch_assembly, watch_assembly_fine;
-    String _cubature = "gauss-legendre:5";
     SystemDataType _temperature;
     SystemDataType _mesh_scale;
     SystemDataType _weight_jacobian;
@@ -446,10 +457,181 @@ namespace Gendie
       _mesh_scale = mesh_scale;
     }
 
-    void set_cubature(const String& cubature)
+  }; //class CarrauSystemFlowAssembler<...>
+
+  /**
+   * \brief Standard Burgers Carreau assembler
+   *
+   */
+  template<typename Domain_>
+  class BurgersSystemFlowAssembler : public SystemFlowAssemblerBaseCRTP<BurgersSystemFlowAssembler<Domain_>, Domain_>
+  {
+  public:
+    typedef SystemFlowAssemblerBaseCRTP<BurgersSystemFlowAssembler, Domain_> BaseClass;
+    typedef typename BaseClass::DomainType DomainType;
+    typedef typename BaseClass::SystemDataType SystemDataType;
+    friend BaseClass;
+
+  protected:
+
+    bool _parse([[maybe_unused]] const FEAT::PropertyMap* prop)
     {
-      _cubature = cubature;
+
+      return true;
     }
 
-  }; //class CarrauSystemFlowAssembler<...>
+    void _init()
+    {
+    }
+
+    void _done()
+    {
+    }
+
+    void _set_jacobian(double weight)
+    {
+      _weight_jacobian = weight;
+    }
+
+    SystemDataType _calc_stiffness_factor() const
+    {
+      return nu;
+    }
+
+    /// always assume that matrix structure is preassambled
+    template<typename LevelType_, typename VecType_>
+    void _assemble_matrices(std::deque<std::shared_ptr<LevelType_>>& system_levels, const VecType_& vec_sol) const
+    {
+      typedef typename LevelType_::GlobalVeloVector ConvVecType;
+      typedef typename LevelType_::DataType AssemblyDataType;
+
+      // constexpr bool same_vecs = std::is_same_v<VecType_, ConvVecType>;
+      // assemble convections
+      std::vector<ConvVecType> conv_vecs;
+      conv_vecs.reserve(system_levels.size());
+      this->_fill_convections(system_levels, conv_vecs, vec_sol);
+      this->_restrict_convections(system_levels, conv_vecs);
+
+      this->watch_assembly.start();
+      for(std::size_t i = 0; i < system_levels.size(); ++i)
+      {
+        if(i == 0) this->watch_assembly_fine.start();
+        // setup
+        auto& cur_sys = *system_levels[i];
+        auto& cur_dom = *this->domain->at(i);
+        ASSERTM(!cur_sys.matrix_a.local().empty(), "A Matrix not allocated");
+        ASSERTM(!cur_sys.matrix_b.local().empty(), "B Matrix not allocated");
+        ASSERTM(!cur_sys.matrix_d.local().empty(), "D Matrix not allocated");
+        FEAT::Assembly::BurgersBlockedMatrixAssemblyJob burgers_mat_job(
+          cur_sys.matrix_a.local(), conv_vecs[i].local(), cur_dom.space_velo,
+          this->_cubature);
+        {
+          burgers_mat_job.deformation = deformation;
+          burgers_mat_job.nu = AssemblyDataType(nu);
+          burgers_mat_job.sd_delta = AssemblyDataType(0);
+          burgers_mat_job.sd_nu = AssemblyDataType(nu);
+          burgers_mat_job.beta = AssemblyDataType(beta);
+          burgers_mat_job.frechet_beta = AssemblyDataType(SystemDataType(burgers_mat_job.beta) * this->_weight_jacobian);
+          burgers_mat_job.theta = AssemblyDataType(theta);
+          burgers_mat_job.alpha = AssemblyDataType(SystemDataType(1) / this->stiffness_factor);
+        }
+
+        cur_sys.matrix_a.local().format();
+
+        // actual assembly
+        cur_dom.domain_asm.assemble(burgers_mat_job);
+        if(i == 0) this->watch_assembly_fine.stop();
+      }
+      this->watch_assembly.stop();
+    }
+
+    template<typename LevelType_>
+    void _assemble_matrices_isotrop(std::deque<std::shared_ptr<LevelType_>>& system_levels) const
+    {
+      typedef typename LevelType_::DataType AssemblyDataType;
+      this->watch_assembly.start();
+
+      for(std::size_t i = 0; i < system_levels.size(); ++i)
+      {
+        if(i == 0) this->watch_assembly_fine.start();
+        // setup
+        auto& cur_sys = *system_levels[i];
+        auto& cur_dom = *this->domain->at(i);
+        ASSERTM(!cur_sys.matrix_a.local().empty(), "A Matrix not allocated");
+        ASSERTM(!cur_sys.matrix_b.local().empty(), "B Matrix not allocated");
+        ASSERTM(!cur_sys.matrix_d.local().empty(), "D Matrix not allocated");
+        Assembly::Common::LaplaceOperatorBlocked<LevelType_::dim> laplace_op;
+
+        cur_sys.matrix_a.local().format();
+
+        // actual assembly
+        Assembly::assemble_bilinear_operator_matrix_1(cur_dom.domain_asm, cur_sys.matrix_a.local(), laplace_op, cur_dom.space_velo, this->_cubature,
+          nu * AssemblyDataType(SystemDataType(1) / this->stiffness_factor));
+        if(i == 0) this->watch_assembly_fine.stop();
+      }
+      this->watch_assembly.stop();
+    }
+
+    FEAT::String _format_timings() const
+    {
+      enum _TimeID
+      {
+        total = 0,
+        assembly = 1,
+        assembly_fine = 2,
+        restrict = 3,
+        restrict_alloc = 4,
+        num_entries = 5
+      };
+      FEAT::String s;
+      double timings_max[_TimeID::num_entries], timings_min[_TimeID::num_entries], timings[_TimeID::num_entries];
+      timings_min[_TimeID::total] = timings_max[_TimeID::total] = timings[_TimeID::total] = this->watch_total.elapsed();
+      timings_min[_TimeID::assembly] = timings_max[_TimeID::assembly] = timings[_TimeID::assembly] = this->watch_assembly.elapsed();
+      timings_min[_TimeID::assembly_fine] = timings_max[_TimeID::assembly_fine] = timings[_TimeID::assembly_fine] = this->watch_assembly_fine.elapsed();
+      timings_min[_TimeID::restrict] = timings_max[_TimeID::restrict] = timings[_TimeID::restrict] = this->watch_restrict.elapsed();
+      timings_min[_TimeID::restrict_alloc] = timings_max[_TimeID::restrict_alloc] = timings[_TimeID::restrict_alloc] = this->watch_restrict_alloc.elapsed();
+      // sync our timings
+      this->domain->comm().allreduce(timings_max, timings_max, _TimeID::num_entries, FEAT::Dist::op_max);
+      this->domain->comm().allreduce(timings_min, timings_min, _TimeID::num_entries, FEAT::Dist::op_min);
+
+      s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
+      s += FEAT::String("\n------------------------------------Timings Single Material System Assembler----------------------\n");
+      s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
+      s += format_subtime_mm("Allocate Restrictions", timings[_TimeID::restrict_alloc], timings[_TimeID::total], timings_min[_TimeID::restrict_alloc], timings_max[_TimeID::restrict_alloc], this->padlen);
+      s += format_subtime_mm("Restrict Convection", timings[_TimeID::restrict], timings[_TimeID::total], timings_min[_TimeID::restrict], timings_max[_TimeID::restrict], this->padlen);
+      s += format_subtime_mm("Assemble Systems", timings[_TimeID::assembly], timings[_TimeID::total], timings_min[_TimeID::assembly], timings_max[_TimeID::assembly], this->padlen);
+      s += format_subtime_mm("Assemble Fine System", timings[_TimeID::assembly_fine], timings[_TimeID::total], timings_min[_TimeID::assembly_fine], timings_max[_TimeID::assembly_fine], this->padlen);
+      s += format_subtime_mm("System Assembly Total Time", timings[_TimeID::total], timings[_TimeID::total], timings_min[_TimeID::total], timings_max[_TimeID::total], this->padlen);
+
+      return s;
+    }
+
+  public:
+    mutable FEAT::StopWatch watch_assembly, watch_assembly_fine;
+    SystemDataType nu, beta, theta, _weight_jacobian;
+    bool deformation;
+
+
+  public:
+    BurgersSystemFlowAssembler() = default;
+
+    BurgersSystemFlowAssembler(DomainType& domain_, const FEAT::PropertyMap* prop)
+      : BaseClass(domain_, prop),
+      nu(SystemDataType(1)),
+      beta(SystemDataType(0)),
+      theta(SystemDataType(0)),
+      _weight_jacobian(SystemDataType(0)),
+      deformation(false)
+    {
+      _parse(prop);
+    }
+
+    virtual ~BurgersSystemFlowAssembler() = default;
+
+    BurgersSystemFlowAssembler(const BurgersSystemFlowAssembler&) = default;
+    BurgersSystemFlowAssembler(BurgersSystemFlowAssembler&&) noexcept = default;
+    BurgersSystemFlowAssembler& operator=(const BurgersSystemFlowAssembler&) = default;
+    BurgersSystemFlowAssembler& operator=(BurgersSystemFlowAssembler&&) noexcept = default;
+
+  }; //class BurgersSystemFlowAssembler<...>
 }

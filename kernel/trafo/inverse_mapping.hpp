@@ -464,8 +464,7 @@ namespace FEAT
        */
       bool find_candidate_cells(std::vector<Index>& cells, const ImagePointType& img_point) const
       {
-        if(_bboxes.size() != _trafo.get_mesh().get_num_elements())
-          init_bounding_boxes(DataType(1E-2));
+        XASSERTM(_bboxes.size() == _trafo.get_mesh().get_num_elements(), "Boundingbox are not initilialized correctly");
         // loop over all cells/bounding boxes
         for(std::size_t cell(0); cell < _bboxes.size(); ++cell)
         {

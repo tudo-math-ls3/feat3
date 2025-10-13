@@ -25,11 +25,26 @@
 #include <control/scalar_basic.hpp>
 #include "scalexa_gendie_scalarize_helper.hpp"
 #include "format_helper.hpp"
+#include "template_helper.hpp"
+#include <kernel/adjacency/graph.hpp>
+#include <kernel/adjacency/coloring.hpp>
 
 #include <memory>
 
 namespace Gendie
 {
+  namespace Intern
+  {
+    template<typename DomainLevel_>
+    inline static FEAT::Adjacency::Coloring get_element_coloring(const DomainLevel_& dom)
+    {
+      // create coloring
+      const auto& verts_at_elem = dom.get_mesh().template get_index_set<DomainLevel_::MeshType::shape_dim, 0>();
+      FEAT::Adjacency::Graph elems_at_vert(FEAT::Adjacency::RenderType::transpose, verts_at_elem);
+      FEAT::Adjacency::Graph elems_at_elem(FEAT::Adjacency::RenderType::injectify, verts_at_elem, elems_at_vert);
+      return FEAT::Adjacency::Coloring(elems_at_elem);
+    }
+  }
   // CRTP interface for Flow System Assembler
   template<typename Derived_, typename SystemLevel_>
   class SteadyStokesFlowSolverBaseCRTP
@@ -346,26 +361,27 @@ namespace Gendie
     }
   }; // class SteadyFlowSolverBaseCRTP<...>
 
-  template<typename LevelType_>
-  class MultigridVankaFBMFlowSolver : public SteadyStokesFlowSolverBaseCRTP<MultigridVankaFBMFlowSolver<LevelType_>, LevelType_>
+  template<typename SystemMatrix_, typename SystemTransfer_, typename SystemFilter_>
+  class MultigridVankaComponent
   {
   public:
-    typedef SteadyStokesFlowSolverBaseCRTP<MultigridVankaFBMFlowSolver, LevelType_> BaseClass;
-    typedef typename BaseClass::SystemLevelType SystemLevelType;
-    typedef typename BaseClass::SystemLevels SystemLevels;
-    typedef typename BaseClass::DataType DataType;
-    typedef typename BaseClass::DefectVectorType DefectVectorType;
-    typedef typename BaseClass::VectorType VectorType;
 
-    friend BaseClass;
+    typedef SystemMatrix_ SystemMatrix;
+    typedef typename SystemMatrix_::LocalMatrixType LocalSystemMatrix;
+    typedef SystemTransfer_ SystemTransfer;
+    typedef SystemFilter_ SystemFilter;
+    typedef typename SystemFilter_::LocalFilterType LocalSystemFilter;
+    typedef typename SystemMatrix_::VectorTypeL DefectVectorType;
 
-    typedef typename SystemLevelType::GlobalSystemMatrix SystemMatrix;
-    typedef typename SystemLevelType::LocalSystemMatrix LocalSystemMatrix;
-    typedef typename SystemLevelType::GlobalSystemTransfer SystemTransfer;
-    typedef typename SystemLevelType::GlobalSystemFilter SystemFilter;
-    typedef typename SystemLevelType::LocalSystemFilter LocalSystemFilter;
+    typedef typename LocalSystemMatrix::DataType DataType;
+    typedef typename LocalSystemMatrix::IndexType IndexType;
 
-    static constexpr int dim = SystemLevelType::dim;
+    // static constexpr int dim = SystemLevelType::dim;
+    typedef std::shared_ptr<FEAT::Solver::SolverBase<DefectVectorType>> BaseSolver;
+    typedef std::shared_ptr<FEAT::Solver::IterativeSolver<DefectVectorType>> BaseIterativeSolver;
+
+    BaseSolver base_solver;
+    BaseIterativeSolver iter_solver;
 
     std::shared_ptr<FEAT::Solver::MultiGridHierarchy<SystemMatrix, SystemFilter, SystemTransfer>> multigrid_hierarchy;
     // hold a deque of the local vanka solvers
@@ -411,25 +427,17 @@ namespace Gendie
     FEAT::Index min_stag_iter;
     FEAT::PreferredBackend solver_backend;
     FEAT::Solver::MultiGridCycle cycle;
-    mutable FEAT::StopWatch watch_create_solver, watch_system_filter, watch_mg_hirarch, watch_vanka_symbolic_init, watch_vanka_numeric_init;
+    mutable FEAT::StopWatch watch_mg_hirarch;
     bool coarse_frosch;
     bool coarse_gmres;
     bool voxel_vanka;
     bool coarse_solver_info;
 
-  protected:
-    const Gendie::Logger* _logger;
-    bool _init_params;
+  public:
 
-    DefectVectorType _create_vector() const
-    {
-      return this->system_levels.front()->create_global_vector_sys();
-    }
-
-    bool _parse(const FEAT::PropertyMap* prop)
+    bool parse(const FEAT::PropertyMap* prop)
     {
       bool success = true;
-      success &= BaseClass::_parse(prop);
       if(prop == nullptr)
         return success;
 
@@ -671,7 +679,7 @@ namespace Gendie
     }
     #endif
 
-    void _clear_solver()
+    void clear_solver()
     {
       #ifdef FEAT_HAVE_TRILINOS
       this->frosch_precond.reset();
@@ -687,22 +695,24 @@ namespace Gendie
       this->smoother.clear();
     }
 
-    template<typename Domain_>
-    void _set_solver(const Domain_& domain)
+    template<typename Domain_, typename System_, template<typename> typename Container_>
+    void set_solver(const Container_<std::shared_ptr<System_>>& system_levels, const Domain_& domain)
     {
-      watch_create_solver.start();
-      XASSERTM(this->_init_params, "You have to initialize the system before calling this function");
-      XASSERTM(this->system_levels.size() > 0, "System levels not set");
-      this->_clear_solver();
-      const auto& matrix_sys = this->system_levels.front()->matrix_sys;
-      const auto& filter_sys = this->system_levels.front()->filter_sys;
+      // typedef System_ SystemLevelType;
+      // XASSERTM(this->_init_params, "You have to initialize the system before calling this function");
+      XASSERTM(system_levels.size() > 0, "System levels not set");
+      this->clear_solver();
+      const auto& matrix_sys = system_levels.front()->matrix_sys;
+      const auto& filter_sys = system_levels.front()->filter_sys;
+
+      domain_virtual_size = domain.size_virtual();
 
       // if we use frosch, initialize frosch params now
       #ifdef FEAT_HAVE_TRILINOS
-      if(coarse_frosch && (this->system_levels.size() == domain_virtual_size))
+      if(coarse_frosch && (system_levels.size() == domain_virtual_size))
       {
-        scalarize_helper = std::make_shared<Gendie::GendieScalarizeHelper<SystemLevelType, ScalarizedSystemLevelType>>();
-        scalarize_helper->create(*this->system_levels.back());
+        scalarize_helper = std::make_shared<Gendie::GendieScalarizeHelper<System_, ScalarizedSystemLevelType>>();
+        scalarize_helper->create(*system_levels.back());
         // create on same communicater our coarse level uses
         frosch_params = std::make_shared<FEAT::Solver::Trilinos::FROSchParameterList>(domain.back().layer().comm(), 3, FEAT::Solver::Trilinos::FROSchParameterList::SADDLEPOINT);
         // if(_logger) _logger->print("Parsing from " + frosch_xml, info);
@@ -722,7 +732,6 @@ namespace Gendie
         {
           auto backendt = FEAT::Backend::get_preferred_backend();
           FEAT::Backend::set_preferred_backend(solver_backend);
-          if(_logger) _logger->print("Only 1 level chosen; creating single grid solver: DirectStokesSolver", info);
           this->base_solver = FEAT::Solver::new_direct_stokes_solver(matrix_sys, filter_sys);
           FEAT::Backend::set_preferred_backend(backendt);
         }
@@ -734,7 +743,6 @@ namespace Gendie
         if(coarse_frosch)
 #endif
         {
-          if(_logger) _logger->print("Only 1 level chosen; creating single grid solver: FroschSolver", info);
           Index num_owned_pres_dofs = this->system_levels.front()->gate_pres.get_num_local_dofs();
           this->frosch_precond = FEAT::Solver::new_stokes_frosch(scalarize_helper->scalarized_level.matrix_sys,
             scalarize_helper->scalarized_level.filter_sys, num_owned_pres_dofs, *frosch_params);
@@ -755,16 +763,22 @@ namespace Gendie
           // solver_iterative->set_plot_mode(FEAT::Solver::PlotMode::summary);
           solver_iterative->set_plot_mode(coarse_solver_info ? FEAT::Solver::PlotMode::summary : FEAT::Solver::PlotMode::none);
 
-          this->base_solver = std::make_shared<Gendie::GendieScalarizeWrapper<SystemLevelType, ScalarizedSystemLevelType>>(*scalarize_helper, solver_iterative);
+          this->base_solver = std::make_shared<Gendie::GendieScalarizeWrapper<System_, ScalarizedSystemLevelType>>(*scalarize_helper, solver_iterative);
         }
         else
 #endif // FEAT_HAVE_TRILINOS
         {
-          if(_logger) _logger->print("Only 1 level chosen; creating single grid solver: FGMRES-AmaVanka");
           if(voxel_vanka)
-            this->vanka_solver.push_back(FEAT::Solver::new_voxel_amavanka(this->system_levels.front()->local_matrix_sys, filter_sys.local(), domain.front()->element_coloring));
+          {
+            if constexpr(Intern::supports_element_coloring<Domain_>)
+              this->vanka_solver.push_back(FEAT::Solver::new_voxel_amavanka(system_levels.front()->local_matrix_sys, filter_sys.local(), domain.front()->element_coloring));
+            else
+            {
+              this->vanka_solver.push_back(FEAT::Solver::new_voxel_amavanka(system_levels.front()->local_matrix_sys, filter_sys.local(), Intern::get_element_coloring(*domain.front())));
+            }
+          }
           else
-            this->vanka_solver.push_back(FEAT::Solver::new_amavanka(this->system_levels.front()->local_matrix_sys, filter_sys.local()));
+            this->vanka_solver.push_back(FEAT::Solver::new_amavanka(system_levels.front()->local_matrix_sys, filter_sys.local()));
           this->vanka_solver.front()->set_skip_singular(true);
           auto schwarz = FEAT::Solver::new_schwarz_precond(this->vanka_solver.front(), filter_sys);
           if(solve_gmres_dim > FEAT::Index(0)) // todo: is this smart?
@@ -786,16 +800,21 @@ namespace Gendie
       multigrid_hierarchy = std::make_shared<FEAT::Solver::MultiGridHierarchy<
                               SystemMatrix, SystemFilter, SystemTransfer>>(domain_virtual_size);
 
-      for(std::size_t i = 0; i < this->system_levels.size(); ++i)
+      for(std::size_t i = 0; i < system_levels.size(); ++i)
       {
-        auto& lvl = *this->system_levels.at(i);
+        auto& lvl = *system_levels.at(i);
 
         if((i+1) < domain_virtual_size)
         {
           // create Schwarz-AmaVanka
           std::shared_ptr<FEAT::Solver::AmaVanka<LocalSystemMatrix, LocalSystemFilter>> vanka(nullptr);
           if(voxel_vanka)
-            vanka = FEAT::Solver::new_voxel_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local(), domain.at(i)->element_coloring);
+          {
+            if constexpr(Intern::supports_element_coloring<Domain_>)
+              vanka = FEAT::Solver::new_voxel_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local(), domain.at(i)->element_coloring);
+            else
+              vanka = FEAT::Solver::new_voxel_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local(), Intern::get_element_coloring(*domain.at(i)));
+          }
           else
             vanka = FEAT::Solver::new_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local());
           vanka->set_skip_singular(true);
@@ -818,9 +837,8 @@ namespace Gendie
           this->vanka_solver.push_back(std::move(vanka));
         }
 #if defined(FEAT_HAVE_UMFPACK) || defined(FEAT_HAVE_CUDSS)
-        else if(!coarse_frosch && !coarse_gmres)
+        else if(!coarse_frosch && !coarse_gmres && (domain.at(i).layer().comm().size() == 1))
         {
-          if(_logger) _logger->print("Choose direct coarse solver", debug);
           auto backendt = FEAT::Backend::get_preferred_backend();
           FEAT::Backend::set_preferred_backend(solver_backend);
           // create UMFPACK coarse grid solver
@@ -832,7 +850,6 @@ namespace Gendie
 #ifdef FEAT_HAVE_TRILINOS
         else if(coarse_frosch)
         {
-          if(_logger) _logger->print("Chose coarse grid solver: FroschSolver", info);
           Index num_owned_pres_dofs = lvl.gate_pres.get_num_local_dofs();
           this->frosch_precond = Solver::new_stokes_frosch(scalarize_helper->scalarized_level.matrix_sys,
             scalarize_helper->scalarized_level.filter_sys, num_owned_pres_dofs, *frosch_params);
@@ -854,7 +871,7 @@ namespace Gendie
           solver_iterative->set_plot_mode(FEAT::Solver::PlotMode::summary);
           solver_iterative->set_plot_mode(coarse_solver_info ? FEAT::Solver::PlotMode::summary : FEAT::Solver::PlotMode::none);
 
-          this->coarse_solver = std::make_shared<Gendie::GendieScalarizeWrapper<SystemLevelType, ScalarizedSystemLevelType>>(*scalarize_helper, solver_iterative);
+          this->coarse_solver = std::make_shared<Gendie::GendieScalarizeWrapper<System_, ScalarizedSystemLevelType>>(*scalarize_helper, solver_iterative);
           this->multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, this->coarse_solver);
         }
 #endif
@@ -863,7 +880,12 @@ namespace Gendie
           // create FGMRES-AmaVanka coarse grid solver
           std::shared_ptr<FEAT::Solver::AmaVanka<LocalSystemMatrix, LocalSystemFilter>> vanka(nullptr);
           if(voxel_vanka)
-            vanka = FEAT::Solver::new_voxel_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local(), domain.at(i)->element_coloring);
+          {
+            if constexpr(Intern::supports_element_coloring<Domain_>)
+              vanka = FEAT::Solver::new_voxel_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local(), domain.at(i)->element_coloring);
+            else
+              vanka = FEAT::Solver::new_voxel_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local(), Intern::get_element_coloring(*domain.at(i)));
+          }
           else
             vanka = FEAT::Solver::new_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local());
           vanka->set_skip_singular(true);
@@ -904,123 +926,60 @@ namespace Gendie
         this->iter_solver->set_tol_rel(mg_tol_rel);
         this->iter_solver->set_min_stag_iter(min_stag_iter);
       }
-      watch_create_solver.stop();
     }
 
-    void _init_symbolic()
+    void init_symbolic()
     {
-      // in any case, we need to compile the local type1 matrix for our preconditioners
-      for(std::size_t i = 0; i < this->system_levels.size(); ++i)
-      {
-        auto& system = *this->system_levels.at(i);
-        system.compile_system_matrix();
-        system.compile_local_matrix();
-      }
       if(multigrid_hierarchy) multigrid_hierarchy->init_symbolic();
-      BaseClass::_init_symbolic();
     }
 
-    void _done_symbolic()
+    void done_symbolic()
     {
-      BaseClass::_done_symbolic();
       if(multigrid_hierarchy) multigrid_hierarchy->done_symbolic();
-      // free up type 1 matrix
-      for(std::size_t i = 0; i < this->system_levels.size(); ++i)
-      {
-        auto& system = *this->system_levels.at(i);
-        system.local_matrix_sys = typename SystemLevelType::LocalSystemMatrix();
-      }
-
     }
 
-    void _init_numeric()
+    void init_numeric()
     {
       // FEAT::PreferredBackend prev_backend = FEAT::Backend::get_preferred_backend();
       FEAT::Backend::set_preferred_backend(solver_backend);
-      // before the numeric initialization, we have to guarantee that our system is compiled
-      watch_system_filter.start();
-      for(std::size_t i = 0; i < this->system_levels.size(); ++i)
-      {
-        auto& system = *this->system_levels.at(i);
-        // this solver always assumes fbm
-        system.filter_interface_fbm.filter_weak_matrix_rows(system.matrix_a.local(), system.velo_mass_matrix.local());
-        system.compile_system_matrix();
-        system.compile_local_matrix();
-      }
-      watch_system_filter.stop();
       watch_mg_hirarch.start();
       if(multigrid_hierarchy) multigrid_hierarchy->init_numeric();
       watch_mg_hirarch.stop();
-      BaseClass::_init_numeric();
-      // FEAT::Backend::set_preferred_backend(prev_backend);
     }
 
-    void _done_numeric()
+    void done_numeric()
     {
       // FEAT::PreferredBackend prev_backend = FEAT::Backend::get_preferred_backend();
       FEAT::Backend::set_preferred_backend(solver_backend);
-      BaseClass::_done_numeric();
       watch_mg_hirarch.start();
       if(multigrid_hierarchy) multigrid_hierarchy->done_numeric();
       watch_mg_hirarch.stop();
       // FEAT::Backend::set_preferred_backend(prev_backend);
     }
 
-    FEAT::Solver::Status _apply(DefectVectorType& vec_cor, const DefectVectorType& vec_def) const
-    {
-      // FEAT::PreferredBackend prev_backend = FEAT::Backend::get_preferred_backend();
-
-      FEAT::Backend::set_preferred_backend(solver_backend);
-      // todo: explicitly transfer vec_cor and vec_def memory to our device memory?
-      FEAT::Solver::Status status = BaseClass::_apply(vec_cor, vec_def);
-      // FEAT::Backend::set_preferred_backend(prev_backend);
-      return status;
-    }
-
-    FEAT::String _format_timings() const
+    FEAT::String format_timings(const FEAT::Dist::Comm& comm, double total_time, unsigned long long padlen) const
     {
       enum _TimeID
       {
-        total = 0,
-        solver_apply = 1,
-        symbolic_init = 2,
-        create_solver = 3,
-        numeric_init = 4,
-        system_filter = 5,
-        mg_hirarch = 6,
-        vanka_symbolic_init = 7,
-        vanka_numeric_init = 8,
-        num_entries = 9
+        mg_hirarch = 0,
+        vanka_symbolic_init = 1,
+        vanka_numeric_init = 2,
+        num_entries = 3
       };
       FEAT::String s;
       double timings_max[_TimeID::num_entries], timings_min[_TimeID::num_entries], timings[_TimeID::num_entries];
-      timings_min[_TimeID::total] = timings_max[_TimeID::total] = timings[_TimeID::total] = this->watch_total.elapsed();
-      timings_min[_TimeID::solver_apply] = timings_max[_TimeID::solver_apply] = timings[_TimeID::solver_apply] = this->watch_apply.elapsed();
-      timings_min[_TimeID::symbolic_init] = timings_max[_TimeID::symbolic_init] = timings[_TimeID::symbolic_init] = this->watch_init_symbolic.elapsed();
-      timings_min[_TimeID::create_solver] = timings_max[_TimeID::create_solver] = timings[_TimeID::create_solver] = watch_create_solver.elapsed();
-      timings_min[_TimeID::numeric_init] = timings_max[_TimeID::numeric_init] = timings[_TimeID::numeric_init] = this->watch_init_numeric.elapsed();
-      timings_min[_TimeID::system_filter] = timings_max[_TimeID::system_filter] = timings[_TimeID::system_filter] = watch_system_filter.elapsed();
-      timings_min[_TimeID::mg_hirarch] = timings_max[_TimeID::mg_hirarch] = timings[_TimeID::mg_hirarch] = watch_mg_hirarch.elapsed();
+      timings_min[_TimeID::mg_hirarch] = timings_max[_TimeID::mg_hirarch] = timings[_TimeID::mg_hirarch] = this->watch_mg_hirarch.elapsed();
       timings_min[_TimeID::vanka_symbolic_init] = timings_max[_TimeID::vanka_symbolic_init] = timings[_TimeID::vanka_symbolic_init] = std::accumulate(this->vanka_solver.begin(), this->vanka_solver.end(), double(0),
                               [](double t, const auto& van){return t + van->time_init_symbolic();});
       timings_min[_TimeID::vanka_numeric_init] = timings_max[_TimeID::vanka_numeric_init] = timings[_TimeID::vanka_numeric_init] = std::accumulate(this->vanka_solver.begin(), this->vanka_solver.end(), double(0),
                               [](double t, const auto& van){return t + van->time_init_numeric();});
       // sync our timings
-      _logger->comm.allreduce(timings_max, timings_max, _TimeID::num_entries, FEAT::Dist::op_max);
-      _logger->comm.allreduce(timings_min, timings_min, _TimeID::num_entries, FEAT::Dist::op_min);
+      comm.allreduce(timings_max, timings_max, _TimeID::num_entries, FEAT::Dist::op_max);
+      comm.allreduce(timings_min, timings_min, _TimeID::num_entries, FEAT::Dist::op_min);
 
-      s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
-      s += FEAT::String("\n------------------------------------Timings MG Vanka Solver---------------------------------------\n");
-      s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
-      s += format_subtime_mm("Create MG Hirarch", timings[_TimeID::mg_hirarch], timings[_TimeID::total], timings_min[_TimeID::mg_hirarch], timings_max[_TimeID::mg_hirarch], this->padlen);
-      s += format_subtime_mm("Filter Local System", timings[_TimeID::system_filter], timings[_TimeID::total], timings_min[_TimeID::system_filter], timings_max[_TimeID::system_filter], this->padlen);
-      s += format_subtime_mm("Create Solver", timings[_TimeID::create_solver], timings[_TimeID::total], timings_min[_TimeID::create_solver], timings_max[_TimeID::create_solver], this->padlen);
-      s += format_subtime_mm("Symbolic Init", timings[_TimeID::symbolic_init], timings[_TimeID::total], timings_min[_TimeID::symbolic_init], timings_max[_TimeID::symbolic_init], this->padlen);
-      s += format_subtime_mm("Vanka Symbolic Init", timings[_TimeID::vanka_symbolic_init], timings[_TimeID::total], timings_min[_TimeID::vanka_symbolic_init], timings_max[_TimeID::vanka_symbolic_init], this->padlen);
-      s += format_subtime_mm("Numeric Init", timings[_TimeID::numeric_init], timings[_TimeID::total], timings_min[_TimeID::numeric_init], timings_max[_TimeID::numeric_init], this->padlen);
-      s += format_subtime_mm("Vanka Numeric Init", timings[_TimeID::vanka_numeric_init], timings[_TimeID::total], timings_min[_TimeID::vanka_numeric_init], timings_max[_TimeID::vanka_numeric_init], this->padlen);
-      s += format_subtime_mm("Apply Linear Solver", timings[_TimeID::solver_apply], timings[_TimeID::total], timings_min[_TimeID::solver_apply], timings_max[_TimeID::solver_apply], this->padlen);
-      s += format_subtime_mm("Linear Solver Total Time", timings[_TimeID::total], timings[_TimeID::total], timings_min[_TimeID::total], timings_max[_TimeID::total], this->padlen);
+      s += format_subtime_mm("Create MG Hirarch", timings[_TimeID::mg_hirarch], total_time, timings_min[_TimeID::mg_hirarch], timings_max[_TimeID::mg_hirarch], padlen);
+      s += format_subtime_mm("Vanka Symbolic Init", timings[_TimeID::vanka_symbolic_init], total_time, timings_min[_TimeID::vanka_symbolic_init], timings_max[_TimeID::vanka_symbolic_init], padlen);
+      s += format_subtime_mm("Vanka Numeric Init", timings[_TimeID::vanka_numeric_init], total_time, timings_min[_TimeID::vanka_numeric_init], timings_max[_TimeID::vanka_numeric_init], padlen);
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
       s += this->_format_multigrid_timings();
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
@@ -1057,8 +1016,7 @@ namespace Gendie
 
 
   public:
-    MultigridVankaFBMFlowSolver()
-     :  BaseClass(),
+    MultigridVankaComponent() :
 #ifdef FEAT_HAVE_TRILINOS
         _frosch_subregions(1, 1),
         _frosch_gmres_dim(FEAT::Index(16)),
@@ -1091,20 +1049,17 @@ namespace Gendie
         coarse_frosch(false),
         coarse_gmres(false),
         voxel_vanka(false),
-        coarse_solver_info(false),
-        _logger(nullptr),
-        _init_params(false)
+        coarse_solver_info(false)
     {}
 
-    ~MultigridVankaFBMFlowSolver() = default;
-    MultigridVankaFBMFlowSolver(const MultigridVankaFBMFlowSolver&) = default;
-    MultigridVankaFBMFlowSolver(MultigridVankaFBMFlowSolver&&) = default;
-    MultigridVankaFBMFlowSolver& operator=(const MultigridVankaFBMFlowSolver&) = default;
-    MultigridVankaFBMFlowSolver& operator=(MultigridVankaFBMFlowSolver&&) = default;
+    ~MultigridVankaComponent() = default;
+    MultigridVankaComponent(const MultigridVankaComponent&) = default;
+    MultigridVankaComponent(MultigridVankaComponent&&) = default;
+    MultigridVankaComponent& operator=(const MultigridVankaComponent&) = default;
+    MultigridVankaComponent& operator=(MultigridVankaComponent&&) = default;
 
-    template<typename Domain_>
-    MultigridVankaFBMFlowSolver(SystemLevels sys_levels, const Domain_& domain, const FEAT::PropertyMap* prop, const Logger* logger = nullptr)
-      : BaseClass(std::move(sys_levels)),
+    template<typename Domain_, typename System_, template<typename> typename Container_>
+    MultigridVankaComponent(const Container_<std::shared_ptr<System_>>& sys_levels, const Domain_& domain, const FEAT::PropertyMap* prop) :
 #ifdef FEAT_HAVE_TRILINOS
         _frosch_subregions(1, 1),
         _frosch_gmres_dim(FEAT::Index(16)),
@@ -1137,7 +1092,212 @@ namespace Gendie
         coarse_frosch(false),
         coarse_gmres((domain.back_layer().comm().size() > 1)),
         voxel_vanka(false),
-        coarse_solver_info(false),
+        coarse_solver_info(false)
+    {
+      this->parse(prop);
+      this->set_solver(sys_levels, domain);
+    }
+
+  }; //class MultigridVankaComponent
+
+  template<typename LevelType_, bool use_fbm_ = false>
+  class MultigridVankaFlowSolver : public SteadyStokesFlowSolverBaseCRTP<MultigridVankaFlowSolver<LevelType_, use_fbm_>, LevelType_>
+  {
+  public:
+    typedef SteadyStokesFlowSolverBaseCRTP<MultigridVankaFlowSolver, LevelType_> BaseClass;
+    typedef typename BaseClass::SystemLevelType SystemLevelType;
+    typedef typename BaseClass::SystemLevels SystemLevels;
+    typedef typename BaseClass::DataType DataType;
+    typedef typename BaseClass::DefectVectorType DefectVectorType;
+    typedef typename BaseClass::VectorType VectorType;
+
+    friend BaseClass;
+
+    typedef typename SystemLevelType::GlobalSystemMatrix SystemMatrix;
+    typedef typename SystemLevelType::LocalSystemMatrix LocalSystemMatrix;
+    typedef typename SystemLevelType::GlobalSystemTransfer SystemTransfer;
+    typedef typename SystemLevelType::GlobalSystemFilter SystemFilter;
+    typedef typename SystemLevelType::LocalSystemFilter LocalSystemFilter;
+
+    static constexpr int dim = SystemLevelType::dim;
+    static constexpr bool use_fbm = use_fbm_;
+
+    MultigridVankaComponent<SystemMatrix, SystemTransfer, SystemFilter> multigrid_solver;
+
+    std::size_t domain_virtual_size;
+    FEAT::PreferredBackend solver_backend;
+    mutable FEAT::StopWatch watch_create_solver, watch_system_filter;
+
+  protected:
+    const Gendie::Logger* _logger;
+    bool _init_params;
+
+    DefectVectorType _create_vector() const
+    {
+      return this->system_levels.front()->create_global_vector_sys();
+    }
+
+    bool _parse(const FEAT::PropertyMap* prop)
+    {
+      bool success = true;
+      success &= BaseClass::_parse(prop);
+      if(prop == nullptr)
+        return success;
+
+      solver_backend = Gendie::parse_backend(prop->query("backend", "generic"));
+
+      success &= multigrid_solver.parse(prop);
+
+      return success;
+    }
+
+    void _clear_solver()
+    {
+      this->base_solver.reset();
+      this->iter_solver.reset();
+      multigrid_solver.clear_solver();
+    }
+
+    template<typename Domain_>
+    void _set_solver(const Domain_& domain)
+    {
+      watch_create_solver.start();
+      XASSERTM(this->_init_params, "You have to initialize the system before calling this function");
+      XASSERTM(this->system_levels.size() > 0, "System levels not set");
+      this->_clear_solver();
+      multigrid_solver.set_solver(this->system_levels, domain);
+      this->base_solver = multigrid_solver.base_solver;
+      this->iter_solver = multigrid_solver.iter_solver;
+      watch_create_solver.stop();
+    }
+
+    void _init_symbolic()
+    {
+      // in any case, we need to compile the local type1 matrix for our preconditioners
+      for(std::size_t i = 0; i < this->system_levels.size(); ++i)
+      {
+        auto& system = *this->system_levels.at(i);
+        system.compile_system_matrix();
+        system.compile_local_matrix();
+      }
+      multigrid_solver.init_symbolic();
+      BaseClass::_init_symbolic();
+    }
+
+    void _done_symbolic()
+    {
+      BaseClass::_done_symbolic();
+      multigrid_solver.done_symbolic();
+      // free up type 1 matrix
+      for(std::size_t i = 0; i < this->system_levels.size(); ++i)
+      {
+        auto& system = *this->system_levels.at(i);
+        system.local_matrix_sys = typename SystemLevelType::LocalSystemMatrix();
+      }
+
+    }
+
+    void _init_numeric()
+    {
+      // FEAT::PreferredBackend prev_backend = FEAT::Backend::get_preferred_backend();
+      FEAT::Backend::set_preferred_backend(solver_backend);
+      // before the numeric initialization, we have to guarantee that our system is compiled
+      watch_system_filter.start();
+      for(std::size_t i = 0; i < this->system_levels.size(); ++i)
+      {
+        auto& system = *this->system_levels.at(i);
+        // this solver always assumes fbm
+        if constexpr(use_fbm_)
+          system.filter_interface_fbm.filter_weak_matrix_rows(system.matrix_a.local(), system.velo_mass_matrix.local());
+        system.compile_system_matrix();
+        system.compile_local_matrix();
+      }
+      watch_system_filter.stop();
+      multigrid_solver.init_numeric();
+      BaseClass::_init_numeric();
+      // FEAT::Backend::set_preferred_backend(prev_backend);
+    }
+
+    void _done_numeric()
+    {
+      // FEAT::PreferredBackend prev_backend = FEAT::Backend::get_preferred_backend();
+      FEAT::Backend::set_preferred_backend(solver_backend);
+      BaseClass::_done_numeric();
+      multigrid_solver.done_numeric();
+      // FEAT::Backend::set_preferred_backend(prev_backend);
+    }
+
+    FEAT::Solver::Status _apply(DefectVectorType& vec_cor, const DefectVectorType& vec_def) const
+    {
+      // FEAT::PreferredBackend prev_backend = FEAT::Backend::get_preferred_backend();
+
+      FEAT::Backend::set_preferred_backend(solver_backend);
+      // todo: explicitly transfer vec_cor and vec_def memory to our device memory?
+      FEAT::Solver::Status status = BaseClass::_apply(vec_cor, vec_def);
+      // FEAT::Backend::set_preferred_backend(prev_backend);
+      return status;
+    }
+
+    FEAT::String _format_timings() const
+    {
+      enum _TimeID
+      {
+        total = 0,
+        solver_apply = 1,
+        symbolic_init = 2,
+        create_solver = 3,
+        numeric_init = 4,
+        system_filter = 5,
+        num_entries = 6
+      };
+      FEAT::String s;
+      double timings_max[_TimeID::num_entries], timings_min[_TimeID::num_entries], timings[_TimeID::num_entries];
+      timings_min[_TimeID::total] = timings_max[_TimeID::total] = timings[_TimeID::total] = this->watch_total.elapsed();
+      timings_min[_TimeID::solver_apply] = timings_max[_TimeID::solver_apply] = timings[_TimeID::solver_apply] = this->watch_apply.elapsed();
+      timings_min[_TimeID::symbolic_init] = timings_max[_TimeID::symbolic_init] = timings[_TimeID::symbolic_init] = this->watch_init_symbolic.elapsed();
+      timings_min[_TimeID::create_solver] = timings_max[_TimeID::create_solver] = timings[_TimeID::create_solver] = watch_create_solver.elapsed();
+      timings_min[_TimeID::numeric_init] = timings_max[_TimeID::numeric_init] = timings[_TimeID::numeric_init] = this->watch_init_numeric.elapsed();
+      timings_min[_TimeID::system_filter] = timings_max[_TimeID::system_filter] = timings[_TimeID::system_filter] = watch_system_filter.elapsed();
+      // sync our timings
+      _logger->comm.allreduce(timings_max, timings_max, _TimeID::num_entries, FEAT::Dist::op_max);
+      _logger->comm.allreduce(timings_min, timings_min, _TimeID::num_entries, FEAT::Dist::op_min);
+
+      s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
+      s += FEAT::String("\n------------------------------------Timings MG Vanka Solver---------------------------------------\n");
+      s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
+      s += format_subtime_mm("Filter Local System", timings[_TimeID::system_filter], timings_max[_TimeID::total], timings_min[_TimeID::system_filter], timings_max[_TimeID::system_filter], this->padlen);
+      s += format_subtime_mm("Create Solver", timings[_TimeID::create_solver], timings_max[_TimeID::total], timings_min[_TimeID::create_solver], timings_max[_TimeID::create_solver], this->padlen);
+      s += format_subtime_mm("Symbolic Init", timings[_TimeID::symbolic_init], timings_max[_TimeID::total], timings_min[_TimeID::symbolic_init], timings_max[_TimeID::symbolic_init], this->padlen);
+      s += format_subtime_mm("Numeric Init", timings[_TimeID::numeric_init], timings_max[_TimeID::total], timings_min[_TimeID::numeric_init], timings_max[_TimeID::numeric_init], this->padlen);
+      s += format_subtime_mm("Apply Linear Solver", timings[_TimeID::solver_apply], timings_max[_TimeID::total], timings_min[_TimeID::solver_apply], timings_max[_TimeID::solver_apply], this->padlen);
+      s += format_subtime_mm("Linear Solver Total Time", timings_max[_TimeID::total], timings[_TimeID::total], timings_min[_TimeID::total], timings_max[_TimeID::total], this->padlen);
+      s += multigrid_solver.format_timings(_logger->comm, timings_max[_TimeID::total], this->padlen);
+
+      return s;
+    }
+
+  public:
+    MultigridVankaFlowSolver()
+     :  BaseClass(),
+        multigrid_solver(),
+        domain_virtual_size(std::size_t(0)),
+        solver_backend(FEAT::PreferredBackend::generic),
+        _logger(nullptr),
+        _init_params(false)
+    {}
+
+    ~MultigridVankaFlowSolver() = default;
+    MultigridVankaFlowSolver(const MultigridVankaFlowSolver&) = default;
+    MultigridVankaFlowSolver(MultigridVankaFlowSolver&&) = default;
+    MultigridVankaFlowSolver& operator=(const MultigridVankaFlowSolver&) = default;
+    MultigridVankaFlowSolver& operator=(MultigridVankaFlowSolver&&) = default;
+
+    template<typename Domain_>
+    MultigridVankaFlowSolver(SystemLevels sys_levels, const Domain_& domain, const FEAT::PropertyMap* prop, const Logger* logger = nullptr)
+      : BaseClass(std::move(sys_levels)),
+        multigrid_solver(),
+        domain_virtual_size(domain.size_virtual()),
+        solver_backend(FEAT::PreferredBackend::generic),
         _logger(logger),
         _init_params(true)
     {
@@ -1158,6 +1318,6 @@ namespace Gendie
     {
       _logger = log;
     }
-  }; //class MultigridVankaFBMFlowSolver
+  }; //class MultigridVankaFlowSolver
 
 }

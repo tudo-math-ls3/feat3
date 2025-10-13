@@ -18,7 +18,7 @@ namespace FEAT::Geometry::Intern
     typedef typename MeshType::CoordType DataType;
 
 
-    static std::unique_ptr<Atlas::Bezier<MeshType>> meshpart_to_bezier(const MeshType& mesh, const MeshPartType& meshpart)
+    static std::unique_ptr<Atlas::ChartBase<MeshType>> meshpart_to_bezier(const MeshType& mesh, const MeshPartType& meshpart)
     {
       // only works in 2d
       if constexpr(dim == 2)
@@ -167,7 +167,7 @@ namespace FEAT::Geometry::Intern
         XABORTM("Bezier chart only valid in 2d");
       }
 
-      return std::unique_ptr<Atlas::Bezier<MeshType>>{nullptr};
+      return std::unique_ptr<Atlas::ChartBase<MeshType>>{nullptr};
     }
 
   };

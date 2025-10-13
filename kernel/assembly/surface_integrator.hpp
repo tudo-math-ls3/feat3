@@ -191,7 +191,7 @@ namespace FEAT::Assembly
 
       // now process which mesh cells are candidates for each surface cell
       _cell_helper.clear();
-      _cell_helper_offsets.resize(_active_surfaces.size()+1);
+      _cell_helper_offsets.resize(_shape_indices.get_num_entities()+1);
       for(auto& c : _cell_helper_offsets)
       {
         c = IndexType(0);
@@ -240,10 +240,10 @@ namespace FEAT::Assembly
           }
         }
         // now gather our information into our offset array
-        Index cur_entry = offset;
-        for(const auto& v_info : gather_helper)
+        for(std::size_t k = 0; k < gather_helper.size(); ++k)
         {
-          _cell_helper_offsets.at(++cur_entry) = v_info.size();
+          const auto& v_info = gather_helper[k];
+          _cell_helper_offsets.at(_active_surfaces.at(k+offset)+1) = v_info.size();
           for(const auto& val : v_info)
             _cell_helper.push_back(val);
         }
@@ -364,6 +364,8 @@ namespace FEAT::Assembly
           // our determinant
           DataType jac_det = DataType(0);
 
+          DataType face_volume = EvalHelper::volume(coefficients);
+
           // our cubature points
           std::vector<CoordVecType> points(_cubature_rule.get_num_points());
           // our weights
@@ -397,9 +399,8 @@ namespace FEAT::Assembly
             weights[pt] = point_weight;
           }
 
-
           // prepare our job, we simply provide all the candidate cells, its the jobs job to handle the information
-          task->prepare(_cell_helper, _cell_helper_offsets, points, weights, normal, _active_surfaces[k]);
+          task->prepare(_cell_helper, _cell_helper_offsets, points, weights, normal, face_volume, _active_surfaces[k]);
 
           // now, assemble our task
           task->assemble();

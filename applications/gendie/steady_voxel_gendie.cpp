@@ -15,15 +15,8 @@
 #include <applications/gendie/cgal_meshpart_helper.hpp>
 #include <applications/gendie/velo_analyser.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
+#include <kernel/util/omp_util.hpp>
 
-#ifdef FEAT_HAVE_OMP
-#include "omp.h"
-#else
-static inline int omp_get_max_threads()
-{
-  return 1;
-}
-#endif
 
 
 
@@ -524,42 +517,7 @@ namespace Gendie
     // assemble fbm filter
     {
       auto& fbm_asm = *cur_dom.fbm_assembler;
-      // auto& filter_fbm_p = system_level.get_local_pres_unit_filter();
-      // auto& filter_fbm_v = system_level.get_local_velo_unit_filter_seq().find_or_add("fbm");
-      auto& filter_fbm_int_v = system_level.filter_interface_fbm;
-
-      // assemble velocity unit filter
-      if(param_holder.assemble_q2_filter)
-      {
-        // fbm_asm.assemble_inside_filter(filter_fbm_v, cur_dom.space_velo);
-        // fbm_asm.assemble_inside_filter(filter_fbm_p, cur_dom.space_pres);
-        // if(correct_fbm_filter)
-        // {
-        //   //this probably does not work with interface filter...
-        //   correct_filters(*domain.at(i), filter_fbm_v, filter_fbm_p, *cgal_wrapper);
-        // }
-        // we assume matrix_a and velo matrix to be assembled at this point, but they can be freed after
-        // fbm_asm.assemble_interface_filter(filter_fbm_int_v, cur_dom.space_velo, system_level.matrix_a, system_level.velo_mass_matrix, true);
-        // fbm_asm.assemble_interface_filter(filter_fbm_int_v, cur_dom.space_velo, system_level.matrix_a, system_level.velo_mass_matrix, false);
-        system_level.assemble_fbm_filters(fbm_asm, cur_dom.space_velo, cur_dom.space_pres, assemble_mask, false);
-      }
-      else
-        filter_fbm_int_v = typename SystemLevel_::LocalVeloUnitFilter(cur_dom.space_velo.get_num_dofs());
-
-      // assemble mask vectors on finest level
-      // TODO: Only required for debugging purposes
-      // if(assemble_mask)
-      // {
-      //   auto& mask_v = system_level.fbm_mask_velo;
-      //   mask_v.reserve(cur_dom.space_velo.get_num_dofs());
-      //   for(int d(0); d <= dim; ++d)
-      //   {
-      //     for(auto k : fbm_asm.get_fbm_mask_vector(d))
-      //       mask_v.push_back(k);
-      //   }
-      //   system_level.fbm_mask_pres = fbm_asm.get_fbm_mask_vector(dim);
-      // }
-
+      system_level.assemble_fbm_filters(fbm_asm, cur_dom.space_velo, cur_dom.space_pres, assemble_mask, param_holder.assemble_q2_filter, false);
     }
 
     // compile system filter
@@ -802,7 +760,7 @@ namespace Gendie
 
     // start by constructing our domain and systemlevels
     logger.print("Number of Processes: " + stringify(comm.size()), info);
-    logger.print("Number of OMP Threads: " + stringify(omp_get_max_threads()), info);
+    logger.print("Number of OMP Threads: " + stringify(feat_omp_get_max_threads()), info);
     logger.print("System DataType: " + String(fp_typename), info);
     logger.print("System IndexType: " + String(ix_typename), info);
 

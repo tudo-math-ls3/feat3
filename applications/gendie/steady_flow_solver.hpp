@@ -5,18 +5,23 @@
 #pragma once
 
 #include <kernel/solver/base.hpp>
+#include <kernel/solver/iterative.hpp>
 #include <kernel/util/property_map.hpp>
+#include <kernel/util/math.hpp>
 #include "logger.hpp"
 #include "format_helper.hpp"
 #include <kernel/util/stop_watch.hpp>
 #include <kernel/util/string.hpp>
-#include <applications/gendie/gendie_common.hpp>
+//#include <applications/gendie/gendie_common.hpp>
+#include "template_helper.hpp"
+#include "parsing_helper.hpp"
 
 #include <memory>
 
 namespace Gendie
 {
   typedef FEAT::Index Index;
+
   /**
    * \brief BaseClass for steady-solver interface
    */
@@ -108,7 +113,7 @@ namespace Gendie
     typedef typename DefectVectorType::DataType DefectDataType;
 
     static constexpr bool no_convert = std::is_same_v<DefectVectorType, SolverVectorType>;
-    const String solver_datatype_id = String(Intern::DataTypeId<SolverDataType>::id);
+    const FEAT::String solver_datatype_id = FEAT::String(Intern::DataTypeId<SolverDataType>::id);
     static constexpr int padlen = 30;
     static constexpr char pc = '.';
 
@@ -336,11 +341,13 @@ namespace Gendie
     const Gendie::Logger* _logger;
     DefectVectorType _vec_def, _vec_cor;
     SolverVectorType _vec_solver_def, _vec_solver_cor;
+  public:
     DefectDataType _tol_abs, _tol_rel, _tol_low_abs;
     DefectDataType _stag_rate;
     DefectDataType _fixed_ls_tol;
     DefectDataType _scaling_factor;
     Index _min_nonlin_iter, _max_nonlin_iter, _cur_iter, _max_stokes_iter;
+  protected:
 
     std::deque<DefectDataType> _defects;
 
@@ -603,7 +610,7 @@ namespace Gendie
 
       if(this->_logger)
       {
-        this->_logger->print("Using scaling factor: " + stringify_fp_sci(this->_scaling_factor) , info);
+        this->_logger->print("Using scaling factor: " + FEAT::stringify_fp_sci(this->_scaling_factor) , info);
         this->_logger->print("\nSolver   #  Defect (abs)   Defect (rel)   Improve   |  LS  fin abs Def   fin rel Def  abs Tol", info);
         this->_logger->print(  "----------------------------------------------------+---------------------------------------------", info);
       }
@@ -679,16 +686,16 @@ namespace Gendie
         // also assembles matrix for adjusted system (u, \tilde(p)),  \tilde(p) = p/scaling_factor
         this->system_asm->assemble_matrices(this->flow_solver->get_systems(), vec_sol);
 
-        #ifdef FEAT_DEBUG_MODE
-        {
-          auto diag_a = this->flow_solver->get_systems().front()->matrix_a.create_vector_l();
-          auto diag_m = this->flow_solver->get_systems().front()->velo_mass_matrix.create_vector_l();
-          this->flow_solver->get_systems().front()->matrix_a.extract_diag(diag_a, true);
-          this->flow_solver->get_systems().front()->velo_mass_matrix.extract_diag(diag_m, true);
-          auto sc_factor = diag_a.max_abs_element() / diag_m.max_abs_element();
-          if(this->_logger) this->_logger->print("Max abs ele " + stringify(sc_factor), info);
-        }
-        #endif
+        // #ifdef FEAT_DEBUG_MODE  //careful, requires assembled velo_mass_matrix
+        // {
+        //   auto diag_a = this->flow_solver->get_systems().front()->matrix_a.create_vector_l();
+        //   auto diag_m = this->flow_solver->get_systems().front()->velo_mass_matrix.create_vector_l();
+        //   this->flow_solver->get_systems().front()->matrix_a.extract_diag(diag_a, true);
+        //   this->flow_solver->get_systems().front()->velo_mass_matrix.extract_diag(diag_m, true);
+        //   auto sc_factor = diag_a.max_abs_element() / diag_m.max_abs_element();
+        //   if(this->_logger) this->_logger->print("Max abs ele " + FEAT::stringify(sc_factor), info);
+        // }
+        // #endif
 
         // this->flow_solver->set_backend();
 
@@ -713,9 +720,9 @@ namespace Gendie
         {
           line += FEAT::String(" | ") + FEAT::stringify(this->flow_solver->get_num_iter()).pad_front(3) + ": "
             + FEAT::stringify_fp_sci(this->flow_solver->get_def_final(), 4) + " / "
-            + stringify_fp_sci(this->flow_solver->get_def_final() / this->flow_solver->get_def_initial(), 4);
+            + FEAT::stringify_fp_sci(this->flow_solver->get_def_final() / this->flow_solver->get_def_initial(), 4);
           if((this->_fixed_ls_tol<DefectDataType(0)) && (nl_step > Index(0)))
-            line += FEAT::String(" [") + stringify_fp_sci(this->flow_solver->get_tol_abs(), 4) + "]";
+            line += FEAT::String(" [") + FEAT::stringify_fp_sci(this->flow_solver->get_tol_abs(), 4) + "]";
           this->_logger->print(line, info);
         }
 
@@ -760,6 +767,9 @@ namespace Gendie
     typedef typename BaseClass::FilterType FilterType;
     typedef typename BaseClass::SolverDataType SolverDataType;
     typedef typename BaseClass::DefectDataType DefectDataType;
+    // if SystemLevel has field fbm_support = true, we will try to call fbm systemlevel functions, specifically
+    // apply_fbm_filter_to_rhs(LocalDefSystemVector)
+    static constexpr bool use_fbm = Intern::supports_fbm<typename DefectAssembler_::LevelType>;
 
     friend BaseClass;
 
@@ -811,14 +821,15 @@ namespace Gendie
     FEAT::String _format_string() const
     {
       using String = FEAT::String;
+
       String s = String("PseudoTimeStepping-Solver:\n") + BaseClass::_format_string();
       s += String("Adapt Timestep ").pad_back(this->padlen, this->pc) + ": " + (adp_step_size ? String("Yes") : String("No")) + "\n";
-      s += String("Timestep Size ").pad_back(this->padlen, this->pc) + ": " + stringify_fp_sci(time_step_size, 2, 4) + "\n";
+      s += String("Timestep Size ").pad_back(this->padlen, this->pc) + ": " + FEAT::stringify_fp_sci(time_step_size, 2, 4) + "\n";
       if(adp_step_size)
       {
-        s += String("Stablitiy Tolerance ").pad_back(this->padlen, this->pc) + ": " + stringify_fp_sci(stable_rel_tolerance, 2, 4) + "\n";
-        s += String("Stablility Sample Size ").pad_back(this->padlen, this->pc) + ": " + stringify(sample_size) + "\n";
-        s += String("Adapt Change Factor ").pad_back(this->padlen, this->pc) + ": " + stringify_fp_sci(adaptive_factor, 2, 4) + "\n";
+        s += String("Stablitiy Tolerance ").pad_back(this->padlen, this->pc) + ": " + FEAT::stringify_fp_sci(stable_rel_tolerance, 2, 4) + "\n";
+        s += String("Stablility Sample Size ").pad_back(this->padlen, this->pc) + ": " + FEAT::stringify(sample_size) + "\n";
+        s += String("Adapt Change Factor ").pad_back(this->padlen, this->pc) + ": " + FEAT::stringify_fp_sci(adaptive_factor, 2, 4) + "\n";
       }
       return s;
     }
@@ -866,7 +877,7 @@ namespace Gendie
         unstable_counter += Index(def_improve > (1+stable_rel_tolerance)*prev_improve);
       }
 
-      Index actual_sample_size = Math::min(t_step-min_steps, sample_size);
+      Index actual_sample_size = FEAT::Math::min(t_step-min_steps, sample_size);
       return unstable_counter <= Index(0.35*double(actual_sample_size));
     }
 
@@ -925,7 +936,7 @@ namespace Gendie
         if(!_convergence_stable(t_step, def_nl, def_improve, this->_defects))
         {
           time_step_size *= adaptive_factor;
-          if(this->_logger) this->_logger->print("Increase time step size to " + stringify_fp_sci(time_step_size, 2), info);
+          if(this->_logger) this->_logger->print("Increase time step size to " + FEAT::stringify_fp_sci(time_step_size, 2), info);
         }
 
         if(def_rel > DefectDataType(1E+3))
@@ -981,7 +992,10 @@ namespace Gendie
           this->defect_asm->system_level->velo_mass_matrix.apply(loc_def, loc_sol, loc_def, DefectDataType(1)/time_step_size);
 
           // only works with fbm based assembler
-          this->defect_asm->system_level->apply_fbm_filter_to_rhs(loc_def.local());
+          if constexpr(use_fbm)
+          {
+            this->defect_asm->system_level->apply_fbm_filter_to_rhs(loc_def.local());
+          }
           // and filter
           this->filter.filter_rhs(this->_vec_def);
 

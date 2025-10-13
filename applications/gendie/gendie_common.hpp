@@ -1,5 +1,6 @@
 #pragma once
 
+#include <applications/gendie/fbm_control_helper.hpp>
 #include <kernel/runtime.hpp>
 #include <kernel/backend.hpp>
 #include <kernel/util/assertion.hpp>
@@ -114,238 +115,13 @@ namespace Gendie
   typedef Space::Discontinuous::ElementP1<TrafoType> SpacePresType;
 #endif
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  class DomainLevelBase :
-    public Control::Domain::StokesDomainLevel<MeshType, TrafoType, SpaceVeloType, SpacePresType>
-  {
-  public:
-    typedef Control::Domain::StokesDomainLevel<MeshType, TrafoType, SpaceVeloType, SpacePresType> BaseClass;
-
-    /// the FBM assembler for this level
-    std::unique_ptr<Assembly::StokesFBMAssembler<MeshType>> fbm_assembler;
-
-    // inherit constructor
-    using BaseClass::BaseClass;
-
-    void create_fbm_assembler(const Dist::Comm& comm, const String& fbm_meshpart_names)
-    {
-      // get out mesh node
-      const MeshNodeType& mesh_node = *this->get_mesh_node();
-
-      // allocate assembler
-      fbm_assembler.reset(new Assembly::StokesFBMAssembler<MeshType>(*mesh_node.get_mesh()));
-
-      // loop over all FBM meshparts
-      std::deque<String> fbm_name_deque = fbm_meshpart_names.split_by_whitespaces();
-      for(const String& name : fbm_name_deque)
-      {
-        // find meshpart node
-        const auto* part_node = mesh_node.find_mesh_part_node(name);
-        XASSERTM(part_node != nullptr, "FBM meshpart node '" + name + "'not found");
-
-        // get the meshpart if it exists
-        const MeshPartType* fbm_meshpart = part_node->get_mesh();
-        if(fbm_meshpart)
-          fbm_assembler->add_fbm_meshpart(*fbm_meshpart);
-      }
-      // synchronize over comm
-      fbm_assembler->sync(mesh_node, comm);
-
-      // compile the assembler
-      fbm_assembler->compile();
-    }
-  }; // class DomainLevel
-
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  typedef FEAT::Control::StokesFBMDomainLevelBase<SpaceVeloType, SpacePresType> DomainLevelBase;
 
   /**
    * \brief Navier-Stokes System Level base class
    */
   template<typename DT_, typename IT_>
-  class SystemLevelBase :
-    public Control::StokesBlockedCombinedSystemLevel<dim, DT_, IT_, LocalMatrixBlockA<DT_, IT_>, LocalMatrixBlockB<DT_, IT_>, LocalMatrixBlockD<DT_, IT_>, LocalScalarMatrix<DT_, IT_>>
-  {
-  public:
-    /// out base class
-    typedef Control::StokesBlockedCombinedSystemLevel<dim, DT_, IT_, LocalMatrixBlockA<DT_, IT_>, LocalMatrixBlockB<DT_, IT_>, LocalMatrixBlockD<DT_, IT_>, LocalScalarMatrix<DT_, IT_>> BaseClass;
-
-    /// the filtered local system matrix for Vanka
-    typename BaseClass::LocalSystemMatrix local_matrix_sys;
-
-    /// the velocity mass matrix
-    typename BaseClass::GlobalMatrixBlockA velo_mass_matrix;
-
-    /// the local interface filter
-    typename BaseClass::LocalVeloUnitFilter filter_interface_fbm;
-
-    typedef DT_ DataType;
-    typedef IT_ IndexType;
-    typedef typename BaseClass::GlobalSystemVector GlobalSystemVector;
-    typedef typename BaseClass::LocalVeloVector LocalVeloVector;
-
-    /// FBM mask vectors of velocity and pressure
-    std::vector<int> fbm_mask_velo, fbm_mask_pres;
-
-    void assemble_velocity_laplace_matrix(Assembly::DomainAssembler<TrafoType>& dom_asm,
-      const SpaceVeloType& space_velo, const DataType nu, bool defo, String cubature = "")
-    {
-      auto& loc_a = this->matrix_a.local();
-      loc_a.format();
-      Assembly::Common::LaplaceOperatorBlocked<dim> lapl_op;
-      Assembly::Common::DuDvOperatorBlocked<dim> dudv_op;
-      if(cubature.empty())
-        cubature = "auto-degree:" + stringify(2*SpaceVeloType::local_degree+2);
-      if(defo)
-        Assembly::assemble_bilinear_operator_matrix_1(dom_asm, loc_a, dudv_op, space_velo, cubature, nu);
-      else
-        Assembly::assemble_bilinear_operator_matrix_1(dom_asm, loc_a, lapl_op, space_velo, cubature, nu);
-    }
-
-    void clear_velocity_laplace_matrix()
-    {
-      this->matrix_a.local() = BaseClass::LocalMatrixBlockA();
-    }
-
-    void assemble_velocity_mass_matrix(Assembly::DomainAssembler<TrafoType>& dom_asm, const SpaceVeloType& space_velo, String cubature = "")
-    {
-      this->velo_mass_matrix = this->matrix_a.clone(LAFEM::CloneMode::Weak);
-      auto& loc_m = this->velo_mass_matrix.local();
-      loc_m.format();
-
-      if(cubature.empty())
-        cubature = "auto-degree:" + stringify(2*SpaceVeloType::local_degree+2);
-      Assembly::Common::IdentityOperatorBlocked<dim> id_op;
-      Assembly::assemble_bilinear_operator_matrix_1(dom_asm, loc_m, id_op, space_velo, cubature);
-    }
-
-    void compile_local_matrix()
-    {
-      // do we have to allocate the structures?
-      if(this->local_matrix_sys.block_a().empty())
-      {
-        this->local_matrix_sys.block_a() = this->matrix_a.local().clone(LAFEM::CloneMode::Layout);
-        this->local_matrix_sys.block_b() = this->matrix_b.local().clone(LAFEM::CloneMode::Layout);
-        this->local_matrix_sys.block_d() = this->matrix_d.local().clone(LAFEM::CloneMode::Layout);
-      }
-      // copy local matrices (and sync 1 if necessary)
-      this->matrix_a.convert_to_1(this->local_matrix_sys.block_a(), false);
-      this->local_matrix_sys.block_b().copy(this->matrix_b.local());
-      this->local_matrix_sys.block_d().copy(this->matrix_d.local());
-
-      // apply velocity unit filters to A and B
-      for(const auto& filter : this->get_local_velo_unit_filter_seq())
-      {
-        filter.second.filter_mat(this->local_matrix_sys.block_a());
-        filter.second.filter_offdiag_row_mat(this->local_matrix_sys.block_b());
-      }
-    }
-
-    void assemble_fbm_filters(Assembly::StokesFBMAssembler<MeshType>& fbm_asm, const SpaceVeloType& space_velo, const SpacePresType& space_pres, bool asm_mask, bool no_scale)
-    {
-      // assemble velocity and pressure unit filters
-      fbm_asm.assemble_inside_filter(this->get_local_velo_unit_filter_seq().find_or_add("fbm"), space_velo);
-      fbm_asm.assemble_inside_filter(this->get_local_pres_unit_filter(), space_pres);
-
-      // assemble interface filter for velocity
-      fbm_asm.assemble_interface_filter(filter_interface_fbm, space_velo, this->matrix_a, velo_mass_matrix, no_scale);
-      //filter_interface_fbm = LocalVeloUnitFilter(space_velo.get_num_dofs());
-
-      // assemble mask vectors on finest level
-      if(asm_mask)
-      {
-        fbm_mask_velo.reserve(space_velo.get_num_dofs());
-        for(int d(0); d <= dim; ++d)
-        {
-          for(auto k : fbm_asm.get_fbm_mask_vector(d))
-            fbm_mask_velo.push_back(k);
-        }
-        fbm_mask_pres = fbm_asm.get_fbm_mask_vector(dim);
-      }
-    }
-
-    void assemble_pressure_mean_filter(const SpacePresType& space_pres, bool enable_fbm)
-    {
-      typename BaseClass::GlobalPresVector  vec_glob_v(&this->gate_pres), vec_glob_w(&this->gate_pres);
-
-      // fetch the local vectors
-      LocalPresVector<DT_, IT_>& vec_loc_v = vec_glob_v.local();
-      LocalPresVector<DT_, IT_>& vec_loc_w = vec_glob_w.local();
-
-      // fetch the frequency vector of the pressure gate
-      LocalPresVector<DT_, IT_>& vec_loc_f = this->gate_pres._freqs;
-
-      // assemble the mean filter
-      Assembly::MeanFilterAssembler::assemble(vec_loc_v, vec_loc_w, space_pres, "gauss-legendre:2");
-
-      // synchronize the vectors
-      vec_glob_v.sync_1();
-      vec_glob_w.sync_0();
-
-      // apply pressure unit filter if FBM is enabled
-      if(enable_fbm)
-      {
-        const auto& fil_p = this->get_local_pres_unit_filter();
-        fil_p.filter_cor(vec_loc_v);
-        fil_p.filter_def(vec_loc_w);
-      }
-
-      // create mean filter
-      this->get_local_pres_mean_filter() = LocalPresMeanFilter(vec_loc_v.clone(), vec_loc_w.clone(), vec_loc_f.clone(), this->gate_pres.get_comm());
-    }
-
-    void apply_fbm_filter_to_rhs(GlobalSystemVector& vec_rhs) const
-    {
-      this->apply_fbm_filter_to_rhs(vec_rhs.local().first());
-    }
-
-    void apply_fbm_filter_to_rhs(LocalVeloVector& vec_rhs_v) const
-    {
-      this->filter_interface_fbm.filter_def(vec_rhs_v);
-    }
-
-    void apply_fbm_filter_to_def(GlobalSystemVector& vec_def_v, const GlobalSystemVector& vec_sol_v, const DataType factor) const
-    {
-      this->apply_fbm_filter_to_def(vec_def_v.local().first(), vec_sol_v.local().first(), factor);
-    }
-
-    void apply_fbm_filter_to_def(LocalVeloVector& vec_def_v, const LocalVeloVector& vec_sol_v, const DataType factor) const
-    {
-      if(this->filter_interface_fbm.used_elements() == Index(0))
-        return;
-
-      auto* vdef = vec_def_v.elements();
-      const auto* vsol = vec_sol_v.elements();
-      const IndexType* fidx = this->filter_interface_fbm.get_indices();
-      const auto* fval = this->filter_interface_fbm.get_values();
-      const IndexType* row_ptr = this->velo_mass_matrix.local().row_ptr();
-      const IndexType* col_idx = this->velo_mass_matrix.local().col_ind();
-      const auto* mval = this->velo_mass_matrix.local().val();
-
-      Index n = this->filter_interface_fbm.used_elements();
-      for(Index i(0); i < n; ++i)
-      {
-        IndexType row = fidx[i];
-        vdef[row] = DataType(0);
-        for(IndexType j(row_ptr[row]); j < row_ptr[row+1]; ++j)
-        {
-          vdef[row] += mval[j] * vsol[col_idx[j]];
-        }
-        vdef[row] *= fval[i][0] * factor;
-      }
-    }
-
-
-  }; // class SystemLevelBase
-
+  using SystemLevelBase = FEAT::Control::StokesFBMSystemLevelBase<dim, LocalMatrixBlockA<DT_, IT_>, LocalMatrixBlockB<DT_, IT_>, LocalMatrixBlockD<DT_, IT_>, LocalScalarMatrix<DT_, IT_>>;
 
   template<typename SystemLevel_, typename Domain_, typename InflowBounds_, typename SolverDataType_, typename ParamHolder_>
   std::unique_ptr<Gendie::NonlinearSteadyFlowSolverBase<typename SystemLevel_::GlobalSystemVector>> new_flow_solver_inner_type(
@@ -554,36 +330,8 @@ namespace Gendie
           // auto& filter_fbm_p = solver_levels.at(i)->get_local_pres_unit_filter();
           // auto& filter_fbm_v = solver_levels.at(i)->get_local_velo_unit_filter_seq().find_or_add("fbm");
           auto& filter_fbm_int_v = solver_levels.at(i)->filter_interface_fbm;
-
-          // assemble velocity unit filter
-          if(use_q2_fbm && ((unsigned short)(i) <= min_q2_fbm_level || use_coarse_fbm))
-          {
-            // fbm_asm.assemble_inside_filter(filter_fbm_v, domain.at(i)->space_velo);
-            // fbm_asm.assemble_inside_filter(filter_fbm_p, domain.at(i)->space_pres);
-            // // if(correct_fbm_filter)
-            // // {
-            // //   //this probably does not work with interface filter...
-            // //   correct_filters(*domain.at(i), filter_fbm_v, filter_fbm_p, *cgal_wrapper);
-            // // }
-            // fbm_asm.assemble_interface_filter(filter_fbm_int_v, domain.at(i)->space_velo, solver_levels.at(i)->matrix_a, solver_levels.at(i)->velo_mass_matrix, true);
-            solver_levels.at(i)->assemble_fbm_filters(fbm_asm, domain.at(i)->space_velo, domain.at(i)->space_pres, (i==0u), false);
-          }
-          else
-            filter_fbm_int_v = typename SolverLevel::LocalVeloUnitFilter(domain.at(i)->space_velo.get_num_dofs());
-
-          // // assemble mask vectors on finest level
-          // if(i == 0u)
-          // {
-          //   auto& mask_v = solver_levels.at(i)->fbm_mask_velo;
-          //   mask_v.reserve(domain.at(i)->space_velo.get_num_dofs());
-          //   for(int d(0); d <= dim; ++d)
-          //   {
-          //     for(auto k : fbm_asm.get_fbm_mask_vector(d))
-          //       mask_v.push_back(k);
-          //   }
-          //   solver_levels.at(i)->fbm_mask_pres = fbm_asm.get_fbm_mask_vector(dim);
-          // }
-
+          const bool q2_fbm = use_q2_fbm && ((unsigned short)(i) <= min_q2_fbm_level || use_coarse_fbm);
+          solver_levels.at(i)->assemble_fbm_filters(fbm_asm, domain.at(i)->space_velo, domain.at(i)->space_pres, (i==0u), q2_fbm, false);
         }
         // compile system filter
         solver_levels.at(i)->compile_system_filter();
@@ -591,7 +339,7 @@ namespace Gendie
     }
 
     // system is assembled, now we need to create the components
-    auto stokes_solver = std::make_shared<MultigridVankaFBMFlowSolver<SolverLevel>>(solver_levels, domain, config->get_sub_section("solver-params"), logger);
+    auto stokes_solver = std::make_shared<MultigridVankaFlowSolver<SolverLevel, true>>(solver_levels, domain, config->get_sub_section("solver-params"), logger);
     auto defect_asm = std::make_shared<CarreauSingleMatDefectFlowAssembler<Domain_, SystemLevel_>>(domain, system_level, config, materials.front(), inflow_bounds.front().get_temperature(), mesh_unit_scale);
     defect_asm->set_cubature(cubature_matrix_a);
     auto system_asm = std::make_shared<CarreauSingleMatSystemFlowAssembler<Domain_>>(domain, config, materials.front(), inflow_bounds.front().get_temperature(), mesh_unit_scale);
@@ -635,7 +383,7 @@ namespace Gendie
       system_asm->set_stiffness_factor(scaling_factor);
     }
 
-    typedef MultigridVankaFBMFlowSolver<SolverLevel> StS;
+    typedef MultigridVankaFlowSolver<SolverLevel, true> StS;
     typedef CarreauSingleMatDefectFlowAssembler<Domain_, SystemLevel_> CaD;
     typedef CarreauSingleMatSystemFlowAssembler<Domain_> CaS;
 
@@ -650,7 +398,7 @@ namespace Gendie
     else if(sol_config && (sol_config->query("nl-solver", "pseudo-ts").compare_no_case("newton") == 0))
     {
       XABORTM("Not implemented");
-      return std::unique_ptr<Gendie::NonlinearSteadyFlowSolverBase<typename SystemLevel_::GlobalSystemVector>>(nullptr);
+      return std::unique_ptr<NonlinearSteadyFlowSolverBase<typename SystemLevel_::GlobalSystemVector>>(nullptr);
     }
     else if(sol_config && (sol_config->query("nl-solver", "pseudo-ts").compare_no_case("picard") == 0))
     {

@@ -215,6 +215,8 @@ namespace CCND
     /// out base class
     typedef Control::StokesBlockedCombinedSystemLevel<dim, DataType, IndexType, LocalMatrixBlockA, LocalMatrixBlockB, LocalMatrixBlockD, LocalScalarMatrix> BaseClass;
 
+    static constexpr bool fbm_support = true;
+
     /// the filtered local system matrix for Vanka
     LocalSystemMatrix local_matrix_sys;
 

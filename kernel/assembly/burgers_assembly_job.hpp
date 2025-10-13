@@ -143,6 +143,9 @@ namespace FEAT
       /// the cubature factory to use
       Cubature::DynamicFactory cubature_factory;
 
+      /// scaling parameter
+      DataType_ alpha;
+
     public:
       /**
        * \brief Constructor
@@ -167,7 +170,8 @@ namespace FEAT
         sd_v_norm(DataType_(0)),
         convection_vector(conv_vector),
         space(space_),
-        cubature_factory(cubature)
+        cubature_factory(cubature),
+        alpha(DataType_(1))
       {
       }
 
@@ -307,6 +311,9 @@ namespace FEAT
       /// velocity norm for streamline diffusion
       const DataType sd_v_norm;
 
+      /// scatter scaling parameter
+      const DataType alpha;
+
       /// keep track what we need to assemble
       const bool need_diff, need_conv, need_conv_frechet, need_reac, need_streamdiff;
 
@@ -377,6 +384,7 @@ namespace FEAT
         sd_delta(job_.sd_delta),
         sd_nu(job_.sd_nu),
         sd_v_norm(job_.sd_v_norm),
+        alpha(job_.alpha),
         need_diff(Math::abs(nu) > DataType(0)),
         need_conv(Math::abs(beta) > DataType(0)),
         need_conv_frechet(Math::abs(frechet_beta) > DataType(0)),
@@ -827,7 +835,7 @@ namespace FEAT
         /// scatters the local matrix
         void scatter()
         {
-          this->scatter_matrix(this->local_matrix, this->dof_mapping, this->dof_mapping);
+          this->scatter_matrix(this->local_matrix, this->dof_mapping, this->dof_mapping, this->alpha);
         }
       }; // class BurgersBlockedMatrixAssemblyJob::Task
     }; // class BurgersBlockedMatrixAssemblyJob
@@ -988,7 +996,7 @@ namespace FEAT
         /// scatters the local vector
         void scatter()
         {
-          this->scatter_vec_rhs(this->local_vector, this->dof_mapping);
+          this->scatter_vec_rhs(this->local_vector, this->dof_mapping, this->alpha);
         }
       }; // class BurgersBlockedVectorAssemblyJob::Task
     }; // class BurgersBlockedVectorAssemblyJob<...>
@@ -1228,7 +1236,7 @@ namespace FEAT
         /// scatters the local matrix
         void scatter()
         {
-          this->scatter_matrix(this->local_matrix, this->dof_mapping, this->dof_mapping);
+          this->scatter_matrix(this->local_matrix, this->dof_mapping, this->dof_mapping, this->alpha);
         }
       }; // class BurgersScalarMatrixAssemblyJob::Task
     }; // class BurgersScalarMatrixAssemblyJob
@@ -1369,7 +1377,7 @@ namespace FEAT
         /// scatters the local vector
         void scatter()
         {
-          this->scatter_vec_rhs(this->local_vector, this->dof_mapping);
+          this->scatter_vec_rhs(this->local_vector, this->dof_mapping, this->alpha);
         }
       }; // class BurgersScalarVectorAssemblyJob::Task
     }; // class BurgersScalarVectorAssemblyJob<...>

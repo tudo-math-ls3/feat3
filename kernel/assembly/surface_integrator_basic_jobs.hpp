@@ -43,6 +43,7 @@ namespace FEAT::Assembly
     ImagePointType _cur_img_point;
     ImagePointType _cur_dom_point;
     ImagePointType _normal;
+    DataType _face_volume;
     IndexType _cur_surface_index;
 
     DataType _integration_weight;
@@ -59,15 +60,17 @@ namespace FEAT::Assembly
       _cur_img_point(),
       _cur_dom_point(),
       _normal(),
+      _face_volume(),
       _cur_surface_index(~IndexType(0)),
       _integration_weight(DataType(0))
     {}
 
     template<typename DT_, typename ImgP_, typename IT_>
     void prepare(const std::vector<IT_>& cells, const std::vector<IT_>& cell_offsets, const std::vector<ImgP_>& points,
-      const std::vector<DT_>& integration_weights, const ImgP_& normal, IT_ surface_ind)
+      const std::vector<DT_>& integration_weights, const ImgP_& normal, DT_ face_volume, IT_ surface_ind)
     {
       _normal = ImagePointType::convert_new(normal);
+      _face_volume = DataType(face_volume);
       _cell_helper.resize(cell_offsets.at(surface_ind+1)-cell_offsets.at(surface_ind));
       std::copy(cells.begin()+cell_offsets.at(surface_ind), cells.begin()+cell_offsets.at(surface_ind+1), _cell_helper.begin());
       _cur_surface_index = surface_ind;
@@ -269,7 +272,6 @@ namespace FEAT::Assembly
       }
       if constexpr(loc_value_holder.has_grad)
       {
-        std::cout << "Has grad\n";
         loc_value_holder.grad.format();
         for(int i = 0; i < num_loc_dofs; ++i)
         {
