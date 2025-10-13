@@ -908,8 +908,6 @@ namespace Gendie
     Index max_stagnations = Index(2);
     /// rate to increase stagnation
     DefectDataType stag_increase = DefectDataType(100);
-    /// maximum ts size
-    DefectDataType max_ts_size = DefectDataType(1e+10);
     /// Do we use adaptive step size ?
     bool adp_step_size = true;
 
@@ -954,11 +952,11 @@ namespace Gendie
       s += String("Timestep Size ").pad_back(this->padlen, this->pc) + ": " + FEAT::stringify_fp_sci(time_step_size, 2, 4) + "\n";
       if(adp_step_size)
       {
-        s += String("Stablitiy Tolerance ").pad_back(this->padlen, this->pc) + ": " + FEAT::stringify_fp_sci(stable_rel_tolerance, 2, 4) + "\n";
-        s += String("Stablility Sample Size ").pad_back(this->padlen, this->pc) + ": " + FEAT::stringify(sample_size) + "\n";
-        s += String("Adapt Change Factor ").pad_back(this->padlen, this->pc) + ": " + FEAT::stringify_fp_sci(adaptive_factor, 2, 4) + "\n";
-        s += String("Max Stagnations Times ").pad_back(this->padlen, this->pc) + ": " + FEAT::stringify(max_stagnations) + "\n";
-        s += String("Stepsize stagnation increase ").pad_back(this->padlen, this->pc) + ": " + FEAT::stringify_fp_sci(stag_increase, 2, 4) + "\n";
+        s += String("Stablitiy Tolerance ").pad_back(this->padlen, this->pc) + ": " + stringify_fp_sci(stable_rel_tolerance, 2, 4) + "\n";
+        s += String("Stablility Sample Size ").pad_back(this->padlen, this->pc) + ": " + stringify(sample_size) + "\n";
+        s += String("Adapt Change Factor ").pad_back(this->padlen, this->pc) + ": " + stringify_fp_sci(adaptive_factor, 2, 4) + "\n";
+        s += String("Max Stagnations Times ").pad_back(this->padlen, this->pc) + ": " + stringify(max_stagnations) + "\n";
+        s += String("Stepsize stagnation increase ").pad_back(this->padlen, this->pc) + ": " + stringify_fp_sci(stag_increase, 2, 4) + "\n";
       }
       return s;
     }
@@ -1109,17 +1107,17 @@ namespace Gendie
         }
         else if((this->_cur_iter >= 3) && (this->_stag_rate < def_improve))
         {
-          if(adp_step_size && (stagnation_counter >= max_stagnations))
+          if(adp_step_size && (this->stagnation_counter >= this->max_stagnations))
           {
             if(this->_logger)
               this->_logger->print(line + "\nNonlinear solver stagnated!\n", warning);
             nl_status = inner_status == FEAT::Solver::Status::stagnated ? NonLinearStatus::inner_stagnated : NonLinearStatus::stagnated;
             break;
           }
-          ++stagnation_counter;
-          time_step_size = Math::min(stag_increase * time_step_size, max_ts_size);
-          if(this->_logger)
-            this->_logger->print(line + "\nIncrease timestepsize to " + stringify_fp_sci(time_step_size, 2) + " due to stagnation\n", info);
+          ++this->stagnation_counter;
+          this->time_step_size *= this->stag_increase;
+          if(this->logger)
+            this->_logger->print(line + "\nIncrease timestepsize to " + stringify_fp_sci(this->time_step_size, 2) + " due to stagnation\n", info);
         }
 
         // assembly of actual rhs (implicit euler)
