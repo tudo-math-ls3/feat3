@@ -1029,9 +1029,9 @@ namespace Gendie
     logger.print("Start Nonlinear Solver", info);
     logger.flush_print();
     //now solve
-    FEAT::Solver::Status status = flow_solver->apply(vec_sol, vec_rhs);
+    NonLinearStatus status = flow_solver->apply(vec_sol, vec_rhs);
 
-    if(status != FEAT::Solver::Status::success)
+    if(status != NonLinearStatus::success)
     {
       logger.print("Solver did not converge with status code" + stringify(status), error);
     }

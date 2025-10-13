@@ -43,22 +43,22 @@ namespace FEAT
      * This enumeration defined the solver status return codes, which specify whether
      * the solver application was successful or failed due to some reason.
      */
-    enum class Status
+    enum class Status : std::uint8_t
     {
       /// undefined status
-      undefined = 0,
+      undefined = 0u,
       /// continue iteration (internal use only)
-      progress,
+      progress = 1u,
       /// solving successful (convergence criterion fulfilled)
-      success,
+      success = 2u,
       /// premature abort (solver aborted due to internal errors or preconditioner failure)
-      aborted,
+      aborted = 3u,
       /// solver diverged (divergence criterion fulfilled)
-      diverged,
+      diverged = 4u,
       /// solver reached maximum iterations
-      max_iter,
+      max_iter = 5u,
       /// solver stagnated (stagnation criterion fulfilled)
-      stagnated
+      stagnated = 6u
     };
 
     /// \cond internal

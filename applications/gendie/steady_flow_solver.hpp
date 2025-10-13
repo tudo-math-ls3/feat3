@@ -23,6 +23,94 @@ namespace Gendie
   typedef FEAT::Index Index;
 
   /**
+    * \brief NonlinSolver status return codes enumeration
+    *
+    * This enumeration defined the solver status return codes, which specify whether
+    * the solver application was successful or failed due to some reason.
+    */
+  enum class NonLinearStatus : std::uint8_t
+  {
+    /// undefined status
+    undefined = 0u,
+    /// continue iteration (internal use only)
+    progress = 1u,
+    /// solving successful (convergence criterion fulfilled)
+    success = 2u,
+    /// premature abort (solver aborted due to internal errors or preconditioner failure)
+    aborted = 3u,
+    /// solver diverged (divergence criterion fulfilled)
+    diverged = 4u,
+    /// solver reached maximum iterations
+    max_iter = 5u,
+    /// solver stagnated (stagnation criterion fulfilled)
+    stagnated = 6u,
+    /// inner linear solver stagnted
+    inner_stagnated = 7u
+  };
+
+  /// \cond internal
+  inline std::ostream& operator<<(std::ostream& os, NonLinearStatus status)
+  {
+    switch(status)
+    {
+    case NonLinearStatus::undefined:
+      return os << "undefined";
+    case NonLinearStatus::progress:
+      return os << "progress";
+    case NonLinearStatus::success:
+      return os << "success";
+    case NonLinearStatus::aborted:
+      return os << "aborted";
+    case NonLinearStatus::diverged:
+      return os << "diverged";
+    case NonLinearStatus::max_iter:
+      return os << "max-iter";
+    case NonLinearStatus::stagnated:
+      return os << "stagnated";
+    case NonLinearStatus::inner_stagnated:
+      return os << "inner stagnated";
+    default:
+      return os << "-unknown-";
+    }
+  }
+  /// \endcond
+
+  /**
+    * \brief Status success check function
+    *
+    * This function takes a Status value as input and checks whether it represents a
+    * 'successful' run. A solving run is interpreted as successful, if one of the following
+    * status codes was returned:
+    *
+    *  - Status::success
+    *  - Status::max_iter
+    *  - Status::stagnated
+    *  - Status::inner_stagnated
+    *
+    * For any other status code, the solving run is interpreted as unsuccessful.
+    *
+    * \param[in] status
+    * A status code returned by a solver.
+    *
+    * \returns
+    * \c true, if the run was successful, otherwise \c false.
+    */
+  inline bool status_success(NonLinearStatus status)
+  {
+    switch(status)
+    {
+    case NonLinearStatus::success:
+    case NonLinearStatus::max_iter:
+    case NonLinearStatus::stagnated:
+    case NonLinearStatus::inner_stagnated:
+      return true;
+
+    default:
+      return false;
+    }
+  }
+
+  /**
    * \brief BaseClass for steady-solver interface
    */
   template<typename VectorType_>
@@ -68,7 +156,9 @@ namespace Gendie
      *                 NOT ignored, so it is advantegeous if a good initial guess is given.
      * \param[in] vec_rhs The rhs vector with correct boundary values. Has to be synchronized, i.e. type 1
      */
-    virtual FEAT::Solver::Status apply(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs) = 0;
+    virtual NonLinearStatus apply(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs) = 0;
+
+    virtual typename DefectVectorType::DataType get_final_defect() const = 0;
 
     virtual bool init_sol(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs) = 0;
 
@@ -338,6 +428,12 @@ namespace Gendie
       return flow_solver->get_total_time_elapsed();
     }
 
+
+    DefectDataType _get_final_defect() const
+    {
+      return _defects.back();
+    }
+
     const Gendie::Logger* _logger;
     DefectVectorType _vec_def, _vec_cor;
     SolverVectorType _vec_solver_def, _vec_solver_cor;
@@ -456,12 +552,17 @@ namespace Gendie
       this->cast()._reset();
     }
 
-    virtual FEAT::Solver::Status apply(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs) override final
+    virtual NonLinearStatus apply(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs) override final
     {
       this->watch_total.start();
       auto status = this->cast()._apply(vec_sol, vec_rhs);
       this->watch_total.stop();
       return status;
+    }
+
+    virtual typename DefectVectorType::DataType get_final_defect() const override final
+    {
+      return this->cast()._get_final_defect();
     }
 
     virtual bool init_sol(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs) override final
@@ -595,12 +696,12 @@ namespace Gendie
 
     }
 
-    FEAT::Solver::Status _apply(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs)
+    NonLinearStatus _apply(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs)
     {
       this->watch_total.start();
       this->_defects.clear();
 
-      FEAT::Solver::Status nl_status = FEAT::Solver::Status::success;
+      NonLinearStatus nl_status = NonLinearStatus::success;
 
       //scale down starting solution pressure part
       this->watch_internal_scaling.start();
@@ -649,7 +750,7 @@ namespace Gendie
           }
           //if(testmode)
             //comm.print("Test-Mode: FAILED");
-          return FEAT::Solver::Status::diverged;
+          return static_cast<NonLinearStatus>(FEAT::Solver::Status::diverged);
         }
         else if(nl_step < this->_min_nonlin_iter)
         {
@@ -660,21 +761,21 @@ namespace Gendie
         {
           if(this->_logger)
             this->_logger->print(line + "\nNonlinear solver converged!\n", info);
-          nl_status = FEAT::Solver::Status::success;
+          nl_status = NonLinearStatus::success;
           break;
         }
         else if(nl_step >= this->_max_nonlin_iter)
         {
           if(this->_logger)
             this->_logger->print(line + "\nMaximum iterations reached!\n", warning);
-          nl_status = FEAT::Solver::Status::max_iter;
+          nl_status = NonLinearStatus::max_iter;
           break;
         }
         else if((nl_step >= 3) && (nl_step % 2 == 0u) && (this->_stag_rate < def_improve))
         {
           if(this->_logger)
             this->_logger->print(line + "\nNonlinear solver stagnated!\n", warning);
-          nl_status = FEAT::Solver::Status::stagnated;
+          nl_status = NonLinearStatus::stagnated;
           break;
         }
 
@@ -732,7 +833,7 @@ namespace Gendie
         {
           if(this->_logger)
             this->_logger->print("\n LINEAR SOLVER BREAKDOWN\n", error);
-          return status;
+          return static_cast<NonLinearStatus>(status);
         }
 
         // update solution
@@ -786,6 +887,12 @@ namespace Gendie
     DefectDataType stable_rel_tolerance = DefectDataType(0.05);
     /// Sample size for stable convergence check
     Index sample_size = Index(4);
+    /// Counter of often we have run into stagnation
+    Index stagnation_counter = Index(0);
+    /// Maximum stagnations allowed
+    Index max_stagnations = Index(1);
+    /// rate to increase stagnation
+    DefectDataType stag_increase = DefectDataType(100);
     /// Do we use adaptive step size ?
     bool adp_step_size = true;
 
@@ -815,6 +922,9 @@ namespace Gendie
       success &= prop->parse_entry("adapt-factor", adaptive_factor);
       success &= prop->parse_entry("stability-tol", stable_rel_tolerance);
       success &= prop->parse_entry("stability-sample-size", sample_size);
+      success &= prop->parse_entry("max-stagnations", max_stagnations);
+      success &= prop->parse_entry("stagnation-increase", stag_increase);
+
       return success;
     }
 
@@ -830,6 +940,8 @@ namespace Gendie
         s += String("Stablitiy Tolerance ").pad_back(this->padlen, this->pc) + ": " + FEAT::stringify_fp_sci(stable_rel_tolerance, 2, 4) + "\n";
         s += String("Stablility Sample Size ").pad_back(this->padlen, this->pc) + ": " + FEAT::stringify(sample_size) + "\n";
         s += String("Adapt Change Factor ").pad_back(this->padlen, this->pc) + ": " + FEAT::stringify_fp_sci(adaptive_factor, 2, 4) + "\n";
+        s += String("Max Stagnations Times ").pad_back(this->padlen, this->pc) + ": " + FEAT::stringify(max_stagnations) + "\n";
+        s += String("Stepsize stagnation increase ").pad_back(this->padlen, this->pc) + ": " + FEAT::stringify_fp_sci(stag_increase, 2, 4) + "\n";
       }
       return s;
     }
@@ -881,11 +993,12 @@ namespace Gendie
       return unstable_counter <= Index(0.35*double(actual_sample_size));
     }
 
-    FEAT::Solver::Status _apply(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs)
+    NonLinearStatus _apply(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs)
     {
       this->_defects.clear();
 
-      FEAT::Solver::Status nl_status = FEAT::Solver::Status::success;
+      NonLinearStatus nl_status = NonLinearStatus::success;
+      FEAT::Solver::Status inner_status = FEAT::Solver::Status::success;
 
       // for now, we operate on our internal correction vector
       this->_vec_cor.local().copy(vec_sol.local());
@@ -908,6 +1021,7 @@ namespace Gendie
         this->_logger->print("\nSolver   #  Defect (abs)   Defect (rel)   Improve   |  LS  fin abs Def   fin rel Def  abs Tol", info);
         this->_logger->print(  "----------------------------------------------------+---------------------------------------------", info);
       }
+
       for(Index t_step = 0; t_step < this->_max_nonlin_iter; ++t_step)
       {
         // this->defect_asm->set_backend();
@@ -948,7 +1062,7 @@ namespace Gendie
           }
           //if(testmode)
             //comm.print("Test-Mode: FAILED");
-          return FEAT::Solver::Status::diverged;
+          return NonLinearStatus::diverged;
         }
         else if(t_step < this->_min_nonlin_iter)
         {
@@ -959,22 +1073,29 @@ namespace Gendie
         {
           if(this->_logger)
             this->_logger->print(line + "\nNonlinear solver converged!\n", info);
-          nl_status = FEAT::Solver::Status::success;
+          nl_status = NonLinearStatus::success;
           break;
         }
         else if(t_step >= this->_max_nonlin_iter)
         {
           if(this->_logger)
             this->_logger->print(line + "\nMaximum iterations reached!\n", warning);
-          nl_status = FEAT::Solver::Status::max_iter;
+          nl_status = NonLinearStatus::max_iter;
           break;
         }
         else if((t_step >= 3) && (this->_stag_rate < def_improve))
         {
-          if(this->_logger)
-            this->_logger->print(line + "\nNonlinear solver stagnated!\n", warning);
-          nl_status = FEAT::Solver::Status::stagnated;
-          break;
+          if(adp_step_size && (this->stagnation_counter >= this->max_stagnations))
+          {
+            if(this->_logger)
+              this->_logger->print(line + "\nNonlinear solver stagnated!\n", warning);
+            nl_status = inner_status == FEAT::Solver::Status::stagnated ? NonLinearStatus::inner_stagnated : NonLinearStatus::stagnated;
+            break;
+          }
+          ++this->stagnation_counter;
+          this->time_step_size *= this->stag_increase;
+          if(this->logger)
+            this->_logger->print(line + "\nIncrease timestepsize to " + stringify_fp_sci(this->time_step_size, 2) + " due to stagnation\n", info);
         }
 
         // assembly of actual rhs (implicit euler)
@@ -1026,7 +1147,7 @@ namespace Gendie
         {
           this->_vec_solver_def.local().convert(this->_vec_def.local());
         }
-        FEAT::Solver::Status status = this->flow_solver->solve(this->_vec_solver_cor, this->_vec_solver_def);
+        inner_status = this->flow_solver->solve(this->_vec_solver_cor, this->_vec_solver_def);
         if constexpr(!no_convert)
         {
           this->_vec_cor.local().convert(this->_vec_solver_cor.local());
@@ -1045,11 +1166,11 @@ namespace Gendie
 
         this->flow_solver->done_numeric();
 
-        if(!FEAT::Solver::status_success(status))
+        if(!FEAT::Solver::status_success(inner_status))
         {
           if(this->_logger)
             this->_logger->print("\n LINEAR SOLVER BREAKDOWN\n", error);
-          return status;
+          return static_cast<NonLinearStatus>(inner_status);
         }
 
         if(this->_logger)

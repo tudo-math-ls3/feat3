@@ -15,7 +15,7 @@ namespace FEAT
   namespace Solver
   {
     // forward declaration
-    enum class Status;
+    enum class Status : std::uint8_t;
 
     /// Expression Type enumeration
     enum class ExpressionType

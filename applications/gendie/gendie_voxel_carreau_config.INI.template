@@ -176,6 +176,12 @@ stability-tol = float #default 0.8
 # Number of previous defects to check fo stability
 stability-smaple-size = uint #default 4
 
+# Maximum times we are allowed to hit stagnation
+max-stagnations = uint  # default 1
+
+# By how much we increase ts size if we hit nl stagnation
+stagnation-increase = float  #default 100.
+
 # Set postprocessing flags, mainly for paraview
 [postproc-params]
 # Write out refined vtk file?
