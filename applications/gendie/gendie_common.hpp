@@ -385,24 +385,32 @@ namespace Gendie
     typedef CarreauSingleMatSystemFlowAssembler<Domain_> CaS;
 
     const auto* sol_config = config->get_sub_section("solver-params");
-    if(sol_config && (sol_config->query("nl-solver", "pseudo-ts").compare_no_case("alpine") == 0))
+    const String solver_string = sol_config->query("nl-solver", "pseudo-ts");
+    if(sol_config && (solver_string.compare_no_case("alpine") == 0))
     {
       auto* sys_solver_ptr = new AlPiNeSteadyFlowSolver<StS, CaD, CaS, decltype(system_level->filter_sys)>(stokes_solver, defect_asm, system_asm, system_level->filter_sys, logger);
       sys_solver_ptr->set_scaling_factor(scaling_factor);
       sys_solver_ptr->parse(sol_config);
       return std::unique_ptr<Gendie::NonlinearSteadyFlowSolverBase<typename SystemLevel_::GlobalSystemVector>>(sys_solver_ptr);
     }
-    else if(sol_config && (sol_config->query("nl-solver", "pseudo-ts").compare_no_case("newton") == 0))
+    else if(sol_config && (solver_string.compare_no_case("backtrace-newton") == 0))
+    {
+      auto* sys_solver_ptr = new BackTraceNewtonSteadyFlowSolver<StS, CaD, CaS, decltype(system_level->filter_sys)>(stokes_solver, defect_asm, system_asm, system_level->filter_sys, logger);
+      sys_solver_ptr->set_scaling_factor(scaling_factor);
+      sys_solver_ptr->parse(sol_config);
+      return std::unique_ptr<Gendie::NonlinearSteadyFlowSolverBase<typename SystemLevel_::GlobalSystemVector>>(sys_solver_ptr);
+    }
+    else if(sol_config && (solver_string.compare_no_case("newton") == 0))
     {
       XABORTM("Not implemented");
       return std::unique_ptr<NonlinearSteadyFlowSolverBase<typename SystemLevel_::GlobalSystemVector>>(nullptr);
     }
-    else if(sol_config && (sol_config->query("nl-solver", "pseudo-ts").compare_no_case("picard") == 0))
+    else if(sol_config && (solver_string.compare_no_case("picard") == 0))
     {
       XABORTM("Not implemented");
       return std::unique_ptr<Gendie::NonlinearSteadyFlowSolverBase<typename SystemLevel_::GlobalSystemVector>>(nullptr);
     }
-    else if(sol_config && (sol_config->query("nl-solver", "pseudo-ts").compare_no_case("pseudo-ts") == 0))
+    else if(sol_config && (solver_string.compare_no_case("pseudo-ts") == 0))
     {
       auto* sys_solver_ptr = new PseudoUnsteadyFlowSolver<StS, CaD, CaS, decltype(system_level->filter_sys)>(stokes_solver, defect_asm, system_asm, system_level->filter_sys, logger);
       sys_solver_ptr->set_scaling_factor(scaling_factor);

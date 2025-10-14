@@ -160,6 +160,8 @@ namespace Gendie
 
     virtual typename DefectVectorType::DataType get_final_defect() const = 0;
 
+    virtual Index get_num_iters() const = 0;
+
     virtual bool init_sol(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs) = 0;
 
     virtual FEAT::String format_timings() const = 0;
@@ -287,6 +289,7 @@ namespace Gendie
         this->_vec_solver_def = this->flow_solver->create_defect();
         this->_vec_solver_cor = this->flow_solver->create_correction();
       }
+      _defects.clear();
     }
 
     void _done()
@@ -337,9 +340,10 @@ namespace Gendie
       return s;
     }
 
-    //for now does nothing
+    //for now only reset the defects
     void _reset()
     {
+      _defects.clear();
     }
 
     bool _init_sol(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs)
@@ -432,6 +436,11 @@ namespace Gendie
     DefectDataType _get_final_defect() const
     {
       return _defects.back();
+    }
+
+    Index _get_num_iters() const
+    {
+      return _cur_iter;
     }
 
     const Gendie::Logger* _logger;
@@ -563,6 +572,11 @@ namespace Gendie
     virtual typename DefectVectorType::DataType get_final_defect() const override final
     {
       return this->cast()._get_final_defect();
+    }
+
+    virtual Index get_num_iters() const override final
+    {
+      return this->cast()._get_num_iters();
     }
 
     virtual bool init_sol(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs) override final
@@ -715,7 +729,7 @@ namespace Gendie
         this->_logger->print("\nSolver   #  Defect (abs)   Defect (rel)   Improve   |  LS  fin abs Def   fin rel Def  abs Tol", info);
         this->_logger->print(  "----------------------------------------------------+---------------------------------------------", info);
       }
-      for(Index nl_step = 0; nl_step < this->_max_nonlin_iter; ++nl_step)
+      for(this->_cur_iter = 0; this->_cur_iter < this->_max_nonlin_iter; ++this->_cur_iter)
       {
         // this->defect_asm->set_backend();
         //assemble defect
@@ -736,7 +750,7 @@ namespace Gendie
         const DefectDataType def_rel = def_nl / this->_defects.front();
 
         FEAT::String line = "AlPiNe: ";
-        line += FEAT::stringify(nl_step).pad_front(2) + ": ";
+        line += FEAT::stringify(this->_cur_iter).pad_front(2) + ": ";
         line += FEAT::stringify_fp_sci(def_nl, 6) + " / ";
         line += FEAT::stringify_fp_sci(def_nl/this->_defects.front()) + " / ";
         line += FEAT::stringify_fp_sci(def_nl/def_prev, 3);
@@ -752,7 +766,7 @@ namespace Gendie
             //comm.print("Test-Mode: FAILED");
           return static_cast<NonLinearStatus>(FEAT::Solver::Status::diverged);
         }
-        else if(nl_step < this->_min_nonlin_iter)
+        else if(this->_cur_iter < this->_min_nonlin_iter)
         {
           // nothing to do here; this else-case exists just to ensure
           // that none of the following cases fires and breaks the loop
@@ -764,14 +778,14 @@ namespace Gendie
           nl_status = NonLinearStatus::success;
           break;
         }
-        else if(nl_step >= this->_max_nonlin_iter)
+        else if(this->_cur_iter >= this->_max_nonlin_iter)
         {
           if(this->_logger)
             this->_logger->print(line + "\nMaximum iterations reached!\n", warning);
           nl_status = NonLinearStatus::max_iter;
           break;
         }
-        else if((nl_step >= 3) && (nl_step % 2 == 0u) && (this->_stag_rate < def_improve))
+        else if((this->_cur_iter >= 3) && (this->_cur_iter % 2 == 0u) && (this->_stag_rate < def_improve))
         {
           if(this->_logger)
             this->_logger->print(line + "\nNonlinear solver stagnated!\n", warning);
@@ -781,7 +795,7 @@ namespace Gendie
 
         // this->system_asm->set_backend();
         // set newton or picard step
-        this->system_asm->set_jacobian(double(nl_step%2u & (nl_step>min_picard_steps)));
+        this->system_asm->set_jacobian(double(this->_cur_iter%2u & (this->_cur_iter>min_picard_steps)));
 
         // this call has to work with arbitrary solution vector...
         // also assembles matrix for adjusted system (u, \tilde(p)),  \tilde(p) = p/scaling_factor
@@ -803,7 +817,7 @@ namespace Gendie
         //todo: init_numeric sets its own backend??
         this->flow_solver->init_numeric();
 
-        this->flow_solver->set_tol_abs(SolverDataType(this->_choose_linear_tolerance(nl_step, def_nl, def_improve, this->_defects)));
+        this->flow_solver->set_tol_abs(SolverDataType(this->_choose_linear_tolerance(this->_cur_iter, def_nl, def_improve, this->_defects)));
         this->flow_solver->set_tol_rel(this->_fixed_ls_tol > DefectDataType(0) ? SolverDataType(this->_fixed_ls_tol) : SolverDataType(1E-2));
 
         if constexpr(!no_convert)
@@ -822,7 +836,7 @@ namespace Gendie
           line += FEAT::String(" | ") + FEAT::stringify(this->flow_solver->get_num_iter()).pad_front(3) + ": "
             + FEAT::stringify_fp_sci(this->flow_solver->get_def_final(), 4) + " / "
             + FEAT::stringify_fp_sci(this->flow_solver->get_def_final() / this->flow_solver->get_def_initial(), 4);
-          if((this->_fixed_ls_tol<DefectDataType(0)) && (nl_step > Index(0)))
+          if((this->_fixed_ls_tol<DefectDataType(0)) && (this->_cur_iter > Index(0)))
             line += FEAT::String(" [") + FEAT::stringify_fp_sci(this->flow_solver->get_tol_abs(), 4) + "]";
           this->_logger->print(line, info);
         }
@@ -886,13 +900,15 @@ namespace Gendie
     /// Tolerance to decide on linear convergence
     DefectDataType stable_rel_tolerance = DefectDataType(0.05);
     /// Sample size for stable convergence check
-    Index sample_size = Index(4);
+    Index sample_size = Index(8);
     /// Counter of often we have run into stagnation
     Index stagnation_counter = Index(0);
     /// Maximum stagnations allowed
-    Index max_stagnations = Index(1);
+    Index max_stagnations = Index(2);
     /// rate to increase stagnation
     DefectDataType stag_increase = DefectDataType(100);
+    /// maximum ts size
+    DefectDataType max_ts_size = DefectDataType(1e+10);
     /// Do we use adaptive step size ?
     bool adp_step_size = true;
 
@@ -949,6 +965,13 @@ namespace Gendie
     void _init()
     {
       BaseClass::_init();
+      stagnation_counter = Index(0);
+    }
+
+    void _reset()
+    {
+      BaseClass::_reset();
+      stagnation_counter = Index(0);
     }
 
     DefectDataType _choose_linear_tolerance(FEAT::Index t_step, DefectDataType def_nl, DefectDataType def_improve, [[maybe_unused]] const std::deque<DefectDataType>& defects) const
@@ -1022,7 +1045,7 @@ namespace Gendie
         this->_logger->print(  "----------------------------------------------------+---------------------------------------------", info);
       }
 
-      for(Index t_step = 0; t_step < this->_max_nonlin_iter; ++t_step)
+      for(this->_cur_iter = 0; this->_cur_iter < this->_max_nonlin_iter; ++this->_cur_iter)
       {
         // this->defect_asm->set_backend();
 
@@ -1041,15 +1064,15 @@ namespace Gendie
         const DefectDataType def_rel = def_nl / this->_defects.front();
 
         FEAT::String line = "Pseudo Time Stepping: ";
-        line += FEAT::stringify(t_step).pad_front(2) + ": ";
+        line += FEAT::stringify(this->_cur_iter).pad_front(2) + ": ";
         line += FEAT::stringify_fp_sci(def_nl, 6) + " / ";
         line += FEAT::stringify_fp_sci(def_nl/this->_defects.front()) + " / ";
         line += FEAT::stringify_fp_sci(def_nl/def_prev, 3);
 
         // increase time step factor if we do not have linear convergence
-        if(!_convergence_stable(t_step, def_nl, def_improve, this->_defects))
+        if(!_convergence_stable(this->_cur_iter, def_nl, def_improve, this->_defects))
         {
-          time_step_size *= adaptive_factor;
+          time_step_size = Math::max(time_step_size * adaptive_factor, max_ts_size);
           if(this->_logger) this->_logger->print("Increase time step size to " + FEAT::stringify_fp_sci(time_step_size, 2), info);
         }
 
@@ -1064,7 +1087,7 @@ namespace Gendie
             //comm.print("Test-Mode: FAILED");
           return NonLinearStatus::diverged;
         }
-        else if(t_step < this->_min_nonlin_iter)
+        else if(this->_cur_iter < this->_min_nonlin_iter)
         {
           // nothing to do here; this else-case exists just to ensure
           // that none of the following cases fires and breaks the loop
@@ -1076,26 +1099,26 @@ namespace Gendie
           nl_status = NonLinearStatus::success;
           break;
         }
-        else if(t_step >= this->_max_nonlin_iter)
+        else if(this->_cur_iter >= this->_max_nonlin_iter)
         {
           if(this->_logger)
             this->_logger->print(line + "\nMaximum iterations reached!\n", warning);
           nl_status = NonLinearStatus::max_iter;
           break;
         }
-        else if((t_step >= 3) && (this->_stag_rate < def_improve))
+        else if((this->_cur_iter >= 3) && (this->_stag_rate < def_improve))
         {
-          if(adp_step_size && (this->stagnation_counter >= this->max_stagnations))
+          if(adp_step_size && (stagnation_counter >= max_stagnations))
           {
             if(this->_logger)
               this->_logger->print(line + "\nNonlinear solver stagnated!\n", warning);
             nl_status = inner_status == FEAT::Solver::Status::stagnated ? NonLinearStatus::inner_stagnated : NonLinearStatus::stagnated;
             break;
           }
-          ++this->stagnation_counter;
-          this->time_step_size *= this->stag_increase;
-          if(this->logger)
-            this->_logger->print(line + "\nIncrease timestepsize to " + stringify_fp_sci(this->time_step_size, 2) + " due to stagnation\n", info);
+          ++stagnation_counter;
+          time_step_size = Math::max(stag_increase * time_step_size, max_ts_size);
+          if(this->_logger)
+            this->_logger->print(line + "\nIncrease timestepsize to " + stringify_fp_sci(time_step_size, 2) + " due to stagnation\n", info);
         }
 
         // assembly of actual rhs (implicit euler)
@@ -1140,7 +1163,7 @@ namespace Gendie
         // todo: init numeric sets its own backend?
         this->flow_solver->init_numeric();
 
-        this->flow_solver->set_tol_abs(SolverDataType(this->_choose_linear_tolerance(t_step, def_nl, def_improve, this->_defects)));
+        this->flow_solver->set_tol_abs(SolverDataType(this->_choose_linear_tolerance(this->_cur_iter, def_nl, def_improve, this->_defects)));
         this->flow_solver->set_tol_rel(this->_fixed_ls_tol > DefectDataType(0) ? SolverDataType(this->_fixed_ls_tol) : SolverDataType(1E-2));
 
         if constexpr(!no_convert)
@@ -1159,7 +1182,7 @@ namespace Gendie
           line += FEAT::String(" | ") + FEAT::stringify(this->flow_solver->get_num_iter()).pad_front(3) + ": "
             + FEAT::stringify_fp_sci(this->flow_solver->get_def_final(), 4) + " / "
             + stringify_fp_sci(this->flow_solver->get_def_final() / this->flow_solver->get_def_initial(), 4);
-          if((this->_fixed_ls_tol<DefectDataType(0)) && (t_step > Index(0)))
+          if((this->_fixed_ls_tol<DefectDataType(0)) && (this->_cur_iter > Index(0)))
             line += FEAT::String(" [") + stringify_fp_sci(this->flow_solver->get_tol_abs(), 4) + "]";
           this->_logger->print(line, info);
         }
@@ -1189,5 +1212,268 @@ namespace Gendie
       return nl_status;
     }
 
-  }; // class AlPiNeSteadyFlowSolver<...>
+  }; // class PseudoUnsteadyFlowSolver<...>
+
+  template<typename StokesSolver_, typename DefectAssembler_, typename SystemAssembler_, typename DefectFilter_>
+  class BackTraceNewtonSteadyFlowSolver : public NonlinearSteadyFlowSolverCRTP<BackTraceNewtonSteadyFlowSolver<StokesSolver_, DefectAssembler_, SystemAssembler_, DefectFilter_>, StokesSolver_, DefectAssembler_, SystemAssembler_, DefectFilter_>
+  {
+  public:
+    typedef NonlinearSteadyFlowSolverCRTP<BackTraceNewtonSteadyFlowSolver, StokesSolver_, DefectAssembler_, SystemAssembler_, DefectFilter_> BaseClass;
+    typedef typename BaseClass::DefectVectorType DefectVectorType;
+    typedef typename BaseClass::SteadyStokesSolver SteadyStokesSolver;
+    typedef typename BaseClass::DefectAssembler DefectAssembler;
+    typedef typename BaseClass::SystemAssembler SystemAssembler;
+    typedef typename BaseClass::DefectFilter DefectFilter;
+    typedef typename BaseClass::SolverVectorType SolverVectorType;
+    typedef typename BaseClass::FilterType FilterType;
+    typedef typename BaseClass::SolverDataType SolverDataType;
+    typedef typename BaseClass::DefectDataType DefectDataType;
+
+    friend BaseClass;
+
+    //use constructors of baseclass
+    using BaseClass::BaseClass;
+
+    using BaseClass::no_convert;
+
+    DefectDataType min_backtrace_omega = DefectDataType(1E-2);
+    std::size_t min_picard_steps = std::size_t(3);
+
+  protected:
+
+    bool _parse(const FEAT::PropertyMap* prop)
+    {
+      bool success = BaseClass::_parse(prop);
+      if(!prop)
+        return success;
+      success &= prop->parse_entry("min-picard-steps", min_picard_steps);
+      // {
+      // }
+      return success;
+    }
+
+    FEAT::String _format_string() const
+    {
+      using String = FEAT::String;
+      String s = String("Newton-Solver:\n") + BaseClass::_format_string();
+      return s;
+    }
+
+    void _init()
+    {
+      BaseClass::_init();
+    }
+
+    DefectDataType _choose_linear_tolerance(FEAT::Index nl_step, DefectDataType def_nl, DefectDataType def_improve, const std::deque<DefectDataType>& defects) const
+    {
+      DefectDataType abs_tol = DefectDataType(1e+20);
+      if(this->_fixed_ls_tol > DefectDataType(0))
+      {
+        return abs_tol;
+      }
+      if(nl_step == 0)
+      {
+        // shutoff absolute tolerance
+      }
+      else if(nl_step <= min_picard_steps)
+      {
+        // linear improvement
+        abs_tol = def_nl * def_improve * DefectDataType(0.1);
+      }
+      else if(nl_step == 1)
+      {
+        // We furthermore limit this absolute tolerance to ensure that we do not
+        // overshoot the mark by overoptimistic quadratic convergence expectations.
+        abs_tol = def_nl * def_improve * def_improve * DefectDataType(0.1);
+      }
+      else
+      {
+        // We furthermore limit this absolute tolerance to ensure that we do not
+        // overshoot the mark by overoptimistic quadratic convergence expectations.
+        DefectDataType def_prev_imp = defects.at(defects.size()-2)/defects.at(defects.size()-3);
+        abs_tol = def_nl * def_prev_imp * def_prev_imp * def_improve * DefectDataType(0.1);
+      }
+      return FEAT::Math::max(abs_tol, this->_tol_abs * DefectDataType(0.01));
+
+    }
+
+    NonLinearStatus _apply(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs)
+    {
+      XASSERTM(min_backtrace_omega < DefectDataType(0.5), "We have to at least allow one backtrace step");
+      this->watch_total.start();
+      this->_defects.clear();
+
+      NonLinearStatus nl_status = NonLinearStatus::success;
+
+      //scale down starting solution pressure part
+      this->watch_internal_scaling.start();
+      vec_sol.local().template at<1>().scale(vec_sol.local().template at<1>(), DefectDataType(1)/this->_scaling_factor);
+      this->watch_internal_scaling.stop();
+
+
+      if(this->_logger)
+      {
+        this->_logger->print("Using scaling factor: " + stringify_fp_sci(this->_scaling_factor) , info);
+        this->_logger->print("\nSolver   #  Defect (abs)   Defect (rel)   Improve   |  LS  fin abs Def   fin rel Def  abs Tol", info);
+        this->_logger->print(  "----------------------------------------------------+---------------------------------------------", info);
+      }
+      for(this->_cur_iter = 0; this->_cur_iter < this->_max_nonlin_iter; ++this->_cur_iter)
+      {
+        const DefectDataType def_prev = (this->_defects.empty() ? DefectDataType(1) : this->_defects.back());
+        // this->defect_asm->set_backend();
+        //assemble defect
+        if(this->_cur_iter <= min_picard_steps)
+        {
+          this->defect_asm->assemble_defect(this->_vec_def, vec_sol, vec_sol, vec_rhs);
+          // and filter
+          this->filter.filter_def(this->_vec_def);
+        }
+        else
+        {
+          // we are performing our backtracing newton, so check if we converged
+          for(DefectDataType bt_omega = DefectDataType(0.5); bt_omega > min_backtrace_omega; bt_omega *= DefectDataType(0.5))
+          {
+            this->defect_asm->assemble_defect(this->_vec_def, vec_sol, vec_sol, vec_rhs);
+            // and filter
+            this->filter.filter_def(this->_vec_def);
+            // did we improve?
+            if(def_prev > this->_vec_def.norm2())
+              break;
+
+            // backtrace solution
+            vec_sol.axpy(this->_vec_cor, -bt_omega);
+            // TODO: do we need to filter?? I think not
+          }
+        }
+
+
+        if constexpr(!no_convert)
+        {
+          this->_vec_solver_def.local().convert(this->_vec_def.local());
+        }
+
+        const DefectDataType def_nl = this->_vec_def.norm2();
+        const DefectDataType def_improve = def_nl / def_prev;
+        this->_defects.push_back(def_nl);
+        const DefectDataType def_rel = def_nl / this->_defects.front();
+
+        FEAT::String line = "RestrictedNewton: ";
+        line += FEAT::stringify(this->_cur_iter).pad_front(2) + ": ";
+        line += FEAT::stringify_fp_sci(def_nl, 6) + " / ";
+        line += FEAT::stringify_fp_sci(def_nl/this->_defects.front()) + " / ";
+        line += FEAT::stringify_fp_sci(def_nl/def_prev, 3);
+
+        if(def_rel > DefectDataType(1E+3))
+        {
+          if(this->_logger)
+          {
+            this->_logger->print(line, info);
+            this->_logger->print("NONLINEAR SOLVER DIVERGED !!!", error);
+          }
+          //if(testmode)
+            //comm.print("Test-Mode: FAILED");
+          return static_cast<NonLinearStatus>(FEAT::Solver::Status::diverged);
+        }
+        else if(this->_cur_iter < this->_min_nonlin_iter)
+        {
+          // nothing to do here; this else-case exists just to ensure
+          // that none of the following cases fires and breaks the loop
+        }
+        else if((def_nl < this->_tol_abs && def_rel < this->_tol_rel) || def_nl < this->_tol_low_abs)
+        {
+          if(this->_logger)
+            this->_logger->print(line + "\nNonlinear solver converged!\n", info);
+          nl_status = NonLinearStatus::success;
+          break;
+        }
+        else if(this->_cur_iter >= this->_max_nonlin_iter)
+        {
+          if(this->_logger)
+            this->_logger->print(line + "\nMaximum iterations reached!\n", warning);
+          nl_status = NonLinearStatus::max_iter;
+          break;
+        }
+        else if((this->_stag_rate < def_improve))
+        {
+          // fix our correction
+          if(this->_logger)
+            this->_logger->print(line + "\nNonlinear solver stagnated!\n", warning);
+          nl_status = NonLinearStatus::stagnated;
+          break;
+        }
+
+        // this->system_asm->set_backend();
+        // set newton or picard step
+        this->system_asm->set_jacobian(double(this->_cur_iter%2u & (this->_cur_iter>min_picard_steps)));
+
+        // this call has to work with arbitrary solution vector...
+        // also assembles matrix for adjusted system (u, \tilde(p)),  \tilde(p) = p/scaling_factor
+        this->system_asm->assemble_matrices(this->flow_solver->get_systems(), vec_sol);
+
+        #ifdef FEAT_DEBUG_MODE
+        {
+          auto diag_a = this->flow_solver->get_systems().front()->matrix_a.create_vector_l();
+          auto diag_m = this->flow_solver->get_systems().front()->velo_mass_matrix.create_vector_l();
+          this->flow_solver->get_systems().front()->matrix_a.extract_diag(diag_a, true);
+          this->flow_solver->get_systems().front()->velo_mass_matrix.extract_diag(diag_m, true);
+          auto sc_factor = diag_a.max_abs_element() / diag_m.max_abs_element();
+          if(this->_logger) this->_logger->print("Max abs ele " + stringify(sc_factor), info);
+        }
+        #endif
+
+        // this->flow_solver->set_backend();
+
+        //todo: init_numeric sets its own backend??
+        this->flow_solver->init_numeric();
+
+        this->flow_solver->set_tol_abs(SolverDataType(this->_choose_linear_tolerance(this->_cur_iter, def_nl, def_improve, this->_defects)));
+        this->flow_solver->set_tol_rel(this->_fixed_ls_tol > DefectDataType(0) ? SolverDataType(this->_fixed_ls_tol) : SolverDataType(1E-2));
+
+        if constexpr(!no_convert)
+        {
+          this->_vec_solver_def.local().convert(this->_vec_def.local());
+        }
+        FEAT::Solver::Status status = this->flow_solver->apply(this->_vec_solver_cor, this->_vec_solver_def);
+        if constexpr(!no_convert)
+        {
+          this->_vec_cor.local().convert(this->_vec_solver_cor.local());
+        }
+
+        // get solver statistics
+        if(this->_logger)
+        {
+          line += FEAT::String(" | ") + FEAT::stringify(this->flow_solver->get_num_iter()).pad_front(3) + ": "
+            + FEAT::stringify_fp_sci(this->flow_solver->get_def_final(), 4) + " / "
+            + stringify_fp_sci(this->flow_solver->get_def_final() / this->flow_solver->get_def_initial(), 4);
+          if((this->_fixed_ls_tol<DefectDataType(0)) && (this->_cur_iter > Index(0)))
+            line += FEAT::String(" [") + stringify_fp_sci(this->flow_solver->get_tol_abs(), 4) + "]";
+          this->_logger->print(line, info);
+        }
+
+        this->flow_solver->done_numeric();
+
+        if(!FEAT::Solver::status_success(status))
+        {
+          if(this->_logger)
+            this->_logger->print("\n LINEAR SOLVER BREAKDOWN\n", error);
+          return static_cast<NonLinearStatus>(status);
+        }
+
+        // update solution
+        vec_sol.axpy(this->_vec_cor, DefectDataType(1));
+
+        if(this->_logger)
+          this->_logger->flush_print();
+
+      } // end of inner iteration
+
+      //scale back pressure
+      this->watch_internal_scaling.start();
+      vec_sol.local().template at<1>().scale(vec_sol.local().template at<1>(), this->_scaling_factor);
+      this->watch_internal_scaling.stop();
+
+      return nl_status;
+    }
+
+  }; // class BackTraceNewtonFlowSolver<...>
 }

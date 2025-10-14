@@ -88,7 +88,7 @@ min-gap = float  # or false
 # Define the solver
 [solver-params]
 # Use full jacobian for the convection part?
-nl-solver = pseudo-ts or picard or newton or alpine
+nl-solver = pseudo-ts or picard or newton or alpine or backtrace-newton
 
 # Use full jacobian for the carreau part?
 material-newton = float  ## if 0 switches of Picard, if 1 full Newton
