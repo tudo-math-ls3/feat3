@@ -1117,7 +1117,7 @@ namespace Gendie
             break;
           }
           ++stagnation_counter;
-          time_step_size = Math::max(stag_increase * time_step_size, max_ts_size);
+          time_step_size = Math::min(stag_increase * time_step_size, max_ts_size);
           if(this->_logger)
             this->_logger->print(line + "\nIncrease timestepsize to " + stringify_fp_sci(time_step_size, 2) + " due to stagnation\n", info);
         }
