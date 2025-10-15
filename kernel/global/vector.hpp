@@ -71,6 +71,7 @@ namespace FEAT
 
       typedef typename LocalVector_::DataType DataType;
       typedef typename LocalVector_::IndexType IndexType;
+      typedef Mirror_ MirrorType;
       typedef LocalVector_ LocalVectorType;
 
       /// Our 'base' class type

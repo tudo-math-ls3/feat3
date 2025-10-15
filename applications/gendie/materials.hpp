@@ -97,7 +97,7 @@ namespace Gendie
     //formatting variables
     static constexpr int prec = 2;
     static constexpr int width = 5;
-    static constexpr bool clamp_shearrate = false;
+    static constexpr bool clamp_shearrate = true;
 
     template<typename... T>
     ViscoModelBase(T... in) : data({in...}) {}

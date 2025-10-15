@@ -13,7 +13,7 @@
 #include <applications/gendie/steady_stokes_solver.hpp>
 #include <applications/gendie/steady_flow_solver.hpp>
 #include <applications/gendie/cgal_meshpart_helper.hpp>
-#include <applications/gendie/velo_analyser.hpp>
+#include <applications/gendie/shearrate_assembler.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/util/omp_util.hpp>
 
@@ -524,8 +524,8 @@ namespace Gendie
     system_level.compile_system_filter();
   }
 
-  template<typename SystemLevel_, typename DomainLevel_, typename VeloInfo_, typename ParamHolder_>
-  void write_vtk(const typename SystemLevel_::GlobalSystemVector& vec_sol, const typename SystemLevel_::GlobalSystemVector& vec_rhs, const DomainLevel_& domain, SystemLevel_& system_level, const VeloInfo_& velo_info, const ParamHolder_& param_holder, const Logger* logger)
+  template<typename SystemLevel_, typename DomainLevel_, typename ScalarVector_, typename ParamHolder_>
+  void write_vtk(const typename SystemLevel_::GlobalSystemVector& vec_sol, const typename SystemLevel_::GlobalSystemVector& vec_rhs, const DomainLevel_& domain, SystemLevel_& system_level, const ScalarVector_& vec_shearrate, const ScalarVector_& vec_viscosity, const ParamHolder_& param_holder, const Logger* logger)
   {
     logger->print("Writing VTK output to '" + param_holder.vtk_name + ".pvtu'", info);
 
@@ -554,10 +554,10 @@ namespace Gendie
     }
     if(param_holder.vtk_debug)
       exporter.add_vertex_vector("Debug: rhs_v", vec_rhs.local().template at<0>());
-    if(velo_info.vec_viscosity.size() == vec_sol.local().template at<0>().size())
+    if(vec_viscosity.local().size() == vec_sol.local().template at<0>().size())
     {
-      exporter.add_vertex_scalar("Viscosity [Pa s]", velo_info.vec_viscosity.get_elements().front(), param_holder.visc_scaling_factor);
-      exporter.add_vertex_scalar("NormShearRate [1/s]", velo_info.vec_norm_shear.get_elements().front());
+      exporter.add_vertex_scalar("Viscosity [Pa s]", vec_viscosity.local().get_elements().front(), param_holder.visc_scaling_factor);
+      exporter.add_vertex_scalar("NormShearRate [1/s]", vec_shearrate.local().get_elements().front());
     }
 
 
@@ -1047,29 +1047,45 @@ namespace Gendie
     double ls_time_solver = flow_solver->get_linear_solver_time();
 
     // reset solver to free memory
-    flow_solver->reset();
+    flow_solver.reset();
 
+    FEAT::Global::Vector<FEAT::LAFEM::DenseVector<SystemDataType, SystemIndexType>, FEAT::LAFEM::VectorMirror<SystemDataType, SystemIndexType>> vec_shearrate{&system_level->gate_scalar_velo}, vec_viscosity{&system_level->gate_scalar_velo};
     // and now, postprocessing, todo: refactor velo analyzer
     watch_analyze_sol.start();
-    const auto mat_data = materials.front().get_viscosity_model()->get_data();
-    auto velo_info = Gendie::CarreauVelocityAnalyser::compute(vec_sol.local().first(), domain.front()->space_velo, param_holder.cubature_postproc,
-                                                materials.front().get_density_gram_per_unit(param_holder.mesh_unit_scale), inflow_boundaries.front().get_throughput(), mat_data[0] * param_holder.visc_scaling_factor, SystemDataType(0), mat_data[2], SystemDataType(2), mat_data[1], SystemDataType(40));
+    if(param_holder.want_vtk)
     {
-      //create gate for communication
-      // FEAT::Global::Gate<FEAT::LAFEM::DenseVector<SystemDataType,Index>, FEAT::LAFEM::VectorMirror<SystemDataType, Index>> tmp_gate;
-      // FEAT::LAFEM::DenseVector<SystemDataType,Index> tmp_vec(system_level->gate_velo._freqs.size());
-      // tmp_gate.convert(system_level->gate_velo, std::move(tmp_vec));
-      // TODO: why not use scalar gate?
-      velo_info.synchronize(comm, system_level->gate_scalar_velo);
+      vec_shearrate.local() = FEAT::LAFEM::DenseVector<SystemDataType, SystemIndexType>(domain.front()->space_velo.get_num_dofs());
+      vec_shearrate.format();
+      {
+        SystemLevel<SystemDataType, SystemIndexType>::GlobalVeloVector sol_velo(&system_level->gate_velo, vec_sol.local().first().clone(FEAT::LAFEM::CloneMode::Shallow));
+        auto mass_vec = system_level->velo_mass_matrix.lump_rows(true);
+        mass_vec.local().component_invert(mass_vec.local());
+        Gendie::assemble_shear_vector(domain.front()->domain_asm, vec_shearrate.local(), sol_velo, mass_vec.local(), domain.front()->space_velo, param_holder.cubature_postproc);
+      }
+      auto visco_func = materials.front().get_visc_func(param_holder.mesh_unit_scale);
+      vec_viscosity.local() = FEAT::LAFEM::DenseVector<SystemDataType, SystemIndexType>(domain.front()->space_velo.get_num_dofs());
+      vec_viscosity.format();
+
+      auto abiat_at = materials.front().get_abiat_aT(inflow_boundaries.front().get_temperature());
+
+      auto* visco_val = vec_viscosity.local().elements();
+      const auto* shear_val = vec_shearrate.local().elements();
+
+      FEAT_PRAGMA_OMP(parallel for)
+      for(Index i = 0; i < vec_shearrate.local().size(); ++i)
+      {
+        visco_val[i] = visco_func(shear_val[i], abiat_at);
+      }
+
+      // to be assure, average, so we have the same value everywhere
+      vec_viscosity.sync_1();
+      vec_shearrate.sync_1();
     }
     watch_analyze_sol.stop();
 
-    // print analysis
-    logger.print(velo_info.format_string(), info);
-
     watch_write_out.start();
     if(param_holder.want_vtk)
-      write_vtk(vec_sol, vec_rhs, domain, *system_level, velo_info, param_holder, &logger);
+      write_vtk(vec_sol, vec_rhs, domain, *system_level, vec_shearrate, vec_viscosity, param_holder, &logger);
     watch_write_out.stop();
 
 
