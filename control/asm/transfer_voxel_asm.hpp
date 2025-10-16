@@ -41,25 +41,26 @@ namespace FEAT
         template<typename Matrix_, typename Mirror_>
         static Matrix_ deslag_matrix_rows(const Matrix_& matrix, const Mirror_& row_mirror)
         {
+          typedef typename Matrix_::IndexType IndexType;
           const Index num_idx = row_mirror.num_indices();
           const auto* idx_f = row_mirror.indices();
 
-          const auto* row_ptr_s = matrix.row_ptr();
-          const auto* col_idx_s = matrix.col_ind();
+          const IndexType* row_ptr_s = matrix.row_ptr();
+          const IndexType* col_idx_s = matrix.col_ind();
           Index num_nze = 0u;
           for(Index i(0); i < num_idx; ++i)
             num_nze += row_ptr_s[idx_f[i] + 1u] - row_ptr_s[idx_f[i]];
 
           Matrix_ matrix_x(num_idx, matrix.columns(), num_nze);
-          auto* row_ptr_x = matrix_x.row_ptr();
-          auto* col_idx_x = matrix_x.col_ind();
+          IndexType* row_ptr_x = matrix_x.row_ptr();
+          IndexType* col_idx_x = matrix_x.col_ind();
           auto* val_x = matrix_x.val();
           const auto* val_s = matrix.val();
           row_ptr_x[0] = 0u;
           for(Index i(0); i < num_idx; ++i)
           {
             Index row_s = idx_f[i];
-            Index k(row_ptr_x[i]);
+            IndexType k(row_ptr_x[i]);
             for(auto j(row_ptr_s[row_s]); j < row_ptr_s[row_s+1u]; ++j, ++k)
             {
               col_idx_x[k] = col_idx_s[j];
@@ -74,6 +75,7 @@ namespace FEAT
         template<typename Matrix_, typename Mirror_>
         static Matrix_ deslag_matrix_cols(const Matrix_& matrix, const Mirror_& col_mirror)
         {
+          typedef typename Matrix_::IndexType IndexType;
           const Index num_idx = col_mirror.num_indices();
           const auto* idx_f = col_mirror.indices();
 
@@ -82,27 +84,27 @@ namespace FEAT
             col_map[idx_f[i]] = i;
 
           const Index num_rows = matrix.rows();
-          const auto* row_ptr_s = matrix.row_ptr();
-          const auto* col_idx_s = matrix.col_ind();
+          const IndexType* row_ptr_s = matrix.row_ptr();
+          const IndexType* col_idx_s = matrix.col_ind();
           Index used_elems = matrix.used_elements();
           Index num_nze = 0u;
           for(Index i(0); i < used_elems; ++i)
             num_nze += (col_map[col_idx_s[i]] != ~Index(0));
 
           Matrix_ matrix_x(num_rows, num_idx, num_nze);
-          auto* row_ptr_x = matrix_x.row_ptr();
-          auto* col_idx_x = matrix_x.col_ind();
+          IndexType* row_ptr_x = matrix_x.row_ptr();
+          IndexType* col_idx_x = matrix_x.col_ind();
           auto* val_x = matrix_x.val();
           const auto* val_s = matrix.val();
           row_ptr_x[0] = 0u;
           for(Index i(0); i < num_rows; ++i)
           {
-            Index k(row_ptr_x[i]);
+            IndexType k(row_ptr_x[i]);
             for(auto j(row_ptr_s[i]); j < row_ptr_s[i+1u]; ++j)
             {
               if(col_map[col_idx_s[j]] != ~Index(0))
               {
-                col_idx_x[k] = col_map[col_idx_s[j]];
+                col_idx_x[k] = IndexType(col_map[col_idx_s[j]]);
                 val_x[k] = val_s[j];
                 ++k;
               }

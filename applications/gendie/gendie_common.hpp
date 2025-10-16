@@ -330,8 +330,8 @@ namespace Gendie
       const IndexType* col_idx = this->velo_mass_matrix.local().col_ind();
       const auto* mval = this->velo_mass_matrix.local().val();
 
-      IndexType n = this->filter_interface_fbm.used_elements();
-      for(IndexType i(0); i < n; ++i)
+      Index n = this->filter_interface_fbm.used_elements();
+      for(Index i(0); i < n; ++i)
       {
         IndexType row = fidx[i];
         vdef[row] = DataType(0);
