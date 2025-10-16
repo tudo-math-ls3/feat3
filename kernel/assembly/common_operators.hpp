@@ -24,10 +24,10 @@ namespace FEAT
       /**
        * \brief -Laplace operator implementation
        *
-       * This functor implements the weak formulation of the bilinear scalar Laplace operator, i.e.
+       * This class implements the weak formulation of the bilinear scalar Laplace operator, i.e.
        *   \f[ \nabla \varphi \cdot \nabla\psi \f]
        *
-       * This functor can be used with the BilinearOperator assembly class template to assemble a
+       * This class can be used with the BilinearOperator assembly class template to assemble a
        * scalar Laplace/Stiffness matrix.
        *
        * \author Peter Zajac
@@ -88,7 +88,7 @@ namespace FEAT
            * The test function data in the current evaluation point. \see Space::EvalData
            *
            * \returns
-           * The value of the bilinear functor.
+           * The value of the bilinear operator.
            **/
           ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
@@ -100,10 +100,10 @@ namespace FEAT
       /**
        * \brief -Laplace operator implementation
        *
-       * This functor implements the weak formulation of the bilinear blocked Laplace operator, i.e.
+       * This class implements the weak formulation of the bilinear blocked Laplace operator, i.e.
        *   \f[ \nabla \varphi \cdot \nabla\psi \f]
        *
-       * This functor can be used with the BilinearOperator assembly class template to assemble a
+       * This class can be used with the BilinearOperator assembly class template to assemble a
        * blocked Laplace/Stiffness matrix.
        *
        * \author Peter Zajac
@@ -170,7 +170,7 @@ namespace FEAT
            * The test function data in the current evaluation point. \see Space::EvalData
            *
            * \returns
-           * The value of the bilinear functor.
+           * The value of the bilinear operator.
            **/
           ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
@@ -283,14 +283,89 @@ namespace FEAT
         }; // class LaplaceBeltramiOperator::Evaluator<...>
       }; // class LaplaceBeltramiOperator
 
+      /**
+       * \brief Biharmonic "Laplace^2" operator implementation
+       *
+       * This class implements the weak formulation of the bilinear scalar biharmonic operator, i.e.
+       *   \f[ \Delta \varphi \cdot \Delta\psi \f]
+       *
+       * This class can be used with the BilinearOperator assembly class template to assemble a
+       * scalar Laplace^2 matrix.
+       *
+       * \author Peter Zajac
+       */
+      class BiharmonicOperator :
+        public BilinearOperator
+      {
+      public:
+        static constexpr TrafoTags trafo_config = TrafoTags::none;
+        static constexpr SpaceTags test_config = SpaceTags::hess;
+        static constexpr SpaceTags trial_config = SpaceTags::hess;
+
+        /**
+         * \brief Biharmonic evaluator class template
+         *
+         * \tparam AsmTraits_
+         * The assembly traits class.
+         *
+         * \author Peter Zajac
+         */
+        template<typename AsmTraits_>
+        class Evaluator :
+          public BilinearOperator::Evaluator<AsmTraits_>
+        {
+        public:
+          /// the data type to be used
+          typedef typename AsmTraits_::DataType DataType;
+          /// the assembler's trafo data type
+          typedef typename AsmTraits_::TrafoData TrafoData;
+          /// the assembler's test-function data type
+          typedef typename AsmTraits_::TestBasisData TestBasisData;
+          /// the assembler's trial-function data type
+          typedef typename AsmTraits_::TrialBasisData TrialBasisData;
+          /// the operator's value type
+          typedef DataType ValueType;
+
+        public:
+          /**
+           * \brief Constructor
+           *
+           * \param[in] operat
+           * A reference to the biharmonic operator object.
+           */
+          explicit Evaluator(const BiharmonicOperator& DOXY(operat))
+          {
+          }
+
+          /**
+           * \brief Evaluation operator
+           *
+           * This operator evaluates the bilinear operator for a given combination of test- and trial-functions in
+           * a single point.
+           *
+           * \param[in] phi
+           * The trial function data in the current evaluation point. \see Space::EvalData
+           *
+           * \param[in] psi
+           * The test function data in the current evaluation point. \see Space::EvalData
+           *
+           * \returns
+           * The value of the bilinear operator.
+           **/
+          ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
+          {
+            return phi.hess.trace() * psi.hess.trace();
+          }
+        }; // class BiharmonicOperator::Evaluator<...>
+      }; // class BiharmonicOperator
 
       /**
        * \brief Identity operator implementation
        *
-       * This functor implements the weak formulation of the bilinear scalar Identity operator, i.e.
+       * This class implements the weak formulation of the bilinear scalar Identity operator, i.e.
        *   \f[ \varphi \cdot \psi \f]
        *
-       * This functor can be used with the BilinearOperator assembler class template to assemble a
+       * This class can be used with the BilinearOperator assembler class template to assemble a
        * scalar mass matrix.
        *
        * \author Peter Zajac
@@ -351,7 +426,7 @@ namespace FEAT
            * The test function data in the current evaluation point. \see Space::EvalData
            *
            * \returns
-           * The value of the bilinear functor.
+           * The value of the bilinear operator.
            **/
           ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
@@ -363,7 +438,7 @@ namespace FEAT
       /**
        * \brief Vector-valued identity operator implementation
        *
-       * This functor can be used with the BilinearOperator assembly class template to assemble one
+       * This class can be used with the BilinearOperator assembly class template to assemble one
        * scalar matrix corresponding to one block of the \f$ d \times d \f$ block matrix, where \f$ d \f$ is the
        * number of space dimensions.
        *
@@ -431,7 +506,7 @@ namespace FEAT
            * The test function data in the current evaluation point. \see Space::EvalData
            *
            * \returns
-           * The value of the bilinear functor.
+           * The value of the bilinear operator.
            **/
           ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
@@ -445,10 +520,10 @@ namespace FEAT
       /**
        * \brief Trial-Derivative operator implementation
        *
-       * This functor implements the weak formulation of the bilinear trial-function derivative operator, i.e.
+       * This class implements the weak formulation of the bilinear trial-function derivative operator, i.e.
        *   \f[ \partial_i \varphi \cdot \psi \f]
        *
-       * This functor can be used with the BilinearOperator assembly class template to assemble a
+       * This class can be used with the BilinearOperator assembly class template to assemble a
        * scalar matrix for the pressure-gradient operator of the Stokes equation.
        *
        * \author Peter Zajac
@@ -519,7 +594,7 @@ namespace FEAT
            * The test function data in the current evaluation point. \see Space::EvalData
            *
            * \returns
-           * The value of the bilinear functor.
+           * The value of the bilinear operator.
            **/
           ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
@@ -545,10 +620,10 @@ namespace FEAT
       /**
        * \brief Test-Derivative operator implementation
        *
-       * This functor implements the weak formulation of the bilinear test-function derivative operator, i.e.
+       * This class implements the weak formulation of the bilinear test-function derivative operator, i.e.
        *   \f[ \varphi \cdot \partial_i \psi \f]
        *
-       * This functor can be used with the BilinearOperator assembly class template to assemble a
+       * This class can be used with the BilinearOperator assembly class template to assemble a
        * scalar matrix for the pressure-gradient operator of the Stokes equation.
        *
        * \author Peter Zajac
@@ -619,7 +694,7 @@ namespace FEAT
            * The test function data in the current evaluation point. \see Space::EvalData
            *
            * \returns
-           * The value of the bilinear functor.
+           * The value of the bilinear operator.
            **/
           ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
@@ -707,7 +782,7 @@ namespace FEAT
            * The test function data in the current evaluation point. \see Space::EvalData
            *
            * \returns
-           * The value of the bilinear functor.
+           * The value of the bilinear operator.
            **/
           ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
@@ -733,7 +808,7 @@ namespace FEAT
       /**
        * \brief Du:Dv operator implementation
        *
-       * This functor implements the weak formulation of the bilinear Du : Dv operator, i.e.
+       * This class implements the weak formulation of the bilinear Du : Dv operator, i.e.
        * \f[
        *   \mathbf{D} \varphi : \mathbf{D} \psi
        * \f]
@@ -749,7 +824,7 @@ namespace FEAT
        * so the \f$ (k,l) \f$-block consists of entries corresponding to \f$ \partial_k \varphi \partial_l \psi \f$.
        *
        *
-       * This functor can be used with the BilinearOperator assembly class template to assemble one
+       * This class can be used with the BilinearOperator assembly class template to assemble one
        * scalar matrix corresponding to one block of the \f$ d \times d \f$ block matrix, where \f$ d \f$ is the
        * number of space dimensions.
        *
@@ -823,7 +898,7 @@ namespace FEAT
            * The test function data in the current evaluation point. \see Space::EvalData
            *
            * \returns
-           * The value of the bilinear functor.
+           * The value of the bilinear operator.
            **/
           ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
@@ -849,7 +924,7 @@ namespace FEAT
       /**
        * \brief Du:Dv operator implementation
        *
-       * This functor implements the weak formulation of the bilinear Du : Dv operator, i.e.
+       * This class implements the weak formulation of the bilinear Du : Dv operator, i.e.
        * \f[
        *   \mathbf{D} \varphi : \mathbf{D} \psi
        * \f]
@@ -858,7 +933,7 @@ namespace FEAT
        *   \mathbf{D} \varphi = \frac{1}{2} \left( \nabla \varphi + \left( \nabla \varphi \right)^T \right).
        * \f]
        *
-       * This functor can be used with the BilinearOperator assembly class template to assemble one
+       * This class can be used with the BilinearOperator assembly class template to assemble one
        * scalar matrix corresponding to one block of the \f$ d \times d \f$ block matrix, where \f$ d \f$ is the
        * number of space dimensions.
        *
@@ -932,7 +1007,7 @@ namespace FEAT
            * The test function data in the current evaluation point. \see Space::EvalData
            *
            * \returns
-           * The value of the bilinear functor.
+           * The value of the bilinear operator.
            **/
           ValueType eval(const TrialBasisData& phi, const TestBasisData& psi)
           {
@@ -964,12 +1039,12 @@ namespace FEAT
        *
        * \tparam dimension_ The dimension of the blocks of the FE functions
        *
-       * This functor implements the weak formulation of the bilinear trace gradient trial operator, i.e.
+       * This class implements the weak formulation of the bilinear trace gradient trial operator, i.e.
        * \f[
        *   \nabla \varphi \cdot n \psi
        * \f]
        *
-       * This functor can be used with the BilinearOperator TraceAssembly class template to assemble a
+       * This class can be used with the BilinearOperator TraceAssembly class template to assemble a
        * vector valued FE matrix.
        *
        * \note This operator expects the trafo eval object to have an assembled normal vector, which the wrapper traceassembly job
@@ -1033,12 +1108,12 @@ namespace FEAT
        *
        * \tparam dimension_ The dimension of the blocks of the FE functions
        *
-       * This functor implements the weak formulation of the bilinear trace transposed gradient trial operator, i.e.
+       * This class implements the weak formulation of the bilinear trace transposed gradient trial operator, i.e.
        * \f[
        *   \nabla \varphi^T \cdot n \psi
        * \f]
        *
-       * This functor can be used with the BilinearOperator TraceAssembly class template to assemble a
+       * This class can be used with the BilinearOperator TraceAssembly class template to assemble a
        * vector valued FE matrix.
        *
        * \note This operator expects the trafo eval object to have an assembled normal vector, which the wrapper traceassembly job
