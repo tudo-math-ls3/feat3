@@ -12,6 +12,7 @@ add_subdirectory( meshopt_r_adapt-app )
 add_subdirectory( meshopt_refinement-app )
 add_subdirectory( navier_stokes_ppnd )
 add_subdirectory( navier_stokes_screws-app )
+add_subdirectory( navsto_k_e_bfs )
 
 # applications to build
 set(app_list
