@@ -116,6 +116,9 @@ bool build_hit_test_meshparts(Geometry::RootMeshNode<MeshType_>& mesh_node_out,
 
   return true;
 #else // no FEAT_HAVE_FPARSER
+  (void)mesh_node_out;
+  (void)mesh_node_in;
+  (void)hit_formulae;
   std::cout << "ERROR: Creation of mesh parts based on hit-test is only available if FEAT is\n";
   std::cout << "configured and build with the 'fparser' third-party library!\n";
   return false;
