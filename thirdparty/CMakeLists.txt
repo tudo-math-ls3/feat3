@@ -293,11 +293,7 @@ if(FEAT_HAVE_SUPERLU_DIST)
     set(SUPERLU_DIST_ENABLE_COMPLEX_16 OFF)
     set(SUPERLU_DIST_ENABLE_SINGLE OFF)
 
-    # appearently, we need to set the index size to 64 if combined with parmetis...
-    # todo: get this from parmetis...
-    if(SUPERLU_DIST_TPL_ENABLE_PARMETIS)
-      set(XSDK_INDEX_SIZE 64)
-    endif()
+    set(XSDK_INDEX_SIZE 64)
   endif()
 endif()
 
