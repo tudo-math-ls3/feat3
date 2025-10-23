@@ -33,7 +33,9 @@ namespace FEAT
      * Nvidia CUDA direct sparse solver "cuDSS" for doing the actual dirty work.
      *
      * \note
-     * This solver can only be applied onto SparseMatrixCSR<double,Index> matrices.
+     * This solver can only be applied onto SparseMatrixCSR<double,Index> matrices. If you require
+     * more flexibility and/or if you want to use cuDSS as a parallel direct solver, please consider
+     * using the DirectSparseSolver class, which can also use cuDSS as a solver backend.
      *
      * \attention
      * This class is only declared if FEAT was configured to build and link against the \c Nvidia cuDSS library.

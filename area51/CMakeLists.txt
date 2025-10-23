@@ -8,6 +8,9 @@ add_subdirectory( ccnd_fiber )
 
 # applications to build
 
+add_executable(dbg-direct-sparse-solver dbg_direct_sparse_solver.cpp)
+target_link_libraries(dbg-direct-sparse-solver feat)
+
 add_executable(dbg-dist-mesh-distortion dbg_dist_mesh_distortion.cpp)
 target_link_libraries(dbg-dist-mesh-distortion feat)
 

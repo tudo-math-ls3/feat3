@@ -101,6 +101,8 @@ void Runtime::initialize(int& argc, char**& argv)
     std::cerr.flush();
     Runtime::abort();
   }
+  // set communcation layer to nullptr, so cuDSS will read its path from $CUDSS_COMM_LIB
+  cudssSetCommLayer(feat_cudss_handle, nullptr);
 #endif
 
   // check whether '---debug [<ranks...>]' option is given

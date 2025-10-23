@@ -606,7 +606,7 @@ namespace FEAT
       DataType max_rel_diff(const Vector & x) const
       {
         ASSERTM(_gate, "Gate is not set!");
-        return _gate->max(_vector.max_rel_diff(x));
+        return _gate->max(_vector.max_rel_diff(x._vector));
       }
 
       /**
@@ -621,7 +621,7 @@ namespace FEAT
       SynchScalarTicket<DataType> max_rel_diff_async(const Vector & x) const
       {
         ASSERTM(_gate, "Gate is not set!");
-        return _gate->max_async(_vector.max_rel_diff(x));
+        return _gate->max_async(_vector.max_rel_diff(x._vector));
       }
 
 

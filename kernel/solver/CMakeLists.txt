@@ -4,6 +4,10 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 # list of lafem source files
 set(kernel-solver-list
   cudss.cpp
+  direct_sparse_solver_cudss.cpp
+  direct_sparse_solver_mkl.cpp
+  direct_sparse_solver_superlu.cpp
+  direct_sparse_solver_umfpack.cpp
   hypre.cpp
   mkl_dss.cpp
   superlu.cpp
@@ -72,6 +76,7 @@ set(test_list
   amavanka-test
   basic_solver-test
   cudss-test
+  direct_sparse_solver-test
   direct_stokes_solver-test
   hypre-test
   mkl_dss-test

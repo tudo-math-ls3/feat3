@@ -248,7 +248,7 @@
 #include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/gmres.hpp>
 #include <kernel/solver/umfpack.hpp>
-#include <kernel/solver/direct_stokes_solver.hpp>
+#include <kernel/solver/direct_sparse_solver.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/util/stop_watch.hpp>
 
@@ -1209,7 +1209,7 @@ int main(int argc, char* argv[])
   }
 
   // can we use a direct coarse grid solver?
-  const bool direct_coarse_solver = (domain.back_layer().comm().size() == 1) && Solver::direct_stokes_solver_available;
+  const bool have_direct_coarse_solver = Solver::DSS::have_backend_global || ((domain.back_layer().comm().size() == 1) && Solver::DSS::have_backend_local);
 
   // is our system actually non-linear?
   const bool non_linear = navier; // currently, only Navier-Stokes is non-linear
@@ -1264,7 +1264,7 @@ int main(int argc, char* argv[])
     comm.print(String("Smoother Type").pad_back(pl, pc) + ": " + String(smooth_gmres ? "GMRES-AmaVanka" : "Richardson-AmaVanka"));
     comm.print(String("Smoother Steps").pad_back(pl, pc) + ": " + stringify(smooth_steps));
     comm.print(String("Smoother Damping").pad_back(pl, pc) + ": " + stringify(smooth_damp));
-    if(direct_coarse_solver)
+    if(have_direct_coarse_solver)
       comm.print(String("Coarse Grid Solver").pad_back(pl, pc) + ": direct solver");
     else
       comm.print(String("Coarse Grid Solver").pad_back(pl, pc) + ": GMRES[16]-AmaVanka");
@@ -1516,9 +1516,6 @@ int main(int argc, char* argv[])
   const SystemDataType norm1_p = Math::sqrt(the_system_level.gate_pres.dot(vec_cor.local().template at<1>(), vec_cor.local().template at<1>()));
   const SystemDataType norm1 = SystemDataType(1);//Math::sqrt(norm1_v*norm1_v + norm1_p*norm1_p);
 
-  comm.print(String("\nNorm of 1-Functional V/P").pad_back(padlen, '.') + ".: " + stringify_fp_sci(norm1_v) + " / " + stringify_fp_sci(norm1_p));
-  comm.print(String("Defect Normalization Factor").pad_back(padlen, '.') + ": " + stringify_fp_sci(SystemDataType(1) / norm1));
-
   // and filter them
   the_system_level.filter_sys.filter_sol(vec_sol);
   the_system_level.filter_sys.filter_rhs(vec_def);
@@ -1650,6 +1647,15 @@ int main(int argc, char* argv[])
         typename SolverLevelType::LocalSystemMatrix,
         typename SolverLevelType::LocalSystemFilter>>> ama_vankas;
 
+  // pointer to direct coarse solver (if chosen)
+  std::shared_ptr<Solver::DirectSparseSolver<
+    typename SolverLevelType::GlobalSystemMatrix,
+    typename SolverLevelType::GlobalSystemFilter>> coarse_solver_direct;
+
+  // pointer to iterative coarse solver (if chosen)
+  std::shared_ptr<Solver::IterativeSolver<
+    typename SolverLevelType::GlobalSystemVector>> coarse_solver_iterative;
+
   // push levels into multigrid
   for(std::size_t i(0); i < solver_levels.size(); ++i)
   {
@@ -1683,11 +1689,11 @@ int main(int argc, char* argv[])
         pre_smoother.reset();
       multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, lvl.transfer_sys, pre_smoother, post_smoother, smoother);
     }
-    else if(direct_coarse_solver)
+    else if(have_direct_coarse_solver)
     {
       // create a direct coarse grid solver
-      auto coarse_solver = Solver::new_direct_stokes_solver(lvl.matrix_sys, lvl.filter_sys);
-      multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, coarse_solver);
+      coarse_solver_direct = Solver::new_direct_sparse_solver(lvl.matrix_sys, lvl.filter_sys);
+      multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, coarse_solver_direct);
     }
     else
     {
@@ -1697,12 +1703,12 @@ int main(int argc, char* argv[])
       ama_vankas.push_back(vanka);
       auto schwarz = Solver::new_schwarz_precond(vanka, lvl.filter_sys);
       schwarz->set_ignore_status(true);
-      auto coarse_solver = Solver::new_gmres(lvl.matrix_sys, lvl.filter_sys, 16, SolverDataType(0.9), schwarz);
-      //auto coarse_solver = Solver::new_bicgstab(lvl.matrix_sys, lvl.filter_sys, schwarz);
-      coarse_solver->set_max_iter(500);
-      coarse_solver->set_tol_rel(SolverDataType(1e-3));
-      coarse_solver->set_plot_name("CoarseSolver");
-      multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, coarse_solver);
+      coarse_solver_iterative = Solver::new_gmres(lvl.matrix_sys, lvl.filter_sys, 16, SolverDataType(0.9), schwarz);
+      //coarse_solver_iterative = Solver::new_bicgstab(lvl.matrix_sys, lvl.filter_sys, schwarz);
+      coarse_solver_iterative->set_max_iter(500);
+      coarse_solver_iterative->set_tol_rel(SolverDataType(1e-3));
+      coarse_solver_iterative->set_plot_name("CoarseSolver");
+      multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, coarse_solver_iterative);
     }
   }
 
@@ -1734,6 +1740,11 @@ int main(int argc, char* argv[])
   for(auto& v : ama_vankas)
     statistics.bytes[Bytes::vanka] += v->bytes();
 
+  // if we use a direct coarse grid solver, print the selected backend now
+  if(coarse_solver_direct)
+    comm.print(String("Coarse Grid Solver Backend").pad_back(padlen, '.') + ": "
+      + stringify(coarse_solver_direct->get_selected_backend()));
+
   // load distributed solution?
   bool loaded_solution = false;
   if(args.check("load-sol") > 0)
@@ -1760,6 +1771,11 @@ int main(int argc, char* argv[])
 
     loaded_solution = true;
   }
+
+
+  comm.print(String("\nNorm of 1-Functional V/P").pad_back(padlen, '.') + ".: " + stringify_fp_sci(norm1_v) + " / " + stringify_fp_sci(norm1_p));
+  comm.print(String("Defect Normalization Factor").pad_back(padlen, '.') + ": " + stringify_fp_sci(SystemDataType(1) / norm1));
+
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

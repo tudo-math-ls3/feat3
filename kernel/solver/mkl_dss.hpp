@@ -37,7 +37,9 @@ namespace FEAT
      * Intel MKL direct sparse solver for doing the actual dirty work.
      *
      * \note
-     * This solver can only be applied onto SparseMatrixCSR<double,Index> matrices.
+     * This solver can only be applied onto SparseMatrixCSR<double,Index> matrices. If you require
+     * more flexibility and/or if you want to use MKL-DSS as a parallel direct solver, please consider
+     * using the DirectSparseSolver class, which can also use MKL-DSS as a solver backend.
      *
      * \attention
      * This class is only declared if FEAT was configured to build and link against the \c Intel MKL library.
