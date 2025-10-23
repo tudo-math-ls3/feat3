@@ -254,6 +254,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae8b17473fb756d05c962e52e13993f7b"><td class="memTemplParams" colspan="2">template&lt;typename SpaceVelo_ , typename SpacePres_ , typename Cubature_ &gt; </td></tr>
 <tr class="memitem:ae8b17473fb756d05c962e52e13993f7b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_stokes_blocked_system_level.html#ae8b17473fb756d05c962e52e13993f7b">assemble_grad_div_matrices</a> (const SpaceVelo_ &amp;space_velo, const SpacePres_ &amp;space_pres, const Cubature_ &amp;cubature)</td></tr>
 <tr class="separator:ae8b17473fb756d05c962e52e13993f7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67163b0dc66a25d2fca3babd2f8068b5"><td class="memTemplParams" colspan="2">template&lt;typename Trafo_ , typename SpaceVelo_ , typename SpacePres_ , typename AsmDT_ &gt; </td></tr>
+<tr class="memitem:a67163b0dc66a25d2fca3babd2f8068b5"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_stokes_blocked_system_level.html#a67163b0dc66a25d2fca3babd2f8068b5">assemble_grad_div_matrices_high_prec</a> (<a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembler.html">Assembly::DomainAssembler</a>&lt; Trafo_ &gt; &amp;dom_asm, const SpaceVelo_ &amp;space_velo, const SpacePres_ &amp;space_pres, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;cubature, const AsmDT_ asm_weight)</td></tr>
+<tr class="separator:a67163b0dc66a25d2fca3babd2f8068b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7b9eaccddafcc6e88eae04cc9d9bd28e"><td class="memTemplParams" colspan="2">template&lt;typename SpacePres_ &gt; </td></tr>
 <tr class="memitem:a7b9eaccddafcc6e88eae04cc9d9bd28e"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_stokes_blocked_system_level.html#a7b9eaccddafcc6e88eae04cc9d9bd28e">assemble_pres_struct</a> (const SpacePres_ &amp;space_pres)</td></tr>
 <tr class="separator:a7b9eaccddafcc6e88eae04cc9d9bd28e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -370,7 +373,7 @@ Static Public Attributes</h2></td></tr>
 struct FEAT::Control::StokesBlockedUnitVeloMeanPresSystemLevel&lt; dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_ &gt;</div><p >System level using a MeanFilter for the pressure. </p>
 <p >This is necessary when there are only Dirichlet BCs for the velocity </p>
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00577">577</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00605">605</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a8b5ab63009e0eb90efb038609bc52ad7" name="a8b5ab63009e0eb90efb038609bc52ad7"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a8b5ab63009e0eb90efb038609bc52ad7">&#9670;&#160;</a></span>BaseClass</h2>
@@ -386,7 +389,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00583">583</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00611">611</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -508,7 +511,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00592">592</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00620">620</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -630,7 +633,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00593">593</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00621">621</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -726,7 +729,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00591">591</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00619">619</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -900,7 +903,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00587">587</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00615">615</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -1126,7 +1129,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00588">588</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00616">616</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -1248,7 +1251,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00586">586</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00614">614</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -1945,6 +1948,66 @@ template&lt;typename SpaceVelo_ , typename SpacePres_ , typename Cubature_ &gt; 
 
 </div>
 </div>
+<a id="a67163b0dc66a25d2fca3babd2f8068b5" name="a67163b0dc66a25d2fca3babd2f8068b5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67163b0dc66a25d2fca3babd2f8068b5">&#9670;&#160;</a></span>assemble_grad_div_matrices_high_prec()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, typename MatrixBlockA_  = LAFEM::SparseMatrixBCSR&lt;DataType_, IndexType_, dim_, dim_&gt;, typename MatrixBlockB_  = LAFEM::SparseMatrixBCSR&lt;DataType_, IndexType_, dim_, 1&gt;, typename MatrixBlockD_  = LAFEM::SparseMatrixBCSR&lt;DataType_, IndexType_, 1, dim_&gt;, typename ScalarMatrix_  = LAFEM::SparseMatrixCSR&lt;DataType_, IndexType_&gt;, typename TransferMatrixV_  = LAFEM::SparseMatrixBWrappedCSR&lt;DataType_, IndexType_, dim_&gt;, typename TransferMatrixP_  = LAFEM::SparseMatrixCSR&lt;DataType_, IndexType_&gt;, typename TransferMatrixS_  = LAFEM::SparseMatrixCSR&lt;DataType_, IndexType_&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename Trafo_ , typename SpaceVelo_ , typename SpacePres_ , typename AsmDT_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_control_1_1_stokes_blocked_system_level.html">FEAT::Control::StokesBlockedSystemLevel</a>&lt; dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_, TransferMatrixS_ &gt;::assemble_grad_div_matrices_high_prec </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembler.html">Assembly::DomainAssembler</a>&lt; Trafo_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>dom_asm</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const SpaceVelo_ &amp;&#160;</td>
+          <td class="paramname"><em>space_velo</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const SpacePres_ &amp;&#160;</td>
+          <td class="paramname"><em>space_pres</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
+          <td class="paramname"><em>cubature</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const AsmDT_&#160;</td>
+          <td class="paramname"><em>asm_weight</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00421">421</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a7b9eaccddafcc6e88eae04cc9d9bd28e" name="a7b9eaccddafcc6e88eae04cc9d9bd28e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7b9eaccddafcc6e88eae04cc9d9bd28e">&#9670;&#160;</a></span>assemble_pres_struct()</h2>
 
@@ -1973,7 +2036,7 @@ template&lt;typename SpacePres_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00429">429</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00457">457</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -2015,7 +2078,7 @@ template&lt;typename SpacePres_ , typename Cubature_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00623">623</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00651">651</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -2323,7 +2386,7 @@ template&lt;typename SpaceVelo_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00421">421</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00449">449</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -2354,7 +2417,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 
 <p>Returns the total amount of bytes allocated. </p>
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00601">601</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00629">629</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="saddle__point__matrix_8hpp_source.html#l00274">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::bytes()</a>, <a class="el" href="tuple__filter_8hpp_source.html#l00133">FEAT::LAFEM::TupleFilter&lt; First_, Rest_ &gt;::bytes()</a>, and <a class="el" href="matrix_8hpp_source.html#l00126">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::local()</a>.</p>
 
@@ -2385,7 +2448,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00649">649</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00677">677</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -2443,7 +2506,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00606">606</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00634">634</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -2565,7 +2628,7 @@ template&lt;typename D_ , typename I_ , typename SM_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00613">613</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00641">641</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -2909,7 +2972,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00598">598</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00626">626</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -2927,7 +2990,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00596">596</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00624">624</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 
 </div>
 </div>
@@ -2945,7 +3008,7 @@ template&lt;int dim_, typename DataType_  = Real, typename IndexType_  = Index, 
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00597">597</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="stokes__blocked_8hpp_source.html#l00625">625</a> of file <a class="el" href="stokes__blocked_8hpp_source.html">stokes_blocked.hpp</a>.</p>
 
 </div>
 </div>

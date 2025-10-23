@@ -197,6 +197,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a584239ddea86a102ca4d2ecafed6d5b4"><td class="memItemLeft" align="right" valign="top">LocalMatrix_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_matrix.html#a584239ddea86a102ca4d2ecafed6d5b4">convert_to_1</a> () const</td></tr>
 <tr class="memdesc:a584239ddea86a102ca4d2ecafed6d5b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes and returns the type-1 conversion of this matrix as a local matrix.  <a href="class_f_e_a_t_1_1_global_1_1_matrix.html#a584239ddea86a102ca4d2ecafed6d5b4">More...</a><br /></td></tr>
 <tr class="separator:a584239ddea86a102ca4d2ecafed6d5b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa804db62b54a2b6a5bac2a4d69b314aa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_matrix.html#aa804db62b54a2b6a5bac2a4d69b314aa">convert_to_1</a> (LocalMatrix_ &amp;matrix_sync_1, bool full_copy=true) const</td></tr>
+<tr class="memdesc:aa804db62b54a2b6a5bac2a4d69b314aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes and returns the type-1 conversion of this matrix as a local matrix.  <a href="class_f_e_a_t_1_1_global_1_1_matrix.html#aa804db62b54a2b6a5bac2a4d69b314aa">More...</a><br /></td></tr>
+<tr class="separator:aa804db62b54a2b6a5bac2a4d69b314aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a43850616272427b10989780236ac244c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html">VectorTypeL</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_matrix.html#a43850616272427b10989780236ac244c">create_vector_l</a> () const</td></tr>
 <tr class="memdesc:a43850616272427b10989780236ac244c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates and returns a new L-compatible global vector object.  <a href="class_f_e_a_t_1_1_global_1_1_matrix.html#a43850616272427b10989780236ac244c">More...</a><br /></td></tr>
 <tr class="separator:a43850616272427b10989780236ac244c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -1262,7 +1265,7 @@ template&lt;typename OtherGlobalMatrix_ &gt; </div>
 </div>
 </div>
 <a id="a584239ddea86a102ca4d2ecafed6d5b4" name="a584239ddea86a102ca4d2ecafed6d5b4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a584239ddea86a102ca4d2ecafed6d5b4">&#9670;&#160;</a></span>convert_to_1()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a584239ddea86a102ca4d2ecafed6d5b4">&#9670;&#160;</a></span>convert_to_1() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1295,6 +1298,60 @@ template&lt;typename LocalMatrix_ , typename RowMirror_ , typename ColMirror_ &g
 <p class="definition">Definition at line <a class="el" href="matrix_8hpp_source.html#l00617">617</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="matrix_8hpp_source.html#l00078">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::_col_gate</a>, <a class="el" href="gate_8hpp_source.html#l00069">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, <a class="el" href="matrix_8hpp_source.html#l00080">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::_matrix</a>, <a class="el" href="gate_8hpp_source.html#l00073">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, <a class="el" href="gate_8hpp_source.html#l00071">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>, <a class="el" href="matrix_8hpp_source.html#l00076">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::_row_gate</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, <a class="el" href="synch__mat_8hpp_source.html#l00226">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::exec()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00124">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::init()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa7324e3727807d95037eb19d304fd91ec">FEAT::LAFEM::Weak</a>.</p>
+
+</div>
+</div>
+<a id="aa804db62b54a2b6a5bac2a4d69b314aa" name="aa804db62b54a2b6a5bac2a4d69b314aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa804db62b54a2b6a5bac2a4d69b314aa">&#9670;&#160;</a></span>convert_to_1() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalMatrix_ , typename RowMirror_ , typename ColMirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_global_1_1_matrix.html">FEAT::Global::Matrix</a>&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::convert_to_1 </td>
+          <td>(</td>
+          <td class="paramtype">LocalMatrix_ &amp;&#160;</td>
+          <td class="paramname"><em>matrix_sync_1</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>full_copy</em> = <code>true</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Computes and returns the type-1 conversion of this matrix as a local matrix. </p>
+<p >This function performs a type-0 to type-1 conversion of this matrix, which is effectively the matrix counterpart of the type-0 synchronization of a vector, i.e. all matrix entries, which are shared by multiple processes, are replaced by the sum of all contributions from all processes which share the corresponding row/column DOFs. This converted matrix is required for Schwarz-like solver approaches.</p>
+<dl class="section attention"><dt>Attention</dt><dd>The resulting matrix may (and usually will) have a larger stencil than the original underlying patch-local <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html" title="LAFEM namespace.">LAFEM</a> matrix, which is stored in this object's _matrix variable. The reason is that a neighbor process may have additional couplings between DOFs that this process does not have, and these additional coupling are also included in this process's type-1 matrix. However, the stencil of the returned matrix is never smaller than the original local matrix stencil, i.e. the stencil of the patch-local type-0 matrix is always a sub-stencil of the returned type-1 matrix.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir"></td><td class="paramname">[in/out]</td><td>matrix_sync_1 The matrix the type 1 conversion should be written into. Has to be allocated to hold at least the stencil of this type-0 matrix.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">full_copy</td><td>Also copy index arrays?</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section attention"><dt>Attention</dt><dd>This function must be called by all processes participating in the gate's communicator, otherwise the application might deadlock. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="matrix_8hpp_source.html#l00656">656</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="matrix_8hpp_source.html#l00078">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::_col_gate</a>, <a class="el" href="gate_8hpp_source.html#l00069">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, <a class="el" href="gate_8hpp_source.html#l00073">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, <a class="el" href="gate_8hpp_source.html#l00071">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>, <a class="el" href="matrix_8hpp_source.html#l00076">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::_row_gate</a>, <a class="el" href="synch__mat_8hpp_source.html#l00226">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::exec()</a>, <a class="el" href="synch__mat_8hpp_source.html#l00124">FEAT::Global::SynchMatrix&lt; MT_, VMT_ &gt;::init()</a>, and <a class="el" href="matrix_8hpp_source.html#l00126">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::local()</a>.</p>
 
 </div>
 </div>
@@ -1452,7 +1509,7 @@ template&lt;typename LocalMatrix_ , typename RowMirror_ , typename ColMirror_ &g
 <p >Calculate size of complete object as it is stored in the checkpoint</p>
 <dl class="section return"><dt>Returns</dt><dd>size of object  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix_8hpp_source.html#l00629">629</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix_8hpp_source.html#l00668">668</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="matrix_8hpp_source.html#l00080">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::_matrix</a>.</p>
 
@@ -1524,7 +1581,7 @@ template&lt;typename LocalMatrix_ , typename RowMirror_ , typename ColMirror_ &g
 
 <p class="reference">References <a class="el" href="matrix_8hpp_source.html#l00076">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::_row_gate</a>, and <a class="el" href="gate_8hpp_source.html#l00138">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_comm()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l01448">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::_apply()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00169">FEAT::Solver::ADPSolverBase&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_comm()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00605">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_numeric()</a>, and <a class="el" href="direct__stokes__solver_8hpp_source.html#l01379">FEAT::Solver::DirectStokesSolver&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l01448">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::_apply()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00169">FEAT::Solver::ADPSolverBase&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_comm()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00605">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_numeric()</a>, and <a class="el" href="direct__stokes__solver_8hpp_source.html#l01378">FEAT::Solver::DirectStokesSolver&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -1596,7 +1653,7 @@ template&lt;typename LocalMatrix_ , typename RowMirror_ , typename ColMirror_ &g
 
 <p class="reference">References <a class="el" href="matrix_8hpp_source.html#l00080">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::_matrix</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="stokes__power_8hpp_source.html#l00730">FEAT::Control::StokesPowerSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::assemble_grad_div_matrices()</a>, <a class="el" href="blocked__basic_8hpp_source.html#l00121">FEAT::Control::BlockedBasicSystemLevel&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;::bytes()</a>, <a class="el" href="scalar__basic_8hpp_source.html#l00141">FEAT::Control::ScalarBasicSystemLevel&lt; DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::bytes()</a>, <a class="el" href="stokes__3field_8hpp_source.html#l00233">FEAT::Control::Stokes3FieldSystemLevel&lt; dim_, nsc_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, MatrixBlockM_, MatrixBlockK_, MatrixBlockL_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_, TransferMatrixS_ &gt;::bytes()</a>, <a class="el" href="stokes__blocked_8hpp_source.html#l00209">FEAT::Control::StokesBlockedSystemLevel&lt; dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_, TransferMatrixS_ &gt;::bytes()</a>, <a class="el" href="stokes__blocked_8hpp_source.html#l00601">FEAT::Control::StokesBlockedUnitVeloMeanPresSystemLevel&lt; dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_ &gt;::bytes()</a>, <a class="el" href="stokes__power_8hpp_source.html#l00791">FEAT::Control::StokesPowerUnitVeloNonePresSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_ &gt;::bytes()</a>, <a class="el" href="stokes__power_8hpp_source.html#l00845">FEAT::Control::StokesPowerUnitVeloMeanPresSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_ &gt;::bytes()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00605">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_numeric()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00423">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01061">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01125">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload_numeric()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l01090">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="stokes__power_8hpp_source.html#l00730">FEAT::Control::StokesPowerSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::assemble_grad_div_matrices()</a>, <a class="el" href="blocked__basic_8hpp_source.html#l00121">FEAT::Control::BlockedBasicSystemLevel&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;::bytes()</a>, <a class="el" href="scalar__basic_8hpp_source.html#l00141">FEAT::Control::ScalarBasicSystemLevel&lt; DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::bytes()</a>, <a class="el" href="stokes__3field_8hpp_source.html#l00233">FEAT::Control::Stokes3FieldSystemLevel&lt; dim_, nsc_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, MatrixBlockM_, MatrixBlockK_, MatrixBlockL_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_, TransferMatrixS_ &gt;::bytes()</a>, <a class="el" href="stokes__blocked_8hpp_source.html#l00209">FEAT::Control::StokesBlockedSystemLevel&lt; dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_, TransferMatrixS_ &gt;::bytes()</a>, <a class="el" href="stokes__blocked_8hpp_source.html#l00629">FEAT::Control::StokesBlockedUnitVeloMeanPresSystemLevel&lt; dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_ &gt;::bytes()</a>, <a class="el" href="stokes__power_8hpp_source.html#l00791">FEAT::Control::StokesPowerUnitVeloNonePresSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_ &gt;::bytes()</a>, <a class="el" href="stokes__power_8hpp_source.html#l00845">FEAT::Control::StokesPowerUnitVeloMeanPresSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_ &gt;::bytes()</a>, <a class="el" href="matrix_8hpp_source.html#l00656">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::convert_to_1()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00605">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_numeric()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00423">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01061">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l01125">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload_numeric()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l01090">FEAT::Global::AlgDofPartiMatrix&lt; LocalMatrix_, Mirror_ &gt;::upload_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -1767,7 +1824,7 @@ template&lt;typename LocalMatrix_ , typename RowMirror_ , typename ColMirror_ &g
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="matrix_8hpp_source.html#l00635">635</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix_8hpp_source.html#l00674">674</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="matrix_8hpp_source.html#l00080">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::_matrix</a>.</p>
 
@@ -1849,7 +1906,7 @@ template&lt;typename LocalMatrix_ , typename RowMirror_ , typename ColMirror_ &g
 
 <p></p>
 
-<p class="definition">Definition at line <a class="el" href="matrix_8hpp_source.html#l00641">641</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="matrix_8hpp_source.html#l00680">680</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="matrix_8hpp_source.html#l00080">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::_matrix</a>.</p>
 
@@ -1950,7 +2007,7 @@ template&lt;typename LocalMatrix_ , typename RowMirror_ , typename ColMirror_ &g
 
 <p class="definition">Definition at line <a class="el" href="matrix_8hpp_source.html#l00080">80</a> of file <a class="el" href="matrix_8hpp_source.html">matrix.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="matrix_8hpp_source.html#l00311">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply()</a>, <a class="el" href="matrix_8hpp_source.html#l00355">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_async()</a>, <a class="el" href="matrix_8hpp_source.html#l00332">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed()</a>, <a class="el" href="matrix_8hpp_source.html#l00378">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed_async()</a>, <a class="el" href="matrix_8hpp_source.html#l00265">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::bytes()</a>, <a class="el" href="matrix_8hpp_source.html#l00187">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::clone()</a>, <a class="el" href="matrix_8hpp_source.html#l00617">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::convert_to_1()</a>, <a class="el" href="matrix_8hpp_source.html#l00197">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::create_vector_l()</a>, <a class="el" href="matrix_8hpp_source.html#l00207">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::create_vector_r()</a>, <a class="el" href="matrix_8hpp_source.html#l00287">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::extract_diag()</a>, <a class="el" href="matrix_8hpp_source.html#l00629">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::get_checkpoint_size()</a>, <a class="el" href="matrix_8hpp_source.html#l00126">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::local()</a>, <a class="el" href="matrix_8hpp_source.html#l00556">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::lump_rows()</a>, <a class="el" href="matrix_8hpp_source.html#l00635">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::restore_from_checkpoint_data()</a>, <a class="el" href="matrix_8hpp_source.html#l00641">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::set_checkpoint_data()</a>, and <a class="el" href="matrix_8hpp_source.html#l00255">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::used_elements()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="matrix_8hpp_source.html#l00311">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply()</a>, <a class="el" href="matrix_8hpp_source.html#l00355">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_async()</a>, <a class="el" href="matrix_8hpp_source.html#l00332">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed()</a>, <a class="el" href="matrix_8hpp_source.html#l00378">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed_async()</a>, <a class="el" href="matrix_8hpp_source.html#l00265">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::bytes()</a>, <a class="el" href="matrix_8hpp_source.html#l00187">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::clone()</a>, <a class="el" href="matrix_8hpp_source.html#l00617">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::convert_to_1()</a>, <a class="el" href="matrix_8hpp_source.html#l00197">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::create_vector_l()</a>, <a class="el" href="matrix_8hpp_source.html#l00207">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::create_vector_r()</a>, <a class="el" href="matrix_8hpp_source.html#l00287">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::extract_diag()</a>, <a class="el" href="matrix_8hpp_source.html#l00668">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::get_checkpoint_size()</a>, <a class="el" href="matrix_8hpp_source.html#l00126">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::local()</a>, <a class="el" href="matrix_8hpp_source.html#l00556">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::lump_rows()</a>, <a class="el" href="matrix_8hpp_source.html#l00674">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::restore_from_checkpoint_data()</a>, <a class="el" href="matrix_8hpp_source.html#l00680">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::set_checkpoint_data()</a>, and <a class="el" href="matrix_8hpp_source.html#l00255">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::used_elements()</a>.</p>
 
 </div>
 </div>

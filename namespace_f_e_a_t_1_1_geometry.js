@@ -138,6 +138,8 @@ var namespace_f_e_a_t_1_1_geometry =
     [ "VoxelMapFileError", "class_f_e_a_t_1_1_geometry_1_1_voxel_map_file_error.html", "class_f_e_a_t_1_1_geometry_1_1_voxel_map_file_error" ],
     [ "VoxelMapFormulaParseError", "class_f_e_a_t_1_1_geometry_1_1_voxel_map_formula_parse_error.html", "class_f_e_a_t_1_1_geometry_1_1_voxel_map_formula_parse_error" ],
     [ "VoxelMasker", "class_f_e_a_t_1_1_geometry_1_1_voxel_masker.html", "class_f_e_a_t_1_1_geometry_1_1_voxel_masker" ],
+    [ "CGALFeature", "namespace_f_e_a_t_1_1_geometry.html#a636b501b375b1f49165fadc7dc731e33", null ],
+    [ "CGALFeatureNetwork", "namespace_f_e_a_t_1_1_geometry.html#a40a9038979415b8e1e29cca17e8f028b", null ],
     [ "i64", "namespace_f_e_a_t_1_1_geometry.html#af3db3da9c05fffceb51e11c1ca9b858e", null ],
     [ "Layer", "namespace_f_e_a_t_1_1_geometry.html#a90e56d666fc2f314ab6d97a29f505076", null ],
     [ "u64", "namespace_f_e_a_t_1_1_geometry.html#a974fef8f8f837250e37e0e263385aae3", null ],

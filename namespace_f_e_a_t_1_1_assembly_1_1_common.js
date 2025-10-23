@@ -1,5 +1,6 @@
 var namespace_f_e_a_t_1_1_assembly_1_1_common =
 [
+    [ "BiharmonicOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_biharmonic_operator.html", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_biharmonic_operator" ],
     [ "DivDivOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_div_div_operator.html", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_div_div_operator" ],
     [ "DuDvOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_du_dv_operator.html", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_du_dv_operator" ],
     [ "DuDvOperatorBlocked", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_du_dv_operator_blocked.html", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_du_dv_operator_blocked" ],

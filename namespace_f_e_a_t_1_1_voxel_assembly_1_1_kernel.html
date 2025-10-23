@@ -119,6 +119,14 @@ Functions</h2></td></tr>
 <tr class="memitem:acd63fb3587dd8f322e5795e1f8b91b66"><td class="memTemplItemLeft" align="right" valign="top">CUDA_HOST_DEVICE void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#acd63fb3587dd8f322e5795e1f8b91b66">burgers_mat_assembly_kernel</a> (LocMatType_ &amp;loc_mat, const LocVecType_ &amp;local_conv_dofs, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; typename SpaceHelp_::DataType, dim_, num_verts_ &gt; &amp;local_coeffs, const typename SpaceHelp_::DomainPointType *cub_pt, const typename SpaceHelp_::DataType *cub_wg, const int num_cubs, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">VoxelAssembly::AssemblyBurgersData</a>&lt; typename SpaceHelp_::DataType &gt; &amp;burgers_params, const bool need_streamline, const bool need_convection, const typename SpaceHelp_::DataType tol_eps)</td></tr>
 <tr class="memdesc:acd63fb3587dd8f322e5795e1f8b91b66"><td class="mdescLeft">&#160;</td><td class="mdescRight">Burgers Matrix assembly kernel.  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#acd63fb3587dd8f322e5795e1f8b91b66">More...</a><br /></td></tr>
 <tr class="separator:acd63fb3587dd8f322e5795e1f8b91b66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7af6e287bd1a7f26c144b0cd889af7f"><td class="memTemplParams" colspan="2">template&lt;typename SpaceHelp_ , typename LocVecType_ , int dim_, int num_verts_, typename ViscFunc_ &gt; </td></tr>
+<tr class="memitem:aa7af6e287bd1a7f26c144b0cd889af7f"><td class="memTemplItemLeft" align="right" valign="top">CUDA_HOST_DEVICE void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#aa7af6e287bd1a7f26c144b0cd889af7f">burgers_velo_material_defect_assembly_kernel</a> (LocVecType_ &amp;loc_vec, const LocVecType_ &amp;local_prim_dofs, const LocVecType_ &amp;local_conv_dofs, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; typename SpaceHelp_::DataType, dim_, num_verts_ &gt; &amp;local_coeffs, const typename SpaceHelp_::DomainPointType *cub_pt, const typename SpaceHelp_::DataType *cub_wg, const int num_cubs, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">VoxelAssembly::AssemblyBurgersData</a>&lt; typename SpaceHelp_::DataType &gt; &amp;burgers_params, const bool need_convection, ViscFunc_ visco_func)</td></tr>
+<tr class="memdesc:aa7af6e287bd1a7f26c144b0cd889af7f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Burgers Vector assembly kernel.  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#aa7af6e287bd1a7f26c144b0cd889af7f">More...</a><br /></td></tr>
+<tr class="separator:aa7af6e287bd1a7f26c144b0cd889af7f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b7212ab9d837c1f676ffba1c6d4bf2f"><td class="memTemplParams" colspan="2">template&lt;typename SpaceHelp_ , typename LocMatType_ , typename LocVecType_ , int dim_, int num_verts_, typename ViscFunc_ , typename ViscDerFunc_ , bool need_stream_diff_&gt; </td></tr>
+<tr class="memitem:a9b7212ab9d837c1f676ffba1c6d4bf2f"><td class="memTemplItemLeft" align="right" valign="top">CUDA_HOST_DEVICE void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#a9b7212ab9d837c1f676ffba1c6d4bf2f">burgers_velo_material_mat_assembly_kernel</a> (LocMatType_ &amp;loc_mat, const LocVecType_ &amp;local_conv_dofs, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; typename SpaceHelp_::DataType, dim_, num_verts_ &gt; &amp;local_coeffs, const typename SpaceHelp_::DomainPointType *cub_pt, const typename SpaceHelp_::DataType *cub_wg, const int num_cubs, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">VoxelAssembly::AssemblyBurgersData</a>&lt; typename SpaceHelp_::DataType &gt; &amp;burgers_params, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_material_data.html">VoxelAssembly::AssemblyMaterialData</a>&lt; typename SpaceHelp_::DataType &gt; &amp;material_params, const bool need_convection, const typename SpaceHelp_::DataType tol_eps, ViscFunc_ visco_func, ViscDerFunc_ visco_d_func)</td></tr>
+<tr class="memdesc:a9b7212ab9d837c1f676ffba1c6d4bf2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Burgers Velo Material Matrix assembly kernel.  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#a9b7212ab9d837c1f676ffba1c6d4bf2f">More...</a><br /></td></tr>
+<tr class="separator:a9b7212ab9d837c1f676ffba1c6d4bf2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab6f7849025fa80da1f92fc0b53fe5c32"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ , FEAT::Intern::MatrixGatherScatterPolicy pol_ = FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt; </td></tr>
 <tr class="memitem:ab6f7849025fa80da1f92fc0b53fe5c32"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#ab6f7849025fa80da1f92fc0b53fe5c32">defo_assembler_matrix1_csr_host</a> (DT_ *matrix_data, const IT_ *matrix_row_ptr, const IT_ *matrix_col_idx, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> matrix_num_rows, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> matrix_num_cols, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, Space_::world_dim &gt; *cub_pt, const DT_ *cub_wg, int num_cubs, DT_ alpha, const IT_ *cell_to_dof, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> cell_num, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, Space_::world_dim &gt; *nodes, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> node_size, const int *coloring_map, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> coloring_size, const IT_ *cell_to_dof_sorter, DT_ nu)</td></tr>
 <tr class="separator:ab6f7849025fa80da1f92fc0b53fe5c32"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -131,6 +139,12 @@ Functions</h2></td></tr>
 <tr class="memitem:a37f12192c77463176ce62c918db25cb6"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
 <tr class="memitem:a37f12192c77463176ce62c918db25cb6"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#a37f12192c77463176ce62c918db25cb6">full_burgers_assembler_vector_bd_host</a> (DT_ *vector_data, const DT_ *conv_data, const DT_ *primal_data, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> vec_size, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, Space_::world_dim &gt; *cub_pt, const DT_ *cub_wg, int num_cubs, DT_ alpha, const IT_ *cell_to_dof, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> cell_num, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, Space_::world_dim &gt; *nodes, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> node_size, const int *coloring_map, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> coloring_size, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">VoxelAssembly::AssemblyBurgersData</a>&lt; DT_ &gt; &amp;burgers_params)</td></tr>
 <tr class="separator:a37f12192c77463176ce62c918db25cb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a343bad18ad5dcaf30e35d9996953c119"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ , typename ViscFunc , typename ViscDFunc , FEAT::Intern::MatrixGatherScatterPolicy pol_ = FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt; </td></tr>
+<tr class="memitem:a343bad18ad5dcaf30e35d9996953c119"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#a343bad18ad5dcaf30e35d9996953c119">full_burgers_vm_assembler_matrix1_bcsr_host</a> (DT_ *matrix_data, const DT_ *conv_data, const IT_ *matrix_row_ptr, const IT_ *matrix_col_idx, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> matrix_num_rows, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> matrix_num_cols, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, Space_::world_dim &gt; *cub_pt, const DT_ *cub_wg, int num_cubs, DT_ alpha, const IT_ *cell_to_dof, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> cell_num, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, Space_::world_dim &gt; *nodes, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> node_size, const int *coloring_map, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> coloring_size, const IT_ *cell_to_dof_sorter, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">VoxelAssembly::AssemblyBurgersData</a>&lt; DT_ &gt; &amp;burgers_params, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_material_data.html">VoxelAssembly::AssemblyMaterialData</a>&lt; DT_ &gt; &amp;material_params, ViscFunc visco_func, ViscDFunc visco_d_func)</td></tr>
+<tr class="separator:a343bad18ad5dcaf30e35d9996953c119"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5488f36d6e5635b6d8225b2280885ec"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ , typename ViscFunc &gt; </td></tr>
+<tr class="memitem:ad5488f36d6e5635b6d8225b2280885ec"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#ad5488f36d6e5635b6d8225b2280885ec">full_burgers_vm_assembler_vector_bd_host</a> (DT_ *vector_data, const DT_ *conv_data, const DT_ *primal_data, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> vec_size, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, Space_::world_dim &gt; *cub_pt, const DT_ *cub_wg, int num_cubs, DT_ alpha, const IT_ *cell_to_dof, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> cell_num, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, Space_::world_dim &gt; *nodes, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> node_size, const int *coloring_map, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> coloring_size, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">VoxelAssembly::AssemblyBurgersData</a>&lt; DT_ &gt; &amp;burgers_params, const ViscFunc &amp;visco_func)</td></tr>
+<tr class="separator:ad5488f36d6e5635b6d8225b2280885ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a832e2b7b166523256572343cb63df592"><td class="memTemplParams" colspan="2">template&lt;typename ThreadGroup_ , typename SpaceHelp_ &gt; </td></tr>
 <tr class="memitem:a832e2b7b166523256572343cb63df592"><td class="memTemplItemLeft" align="right" valign="top">CUDA_DEVICE __forceinline__ void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#a832e2b7b166523256572343cb63df592">grouped_burgers_mat_alt_assembly_kernel</a> (const ThreadGroup_ &amp;tg, <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_shared_data_kernel_wrapper.html">BurgersSharedDataKernelWrapper</a>&lt; SpaceHelp_ &gt; *shared_wrapper, int loc_assemble_size, int assemble_offset, typename SpaceHelp_::DataType *loc_mat, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">VoxelAssembly::AssemblyBurgersData</a>&lt; typename SpaceHelp_::DataType &gt; &amp;burgers_params, const bool need_streamline, const bool need_convection, const typename SpaceHelp_::DataType tol_eps)</td></tr>
 <tr class="memdesc:a832e2b7b166523256572343cb63df592"><td class="mdescLeft">&#160;</td><td class="mdescRight">appears to not work <em>better</em>... compiler optimizes this sufficiently?  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#a832e2b7b166523256572343cb63df592">More...</a><br /></td></tr>
@@ -254,7 +268,7 @@ template&lt;typename SpaceHelp_ , typename LocVecType_ , int dim_, int num_verts
 
 <p class="definition">Definition at line <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html#l00901">901</a> of file <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html">burgers_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="math_8hpp_source.html#l00275">FEAT::Math::abs()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02895">FEAT::Tiny::dot()</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
+<p class="reference">References <a class="el" href="math_8hpp_source.html#l00275">FEAT::Math::abs()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02923">FEAT::Tiny::dot()</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
 
 </div>
 </div>
@@ -363,7 +377,243 @@ template&lt;typename SpaceHelp_ , typename LocMatType_ , typename LocVecType_ , 
 
 <p class="definition">Definition at line <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html#l00105">105</a> of file <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html">burgers_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="math_8hpp_source.html#l00275">FEAT::Math::abs()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02895">FEAT::Tiny::dot()</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
+<p class="reference">References <a class="el" href="math_8hpp_source.html#l00275">FEAT::Math::abs()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02923">FEAT::Tiny::dot()</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
+
+</div>
+</div>
+<a id="aa7af6e287bd1a7f26c144b0cd889af7f" name="aa7af6e287bd1a7f26c144b0cd889af7f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa7af6e287bd1a7f26c144b0cd889af7f">&#9670;&#160;</a></span>burgers_velo_material_defect_assembly_kernel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename SpaceHelp_ , typename LocVecType_ , int dim_, int num_verts_, typename ViscFunc_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">CUDA_HOST_DEVICE void FEAT::VoxelAssembly::Kernel::burgers_velo_material_defect_assembly_kernel </td>
+          <td>(</td>
+          <td class="paramtype">LocVecType_ &amp;&#160;</td>
+          <td class="paramname"><em>loc_vec</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const LocVecType_ &amp;&#160;</td>
+          <td class="paramname"><em>local_prim_dofs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const LocVecType_ &amp;&#160;</td>
+          <td class="paramname"><em>local_conv_dofs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; typename SpaceHelp_::DataType, dim_, num_verts_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>local_coeffs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const typename SpaceHelp_::DomainPointType *&#160;</td>
+          <td class="paramname"><em>cub_pt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const typename SpaceHelp_::DataType *&#160;</td>
+          <td class="paramname"><em>cub_wg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>num_cubs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">VoxelAssembly::AssemblyBurgersData</a>&lt; typename SpaceHelp_::DataType &gt; &amp;&#160;</td>
+          <td class="paramname"><em>burgers_params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>need_convection</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ViscFunc_&#160;</td>
+          <td class="paramname"><em>visco_func</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Burgers Vector assembly kernel. </p>
+<p >Outsources the the most inner execution of the assembly of the full burgers term for a cell previously gathered. Local always refers to the local dofs of the current cell.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">SpaceHelp_</td><td>The psacehelper to be used. Holds most information about the underlying space. </td></tr>
+    <tr><td class="paramname">LocMatType_</td><td>The Matrixtype of the local matrix dofs. </td></tr>
+    <tr><td class="paramname">LocVecType_</td><td>The Vectortype of the local convection dofs. </td></tr>
+    <tr><td class="paramname">dim_</td><td>Dimension of our space. For ease of access. </td></tr>
+    <tr><td class="paramname">num_verts_</td><td>The number of vertices of one cell. </td></tr>
+    <tr><td class="paramname">ViscFunc_</td><td>Function mapping from R to R.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">loc_vec</td><td>A reference to the local defect to be assembled. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">local_prim_dofs</td><td>A reference to the local primal values the matrix is implicitly applied to. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">local_conv_dofs</td><td>A reference to the local convection dofs. If convection is not needed values are ignored. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">local_coeffs</td><td>The local trafo coefficients. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cub_pt</td><td>A pointer to the cubature point coordinate vector. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cub_wg</td><td>A pointer to the cubature weights. Same order as cub_pt array. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">burgers_params</td><td>A struct holding the burgers parameter configuration. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">need_convection</td><td>Do we need convection? </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">visco_func</td><td>Function mapping invariants of velocity jacobian to viscosity. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="burgers__velo__material__assembler_8hpp_source.html#l00704">704</a> of file <a class="el" href="burgers__velo__material__assembler_8hpp_source.html">burgers_velo_material_assembler.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="math_8hpp_source.html#l00275">FEAT::Math::abs()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02923">FEAT::Tiny::dot()</a>, <a class="el" href="math_8hpp_source.html#l00300">FEAT::Math::sqrt()</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
+
+</div>
+</div>
+<a id="a9b7212ab9d837c1f676ffba1c6d4bf2f" name="a9b7212ab9d837c1f676ffba1c6d4bf2f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b7212ab9d837c1f676ffba1c6d4bf2f">&#9670;&#160;</a></span>burgers_velo_material_mat_assembly_kernel()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename SpaceHelp_ , typename LocMatType_ , typename LocVecType_ , int dim_, int num_verts_, typename ViscFunc_ , typename ViscDerFunc_ , bool need_stream_diff_&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">CUDA_HOST_DEVICE void FEAT::VoxelAssembly::Kernel::burgers_velo_material_mat_assembly_kernel </td>
+          <td>(</td>
+          <td class="paramtype">LocMatType_ &amp;&#160;</td>
+          <td class="paramname"><em>loc_mat</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const LocVecType_ &amp;&#160;</td>
+          <td class="paramname"><em>local_conv_dofs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; typename SpaceHelp_::DataType, dim_, num_verts_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>local_coeffs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const typename SpaceHelp_::DomainPointType *&#160;</td>
+          <td class="paramname"><em>cub_pt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const typename SpaceHelp_::DataType *&#160;</td>
+          <td class="paramname"><em>cub_wg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int&#160;</td>
+          <td class="paramname"><em>num_cubs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">VoxelAssembly::AssemblyBurgersData</a>&lt; typename SpaceHelp_::DataType &gt; &amp;&#160;</td>
+          <td class="paramname"><em>burgers_params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_material_data.html">VoxelAssembly::AssemblyMaterialData</a>&lt; typename SpaceHelp_::DataType &gt; &amp;&#160;</td>
+          <td class="paramname"><em>material_params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const bool&#160;</td>
+          <td class="paramname"><em>need_convection</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const typename SpaceHelp_::DataType&#160;</td>
+          <td class="paramname"><em>tol_eps</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ViscFunc_&#160;</td>
+          <td class="paramname"><em>visco_func</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ViscDerFunc_&#160;</td>
+          <td class="paramname"><em>visco_d_func</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Burgers Velo Material Matrix assembly kernel. </p>
+<p >Outsources the the most inner execution of the assembly of the full burgers term for a cell previously gathered. Local always refers to the local dofs of the current cell.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">SpaceHelp_</td><td>The psacehelper to be used. Holds most information about the underlying space. </td></tr>
+    <tr><td class="paramname">LocMatType_</td><td>The Matrixtype of the local matrix dofs. </td></tr>
+    <tr><td class="paramname">LocVecType_</td><td>The Vectortype of the local convection dofs. </td></tr>
+    <tr><td class="paramname">dim_</td><td>Dimension of our space. For ease of access. </td></tr>
+    <tr><td class="paramname">num_verts_</td><td>The number of vertices of one cell. </td></tr>
+    <tr><td class="paramname">ViscFunc_</td><td>Function mapping from R to R. </td></tr>
+    <tr><td class="paramname">ViscDerFunc_</td><td>Function mapping from R to R. </td></tr>
+    <tr><td class="paramname">need_stream_diff_</td><td>Streamdiff required?</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">loc_mat</td><td>A reference to the local matrix to be assembled. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">local_conv_dofs</td><td>A reference to the local convection dofs. If convection is not needed values are ignored. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">local_coeffs</td><td>The local trafo coefficients. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cub_pt</td><td>A pointer to the cubature point coordinate vector. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cub_wg</td><td>A pointer to the cubature weights. Same order as cub_pt array. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">burgers_params</td><td>A struct holding the burgers parameter configuration. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">material_params</td><td>A struct holding the additional material parameters. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">need_convection</td><td>Do we need convection? </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">tol_eps</td><td>Tolerance for local stream norm to be regarded as zero. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">visco_func</td><td>Function mapping invariants of velocity jacobian to viscosity. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">visco_d_func</td><td>Function representing the derivative of visc_func. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="burgers__velo__material__assembler_8hpp_source.html#l00131">131</a> of file <a class="el" href="burgers__velo__material__assembler_8hpp_source.html">burgers_velo_material_assembler.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="math_8hpp_source.html#l00275">FEAT::Math::abs()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02923">FEAT::Tiny::dot()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00712">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::set_mat_vec_mult()</a>, <a class="el" href="math_8hpp_source.html#l00300">FEAT::Math::sqrt()</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
 
 </div>
 </div>
@@ -783,6 +1033,268 @@ template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
 
 </div>
 </div>
+<a id="a343bad18ad5dcaf30e35d9996953c119" name="a343bad18ad5dcaf30e35d9996953c119"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a343bad18ad5dcaf30e35d9996953c119">&#9670;&#160;</a></span>full_burgers_vm_assembler_matrix1_bcsr_host()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Space_ , typename DT_ , typename IT_ , typename ViscFunc , typename ViscDFunc , FEAT::Intern::MatrixGatherScatterPolicy pol_ = FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void FEAT::VoxelAssembly::Kernel::full_burgers_vm_assembler_matrix1_bcsr_host </td>
+          <td>(</td>
+          <td class="paramtype">DT_ *&#160;</td>
+          <td class="paramname"><em>matrix_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const DT_ *&#160;</td>
+          <td class="paramname"><em>conv_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const IT_ *&#160;</td>
+          <td class="paramname"><em>matrix_row_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const IT_ *&#160;</td>
+          <td class="paramname"><em>matrix_col_idx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>matrix_num_rows</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>matrix_num_cols</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, Space_::world_dim &gt; *&#160;</td>
+          <td class="paramname"><em>cub_pt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const DT_ *&#160;</td>
+          <td class="paramname"><em>cub_wg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>num_cubs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">DT_&#160;</td>
+          <td class="paramname"><em>alpha</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const IT_ *&#160;</td>
+          <td class="paramname"><em>cell_to_dof</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>cell_num</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, Space_::world_dim &gt; *&#160;</td>
+          <td class="paramname"><em>nodes</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>node_size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int *&#160;</td>
+          <td class="paramname"><em>coloring_map</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>coloring_size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const IT_ *&#160;</td>
+          <td class="paramname"><em>cell_to_dof_sorter</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">VoxelAssembly::AssemblyBurgersData</a>&lt; DT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>burgers_params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_material_data.html">VoxelAssembly::AssemblyMaterialData</a>&lt; DT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>material_params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ViscFunc&#160;</td>
+          <td class="paramname"><em>visco_func</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">ViscDFunc&#160;</td>
+          <td class="paramname"><em>visco_d_func</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="burgers__velo__material__assembler_8cpp_source.html#l00017">17</a> of file <a class="el" href="burgers__velo__material__assembler_8cpp_source.html">burgers_velo_material_assembler.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ad5488f36d6e5635b6d8225b2280885ec" name="ad5488f36d6e5635b6d8225b2280885ec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5488f36d6e5635b6d8225b2280885ec">&#9670;&#160;</a></span>full_burgers_vm_assembler_vector_bd_host()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Space_ , typename DT_ , typename IT_ , typename ViscFunc &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void FEAT::VoxelAssembly::Kernel::full_burgers_vm_assembler_vector_bd_host </td>
+          <td>(</td>
+          <td class="paramtype">DT_ *&#160;</td>
+          <td class="paramname"><em>vector_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const DT_ *&#160;</td>
+          <td class="paramname"><em>conv_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const DT_ *&#160;</td>
+          <td class="paramname"><em>primal_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>vec_size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, Space_::world_dim &gt; *&#160;</td>
+          <td class="paramname"><em>cub_pt</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const DT_ *&#160;</td>
+          <td class="paramname"><em>cub_wg</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>num_cubs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">DT_&#160;</td>
+          <td class="paramname"><em>alpha</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const IT_ *&#160;</td>
+          <td class="paramname"><em>cell_to_dof</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>cell_num</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, Space_::world_dim &gt; *&#160;</td>
+          <td class="paramname"><em>nodes</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>node_size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const int *&#160;</td>
+          <td class="paramname"><em>coloring_map</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>coloring_size</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">VoxelAssembly::AssemblyBurgersData</a>&lt; DT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>burgers_params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const ViscFunc &amp;&#160;</td>
+          <td class="paramname"><em>visco_func</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="burgers__velo__material__assembler_8cpp_source.html#l00095">95</a> of file <a class="el" href="burgers__velo__material__assembler_8cpp_source.html">burgers_velo_material_assembler.cpp</a>.</p>
+
+</div>
+</div>
 <a id="a832e2b7b166523256572343cb63df592" name="a832e2b7b166523256572343cb63df592"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a832e2b7b166523256572343cb63df592">&#9670;&#160;</a></span>grouped_burgers_mat_alt_assembly_kernel()</h2>
 
@@ -857,7 +1369,7 @@ template&lt;typename ThreadGroup_ , typename SpaceHelp_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html#l00500">500</a> of file <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html">burgers_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="math_8hpp_source.html#l00275">FEAT::Math::abs()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02895">FEAT::Tiny::dot()</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
+<p class="reference">References <a class="el" href="math_8hpp_source.html#l00275">FEAT::Math::abs()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02923">FEAT::Tiny::dot()</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
 
 </div>
 </div>
@@ -1094,7 +1606,7 @@ template&lt;typename ThreadGroup_ , typename SpaceHelp_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html#l00652">652</a> of file <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html">burgers_assembler.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="math_8hpp_source.html#l00275">FEAT::Math::abs()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02895">FEAT::Tiny::dot()</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
+<p class="reference">References <a class="el" href="math_8hpp_source.html#l00275">FEAT::Math::abs()</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02923">FEAT::Tiny::dot()</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
 
 </div>
 </div>

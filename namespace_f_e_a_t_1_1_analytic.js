@@ -23,6 +23,8 @@ var namespace_f_e_a_t_1_1_analytic =
     [ "ParsedVectorFunction", "class_f_e_a_t_1_1_analytic_1_1_parsed_vector_function.html", "class_f_e_a_t_1_1_analytic_1_1_parsed_vector_function" ],
     [ "PolarCoordinate", "class_f_e_a_t_1_1_analytic_1_1_polar_coordinate.html", "class_f_e_a_t_1_1_analytic_1_1_polar_coordinate" ],
     [ "ScalarCurl", "class_f_e_a_t_1_1_analytic_1_1_scalar_curl.html", "class_f_e_a_t_1_1_analytic_1_1_scalar_curl" ],
+    [ "SimplifiedLambdaVectorFunction2D", "class_f_e_a_t_1_1_analytic_1_1_simplified_lambda_vector_function2_d.html", "class_f_e_a_t_1_1_analytic_1_1_simplified_lambda_vector_function2_d" ],
+    [ "SimplifiedLambdaVectorFunction3D", "class_f_e_a_t_1_1_analytic_1_1_simplified_lambda_vector_function3_d.html", "class_f_e_a_t_1_1_analytic_1_1_simplified_lambda_vector_function3_d" ],
     [ "StaticFunction", "class_f_e_a_t_1_1_analytic_1_1_static_function.html", "class_f_e_a_t_1_1_analytic_1_1_static_function" ],
     [ "StaticWrapperFunction", "class_f_e_a_t_1_1_analytic_1_1_static_wrapper_function.html", "class_f_e_a_t_1_1_analytic_1_1_static_wrapper_function" ],
     [ "ParsedFunction", "namespace_f_e_a_t_1_1_analytic.html#a22fbfd51592427d563d1e5edd31538b7", null ],

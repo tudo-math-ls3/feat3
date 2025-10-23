@@ -1,8 +1,8 @@
 var searchData=
 [
   ['f_0',['F',['../namespace_f_e_a_t_1_1_solver.html#a5b14b494b949c5eecc622f4ad6e2d59ba800618943025315f869e4e1f09471012',1,'FEAT::Solver']]],
-  ['fixed_1',['fixed',['../namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7acec315e3d0975e5cc2811d5d8725f149',1,'FEAT::Solver']]],
-  ['fixed_2',['Fixed',['../namespace_f_e_a_t_1_1_solver.html#a9d7f089c4ca7981d407aa7a7038f6e23a4457d440870ad6d42bab9082d9bf9b61',1,'FEAT::Solver']]],
+  ['fixed_1',['Fixed',['../namespace_f_e_a_t_1_1_solver.html#a9d7f089c4ca7981d407aa7a7038f6e23a4457d440870ad6d42bab9082d9bf9b61',1,'FEAT::Solver']]],
+  ['fixed_2',['fixed',['../namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7acec315e3d0975e5cc2811d5d8725f149',1,'FEAT::Solver']]],
   ['fm_5fbcsr_3',['fm_bcsr',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646ad5501f80d1ffb260fbc6d7db56c2df94',1,'FEAT::LAFEM']]],
   ['fm_5fbinary_4',['fm_binary',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646a34b9b130e68b0a9ab2718496480e3142',1,'FEAT::LAFEM']]],
   ['fm_5fbm_5',['fm_bm',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646a6f9b45193f3549bfbf83b052a5c896a4',1,'FEAT::LAFEM']]],

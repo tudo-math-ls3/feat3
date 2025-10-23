@@ -8,6 +8,7 @@ var namespace_f_e_a_t_1_1_analytic_1_1_common =
     [ "DFG95SteadyInflowFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_d_f_g95_steady_inflow_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_d_f_g95_steady_inflow_function" ],
     [ "ExpBubbleScalarStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_bubble_scalar_static.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_bubble_scalar_static" ],
     [ "ExpScalarStatic", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_scalar_static.html", null ],
+    [ "ExpScalarStatic< Half >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_scalar_static_3_01_half_01_4.html", null ],
     [ "Frankes3DVariantFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_frankes3_d_variant_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_frankes3_d_variant_function" ],
     [ "FrankesFunction", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_frankes_function.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_frankes_function" ],
     [ "GuermondStokesSol", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol.html", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_guermond_stokes_sol" ],

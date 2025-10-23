@@ -5,6 +5,10 @@ var namespace_f_e_a_t_1_1_voxel_assembly =
       [ "assemble_burgers_csr_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a6b2f1aefbd0865db566b4cf48f34c49a", null ],
       [ "assemble_burgers_defect", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#acb6ece7251040c8d11ad7c55c05f51ae", null ],
       [ "assemble_burgers_defect_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a3e6a55472d415879ff5a6899a016ae5c", null ],
+      [ "assemble_burgers_velo_material_csr", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a1f6eb0593d9f405d2c22f82b7d51d04b", null ],
+      [ "assemble_burgers_velo_material_csr_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a3918db8ed6d10aa45fb9868487a74052", null ],
+      [ "assemble_burgers_velo_material_defect", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#af67d1f8306bb0d6e3f4ffaa546c17210", null ],
+      [ "assemble_burgers_velo_material_defect_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a10c7db6c578c81fe7f1c473c30fb9f42", null ],
       [ "get_sd_v_norm", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#aa5bb883737c2cc04cc1ec321a2308fae", null ],
       [ "get_sd_v_norm", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#aec510f211770223f5e804a3ede770ae7", null ],
       [ "get_sd_v_norm_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a55b4d5e867d4739199f9365a8cf5b00a", null ],
@@ -13,6 +17,8 @@ var namespace_f_e_a_t_1_1_voxel_assembly =
     [ "Kernel", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html", [
       [ "burgers_defect_assembly_kernel", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#a5a38710550ec3ee871835a808bf55026", null ],
       [ "burgers_mat_assembly_kernel", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#acd63fb3587dd8f322e5795e1f8b91b66", null ],
+      [ "burgers_velo_material_defect_assembly_kernel", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#aa7af6e287bd1a7f26c144b0cd889af7f", null ],
+      [ "burgers_velo_material_mat_assembly_kernel", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#a9b7212ab9d837c1f676ffba1c6d4bf2f", null ],
       [ "grouped_burgers_mat_alt_assembly_kernel", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#a832e2b7b166523256572343cb63df592", null ],
       [ "grouped_burgers_mat_assembly_kernel", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#a5596683b75c77d18b3361e4008dfafd9", null ],
       [ "set_sd_v_norm_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_kernel.html#a4c35914dcc1c3078f382207b96884e5c", null ]
@@ -20,7 +26,10 @@ var namespace_f_e_a_t_1_1_voxel_assembly =
     [ "AssemblyBurgersData", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html", null ],
     [ "AssemblyCubatureData", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data" ],
     [ "AssemblyMappingData", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data" ],
+    [ "AssemblyMaterialData", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_material_data.html", null ],
     [ "BurgersDefectSharedDataGlobalWrapper", "struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_defect_shared_data_global_wrapper.html", null ],
+    [ "BurgersMatSharedDataKernelWrapper", "struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_mat_shared_data_kernel_wrapper.html", null ],
+    [ "BurgersMatSharedDataKernelWrapper< SpaceHelp_, false >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_mat_shared_data_kernel_wrapper_3_01_space_help___00_01false_01_4.html", null ],
     [ "BurgersSharedDataGlobalWrapper", "struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_shared_data_global_wrapper.html", null ],
     [ "BurgersSharedDataKernelWrapper", "struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_shared_data_kernel_wrapper.html", null ],
     [ "CSRMatrixData", "struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html", null ],
@@ -33,6 +42,8 @@ var namespace_f_e_a_t_1_1_voxel_assembly =
     [ "VertexSetWrapper", "class_f_e_a_t_1_1_voxel_assembly_1_1_vertex_set_wrapper.html", null ],
     [ "VoxelBurgersAssembler", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler.html", null ],
     [ "VoxelBurgersAssembler< Q2StandardHyperCube< dim_ >, DT_, IT_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704" ],
+    [ "VoxelBurgersVeloMaterialAssembler", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_velo_material_assembler.html", null ],
+    [ "VoxelBurgersVeloMaterialAssembler< Q2StandardHyperCube< dim_ >, DT_, IT_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_velo_material_assembler_3_01_q2_standard_hype407418e5507f47d8c147d0c95b2976a9.html", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_velo_material_assembler_3_01_q2_standard_hype407418e5507f47d8c147d0c95b2976a9" ],
     [ "VoxelDefoAssembler", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_defo_assembler.html", null ],
     [ "VoxelDefoAssembler< Q2StandardHyperCube< dim_ >, DT_, IT_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_defo_assembler_3_01_q2_standard_hyper_cube_3_01dim___303d3651e9c580c7ce0a75535c178220.html", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_defo_assembler_3_01_q2_standard_hyper_cube_3_01dim___303d3651e9c580c7ce0a75535c178220" ],
     [ "VoxelPoissonAssembler", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_poisson_assembler.html", null ],
@@ -41,5 +52,9 @@ var namespace_f_e_a_t_1_1_voxel_assembly =
     [ "Q2StandardHexa", "namespace_f_e_a_t_1_1_voxel_assembly.html#a460360222fb53df0e88e5c544e28155f", null ],
     [ "Q2StandardHyperCube", "namespace_f_e_a_t_1_1_voxel_assembly.html#aac8277f1b696dd68791c5beb4f81577a", null ],
     [ "Q2StandardQuad", "namespace_f_e_a_t_1_1_voxel_assembly.html#a6fe736366104996cfb3283b4ef2c565b", null ],
+    [ "MaterialType", "namespace_f_e_a_t_1_1_voxel_assembly.html#ab0749226ef372050bd700a3c41ae2e83", [
+      [ "carreau", "namespace_f_e_a_t_1_1_voxel_assembly.html#ab0749226ef372050bd700a3c41ae2e83aa87f01ffb57ab70e98b4f32e249d1c8a", null ],
+      [ "carreauYasuda", "namespace_f_e_a_t_1_1_voxel_assembly.html#ab0749226ef372050bd700a3c41ae2e83a0a41e8ecc4560c3729bcec3b49e48a94", null ]
+    ] ],
     [ "fill_cell_to_dof", "namespace_f_e_a_t_1_1_voxel_assembly.html#a637d205e4e3d706dcc1d6a5fb619c0ed", null ]
 ];

@@ -107,7 +107,6 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
-<a href="#friends">Friends</a> &#124;
 <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">FEAT::LAFEM::PowerFullMatrix&lt; SubType_, width_, height_ &gt; Class Template Reference</div></div>
 </div><!--header-->
@@ -225,6 +224,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad68f2a51213c339019ccaf741fb1537a"><td class="memItemLeft" align="right" valign="top">std::uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html#ad68f2a51213c339019ccaf741fb1537a">get_checkpoint_size</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_serial_config.html">SerialConfig</a> &amp;config)</td></tr>
 <tr class="memdesc:ad68f2a51213c339019ccaf741fb1537a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Calculate size.   <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html#ad68f2a51213c339019ccaf741fb1537a">More...</a><br /></td></tr>
 <tr class="separator:ad68f2a51213c339019ccaf741fb1537a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a864a0c55b1048341ac8297cee1279174"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html#a8595c81db6089ffbce23a42cb9f3f88b">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html#a864a0c55b1048341ac8297cee1279174">max_rel_diff</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html">PowerFullMatrix</a> &amp;x) const</td></tr>
+<tr class="memdesc:a864a0c55b1048341ac8297cee1279174"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the maximum relative difference of this matrix and another one y.max_rel_diff(x) returns \( \max_{0\leq i &lt; n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html#a864a0c55b1048341ac8297cee1279174">More...</a><br /></td></tr>
+<tr class="separator:a864a0c55b1048341ac8297cee1279174"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a38db57194ed13d927667a550e7835d8a"><td class="memItemLeft" align="right" valign="top"><a id="a38db57194ed13d927667a550e7835d8a" name="a38db57194ed13d927667a550e7835d8a"></a>
 <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html">PowerFullMatrix</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html">PowerFullMatrix</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a38db57194ed13d927667a550e7835d8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">deleted copy-assign operator <br /></td></tr>
@@ -242,6 +244,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ae14a6e5343dc0758a13b570b1754ff7b"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html#ae14a6e5343dc0758a13b570b1754ff7b">rows</a> () const</td></tr>
 <tr class="memdesc:ae14a6e5343dc0758a13b570b1754ff7b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total number of rows in this matrix.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html#ae14a6e5343dc0758a13b570b1754ff7b">More...</a><br /></td></tr>
 <tr class="separator:ae14a6e5343dc0758a13b570b1754ff7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc4db6c346204263889880193b146f8b"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html#adc4db6c346204263889880193b146f8b">same_layout</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html">PowerFullMatrix</a> &amp;x) const</td></tr>
+<tr class="memdesc:adc4db6c346204263889880193b146f8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the structural layout of this matrix matches that of another matrix. This excludes comparison of the actual data values.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html#adc4db6c346204263889880193b146f8b">More...</a><br /></td></tr>
+<tr class="separator:adc4db6c346204263889880193b146f8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63d30bd587fb309cc9b21b8bbba73527"><td class="memItemLeft" align="right" valign="top">std::uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html#a63d30bd587fb309cc9b21b8bbba73527">set_checkpoint_data</a> (std::vector&lt; char &gt; &amp;data, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_serial_config.html">SerialConfig</a> &amp;config)</td></tr>
 <tr class="separator:a63d30bd587fb309cc9b21b8bbba73527"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa7ba8add5baa7be8da3acae723f680d3"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab2adeb0ceb5f9834949b5a865cd4f7e8">Perspective</a> perspective_ = Perspective::native&gt; </td></tr>
@@ -283,12 +288,6 @@ Protected Member Functions</h2></td></tr>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:abb7ce531cc9392fcf010b3d491cf9902"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html#adc5f4b467c22ead5fc1a24e639585cb4">ContClass</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html#abb7ce531cc9392fcf010b3d491cf9902">_container</a></td></tr>
 <tr class="separator:abb7ce531cc9392fcf010b3d491cf9902"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:ad4a79c2aeb14c4838d56066c7ff5a6e7"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html#ad4a79c2aeb14c4838d56066c7ff5a6e7">operator==</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html">PowerFullMatrix</a> &amp;a, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html">PowerFullMatrix</a> &amp;b)</td></tr>
-<tr class="memdesc:ad4a79c2aeb14c4838d56066c7ff5a6e7"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html" title="Power-Full-Matrix meta class template.">PowerFullMatrix</a> comparison operator.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html#ad4a79c2aeb14c4838d56066c7ff5a6e7">More...</a><br /></td></tr>
-<tr class="separator:ad4a79c2aeb14c4838d56066c7ff5a6e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename SubType_, int width_, int height_&gt;<br />
@@ -1297,7 +1296,7 @@ template&lt;typename SubType2_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="power__full__matrix_8hpp_source.html#l00399">399</a> of file <a class="el" href="power__full__matrix_8hpp_source.html">power_full_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__full__matrix_8hpp_source.html#l00423">423</a> of file <a class="el" href="power__full__matrix_8hpp_source.html">power_full_matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -1329,7 +1328,7 @@ template&lt;typename SubType2_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="power__full__matrix_8hpp_source.html#l00405">405</a> of file <a class="el" href="power__full__matrix_8hpp_source.html">power_full_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__full__matrix_8hpp_source.html#l00429">429</a> of file <a class="el" href="power__full__matrix_8hpp_source.html">power_full_matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -1585,9 +1584,44 @@ template&lt;typename SubType_ , int width_, int height_&gt; </div>
 <p >Calculate size of complete object as it is stored in the checkpoint</p>
 <dl class="section return"><dt>Returns</dt><dd>size of object  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="power__full__matrix_8hpp_source.html#l00411">411</a> of file <a class="el" href="power__full__matrix_8hpp_source.html">power_full_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__full__matrix_8hpp_source.html#l00435">435</a> of file <a class="el" href="power__full__matrix_8hpp_source.html">power_full_matrix.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00610">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::get_checkpoint_size()</a>.</p>
+<p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00635">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::get_checkpoint_size()</a>.</p>
+
+</div>
+</div>
+<a id="a864a0c55b1048341ac8297cee1279174" name="a864a0c55b1048341ac8297cee1279174"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a864a0c55b1048341ac8297cee1279174">&#9670;&#160;</a></span>max_rel_diff()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename SubType_ , int width_, int height_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html#a8595c81db6089ffbce23a42cb9f3f88b">DataType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html">FEAT::LAFEM::PowerFullMatrix</a>&lt; SubType_, width_, height_ &gt;::max_rel_diff </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html">PowerFullMatrix</a>&lt; SubType_, width_, height_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieve the maximum relative difference of this matrix and another one y.max_rel_diff(x) returns \( \max_{0\leq i &lt; n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \). </p>
+<dl class="section return"><dt>Returns</dt><dd>The largest relative difference. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="power__full__matrix_8hpp_source.html#l00404">404</a> of file <a class="el" href="power__full__matrix_8hpp_source.html">power_full_matrix.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00556">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::max_rel_diff()</a>.</p>
 
 </div>
 </div>
@@ -1740,9 +1774,9 @@ template&lt;typename SubType_ , int width_, int height_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="power__full__matrix_8hpp_source.html#l00417">417</a> of file <a class="el" href="power__full__matrix_8hpp_source.html">power_full_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__full__matrix_8hpp_source.html#l00441">441</a> of file <a class="el" href="power__full__matrix_8hpp_source.html">power_full_matrix.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00616">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::restore_from_checkpoint_data()</a>.</p>
+<p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00641">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::restore_from_checkpoint_data()</a>.</p>
 
 </div>
 </div>
@@ -1779,6 +1813,47 @@ template&lt;<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab2adeb0ceb
 Raw matrix row count if perspective_ = true. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="power__full__matrix_8hpp_source.html#l00303">303</a> of file <a class="el" href="power__full__matrix_8hpp_source.html">power_full_matrix.hpp</a>.</p>
+
+</div>
+</div>
+<a id="adc4db6c346204263889880193b146f8b" name="adc4db6c346204263889880193b146f8b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc4db6c346204263889880193b146f8b">&#9670;&#160;</a></span>same_layout()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename SubType_ , int width_, int height_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html">FEAT::LAFEM::PowerFullMatrix</a>&lt; SubType_, width_, height_ &gt;::same_layout </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html">PowerFullMatrix</a>&lt; SubType_, width_, height_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks if the structural layout of this matrix matches that of another matrix. This excludes comparison of the actual data values. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The matrix to compare this matrix to</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the layouts match, false otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="power__full__matrix_8hpp_source.html#l00417">417</a> of file <a class="el" href="power__full__matrix_8hpp_source.html">power_full_matrix.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00570">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::same_layout()</a>.</p>
 
 </div>
 </div>
@@ -1820,9 +1895,9 @@ template&lt;typename SubType_ , int width_, int height_&gt; </div>
 
 <p></p>
 
-<p class="definition">Definition at line <a class="el" href="power__full__matrix_8hpp_source.html#l00423">423</a> of file <a class="el" href="power__full__matrix_8hpp_source.html">power_full_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__full__matrix_8hpp_source.html#l00447">447</a> of file <a class="el" href="power__full__matrix_8hpp_source.html">power_full_matrix.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00629">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::set_checkpoint_data()</a>.</p>
+<p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00654">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::set_checkpoint_data()</a>.</p>
 
 </div>
 </div>
@@ -1941,56 +2016,6 @@ template&lt;typename SubType_ , int width_, int height_&gt; </div>
 <p class="definition">Definition at line <a class="el" href="power__full__matrix_8hpp_source.html#l00176">176</a> of file <a class="el" href="power__full__matrix_8hpp_source.html">power_full_matrix.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00204">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::write_out()</a>.</p>
-
-</div>
-</div>
-<h2 class="groupheader">Friends And Related Function Documentation</h2>
-<a id="ad4a79c2aeb14c4838d56066c7ff5a6e7" name="ad4a79c2aeb14c4838d56066c7ff5a6e7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad4a79c2aeb14c4838d56066c7ff5a6e7">&#9670;&#160;</a></span>operator==</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename SubType_ , int width_, int height_&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool operator== </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html">PowerFullMatrix</a>&lt; SubType_, width_, height_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>a</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html">PowerFullMatrix</a>&lt; SubType_, width_, height_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>b</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_full_matrix.html" title="Power-Full-Matrix meta class template.">PowerFullMatrix</a> comparison operator. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">a</td><td>A matrix to compare with. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>A matrix to compare with. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="power__full__matrix_8hpp_source.html#l00434">434</a> of file <a class="el" href="power__full__matrix_8hpp_source.html">power_full_matrix.hpp</a>.</p>
 
 </div>
 </div>

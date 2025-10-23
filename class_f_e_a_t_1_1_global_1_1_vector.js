@@ -25,6 +25,8 @@ var class_f_e_a_t_1_1_global_1_1_vector =
     [ "max_abs_element_async", "class_f_e_a_t_1_1_global_1_1_vector.html#a227754d98d3bb90f267f511bf4ac7522", null ],
     [ "max_element", "class_f_e_a_t_1_1_global_1_1_vector.html#acf03d97a63123f561b03c7e8445e8338", null ],
     [ "max_element_async", "class_f_e_a_t_1_1_global_1_1_vector.html#a8deb252bca2a275ea52393c00cd5b911", null ],
+    [ "max_rel_diff", "class_f_e_a_t_1_1_global_1_1_vector.html#aebfd46d57a69f96db832c085eddb3589", null ],
+    [ "max_rel_diff_async", "class_f_e_a_t_1_1_global_1_1_vector.html#ac1dddef465c7fbd2ee4eadfa643d4964", null ],
     [ "min_abs_element", "class_f_e_a_t_1_1_global_1_1_vector.html#a83676f2192ef827ce7a3cbaad7dbfd85", null ],
     [ "min_abs_element_async", "class_f_e_a_t_1_1_global_1_1_vector.html#a5fee14be0d99644221774f9fe20daab9", null ],
     [ "min_element", "class_f_e_a_t_1_1_global_1_1_vector.html#a81de848963736cbb695948e5d662a6ff", null ],

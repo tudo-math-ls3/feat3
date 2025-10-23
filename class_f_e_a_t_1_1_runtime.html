@@ -131,6 +131,9 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a3bec83484514313c1056e3acdfddd4a9"><td class="memItemLeft" align="right" valign="top">static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_runtime.html#a3bec83484514313c1056e3acdfddd4a9">finalize</a> ()</td></tr>
 <tr class="memdesc:a3bec83484514313c1056e3acdfddd4a9"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> finalization.  <a href="class_f_e_a_t_1_1_runtime.html#a3bec83484514313c1056e3acdfddd4a9">More...</a><br /></td></tr>
 <tr class="separator:a3bec83484514313c1056e3acdfddd4a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89b01550c3364b466a9c9ebd1a81d659"><td class="memItemLeft" align="right" valign="top">static void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_runtime.html#a89b01550c3364b466a9c9ebd1a81d659">get_cudss_handle</a> ()</td></tr>
+<tr class="memdesc:a89b01550c3364b466a9c9ebd1a81d659"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the unique cuDSS third-party library handle.  <a href="class_f_e_a_t_1_1_runtime.html#a89b01550c3364b466a9c9ebd1a81d659">More...</a><br /></td></tr>
+<tr class="separator:a89b01550c3364b466a9c9ebd1a81d659"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae99306204c79ba3a1382180e8c049316"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_runtime.html#ae99306204c79ba3a1382180e8c049316">initialize</a> (int &amp;argc, char **&amp;argv)</td></tr>
 <tr class="memdesc:ae99306204c79ba3a1382180e8c049316"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> initialization.  <a href="class_f_e_a_t_1_1_runtime.html#ae99306204c79ba3a1382180e8c049316">More...</a><br /></td></tr>
 <tr class="separator:ae99306204c79ba3a1382180e8c049316"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -184,11 +187,11 @@ Note that a call-stack dump may not be available on all platforms. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="runtime_8cpp_source.html#l00396">396</a> of file <a class="el" href="runtime_8cpp_source.html">runtime.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime_8cpp_source.html#l00413">413</a> of file <a class="el" href="runtime_8cpp_source.html">runtime.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="os__windows_8cpp_source.html#l00152">FEAT::Windows::dump_call_stack_to_stderr()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="assertion_8hpp_source.html#l00038">FEAT::abortion()</a>, <a class="el" href="assertion_8hpp_source.html#l00114">FEAT::assertion()</a>, <a class="el" href="runtime_8cpp_source.html#l00428">finalize()</a>, and <a class="el" href="runtime_8cpp_source.html#l00043">initialize()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="assertion_8hpp_source.html#l00038">FEAT::abortion()</a>, <a class="el" href="assertion_8hpp_source.html#l00114">FEAT::assertion()</a>, <a class="el" href="runtime_8cpp_source.html#l00445">finalize()</a>, and <a class="el" href="runtime_8cpp_source.html#l00051">initialize()</a>.</p>
 
 </div>
 </div>
@@ -221,11 +224,40 @@ Note that a call-stack dump may not be available on all platforms. </td></tr>
 <dl class="section note"><dt>Note</dt><dd>Internally this functions calls the <a class="el" href="class_f_e_a_t_1_1_memory_pool.html#aef4c18b24cf138941876d84669e01a51" title="Shutdown memory pool and clean up allocated memory pools.">MemoryPool::finalize</a> function. To get proper warnings one memory that is still in use and not freed correctly one has to make sure, that any <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> Container has been destructed when calling the finalize method. This is usually achieved by keeping the C++ main function slim and kicking off all the fancy application stuff in a separate function/method. Thus (at most) every <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> related stuff is destructed when this separate function/method ends.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An exit code (<code>EXIT_SUCCESS</code>) that can be returned by the <code>main</code> function. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="runtime_8cpp_source.html#l00428">428</a> of file <a class="el" href="runtime_8cpp_source.html">runtime.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime_8cpp_source.html#l00445">445</a> of file <a class="el" href="runtime_8cpp_source.html">runtime.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="runtime_8hpp_source.html#l00031">_finalized</a>, <a class="el" href="runtime_8hpp_source.html#l00028">_initialized</a>, <a class="el" href="runtime_8cpp_source.html#l00396">abort()</a>, <a class="el" href="likwid__marker_8hpp_source.html#l00052">FEAT_MARKER_CLOSE</a>, <a class="el" href="dist_8cpp_source.html#l00148">FEAT::Dist::finalize()</a>, and <a class="el" href="memory__pool_8hpp_source.html#l00066">FEAT::MemoryPool::finalize()</a>.</p>
+<p class="reference">References <a class="el" href="runtime_8hpp_source.html#l00031">_finalized</a>, <a class="el" href="runtime_8hpp_source.html#l00028">_initialized</a>, <a class="el" href="runtime_8cpp_source.html#l00413">abort()</a>, <a class="el" href="likwid__marker_8hpp_source.html#l00052">FEAT_MARKER_CLOSE</a>, <a class="el" href="dist_8cpp_source.html#l00148">FEAT::Dist::finalize()</a>, and <a class="el" href="memory__pool_8hpp_source.html#l00066">FEAT::MemoryPool::finalize()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="runtime_8hpp_source.html#l00058">FEAT::Runtime::ScopeGuard::~ScopeGuard()</a>.</p>
+
+</div>
+</div>
+<a id="a89b01550c3364b466a9c9ebd1a81d659" name="a89b01550c3364b466a9c9ebd1a81d659"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89b01550c3364b466a9c9ebd1a81d659">&#9670;&#160;</a></span>get_cudss_handle()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void * Runtime::get_cudss_handle </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the unique cuDSS third-party library handle. </p>
+
+<p class="definition">Definition at line <a class="el" href="runtime_8cpp_source.html#l00488">488</a> of file <a class="el" href="runtime_8cpp_source.html">runtime.cpp</a>.</p>
 
 </div>
 </div>
@@ -274,9 +306,9 @@ Note that a call-stack dump may not be available on all platforms. </td></tr>
 </dl>
 <dl class="platformswitches"><dt><b><a class="el" href="platformswitches.html#_platformswitches000002">Platform dependend code branching:</a></b></dt><dd>On <a class="el" href="namespace_f_e_a_t_1_1_windows.html" title="Windows OS utility namespace.">Windows</a>, these two function calls MUST come before anything else, otherwise one the following calls may cause the automated regression test system to halt with an error prompt awaiting user interaction. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="runtime_8cpp_source.html#l00043">43</a> of file <a class="el" href="runtime_8cpp_source.html">runtime.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime_8cpp_source.html#l00051">51</a> of file <a class="el" href="runtime_8cpp_source.html">runtime.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="runtime_8hpp_source.html#l00031">_finalized</a>, <a class="el" href="runtime_8hpp_source.html#l00028">_initialized</a>, <a class="el" href="runtime_8cpp_source.html#l00396">abort()</a>, <a class="el" href="os__windows_8cpp_source.html#l00214">FEAT::Windows::disable_error_prompts()</a>, <a class="el" href="likwid__marker_8hpp_source.html#l00046">FEAT_MARKER_INIT</a>, <a class="el" href="os__windows_8cpp_source.html#l00222">FEAT::Windows::get_current_process_id()</a>, <a class="el" href="memory__pool_8hpp_source.html#l00061">FEAT::MemoryPool::initialize()</a>, <a class="el" href="dist_8cpp_source.html#l00105">FEAT::Dist::initialize()</a>, <a class="el" href="os__windows_8cpp_source.html#l00208">FEAT::Windows::install_seh_filter()</a>, <a class="el" href="dist_8hpp_source.html#l01494">FEAT::Dist::Comm::rank()</a>, <a class="el" href="base__header_8hpp_source.html#l00110">FEAT::version_major</a>, <a class="el" href="base__header_8hpp_source.html#l00112">FEAT::version_minor</a>, <a class="el" href="base__header_8hpp_source.html#l00114">FEAT::version_patch</a>, and <a class="el" href="dist_8cpp_source.html#l00429">FEAT::Dist::Comm::world()</a>.</p>
+<p class="reference">References <a class="el" href="runtime_8hpp_source.html#l00031">_finalized</a>, <a class="el" href="runtime_8hpp_source.html#l00028">_initialized</a>, <a class="el" href="runtime_8cpp_source.html#l00413">abort()</a>, <a class="el" href="os__windows_8cpp_source.html#l00214">FEAT::Windows::disable_error_prompts()</a>, <a class="el" href="likwid__marker_8hpp_source.html#l00046">FEAT_MARKER_INIT</a>, <a class="el" href="os__windows_8cpp_source.html#l00222">FEAT::Windows::get_current_process_id()</a>, <a class="el" href="memory__pool_8hpp_source.html#l00061">FEAT::MemoryPool::initialize()</a>, <a class="el" href="dist_8cpp_source.html#l00105">FEAT::Dist::initialize()</a>, <a class="el" href="os__windows_8cpp_source.html#l00208">FEAT::Windows::install_seh_filter()</a>, <a class="el" href="dist_8hpp_source.html#l01494">FEAT::Dist::Comm::rank()</a>, <a class="el" href="base__header_8hpp_source.html#l00110">FEAT::version_major</a>, <a class="el" href="base__header_8hpp_source.html#l00112">FEAT::version_minor</a>, <a class="el" href="base__header_8hpp_source.html#l00114">FEAT::version_patch</a>, and <a class="el" href="dist_8cpp_source.html#l00429">FEAT::Dist::Comm::world()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="runtime_8hpp_source.html#l00048">FEAT::Runtime::ScopeGuard::ScopeGuard()</a>.</p>
 
@@ -307,7 +339,7 @@ Note that a call-stack dump may not be available on all platforms. </td></tr>
 
 <p class="definition">Definition at line <a class="el" href="runtime_8hpp_source.html#l00031">31</a> of file <a class="el" href="runtime_8hpp_source.html">runtime.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="runtime_8cpp_source.html#l00428">finalize()</a>, and <a class="el" href="runtime_8cpp_source.html#l00043">initialize()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="runtime_8cpp_source.html#l00445">finalize()</a>, and <a class="el" href="runtime_8cpp_source.html#l00051">initialize()</a>.</p>
 
 </div>
 </div>
@@ -335,7 +367,7 @@ Note that a call-stack dump may not be available on all platforms. </td></tr>
 
 <p class="definition">Definition at line <a class="el" href="runtime_8hpp_source.html#l00028">28</a> of file <a class="el" href="runtime_8hpp_source.html">runtime.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="runtime_8cpp_source.html#l00428">finalize()</a>, and <a class="el" href="runtime_8cpp_source.html#l00043">initialize()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="runtime_8cpp_source.html#l00445">finalize()</a>, and <a class="el" href="runtime_8cpp_source.html#l00051">initialize()</a>.</p>
 
 </div>
 </div>

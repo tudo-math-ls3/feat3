@@ -40,6 +40,7 @@ var class_f_e_a_t_1_1_property_map =
     [ "read", "class_f_e_a_t_1_1_property_map.html#a1306de2f57c0f2f55646db8ce5bdb541", null ],
     [ "read", "class_f_e_a_t_1_1_property_map.html#af8c4fa20d4321c8af369677bea7cbafd", null ],
     [ "read", "class_f_e_a_t_1_1_property_map.html#aeb9fdd3646022a6b972f0016382241f0", null ],
+    [ "treeify_structures", "class_f_e_a_t_1_1_property_map.html#a5d5b2699ec6115b633388f84bd2acdc5", null ],
     [ "write", "class_f_e_a_t_1_1_property_map.html#a53c28b49c083f95cc378d84a527c36ed", null ],
     [ "write", "class_f_e_a_t_1_1_property_map.html#a3560cdc14c4d59a6ef051b06c6cd29a6", null ],
     [ "write", "class_f_e_a_t_1_1_property_map.html#afbe0a77331ae91f62c777cfc8ea4aa80", null ],

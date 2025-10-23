@@ -9,6 +9,7 @@ var test__system_8hpp =
     [ "TEST_CHECK_EQUAL", "test__system_8hpp.html#aec703c88b9951285edb42334b5de816c", null ],
     [ "TEST_CHECK_EQUAL_WITHIN_EPS", "test__system_8hpp.html#a7585e793a391d301bd4cbdc66f024018", null ],
     [ "TEST_CHECK_IN_RANGE", "test__system_8hpp.html#a2c23cb13a7c79e7821f4d3dad74cf550", null ],
+    [ "TEST_CHECK_LESS_THAN", "test__system_8hpp.html#a5ac5be32c01b54e44938fce83d4e5f51", null ],
     [ "TEST_CHECK_MSG", "test__system_8hpp.html#a77113b042a17bf510fec145e7eda1fd3", null ],
     [ "TEST_CHECK_NOT_EQUAL", "test__system_8hpp.html#a6153fa6708f27e2294595086ead3927b", null ],
     [ "TEST_CHECK_RELATIVE", "test__system_8hpp.html#ae9b1cfc8f38cdb393ed4cdfd3a90e159", null ],

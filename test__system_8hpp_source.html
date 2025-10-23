@@ -404,16 +404,21 @@ $(document).ready(function(){initNavTree('test__system_8hpp_source.html',''); in
 <div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span>        + &quot;, with &quot; #a &quot;=&quot; + FEAT::stringify(a) + &quot; and &quot; #b &quot;=&quot; + FEAT::stringify(b))\</div>
 <div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span>  } while (false)</div>
 <div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span> </div>
-<div class="line"><a id="l00388" name="l00388"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a29fc8ef53f555acfd8901be6843345b1">  388</a></span><span class="preprocessor">#define TEST(pre, test, post) \</span></div>
+<div class="line"><a id="l00388" name="l00388"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a5ac5be32c01b54e44938fce83d4e5f51">  388</a></span><span class="preprocessor">#define TEST_CHECK_LESS_THAN(a, b) \</span></div>
 <div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span><span class="preprocessor">  do { \</span></div>
-<div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span><span class="preprocessor">    pre; \</span></div>
-<div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span><span class="preprocessor">    try { \</span></div>
-<div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span><span class="preprocessor">      test; \</span></div>
-<div class="line"><a id="l00393" name="l00393"></a><span class="lineno">  393</span><span class="preprocessor">    } catch (const FEAT::TestSystem::TestFailedException &amp; test_e) { \</span></div>
-<div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span><span class="preprocessor">      post; \</span></div>
-<div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span><span class="preprocessor">      throw; } \</span></div>
-<div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span><span class="preprocessor">    post; \</span></div>
-<div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span><span class="preprocessor">  } while (false)</span></div>
+<div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span><span class="preprocessor">    CHECK_INTERNAL((a) &lt; (b), this-&gt;_id + &quot;\n&quot;</span> +  &quot;Expected &#39;&quot; #a &quot;&#39; to be less than \n&#39;&quot; + FEAT::stringify(b) + &quot;&#39;\nbut got\n&#39;&quot; + FEAT::stringify(a) + &quot;&#39;&quot;)\</div>
+<div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span>  } while (false)</div>
+<div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span> </div>
+<div class="line"><a id="l00394" name="l00394"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a29fc8ef53f555acfd8901be6843345b1">  394</a></span><span class="preprocessor">#define TEST(pre, test, post) \</span></div>
+<div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span><span class="preprocessor">  do { \</span></div>
+<div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span><span class="preprocessor">    pre; \</span></div>
+<div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span><span class="preprocessor">    try { \</span></div>
+<div class="line"><a id="l00398" name="l00398"></a><span class="lineno">  398</span><span class="preprocessor">      test; \</span></div>
+<div class="line"><a id="l00399" name="l00399"></a><span class="lineno">  399</span><span class="preprocessor">    } catch (const FEAT::TestSystem::TestFailedException &amp; test_e) { \</span></div>
+<div class="line"><a id="l00400" name="l00400"></a><span class="lineno">  400</span><span class="preprocessor">      post; \</span></div>
+<div class="line"><a id="l00401" name="l00401"></a><span class="lineno">  401</span><span class="preprocessor">      throw; } \</span></div>
+<div class="line"><a id="l00402" name="l00402"></a><span class="lineno">  402</span><span class="preprocessor">    post; \</span></div>
+<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span><span class="preprocessor">  } while (false)</span></div>
 <div class="ttc" id="abase__header_8hpp_html"><div class="ttname"><a href="base__header_8hpp.html">base_header.hpp</a></div><div class="ttdoc">FEAT Kernel base header.</div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_string_html"><div class="ttname"><a href="class_f_e_a_t_1_1_string.html">FEAT::String</a></div><div class="ttdoc">String class implementation.</div><div class="ttdef"><b>Definition:</b> <a href="string_8hpp_source.html#l00044">string.hpp:46</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_test_system_1_1_test_failed_exception_html"><div class="ttname"><a href="class_f_e_a_t_1_1_test_system_1_1_test_failed_exception.html">FEAT::TestSystem::TestFailedException</a></div><div class="ttdoc">exception thrown by the check method in UnitTest</div><div class="ttdef"><b>Definition:</b> <a href="test__system_8hpp_source.html#l00043">test_system.hpp:45</a></div></div>

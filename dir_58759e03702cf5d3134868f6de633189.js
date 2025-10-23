@@ -11,7 +11,7 @@ var dir_58759e03702cf5d3134868f6de633189 =
     [ "bicgstabl.hpp", "bicgstabl_8hpp_source.html", null ],
     [ "chebyshev.hpp", "chebyshev_8hpp_source.html", null ],
     [ "convert_precond.hpp", "convert__precond_8hpp_source.html", null ],
-    [ "cudss.cu", "cudss_8cu_source.html", null ],
+    [ "cudss.cpp", "cudss_8cpp_source.html", null ],
     [ "cudss.hpp", "cudss_8hpp_source.html", null ],
     [ "cusolver.cu", "cusolver_8cu_source.html", null ],
     [ "cusolver.hpp", "cusolver_8hpp_source.html", null ],

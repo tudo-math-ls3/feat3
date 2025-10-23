@@ -8,7 +8,8 @@ var searchData=
   ['ref_5fvalue_5',['ref_value',['../class_f_e_a_t_1_1_space_1_1_basis_data_reduced.html#a1cb0845b6af9c7b6c7b965b56c5842e8',1,'FEAT::Space::BasisDataReduced::ref_value()'],['../class_f_e_a_t_1_1_space_1_1_basis_data.html#acdb03e564030ca5f29bd6d2bc779871c',1,'FEAT::Space::BasisData::ref_value()']]],
   ['reference_6',['reference',['../struct_f_e_a_t_1_1_geometry_1_1_entity_search_entry.html#a4c805c4033a677f718a516f8ff243c72',1,'FEAT::Geometry::EntitySearchEntry']]],
   ['references_7',['references',['../struct_f_e_a_t_1_1_geometry_1_1_topology_template_3_01_shape___00_010_01_4.html#a9305a2ab2744a4566c25e7b992208971',1,'FEAT::Geometry::TopologyTemplate&lt; Shape_, 0 &gt;::references()'],['../struct_f_e_a_t_1_1_geometry_1_1_topology_template.html#a6203c89bfbfb24bdbf8e74df48d71af3',1,'FEAT::Geometry::TopologyTemplate::references()']]],
-  ['removed_8',['removed',['../struct_f_e_a_t_1_1_geometry_1_1_adaption_stats.html#a17a24fa419be891ea3260a7bfd88d57a',1,'FEAT::Geometry::AdaptionStats']]],
-  ['request_9',['request',['../class_f_e_a_t_1_1_dist_1_1_request.html#a0cbcdd9b17654cc65352b45322c9f98a',1,'FEAT::Dist::Request']]],
-  ['right_10',['right',['../struct_f_e_a_t_1_1_geometry_1_1_inner_1_1_join_entry.html#ac3ad98230aa3f7139e306852582d5d03',1,'FEAT::Geometry::Inner::JoinEntry']]]
+  ['reg_5feps_8',['reg_eps',['../class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_velo_material_assembler_3_01_q2_standard_hype407418e5507f47d8c147d0c95b2976a9.html#aee3db5891d244a47c5b695f9d89aeaac',1,'FEAT::VoxelAssembly::VoxelBurgersVeloMaterialAssembler&lt; Q2StandardHyperCube&lt; dim_ &gt;, DT_, IT_ &gt;']]],
+  ['removed_9',['removed',['../struct_f_e_a_t_1_1_geometry_1_1_adaption_stats.html#a17a24fa419be891ea3260a7bfd88d57a',1,'FEAT::Geometry::AdaptionStats']]],
+  ['request_10',['request',['../class_f_e_a_t_1_1_dist_1_1_request.html#a0cbcdd9b17654cc65352b45322c9f98a',1,'FEAT::Dist::Request']]],
+  ['right_11',['right',['../struct_f_e_a_t_1_1_geometry_1_1_inner_1_1_join_entry.html#ac3ad98230aa3f7139e306852582d5d03',1,'FEAT::Geometry::Inner::JoinEntry']]]
 ];

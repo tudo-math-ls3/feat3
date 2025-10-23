@@ -133,6 +133,9 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><b>CGALWrapper</b> (const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html">CGALWrapper</a> &amp;)=delete</td></tr>
 <tr class="memdesc:ac06d240d9f1969af491026b71b431f48"><td class="mdescLeft">&#160;</td><td class="mdescRight">rule of five <br /></td></tr>
 <tr class="separator:ac06d240d9f1969af491026b71b431f48"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3599c5ae378378b16eeb0b790e1ea791"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a3599c5ae378378b16eeb0b790e1ea791">CGALWrapper</a> (const std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &gt; &amp;vertices, const std::vector&lt; std::array&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>, 3 &gt; &gt; &amp;faces)</td></tr>
+<tr class="memdesc:a3599c5ae378378b16eeb0b790e1ea791"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html" title="Wrapper for the CGAL Library.">CGALWrapper</a> Instance from vertices and faces.  <a href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a3599c5ae378378b16eeb0b790e1ea791">More...</a><br /></td></tr>
+<tr class="separator:a3599c5ae378378b16eeb0b790e1ea791"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a12e52802cc9574de2aafcb165f1d76e3"><td class="memItemLeft" align="right" valign="top"><a id="a12e52802cc9574de2aafcb165f1d76e3" name="a12e52802cc9574de2aafcb165f1d76e3"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>CGALWrapper</b> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;filename, <a class="el" href="namespace_f_e_a_t_1_1_geometry.html#abcc16a3ca21fc13d41a4a9af795fb25f">CGALFileMode</a> file_mode)</td></tr>
 <tr class="memdesc:a12e52802cc9574de2aafcb165f1d76e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Create a new <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html" title="Wrapper for the CGAL Library.">CGALWrapper</a> Instance and open the provided file in given format. <br /></td></tr>
@@ -143,33 +146,57 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a604038555709c32d345e5875fd958874"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa820ac480b3824d5340b5cb91cad8c34"><td class="memItemLeft" align="right" valign="top"><a id="aa820ac480b3824d5340b5cb91cad8c34" name="aa820ac480b3824d5340b5cb91cad8c34"></a>
 std::size_t&#160;</td><td class="memItemRight" valign="bottom"><b>bytes</b> () const</td></tr>
-<tr class="memdesc:aa820ac480b3824d5340b5cb91cad8c34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size in bytes, //TODO: Implement me. <br /></td></tr>
+<tr class="memdesc:aa820ac480b3824d5340b5cb91cad8c34"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the size in bytes. <br /></td></tr>
 <tr class="separator:aa820ac480b3824d5340b5cb91cad8c34"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aca58d6b507384cf831ed6528598540b7"><td class="memItemLeft" align="right" valign="top"><a id="aca58d6b507384cf831ed6528598540b7" name="aca58d6b507384cf831ed6528598540b7"></a>
-<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>closest_point</b> (const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;point) const</td></tr>
+<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>closest_point</b> (const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#ad4b7844bfa49141bb03edf512a8c9cfb">point</a>) const</td></tr>
 <tr class="memdesc:aca58d6b507384cf831ed6528598540b7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the nearest point regarding on all input primitives defined at objects' construction. <br /></td></tr>
 <tr class="separator:aca58d6b507384cf831ed6528598540b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a997ff1624507ce93ac82d69d16069c93"><td class="memItemLeft" align="right" valign="top"><a id="a997ff1624507ce93ac82d69d16069c93" name="a997ff1624507ce93ac82d69d16069c93"></a>
-<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>closest_point</b> (const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;point, <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;primitive_grad) const</td></tr>
+<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>closest_point</b> (const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#ad4b7844bfa49141bb03edf512a8c9cfb">point</a>, <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;primitive_grad) const</td></tr>
 <tr class="separator:a997ff1624507ce93ac82d69d16069c93"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69279547b7f6b0b6cfb5a7f9c210a21b"><td class="memItemLeft" align="right" valign="top"><a id="a69279547b7f6b0b6cfb5a7f9c210a21b" name="a69279547b7f6b0b6cfb5a7f9c210a21b"></a>
 <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>closest_point</b> (DataType x, DataType y, DataType z) const</td></tr>
 <tr class="memdesc:a69279547b7f6b0b6cfb5a7f9c210a21b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the nearest point regarding on all input primitives defined at objects' construction. <br /></td></tr>
 <tr class="separator:a69279547b7f6b0b6cfb5a7f9c210a21b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2472285376bb2c0c210ee89f0fc319a"><td class="memItemLeft" align="right" valign="top"><a id="af2472285376bb2c0c210ee89f0fc319a" name="af2472285376bb2c0c210ee89f0fc319a"></a>
+<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>closest_point_on_feature</b> (const <a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a636b501b375b1f49165fadc7dc731e33">CGALFeature</a> &amp;f, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;p) const</td></tr>
+<tr class="memdesc:af2472285376bb2c0c210ee89f0fc319a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the closest point closest to p on the given feature. <br /></td></tr>
+<tr class="separator:af2472285376bb2c0c210ee89f0fc319a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab1714bbe96f7c339c63936d5d911e3b1"><td class="memItemLeft" align="right" valign="top"><a id="ab1714bbe96f7c339c63936d5d911e3b1" name="ab1714bbe96f7c339c63936d5d911e3b1"></a>
+<a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a40a9038979415b8e1e29cca17e8f028b">CGALFeatureNetwork</a>&#160;</td><td class="memItemRight" valign="bottom"><b>detect_features</b> (DataType critical_angle)</td></tr>
+<tr class="memdesc:ab1714bbe96f7c339c63936d5d911e3b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a vector of all feature vertices defined at objects' construction. <br /></td></tr>
+<tr class="separator:ab1714bbe96f7c339c63936d5d911e3b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3faf05364a7aa31864b959a8acccfa90"><td class="memItemLeft" align="right" valign="top"><a id="a3faf05364a7aa31864b959a8acccfa90" name="a3faf05364a7aa31864b959a8acccfa90"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>intersects_line</b> (const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;a, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;b) const</td></tr>
+<tr class="memdesc:a3faf05364a7aa31864b959a8acccfa90"><td class="mdescLeft">&#160;</td><td class="mdescRight">tests whether the cgal mesh intersects with the line segment a-&gt;b <br /></td></tr>
+<tr class="separator:a3faf05364a7aa31864b959a8acccfa90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae8e80ec670171717cc245b4f4441d2d0"><td class="memItemLeft" align="right" valign="top"><a id="ae8e80ec670171717cc245b4f4441d2d0" name="ae8e80ec670171717cc245b4f4441d2d0"></a>
 <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html">CGALWrapper</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html">CGALWrapper</a> &amp;&amp;<a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a9a08208ef110199cc9c70de1f8b83de6a795f3202b17cb6bc3d4b771d8c6c9eaf">other</a>) noexcept</td></tr>
 <tr class="separator:ae8e80ec670171717cc245b4f4441d2d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb33824b8a07e40b8dea6fe5860badc0"><td class="memItemLeft" align="right" valign="top"><a id="acb33824b8a07e40b8dea6fe5860badc0" name="acb33824b8a07e40b8dea6fe5860badc0"></a>
 <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html">CGALWrapper</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html">CGALWrapper</a> &amp;)=delete</td></tr>
 <tr class="separator:acb33824b8a07e40b8dea6fe5860badc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4b7844bfa49141bb03edf512a8c9cfb"><td class="memItemLeft" align="right" valign="top"><a id="ad4b7844bfa49141bb03edf512a8c9cfb" name="ad4b7844bfa49141bb03edf512a8c9cfb"></a>
+<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a>&#160;</td><td class="memItemRight" valign="bottom"><b>point</b> (std::uint32_t idx) const</td></tr>
+<tr class="memdesc:ad4b7844bfa49141bb03edf512a8c9cfb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the point of the surface mesh with the given index. <br /></td></tr>
+<tr class="separator:ad4b7844bfa49141bb03edf512a8c9cfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a163a2c526c810459165515f98956857c"><td class="memItemLeft" align="right" valign="top"><a id="a163a2c526c810459165515f98956857c" name="a163a2c526c810459165515f98956857c"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><b>point_inside</b> (DataType x, DataType y, DataType z) const</td></tr>
 <tr class="memdesc:a163a2c526c810459165515f98956857c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether a point is inside the Polyhedron defined at objects' construction. <br /></td></tr>
 <tr class="separator:a163a2c526c810459165515f98956857c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acee5cc4a4fd75835ca2ca567a7864e84"><td class="memItemLeft" align="right" valign="top"><a id="acee5cc4a4fd75835ca2ca567a7864e84" name="acee5cc4a4fd75835ca2ca567a7864e84"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><b>point_not_outside</b> (DataType x, DataType y, DataType z) const</td></tr>
+<tr class="memdesc:acee5cc4a4fd75835ca2ca567a7864e84"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check whether a point is inside or on the boundary of the Polyhedron defined at objects' construction. <br /></td></tr>
+<tr class="separator:acee5cc4a4fd75835ca2ca567a7864e84"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7f59c7a3d1e2ada0f8414c0a1060a3a7"><td class="memItemLeft" align="right" valign="top"><a id="a7f59c7a3d1e2ada0f8414c0a1060a3a7" name="a7f59c7a3d1e2ada0f8414c0a1060a3a7"></a>
 DataType&#160;</td><td class="memItemRight" valign="bottom"><b>squared_distance</b> (DataType x, DataType y, DataType z) const</td></tr>
 <tr class="memdesc:a7f59c7a3d1e2ada0f8414c0a1060a3a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the minimun squared distance between the query point and all input primitives defined at objects' construction. <br /></td></tr>
 <tr class="separator:a7f59c7a3d1e2ada0f8414c0a1060a3a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:accd465525148caac6e5231501684ee94"><td class="memItemLeft" align="right" valign="top"><a id="accd465525148caac6e5231501684ee94" name="accd465525148caac6e5231501684ee94"></a>
+DataType&#160;</td><td class="memItemRight" valign="bottom"><b>squared_distance_to_feature</b> (const <a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a636b501b375b1f49165fadc7dc731e33">CGALFeature</a> &amp;f, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;p) const</td></tr>
+<tr class="memdesc:accd465525148caac6e5231501684ee94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the minimum squared distance between the query point and the given feature. <br /></td></tr>
+<tr class="separator:accd465525148caac6e5231501684ee94"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a11a9dcee8b70993d969023985d0ef3b5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a11a9dcee8b70993d969023985d0ef3b5">transform</a> (const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">TransformMatrix</a> &amp;trafo_mat, const <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &amp;translation, DataType scale=DataType(1))</td></tr>
 <tr class="separator:a11a9dcee8b70993d969023985d0ef3b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -205,7 +232,7 @@ class FEAT::Geometry::CGALWrapper&lt; DT_ &gt;</div><p >Wrapper for the CGAL Lib
 <p>This class acts as a wrapper for a small portion of the CGAL Library. As of now, only the interaction with 3d tetrahedral OFF files is implemented.</p>
 <dl class="section note"><dt>Note</dt><dd><a href="https://www.cgal.org/">https://www.cgal.org/</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00037">37</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00056">56</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="affedf72db532d05a691bdad831ede865" name="affedf72db532d05a691bdad831ede865"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#affedf72db532d05a691bdad831ede865">&#9670;&#160;</a></span>DataType</h2>
@@ -221,7 +248,7 @@ template&lt;typename DT_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00040">40</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00059">59</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
 
 </div>
 </div>
@@ -239,7 +266,7 @@ template&lt;typename DT_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00041">41</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00060">60</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
 
 </div>
 </div>
@@ -257,7 +284,57 @@ template&lt;typename DT_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00042">42</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00061">61</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a3599c5ae378378b16eeb0b790e1ea791" name="a3599c5ae378378b16eeb0b790e1ea791"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3599c5ae378378b16eeb0b790e1ea791">&#9670;&#160;</a></span>CGALWrapper()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename DT_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html">FEAT::Geometry::CGALWrapper</a>&lt; DT_ &gt;::CGALWrapper </td>
+          <td>(</td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">PointType</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>vertices</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; std::array&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>, 3 &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>faces</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Create a new <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html" title="Wrapper for the CGAL Library.">CGALWrapper</a> Instance from vertices and faces. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">vertices</td><td>Array of vertices </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">faces</td><td>Array of faces</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html" title="Wrapper for the CGAL Library.">CGALWrapper</a> for a surface mesh containing the given vertices and faces</dd></dl>
+<dl class="section warning"><dt>Warning</dt><dd>CGAL expects faces to be wound counter-clockwise. This constructor will abort the program if that is not the case. </dd></dl>
 
 </div>
 </div>
@@ -322,7 +399,7 @@ template&lt;typename DT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00044">44</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00064">64</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
 
 </div>
 </div>

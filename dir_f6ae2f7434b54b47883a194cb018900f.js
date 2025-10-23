@@ -8,6 +8,8 @@ var dir_f6ae2f7434b54b47883a194cb018900f =
     [ "burgers_assembler.hpp", "assembly_2burgers__assembler_8hpp_source.html", null ],
     [ "burgers_assembler_carreau.hpp", "burgers__assembler__carreau_8hpp_source.html", null ],
     [ "burgers_assembly_job.hpp", "burgers__assembly__job_8hpp_source.html", null ],
+    [ "burgers_carreau_assembly_job.hpp", "burgers__carreau__assembly__job_8hpp_source.html", null ],
+    [ "burgers_velo_material_assembly_job.hpp", "burgers__velo__material__assembly__job_8hpp_source.html", null ],
     [ "common_functionals.hpp", "common__functionals_8hpp_source.html", null ],
     [ "common_operators.hpp", "common__operators_8hpp_source.html", null ],
     [ "discrete_evaluator.hpp", "discrete__evaluator_8hpp_source.html", null ],

@@ -192,7 +192,7 @@ Private Attributes</h2></td></tr>
 <div class="textblock"><p >Checkpoint/Restart infrastructure. </p>
 <p >This class provides a general interface for checkpoint/restart usecases. Compatible objects can be summed up to a single checkpoint. This checkpoint can then be stored and restored via mpi io mechanics. Afterwards, any object can be restored from the recreated checkpoint.</p>
 <dl class="section note"><dt>Note</dt><dd>The checkpoint control class object is used on a per rank basis. The contents of all ranks objects will be written into one single file. Later on, the loaded objects will, again, be local objects in every rank with distinct contents.</dd></dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000071">Todo:</a></b></dt><dd>do we need extra handling for machines with no global acessible file servers? </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000073">Todo:</a></b></dt><dd>do we need extra handling for machines with no global acessible file servers? </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="checkpoint__control_8hpp_source.html#l00140">140</a> of file <a class="el" href="checkpoint__control_8hpp_source.html">checkpoint_control.hpp</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>

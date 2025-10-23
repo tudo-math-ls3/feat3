@@ -146,7 +146,7 @@ Static Public Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;int dimension_&gt;<br />
 class FEAT::Assembly::Common::DuDvOperatorBlocked&lt; dimension_ &gt;</div><p >Du:Dv operator implementation. </p>
-<p >This functor implements the weak formulation of the bilinear Du : Dv operator, i.e.  </p><p class="formulaDsp">
+<p >This class implements the weak formulation of the bilinear Du : Dv operator, i.e.  </p><p class="formulaDsp">
 \[
   \mathbf{D} \varphi : \mathbf{D} \psi
 \]
@@ -156,7 +156,7 @@ class FEAT::Assembly::Common::DuDvOperatorBlocked&lt; dimension_ &gt;</div><p >D
   \mathbf{D} \varphi = \frac{1}{2} \left( \nabla \varphi + \left( \nabla \varphi \right)^T \right).
 \]
 </p>
-<p >This functor can be used with the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_bilinear_operator.html" title="Base class for Bilinear Operators.">BilinearOperator</a> assembly class template to assemble one scalar matrix corresponding to one block of the \( d \times d \) block matrix, where \( d \) is the number of space dimensions.</p>
+<p >This class can be used with the <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_bilinear_operator.html" title="Base class for Bilinear Operators.">BilinearOperator</a> assembly class template to assemble one scalar matrix corresponding to one block of the \( d \times d \) block matrix, where \( d \) is the number of space dimensions.</p>
 <p >Note that  </p><p class="formulaDsp">
 \[
   \mathbf{D} \varphi : \mathbf{D} \psi = 2 \left( \nabla \varphi : \nabla \psi + \nabla \varphi : \left( \nabla \psi \right)^T \right),
@@ -165,7 +165,7 @@ class FEAT::Assembly::Common::DuDvOperatorBlocked&lt; dimension_ &gt;</div><p >D
 <p> so the \( (k,l) \)-block consists of entries corresponding to \( \partial_k \varphi \partial_l \psi \).</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="common__operators_8hpp_source.html#l00874">874</a> of file <a class="el" href="common__operators_8hpp_source.html">common_operators.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common__operators_8hpp_source.html#l00949">949</a> of file <a class="el" href="common__operators_8hpp_source.html">common_operators.hpp</a>.</p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
 <a id="ae20d9c2e65a77ce8f2e5261d2d34bec1" name="ae20d9c2e65a77ce8f2e5261d2d34bec1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae20d9c2e65a77ce8f2e5261d2d34bec1">&#9670;&#160;</a></span>BlockHeight</h2>
@@ -191,7 +191,7 @@ template&lt;int dimension_&gt; </div>
 
 <p>Every block is a dimension x dimension matrix. </p>
 
-<p class="definition">Definition at line <a class="el" href="common__operators_8hpp_source.html#l00879">879</a> of file <a class="el" href="common__operators_8hpp_source.html">common_operators.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common__operators_8hpp_source.html#l00954">954</a> of file <a class="el" href="common__operators_8hpp_source.html">common_operators.hpp</a>.</p>
 
 </div>
 </div>
@@ -219,7 +219,7 @@ template&lt;int dimension_&gt; </div>
 
 <p>Every block is a dimension x dimension matrix. </p>
 
-<p class="definition">Definition at line <a class="el" href="common__operators_8hpp_source.html#l00881">881</a> of file <a class="el" href="common__operators_8hpp_source.html">common_operators.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common__operators_8hpp_source.html#l00956">956</a> of file <a class="el" href="common__operators_8hpp_source.html">common_operators.hpp</a>.</p>
 
 </div>
 </div>
@@ -245,7 +245,7 @@ template&lt;int dimension_&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="common__operators_8hpp_source.html#l00884">884</a> of file <a class="el" href="common__operators_8hpp_source.html">common_operators.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common__operators_8hpp_source.html#l00959">959</a> of file <a class="el" href="common__operators_8hpp_source.html">common_operators.hpp</a>.</p>
 
 </div>
 </div>
@@ -271,7 +271,7 @@ template&lt;int dimension_&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="common__operators_8hpp_source.html#l00883">883</a> of file <a class="el" href="common__operators_8hpp_source.html">common_operators.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common__operators_8hpp_source.html#l00958">958</a> of file <a class="el" href="common__operators_8hpp_source.html">common_operators.hpp</a>.</p>
 
 </div>
 </div>
@@ -297,7 +297,7 @@ template&lt;int dimension_&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="common__operators_8hpp_source.html#l00885">885</a> of file <a class="el" href="common__operators_8hpp_source.html">common_operators.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="common__operators_8hpp_source.html#l00960">960</a> of file <a class="el" href="common__operators_8hpp_source.html">common_operators.hpp</a>.</p>
 
 </div>
 </div>

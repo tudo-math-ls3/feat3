@@ -108,7 +108,6 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#pri-types">Private Types</a> &#124;
 <a href="#pri-methods">Private Member Functions</a> &#124;
-<a href="#friends">Friends</a> &#124;
 <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt; Class Template Reference</div></div>
 </div><!--header-->
@@ -230,6 +229,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a98952d272de3b48bb4b7df1e03e272a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a884982ad2771746c53c6ba12d1eab2a4">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a98952d272de3b48bb4b7df1e03e272a0">max_element</a> () const</td></tr>
 <tr class="memdesc:a98952d272de3b48bb4b7df1e03e272a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the maximum value of this vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a98952d272de3b48bb4b7df1e03e272a0">More...</a><br /></td></tr>
 <tr class="separator:a98952d272de3b48bb4b7df1e03e272a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aacdb426c75675671fe436283e148ca4f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a884982ad2771746c53c6ba12d1eab2a4">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#aacdb426c75675671fe436283e148ca4f">max_rel_diff</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html">PowerVector</a> &amp;x) const</td></tr>
+<tr class="memdesc:aacdb426c75675671fe436283e148ca4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the maximum relative difference of this vector and another one y.max_rel_diff(x) returns \( \max_{0\leq i &lt; n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#aacdb426c75675671fe436283e148ca4f">More...</a><br /></td></tr>
+<tr class="separator:aacdb426c75675671fe436283e148ca4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a434dd5f40bc182ad2d6b6ccfb96cd797"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a884982ad2771746c53c6ba12d1eab2a4">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a434dd5f40bc182ad2d6b6ccfb96cd797">min_abs_element</a> () const</td></tr>
 <tr class="memdesc:a434dd5f40bc182ad2d6b6ccfb96cd797"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the absolute minimum value of this vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a434dd5f40bc182ad2d6b6ccfb96cd797">More...</a><br /></td></tr>
 <tr class="separator:a434dd5f40bc182ad2d6b6ccfb96cd797"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -264,6 +266,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5a61582346565b3cf6215569d2d0e91f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a5a61582346565b3cf6215569d2d0e91f">restore_from_checkpoint_data</a> (std::vector&lt; char &gt; &amp;data)</td></tr>
 <tr class="memdesc:a5a61582346565b3cf6215569d2d0e91f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Extract object from checkpoint.   <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a5a61582346565b3cf6215569d2d0e91f">More...</a><br /></td></tr>
 <tr class="separator:a5a61582346565b3cf6215569d2d0e91f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a205e5291862a182e86fc1646dda628e8"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a205e5291862a182e86fc1646dda628e8">same_layout</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html">PowerVector</a> &amp;x) const</td></tr>
+<tr class="memdesc:a205e5291862a182e86fc1646dda628e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the structural layout of this vector matches that of another vector. This excludes comparison of the actual data values.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a205e5291862a182e86fc1646dda628e8">More...</a><br /></td></tr>
+<tr class="separator:a205e5291862a182e86fc1646dda628e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a348ce421884dd5153d395a3596e369dc"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a348ce421884dd5153d395a3596e369dc">scale</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html">PowerVector</a> &amp;x, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a884982ad2771746c53c6ba12d1eab2a4">DataType</a> alpha)</td></tr>
 <tr class="memdesc:a348ce421884dd5153d395a3596e369dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs \( this \leftarrow \alpha\cdot x \).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a348ce421884dd5153d395a3596e369dc">More...</a><br /></td></tr>
 <tr class="separator:a348ce421884dd5153d395a3596e369dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -318,12 +323,6 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:a10f3975cd5725a297fa16ad0c294b8fa"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a10f3975cd5725a297fa16ad0c294b8fa">_write_out_binary</a> (std::ostream &amp;file) const</td></tr>
 <tr class="memdesc:a10f3975cd5725a297fa16ad0c294b8fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">write binary data of _first and _rest to file.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a10f3975cd5725a297fa16ad0c294b8fa">More...</a><br /></td></tr>
 <tr class="separator:a10f3975cd5725a297fa16ad0c294b8fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:a12dfb037fa267a7bab07e5716b3edac4"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a12dfb037fa267a7bab07e5716b3edac4">operator==</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html">PowerVector</a> &amp;a, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html">PowerVector</a> &amp;b)</td></tr>
-<tr class="memdesc:a12dfb037fa267a7bab07e5716b3edac4"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html" title="Power-Vector meta class template.">PowerVector</a> comparison operator.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a12dfb037fa267a7bab07e5716b3edac4">More...</a><br /></td></tr>
-<tr class="separator:a12dfb037fa267a7bab07e5716b3edac4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename SubType_, int count_&gt;<br />
@@ -730,7 +729,7 @@ template&lt;typename SubType_ , int count_&gt; </div>
 
 <p class="reference">References <a class="el" href="power__vector_8hpp_source.html#l00091">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_first</a>, <a class="el" href="power__vector_8hpp_source.html#l00052">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_read_from_binary()</a>, <a class="el" href="power__vector_8hpp_source.html#l00093">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_rest</a>, and <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646a34b9b130e68b0a9ab2718496480e3142">FEAT::LAFEM::fm_binary</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00052">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_read_from_binary()</a>, and <a class="el" href="power__vector_8hpp_source.html#l00600">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::read_from()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00052">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_read_from_binary()</a>, and <a class="el" href="power__vector_8hpp_source.html#l00624">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::read_from()</a>.</p>
 
 </div>
 </div>
@@ -766,7 +765,7 @@ template&lt;typename SubType_ , int count_&gt; </div>
 
 <p class="reference">References <a class="el" href="power__vector_8hpp_source.html#l00091">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_first</a>, <a class="el" href="power__vector_8hpp_source.html#l00093">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_rest</a>, <a class="el" href="power__vector_8hpp_source.html#l00062">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_write_out_binary()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646a34b9b130e68b0a9ab2718496480e3142">FEAT::LAFEM::fm_binary</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00062">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_write_out_binary()</a>, and <a class="el" href="power__vector_8hpp_source.html#l00644">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::write_out()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00062">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_write_out_binary()</a>, and <a class="el" href="power__vector_8hpp_source.html#l00668">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::write_out()</a>.</p>
 
 </div>
 </div>
@@ -960,11 +959,11 @@ template&lt;typename SubType_ , int count_&gt; </div>
 
 <p>Returns the total amount of bytes allocated. </p>
 
-<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00574">574</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00598">598</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="power__vector_8hpp_source.html#l00091">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_first</a>, <a class="el" href="power__vector_8hpp_source.html#l00093">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_rest</a>, and <a class="el" href="power__vector_8hpp_source.html#l00574">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::bytes()</a>.</p>
+<p class="reference">References <a class="el" href="power__vector_8hpp_source.html#l00091">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_first</a>, <a class="el" href="power__vector_8hpp_source.html#l00093">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_rest</a>, and <a class="el" href="power__vector_8hpp_source.html#l00598">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::bytes()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00574">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::bytes()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00598">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::bytes()</a>.</p>
 
 </div>
 </div>
@@ -1261,7 +1260,7 @@ template&lt;typename SubType2_ &gt; </div>
 </dl>
 <p>Use source vector content as content of current vector </p>
 
-<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00567">567</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00591">591</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
 
 </div>
 </div>
@@ -1644,6 +1643,43 @@ template&lt;typename SubType_ , int count_&gt; </div>
 
 </div>
 </div>
+<a id="aacdb426c75675671fe436283e148ca4f" name="aacdb426c75675671fe436283e148ca4f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aacdb426c75675671fe436283e148ca4f">&#9670;&#160;</a></span>max_rel_diff()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename SubType_ , int count_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a884982ad2771746c53c6ba12d1eab2a4">DataType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html">FEAT::LAFEM::PowerVector</a>&lt; SubType_, count_ &gt;::max_rel_diff </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html">PowerVector</a>&lt; SubType_, count_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieve the maximum relative difference of this vector and another one y.max_rel_diff(x) returns \( \max_{0\leq i &lt; n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \). </p>
+<dl class="section return"><dt>Returns</dt><dd>The largest relative difference. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00508">508</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, and <a class="el" href="power__vector_8hpp_source.html#l00508">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::max_rel_diff()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00508">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::max_rel_diff()</a>.</p>
+
+</div>
+</div>
 <a id="a434dd5f40bc182ad2d6b6ccfb96cd797" name="a434dd5f40bc182ad2d6b6ccfb96cd797"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a434dd5f40bc182ad2d6b6ccfb96cd797">&#9670;&#160;</a></span>min_abs_element()</h2>
 
@@ -1850,7 +1886,7 @@ template&lt;typename SubType_ , int count_&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Specific vector element. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00509">509</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00533">533</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00229">ASSERT</a>, and <a class="el" href="power__vector_8hpp_source.html#l00310">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::size()</a>.</p>
 
@@ -1901,7 +1937,7 @@ template&lt;typename SubType_ , int count_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00529">529</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00553">553</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00229">ASSERT</a>, <a class="el" href="power__vector_8hpp_source.html#l00310">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::size()</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
 
@@ -1986,11 +2022,11 @@ template&lt;typename SubType_ , int count_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00585">585</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00609">609</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="power__vector_8hpp_source.html#l00585">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::read_from()</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
+<p class="reference">References <a class="el" href="power__vector_8hpp_source.html#l00609">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::read_from()</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00585">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::read_from()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00609">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::read_from()</a>.</p>
 
 </div>
 </div>
@@ -2039,7 +2075,7 @@ template&lt;typename SubType_ , int count_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00600">600</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00624">624</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="power__vector_8hpp_source.html#l00052">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_read_from_binary()</a>, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646a34b9b130e68b0a9ab2718496480e3142">FEAT::LAFEM::fm_binary</a>, <a class="el" href="string_8hpp_source.html#l00944">FEAT::stringify()</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
 
@@ -2085,6 +2121,49 @@ template&lt;typename SubType_ , int count_&gt; </div>
 <p class="reference">References <a class="el" href="power__vector_8hpp_source.html#l00091">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_first</a>, <a class="el" href="power__vector_8hpp_source.html#l00093">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_rest</a>, and <a class="el" href="power__vector_8hpp_source.html#l00253">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::restore_from_checkpoint_data()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00253">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::restore_from_checkpoint_data()</a>.</p>
+
+</div>
+</div>
+<a id="a205e5291862a182e86fc1646dda628e8" name="a205e5291862a182e86fc1646dda628e8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a205e5291862a182e86fc1646dda628e8">&#9670;&#160;</a></span>same_layout()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename SubType_ , int count_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html">FEAT::LAFEM::PowerVector</a>&lt; SubType_, count_ &gt;::same_layout </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html">PowerVector</a>&lt; SubType_, count_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks if the structural layout of this vector matches that of another vector. This excludes comparison of the actual data values. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The vector to compare this vector to</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the layouts match, false otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00521">521</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="power__vector_8hpp_source.html#l00521">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::same_layout()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00521">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::same_layout()</a>.</p>
 
 </div>
 </div>
@@ -2214,7 +2293,7 @@ template&lt;<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab2adeb0ceb
 
 <p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00310">310</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00509">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::operator()()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00533">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::operator()()</a>.</p>
 
 </div>
 </div>
@@ -2313,11 +2392,11 @@ template&lt;typename SubType_ , int count_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00629">629</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00653">653</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="power__vector_8hpp_source.html#l00629">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::write_out()</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
+<p class="reference">References <a class="el" href="power__vector_8hpp_source.html#l00653">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::write_out()</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00629">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::write_out()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00653">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::write_out()</a>.</p>
 
 </div>
 </div>
@@ -2365,9 +2444,9 @@ template&lt;typename SubType_ , int count_&gt; </div>
   </table>
   </dd>
 </dl>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000035">Todo:</a></b></dt><dd>globale liste anlegen </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000037">Todo:</a></b></dt><dd>globale liste anlegen </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00644">644</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00668">668</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="power__vector_8hpp_source.html#l00062">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_write_out_binary()</a>, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646a34b9b130e68b0a9ab2718496480e3142">FEAT::LAFEM::fm_binary</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
 
@@ -2402,55 +2481,6 @@ template&lt;typename , int &gt; </div>
 
 </div>
 </div>
-<a id="a12dfb037fa267a7bab07e5716b3edac4" name="a12dfb037fa267a7bab07e5716b3edac4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a12dfb037fa267a7bab07e5716b3edac4">&#9670;&#160;</a></span>operator==</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename SubType_ , int count_&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool operator== </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html">PowerVector</a>&lt; SubType_, count_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>a</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html">PowerVector</a>&lt; SubType_, count_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>b</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html" title="Power-Vector meta class template.">PowerVector</a> comparison operator. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">a</td><td>A vector to compare with. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>A vector to compare with. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00673">673</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
-
-</div>
-</div>
 <h2 class="groupheader">Member Data Documentation</h2>
 <a id="a917108d834c3e6a435ec065594c4dc7a" name="a917108d834c3e6a435ec065594c4dc7a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a917108d834c3e6a435ec065594c4dc7a">&#9670;&#160;</a></span>_first</h2>
@@ -2478,7 +2508,7 @@ template&lt;typename SubType_ , int count_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00091">91</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00052">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_read_from_binary()</a>, <a class="el" href="power__vector_8hpp_source.html#l00062">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_write_out_binary()</a>, <a class="el" href="power__vector_8hpp_source.html#l00574">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::bytes()</a>, <a class="el" href="power__vector_8hpp_source.html#l00170">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::clone()</a>, <a class="el" href="power__vector_8hpp_source.html#l00233">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::get()</a>, <a class="el" href="power__vector_8hpp_source.html#l00247">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::get_checkpoint_size()</a>, <a class="el" href="power__vector_8hpp_source.html#l00143">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::operator=()</a>, <a class="el" href="power__vector_8hpp_source.html#l00253">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::restore_from_checkpoint_data()</a>, and <a class="el" href="power__vector_8hpp_source.html#l00266">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::set_checkpoint_data()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00052">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_read_from_binary()</a>, <a class="el" href="power__vector_8hpp_source.html#l00062">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_write_out_binary()</a>, <a class="el" href="power__vector_8hpp_source.html#l00598">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::bytes()</a>, <a class="el" href="power__vector_8hpp_source.html#l00170">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::clone()</a>, <a class="el" href="power__vector_8hpp_source.html#l00233">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::get()</a>, <a class="el" href="power__vector_8hpp_source.html#l00247">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::get_checkpoint_size()</a>, <a class="el" href="power__vector_8hpp_source.html#l00143">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::operator=()</a>, <a class="el" href="power__vector_8hpp_source.html#l00253">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::restore_from_checkpoint_data()</a>, and <a class="el" href="power__vector_8hpp_source.html#l00266">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::set_checkpoint_data()</a>.</p>
 
 </div>
 </div>
@@ -2508,7 +2538,7 @@ template&lt;typename SubType_ , int count_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="power__vector_8hpp_source.html#l00093">93</a> of file <a class="el" href="power__vector_8hpp_source.html">power_vector.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00052">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_read_from_binary()</a>, <a class="el" href="power__vector_8hpp_source.html#l00062">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_write_out_binary()</a>, <a class="el" href="power__vector_8hpp_source.html#l00574">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::bytes()</a>, <a class="el" href="power__vector_8hpp_source.html#l00170">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::clone()</a>, <a class="el" href="power__vector_8hpp_source.html#l00233">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::get()</a>, <a class="el" href="power__vector_8hpp_source.html#l00247">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::get_checkpoint_size()</a>, <a class="el" href="power__vector_8hpp_source.html#l00143">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::operator=()</a>, <a class="el" href="power__vector_8hpp_source.html#l00253">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::restore_from_checkpoint_data()</a>, and <a class="el" href="power__vector_8hpp_source.html#l00266">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::set_checkpoint_data()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="power__vector_8hpp_source.html#l00052">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_read_from_binary()</a>, <a class="el" href="power__vector_8hpp_source.html#l00062">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::_write_out_binary()</a>, <a class="el" href="power__vector_8hpp_source.html#l00598">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::bytes()</a>, <a class="el" href="power__vector_8hpp_source.html#l00170">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::clone()</a>, <a class="el" href="power__vector_8hpp_source.html#l00233">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::get()</a>, <a class="el" href="power__vector_8hpp_source.html#l00247">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::get_checkpoint_size()</a>, <a class="el" href="power__vector_8hpp_source.html#l00143">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::operator=()</a>, <a class="el" href="power__vector_8hpp_source.html#l00253">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::restore_from_checkpoint_data()</a>, and <a class="el" href="power__vector_8hpp_source.html#l00266">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::set_checkpoint_data()</a>.</p>
 
 </div>
 </div>

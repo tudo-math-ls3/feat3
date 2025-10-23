@@ -26,6 +26,18 @@ var hierarchy =
     [ "FEAT::Assembly::BurgersAssemblyTaskBase< BurgersBlockedVectorAssemblyJob, DataType >", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_task_base.html", null ],
     [ "FEAT::Assembly::BurgersAssemblyTaskBase< BurgersScalarMatrixAssemblyJob, DataType >", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_task_base.html", null ],
     [ "FEAT::Assembly::BurgersAssemblyTaskBase< BurgersScalarVectorAssemblyJob, DataType >", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_task_base.html", null ],
+    [ "FEAT::Assembly::BurgersCarreauAssemblyJobBase< Matrix_::DataType, Space_, ConvVector_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_assembly_job_base.html", [
+      [ "FEAT::Assembly::BurgersCarreauScalarMatrixAssemblyJob< Matrix_, Space_, ConvVector_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_scalar_matrix_assembly_job.html", null ]
+    ] ],
+    [ "FEAT::Assembly::BurgersCarreauAssemblyJobBase< Matrix_::DataType, Space_, typename Matrix_::VectorTypeR >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_assembly_job_base.html", null ],
+    [ "FEAT::Assembly::BurgersCarreauAssemblyJobBase< Vector_::DataType, Space_, ConvVector_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_assembly_job_base.html", [
+      [ "FEAT::Assembly::BurgersCarreauScalarVectorAssemblyJob< Vector_, Space_, ConvVector_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_scalar_vector_assembly_job.html", null ]
+    ] ],
+    [ "FEAT::Assembly::BurgersCarreauAssemblyJobBase< Vector_::DataType, Space_, Vector_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_assembly_job_base.html", null ],
+    [ "FEAT::Assembly::BurgersCarreauAssemblyTaskBase< BurgersCarreauBlockedMatrixAssemblyJob, DataType >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_assembly_task_base.html", null ],
+    [ "FEAT::Assembly::BurgersCarreauAssemblyTaskBase< BurgersCarreauBlockedVectorAssemblyJob, DataType >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_assembly_task_base.html", null ],
+    [ "FEAT::Assembly::BurgersCarreauAssemblyTaskBase< BurgersCarreauScalarMatrixAssemblyJob, DataType >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_assembly_task_base.html", null ],
+    [ "FEAT::Assembly::BurgersCarreauAssemblyTaskBase< BurgersCarreauScalarVectorAssemblyJob, DataType >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_assembly_task_base.html", null ],
     [ "FEAT::Geometry::CGALWrapper< CoordType_ >", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html", null ],
     [ "FEAT::Geometry::Atlas::ChartBase< MeshType >", "class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base.html", null ],
     [ "FEAT::LAFEM::Container< CoordType, Index >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_container.html", null ],
@@ -115,7 +127,9 @@ var hierarchy =
       [ "FEAT::Analytic::Distance::DistanceFunction< dim_, DataType_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_distance_function_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Distance::DistanceFunctionSD< dim_, DataType_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_distance_function_s_d_1_1_evaluator.html", null ],
       [ "FEAT::Analytic::Distance::InverseDistanceFunction< dim_, DataType_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_inverse_distance_function_1_1_evaluator.html", null ],
-      [ "FEAT::Analytic::Distance::PlaneDistanceFunctionSD< component_, dim_, DataType_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_plane_distance_function_s_d_1_1_evaluator.html", null ]
+      [ "FEAT::Analytic::Distance::PlaneDistanceFunctionSD< component_, dim_, DataType_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_distance_1_1_plane_distance_function_s_d_1_1_evaluator.html", null ],
+      [ "FEAT::Analytic::SimplifiedLambdaVectorFunction2D< Callable_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_simplified_lambda_vector_function2_d_1_1_evaluator.html", null ],
+      [ "FEAT::Analytic::SimplifiedLambdaVectorFunction3D< Callable_ >::Evaluator< EvalTraits_ >", "class_f_e_a_t_1_1_analytic_1_1_simplified_lambda_vector_function3_d_1_1_evaluator.html", null ]
     ] ],
     [ "FEAT::Space::CaiDouSanSheYe::Evaluator< FacetType, DataType_ >", "class_f_e_a_t_1_1_space_1_1_cai_dou_san_she_ye_1_1_evaluator.html", null ],
     [ "FEAT::Space::Argyris::Evaluator< Shape::Simplex< 1 >, DataType_ >", "class_f_e_a_t_1_1_space_1_1_argyris_1_1_evaluator.html", null ],
@@ -235,6 +249,7 @@ var hierarchy =
     [ "FEAT::Analytic::Common::CosineTensorStatic< DataType_, k_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_cosine_tensor_static.html", null ],
     [ "FEAT::Analytic::Common::ExpBubbleScalarStatic< DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_bubble_scalar_static.html", null ],
     [ "FEAT::Analytic::Common::ExpScalarStatic< DT_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_scalar_static.html", null ],
+    [ "FEAT::Analytic::Common::ExpScalarStatic< Half >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_scalar_static_3_01_half_01_4.html", null ],
     [ "FEAT::Analytic::Common::Q2BubbleScalarStatic< DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_q2_bubble_scalar_static.html", null ],
     [ "FEAT::Analytic::Common::SineTensorStatic< DataType_, k_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_sine_tensor_static.html", null ],
     [ "FEAT::Analytic::Common::TensorStatic< Scalar_, DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_tensor_static.html", null ],
@@ -290,6 +305,8 @@ var hierarchy =
       [ "FEAT::Analytic::ParsedVectorFunction< dom_dim_, img_dim_ >", "class_f_e_a_t_1_1_analytic_1_1_parsed_vector_function.html", null ],
       [ "FEAT::Analytic::PolarCoordinate< Function_, pos_range_ >", "class_f_e_a_t_1_1_analytic_1_1_polar_coordinate.html", null ],
       [ "FEAT::Analytic::ScalarCurl< Function_ >", "class_f_e_a_t_1_1_analytic_1_1_scalar_curl.html", null ],
+      [ "FEAT::Analytic::SimplifiedLambdaVectorFunction2D< Callable_ >", "class_f_e_a_t_1_1_analytic_1_1_simplified_lambda_vector_function2_d.html", null ],
+      [ "FEAT::Analytic::SimplifiedLambdaVectorFunction3D< Callable_ >", "class_f_e_a_t_1_1_analytic_1_1_simplified_lambda_vector_function3_d.html", null ],
       [ "FEAT::Analytic::StaticWrapperFunction< domain_dim_, Function_, can_value_, can_grad_, can_hess_ >", "class_f_e_a_t_1_1_analytic_1_1_static_wrapper_function.html", null ]
     ] ],
     [ "FEAT::Analytic::Function::Evaluator< Traits_ >", "class_f_e_a_t_1_1_analytic_1_1_function_1_1_evaluator.html", [
@@ -322,6 +339,7 @@ var hierarchy =
     [ "FEAT::Assembly::AnalyticFunctionIntegral< DataType_, Function_ >", "struct_f_e_a_t_1_1_assembly_1_1_analytic_function_integral.html", null ],
     [ "FEAT::Assembly::AnalyticVertexProjector", "class_f_e_a_t_1_1_assembly_1_1_analytic_vertex_projector.html", null ],
     [ "FEAT::Assembly::BilinearOperator", "class_f_e_a_t_1_1_assembly_1_1_bilinear_operator.html", [
+      [ "FEAT::Assembly::Common::BiharmonicOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_biharmonic_operator.html", null ],
       [ "FEAT::Assembly::Common::DivDivOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_div_div_operator.html", null ],
       [ "FEAT::Assembly::Common::DuDvOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_du_dv_operator.html", null ],
       [ "FEAT::Assembly::Common::DuDvOperatorBlocked< dimension_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_du_dv_operator_blocked.html", null ],
@@ -340,6 +358,7 @@ var hierarchy =
       [ "FEAT::Assembly::Common::TrialDerivativeOperator", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_trial_derivative_operator.html", null ]
     ] ],
     [ "FEAT::Assembly::BilinearOperator::Evaluator< AsmTraits_ >", "class_f_e_a_t_1_1_assembly_1_1_bilinear_operator_1_1_evaluator.html", [
+      [ "FEAT::Assembly::Common::BiharmonicOperator::Evaluator< AsmTraits_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_biharmonic_operator_1_1_evaluator.html", null ],
       [ "FEAT::Assembly::Common::DivDivOperator::Evaluator< AsmTraits_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_div_div_operator_1_1_evaluator.html", null ],
       [ "FEAT::Assembly::Common::DuDvOperator::Evaluator< AsmTraits_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_du_dv_operator_1_1_evaluator.html", null ],
       [ "FEAT::Assembly::Common::DuDvOperatorBlocked< dimension_ >::Evaluator< AsmTraits_ >", "class_f_e_a_t_1_1_assembly_1_1_common_1_1_du_dv_operator_blocked_1_1_evaluator.html", null ],
@@ -379,6 +398,26 @@ var hierarchy =
       ] ],
       [ "FEAT::Assembly::BurgersBlockedAssemblyTaskBase< Job_, DataType_, block_size_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_assembly_task_base.html", null ],
       [ "FEAT::Assembly::BurgersScalarAssemblyTaskBase< Job_, DataType_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_scalar_assembly_task_base.html", null ]
+    ] ],
+    [ "FEAT::Assembly::BurgersCarreauAssemblyJobBase< DataType_, Space_, ConvVector_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_assembly_job_base.html", [
+      [ "FEAT::Assembly::BurgersCarreauBlockedMatrixAssemblyJob< Matrix_, Space_, ConvVector_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_blocked_matrix_assembly_job.html", null ],
+      [ "FEAT::Assembly::BurgersCarreauBlockedVectorAssemblyJob< Vector_, Space_, ConvVector_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_blocked_vector_assembly_job.html", null ]
+    ] ],
+    [ "FEAT::Assembly::BurgersCarreauAssemblyTaskBase< Job_, DataType_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_assembly_task_base.html", [
+      [ "FEAT::Assembly::BurgersCarreauBlockedAssemblyTaskBase< BurgersCarreauBlockedMatrixAssemblyJob, DataType, block_size >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_blocked_assembly_task_base.html", [
+        [ "FEAT::Assembly::BurgersCarreauBlockedMatrixAssemblyJob< Matrix_, Space_, ConvVector_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_blocked_matrix_assembly_job_1_1_task.html", null ]
+      ] ],
+      [ "FEAT::Assembly::BurgersCarreauBlockedAssemblyTaskBase< BurgersCarreauBlockedVectorAssemblyJob, DataType, block_size >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_blocked_assembly_task_base.html", [
+        [ "FEAT::Assembly::BurgersCarreauBlockedVectorAssemblyJob< Vector_, Space_, ConvVector_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_blocked_vector_assembly_job_1_1_task.html", null ]
+      ] ],
+      [ "FEAT::Assembly::BurgersCarreauScalarAssemblyTaskBase< BurgersCarreauScalarMatrixAssemblyJob, DataType >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_scalar_assembly_task_base.html", [
+        [ "FEAT::Assembly::BurgersCarreauScalarMatrixAssemblyJob< Matrix_, Space_, ConvVector_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_scalar_matrix_assembly_job_1_1_task.html", null ]
+      ] ],
+      [ "FEAT::Assembly::BurgersCarreauScalarAssemblyTaskBase< BurgersCarreauScalarVectorAssemblyJob, DataType >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_scalar_assembly_task_base.html", [
+        [ "FEAT::Assembly::BurgersCarreauScalarVectorAssemblyJob< Vector_, Space_, ConvVector_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_scalar_vector_assembly_job_1_1_task.html", null ]
+      ] ],
+      [ "FEAT::Assembly::BurgersCarreauBlockedAssemblyTaskBase< Job_, DataType_, block_size_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_blocked_assembly_task_base.html", null ],
+      [ "FEAT::Assembly::BurgersCarreauScalarAssemblyTaskBase< Job_, DataType_ >", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_scalar_assembly_task_base.html", null ]
     ] ],
     [ "FEAT::Assembly::CellErrorFunctionIntegralJob< Function_, Vector_, Space_, max_der_ >", "class_f_e_a_t_1_1_assembly_1_1_cell_error_function_integral_job.html", null ],
     [ "FEAT::Assembly::CellErrorFunctionIntegralJob< Function_, Vector_, Space_, max_der_ >::Task", "class_f_e_a_t_1_1_assembly_1_1_cell_error_function_integral_job_1_1_task.html", null ],
@@ -834,6 +873,7 @@ var hierarchy =
     [ "FEAT::LAFEM::Arch::Lumping", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_lumping.html", null ],
     [ "FEAT::LAFEM::Arch::MaxAbsIndex", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_max_abs_index.html", null ],
     [ "FEAT::LAFEM::Arch::MaxIndex", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_max_index.html", null ],
+    [ "FEAT::LAFEM::Arch::MaxRelDiff", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_max_rel_diff.html", null ],
     [ "FEAT::LAFEM::Arch::MinAbsIndex", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_min_abs_index.html", null ],
     [ "FEAT::LAFEM::Arch::MinIndex", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_min_index.html", null ],
     [ "FEAT::LAFEM::Arch::Mirror", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_mirror.html", null ],
@@ -1423,7 +1463,10 @@ var hierarchy =
     [ "FEAT::VoxelAssembly::AssemblyBurgersData< DT_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html", null ],
     [ "FEAT::VoxelAssembly::AssemblyCubatureData< DT_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html", null ],
     [ "FEAT::VoxelAssembly::AssemblyMappingData< DT_, IT_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html", null ],
+    [ "FEAT::VoxelAssembly::AssemblyMaterialData< DT_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_material_data.html", null ],
     [ "FEAT::VoxelAssembly::BurgersDefectSharedDataGlobalWrapper< SpaceHelp_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_defect_shared_data_global_wrapper.html", null ],
+    [ "FEAT::VoxelAssembly::BurgersMatSharedDataKernelWrapper< SpaceHelp_, need_streamdiff_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_mat_shared_data_kernel_wrapper.html", null ],
+    [ "FEAT::VoxelAssembly::BurgersMatSharedDataKernelWrapper< SpaceHelp_, false >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_mat_shared_data_kernel_wrapper_3_01_space_help___00_01false_01_4.html", null ],
     [ "FEAT::VoxelAssembly::BurgersSharedDataGlobalWrapper< SpaceHelp_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_shared_data_global_wrapper.html", null ],
     [ "FEAT::VoxelAssembly::BurgersSharedDataKernelWrapper< SpaceHelp_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_shared_data_kernel_wrapper.html", null ],
     [ "FEAT::VoxelAssembly::CSRMatrixData< DT_, IT_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html", null ],
@@ -1431,6 +1474,18 @@ var hierarchy =
     [ "FEAT::VoxelAssembly::Intern::DofHelper< SpaceType_, target_dim_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_intern_1_1_dof_helper.html", null ],
     [ "FEAT::VoxelAssembly::Intern::DofHelper< VoxelAssembly::Q2StandardHexa, target_dim >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_intern_1_1_dof_helper_3_01_voxel_assembly_1_1_q2_standard_hexa_00_01target__dim_01_4.html", null ],
     [ "FEAT::VoxelAssembly::Intern::DofHelper< VoxelAssembly::Q2StandardQuad, target_dim >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_intern_1_1_dof_helper_3_01_voxel_assembly_1_1_q2_standard_quad_00_01target__dim_01_4.html", null ],
+    [ "FEAT::VoxelAssembly::Intern::ViscoDFunctor< DT_, mat_type >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_intern_1_1_visco_d_functor.html", null ],
+    [ "FEAT::VoxelAssembly::Intern::ViscoDFunctor< DT_, MaterialType::carreau >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_intern_1_1_visco_d_functor_3_01_d_t___00_01_material_type_1_1carreau_01_4.html", null ],
+    [ "FEAT::VoxelAssembly::Intern::ViscoDFunctor< DT_, MaterialType::carreauYasuda >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_intern_1_1_visco_d_functor_3_01_d_t___00_01_material_type_1_1carreau_yasuda_01_4.html", null ],
+    [ "FEAT::VoxelAssembly::Intern::ViscoDFunctorNew< DT_, mat_type >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_intern_1_1_visco_d_functor_new.html", null ],
+    [ "FEAT::VoxelAssembly::Intern::ViscoDFunctorNew< DT_, MaterialType::carreau >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_intern_1_1_visco_d_functor_new_3_01_d_t___00_01_material_type_1_1carreau_01_4.html", null ],
+    [ "FEAT::VoxelAssembly::Intern::ViscoDFunctorNew< DT_, MaterialType::carreauYasuda >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_intern_1_1_visco_d_functor_new_3_01_d_t___00_01_material_type_1_1carreau_yasuda_01_4.html", null ],
+    [ "FEAT::VoxelAssembly::Intern::ViscoFunctor< DT_, mat_type >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_intern_1_1_visco_functor.html", null ],
+    [ "FEAT::VoxelAssembly::Intern::ViscoFunctor< DT_, MaterialType::carreau >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_intern_1_1_visco_functor_3_01_d_t___00_01_material_type_1_1carreau_01_4.html", null ],
+    [ "FEAT::VoxelAssembly::Intern::ViscoFunctor< DT_, MaterialType::carreauYasuda >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_intern_1_1_visco_functor_3_01_d_t___00_01_material_type_1_1carreau_yasuda_01_4.html", null ],
+    [ "FEAT::VoxelAssembly::Intern::ViscoFunctorNew< DT_, mat_type >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_intern_1_1_visco_functor_new.html", null ],
+    [ "FEAT::VoxelAssembly::Intern::ViscoFunctorNew< DT_, MaterialType::carreau >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_intern_1_1_visco_functor_new_3_01_d_t___00_01_material_type_1_1carreau_01_4.html", null ],
+    [ "FEAT::VoxelAssembly::Intern::ViscoFunctorNew< DT_, MaterialType::carreauYasuda >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_intern_1_1_visco_functor_new_3_01_d_t___00_01_material_type_1_1carreau_yasuda_01_4.html", null ],
     [ "FEAT::VoxelAssembly::LagrangeDataHandler< Space_, DT_, IT_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_lagrange_data_handler.html", null ],
     [ "FEAT::VoxelAssembly::SharedIndexSetWrapper< IndexType_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_shared_index_set_wrapper.html", null ],
     [ "FEAT::VoxelAssembly::SpaceHelper< Space_, DT_, IT_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_space_helper.html", null ],
@@ -1439,7 +1494,10 @@ var hierarchy =
     [ "FEAT::VoxelAssembly::UnitCubeColoring< Shape_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_unit_cube_coloring.html", null ],
     [ "FEAT::VoxelAssembly::VertexSetWrapper< VertexType_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_vertex_set_wrapper.html", null ],
     [ "FEAT::VoxelAssembly::VoxelBurgersAssembler< Space_, DT_, IT_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler.html", null ],
-    [ "FEAT::VoxelAssembly::VoxelBurgersAssembler< Q2StandardHyperCube< dim_ >, DT_, IT_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html", null ],
+    [ "FEAT::VoxelAssembly::VoxelBurgersAssembler< Q2StandardHyperCube< dim_ >, DT_, IT_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_assembler_3_01_q2_standard_hyper_cube_3_01dimcd264f458d76378c7602bad0426c2704.html", [
+      [ "FEAT::VoxelAssembly::VoxelBurgersVeloMaterialAssembler< Q2StandardHyperCube< dim_ >, DT_, IT_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_velo_material_assembler_3_01_q2_standard_hype407418e5507f47d8c147d0c95b2976a9.html", null ]
+    ] ],
+    [ "FEAT::VoxelAssembly::VoxelBurgersVeloMaterialAssembler< Space_, DT_, IT_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_burgers_velo_material_assembler.html", null ],
     [ "FEAT::VoxelAssembly::VoxelDefoAssembler< Space_, DT_, IT_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_defo_assembler.html", null ],
     [ "FEAT::VoxelAssembly::VoxelDefoAssembler< Q2StandardHyperCube< dim_ >, DT_, IT_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_defo_assembler_3_01_q2_standard_hyper_cube_3_01dim___303d3651e9c580c7ce0a75535c178220.html", null ],
     [ "FEAT::VoxelAssembly::VoxelPoissonAssembler< Space_, DT_, IT_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_voxel_poisson_assembler.html", null ],

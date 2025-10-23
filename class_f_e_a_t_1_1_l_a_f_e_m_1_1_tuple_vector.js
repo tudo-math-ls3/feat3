@@ -26,6 +26,7 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector =
     [ "get_checkpoint_size", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a9d279cf7af9730e4855bb227e48d9a5e", null ],
     [ "max_abs_element", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#aaf518e5245006923971cabaa7d929d9d", null ],
     [ "max_element", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a708ef58b0edead3f3e8eaf637dc855a8", null ],
+    [ "max_rel_diff", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a21984c9fa091cdd140ce0e19eb219dae", null ],
     [ "min_abs_element", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a1ea33d1484717e6e16b07b69b4fd440b", null ],
     [ "min_element", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a78fd8cd1ae56f9741becd64929ae3c2e", null ],
     [ "name", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#ab56babf6ddcd6031b77b79c6682fc8e9", null ],

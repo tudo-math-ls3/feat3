@@ -127,6 +127,22 @@ Functions</h2></td></tr>
 <tr class="memitem:a3e6a55472d415879ff5a6899a016ae5c"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a3e6a55472d415879ff5a6899a016ae5c">assemble_burgers_defect_host</a> (const Space_ &amp;space, DT_ *vector_data, const DT_ *conv_data, const DT_ *primal_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; int * &gt; &amp;coloring_maps, const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;coloring_map_sizes, DT_ alpha, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">AssemblyBurgersData</a>&lt; DT_ &gt; &amp;burgers_params)</td></tr>
 <tr class="memdesc:a3e6a55472d415879ff5a6899a016ae5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Host kernel wrapper for the defect burgers assembler.  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a3e6a55472d415879ff5a6899a016ae5c">More...</a><br /></td></tr>
 <tr class="separator:a3e6a55472d415879ff5a6899a016ae5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1f6eb0593d9f405d2c22f82b7d51d04b"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
+<tr class="memitem:a1f6eb0593d9f405d2c22f82b7d51d04b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a1f6eb0593d9f405d2c22f82b7d51d04b">assemble_burgers_velo_material_csr</a> (const Space_ &amp;space, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html">CSRMatrixData</a>&lt; DT_, IT_ &gt; &amp;matrix_data, const DT_ *conv_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; int * &gt; &amp;coloring_maps, const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;coloring_map_sizes, DT_ alpha, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">AssemblyBurgersData</a>&lt; DT_ &gt; &amp;burgers_params, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_material_data.html">AssemblyMaterialData</a>&lt; DT_ &gt; &amp;material_params, <a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly.html#ab0749226ef372050bd700a3c41ae2e83">MaterialType</a> mat_type, int shared_mem, int blocksize, int gridsize, bool print_occupancy)</td></tr>
+<tr class="memdesc:a1f6eb0593d9f405d2c22f82b7d51d04b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Device kernel wrapper for the full matrix burgers assembler.  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a1f6eb0593d9f405d2c22f82b7d51d04b">More...</a><br /></td></tr>
+<tr class="separator:a1f6eb0593d9f405d2c22f82b7d51d04b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3918db8ed6d10aa45fb9868487a74052"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
+<tr class="memitem:a3918db8ed6d10aa45fb9868487a74052"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a3918db8ed6d10aa45fb9868487a74052">assemble_burgers_velo_material_csr_host</a> (const Space_ &amp;space, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html">CSRMatrixData</a>&lt; DT_, IT_ &gt; &amp;matrix_data, const DT_ *conv_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; int * &gt; &amp;coloring_maps, const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;coloring_map_sizes, DT_ alpha, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">AssemblyBurgersData</a>&lt; DT_ &gt; &amp;burgers_params, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_material_data.html">AssemblyMaterialData</a>&lt; DT_ &gt; &amp;material_params, <a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly.html#ab0749226ef372050bd700a3c41ae2e83">MaterialType</a> material_type)</td></tr>
+<tr class="memdesc:a3918db8ed6d10aa45fb9868487a74052"><td class="mdescLeft">&#160;</td><td class="mdescRight">Host kernel wrapper for the full matrix burgers assembler.  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a3918db8ed6d10aa45fb9868487a74052">More...</a><br /></td></tr>
+<tr class="separator:a3918db8ed6d10aa45fb9868487a74052"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af67d1f8306bb0d6e3f4ffaa546c17210"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
+<tr class="memitem:af67d1f8306bb0d6e3f4ffaa546c17210"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#af67d1f8306bb0d6e3f4ffaa546c17210">assemble_burgers_velo_material_defect</a> (const Space_ &amp;space, DT_ *vector_data, const DT_ *conv_data, const DT_ *primal_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; int * &gt; &amp;coloring_maps, const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;coloring_map_sizes, DT_ alpha, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">AssemblyBurgersData</a>&lt; DT_ &gt; &amp;burgers_params, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_material_data.html">AssemblyMaterialData</a>&lt; DT_ &gt; &amp;material_params, <a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly.html#ab0749226ef372050bd700a3c41ae2e83">MaterialType</a> material_type, int shared_mem, int blocksize, int gridsize, bool print_occupancy)</td></tr>
+<tr class="memdesc:af67d1f8306bb0d6e3f4ffaa546c17210"><td class="mdescLeft">&#160;</td><td class="mdescRight">Device kernel wrapper for the defect burgers assembler.  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#af67d1f8306bb0d6e3f4ffaa546c17210">More...</a><br /></td></tr>
+<tr class="separator:af67d1f8306bb0d6e3f4ffaa546c17210"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10c7db6c578c81fe7f1c473c30fb9f42"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
+<tr class="memitem:a10c7db6c578c81fe7f1c473c30fb9f42"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a10c7db6c578c81fe7f1c473c30fb9f42">assemble_burgers_velo_material_defect_host</a> (const Space_ &amp;space, DT_ *vector_data, const DT_ *conv_data, const DT_ *primal_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; int * &gt; &amp;coloring_maps, const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;coloring_map_sizes, DT_ alpha, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">AssemblyBurgersData</a>&lt; DT_ &gt; &amp;burgers_params, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_material_data.html">AssemblyMaterialData</a>&lt; DT_ &gt; &amp;material_params, <a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly.html#ab0749226ef372050bd700a3c41ae2e83">MaterialType</a> material_type)</td></tr>
+<tr class="memdesc:a10c7db6c578c81fe7f1c473c30fb9f42"><td class="mdescLeft">&#160;</td><td class="mdescRight">Host kernel wrapper for the defect burgers assembler.  <a href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a10c7db6c578c81fe7f1c473c30fb9f42">More...</a><br /></td></tr>
+<tr class="separator:a10c7db6c578c81fe7f1c473c30fb9f42"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac166440142faa086bc36d8abc7ab1e2e"><td class="memTemplParams" colspan="2">template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </td></tr>
 <tr class="memitem:ac166440142faa086bc36d8abc7ab1e2e"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#ac166440142faa086bc36d8abc7ab1e2e">assemble_defo_csr_host</a> (const Space_ &amp;space, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html">CSRMatrixData</a>&lt; DT_, IT_ &gt; &amp;matrix_data, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;cubature, const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;dof_mapping, const std::vector&lt; int * &gt; &amp;coloring_maps, const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;coloring_map_sizes, DT_ alpha, DT_ nu)</td></tr>
 <tr class="separator:ac166440142faa086bc36d8abc7ab1e2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -616,6 +632,522 @@ template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
 <p class="definition">Definition at line <a class="el" href="burgers__assembler_8cpp_source.html#l00219">219</a> of file <a class="el" href="burgers__assembler_8cpp_source.html">burgers_assembler.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="voxel__assembly__common_8hpp_source.html#l00065">FEAT::VoxelAssembly::AssemblyMappingData&lt; DT_, IT_ &gt;::cell_num</a>, <a class="el" href="voxel__assembly__common_8hpp_source.html#l00061">FEAT::VoxelAssembly::AssemblyMappingData&lt; DT_, IT_ &gt;::cell_to_dof</a>, <a class="el" href="voxel__assembly__common_8hpp_source.html#l00081">FEAT::VoxelAssembly::AssemblyCubatureData&lt; DT_ &gt;::cub_pt</a>, <a class="el" href="voxel__assembly__common_8hpp_source.html#l00083">FEAT::VoxelAssembly::AssemblyCubatureData&lt; DT_ &gt;::cub_wg</a>, <a class="el" href="voxel__assembly__common_8hpp_source.html#l00069">FEAT::VoxelAssembly::AssemblyMappingData&lt; DT_, IT_ &gt;::node_size</a>, <a class="el" href="voxel__assembly__common_8hpp_source.html#l00067">FEAT::VoxelAssembly::AssemblyMappingData&lt; DT_, IT_ &gt;::nodes</a>, and <a class="el" href="voxel__assembly__common_8hpp_source.html#l00085">FEAT::VoxelAssembly::AssemblyCubatureData&lt; DT_ &gt;::num_cubs</a>.</p>
+
+</div>
+</div>
+<a id="a1f6eb0593d9f405d2c22f82b7d51d04b" name="a1f6eb0593d9f405d2c22f82b7d51d04b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1f6eb0593d9f405d2c22f82b7d51d04b">&#9670;&#160;</a></span>assemble_burgers_velo_material_csr()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void FEAT::VoxelAssembly::Arch::assemble_burgers_velo_material_csr </td>
+          <td>(</td>
+          <td class="paramtype">const Space_ &amp;&#160;</td>
+          <td class="paramname"><em>space</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html">CSRMatrixData</a>&lt; DT_, IT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>matrix_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const DT_ *&#160;</td>
+          <td class="paramname"><em>conv_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>cubature</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>dof_mapping</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; int * &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_maps</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_map_sizes</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">DT_&#160;</td>
+          <td class="paramname"><em>alpha</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">AssemblyBurgersData</a>&lt; DT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>burgers_params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_material_data.html">AssemblyMaterialData</a>&lt; DT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>material_params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly.html#ab0749226ef372050bd700a3c41ae2e83">MaterialType</a>&#160;</td>
+          <td class="paramname"><em>mat_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>shared_mem</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>blocksize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gridsize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>print_occupancy</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Device kernel wrapper for the full matrix burgers assembler. </p>
+<p >Assembles the standard burgers operator on the device side in an additive manner.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Space_</td><td>The underlying spacetype. </td></tr>
+    <tr><td class="paramname">DT_</td><td>The datatype. </td></tr>
+    <tr><td class="paramname">IT_</td><td>The indextype.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">space</td><td>The actual space we use. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">[in/out]</td><td>matrix_data Holds the CSR typed matrix data. The const only refers to the inner pointer, not the data they refer to. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">conv_data</td><td>The data array of the convection vector. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cubature</td><td>A wrapper around the cubature rule data. Datapointer have to be device pointer. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dof_mapping</td><td>A wrapper around the dof mapping for scattering gathering of local dofs. Datapointer have to be devicepointer. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_maps</td><td>A vector of arrays of the dof indices per color. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_map_sizes</td><td>A vector of the coloring map sizes. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>Scaling parameter for gathering. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">burgers_params</td><td>A struct holding all burgers parameters. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">material_params</td><td>Additonal material data. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">material_type</td><td>Function determining the material model used. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a3918db8ed6d10aa45fb9868487a74052" name="a3918db8ed6d10aa45fb9868487a74052"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3918db8ed6d10aa45fb9868487a74052">&#9670;&#160;</a></span>assemble_burgers_velo_material_csr_host()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void FEAT::VoxelAssembly::Arch::assemble_burgers_velo_material_csr_host </td>
+          <td>(</td>
+          <td class="paramtype">const Space_ &amp;&#160;</td>
+          <td class="paramname"><em>space</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html">CSRMatrixData</a>&lt; DT_, IT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>matrix_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const DT_ *&#160;</td>
+          <td class="paramname"><em>conv_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>cubature</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>dof_mapping</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; int * &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_maps</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_map_sizes</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">DT_&#160;</td>
+          <td class="paramname"><em>alpha</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">AssemblyBurgersData</a>&lt; DT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>burgers_params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_material_data.html">AssemblyMaterialData</a>&lt; DT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>material_params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly.html#ab0749226ef372050bd700a3c41ae2e83">MaterialType</a>&#160;</td>
+          <td class="paramname"><em>material_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Host kernel wrapper for the full matrix burgers assembler. </p>
+<p >Assembles the extended burgers operator on the host side in an additive manner.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Space_</td><td>The underlying spacetype. </td></tr>
+    <tr><td class="paramname">DT_</td><td>The datatype. </td></tr>
+    <tr><td class="paramname">IT_</td><td>The indextype.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">space</td><td>The actual space we use. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">[in/out]</td><td>matrix_data Holds the CSR typed matrix data. The const only refers to the inner pointer, not the data they refer to. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">conv_data</td><td>The data array of the convection vector. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cubature</td><td>A wrapper around the cubature rule data. Data has to be allocated on host side. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dof_mapping</td><td>A wrapper around the dof mapping for scattering gathering of local dofs. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_maps</td><td>A vector of arrays of the dof indices per color. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_map_sizes</td><td>A vector of the coloring map sizes. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>Scaling parameter for gathering. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">burgers_params</td><td>A struct holding all burgers parameters. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">material_params</td><td>Additonal material data. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">material_type</td><td>Function determining the material model used. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="burgers__velo__material__assembler_8cpp_source.html#l00163">163</a> of file <a class="el" href="burgers__velo__material__assembler_8cpp_source.html">burgers_velo_material_assembler.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="voxel__assembly__common_8hpp_source.html#l00065">FEAT::VoxelAssembly::AssemblyMappingData&lt; DT_, IT_ &gt;::cell_num</a>, <a class="el" href="voxel__assembly__common_8hpp_source.html#l00061">FEAT::VoxelAssembly::AssemblyMappingData&lt; DT_, IT_ &gt;::cell_to_dof</a>, <a class="el" href="voxel__assembly__common_8hpp_source.html#l00063">FEAT::VoxelAssembly::AssemblyMappingData&lt; DT_, IT_ &gt;::cell_to_dof_sorter</a>, <a class="el" href="voxel__assembly__common_8hpp_source.html#l00081">FEAT::VoxelAssembly::AssemblyCubatureData&lt; DT_ &gt;::cub_pt</a>, <a class="el" href="voxel__assembly__common_8hpp_source.html#l00083">FEAT::VoxelAssembly::AssemblyCubatureData&lt; DT_ &gt;::cub_wg</a>, <a class="el" href="voxel__assembly__common_8hpp_source.html#l00069">FEAT::VoxelAssembly::AssemblyMappingData&lt; DT_, IT_ &gt;::node_size</a>, <a class="el" href="voxel__assembly__common_8hpp_source.html#l00067">FEAT::VoxelAssembly::AssemblyMappingData&lt; DT_, IT_ &gt;::nodes</a>, and <a class="el" href="voxel__assembly__common_8hpp_source.html#l00085">FEAT::VoxelAssembly::AssemblyCubatureData&lt; DT_ &gt;::num_cubs</a>.</p>
+
+</div>
+</div>
+<a id="af67d1f8306bb0d6e3f4ffaa546c17210" name="af67d1f8306bb0d6e3f4ffaa546c17210"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af67d1f8306bb0d6e3f4ffaa546c17210">&#9670;&#160;</a></span>assemble_burgers_velo_material_defect()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void FEAT::VoxelAssembly::Arch::assemble_burgers_velo_material_defect </td>
+          <td>(</td>
+          <td class="paramtype">const Space_ &amp;&#160;</td>
+          <td class="paramname"><em>space</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">DT_ *&#160;</td>
+          <td class="paramname"><em>vector_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const DT_ *&#160;</td>
+          <td class="paramname"><em>conv_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const DT_ *&#160;</td>
+          <td class="paramname"><em>primal_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>cubature</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>dof_mapping</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; int * &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_maps</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_map_sizes</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">DT_&#160;</td>
+          <td class="paramname"><em>alpha</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">AssemblyBurgersData</a>&lt; DT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>burgers_params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_material_data.html">AssemblyMaterialData</a>&lt; DT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>material_params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly.html#ab0749226ef372050bd700a3c41ae2e83">MaterialType</a>&#160;</td>
+          <td class="paramname"><em>material_type</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>shared_mem</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>blocksize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>gridsize</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>print_occupancy</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Device kernel wrapper for the defect burgers assembler. </p>
+<p >Assembles the defect for the standard burgers operator on the device side in an additive manner.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Space_</td><td>The underlying spacetype. </td></tr>
+    <tr><td class="paramname">DT_</td><td>The datatype. </td></tr>
+    <tr><td class="paramname">IT_</td><td>The indextype.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">space</td><td>The actual space we use. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">[in/out]</td><td>vector_data Holds the (device side) data of the defect vector to be assembled. Data is added onto. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">conv_data</td><td>The data array of the convection vector. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">primal_data</td><td>The data array of the primal vector the matrix is applied to. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cubature</td><td>A wrapper around the cubature rule data. Datapointer have to be device pointer. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dof_mapping</td><td>A wrapper around the dof mapping for scattering gathering of local dofs. Datapointer have to be devicepointer. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_maps</td><td>A vector of arrays of the dof indices per color. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_map_sizes</td><td>A vector of the coloring map sizes. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>Scaling parameter for gathering. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">burgers_params</td><td>A struct holding all burgers parameters. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">material_params</td><td>Additonal material data. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">material_type</td><td>Function determining the material model used. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a10c7db6c578c81fe7f1c473c30fb9f42" name="a10c7db6c578c81fe7f1c473c30fb9f42"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a10c7db6c578c81fe7f1c473c30fb9f42">&#9670;&#160;</a></span>assemble_burgers_velo_material_defect_host()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Space_ , typename DT_ , typename IT_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">void FEAT::VoxelAssembly::Arch::assemble_burgers_velo_material_defect_host </td>
+          <td>(</td>
+          <td class="paramtype">const Space_ &amp;&#160;</td>
+          <td class="paramname"><em>space</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">DT_ *&#160;</td>
+          <td class="paramname"><em>vector_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const DT_ *&#160;</td>
+          <td class="paramname"><em>conv_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const DT_ *&#160;</td>
+          <td class="paramname"><em>primal_data</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_cubature_data.html">AssemblyCubatureData</a>&lt; DT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>cubature</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_mapping_data.html">AssemblyMappingData</a>&lt; DT_, IT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>dof_mapping</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; int * &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_maps</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>coloring_map_sizes</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">DT_&#160;</td>
+          <td class="paramname"><em>alpha</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_burgers_data.html">AssemblyBurgersData</a>&lt; DT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>burgers_params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="struct_f_e_a_t_1_1_voxel_assembly_1_1_assembly_material_data.html">AssemblyMaterialData</a>&lt; DT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>material_params</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t_1_1_voxel_assembly.html#ab0749226ef372050bd700a3c41ae2e83">MaterialType</a>&#160;</td>
+          <td class="paramname"><em>material_type</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Host kernel wrapper for the defect burgers assembler. </p>
+<p >Assembles the defect for the standard burgers operator on the host side in an additive manner.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">Space_</td><td>The underlying spacetype. </td></tr>
+    <tr><td class="paramname">DT_</td><td>The datatype. </td></tr>
+    <tr><td class="paramname">IT_</td><td>The indextype.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">space</td><td>The actual space we use. </td></tr>
+    <tr><td class="paramdir"></td><td class="paramname">[in/out]</td><td>vector_data Holds the (host side) data of the defect vector to be assembled. Data is added onto. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">conv_data</td><td>The data array of the convection vector. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">primal_data</td><td>The data array of the primal vector the matrix is applied to. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">cubature</td><td>A wrapper around the cubature rule data. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">dof_mapping</td><td>A wrapper around the dof mapping for scattering gathering of local dofs. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_maps</td><td>A vector of arrays of the dof indices per color. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">coloring_map_sizes</td><td>A vector of the coloring map sizes. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>Scaling parameter for gathering. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">burgers_params</td><td>A struct holding all burgers parameters. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">material_params</td><td>Additonal material data. </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">material_type</td><td>Function determining the material model used. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="burgers__velo__material__assembler_8cpp_source.html#l00216">216</a> of file <a class="el" href="burgers__velo__material__assembler_8cpp_source.html">burgers_velo_material_assembler.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="burgers__velo__material__assembler_8cpp_source.html#l00216">assemble_burgers_velo_material_defect_host()</a>, <a class="el" href="voxel__assembly__common_8hpp_source.html#l00065">FEAT::VoxelAssembly::AssemblyMappingData&lt; DT_, IT_ &gt;::cell_num</a>, <a class="el" href="voxel__assembly__common_8hpp_source.html#l00061">FEAT::VoxelAssembly::AssemblyMappingData&lt; DT_, IT_ &gt;::cell_to_dof</a>, <a class="el" href="voxel__assembly__common_8hpp_source.html#l00081">FEAT::VoxelAssembly::AssemblyCubatureData&lt; DT_ &gt;::cub_pt</a>, <a class="el" href="voxel__assembly__common_8hpp_source.html#l00083">FEAT::VoxelAssembly::AssemblyCubatureData&lt; DT_ &gt;::cub_wg</a>, <a class="el" href="voxel__assembly__common_8hpp_source.html#l00069">FEAT::VoxelAssembly::AssemblyMappingData&lt; DT_, IT_ &gt;::node_size</a>, <a class="el" href="voxel__assembly__common_8hpp_source.html#l00067">FEAT::VoxelAssembly::AssemblyMappingData&lt; DT_, IT_ &gt;::nodes</a>, and <a class="el" href="voxel__assembly__common_8hpp_source.html#l00085">FEAT::VoxelAssembly::AssemblyCubatureData&lt; DT_ &gt;::num_cubs</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="burgers__velo__material__assembler_8cpp_source.html#l00216">assemble_burgers_velo_material_defect_host()</a>.</p>
 
 </div>
 </div>

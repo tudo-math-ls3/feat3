@@ -108,7 +108,6 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="#pri-types">Private Types</a> &#124;
-<a href="#friends">Friends</a> &#124;
 <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt; Class Template Reference</div></div>
 </div><!--header-->
@@ -234,6 +233,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ac597250145acca4cb7817a07c767ae9f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#ac597250145acca4cb7817a07c767ae9f">get_length_of_line</a> (const <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> row) const</td></tr>
 <tr class="memdesc:ac597250145acca4cb7817a07c767ae9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of NNZ-elements of the selected row.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#ac597250145acca4cb7817a07c767ae9f">More...</a><br /></td></tr>
 <tr class="separator:ac597250145acca4cb7817a07c767ae9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbfbffd725899c43b974572dc6758ef5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#a37940c9736793a3694ce3d09eff40c76">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#adbfbffd725899c43b974572dc6758ef5">max_rel_diff</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html">PowerColMatrix</a> &amp;x) const</td></tr>
+<tr class="memdesc:adbfbffd725899c43b974572dc6758ef5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the maximum relative difference of this matrix and another one y.max_rel_diff(x) returns \( \max_{0\leq i &lt; n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#adbfbffd725899c43b974572dc6758ef5">More...</a><br /></td></tr>
+<tr class="separator:adbfbffd725899c43b974572dc6758ef5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3449d668f9ae25a1aefa6a495be0602f"><td class="memItemLeft" align="right" valign="top"><a id="a3449d668f9ae25a1aefa6a495be0602f" name="a3449d668f9ae25a1aefa6a495be0602f"></a>
 <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html">PowerColMatrix</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html">PowerColMatrix</a> &amp;)=delete</td></tr>
 <tr class="memdesc:a3449d668f9ae25a1aefa6a495be0602f"><td class="mdescLeft">&#160;</td><td class="mdescRight">deleted copy-assign operator <br /></td></tr>
@@ -251,6 +253,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a4029347d462ec9acce99cad86631f8d1"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#a4029347d462ec9acce99cad86631f8d1">rows</a> () const</td></tr>
 <tr class="memdesc:a4029347d462ec9acce99cad86631f8d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total number of rows in this matrix.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#a4029347d462ec9acce99cad86631f8d1">More...</a><br /></td></tr>
 <tr class="separator:a4029347d462ec9acce99cad86631f8d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3a1eec8c7d3cc570264f82fa3965ebc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#aa3a1eec8c7d3cc570264f82fa3965ebc">same_layout</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html">PowerColMatrix</a> &amp;x) const</td></tr>
+<tr class="memdesc:aa3a1eec8c7d3cc570264f82fa3965ebc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the structural layout of this matrix matches that of another matrix. This excludes comparison of the actual data values.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#aa3a1eec8c7d3cc570264f82fa3965ebc">More...</a><br /></td></tr>
+<tr class="separator:aa3a1eec8c7d3cc570264f82fa3965ebc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6b8df6f89cf72dd6a410be638fa8dc30"><td class="memItemLeft" align="right" valign="top">std::uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#a6b8df6f89cf72dd6a410be638fa8dc30">set_checkpoint_data</a> (std::vector&lt; char &gt; &amp;data, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_serial_config.html">SerialConfig</a> &amp;config)</td></tr>
 <tr class="separator:a6b8df6f89cf72dd6a410be638fa8dc30"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a60ac7d213a0e8f7cc990eca1f2fc83f2"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab2adeb0ceb5f9834949b5a865cd4f7e8">Perspective</a> perspective_ = Perspective::native&gt; </td></tr>
@@ -305,12 +310,6 @@ Private Types</h2></td></tr>
 <tr class="memitem:aed7477fac858fb581b446e19394cb601"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html">PowerColMatrix</a>&lt; SubType_, blocks_-1 &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#aed7477fac858fb581b446e19394cb601">RestClass</a></td></tr>
 <tr class="memdesc:aed7477fac858fb581b446e19394cb601"><td class="mdescLeft">&#160;</td><td class="mdescRight">rest-class typedef  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#aed7477fac858fb581b446e19394cb601">More...</a><br /></td></tr>
 <tr class="separator:aed7477fac858fb581b446e19394cb601"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:a97eb87cee72270acbe1e30c7006ac2da"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#a97eb87cee72270acbe1e30c7006ac2da">operator==</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html">PowerColMatrix</a> &amp;a, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html">PowerColMatrix</a> &amp;b)</td></tr>
-<tr class="memdesc:a97eb87cee72270acbe1e30c7006ac2da"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html" title="Power-Col-Matrix meta class template.">PowerColMatrix</a> comparison operator.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#a97eb87cee72270acbe1e30c7006ac2da">More...</a><br /></td></tr>
-<tr class="separator:a97eb87cee72270acbe1e30c7006ac2da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename SubType_, int blocks_&gt;<br />
@@ -1435,7 +1434,7 @@ template&lt;typename SubType2_ &gt; </div>
 </dl>
 <p>Use source matrix content as content of current matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00651">651</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00676">676</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -1467,7 +1466,7 @@ template&lt;typename SubType2_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00658">658</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00683">683</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -1498,11 +1497,11 @@ template&lt;typename SubType_ , int blocks_&gt; </div>
 
 <p>Returns a new compatible L-Vector. </p>
 
-<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00551">551</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00576">576</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00551">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::create_vector_l()</a>.</p>
+<p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00576">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::create_vector_l()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="power__col__matrix_8hpp_source.html#l00551">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::create_vector_l()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="power__col__matrix_8hpp_source.html#l00576">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::create_vector_l()</a>.</p>
 
 </div>
 </div>
@@ -1533,7 +1532,7 @@ template&lt;typename SubType_ , int blocks_&gt; </div>
 
 <p>Returns a new compatible R-Vector. </p>
 
-<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00557">557</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00582">582</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -1711,11 +1710,11 @@ template&lt;typename SubType_ , int blocks_&gt; </div>
 <p >Calculate size of complete object as it is stored in the checkpoint</p>
 <dl class="section return"><dt>Returns</dt><dd>size of object  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00610">610</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00635">635</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00074">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::_first</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00076">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::_rest</a>, and <a class="el" href="power__col__matrix_8hpp_source.html#l00610">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::get_checkpoint_size()</a>.</p>
+<p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00074">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::_first</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00076">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::_rest</a>, and <a class="el" href="power__col__matrix_8hpp_source.html#l00635">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::get_checkpoint_size()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="power__col__matrix_8hpp_source.html#l00610">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::get_checkpoint_size()</a>, and <a class="el" href="power__full__matrix_8hpp_source.html#l00411">FEAT::LAFEM::PowerFullMatrix&lt; SubType_, width_, height_ &gt;::get_checkpoint_size()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="power__col__matrix_8hpp_source.html#l00635">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::get_checkpoint_size()</a>, and <a class="el" href="power__full__matrix_8hpp_source.html#l00435">FEAT::LAFEM::PowerFullMatrix&lt; SubType_, width_, height_ &gt;::get_checkpoint_size()</a>.</p>
 
 </div>
 </div>
@@ -1747,7 +1746,44 @@ template&lt;typename SubType_ , int blocks_&gt; </div>
 
 <p>Returns the number of NNZ-elements of the selected row. </p>
 
-<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00563">563</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00588">588</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
+
+</div>
+</div>
+<a id="adbfbffd725899c43b974572dc6758ef5" name="adbfbffd725899c43b974572dc6758ef5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbfbffd725899c43b974572dc6758ef5">&#9670;&#160;</a></span>max_rel_diff()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename SubType_ , int blocks_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#a37940c9736793a3694ce3d09eff40c76">DataType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html">FEAT::LAFEM::PowerColMatrix</a>&lt; SubType_, blocks_ &gt;::max_rel_diff </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html">PowerColMatrix</a>&lt; SubType_, blocks_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieve the maximum relative difference of this matrix and another one y.max_rel_diff(x) returns \( \max_{0\leq i &lt; n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \). </p>
+<dl class="section return"><dt>Returns</dt><dd>The largest relative difference. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00556">556</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, and <a class="el" href="power__col__matrix_8hpp_source.html#l00556">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::max_rel_diff()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="power__col__matrix_8hpp_source.html#l00556">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::max_rel_diff()</a>, and <a class="el" href="power__full__matrix_8hpp_source.html#l00404">FEAT::LAFEM::PowerFullMatrix&lt; SubType_, width_, height_ &gt;::max_rel_diff()</a>.</p>
 
 </div>
 </div>
@@ -1781,6 +1817,8 @@ template&lt;typename SubType_ , int blocks_&gt; </div>
 <p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00383">383</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="string_8hpp_source.html#l00944">FEAT::stringify()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="power__col__matrix_8hpp_source.html#l00570">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::same_layout()</a>.</p>
 
 </div>
 </div>
@@ -1906,11 +1944,11 @@ template&lt;typename SubType_ , int blocks_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00616">616</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00641">641</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00074">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::_first</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00076">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::_rest</a>, and <a class="el" href="power__col__matrix_8hpp_source.html#l00616">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::restore_from_checkpoint_data()</a>.</p>
+<p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00074">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::_first</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00076">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::_rest</a>, and <a class="el" href="power__col__matrix_8hpp_source.html#l00641">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::restore_from_checkpoint_data()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="power__col__matrix_8hpp_source.html#l00616">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::restore_from_checkpoint_data()</a>, and <a class="el" href="power__full__matrix_8hpp_source.html#l00417">FEAT::LAFEM::PowerFullMatrix&lt; SubType_, width_, height_ &gt;::restore_from_checkpoint_data()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="power__col__matrix_8hpp_source.html#l00641">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::restore_from_checkpoint_data()</a>, and <a class="el" href="power__full__matrix_8hpp_source.html#l00441">FEAT::LAFEM::PowerFullMatrix&lt; SubType_, width_, height_ &gt;::restore_from_checkpoint_data()</a>.</p>
 
 </div>
 </div>
@@ -1947,6 +1985,49 @@ template&lt;<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab2adeb0ceb
 Raw matrix row count if perspective_ = true. </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00353">353</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aa3a1eec8c7d3cc570264f82fa3965ebc" name="aa3a1eec8c7d3cc570264f82fa3965ebc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3a1eec8c7d3cc570264f82fa3965ebc">&#9670;&#160;</a></span>same_layout()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename SubType_ , int blocks_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html">FEAT::LAFEM::PowerColMatrix</a>&lt; SubType_, blocks_ &gt;::same_layout </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html">PowerColMatrix</a>&lt; SubType_, blocks_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks if the structural layout of this matrix matches that of another matrix. This excludes comparison of the actual data values. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The matrix to compare this matrix to</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the layouts match, false otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00570">570</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00383">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::name()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="power__full__matrix_8hpp_source.html#l00417">FEAT::LAFEM::PowerFullMatrix&lt; SubType_, width_, height_ &gt;::same_layout()</a>.</p>
 
 </div>
 </div>
@@ -1988,11 +2069,11 @@ template&lt;typename SubType_ , int blocks_&gt; </div>
 
 <p></p>
 
-<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00629">629</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00654">654</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00074">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::_first</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00076">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::_rest</a>, and <a class="el" href="power__col__matrix_8hpp_source.html#l00629">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::set_checkpoint_data()</a>.</p>
+<p class="reference">References <a class="el" href="power__col__matrix_8hpp_source.html#l00074">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::_first</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00076">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::_rest</a>, and <a class="el" href="power__col__matrix_8hpp_source.html#l00654">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::set_checkpoint_data()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="power__col__matrix_8hpp_source.html#l00629">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::set_checkpoint_data()</a>, and <a class="el" href="power__full__matrix_8hpp_source.html#l00423">FEAT::LAFEM::PowerFullMatrix&lt; SubType_, width_, height_ &gt;::set_checkpoint_data()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="power__col__matrix_8hpp_source.html#l00654">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::set_checkpoint_data()</a>, and <a class="el" href="power__full__matrix_8hpp_source.html#l00447">FEAT::LAFEM::PowerFullMatrix&lt; SubType_, width_, height_ &gt;::set_checkpoint_data()</a>.</p>
 
 </div>
 </div>
@@ -2218,55 +2299,6 @@ template&lt;typename , int &gt; </div>
 
 </div>
 </div>
-<a id="a97eb87cee72270acbe1e30c7006ac2da" name="a97eb87cee72270acbe1e30c7006ac2da"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a97eb87cee72270acbe1e30c7006ac2da">&#9670;&#160;</a></span>operator==</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename SubType_ , int blocks_&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool operator== </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html">PowerColMatrix</a>&lt; SubType_, blocks_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>a</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html">PowerColMatrix</a>&lt; SubType_, blocks_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>b</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html" title="Power-Col-Matrix meta class template.">PowerColMatrix</a> comparison operator. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">a</td><td>A matrix to compare with. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>A matrix to compare with. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00670">670</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
-
-</div>
-</div>
 <h2 class="groupheader">Member Data Documentation</h2>
 <a id="a217cff3140682a8617e91aef96995c1a" name="a217cff3140682a8617e91aef96995c1a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a217cff3140682a8617e91aef96995c1a">&#9670;&#160;</a></span>_first</h2>
@@ -2294,7 +2326,7 @@ template&lt;typename SubType_ , int blocks_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00074">74</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="power__col__matrix_8hpp_source.html#l00128">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::PowerColMatrix()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00258">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::bytes()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00252">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::clone()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00301">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::get()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00610">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::get_checkpoint_size()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00178">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::operator=()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00151">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::read_from()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00616">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::restore_from_checkpoint_data()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00629">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::set_checkpoint_data()</a>, and <a class="el" href="power__col__matrix_8hpp_source.html#l00243">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::write_out_submatrices()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="power__col__matrix_8hpp_source.html#l00128">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::PowerColMatrix()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00258">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::bytes()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00252">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::clone()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00301">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::get()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00635">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::get_checkpoint_size()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00178">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::operator=()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00151">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::read_from()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00641">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::restore_from_checkpoint_data()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00654">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::set_checkpoint_data()</a>, and <a class="el" href="power__col__matrix_8hpp_source.html#l00243">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::write_out_submatrices()</a>.</p>
 
 </div>
 </div>
@@ -2324,7 +2356,7 @@ template&lt;typename SubType_ , int blocks_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="power__col__matrix_8hpp_source.html#l00076">76</a> of file <a class="el" href="power__col__matrix_8hpp_source.html">power_col_matrix.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="power__col__matrix_8hpp_source.html#l00128">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::PowerColMatrix()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00258">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::bytes()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00252">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::clone()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00301">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::get()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00610">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::get_checkpoint_size()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00178">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::operator=()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00151">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::read_from()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00616">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::restore_from_checkpoint_data()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00629">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::set_checkpoint_data()</a>, and <a class="el" href="power__col__matrix_8hpp_source.html#l00243">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::write_out_submatrices()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="power__col__matrix_8hpp_source.html#l00128">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::PowerColMatrix()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00258">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::bytes()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00252">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::clone()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00301">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::get()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00635">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::get_checkpoint_size()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00178">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::operator=()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00151">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::read_from()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00641">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::restore_from_checkpoint_data()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00654">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::set_checkpoint_data()</a>, and <a class="el" href="power__col__matrix_8hpp_source.html#l00243">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::write_out_submatrices()</a>.</p>
 
 </div>
 </div>

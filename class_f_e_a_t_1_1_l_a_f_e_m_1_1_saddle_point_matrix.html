@@ -106,7 +106,6 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
-<a href="#friends">Friends</a> &#124;
 <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt; Class Template Reference</div></div>
 </div><!--header-->
@@ -252,6 +251,9 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a72140d110ee48f6e70725a23a75058db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a13a3d3e6acf0cc056a139227844345ac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a13a3d3e6acf0cc056a139227844345ac">lump_rows</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#aa1ac334f103043a6f34a0d15f70a8ba6">VectorTypeL</a> &amp;lump, bool=true) const</td></tr>
 <tr class="separator:a13a3d3e6acf0cc056a139227844345ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a379d7845518210a5aa3999285ee84389"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a5655ae0508f0074801e1837f17425b04">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a379d7845518210a5aa3999285ee84389">max_rel_diff</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html">SaddlePointMatrix</a> &amp;x) const</td></tr>
+<tr class="memdesc:a379d7845518210a5aa3999285ee84389"><td class="mdescLeft">&#160;</td><td class="mdescRight">Retrieve the maximum relative difference of this matrix and another one y.max_rel_diff(x) returns \( \max_{0\leq i &lt; n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \).  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a379d7845518210a5aa3999285ee84389">More...</a><br /></td></tr>
+<tr class="separator:a379d7845518210a5aa3999285ee84389"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab73fa9ab9f67464d4962435f05bdd57e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html">SaddlePointMatrix</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#ab73fa9ab9f67464d4962435f05bdd57e">operator=</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html">SaddlePointMatrix</a> &amp;&amp;other)</td></tr>
 <tr class="memdesc:ab73fa9ab9f67464d4962435f05bdd57e"><td class="mdescLeft">&#160;</td><td class="mdescRight">move-assign operator  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#ab73fa9ab9f67464d4962435f05bdd57e">More...</a><br /></td></tr>
 <tr class="separator:ab73fa9ab9f67464d4962435f05bdd57e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -265,6 +267,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a847214de92858656c5dcbacc9557ff22"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a847214de92858656c5dcbacc9557ff22">rows</a> () const</td></tr>
 <tr class="memdesc:a847214de92858656c5dcbacc9557ff22"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total number of rows in this matrix.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a847214de92858656c5dcbacc9557ff22">More...</a><br /></td></tr>
 <tr class="separator:a847214de92858656c5dcbacc9557ff22"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a207c8af6f705eeda6683cfc519d87a80"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a207c8af6f705eeda6683cfc519d87a80">same_layout</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html">SaddlePointMatrix</a> &amp;x) const</td></tr>
+<tr class="memdesc:a207c8af6f705eeda6683cfc519d87a80"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the structural layout of this matrix matches that of another matrix. This excludes comparison of the actual data values.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a207c8af6f705eeda6683cfc519d87a80">More...</a><br /></td></tr>
+<tr class="separator:a207c8af6f705eeda6683cfc519d87a80"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3fea0d75c40e2e1a3bdb1b76c2b91475"><td class="memItemLeft" align="right" valign="top">std::uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a3fea0d75c40e2e1a3bdb1b76c2b91475">set_checkpoint_data</a> (std::vector&lt; char &gt; &amp;data, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_serial_config.html">SerialConfig</a> &amp;config)</td></tr>
 <tr class="separator:a3fea0d75c40e2e1a3bdb1b76c2b91475"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a189bdda00a19175c5385f134dbe96246"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab2adeb0ceb5f9834949b5a865cd4f7e8">Perspective</a> perspective_ = Perspective::native&gt; </td></tr>
@@ -304,12 +309,6 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:ac355fbf74772940f4a9fa8df83f99fb7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a0a17c33e7943b08f63ed7f748e672793">MatrixTypeD</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#ac355fbf74772940f4a9fa8df83f99fb7">_matrix_d</a></td></tr>
 <tr class="memdesc:ac355fbf74772940f4a9fa8df83f99fb7"><td class="mdescLeft">&#160;</td><td class="mdescRight">sub-matrix C  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#ac355fbf74772940f4a9fa8df83f99fb7">More...</a><br /></td></tr>
 <tr class="separator:ac355fbf74772940f4a9fa8df83f99fb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="friends" name="friends"></a>
-Friends</h2></td></tr>
-<tr class="memitem:a560a8d56e9f3b256eb93a8b65db43fed"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a560a8d56e9f3b256eb93a8b65db43fed">operator==</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html">SaddlePointMatrix</a> &amp;a, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html">SaddlePointMatrix</a> &amp;b)</td></tr>
-<tr class="memdesc:a560a8d56e9f3b256eb93a8b65db43fed"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html" title="Saddle-Point matrix meta class template.">SaddlePointMatrix</a> comparison operator.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a560a8d56e9f3b256eb93a8b65db43fed">More...</a><br /></td></tr>
-<tr class="separator:a560a8d56e9f3b256eb93a8b65db43fed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename MatrixA_, typename MatrixB_ = MatrixA_, typename MatrixD_ = MatrixB_&gt;<br />
@@ -1266,7 +1265,7 @@ template&lt;typename MatrixA_ , typename MatrixB_  = MatrixA_, typename MatrixD_
 
 <p class="reference">References <a class="el" href="saddle__point__matrix_8hpp_source.html#l00113">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::_matrix_a</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="vanka_8hpp_source.html#l01799">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_apply_diag()</a>, <a class="el" href="vanka_8hpp_source.html#l01556">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_apply_full()</a>, <a class="el" href="vanka_8hpp_source.html#l01694">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_factor_diag()</a>, <a class="el" href="vanka_8hpp_source.html#l01492">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_factor_full()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00444">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::apply()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00479">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::apply_transposed()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00412">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::clear()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00717">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::convert()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00593">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::create_vector_l()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00599">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::create_vector_r()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00402">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::format()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00658">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::get_checkpoint_size()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00605">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::get_length_of_line()</a>, <a class="el" href="umfpack_8hpp_source.html#l00459">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::init_numeric()</a>, <a class="el" href="umfpack_8hpp_source.html#l00349">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::init_symbolic()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00664">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::restore_from_checkpoint_data()</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00684">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::set_checkpoint_data()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="vanka_8hpp_source.html#l01799">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_apply_diag()</a>, <a class="el" href="vanka_8hpp_source.html#l01556">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_apply_full()</a>, <a class="el" href="vanka_8hpp_source.html#l01694">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_factor_diag()</a>, <a class="el" href="vanka_8hpp_source.html#l01492">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_factor_full()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00444">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::apply()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00479">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::apply_transposed()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00412">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::clear()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00745">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::convert()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00621">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::create_vector_l()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00627">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::create_vector_r()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00402">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::format()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00686">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::get_checkpoint_size()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00633">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::get_length_of_line()</a>, <a class="el" href="umfpack_8hpp_source.html#l00459">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::init_numeric()</a>, <a class="el" href="umfpack_8hpp_source.html#l00349">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::init_symbolic()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00598">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::max_rel_diff()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00692">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::restore_from_checkpoint_data()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00614">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::same_layout()</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00712">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::set_checkpoint_data()</a>.</p>
 
 </div>
 </div>
@@ -1334,7 +1333,7 @@ template&lt;typename MatrixA_ , typename MatrixB_  = MatrixA_, typename MatrixD_
 
 <p class="reference">References <a class="el" href="saddle__point__matrix_8hpp_source.html#l00115">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::_matrix_b</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="vanka_8hpp_source.html#l01799">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_apply_diag()</a>, <a class="el" href="vanka_8hpp_source.html#l01556">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_apply_full()</a>, <a class="el" href="vanka_8hpp_source.html#l01259">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_build_p_block()</a>, <a class="el" href="vanka_8hpp_source.html#l01694">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_factor_diag()</a>, <a class="el" href="vanka_8hpp_source.html#l01492">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_factor_full()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00444">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::apply()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00479">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::apply_transposed()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00412">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::clear()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00717">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::convert()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00599">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::create_vector_r()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00402">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::format()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00658">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::get_checkpoint_size()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00605">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::get_length_of_line()</a>, <a class="el" href="umfpack_8hpp_source.html#l00459">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::init_numeric()</a>, <a class="el" href="umfpack_8hpp_source.html#l00349">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::init_symbolic()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00664">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::restore_from_checkpoint_data()</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00684">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::set_checkpoint_data()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="vanka_8hpp_source.html#l01799">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_apply_diag()</a>, <a class="el" href="vanka_8hpp_source.html#l01556">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_apply_full()</a>, <a class="el" href="vanka_8hpp_source.html#l01259">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_build_p_block()</a>, <a class="el" href="vanka_8hpp_source.html#l01694">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_factor_diag()</a>, <a class="el" href="vanka_8hpp_source.html#l01492">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_factor_full()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00444">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::apply()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00479">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::apply_transposed()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00412">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::clear()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00745">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::convert()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00627">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::create_vector_r()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00402">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::format()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00686">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::get_checkpoint_size()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00633">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::get_length_of_line()</a>, <a class="el" href="umfpack_8hpp_source.html#l00459">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::init_numeric()</a>, <a class="el" href="umfpack_8hpp_source.html#l00349">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::init_symbolic()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00598">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::max_rel_diff()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00692">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::restore_from_checkpoint_data()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00614">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::same_layout()</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00712">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::set_checkpoint_data()</a>.</p>
 
 </div>
 </div>
@@ -1402,7 +1401,7 @@ template&lt;typename MatrixA_ , typename MatrixB_  = MatrixA_, typename MatrixD_
 
 <p class="reference">References <a class="el" href="saddle__point__matrix_8hpp_source.html#l00117">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::_matrix_d</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="vanka_8hpp_source.html#l01799">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_apply_diag()</a>, <a class="el" href="vanka_8hpp_source.html#l01556">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_apply_full()</a>, <a class="el" href="vanka_8hpp_source.html#l01259">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_build_p_block()</a>, <a class="el" href="vanka_8hpp_source.html#l01339">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_build_p_nodal()</a>, <a class="el" href="vanka_8hpp_source.html#l01357">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_build_v_block()</a>, <a class="el" href="vanka_8hpp_source.html#l01694">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_factor_diag()</a>, <a class="el" href="vanka_8hpp_source.html#l01492">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_factor_full()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00444">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::apply()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00479">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::apply_transposed()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00412">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::clear()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00717">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::convert()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00593">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::create_vector_l()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00402">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::format()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00658">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::get_checkpoint_size()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00605">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::get_length_of_line()</a>, <a class="el" href="umfpack_8hpp_source.html#l00459">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::init_numeric()</a>, <a class="el" href="umfpack_8hpp_source.html#l00349">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::init_symbolic()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00664">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::restore_from_checkpoint_data()</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00684">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::set_checkpoint_data()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="vanka_8hpp_source.html#l01799">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_apply_diag()</a>, <a class="el" href="vanka_8hpp_source.html#l01556">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_apply_full()</a>, <a class="el" href="vanka_8hpp_source.html#l01259">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_build_p_block()</a>, <a class="el" href="vanka_8hpp_source.html#l01339">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_build_p_nodal()</a>, <a class="el" href="vanka_8hpp_source.html#l01357">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_build_v_block()</a>, <a class="el" href="vanka_8hpp_source.html#l01694">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_factor_diag()</a>, <a class="el" href="vanka_8hpp_source.html#l01492">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_factor_full()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00444">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::apply()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00479">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::apply_transposed()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00412">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::clear()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00745">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::convert()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00621">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::create_vector_l()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00402">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::format()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00686">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::get_checkpoint_size()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00633">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::get_length_of_line()</a>, <a class="el" href="umfpack_8hpp_source.html#l00459">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::init_numeric()</a>, <a class="el" href="umfpack_8hpp_source.html#l00349">FEAT::Solver::SaddleUmfpackMean&lt; DT_, IT_, dim_ &gt;::init_symbolic()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00598">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::max_rel_diff()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00692">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::restore_from_checkpoint_data()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00614">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::same_layout()</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00712">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::set_checkpoint_data()</a>.</p>
 
 </div>
 </div>
@@ -1470,7 +1469,7 @@ template&lt;typename MatrixA_ , typename MatrixB_  = MatrixA_, typename MatrixD_
 
 <p class="reference">References <a class="el" href="saddle__point__matrix_8hpp_source.html#l00113">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::_matrix_a</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00115">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::_matrix_b</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00117">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::_matrix_d</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="stokes__blocked_8hpp_source.html#l00209">FEAT::Control::StokesBlockedSystemLevel&lt; dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_, TransferMatrixS_ &gt;::bytes()</a>, <a class="el" href="stokes__blocked_8hpp_source.html#l00601">FEAT::Control::StokesBlockedUnitVeloMeanPresSystemLevel&lt; dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_ &gt;::bytes()</a>, <a class="el" href="stokes__power_8hpp_source.html#l00791">FEAT::Control::StokesPowerUnitVeloNonePresSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_ &gt;::bytes()</a>, and <a class="el" href="stokes__power_8hpp_source.html#l00845">FEAT::Control::StokesPowerUnitVeloMeanPresSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_ &gt;::bytes()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="stokes__blocked_8hpp_source.html#l00209">FEAT::Control::StokesBlockedSystemLevel&lt; dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_, TransferMatrixS_ &gt;::bytes()</a>, <a class="el" href="stokes__blocked_8hpp_source.html#l00629">FEAT::Control::StokesBlockedUnitVeloMeanPresSystemLevel&lt; dim_, DataType_, IndexType_, MatrixBlockA_, MatrixBlockB_, MatrixBlockD_, ScalarMatrix_, TransferMatrixV_, TransferMatrixP_ &gt;::bytes()</a>, <a class="el" href="stokes__power_8hpp_source.html#l00791">FEAT::Control::StokesPowerUnitVeloNonePresSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_ &gt;::bytes()</a>, and <a class="el" href="stokes__power_8hpp_source.html#l00845">FEAT::Control::StokesPowerUnitVeloMeanPresSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_ &gt;::bytes()</a>.</p>
 
 </div>
 </div>
@@ -1616,7 +1615,7 @@ template&lt;typename MatrixA2_ , typename MatrixB2_ , typename MatrixD2_ &gt; </
 </dl>
 <p>Use source matrix content as content of current matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00717">717</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00745">745</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="saddle__point__matrix_8hpp_source.html#l00280">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_a()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00292">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_b()</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00304">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_d()</a>.</p>
 
@@ -1652,7 +1651,7 @@ template&lt;typename MatrixA2_ , typename MatrixB2_ , typename MatrixD2_ &gt; </
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00725">725</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00753">753</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
 
 </div>
 </div>
@@ -1683,11 +1682,11 @@ template&lt;typename MatrixA_ , typename MatrixB_  = MatrixA_, typename MatrixD_
 
 <p>Returns a new compatible L-Vector. </p>
 
-<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00593">593</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00621">621</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="saddle__point__matrix_8hpp_source.html#l00280">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_a()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00304">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_d()</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00593">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::create_vector_l()</a>.</p>
+<p class="reference">References <a class="el" href="saddle__point__matrix_8hpp_source.html#l00280">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_a()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00304">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_d()</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00621">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::create_vector_l()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="saddle__point__matrix_8hpp_source.html#l00593">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::create_vector_l()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="saddle__point__matrix_8hpp_source.html#l00621">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::create_vector_l()</a>.</p>
 
 </div>
 </div>
@@ -1718,11 +1717,11 @@ template&lt;typename MatrixA_ , typename MatrixB_  = MatrixA_, typename MatrixD_
 
 <p>Returns a new compatible R-Vector. </p>
 
-<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00599">599</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00627">627</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="saddle__point__matrix_8hpp_source.html#l00280">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_a()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00292">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_b()</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00599">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::create_vector_r()</a>.</p>
+<p class="reference">References <a class="el" href="saddle__point__matrix_8hpp_source.html#l00280">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_a()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00292">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_b()</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00627">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::create_vector_r()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="saddle__point__matrix_8hpp_source.html#l00599">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::create_vector_r()</a>, and <a class="el" href="vanka_8hpp_source.html#l01113">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="saddle__point__matrix_8hpp_source.html#l00627">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::create_vector_r()</a>, and <a class="el" href="vanka_8hpp_source.html#l01113">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -1830,7 +1829,7 @@ template&lt;typename MatrixA_ , typename MatrixB_  = MatrixA_, typename MatrixD_
 <p >Calculate size of complete object as it is stored in the checkpoint</p>
 <dl class="section return"><dt>Returns</dt><dd>size of object  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00658">658</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00686">686</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="saddle__point__matrix_8hpp_source.html#l00280">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_a()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00292">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_b()</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00304">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_d()</a>.</p>
 
@@ -1864,7 +1863,7 @@ template&lt;typename MatrixA_ , typename MatrixB_  = MatrixA_, typename MatrixD_
 
 <p>Returns the number of NNZ-elements of the selected row. </p>
 
-<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00605">605</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00633">633</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="saddle__point__matrix_8hpp_source.html#l00280">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_a()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00292">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_b()</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00304">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_d()</a>.</p>
 
@@ -1910,6 +1909,43 @@ template&lt;typename MatrixA_ , typename MatrixB_  = MatrixA_, typename MatrixD_
 
 </div>
 </div>
+<a id="a379d7845518210a5aa3999285ee84389" name="a379d7845518210a5aa3999285ee84389"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a379d7845518210a5aa3999285ee84389">&#9670;&#160;</a></span>max_rel_diff()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixA_ , typename MatrixB_  = MatrixA_, typename MatrixD_  = MatrixB_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a5655ae0508f0074801e1837f17425b04">DataType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html">FEAT::LAFEM::SaddlePointMatrix</a>&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::max_rel_diff </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html">SaddlePointMatrix</a>&lt; MatrixA_, MatrixB_, MatrixD_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Retrieve the maximum relative difference of this matrix and another one y.max_rel_diff(x) returns \( \max_{0\leq i &lt; n}\frac{|x_i-y_i|}{\max{|x_i|+|y_i|, eps}} \). </p>
+<dl class="section return"><dt>Returns</dt><dd>The largest relative difference. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00598">598</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="saddle__point__matrix_8hpp_source.html#l00280">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_a()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00292">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_b()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00304">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_d()</a>, <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00598">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::max_rel_diff()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="saddle__point__matrix_8hpp_source.html#l00598">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::max_rel_diff()</a>.</p>
+
+</div>
+</div>
 <a id="ac035545e02805294a10e9d90960cc305" name="ac035545e02805294a10e9d90960cc305"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac035545e02805294a10e9d90960cc305">&#9670;&#160;</a></span>name()</h2>
 
@@ -1938,6 +1974,8 @@ template&lt;typename MatrixA_ , typename MatrixB_  = MatrixA_, typename MatrixD_
 <p>Returns a descriptive string for this container. </p>
 
 <p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00383">383</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="saddle__point__matrix_8hpp_source.html#l00614">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::same_layout()</a>.</p>
 
 </div>
 </div>
@@ -2063,7 +2101,7 @@ template&lt;typename MatrixA_ , typename MatrixB_  = MatrixA_, typename MatrixD_
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00664">664</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00692">692</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="saddle__point__matrix_8hpp_source.html#l00280">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_a()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00292">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_b()</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00304">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_d()</a>.</p>
 
@@ -2107,6 +2145,47 @@ Raw matrix row count if perspective_ = true. </dd></dl>
 
 </div>
 </div>
+<a id="a207c8af6f705eeda6683cfc519d87a80" name="a207c8af6f705eeda6683cfc519d87a80"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a207c8af6f705eeda6683cfc519d87a80">&#9670;&#160;</a></span>same_layout()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixA_ , typename MatrixB_  = MatrixA_, typename MatrixD_  = MatrixB_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html">FEAT::LAFEM::SaddlePointMatrix</a>&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::same_layout </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html">SaddlePointMatrix</a>&lt; MatrixA_, MatrixB_, MatrixD_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>x</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks if the structural layout of this matrix matches that of another matrix. This excludes comparison of the actual data values. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">x</td><td>The matrix to compare this matrix to</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>true if the layouts match, false otherwise. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00614">614</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="saddle__point__matrix_8hpp_source.html#l00280">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_a()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00292">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_b()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00304">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_d()</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00383">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::name()</a>.</p>
+
+</div>
+</div>
 <a id="a3fea0d75c40e2e1a3bdb1b76c2b91475" name="a3fea0d75c40e2e1a3bdb1b76c2b91475"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3fea0d75c40e2e1a3bdb1b76c2b91475">&#9670;&#160;</a></span>set_checkpoint_data()</h2>
 
@@ -2145,7 +2224,7 @@ template&lt;typename MatrixA_ , typename MatrixB_  = MatrixA_, typename MatrixD_
 
 <p></p>
 
-<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00684">684</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00712">712</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="saddle__point__matrix_8hpp_source.html#l00280">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_a()</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00292">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_b()</a>, and <a class="el" href="saddle__point__matrix_8hpp_source.html#l00304">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::block_d()</a>.</p>
 
@@ -2268,56 +2347,6 @@ template&lt;typename MatrixA_ , typename MatrixB_  = MatrixA_, typename MatrixD_
 <p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00233">233</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="saddle__point__matrix_8hpp_source.html#l00113">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::_matrix_a</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00115">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::_matrix_b</a>, <a class="el" href="saddle__point__matrix_8hpp_source.html#l00117">FEAT::LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;::_matrix_d</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
-
-</div>
-</div>
-<h2 class="groupheader">Friends And Related Function Documentation</h2>
-<a id="a560a8d56e9f3b256eb93a8b65db43fed" name="a560a8d56e9f3b256eb93a8b65db43fed"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a560a8d56e9f3b256eb93a8b65db43fed">&#9670;&#160;</a></span>operator==</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename MatrixA_ , typename MatrixB_  = MatrixA_, typename MatrixD_  = MatrixB_&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool operator== </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html">SaddlePointMatrix</a>&lt; MatrixA_, MatrixB_, MatrixD_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>a</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html">SaddlePointMatrix</a>&lt; MatrixA_, MatrixB_, MatrixD_ &gt; &amp;&#160;</td>
-          <td class="paramname"><em>b</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">friend</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html" title="Saddle-Point matrix meta class template.">SaddlePointMatrix</a> comparison operator. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">a</td><td>A matrix to compare with. </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">b</td><td>A matrix to compare with. </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="saddle__point__matrix_8hpp_source.html#l00738">738</a> of file <a class="el" href="saddle__point__matrix_8hpp_source.html">saddle_point_matrix.hpp</a>.</p>
 
 </div>
 </div>

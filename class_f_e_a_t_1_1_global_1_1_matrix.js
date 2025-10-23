@@ -16,6 +16,7 @@ var class_f_e_a_t_1_1_global_1_1_matrix =
     [ "clone", "class_f_e_a_t_1_1_global_1_1_matrix.html#a1f651af1362bfb92fb8fe75d42ee7807", null ],
     [ "columns", "class_f_e_a_t_1_1_global_1_1_matrix.html#a536d5ef27a9bfbae92e03ab9f267838f", null ],
     [ "convert_to_1", "class_f_e_a_t_1_1_global_1_1_matrix.html#a584239ddea86a102ca4d2ecafed6d5b4", null ],
+    [ "convert_to_1", "class_f_e_a_t_1_1_global_1_1_matrix.html#aa804db62b54a2b6a5bac2a4d69b314aa", null ],
     [ "create_vector_l", "class_f_e_a_t_1_1_global_1_1_matrix.html#a43850616272427b10989780236ac244c", null ],
     [ "create_vector_r", "class_f_e_a_t_1_1_global_1_1_matrix.html#a26df7139047eb5544310c07813f4a896", null ],
     [ "extract_diag", "class_f_e_a_t_1_1_global_1_1_matrix.html#ac03af57acbff2277d8e687e322fc8baf", null ],

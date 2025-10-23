@@ -165,6 +165,9 @@ Macros</h2></td></tr>
 <tr class="memitem:a2c23cb13a7c79e7821f4d3dad74cf550"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__system_8hpp.html#a2c23cb13a7c79e7821f4d3dad74cf550">TEST_CHECK_IN_RANGE</a>(x,  a,  b)</td></tr>
 <tr class="memdesc:a2c23cb13a7c79e7821f4d3dad74cf550"><td class="mdescLeft">&#160;</td><td class="mdescRight">checks if a &lt;= x &lt;= b  <a href="test__system_8hpp.html#a2c23cb13a7c79e7821f4d3dad74cf550">More...</a><br /></td></tr>
 <tr class="separator:a2c23cb13a7c79e7821f4d3dad74cf550"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ac5be32c01b54e44938fce83d4e5f51"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__system_8hpp.html#a5ac5be32c01b54e44938fce83d4e5f51">TEST_CHECK_LESS_THAN</a>(a,  b)</td></tr>
+<tr class="memdesc:a5ac5be32c01b54e44938fce83d4e5f51"><td class="mdescLeft">&#160;</td><td class="mdescRight">checks if a &lt; b  <a href="test__system_8hpp.html#a5ac5be32c01b54e44938fce83d4e5f51">More...</a><br /></td></tr>
+<tr class="separator:a5ac5be32c01b54e44938fce83d4e5f51"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a77113b042a17bf510fec145e7eda1fd3"><td class="memItemLeft" align="right" valign="top">#define&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="test__system_8hpp.html#a77113b042a17bf510fec145e7eda1fd3">TEST_CHECK_MSG</a>(a,  msg)</td></tr>
 <tr class="memdesc:a77113b042a17bf510fec145e7eda1fd3"><td class="mdescLeft">&#160;</td><td class="mdescRight">checks if <code>a</code> is true; prints <code>msg</code> if <code>a</code> is false  <a href="test__system_8hpp.html#a77113b042a17bf510fec145e7eda1fd3">More...</a><br /></td></tr>
 <tr class="separator:a77113b042a17bf510fec145e7eda1fd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -262,7 +265,7 @@ Macros</h2></td></tr>
 </div><!-- fragment -->
 <p>runs the given test with pre- and postprocessing </p>
 
-<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00388">388</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00394">394</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -410,6 +413,41 @@ Macros</h2></td></tr>
 <p>checks if a &lt;= x &lt;= b </p>
 
 <p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00318">318</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a5ac5be32c01b54e44938fce83d4e5f51" name="a5ac5be32c01b54e44938fce83d4e5f51"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ac5be32c01b54e44938fce83d4e5f51">&#9670;&#160;</a></span>TEST_CHECK_LESS_THAN</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">#define TEST_CHECK_LESS_THAN</td>
+          <td>(</td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">a, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">&#160;</td>
+          <td class="paramname">b&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Value:</b><div class="fragment"><div class="line">  <span class="keywordflow">do</span> { \</div>
+<div class="line">    CHECK_INTERNAL((a) &lt; (b), this-&gt;_id + <span class="stringliteral">&quot;\n&quot;</span> +  <span class="stringliteral">&quot;Expected &#39;&quot;</span> #a <span class="stringliteral">&quot;&#39; to be less than \n&#39;&quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">FEAT::stringify</a>(b) + <span class="stringliteral">&quot;&#39;\nbut got\n&#39;&quot;</span> + <a class="code hl_function" href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">FEAT::stringify</a>(a) + <span class="stringliteral">&quot;&#39;&quot;</span>)\</div>
+<div class="line">  } <span class="keywordflow">while</span> (<span class="keyword">false</span>)</div>
+</div><!-- fragment -->
+<p>checks if a &lt; b </p>
+
+<p class="definition">Definition at line <a class="el" href="test__system_8hpp_source.html#l00388">388</a> of file <a class="el" href="test__system_8hpp_source.html">test_system.hpp</a>.</p>
 
 </div>
 </div>

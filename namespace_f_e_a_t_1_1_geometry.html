@@ -511,6 +511,12 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="typedef-members" name="typedef-members"></a>
 Typedefs</h2></td></tr>
+<tr class="memitem:a636b501b375b1f49165fadc7dc731e33"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a636b501b375b1f49165fadc7dc731e33">CGALFeature</a> = std::vector&lt; std::uint32_t &gt;</td></tr>
+<tr class="memdesc:a636b501b375b1f49165fadc7dc731e33"><td class="mdescLeft">&#160;</td><td class="mdescRight">A feature is an edge-path on a surface mesh, stored as a list of vertex indices.  <a href="namespace_f_e_a_t_1_1_geometry.html#a636b501b375b1f49165fadc7dc731e33">More...</a><br /></td></tr>
+<tr class="separator:a636b501b375b1f49165fadc7dc731e33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a40a9038979415b8e1e29cca17e8f028b"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a40a9038979415b8e1e29cca17e8f028b">CGALFeatureNetwork</a> = std::vector&lt; <a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a636b501b375b1f49165fadc7dc731e33">CGALFeature</a> &gt;</td></tr>
+<tr class="memdesc:a40a9038979415b8e1e29cca17e8f028b"><td class="mdescLeft">&#160;</td><td class="mdescRight">A FeatureNetwork is a list of features.  <a href="namespace_f_e_a_t_1_1_geometry.html#a40a9038979415b8e1e29cca17e8f028b">More...</a><br /></td></tr>
+<tr class="separator:a40a9038979415b8e1e29cca17e8f028b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af3db3da9c05fffceb51e11c1ca9b858e"><td class="memItemLeft" align="right" valign="top">typedef std::int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_geometry.html#af3db3da9c05fffceb51e11c1ca9b858e">i64</a></td></tr>
 <tr class="memdesc:af3db3da9c05fffceb51e11c1ca9b858e"><td class="mdescLeft">&#160;</td><td class="mdescRight">signed 64-bit integer type  <a href="namespace_f_e_a_t_1_1_geometry.html#af3db3da9c05fffceb51e11c1ca9b858e">More...</a><br /></td></tr>
 <tr class="separator:af3db3da9c05fffceb51e11c1ca9b858e"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -573,6 +579,9 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a21b37f74026c4ed85ba83fe5ea04c325"><td class="memTemplParams" colspan="2">template&lt;typename MeshType_ &gt; </td></tr>
+<tr class="memitem:a21b37f74026c4ed85ba83fe5ea04c325"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html">CGALWrapper</a>&lt; typename MeshType_::CoordType &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a21b37f74026c4ed85ba83fe5ea04c325">cgal_wrapper_from_mesh</a> (const MeshType_ &amp;mesh, const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; MeshType_ &gt; &amp;part)</td></tr>
+<tr class="separator:a21b37f74026c4ed85ba83fe5ea04c325"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a72d944705fe89846617299d7a5568599"><td class="memTemplParams" colspan="2">template&lt;typename TemplateMap , typename RefinementType_ &gt; </td></tr>
 <tr class="memitem:a72d944705fe89846617299d7a5568599"><td class="memTemplItemLeft" align="right" valign="top">int&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a72d944705fe89846617299d7a5568599">create_2dtemplate_rotations</a> (TemplateMap &amp;map, const RefinementType_ &amp;base_type)</td></tr>
 <tr class="separator:a72d944705fe89846617299d7a5568599"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -735,6 +744,44 @@ template void&#160;</td><td class="memItemRight" valign="bottom"><b>MeshFileRead
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p ><a class="el" href="namespace_f_e_a_t_1_1_geometry.html" title="Geometry namespace.">Geometry</a> namespace. </p>
 </div><h2 class="groupheader">Typedef Documentation</h2>
+<a id="a636b501b375b1f49165fadc7dc731e33" name="a636b501b375b1f49165fadc7dc731e33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a636b501b375b1f49165fadc7dc731e33">&#9670;&#160;</a></span>CGALFeature</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a636b501b375b1f49165fadc7dc731e33">FEAT::Geometry::CGALFeature</a> = typedef std::vector&lt;std::uint32_t&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>A feature is an edge-path on a surface mesh, stored as a list of vertex indices. </p>
+<p >Features generally describe paths of "sharp" edges, i.e. edges with a large difference in surface normal between their adjacent faces. These paths are of special interest when trying to reproduce a surface mesh exactly. Features do not self-intersect. Note that this does not mean that the vertices of a feature acre distinct. Circular features contain one vertex twice to account for all edges of the path. </p>
+
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00036">36</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a40a9038979415b8e1e29cca17e8f028b" name="a40a9038979415b8e1e29cca17e8f028b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a40a9038979415b8e1e29cca17e8f028b">&#9670;&#160;</a></span>CGALFeatureNetwork</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a40a9038979415b8e1e29cca17e8f028b">FEAT::Geometry::CGALFeatureNetwork</a> = typedef std::vector&lt;<a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a636b501b375b1f49165fadc7dc731e33">CGALFeature</a>&gt;</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>A FeatureNetwork is a list of features. </p>
+<p >Each feature is an edge-path. Together these features describe a network of paths across the surface mesh. </p>
+
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00043">43</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+
+</div>
+</div>
 <a id="af3db3da9c05fffceb51e11c1ca9b858e" name="af3db3da9c05fffceb51e11c1ca9b858e"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af3db3da9c05fffceb51e11c1ca9b858e">&#9670;&#160;</a></span>i64</h2>
 
@@ -942,7 +989,7 @@ template&lt;typename MeshType_ &gt; </div>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00020">20</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00022">22</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
 
 </div>
 </div>
@@ -1054,6 +1101,46 @@ template&lt;typename MeshType_ &gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="a21b37f74026c4ed85ba83fe5ea04c325" name="a21b37f74026c4ed85ba83fe5ea04c325"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a21b37f74026c4ed85ba83fe5ea04c325">&#9670;&#160;</a></span>cgal_wrapper_from_mesh()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MeshType_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html">CGALWrapper</a>&lt; typename MeshType_::CoordType &gt; FEAT::Geometry::cgal_wrapper_from_mesh </td>
+          <td>(</td>
+          <td class="paramtype">const MeshType_ &amp;&#160;</td>
+          <td class="paramname"><em>mesh</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; MeshType_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>part</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="cgal_8hpp_source.html#l00146">146</a> of file <a class="el" href="cgal_8hpp_source.html">cgal.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a72d944705fe89846617299d7a5568599" name="a72d944705fe89846617299d7a5568599"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a72d944705fe89846617299d7a5568599">&#9670;&#160;</a></span>create_2dtemplate_rotations()</h2>
 
