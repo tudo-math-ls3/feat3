@@ -203,6 +203,11 @@ namespace FEAT
       }
       /// \endcond
 
+      bool empty() const
+      {
+        return _vec_prim.empty();
+      }
+
       /**
        * \brief Applies the filter onto the right-hand-side vector.
        *

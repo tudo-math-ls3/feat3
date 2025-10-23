@@ -2843,6 +2843,113 @@ namespace FEAT
         return Index(prow_ptr[trow + 1] - prow_ptr[trow]) * Index(BlockWidth_);
       }
 
+      /// Returns the number of NNZ-elements of the selected row
+      Index row_degree(const Index row) const
+      {
+        const auto * prow_ptr(this->row_ptr());
+        const auto trow = row / Index(BlockHeight_);
+        return Index(prow_ptr[trow + 1] - prow_ptr[trow]) * Index(BlockWidth_);
+      }
+
+      /**
+       * \brief Extracts the column indices for a given row
+       *
+       * \param[in] row
+       * The index of the row whose column indices are to be extracted
+       *
+       * \param[out] pcol_idx
+       * A \transient array that receives the column indices
+       *
+       * \param[in] col_offset
+       * An offset that is to be added onto each column index
+       *
+       * \returns The number of column indices extracted
+       */
+      template<typename IT2_>
+      Index get_row_col_indices(const Index row, IT2_ * const pcol_idx, const IT2_ col_offset) const
+      {
+        const auto * prow_ptr(this->row_ptr());
+        const auto * pcol_ind(this->col_ind());
+
+        const auto trow = int(row) / BlockHeight_;
+        //const auto lrow = int(row) % BlockHeight_;
+
+        const Index start = Index(prow_ptr[trow]);
+        const Index end = Index(prow_ptr[trow + 1] - prow_ptr[trow]);
+        for (Index i(0); i < end; ++i)
+        {
+          for (Index ti(0); ti < Index(BlockWidth_); ++ti)
+          {
+            pcol_idx[i * Index(BlockWidth_) + ti] = IT2_(pcol_ind[start + i]) * IT2_(BlockWidth_) + IT2_(ti) + col_offset;
+          }
+        }
+        return end * Index(BlockWidth_);
+      }
+
+      /**
+       * \brief Extracts the values for a given row
+       *
+       * \param[in] row
+       * The index of the row whose values are to be extracted
+       *
+       * \param[out] pvals
+       * A \transient array that receives the values
+       *
+       * \returns The number of values extracted
+       */
+      template<typename DT2_>
+      Index get_row_values(const Index row, DT2_ * const pvals) const
+      {
+        const auto * prow_ptr(this->row_ptr());
+        const auto * pval(this->val());
+
+        const auto trow = int(row) / BlockHeight_;
+        const auto lrow = int(row) % BlockHeight_;
+
+        const Index start = Index(prow_ptr[trow]);
+        const Index end = Index(prow_ptr[trow + 1] - prow_ptr[trow]);
+        for (Index i(0); i < end; ++i)
+        {
+          for (Index ti(0); ti < Index(BlockWidth_); ++ti)
+          {
+            pvals[i * Index(BlockWidth_) + ti] = DT2_(pval[start + i](lrow, int(ti)));
+          }
+        }
+        return end * Index(BlockWidth_);
+      }
+
+      /**
+       * \brief Overwrites the values for a given row
+       *
+       * \param[in] row
+       * The index of the row whose values are to be written
+       *
+       * \param[out] pvals
+       * A \transient array containing the values to write to the row
+       *
+       * \returns The number of values written
+       */
+      template<typename DT2_>
+      Index set_row_values(const Index row, const DT2_ * const pvals)
+      {
+        const auto * prow_ptr(this->row_ptr());
+        auto * pval(this->val());
+
+        const auto trow = int(row) / BlockHeight_;
+        const auto lrow = int(row) % BlockHeight_;
+
+        const Index start = Index(prow_ptr[trow]);
+        const Index end = Index(prow_ptr[trow + 1] - prow_ptr[trow]);
+        for (Index i(0); i < end; ++i)
+        {
+          for (Index ti(0); ti < Index(BlockWidth_); ++ti)
+          {
+            pval[start + i](lrow, int(ti)) = DT_(pvals[i * Index(BlockWidth_) + ti]);
+          }
+        }
+        return end * Index(BlockWidth_);
+      }
+
       /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
       void set_line(const Index row, DT_ * const pval_set, IT_ * const pcol_set,
                     const Index col_start, const Index stride = 1) const

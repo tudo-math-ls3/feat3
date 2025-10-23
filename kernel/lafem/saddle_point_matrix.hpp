@@ -680,6 +680,56 @@ namespace FEAT
           this->block_d().set_line_reverse(row - arows, pval_set, stride);
         }
       }
+
+      Index row_degree(const Index row) const
+      {
+        const Index rows_a = block_a().template rows<Perspective::pod>();
+        if(row < rows_a)
+          return block_a().row_degree(row) + block_b().row_degree(row);
+        else
+          return block_d().row_degree(row - rows_a);
+      }
+
+      template<typename IT2_>
+      Index get_row_col_indices(const Index row, IT2_* const pcol_idx, const IT2_ col_offset) const
+      {
+        const Index rows_a = block_a().template rows<Perspective::pod>();
+        const Index cols_a = block_a().template columns<Perspective::pod>();
+        if(row < rows_a)
+        {
+          Index degree_a = block_a().get_row_col_indices(row, pcol_idx, col_offset);
+          return degree_a + block_b().get_row_col_indices(row, pcol_idx + degree_a, col_offset + cols_a);
+        }
+        else
+          return block_d().get_row_col_indices(row - rows_a, pcol_idx, col_offset);
+      }
+
+      template<typename DT2_>
+      Index get_row_values(const Index row, DT2_ * const pvals) const
+      {
+        const Index rows_a = block_a().template rows<Perspective::pod>();
+        if(row < rows_a)
+        {
+          Index degree_a = block_a().get_row_values(row, pvals);
+          return degree_a + block_b().get_row_values(row, pvals + degree_a);
+        }
+        else
+          return block_d().get_row_values(row - rows_a, pvals);
+      }
+
+      template<typename DT2_>
+      Index set_row_values(const Index row, const DT2_ * const pvals)
+      {
+        const Index rows_a = block_a().template rows<Perspective::pod>();
+        if(row < rows_a)
+        {
+          Index degree_a = block_a().set_row_values(row, pvals);
+          return degree_a + block_b().set_row_values(row, pvals + degree_a);
+        }
+        else
+          return block_d().set_row_values(row - rows_a, pvals);
+      }
+
       /// \endcond
 
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()

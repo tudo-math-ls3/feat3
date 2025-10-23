@@ -23,6 +23,17 @@ namespace FEAT
      */
     namespace SuperLU_Aux
     {
+      /// the data type used by SuperLU
+      typedef double SLUDataType;
+
+      /// the index type used by SuperLU
+      /// must be identical to 'int_t' in <superlu_defs.h>
+#ifdef FEAT_TPL_SUPERLU_INT64
+      typedef std::int64_t SLUIndexType;
+#else
+      typedef int SLUIndexType;
+#endif
+
       /**
        * \brief Creates an opaque core wrapper object for SuperLU.
        *
@@ -42,36 +53,29 @@ namespace FEAT
        * \param[in] num_owned_dofs
        * The number of global DOFs owned by this process.
        *
-       * \param[in] row_ptr
-       * The row-pointer array of the partitioned CSR matrix.
-       *
-       * \param[in] col_idx
-       * The column-index array of the partitioned CSR matrix.
+       * \param[in] num_nonzeros
+       * The number of non-zero entries for this process
        *
        * \returns
        * A pointer to a newly allocated core wrapper object.
        */
-      void* create_core(const void* comm, Index num_global_dofs, Index dof_offset,
-        Index num_owned_dofs, const unsigned int* row_ptr, const unsigned int* col_idx);
-      void* create_core(const void* comm, Index num_global_dofs, Index dof_offset,
-        Index num_owned_dofs, const unsigned long* row_ptr, const unsigned long* col_idx);
-      void* create_core(const void* comm, Index num_global_dofs, Index dof_offset,
-        Index num_owned_dofs, const unsigned long long* row_ptr, const unsigned long long* col_idx);
+      void* create_core(const void* comm, Index num_global_dofs, Index dof_offset, Index num_owned_dofs, Index num_nonzeros);
 
       /// destroys a wrapper core
       void destroy_core(void* core);
 
-      /// sets the matrix values and performs numeric factorization
-      int init_numeric(void* core, const double* vals);
+      SLUIndexType* get_row_ptr(void* core);
+      SLUIndexType* get_col_idx(void* core);
+      SLUDataType* get_mat_val(void* core);
+      SLUDataType* get_vector(void* core);
+
+      void init_symbolic(void* core);
+      int init_numeric(void* core);
 
       /**
        * \brief Solves a linear system
-       *
-       * \param[inout] x
-       * On entry, the right-hand side vector.
-       * On exit, the solution vector.
        */
-      int solve(void* core, double* x);
+      int solve(void* core);
     } // namespace SuperLU_Aux
     /// \endcond
 
@@ -132,8 +136,13 @@ namespace FEAT
           this->_get_num_global_dofs(),
           this->_get_global_dof_offset(),
           this->_get_num_owned_dofs(),
-          this->_get_mat_row_ptr(),
-          this->_get_mat_col_idx());
+          this->_get_adp_matrix_num_nzes());
+
+        // upload matrix structure
+        BaseClass::_upload_symbolic(SuperLU_Aux::get_row_ptr(this->_core), SuperLU_Aux::get_col_idx(this->_core));
+
+        // initialize
+        SuperLU_Aux::init_symbolic(this->_core);
       }
 
       virtual void done_symbolic() override
@@ -151,8 +160,12 @@ namespace FEAT
         XASSERT(this->_core != nullptr);
         BaseClass::init_numeric();
 
+        // upload matrix values
+        this->_upload_numeric(SuperLU_Aux::get_mat_val(this->_core),
+          SuperLU_Aux::get_row_ptr(this->_core), SuperLU_Aux::get_col_idx(this->_core));
+
         // set the new matrix values
-        const int info = SuperLU_Aux::init_numeric(this->_core, this->_get_mat_vals());
+        const int info = SuperLU_Aux::init_numeric(this->_core);
 
         // info = 0 means success
         // info < 0 means illegal argument; this should never happen
@@ -170,16 +183,16 @@ namespace FEAT
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
         // upload defect vector into internal correction vector
-        this->_upload_vec_cor(vec_def);
+        this->_upload_vector(SuperLU_Aux::get_vector(this->_core), vec_def.local());
 
         // solve
-        int info = SuperLU_Aux::solve(this->_core, this->_get_vec_cor_vals(vec_cor));
+        int info = SuperLU_Aux::solve(this->_core);
 
         // info != 0 means something went wrong, but this should never happen here...
         XASSERTM(info == 0, "SuperLU: solve returned non-zero info value");
 
         // download solution into correction vector
-        this->_download_vec_cor(vec_cor);
+        this->_download_vector(vec_cor.local(), SuperLU_Aux::get_vector(this->_core));
 
         // okay
         return Status::success;

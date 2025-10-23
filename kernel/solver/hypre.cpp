@@ -46,12 +46,23 @@ namespace FEAT
       public:
         // Note: if compiled without MPI, HYPRE defines its own MPI_Comm dummy type
         MPI_Comm _comm;
+        const HYPRE_Int _dof_offset;
+        const HYPRE_Int _num_owned_dofs;
+        const HYPRE_Int _num_nonzeros;
         /// HYPRE global DOF indices array
         std::vector<HYPRE_Int> _hypre_dof_idx;
         /// HYPRE number of non-zero entries per row array
         std::vector<HYPRE_Int> _hypre_num_nze;
+        /// HYPRE row pointer array
+        std::vector<HYPRE_Int> _hypre_row_ptr;
         /// HYPRE column indices array
         std::vector<HYPRE_Int> _hypre_col_idx;
+        /// HYPRE matrix values
+        std::vector<HYPRE_Real> _hypre_mat_val;
+        /// HYPRE defect vector values
+        std::vector<HYPRE_Real> _hypre_def_val;
+        /// HYPRE correction vector values
+        std::vector<HYPRE_Real> _hypre_cor_val;
 
         // note: the following members are actually pointers
         /// handle to the HYPRE IJ matrix object
@@ -63,12 +74,13 @@ namespace FEAT
         /// HYPRE ParVector handles to the defect/correction vectors
         HYPRE_ParVector _hypre_par_def, _hypre_par_cor;
 
-
-        template<typename IT_>
-        explicit Core(const void* comm, Index my_dof_offset, Index num_owned_dofs, const IT_* row_ptr, const IT_* col_idx) :
+        explicit Core(const void* comm, Index my_dof_offset, Index num_owned_dofs, Index num_nonzeros) :
 #ifdef FEAT_HAVE_MPI
           _comm(*reinterpret_cast<const MPI_Comm*>(comm)),
 #endif
+          _dof_offset(HYPRE_Int(my_dof_offset)),
+          _num_owned_dofs(HYPRE_Int(num_owned_dofs)),
+          _num_nonzeros(HYPRE_Int(num_nonzeros)),
           _hypre_dof_idx(),
           _hypre_num_nze(),
           _hypre_col_idx(),
@@ -82,14 +94,10 @@ namespace FEAT
 #ifndef FEAT_HAVE_MPI
           (void)comm; // suppress unused parameter warnings
 #endif
-          // get dof offset and count
-          const HYPRE_Int dof_offset = HYPRE_Int(my_dof_offset);
-          const HYPRE_Int num_owned  = HYPRE_Int(num_owned_dofs);
-
           // set up HYPRE dof indices vector
-          _hypre_dof_idx.resize((std::size_t)num_owned);
-          for(HYPRE_Int i(0); i < num_owned; ++i)
-            _hypre_dof_idx[std::size_t(i)] = dof_offset + i;
+          _hypre_dof_idx.resize((std::size_t)_num_owned_dofs);
+          for(HYPRE_Int i(0); i < _num_owned_dofs; ++i)
+            _hypre_dof_idx[std::size_t(i)] = _dof_offset + i;
 
           // get lower and upper DOF bounds
           const HYPRE_Int ilower = _hypre_dof_idx.front();
@@ -108,34 +116,36 @@ namespace FEAT
           HYPRE_IJVectorInitialize(_hypre_vec_def);
           HYPRE_IJVectorInitialize(_hypre_vec_cor);
 
-          // get matrix dimensions
-          const HYPRE_Int num_nze = HYPRE_Int(row_ptr[num_owned_dofs]);
-
           // create HYPRE index vectors
-          _hypre_num_nze.resize((std::size_t)num_owned);
-          _hypre_col_idx.resize((std::size_t)num_nze);
+          _hypre_num_nze.resize((std::size_t)_num_owned_dofs);
+          _hypre_row_ptr.resize((std::size_t)(_num_owned_dofs+1u));
+          _hypre_col_idx.resize((std::size_t)_num_nonzeros);
+          _hypre_mat_val.resize((std::size_t)_num_nonzeros);
+          _hypre_def_val.resize((std::size_t)_num_owned_dofs);
+          _hypre_cor_val.resize((std::size_t)_num_owned_dofs);
+        }
 
-          // loop over all owned matrix rows
-          for(HYPRE_Int i(0); i < num_owned; ++i)
-          {
-            _hypre_num_nze[std::size_t(i)] = HYPRE_Int(row_ptr[i+1] - row_ptr[i]);
-          }
-          for(HYPRE_Int i(0); i < num_nze; ++i)
-          {
-            _hypre_col_idx[std::size_t(i)] = HYPRE_Int(col_idx[i]);
-          }
+        ~Core()
+        {
+          HYPRE_IJVectorDestroy(_hypre_vec_cor);
+          HYPRE_IJVectorDestroy(_hypre_vec_def);
+          HYPRE_IJMatrixDestroy(_hypre_matrix);
+        }
 
-          // vector for initial vector values
-          std::vector<HYPRE_Real> va((std::size_t)num_nze, 0.0);
-          std::vector<HYPRE_Real> vx((std::size_t)num_owned, 0.0);
+        void upload_symbolic()
+        {
+          // compute row non-zeros from row pointer
+          std::size_t n = _hypre_num_nze.size();
+          for(std::size_t i(0); i < n; ++i)
+            _hypre_num_nze[i] = _hypre_row_ptr[i+1] - _hypre_row_ptr[i];
 
           // set matrix structure + dummy values
-          HYPRE_IJMatrixSetValues(_hypre_matrix, num_owned, _hypre_num_nze.data(), _hypre_dof_idx.data(),
-            _hypre_col_idx.data(), va.data());
+          HYPRE_IJMatrixSetValues(_hypre_matrix, _num_owned_dofs, _hypre_num_nze.data(), _hypre_dof_idx.data(),
+            _hypre_col_idx.data(), _hypre_mat_val.data());
 
           // set vector structures + dummy values
-          HYPRE_IJVectorSetValues(_hypre_vec_def, num_owned, _hypre_dof_idx.data(), vx.data());
-          HYPRE_IJVectorSetValues(_hypre_vec_cor, num_owned, _hypre_dof_idx.data(), vx.data());
+          HYPRE_IJVectorSetValues(_hypre_vec_def, _num_owned_dofs, _hypre_dof_idx.data(), _hypre_def_val.data());
+          HYPRE_IJVectorSetValues(_hypre_vec_cor, _num_owned_dofs, _hypre_dof_idx.data(), _hypre_cor_val.data());
 
           // assemble matrix and get ParCSR object pointer
           HYPRE_IJMatrixAssemble(_hypre_matrix);
@@ -148,62 +158,56 @@ namespace FEAT
           HYPRE_IJVectorGetObject(_hypre_vec_cor, (void **) &_hypre_par_cor);
         }
 
-        ~Core()
+        void upload_mat_val()
         {
-          HYPRE_IJVectorDestroy(_hypre_vec_cor);
-          HYPRE_IJVectorDestroy(_hypre_vec_def);
-          HYPRE_IJMatrixDestroy(_hypre_matrix);
+          HYPRE_IJMatrixSetValues(_hypre_matrix, _num_owned_dofs, _hypre_num_nze.data(), _hypre_dof_idx.data(),
+            _hypre_col_idx.data(), _hypre_mat_val.data());
         }
 
-        void set_matrix_values(const double* vals)
+        void upload_vec_def()
         {
-          HYPRE_IJMatrixSetValues(_hypre_matrix, HYPRE_Int(_hypre_dof_idx.size()), _hypre_num_nze.data(),
-            _hypre_dof_idx.data(), _hypre_col_idx.data(), vals);
+          HYPRE_IJVectorSetValues(_hypre_vec_def, _num_owned_dofs, _hypre_dof_idx.data(), _hypre_def_val.data());
         }
 
-        void set_vec_cor_values(const double* vals)
+        void download_vec_cor()
         {
-          if(vals != nullptr)
-            HYPRE_IJVectorSetValues(_hypre_vec_cor, HYPRE_Int(_hypre_dof_idx.size()), _hypre_dof_idx.data(), vals);
-          else
-            HYPRE_ParVectorSetConstantValues(_hypre_par_cor, HYPRE_Real(0));
+          HYPRE_IJVectorGetValues(_hypre_vec_cor, _num_owned_dofs, _hypre_dof_idx.data(), _hypre_cor_val.data());
         }
 
-        void set_vec_def_values(const double* vals)
+        void format_vec_cor()
         {
-          if(vals != nullptr)
-            HYPRE_IJVectorSetValues(_hypre_vec_def, HYPRE_Int(_hypre_dof_idx.size()), _hypre_dof_idx.data(), vals);
-          else
-            HYPRE_ParVectorSetConstantValues(_hypre_par_def, HYPRE_Real(0));
+          HYPRE_ParVectorSetConstantValues(_hypre_par_cor, HYPRE_Real(0));
         }
 
-        void get_vec_cor_values(double* vals) const
+        HYPRE_Int* get_row_ptr()
         {
-          HYPRE_IJVectorGetValues(_hypre_vec_cor, HYPRE_Int(_hypre_dof_idx.size()), _hypre_dof_idx.data(), vals);
+          return _hypre_row_ptr.data();
         }
 
-        void get_vec_def_values(double* vals) const
+        HYPRE_Int* get_col_idx()
         {
-          HYPRE_IJVectorGetValues(_hypre_vec_cor, HYPRE_Int(_hypre_dof_idx.size()), _hypre_dof_idx.data(), vals);
+          return _hypre_col_idx.data();
+        }
+
+        HYPRE_Real* get_mat_val()
+        {
+          return _hypre_mat_val.data();
+        }
+
+        HYPRE_Real* get_vec_def()
+        {
+          return _hypre_def_val.data();
+        }
+
+        HYPRE_Real* get_vec_cor()
+        {
+          return _hypre_cor_val.data();
         }
       }; // class Core
 
-      void* create_core(const void* comm, Index dof_offset, Index num_owned_dofs,
-        const unsigned int* row_ptr, const unsigned int* col_idx)
+      void* create_core(const void* comm, Index dof_offset, Index num_owned_dofs, Index num_nonzeros)
       {
-        return new Core(comm, dof_offset, num_owned_dofs, row_ptr, col_idx);
-      }
-
-      void* create_core(const void* comm, Index dof_offset, Index num_owned_dofs,
-        const unsigned long* row_ptr, const unsigned long* col_idx)
-      {
-        return new Core(comm, dof_offset, num_owned_dofs, row_ptr, col_idx);
-      }
-
-      void* create_core(const void* comm, Index dof_offset, Index num_owned_dofs,
-        const unsigned long long* row_ptr, const unsigned long long* col_idx)
-      {
-        return new Core(comm, dof_offset, num_owned_dofs, row_ptr, col_idx);
+        return new Core(comm, dof_offset, num_owned_dofs, num_nonzeros);
       }
 
       void destroy_core(void* core)
@@ -211,29 +215,54 @@ namespace FEAT
         delete reinterpret_cast<Core*>(core);
       }
 
-      void set_matrix_values(void* core, const double* vals)
+      HYPRE_Int* get_row_ptr(void* core)
       {
-        reinterpret_cast<Core*>(core)->set_matrix_values(vals);
+        return reinterpret_cast<Core*>(core)->get_row_ptr();
       }
 
-      void set_vec_cor_values(void* core, const double* vals)
+      HYPRE_Int* get_col_idx(void* core)
       {
-        reinterpret_cast<Core*>(core)->set_vec_cor_values(vals);
+        return reinterpret_cast<Core*>(core)->get_col_idx();
       }
 
-      void set_vec_def_values(void* core, const double* vals)
+      HYPRE_Real* get_mat_val(void* core)
       {
-        reinterpret_cast<Core*>(core)->set_vec_def_values(vals);
+        return reinterpret_cast<Core*>(core)->get_mat_val();
       }
 
-      void get_vec_cor_values(const void* core, double* vals)
+      HYPRE_Real* get_vec_def(void* core)
       {
-        reinterpret_cast<const Core*>(core)->get_vec_cor_values(vals);
+        return reinterpret_cast<Core*>(core)->get_vec_def();
       }
 
-      void get_vec_def_values(const void* core, double* vals)
+      HYPRE_Real* get_vec_cor(void* core)
       {
-        reinterpret_cast<const Core*>(core)->get_vec_def_values(vals);
+        return reinterpret_cast<Core*>(core)->get_vec_cor();
+      }
+
+      void upload_symbolic(void* core)
+      {
+        reinterpret_cast<Core*>(core)->upload_symbolic();
+      }
+
+      void upload_mat_val(void* core)
+      {
+        reinterpret_cast<Core*>(core)->upload_mat_val();
+      }
+
+      void upload_vec_def(void* core)
+      {
+        reinterpret_cast<Core*>(core)->upload_vec_def();
+      }
+
+      void download_vec_cor(void* core)
+      {
+        reinterpret_cast<Core*>(core)->download_vec_cor();
+      }
+
+      void format_vec_cor(void* core)
+      {
+        reinterpret_cast<Core*>(core)->format_vec_cor();
       }
 
       /* *********************************************************************************************************** */

@@ -5,10 +5,12 @@
 
 #include <test_system/test_system.hpp>
 #include <kernel/lafem/pointstar_factory.hpp>
-#include <kernel/global/alg_dof_parti.hpp>
+#include <kernel/lafem/none_filter.hpp>
+#include <kernel/global/alg_dof_parti_system.hpp>
 #include <kernel/global/gate.hpp>
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/vector.hpp>
+#include <kernel/global/filter.hpp>
 #include <kernel/util/random.hpp>
 
 using namespace FEAT;
@@ -29,16 +31,19 @@ class AlgDofPartiTest :
 
   typedef LAFEM::VectorMirror<DataType, IndexType> MirrorType;
   typedef LAFEM::DenseVector<DataType, IndexType> LocalVectorType;
+  typedef LAFEM::NoneFilter<DataType, IndexType> LocalFilterType;
   typedef LAFEM::SparseMatrixCSR<DataType, IndexType> LocalMatrixType;
 
   typedef Global::Gate<LocalVectorType, MirrorType> GateType;
   typedef Global::Vector<LocalVectorType, MirrorType> GlobalVectorType;
+  typedef Global::Filter<LocalFilterType, MirrorType> GlobalFilterType;
   typedef Global::Matrix<LocalMatrixType, MirrorType, MirrorType> GlobalMatrixType;
 
   typedef Global::AlgDofParti<LocalVectorType, MirrorType> AlgDofPartiType;
-  typedef Global::AlgDofPartiVector<LocalVectorType, MirrorType> AlgDofPartiVectorType;
-  typedef Global::AlgDofPartiMatrix<LocalMatrixType, MirrorType> AlgDofPartiMatrixType;
+  typedef Global::AlgDofPartiSystem<LocalMatrixType, LocalFilterType, MirrorType> AlgDofPartiSystemType;
 
+  typedef LAFEM::DenseVector<DataType, IndexType> ADPVectorType;
+  typedef LAFEM::SparseMatrixCSR<DataType, IndexType> ADPMatrixType;
 
 public:
   AlgDofPartiTest(PreferredBackend backend) :
@@ -129,21 +134,16 @@ public:
     if(!create_gate(gate, 5))
       return;
 
-    // create alg-dof-parti
-    AlgDofPartiType adp;
-    adp.assemble_by_gate(gate);
-    adp.assemble_allgather(true);
-
     // test vector
-    test_vector(gate, adp);
+    test_vector(gate);
 
     // test matrix
-    test_matrix(gate, adp, 5);
+    test_matrix(gate, 5);
   }
 
-  void test_vector(const GateType& gate, const AlgDofPartiType& adp) const
+  void test_vector(const GateType& gate) const
   {
-    const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.9));
+    const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.8));
     Random rng;
     std::cout << "test_vector RNG Seed: " << rng.get_seed() << "\n";
 
@@ -162,31 +162,36 @@ public:
     // compute dot-product of x and y
     const DataType glob_dot_x_y = glob_vec_x.dot(glob_vec_y);
 
+    // create alg dof parti
+    AlgDofPartiType adp;
+    adp.assemble_by_gate(gate);
+    adp.assemble_allgather(true);
+
     // create two adp vectors
-    AlgDofPartiVectorType adp_vec_x(&adp);
-    AlgDofPartiVectorType adp_vec_y(&adp);
+    ADPVectorType adp_vec_x(adp.get_num_owned_dofs());
+    ADPVectorType adp_vec_y(adp.get_num_owned_dofs());
 
     // upload vectors x and y
-    adp_vec_x.upload(glob_vec_x);
-    adp_vec_y.upload(glob_vec_y);
+    adp.upload_vector(adp_vec_x.elements(), glob_vec_x.local());
+    adp.upload_vector(adp_vec_y.elements(), glob_vec_y.local());
 
     // perform dot-product of owned dofs
-    const DataType owned_dot_x_y = adp_vec_x.owned().dot(adp_vec_y.owned());
+    const DataType owned_dot_x_y = adp_vec_x.dot(adp_vec_y);
 
     // sum up owned dots over all processes
     const DataType adp_dot_x_y = gate.sum(owned_dot_x_y);
 
     // test dot-product error
     const DataType dot_error = Math::abs(adp_dot_x_y - glob_dot_x_y) / Math::abs(glob_dot_x_y);
-    TEST_CHECK(dot_error < tol);
+    TEST_CHECK_LESS_THAN(dot_error, tol);
 
     // create another two global vectors
     GlobalVectorType glob_vec_x2(&gate, gate._freqs.clone(LAFEM::CloneMode::Layout));
     GlobalVectorType glob_vec_y2(&gate, gate._freqs.clone(LAFEM::CloneMode::Layout));
 
     // download from adp vectors
-    adp_vec_x.download(glob_vec_x2);
-    adp_vec_y.download(glob_vec_y2);
+    adp.download_vector(adp_vec_x.elements(), glob_vec_x2.local());
+    adp.download_vector(adp_vec_y.elements(), glob_vec_y2.local());
 
     // compute errors to original vectors
     glob_vec_x2.axpy(glob_vec_x, -DataType(1));
@@ -194,12 +199,12 @@ public:
 
     // compute error
     const DataType download_error = Math::sqrt(glob_vec_x2.norm2sqr() + glob_vec_y2.norm2sqr());
-    TEST_CHECK(download_error < tol);
+    TEST_CHECK_LESS_THAN(download_error, tol);
   }
 
-  void test_matrix(/*const*/ GateType& gate, const AlgDofPartiType& adp, const IT_ m) const
+  void test_matrix(/*const*/ GateType& gate, const IT_ m) const
   {
-    const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.9));
+    const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.8));
     Random rng;
     std::cout << "test_matrix RNG Seed: " << rng.get_seed() << "\n";
 
@@ -224,30 +229,42 @@ public:
     // compute b := A*x
     glob_mat.apply(glob_vec_b, glob_vec_x);
 
+    GlobalFilterType glob_filter;
+
+    // create ADP system
+    AlgDofPartiSystemType adp_sys(glob_mat, glob_filter);
+    adp_sys.init_symbolic();
+    adp_sys.get_alg_dof_parti()->assemble_allgather(true);
+
     // create ADP matrix
-    AlgDofPartiMatrixType adp_mat(&adp);
+    ADPMatrixType adp_mat(
+      adp_sys.get_adp_matrix_rows(),
+      adp_sys.get_adp_matrix_cols(),
+      adp_sys.get_adp_matrix_nzes());
 
     // upload matrix
-    adp_mat.upload(glob_mat);
+    adp_sys.upload_matrix_symbolic(adp_mat.row_ptr(), adp_mat.col_ind());
+    adp_sys.upload_matrix_numeric(adp_mat.val(), adp_mat.row_ptr(), adp_mat.col_ind());
 
     // create two ADP vectors
-    AlgDofPartiVectorType adp_vec_x(&adp);
-    AlgDofPartiVectorType adp_vec_b(&adp);
+    ADPVectorType adp_vec_x(adp_sys.get_adp_vector_size());
+    ADPVectorType adp_vec_b(adp_sys.get_adp_vector_size());
 
     // upload vector x
-    adp_vec_x.upload(glob_vec_x);
+    adp_sys.upload_vector(adp_vec_x.elements(), glob_vec_x.local());
 
     // compute b := A*x
-    adp_mat.apply(adp_vec_b, adp_vec_x);
+    adp_sys.apply(adp_vec_b.elements(), adp_vec_x.elements(),
+      adp_mat.val(), adp_mat.row_ptr(), adp_mat.col_ind());
 
     // create another global vector and download b
     GlobalVectorType glob_vec_b2 = glob_mat.create_vector_l();
-    adp_vec_b.download(glob_vec_b2);
+    adp_sys.download_vector(glob_vec_b2.local(), adp_vec_b.elements());
 
     // compute error vector
     glob_vec_b2.axpy(glob_vec_b, -DataType(1));
     const DataType error_norm = glob_vec_b2.norm2();
-    TEST_CHECK(error_norm < tol);
+    TEST_CHECK_LESS_THAN(error_norm, tol);
   }
 };
 

@@ -542,6 +542,13 @@ namespace FEAT
             XABORTM("Filemode not supported!");
         }
       }
+
+      /// auxiliary function for operator<< implementation
+      void dump(std::ostream& os) const
+      {
+        os << this->first() << ",";
+        this->rest().dump(os);
+      }
     }; // class TupleVector<...>
 
     /// \cond internal
@@ -979,28 +986,19 @@ namespace FEAT
 
         _write_out_binary(file);
       }
+
+      /// auxiliary function for operator<< implementation
+      void dump(std::ostream& os) const
+      {
+        os << this->first();
+      }
     };
-    /// \endcond
-
-    /// \cond internal
-    template <typename First_>
-    inline void dump_tuple_vector(std::ostream & os, const TupleVector<First_>& x)
-    {
-      os << x.first();
-    }
-
-    template <typename First_, typename... Rest_>
-    inline void dump_tuple_vector(std::ostream & os, const TupleVector<First_, Rest_...>& x)
-    {
-      os << x.first() << ",";
-      dump_tuple_vector<Rest_...>(os, x.rest());
-    }
 
     template <typename First_, typename... Rest_>
     inline std::ostream& operator<< (std::ostream & os, const TupleVector<First_, Rest_...>& x)
     {
       os << "[";
-      dump_tuple_vector(os, x);
+      x.dump(os);
       os << "]";
       return os;
     }

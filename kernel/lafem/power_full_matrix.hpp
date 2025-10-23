@@ -272,6 +272,29 @@ namespace FEAT
         _container.set_line_reverse(row, pval_set, stride);
       }
 
+      Index row_degree(const Index row) const
+      {
+        return _container.row_degree(row);
+      }
+
+      template<typename IT2_>
+      Index get_row_col_indices(const Index row, IT2_* const pcol_idx, const IT2_ col_offset) const
+      {
+        return _container.get_row_col_indices(row, pcol_idx, col_offset);
+      }
+
+      template<typename DT2_>
+      Index get_row_values(const Index row, DT2_ * const pvals) const
+      {
+        return _container.get_row_values(row, pvals);
+      }
+
+      template<typename DT2_>
+      Index set_row_values(const Index row, const DT2_ * const pvals)
+      {
+        return _container.set_row_values(row, pvals);
+      }
+
       ContClass& get_container()
       {
         return _container;

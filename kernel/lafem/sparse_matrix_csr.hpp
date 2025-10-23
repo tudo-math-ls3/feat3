@@ -2733,6 +2733,95 @@ namespace FEAT
         return Index(prow_ptr[row + 1] - prow_ptr[row]);
       }
 
+      /// Returns the number of NNZ-elements of the selected row
+      Index row_degree(const Index row) const
+      {
+        const IT_ * prow_ptr(this->row_ptr());
+        return Index(prow_ptr[row + 1] - prow_ptr[row]);
+      }
+
+      /**
+       * \brief Extracts the column indices for a given row
+       *
+       * \param[in] row
+       * The index of the row whose column indices are to be extracted
+       *
+       * \param[out] pcol_idx
+       * A \transient array that receives the column indices
+       *
+       * \param[in] col_offset
+       * An offset that is to be added onto each column index
+       *
+       * \returns The number of column indices extracted
+       */
+      template<typename IT2_>
+      Index get_row_col_indices(const Index row, IT2_ * const pcol_idx, const IT2_ col_offset) const
+      {
+        const IT_ * prow_ptr(this->row_ptr());
+        const IT_ * pcol_ind(this->col_ind());
+
+        const Index start = Index(prow_ptr[row]);
+        const Index end = Index(prow_ptr[row + 1] - prow_ptr[row]);
+        for (Index i(0); i < end; ++i)
+        {
+          pcol_idx[i] = IT2_(pcol_ind[start + i]) + col_offset;
+        }
+        return end;
+      }
+
+      /**
+       * \brief Extracts the values for a given row
+       *
+       * \param[in] row
+       * The index of the row whose values are to be extracted
+       *
+       * \param[out] pvals
+       * A \transient array that receives the values
+       *
+       * \returns The number of values extracted
+       */
+      template<typename DT2_>
+      Index get_row_values(const Index row, DT2_ * const pvals) const
+      {
+        const IT_ * prow_ptr(this->row_ptr());
+        const DT_ * pval(this->val());
+
+        const Index start = Index(prow_ptr[row]);
+        const Index end = Index(prow_ptr[row + 1] - prow_ptr[row]);
+        for (Index i(0); i < end; ++i)
+        {
+          pvals[i] = DT2_(pval[start + i]);
+        }
+        return end;
+      }
+
+      /**
+       * \brief Overwrites the values for a given row
+       *
+       * \param[in] row
+       * The index of the row whose values are to be written
+       *
+       * \param[out] pvals
+       * A \transient array containing the values to write to the row
+       *
+       * \returns The number of values written
+       */
+      template<typename DT2_>
+      Index set_row_values(const Index row, const DT2_ * const pvals)
+      {
+        const IT_ * prow_ptr(this->row_ptr());
+        DT_ * pval(this->val());
+
+        const Index start = Index(prow_ptr[row]);
+        const Index end = Index(prow_ptr[row + 1] - prow_ptr[row]);
+        for (Index i(0); i < end; ++i)
+        {
+          pval[start + i] = DT_(pvals[i]);
+        }
+        return end;
+      }
+
+
       /// \cond internal
 
       /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays

@@ -405,6 +405,12 @@ namespace FEAT
        */
       void permute_indices(const Adjacency::Permutation& inv_perm);
 
+      /// \returns The size of the graph object in bytes.
+      std::size_t bytes() const
+      {
+        return (_image_idx.size() + _domain_ptr.size()) * sizeof(Index);
+      }
+
       /**
        * \brief Serializes the graph into a buffer.
        */

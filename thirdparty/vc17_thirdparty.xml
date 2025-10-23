@@ -97,9 +97,9 @@
     <FeatTPLDef Condition="'$(FeatHaveFParser)'=='true'"
       Include="FEAT_HAVE_FPARSER" />
     <FeatTPLDef Condition="'$(FeatHaveHypre)'=='true' And '$(EnableMPI)'=='true'"
-      Include="FEAT_HAVE_HYPRE;HYPRE_HAVE_MPI" />
+      Include="FEAT_HAVE_HYPRE;HYPRE_HAVE_MPI;FEAT_TPL_HYPRE_INT64" />
     <FeatTPLDef Condition="'$(FeatHaveHypre)'=='true' And '$(EnableMPI)'=='false'"
-      Include="FEAT_HAVE_HYPRE;HYPRE_SEQUENTIAL" />
+      Include="FEAT_HAVE_HYPRE;HYPRE_SEQUENTIAL;FEAT_TPL_HYPRE_INT64" />
     <FeatTPLDef Condition="'$(FeatHaveParMetis)'=='true'"
       Include="FEAT_HAVE_METIS;FEAT_HAVE_PARMETIS" />
     <FeatTPLDef Condition="'$(FeatHavePmp)'=='true'"
@@ -107,7 +107,7 @@
     <FeatTPLDef Condition="'$(FeatHaveSuiteSparse)'=='true'"
       Include="FEAT_HAVE_SUITESPARSE;FEAT_HAVE_UMFPACK" />
     <FeatTPLDef Condition="'$(FeatHaveSuperLU)'=='true'"
-      Include="FEAT_HAVE_SUPERLU_DIST" />
+      Include="FEAT_HAVE_SUPERLU_DIST;FEAT_TPL_SUPERLU_INT64" />
     <FeatTPLDef Condition="'$(FeatHaveTriangle)'=='true'"
       Include="FEAT_HAVE_TRIANGLE" />
     <FeatTPLDef Condition="'$(FeatHaveZfp)'=='true'"

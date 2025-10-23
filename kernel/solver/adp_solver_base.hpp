@@ -7,7 +7,7 @@
 
 // includes, FEAT
 #include <kernel/solver/base.hpp>
-#include <kernel/global/alg_dof_parti.hpp>
+#include <kernel/global/alg_dof_parti_system.hpp>
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/filter.hpp>
 #include <kernel/global/vector.hpp>
@@ -18,16 +18,16 @@ namespace FEAT
   namespace Solver
   {
     /**
-     * \brief Base-Class for Solvers based on Algebraic-DOF-Partitioning
+     * \brief Base-Class for solvers based on Algebraic-DOF-Partitioning
      *
      * This class template specifies a common interface for solvers based on algebraic DOF partitioning.
      * There are two specializations of this class, which depend on the type of the system matrix.
      *
      * \attention
      * This class is only defined for this doxygen documentation! There exists no generic implementation
-     * of this class template, but only the two specializations for Global::Matrix and Global::PMDCDSCMatrix,
-     * however, both these specializations implement the same protected interface, which is defined in
-     * this generic template.
+     * of this class template, but only the three specializations for Global::Matrix, Global::PMDCDSCMatrix
+     * and any purely local LAFEM container, however, all of these specializations implement the same protected
+     * interface, which is documented in this generic template.
      *
      * \tparam Matrix_
      * The type of the system matrix that is to be used by the solver.
@@ -55,112 +55,174 @@ namespace FEAT
       /// \returns A pointer to the underlying communicator
       const Dist::Comm* _get_comm() const;
 
-      /// \returns The number of DOFs owned by this process.
-      Index _get_num_owned_dofs() const;
+      /// \returns The size of the local ADP vector; equal to _get_num_owned_dofs()
+      Index _get_adp_vector_size() const;
 
-      /// \returns The total number of DOFs over all processes.
+      /// \returns The number of rows of the local ADP matrix; equal to _get_num_owned_dofs()
+      Index _get_adp_matrix_num_rows() const;
+
+      /// \returns The number of columns of the local ADP matrix; equal to _get_num_global_dofs()
+      Index _get_adp_matrix_num_cols() const;
+
+      /// \returns The number of nonzero entries of the local ADP matrix
+      Index _get_adp_matrix_num_nzes() const;
+
+      /// \returns The total number of nonzero entries of the global ADP matrix
+      Index _get_num_global_nonzeros() const;
+
+      /// \returns The total number of global DOFs on all processes
       Index _get_num_global_dofs() const;
 
-      /// \returns The offset of the first global DOF index of this process.
+      /// \returns The number of global DOFs owned by this process
+      Index _get_num_owned_dofs() const;
+
+      /// \returns The index of the first global DOF owned by this process
       Index _get_global_dof_offset() const;
 
-      /// \returns The number of non-zero entries in this process's matrix partition
-      Index _get_mat_num_nze() const;
+      /**
+       * \brief Uploads the ADP matrix structure to the given arrays
+       *
+       * \param[out] row_ptr
+       * A \transient pointer to an array of length _get_adp_matrix_num_rows()+1 that receives the
+       * the row-pointer array of the local ADP matrix.
+       *
+       * \param[out] col_idx
+       * A \transient pointer to an array of length _get_adp_matrix_num_nzes() that receives the
+       * column index array of the local ADP matrix.
+       */
+      template<typename RPT_, typename CIT_>
+      void _upload_symbolic(RPT_* row_ptr, CIT_* col_idx);
 
-      /// \returns The value array of the matrix partition.
-      const DataType* _get_mat_vals() const;
+      /**
+       * \brief Uploads the (filtered) ADP matrix values to the given array
+       *
+       * \param[out] val
+       * A \transient pointer to an array of length _get_adp_matrix_num_nzes() that receives the
+       * filtered matrix values of the local ADP matrix.
+       *
+       * \param[in] row_ptr
+       * A \transient pointer to the row-pointer array of the ADP matrix as returned by the
+       * _upload_symbolic() function.
+       *
+       * \param[in] col_idx
+       * A \transient pointer to the column-index array of the ADP matrix as returned by the
+       * _upload_symbolic() function.
+       */
+      template<typename DTV_, typename RPT_, typename CIT_>
+      void _upload_numeric(DTV_* val, const RPT_* row_ptr, const CIT_* col_idx);
 
-      /// \returns The row-pointer array of the matrix partition.
-      const IndexType* _get_mat_row_ptr() const;
+      /**
+       * \brief Uploads the ADP vector values to the given array
+       *
+       * \param[out] val
+       * A \transient pointer to an array of length _get_adp_vector_size() that receives the
+       * local ADP values of the input vector given by \p vector.
+       *
+       * \param[in] vector
+       * A \transient reference to the local vector that is to be uploaded to the ADP value array.
+       */
+      template<typename DTV_>
+      void _upload_vector(DTV_* val, const LocalVectorType& vector);
 
-      /// \returns The column-index array of the matrix partition.
-      const IndexType* _get_mat_col_idx() const;
-
-      /// \returns The data array of the owned defect vector.
-      const DataType* _get_vec_def_vals(const VectorType& vec_def);
-
-      /// \returns The data array of the owned defect vector.
-      DataType* _get_vec_def_vals(VectorType& vec_def);
-
-      /// \returns The data array of the owned correction vector.
-      DataType* _get_vec_cor_vals(VectorType& vec_cor);
-
-      /// \returns Uploads a defect vector.
-      void _upload_vec_def(const VectorType& vec_def);
-
-      /// \returns Uploads a correction vector.
-      void _upload_vec_cor(const VectorType& vec_cor);
-
-      /// \returns Downloads a defect vector.
-      void _download_vec_def(VectorType& vec_def);
-
-      /// \returns Downloads a correction vector.
-      void _download_vec_cor(VectorType& vec_cor);
+      /**
+       * \brief Downloads the ADP vector values from the given array
+       *
+       * \param[inout] vector
+       * A \transient reference to the local vector that receives the downloaded ADP value array.
+       * It is assumed to be allocated to the correct size, but its contents on entry are ignored.
+       *
+       * \param[in] val
+       * A \transient pointer to an array of length _get_adp_vector_size() that contains the
+       * ADP values that are to be downloaded to the output vector given by \p vector.
+       */
+      template<typename DTV_>
+      void _download_vector(LocalVectorType& vector, const DTV_* val);
     }; // class ADPSolverBase
 #endif // DOXYGEN
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * \brief Implementation of ADPSolverBase interface for Global::Matrix instances
      *
      * This class implements the ADPSolverBase interface for Global::Matrix instances, which derive
-     * from standard (scalar) finite element discretizations. Most of the dirty work is outsourced
-     * to the Global::AlgDofParti, Global::AlgDofPartiVector and Global::AlgDoPartiMatrix classes.
-     *
-     * \note
-     * Although this class does not explicitly expect the local matrix to be a LAFEM::SparseMatrixCSR,
-     * this is (currently) the only matrix type that is supported by the underlying Global::AlgDofParti
-     * class template.
+     * from standard finite element discretizations. Most of the dirty work is outsourced
+     * to the Global::AlgDofParti and Global::AlgDofPartiSystem classes.
      *
      * \author Peter Zajac
      */
-    template<typename LocalMatrix_, typename Mirror_, typename GlobalFilter_, typename SolverBase_>
-    class ADPSolverBase<Global::Matrix<LocalMatrix_, Mirror_, Mirror_>, GlobalFilter_, SolverBase_> :
-      //public SolverBase<Global::Vector<typename LocalMatrix_::VectorTypeL, Mirror_>>
+    template<typename LocalMatrix_, typename Mirror_, typename LocalFilter_, typename SolverBase_>
+    class ADPSolverBase<Global::Matrix<LocalMatrix_, Mirror_, Mirror_>, Global::Filter<LocalFilter_, Mirror_>, SolverBase_> :
       public SolverBase_
     {
     public:
+      /// the local matrix type
       typedef LocalMatrix_ LocalMatrixType;
+      /// the local vector type
       typedef typename LocalMatrixType::VectorTypeL LocalVectorType;
+      /// the local filter type
+      typedef LocalFilter_ LocalFilterType;
+      /// the mirror type
       typedef Mirror_ MirrorType;
 
+      /// the global matrix type
       typedef Global::Matrix<LocalMatrixType, MirrorType, MirrorType> GlobalMatrixType;
+      /// the global vector type
       typedef Global::Vector<LocalVectorType, MirrorType> GlobalVectorType;
-      typedef GlobalFilter_ GlobalFilterType;
+      /// the global filter type
+      typedef Global::Filter<LocalFilterType, MirrorType> GlobalFilterType;
 
-      //typedef SolverBase<GlobalVectorType> BaseClass;
+      /// our base class
       typedef SolverBase_ BaseClass;
 
+      /// the system matrix type; coincides with the global matrix type
+      typedef GlobalMatrixType MatrixType;
+      /// the system vector type; coincides with the global vector type
       typedef GlobalVectorType VectorType;
+      /// the system filter type; coincides with the global filter type
+      typedef GlobalFilterType FilterType;
 
+      /// the algebraic dof partitioning instance for this class
       typedef Global::AlgDofParti<LocalVectorType, MirrorType> AlgDofPartiType;
-      typedef Global::AlgDofPartiMatrix<LocalMatrixType, MirrorType> ADPMatrixType;
-      typedef Global::AlgDofPartiVector<LocalVectorType, MirrorType> ADPVectorType;
+      /// the algebraic dof partitioning system instance for this class
+      typedef Global::AlgDofPartiSystem<LocalMatrixType, LocalFilterType, MirrorType> AlgDofPartiSystemType;
 
+      /// our internal data type
       typedef typename AlgDofPartiType::DataType DataType;
+      /// our internal index type
       typedef typename AlgDofPartiType::IndexType IndexType;
 
-    private:
-      /// the algebraic DOF partitioning
-      AlgDofPartiType _alg_dof_parti;
-      /// the ADP matrix
-      ADPMatrixType _adp_matrix;
-      /// two ADP vectors for correction and defect vectors
-      ADPVectorType _adp_vec_def, _adp_vec_cor;
+      /// the ADP matrix type; this is always a (globally partitioned) CSR matrix
+      typedef LAFEM::SparseMatrixCSR<DataType, IndexType> ADPMatrixType;
+      /// the ADP vector type; this is always a (globally partitioned) dense vector
+      typedef LAFEM::DenseVector<DataType, IndexType> ADPVectorType;
 
     protected:
       /// the global system matrix
       const GlobalMatrixType& _system_matrix;
       /// the global system filter
       const GlobalFilterType& _system_filter;
+      /// the algebraic DOF partitioning
+      std::shared_ptr<AlgDofPartiSystemType> _adp_system;
 
+      /**
+       * \brief protected constructor
+       *
+       * \param[in] matrix
+       * A \resident reference to the system matrix
+       *
+       * \param[in] filter
+       * A \resident reference to the system filter
+       */
       explicit ADPSolverBase(const GlobalMatrixType& matrix, const GlobalFilterType& filter) :
         BaseClass(),
-        _alg_dof_parti(),
-        _adp_matrix(),
-        _adp_vec_def(),
-        _adp_vec_cor(),
         _system_matrix(matrix),
-        _system_filter(filter)
+        _system_filter(filter),
+        _adp_system()
       {
       }
 
@@ -172,131 +234,194 @@ namespace FEAT
       }
 
       /**
-       * \brief Symbolic Initialization
+       * \brief Symbolic initialization
        *
-       * This function assembles the algebraic DOF partitioning, creates the ADP matrix,
-       * uploads the matrix structure and creates the two ADP vectors.
+       * This function performs the symbolic initialization of the algebraic DOF partitioning, which pre-computes
+       * the actual algebraic DOF partitioning. After this function call, the derived class has to call the
+       * corresponding upload functions to retrieve the ADP matrix arrays.
        */
       virtual void init_symbolic() override
       {
         BaseClass::init_symbolic();
 
         // assemble the algebraic dof partitioning
-        _alg_dof_parti.assemble_by_gate(*this->_system_matrix.get_row_gate());
-
-        // upload the matrix structure
-        _adp_matrix = ADPMatrixType(&this->_alg_dof_parti);
-        _adp_matrix.upload_symbolic(this->_system_matrix);
-
-        // create two vectors
-        _adp_vec_def = ADPVectorType(&this->_alg_dof_parti);
-        _adp_vec_cor = ADPVectorType(&this->_alg_dof_parti);
-
-        // format matrix and vectors
-        _adp_matrix.owned().format();
-        _adp_vec_def.owned().format();
-        _adp_vec_cor.owned().format();
+        this->_adp_system = std::make_shared<AlgDofPartiSystemType>(this->_system_matrix, this->_system_filter);
+        this->_adp_system->init_symbolic();
       }
 
       /**
-       * \brief Numeric Initialization
+       * \brief Symbolic finalization
        *
-       * This function uploads the numeric matrix values and
-       * applies the filter onto the ADP matrix.
+       * This function releases all data allocated during the symbolic initialization phase.
        */
-      virtual void init_numeric() override
-      {
-        BaseClass::init_numeric();
-
-        // upload matrix values
-        _adp_matrix.upload_numeric(this->_system_matrix);
-
-        // filter matrix
-        _adp_matrix.filter_matrix(this->_system_filter);
-      }
-
       virtual void done_symbolic() override
       {
-        _adp_vec_cor.clear();
-        _adp_vec_def.clear();
-        _adp_matrix.clear();
-        _alg_dof_parti.clear();
+        _adp_system.reset();
 
         BaseClass::done_symbolic();
       }
 
     protected:
-      Index _get_num_owned_dofs() const
+      /// \returns The size of the local ADP vector; equal to _get_num_owned_dofs()
+      Index _get_adp_vector_size() const
       {
-        return this->_alg_dof_parti.get_num_owned_dofs();
+        return this->_adp_system->get_adp_vector_size();
       }
 
+      /// \returns The number of rows of the local ADP matrix; equal to _get_num_owned_dofs()
+      Index _get_adp_matrix_num_rows() const
+      {
+        return this->_adp_system->get_adp_matrix_rows();
+      }
+
+      /// \returns The number of columns of the local ADP matrix; equal to _get_num_global_dofs()
+      Index _get_adp_matrix_num_cols() const
+      {
+        return this->_adp_system->get_adp_matrix_cols();
+      }
+
+      /// \returns The number of nonzero entries of the local ADP matrix
+      Index _get_adp_matrix_num_nzes() const
+      {
+        return this->_adp_system->get_adp_matrix_nzes();
+      }
+
+      /// \returns The total number of nonzero entries of the global ADP matrix
+      Index _get_num_global_nonzeros() const
+      {
+        return this->_adp_system->get_num_global_nonzeros();
+      }
+
+      /// \returns The total number of global DOFs on all processes
       Index _get_num_global_dofs() const
       {
-        return this->_alg_dof_parti.get_num_global_dofs();
+        return this->_adp_system->get_num_global_dofs();
       }
 
+      /// \returns The number of global DOFs owned by this process
+      Index _get_num_owned_dofs() const
+      {
+        return this->_adp_system->get_num_owned_dofs();
+      }
+
+      /// \returns The index of the first global DOF owned by this process
       Index _get_global_dof_offset() const
       {
-        return this->_alg_dof_parti.get_global_dof_offset();
+        return this->_adp_system->get_global_dof_offset();
       }
 
-      Index _get_mat_num_nze() const
+      /**
+       * \brief Uploads the ADP matrix structure to the given arrays
+       *
+       * \param[out] row_ptr
+       * A \transient pointer to an array of length _get_adp_matrix_num_rows()+1 that receives the
+       * the row-pointer array of the ADP matrix.
+       *
+       * \param[out] col_idx
+       * A \transient pointer to an array of length _get_adp_matrix_num_nzes() that receives the
+       * column index array of the ADP matrix.
+       */
+      template<typename RPT_, typename CIT_>
+      void _upload_symbolic(RPT_* row_ptr, CIT_* col_idx)
       {
-        return this->_adp_matrix.owned().used_elements();
+        this->_adp_system->upload_matrix_symbolic(row_ptr, col_idx);
       }
 
-      const DataType* _get_mat_vals() const
+      /**
+       * \brief Uploads the (filtered) ADP matrix values to the given array
+       *
+       * \param[out] val
+       * A \transient pointer to an array of length _get_adp_matrix_num_nzes() that receives the
+       * filtered matrix values of the local ADP matrix.
+       *
+       * \param[in] row_ptr
+       * A \transient pointer to the row-pointer array of the ADP matrix as returned by the
+       * _upload_symbolic() function.
+       *
+       * \param[in] col_idx
+       * A \transient pointer to the column-index array of the ADP matrix as returned by the
+       * _upload_symbolic() function.
+       */
+      template<typename DTV_, typename RPT_, typename CIT_>
+      void _upload_numeric(DTV_* val, const RPT_* row_ptr, const CIT_* col_idx)
       {
-        return this->_adp_matrix.owned().val();
+        this->_adp_system->upload_matrix_numeric(val, row_ptr, col_idx);
+        this->_adp_system->upload_filter();
+        this->_adp_system->filter_matrix(val, row_ptr, col_idx);
       }
 
-      const IndexType* _get_mat_row_ptr() const
+      /**
+       * \brief Uploads the ADP vector values to the given array
+       *
+       * \param[out] val
+       * A \transient pointer to an array of length _get_adp_vector_size() that receives the
+       * local ADP values of the input vector given by \p vector.
+       *
+       * \param[in] vector
+       * A \transient reference to the global vector that is to be uploaded to the ADP value array.
+       */
+      template<typename DTV_>
+      void _upload_vector(DTV_* val, const GlobalVectorType& vector)
       {
-        return this->_adp_matrix.owned().row_ptr();
+        this->_adp_system->upload_vector(val, vector.local());
       }
 
-      const IndexType* _get_mat_col_idx() const
+      /**
+       * \brief Uploads the ADP vector values to the given array
+       *
+       * \param[out] val
+       * A \transient pointer to an array of length _get_adp_vector_size() that receives the
+       * local ADP values of the input vector given by \p vector.
+       *
+       * \param[in] vector
+       * A \transient reference to the local vector that is to be uploaded to the ADP value array.
+       */
+      template<typename DTV_>
+      void _upload_vector(DTV_* val, const LocalVectorType& vector)
       {
-        return this->_adp_matrix.owned().col_ind();
+        this->_adp_system->upload_vector(val, vector);
       }
 
-      const DataType* _get_vec_def_vals(const VectorType&)
+      /**
+       * \brief Downloads the ADP vector values from the given array
+       *
+       * \param[inout] vector
+       * A \transient reference to the global vector that receives the downloaded ADP value array.
+       * It is assumed to be allocated to the correct size, but its contents on entry are ignored.
+       *
+       * \param[in] val
+       * A \transient pointer to an array of length _get_adp_vector_size() that contains the
+       * ADP values that are to be downloaded to the output vector given by \p vector.
+       */
+      template<typename DTV_>
+      void _download_vector(GlobalVectorType& vector, const DTV_* val)
       {
-        return this->_adp_vec_def.owned().elements();
+        this->_adp_system->download_vector(vector.local(), val);
       }
 
-      DataType* _get_vec_def_vals(VectorType&)
+      /**
+       * \brief Downloads the ADP vector values from the given array
+       *
+       * \param[inout] vector
+       * A \transient reference to the local vector that receives the downloaded ADP value array.
+       * It is assumed to be allocated to the correct size, but its contents on entry are ignored.
+       *
+       * \param[in] val
+       * A \transient pointer to an array of length _get_adp_vector_size() that contains the
+       * ADP values that are to be downloaded to the output vector given by \p vector.
+       */
+      template<typename DTV_>
+      void _download_vector(LocalVectorType& vector, const DTV_* val)
       {
-        return this->_adp_vec_def.owned().elements();
-      }
-
-      DataType* _get_vec_cor_vals(VectorType&)
-      {
-        return this->_adp_vec_cor.owned().elements();
-      }
-
-      void _upload_vec_def(const VectorType& vec_def)
-      {
-        this->_adp_vec_def.upload(vec_def);
-      }
-
-      void _upload_vec_cor(const VectorType& vec_cor)
-      {
-        this->_adp_vec_cor.upload(vec_cor);
-      }
-
-      void _download_vec_def(VectorType& vec_def)
-      {
-        this->_adp_vec_def.download(vec_def);
-      }
-
-      void _download_vec_cor(VectorType& vec_cor)
-      {
-        this->_adp_vec_cor.download(vec_cor);
+        this->_adp_system->download_vector(vector, val);
       }
     }; // class ADPSolverBase<Global::Matrix<...>, ...>
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * \brief Implementation of ADPSolverBase interface for Global::PMDCDSCMatrix instances
@@ -307,39 +432,38 @@ namespace FEAT
      * is the Pressure-Poisson-Problem solver of the infamous "PP" application.
      *
      * Most of the dirty work is outsourced to the Global::PMDCDSCMatrix class, most notably to
-     * its two member functions Global::PMDCDSCMatrix::asm_adp_symbolic() and
-     * Global::PMDCDSCMatrix::asm_adp_numeric().
+     * its three member functions Global::PMDCDSCMatrix::adp_compute_counts(),
+     * Global::PMDCDSCMatrix::adp_upload_symbolic() and Global::PMDCDSCMatrix::adp_upload_numeric().
      *
      * \author Peter Zajac
      */
     template<typename MatrixB_, typename MatrixD_, typename GlobalFilter_, typename SolverBase_>
     class ADPSolverBase<Global::PMDCDSCMatrix<MatrixB_, MatrixD_>, GlobalFilter_, SolverBase_> :
-      //public SolverBase<typename Global::PMDCDSCMatrix<MatrixB_, MatrixD_>::VectorTypeL>
       public SolverBase_
     {
     public:
+      /// the global matrix type
       typedef Global::PMDCDSCMatrix<MatrixB_, MatrixD_> GlobalMatrixType;
+      /// the global vector type
+      typedef typename GlobalMatrixType::VectorTypeL GlobalVectorType;
+      /// the global filter type
       typedef GlobalFilter_ GlobalFilterType;
 
+      /// the local Schur-complement matrix type
       typedef typename GlobalMatrixType::LocalMatrixTypeS LocalMatrixTypeS;
+      /// our internal local vector type; always a DenseVector<DataType, IndexType>
+      typedef typename LocalMatrixTypeS::VectorTypeL LocalVectorType;
 
-      typedef typename GlobalMatrixType::VectorTypeL GlobalVectorType;
-
-      //typedef SolverBase<GlobalVectorType> BaseClass;
+      /// our base class
       typedef SolverBase_ BaseClass;
 
+      /// the system vector type
       typedef GlobalVectorType VectorType;
 
+      /// our internal data type
       typedef typename LocalMatrixTypeS::DataType DataType;
+      /// our internal index type
       typedef typename LocalMatrixTypeS::IndexType IndexType;
-
-    private:
-      /// our global DOF offset
-      Index _glob_dof_offset;
-      // the total global DOF count
-      Index _glob_dof_count;
-      /// our Schur-complement matrix slice
-      LocalMatrixTypeS _matrix_slice;
 
     protected:
       /// the global system matrix
@@ -347,12 +471,37 @@ namespace FEAT
       /// the global system filter
       const GlobalFilterType& _system_filter;
 
+    private:
+      /// the total global DOF count
+      Index _global_dof_count;
+      /// our global DOF offset
+      Index _global_dof_offset;
+      /// the owned DOF count
+      Index _owned_dof_count;
+      /// the number of owned non-zero entries
+      Index _owned_num_nzes;
+      /// the number of global non-zero entries
+      Index _global_num_nzes;
+
+    protected:
+      /**
+       * \brief protected constructor
+       *
+       * \param[in] matrix
+       * A \resident reference to the system matrix
+       *
+       * \param[in] filter
+       * A \resident reference to the system filter
+       */
       explicit ADPSolverBase(const GlobalMatrixType& matrix, const GlobalFilterType& filter) :
         BaseClass(),
-        _glob_dof_offset(0),
-        _glob_dof_count(0),
         _system_matrix(matrix),
-        _system_filter(filter)
+        _system_filter(filter),
+        _global_dof_count(0),
+        _global_dof_offset(0),
+        _owned_dof_count(0),
+        _owned_num_nzes(0),
+        _global_num_nzes(0)
       {
       }
 
@@ -363,102 +512,493 @@ namespace FEAT
         return this->_system_matrix.get_comm();
       }
 
+      /**
+       * \brief Symbolic initialization
+       *
+       * This function performs the symbolic initialization of the algebraic DOF partitioning, which boils down to
+       * computing the ADP matrix dimensions for this specialization.
+       */
       virtual void init_symbolic() override
       {
         BaseClass::init_symbolic();
 
-        // assemble matrix slice structure
-        _matrix_slice = _system_matrix.asm_adp_symbolic(_glob_dof_offset, _glob_dof_count);
-      }
-
-      virtual void init_numeric() override
-      {
-        BaseClass::init_numeric();
-
-        // upload matrix values
-        _system_matrix.asm_adp_numeric(_matrix_slice);
-
-        // filter matrix
-        this->_system_filter.local().filter_mat(_matrix_slice);
-      }
-
-      virtual void done_symbolic() override
-       {
-        _matrix_slice.clear();
-        BaseClass::done_symbolic();
+        // compute the ADP dimensions
+        _system_matrix.adp_compute_counts(_global_dof_offset, _global_dof_count, _owned_dof_count, _owned_num_nzes, _global_num_nzes);
       }
 
     protected:
+      /// \returns The size of the local ADP vector; equal to _get_num_owned_dofs()
+      Index _get_adp_vector_size() const
+      {
+        return _get_num_owned_dofs();
+      }
 
+      /// \returns The number of rows of the local ADP matrix; equal to _get_num_owned_dofs()
+      Index _get_adp_matrix_num_rows() const
+      {
+        return _get_num_owned_dofs();
+      }
+
+      /// \returns The number of columns of the local ADP matrix; equal to _get_num_global_dofs()
+      Index _get_adp_matrix_num_cols() const
+      {
+        return _get_num_global_dofs();
+      }
+
+      /// \returns The number of nonzero entries of the local ADP matrix
+      Index _get_adp_matrix_num_nzes() const
+      {
+        return _owned_num_nzes;
+      }
+
+      /// \returns The total number of nonzero entries of the global ADP matrix
+      Index _get_num_global_nonzeros() const
+      {
+        return _global_num_nzes;
+      }
+
+      /// \returns The total number of global DOFs on all processes
       Index _get_num_global_dofs() const
       {
-        return _glob_dof_count;
+        return _global_dof_count;
       }
 
-      Index _get_global_dof_offset() const
-      {
-        return _glob_dof_offset;
-      }
-
+      /// \returns The number of global DOFs owned by this process
       Index _get_num_owned_dofs() const
       {
-        return _matrix_slice.rows();
+        return _owned_dof_count;
       }
 
-      Index _get_mat_num_nze() const
+      /// \returns The index of the first global DOF owned by this process
+      Index _get_global_dof_offset() const
       {
-        return _matrix_slice.used_elements();
+        return _global_dof_offset;
       }
 
-      const DataType* _get_mat_vals() const
+      /**
+       * \brief Uploads the ADP matrix structure to the given arrays
+       *
+       * \param[out] row_ptr
+       * A \transient pointer to an array of length _get_adp_matrix_num_rows()+1 that receives the
+       * the row-pointer array of the ADP matrix.
+       *
+       * \param[out] col_idx
+       * A \transient pointer to an array of length _get_adp_matrix_num_nzes() that receives the
+       * column index array of the ADP matrix.
+       */
+      template<typename RPT_, typename CIT_>
+      void _upload_symbolic(RPT_* row_ptr, CIT_* col_idx)
       {
-        return _matrix_slice.val();
+        _system_matrix.adp_upload_symbolic(row_ptr, col_idx, _global_dof_offset);
       }
 
-      const IndexType* _get_mat_row_ptr() const
+      /**
+       * \brief Uploads the (filtered) ADP matrix values to the given array
+       *
+       * \param[out] val
+       * A \transient pointer to an array of length _get_adp_matrix_num_nzes() that receives the
+       * filtered matrix values of the local ADP matrix.
+       *
+       * \param[in] row_ptr
+       * A \transient pointer to the row-pointer array of the ADP matrix as returned by the
+       * _upload_symbolic() function.
+       *
+       * \param[in] col_idx
+       * A \transient pointer to the column-index array of the ADP matrix as returned by the
+       * _upload_symbolic() function.
+       */
+      template<typename DTV_, typename RPT_, typename CIT_>
+      void _upload_numeric(DTV_* val, const RPT_* row_ptr, const CIT_* col_idx)
       {
-        return _matrix_slice.row_ptr();
+        _system_matrix.adp_upload_numeric(val, row_ptr, col_idx);
+        this->_filter_mat(val, row_ptr, col_idx, this->_system_filter.local());
       }
 
-      const IndexType* _get_mat_col_idx() const
+      /**
+       * \brief Uploads the ADP vector values to the given array
+       *
+       * \param[out] val
+       * A \transient pointer to an array of length _get_adp_vector_size() that receives the
+       * local ADP values of the input vector given by \p vector.
+       *
+       * \param[in] vector
+       * A \transient reference to the local vector that is to be uploaded to the ADP value array.
+       */
+      template<typename DTV_>
+      void _upload_vector(DTV_* val, const LAFEM::DenseVector<DataType, IndexType>& vector)
       {
-        return _matrix_slice.col_ind();
+        const Index n = _get_adp_vector_size();
+        const DataType* vx = vector.elements();
+
+        XASSERT(vector.size() == n);
+
+        FEAT_PRAGMA_OMP(parallel for)
+        for(Index i = 0; i < n; ++i)
+          val[i] = DTV_(vx[i]);
       }
 
-      const DataType* _get_vec_def_vals(const VectorType& vec_def)
+      /**
+       * \brief Downloads the ADP vector values from the given array
+       *
+       * \param[inout] vector
+       * A \transient reference to the local vector that receives the downloaded ADP value array.
+       * It is assumed to be allocated to the correct size, but its contents on entry are ignored.
+       *
+       * \param[in] val
+       * A \transient pointer to an array of length _get_adp_vector_size() that contains the
+       * ADP values that are to be downloaded to the output vector given by \p vector.
+       */
+      template<typename DTV_>
+      void _download_vector(LAFEM::DenseVector<DataType, IndexType>& vector, const DTV_* val)
       {
-        return vec_def.local().elements();
+        const Index n = _get_adp_vector_size();
+        DataType* vx = vector.elements();
+
+        XASSERT(vector.size() == n);
+
+        FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < n; ++i)
+            vx[i] = DataType(val[i]);
       }
 
-      DataType* _get_vec_def_vals(VectorType& vec_def)
-      {
-        return vec_def.local().elements();
-      }
-
-      DataType* _get_vec_cor_vals(VectorType& vec_cor)
-      {
-        return vec_cor.local().elements();
-      }
-
-      void _upload_vec_def(const VectorType&)
+      /// auxiliary function: filters the local ADP matrix
+      template<typename DTV_, typename RPT_, typename CIT_>
+      void _filter_mat(DTV_*, const RPT_*, const CIT_*,
+        const LAFEM::NoneFilter<DataType, IndexType>&)
       {
         // nothing to do here
       }
 
-      void _upload_vec_cor(const VectorType&)
+      /// auxiliary function: filters the local ADP matrix
+      template<typename DTV_, typename RPT_, typename CIT_>
+      void _filter_mat(DTV_* val, const RPT_* row_ptr, const CIT_* col_idx,
+        const LAFEM::UnitFilter<DataType, IndexType>& filter)
       {
-        // nothing to do here
+        const IndexType n = filter.used_elements();
+        const IndexType* fil_idx = filter.get_indices();
+        for(IndexType i = 0; i < n; ++i)
+        {
+          const Index row = fil_idx[i];
+          for(RPT_ j = row_ptr[row]; j < row_ptr[row+1]; ++j)
+            val[j] = DTV_(Index(col_idx[j]) == row ? 1 : 0);
+        }
       }
 
-      void _download_vec_def(VectorType&)
+      /// auxiliary function: filters the local ADP matrix
+      template<typename DTV_, typename RPT_, typename CIT_>
+      void _filter_mat(DTV_*, const RPT_*, const CIT_*,
+        const LAFEM::MeanFilter<DataType, IndexType>& filter)
       {
-        // nothing to do here
+        XASSERTM(filter.empty(), "LAFEM::MeanFilter is not supported by ADPSolverBase yet!");
       }
 
-      void _download_vec_cor(VectorType&)
+      /// auxiliary function: filters the local ADP matrix
+      template<typename DTV_, typename RPT_, typename CIT_>
+      void _filter_mat(DTV_*, const RPT_*, const CIT_*,
+        const Global::MeanFilter<DataType, IndexType>& filter)
       {
-        // nothing to do here
+        XASSERTM(filter.empty(), "LAFEM::MeanFilter is not supported by ADPSolverBase yet!");
+      }
+
+      /// auxiliary function: filters the local ADP matrix
+      template<typename DTV_, typename RPT_, typename CIT_, typename SubFilter_>
+      void _filter_mat(DTV_* val, const RPT_* row_ptr, const CIT_* col_idx,
+        const LAFEM::FilterSequence<SubFilter_>& filter)
+      {
+        for(const auto& sf : filter)
+          this->_filter_mat(val, row_ptr, col_idx, sf.second);
+      }
+
+      /// auxiliary function: filters the local ADP matrix
+      template<typename DTV_, typename RPT_, typename CIT_, typename First_, typename... Rest_>
+      void _filter_mat(DTV_* val, const RPT_* row_ptr, const CIT_* col_idx,
+        const LAFEM::FilterChain<First_, Rest_...>& filter)
+      {
+        this->_filter_mat(val, row_ptr, col_idx, filter.first());
+        this->_filter_mat(val, row_ptr, col_idx, filter.rest());
+      }
+
+      /// auxiliary function: filters the local ADP matrix
+      template<typename DTV_, typename RPT_, typename CIT_, typename First_>
+      void _filter_mat(DTV_* val, const RPT_* row_ptr, const CIT_* col_idx,
+        const LAFEM::FilterChain<First_>& filter)
+      {
+        this->_filter_mat(val, row_ptr, col_idx, filter.first());
       }
     }; // class ADPSolverBase<Global::PMDCDSCMatrix<...>, ...>
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+    /**
+     * \brief Implementation of ADPSolverBase interface (purely local) LAFEM matrices
+     *
+     * This class implements the ADPSolverBase interface for all possible instances of purely local LAFEM matrices,
+     * including meta matrix containers such as e.g. LAFEM::TupleMatrix or LAFEM::SaddlePointMatrix.
+     * In the purely local case, the matrices are not partitioned and in the current implementation, this class does
+     * not perform any partitioning of the matrix and the derived solver class operates only on a single MPI process,
+     * which is represented by the self-communicator.
+     *
+     * \author Peter Zajac
+     */
+    template<typename Matrix_, typename Filter_, typename SolverBase_>
+    class ADPSolverBase :
+      public SolverBase_
+    {
+      /// this specialization expects a local matrix
+      static_assert(Matrix_::is_local, "invalid instantiation of ADPSolverBase for non-local matrix type!");
+
+    public:
+      /// the (local) matrix type
+      typedef Matrix_ MatrixType;
+      /// the (local) vector type
+      typedef typename MatrixType::VectorTypeL VectorType;
+      /// the (local) filter type
+      typedef Filter_ FilterType;
+
+      /// our base class
+      typedef SolverBase_ BaseClass;
+
+      /// our internal data type
+      typedef typename MatrixType::DataType DataType;
+      /// our internal index type
+      typedef typename MatrixType::IndexType IndexType;
+
+    protected:
+      /**
+       * \brief self-communicator object
+       *
+       * Many third-party libraries always expect a MPI_Comm object even if we operate only on a single
+       * MPI process, therefore this class creates a custom self-communicator that can be passed on to
+       * the third-party libraries.
+       */
+      Dist::Comm _comm_self;
+      /// the system matrix
+      const MatrixType& _system_matrix;
+      /// the system filter
+      const FilterType& _system_filter;
+
+    protected:
+      /**
+       * \brief protected constructor
+       *
+       * \param[in] matrix
+       * A \resident reference to the system matrix
+       *
+       * \param[in] filter
+       * A \resident reference to the system filter
+       */
+      explicit ADPSolverBase(const MatrixType& matrix, const FilterType& filter) :
+        _comm_self(Dist::Comm::self()),
+        _system_matrix(matrix),
+        _system_filter(filter)
+      {
+      }
+
+      /// \returns A pointer to the underlying (self) communicator
+      const Dist::Comm* _get_comm() const
+      {
+        return &this->_comm_self;
+      }
+
+      /// \returns The size of the local ADP vector; equal to _get_num_owned_dofs()
+      Index _get_adp_vector_size() const
+      {
+        return _system_matrix.rows();
+      }
+
+      /// \returns The number of rows of the local ADP matrix; equal to _get_num_owned_dofs()
+      Index _get_adp_matrix_num_rows() const
+      {
+        return _system_matrix.rows();
+      }
+
+      /// \returns The number of columns of the local ADP matrix; equal to _get_num_global_dofs()
+      Index _get_adp_matrix_num_cols() const
+      {
+        return _system_matrix.columns();
+      }
+
+      /// \returns The number of nonzero entries of the local ADP matrix
+      Index _get_adp_matrix_num_nzes() const
+      {
+        return _system_matrix.template used_elements<LAFEM::Perspective::pod>();
+      }
+
+      /// \returns The total number of nonzero entries of the global ADP matrix
+      Index _get_num_global_nonzeros() const
+      {
+        return _system_matrix.template used_elements<LAFEM::Perspective::pod>();
+      }
+
+      /// \returns The total number of global DOFs on all processes
+      Index _get_num_global_dofs() const
+      {
+        return _system_matrix.rows();
+      }
+
+      /// \returns The number of global DOFs owned by this process
+      Index _get_num_owned_dofs() const
+      {
+        return _system_matrix.rows();
+      }
+
+      /// \returns The index of the first global DOF owned by this process
+      Index _get_global_dof_offset() const
+      {
+        return Index(0);
+      }
+
+      /**
+       * \brief Uploads the ADP matrix structure to the given arrays
+       *
+       * \param[out] row_ptr
+       * A \transient pointer to an array of length _get_adp_matrix_num_rows()+1 that receives the
+       * the row-pointer array of the ADP matrix.
+       *
+       * \param[out] col_idx
+       * A \transient pointer to an array of length _get_adp_matrix_num_nzes() that receives the
+       * column index array of the ADP matrix.
+       */
+      template<typename RPT_, typename CIT_>
+      void _upload_symbolic(RPT_* row_ptr, CIT_* col_idx)
+      {
+        const Index num_rows = _system_matrix.rows();
+        row_ptr[0] = RPT_(0);
+        for(Index i(0); i < num_rows; ++i)
+        {
+          row_ptr[i+1u] = row_ptr[i] + RPT_(_system_matrix.get_row_col_indices(i, &col_idx[row_ptr[i]], CIT_(0)));
+        }
+      }
+
+      /**
+       * \brief Uploads the (filtered) ADP matrix values to the given array
+       *
+       * \param[out] val
+       * A \transient pointer to an array of length _get_adp_matrix_num_nzes() that receives the
+       * filtered matrix values of the local ADP matrix.
+       *
+       * \param[in] row_ptr
+       * A \transient pointer to the row-pointer array of the ADP matrix as returned by the
+       * _upload_symbolic() function.
+       *
+       * \param[in] col_idx
+       * A \transient pointer to the column-index array of the ADP matrix as returned by the
+       * _upload_symbolic() function.
+       */
+      template<typename DTV_, typename RPT_, typename CIT_>
+      void _upload_numeric(DTV_* val, const RPT_* row_ptr, const CIT_* col_idx)
+      {
+        const Index num_rows = _system_matrix.rows();
+        for(Index i(0); i < num_rows; ++i)
+        {
+          _system_matrix.get_row_values(i, &val[row_ptr[i]]);
+        }
+
+        this->_filter_mat(val, row_ptr, col_idx, this->_system_filter);
+      }
+
+      /**
+       * \brief Uploads the ADP vector values to the given array
+       *
+       * \param[out] val
+       * A \transient pointer to an array of length _get_adp_vector_size() that receives the
+       * local ADP values of the input vector given by \p vector.
+       *
+       * \param[in] vector
+       * A \transient reference to the local vector that is to be uploaded to the ADP value array.
+       */
+      template<typename DTV_>
+      void _upload_vector(DTV_* val, const VectorType& vector)
+      {
+        vector.set_vec(val);
+      }
+
+      /**
+       * \brief Downloads the ADP vector values from the given array
+       *
+       * \param[inout] vector
+       * A \transient reference to the local vector that receives the downloaded ADP value array.
+       * It is assumed to be allocated to the correct size, but its contents on entry are ignored.
+       *
+       * \param[in] val
+       * A \transient pointer to an array of length _get_adp_vector_size() that contains the
+       * ADP values that are to be downloaded to the output vector given by \p vector.
+       */
+      template<typename DTV_>
+      void _download_vector(VectorType& vector, const DTV_* val)
+      {
+        vector.set_vec_inv(val);
+      }
+
+      /// auxiliary function: filters the local ADP matrix
+      template<typename DTV_, typename RPT_, typename CIT_>
+      void _filter_mat(DTV_*, const RPT_*, const CIT_*,
+        const LAFEM::NoneFilter<DataType, IndexType>&)
+      {
+        // nothing to do here
+      }
+
+      /// auxiliary function: filters the local ADP matrix
+      template<typename DTV_, typename RPT_, typename CIT_>
+      void _filter_mat(DTV_* val, const RPT_* row_ptr, const CIT_* col_idx,
+        const LAFEM::UnitFilter<DataType, IndexType>& filter)
+      {
+        const IndexType n = filter.used_elements();
+        const IndexType* fil_idx = filter.get_indices();
+        for(IndexType i = 0; i < n; ++i)
+        {
+          const Index row = fil_idx[i];
+          for(RPT_ j = row_ptr[row]; j < row_ptr[row+1]; ++j)
+            val[j] = DTV_(Index(col_idx[j]) == row ? 1 : 0);
+        }
+      }
+
+      /// auxiliary function: filters the local ADP matrix
+      template<typename DTV_, typename RPT_, typename CIT_>
+      void _filter_mat(DTV_*, const RPT_*, const CIT_*,
+        const LAFEM::MeanFilter<DataType, IndexType>& filter)
+      {
+        XASSERTM(filter.empty(), "LAFEM::MeanFilter is not supported by ADPSolverBase yet!");
+      }
+
+      /// auxiliary function: filters the local ADP matrix
+      template<typename DTV_, typename RPT_, typename CIT_>
+      void _filter_mat(DTV_*, const RPT_*, const CIT_*,
+        const Global::MeanFilter<DataType, IndexType>& filter)
+      {
+        XASSERTM(filter.empty(), "LAFEM::MeanFilter is not supported by ADPSolverBase yet!");
+      }
+
+      /// auxiliary function: filters the local ADP matrix
+      template<typename DTV_, typename RPT_, typename CIT_, typename SubFilter_>
+      void _filter_mat(DTV_* val, const RPT_* row_ptr, const CIT_* col_idx,
+        const LAFEM::FilterSequence<SubFilter_>& filter)
+      {
+        for(const auto& sf : filter)
+          this->_filter_mat(val, row_ptr, col_idx, sf.second);
+      }
+
+      /// auxiliary function: filters the local ADP matrix
+      template<typename DTV_, typename RPT_, typename CIT_, typename First_, typename... Rest_>
+      void _filter_mat(DTV_* val, const RPT_* row_ptr, const CIT_* col_idx,
+        const LAFEM::FilterChain<First_, Rest_...>& filter)
+      {
+        this->_filter_mat(val, row_ptr, col_idx, filter.first());
+        this->_filter_mat(val, row_ptr, col_idx, filter.rest());
+      }
+
+      /// auxiliary function: filters the local ADP matrix
+      template<typename DTV_, typename RPT_, typename CIT_, typename First_>
+      void _filter_mat(DTV_* val, const RPT_* row_ptr, const CIT_* col_idx,
+        const LAFEM::FilterChain<First_>& filter)
+      {
+        this->_filter_mat(val, row_ptr, col_idx, filter.first());
+      }
+    }; // class ADPSolverBase<...>
   } // namespace Solver
 } // namespace FEAT

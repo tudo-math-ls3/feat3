@@ -806,6 +806,30 @@ namespace FEAT
       {
         // nothing to do here
       }
+
+      Index row_degree(const Index) const
+      {
+        return Index(0);
+      }
+
+      template<typename IT2_>
+      Index get_row_col_indices(const Index, IT2_ * const, const IT2_) const
+      {
+        return Index(0);
+      }
+
+      template<typename DT2_>
+      Index get_row_values(const Index, DT2_ * const) const
+      {
+        return Index(0);
+      }
+
+      template<typename DT2_>
+      Index set_row_values(const Index, const DT2_ * const)
+      {
+        return Index(0);
+      }
+
       /// \endcond
 
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()

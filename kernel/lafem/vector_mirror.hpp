@@ -303,10 +303,10 @@ namespace FEAT
        * \brief Gathers the buffer entries from a DenseVector.
        *
        * \param[in,out] buffer
-       * A reference to the buffer.
+       * A \transient reference to the buffer.
        *
        * \param[in] vector
-       * A vector whose entries are to be gathered.
+       * A \transient reference to the vector whose entries are to be gathered.
        *
        * \param[in] buffer_offset
        * The offset within the buffer.
@@ -330,10 +330,10 @@ namespace FEAT
        * \brief Scatters the buffer entries onto a DenseVector.
        *
        * \param[in,out] vector
-       * A reference to the vector.
+       * A \transient reference to the vector to scatter onto.
        *
        * \param[in] buffer
-       * A reference to the buffer whose entries are to be scattered.
+       * A \transient reference to the buffer whose entries are to be scattered.
        *
        * \param[in] alpha
        * A scaling factor for the operation.
@@ -361,10 +361,10 @@ namespace FEAT
        * \brief Gathers the buffer entries from a DenseVectorBlocked.
        *
        * \param[in,out] buffer
-       * A reference to a buffer vector.
+       * A \transient reference to the buffer.
        *
        * \param[in] vector
-       * A vector whose entries are to be gathered.
+       * A \transient reference to the vector whose entries are to be gathered.
        *
        * \param[in] buffer_offset
        * The offset within the buffer vector.
@@ -390,10 +390,10 @@ namespace FEAT
        * \brief Scatters the buffer entries onto a DenseVectorBlocked.
        *
        * \param[in,out] vector
-       * A reference to the vector.
+       * A \transient reference to the vector to scatter onto.
        *
        * \param[in] buffer
-       * A reference to the buffer whose entries are to be scattered.
+       * A \transient reference to the buffer whose entries are to be scattered.
        *
        * \param[in] alpha
        * A scaling factor for the operation.
@@ -423,10 +423,10 @@ namespace FEAT
        * \brief Gathers the buffer entries from a SparseVector.
        *
        * \param[in,out] buffer
-       * A reference to a buffer vector.
+       * A \transient reference to the buffer.
        *
        * \param[in] vector
-       * A vector whose entries are to be gathered.
+       * A \transient reference to the vector whose entries are to be gathered.
        *
        * \param[in] buffer_offset
        * The offset within the buffer vector.
@@ -451,10 +451,10 @@ namespace FEAT
        * \brief Scatters the buffer entries onto a SparseVector.
        *
        * \param[in,out] vector
-       * A reference to the vector.
+       * A \transient reference to the vector to scatter onto.
        *
        * \param[in] buffer
-       * A reference to the buffer whose entries are to be scattered.
+       * A \transient reference to the buffer whose entries are to be scattered.
        *
        * \param[in] alpha
        * A scaling factor for the operation.
@@ -480,13 +480,13 @@ namespace FEAT
       }
 
       /**
-       * \brief Gathers the buffer entries from a SparseVector.
+       * \brief Gathers the buffer entries from a SparseVectorBlocked.
        *
        * \param[in,out] buffer
-       * A reference to a buffer vector.
+       * A \transient reference to the buffer.
        *
        * \param[in] vector
-       * A vector whose entries are to be gathered.
+       * A \transient reference to the vector whose entries are to be gathered.
        *
        * \param[in] buffer_offset
        * The offset within the buffer vector.
@@ -512,10 +512,10 @@ namespace FEAT
        * \brief Scatters the buffer entries onto a SparseVectorBlocked.
        *
        * \param[in,out] vector
-       * A reference to the vector.
+       * A \transient reference to the vector to scatter onto.
        *
        * \param[in] buffer
-       * A reference to the buffer whose entries are to be scattered.
+       * A \transient reference to the buffer whose entries are to be scattered.
        *
        * \param[in] alpha
        * A scaling factor for the operation.

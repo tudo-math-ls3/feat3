@@ -5,59 +5,54 @@
 
 #pragma once
 
-#include <kernel/adjacency/dynamic_graph.hpp>
 #include <kernel/global/gate.hpp>
 #include <kernel/global/vector.hpp>
-#include <kernel/global/filter.hpp>
-#include <kernel/global/matrix.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-#include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/unit_filter.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
-#include <kernel/lafem/matrix_mirror.hpp>
+#include <kernel/lafem/tuple_mirror.hpp>
+#include <kernel/util/omp_util.hpp>
 
-#include <algorithm>
 #include <vector>
 
 namespace FEAT
 {
   namespace Global
   {
-    /**
-     * \brief Algebraic DOF Partitioning implementation class template
-     *
-     * See the documentation of the specialization of this class template for details.
-     */
-    template<typename LocalVector_, typename Mirror_>
-    class AlgDofParti;
+    /// \cond internal
+    namespace Intern
+    {
+      template<typename IdxVector_>
+      class ADPAux;
+    } // namespace Intern
+    /// \endcond
 
     /**
      * \brief Algebraic DOF Partitioning implementation
      *
      * This class implements the functionality to generate and manage a distributed partitioning
-     * of the degrees of freedom of a (linear) system in an algebraic sense instead of the
-     * usual domain-decomposition approach. With this algebraic dof partitioning approach, each
-     * process in a given communicator becomes the unqiue owner of a set of consecutively enumerated
-     * global dofs, whereas in the domain-decomposition approach a single global dof may be shared
-     * by several processes, thus having no unique owner.
-     * The primary purpose of this class and the AlgDofPartiVector and AlgDofPartiMatrix classes
-     * is to offer the capability of embedding various third-party linear solver libraries as
-     * solvers, preconditioners or smoothers within the solver framework used in FEAT.
+     * of the degrees of freedom of a (linear) system in an algebraic sense instead of the usual
+     * domain-decomposition approach. With this <b>algebraic dof partitioning approach (ADP)</b>,
+     * each process in a given communicator becomes the unique owner of a set of consecutively
+     * enumerated global dofs, whereas in the domain-decomposition approach a single global dof
+     * may be shared by several processes, thus having no unique owner.
+     * The primary purpose of this class and the closely related AlgDofPartiSystem class is to
+     * offer the capability of embedding various third-party linear solver libraries as solvers,
+     * preconditioners or smoothers within the solver framework used in FEAT.
      *
      * To use this class, one needs to have a fully assembled Global::Gate object, which contains
      * all the partitioning information in the usual domain-decomposition sense, which is used as
      * a "starting point" for an algebraic DOF partitioning in the assemble_by_gate() function.
      *
-     * Throughout this class and the AlgDofPartiVector and AlgDofPartiMatrix classes, you will
-     * often find the terms "local DOF", "shared DOF" and "owned DOF" and "donee DOF".
-     * The definitions are as followed:
+     * Throughout this class and the closely related AlgDofPartiSystem class, you will frequently
+     * find the terms "local DOF", "shared DOF" and "owned DOF" and "donee DOF", which are defined
+     * as follows:
      * - "local" DOFs always means the DOFs as they are used in the domain decomposition world.
      * - "shared" DOFs are all local DOFs are "shared" by at least two processes in the domain
      *   decomposition world. In other words: Each local DOF, which is part of at least one
      *   neighbor mirror in the Global::Gate, is a shared DOF.
      * - "owned" DOFs are all local DOFs, which:
      *   - are not shared with any other process
-     *   - are only shared with processes of higher rank
+     *   - are only shared with processes of higher comm rank
      * - "donee" DOFs are all shared DOFs, which are not owned DOFs
      *
      * Furthermore, the neighbor ranks and mirrors, which are used in the Global::Gate of the
@@ -75,70 +70,238 @@ namespace FEAT
      * - process B is a "donee neighbor" of process A
      * - process C is a "donee neighbor" of process A
      *
-     * \todo decide what happens if this process has no dofs at all
+     * <u><b>Algebraic DOF partitioning of combined discretizations:</b></u>\n
+     * This class supports the algebraic dof partitioning of simple scalar FE spaces, which are
+     * represented by the LAFEM::DenseVector class, as well as more complex space combinations,
+     * which are represented by a hierarchy of meta containers, such as the LAFEM::TupleVector,
+     * and basic containers like LAFEM::DenseVector and/or LAFEM::DenseVectorBlocked; one prominent
+     * example is the velocity-pressure space pair used in Stokes systems which is typically
+     * represented by a LAFEM::DenseVectorBlocked for the velocity components and a (scalar)
+     * LAFEM::DenseVector for the pressure component, which are then joined together by a
+     * LAFEM::TupleVector meta container to form a single class that contains the entire
+     * velocity-pressure pair.
+     *
+     * In the case of a combined discretization (such as the velocity-pressure pair), the algebraic
+     * dof partitioning distributes the DOFs of the individual components in an \b interleaved
+     * fashion among the processes, i.e. each process owns a set of DOFs of the first component
+     * followed by a set of DOFs of the second component, etc., so in the example of the
+     * velocity-pressure pair each process owns a set of consecutively numbered velocity DOFs
+     * followed by a set of consecutively numbered pressure DOFs, and so from a global perspective,
+     * the global DOFs alternate between sets of velocity and pressure DOFs across all processes.
+     *
+     * <b>Example:</b>\n
+     * Let's assume that we have 25x2=50 velocity DOFs (V0.0, V0.1, V1.0, ..., V24.0, V24.1) and 12
+     * pressure DOFs (P0, ..., P11) in total partitioned among 4 processes and let's assume that each
+     * process owns 3 pressure DOFs and that the four processes own 18, 12, 12 and 8 velocity dofs,
+     * respectively, then the algebraic DOF partitioning of the 62 total global DOFs would look like
+     * in the table below:
+       \verbatim
+       +------------------------------+-------------------------------+--------------------------------+----------------------------------+
+       |          Process 0           |           Process 1           |            Process 2           |            Process 3             |
+       +------------------------------+-------------------------------+--------------------------------+----------------------------------+
+       |    0, ...,    17, 18, 19, 20 |    21, ...,    32, 33, 34, 35 |     36, ...,    47, 48, 49, 50 |    51, ...,     58, 59,  60,  61 | <- global algebraic DOF
+       +------------------------------+-------------------------------+--------------------------------+----------------------------------+
+       |    0, ...,    17, 18, 19, 20 |     0, ...,    11, 12, 13, 14 |      0, ...,    11, 12, 13, 14 |     0, ...,      8,  9,  10,  11 | <- owned (local) algebraic DOF
+       +------------------------------+-------------------------------+--------------------------------+----------------------------------+
+       | V0.0, ...,  V8.1             |  V9.0, ..., V14.1             |  V15.0, ..., V20.1             |  V21.0, ..., V24.1               | <- global velocity DOF (interpreted as blocked DOFs)
+       |  V'0, ...,  V'17             |  V'18, ...,  V'29             |   V'30, ...,  V'41             |   V'42, ...,  V'49               | <- global velocity DOF (interpreted as scalar DOFs)
+       |                   P0, P1, P2 |                    P3, P4, P5 |                     P6, P7, P8 |                     P9, P10, P11 | <- global pressure DOF (scalar)
+       +------------------------------+-------------------------------+--------------------------------+----------------------------------+
+       | v0.0, ...,  v8.1             |  v0.0, ...,  v5.1             |   v0.0, ...,  v5.1             |   v0.0, ...,  v4.1               | <- owned (local) velocity DOF (interpreted as blocked DOFs)
+       |  v'0, ...,  v'17             |   v'0, ...,  v'11             |    v'0, ...,  v'11             |    v'0, ...,   v'7               | <- owned (local) velocity DOF (interpreted as scalar DOFs)
+       |                   p0, p1, p2 |                    p0, p1, p2 |                     p0, p1, p2 |                     p0,  p1,  p2 | <- owned (local) pressure DOF
+       +------------------------------+-------------------------------+--------------------------------+----------------------------------+
+       \endverbatim
+     * So in the above example, global algebraic DOF 33 corresponds to global pressure DOF 3 (P3),
+     * which is owned by process 1 and which corresponds to the owned pressure DOF 1 (p1) on that
+     * process, whereas global DOF 47 corresponds to the second block-component (index 1) of the
+     * global velocity DOF 20 (V20.1), which is owned by process 2 and which corresponds to the
+     * owned velocity DOF 5 (v5.1), etc.
+     *
+     * <u><b>Retrieving ADP block information for combined discretizations:</b></u>\n
+     * Some third-party libraries, which are used as solver backends for ADP based solvers, do not
+     * treat the system as a black box, but require information about the composition of the
+     * system components within the algebraic DOF partitioning -- or in simpler terms: the library
+     * needs to know which DOF is a velocity DOF and which DOF is a pressure DOF in the example above.
+     * This information can be queried by calling the get_block_information() member function, which
+     * returns a String object containing the relevant offsets and counts encoded in XML format.
+     *
+     * The returned XML string consists of one or more lines and each line contains a single XML marker,
+     * which currently is either
+     * - a closed <c>\<Scalar .../\></c> marker that represents a scalar component that corresponds
+     *   to a LAFEM::DenseVector container
+     * - a closed <c>\<Blocked .../\></c> marker that represents a blocked/vector-valued component
+     *   that corresponds to a LAFEM::DenseVectorBlocked container
+     * - an open <c>\<Tuple ...\></c> marker that represents a meta component that combines one or
+     *   more other components and which corresponds to the LAFEM::TupleVector container
+     * - a <c>\</Tuple\></c> marker that closes a previously opened <c>\<Tuple ...\></c> marker
+     *
+     * Each of the above XML markers contains the following five attributes in alphabetical order:
+     * - <c>gc</c> ("global count"): contains the total number of global DOFs on all processes of the
+     *   corresponding component; this quantity is identical on all processes
+     * - <c>gf</c> ("global first"): represents the index of the first DOF of this component that is
+     *   is owned by the current process
+     * - <c>go</c> ("global offset"): represents the index of the first global DOF owned by this
+     *   process, which corresponds to the first global DOF of the corresponding component
+     * - <c>lc</c> ("local count"): contains the number of local DOFs within this component that are
+     *   owned by the current process.
+     * - <c>lo</c> ("local offset"): represents the index of the first local DOF owned by this
+     *   process, which corresponds to the first local DOF of the corresponding component
+     *
+     * Additionally, the <c>\<Blocked .../\></c> marker also contains the following attribute:
+     * - <c>bs</c> ("block size"): contains the total number values per DOF block
+     *
+     * In the example above, the four processes would contain the following block information strings:
+     * - Process 0:
+       \verbatim
+       <Tuple gc="62" gf="0" go="0" lc="21" lo="0">
+       <Blocked bs="2" gc="50" gf="0" go="0" lc="18" lo="0"/>
+       <Scalar gc="12" gf="0" go="18" lc="3" lo="18"/>
+       </Tuple>
+       \endverbatim
+     * - Process 1:
+       \verbatim
+       <Tuple gc="62" gf="21" go="21" lc="15" lo="0">
+       <Blocked bs="2" gc="50" gf="18" go="21" lc="12" lo="0"/>
+       <Scalar gc="12" gf="3" go="33" lc="3" lo="12"/>
+       </Tuple>
+       \endverbatim
+     * - Process 2:
+       \verbatim
+       <Tuple gc="62" gf="36" go="36" lc="15" lo="0">
+       <Blocked bs="2" gc="50" gf="30" go="36" lc="12" lo="0"/>
+       <Scalar gc="12" gf="6" go="48" lc="3" lo="12"/>
+       </Tuple>
+       \endverbatim
+     * - Process 3:
+       \verbatim
+       <Tuple gc="62" gf="51" go="51" lc="11" lo="0">
+       <Blocked bs="2" gc="50" gf="42" go="51" lc="8" lo="0"/>
+       <Scalar gc="12" gf="9" go="59" lc="3" lo="8"/>
+       </Tuple>
+       \endverbatim
+     *
+     * \todo decide what happens if this process owns no dofs at all
      * \todo make sure that this works for discontinuous elements, too
+     * \todo ensure that extra local and extra shared dofs are handled appropriately
      *
      * \author Peter Zajac
      */
-    template<typename DT_, typename IT_>
-    class AlgDofParti<LAFEM::DenseVector<DT_, IT_>, LAFEM::VectorMirror<DT_, IT_>>
+    template<typename LocalVector_, typename Mirror_>
+    class AlgDofParti
     {
     public:
-      /// our data type
-      typedef DT_ DataType;
-      /// our index type
-      typedef IT_ IndexType;
-
       /// the local vector type
-      typedef LAFEM::DenseVector<DataType, IndexType> LocalVectorType;
+      typedef LocalVector_ LocalVectorType;
       /// the vector mirror type
-      typedef LAFEM::VectorMirror<DataType, IndexType> MirrorType;
+      typedef Mirror_ MirrorType;
+
+      /// our data type
+      typedef typename LocalVectorType::DataType DataType;
+      /// our index type
+      typedef typename LocalVectorType::IndexType IndexType;
+
       /// the global vector type
       typedef Global::Vector<LocalVectorType, MirrorType> GlobalVectorType;
       /// the global gate type
       typedef Global::Gate<LocalVectorType, MirrorType> GateType;
 
-    protected:
+      /// the index vector type, this one is required for internal computations
+      typedef typename LocalVectorType::template ContainerTypeByDI<IndexType, IndexType> IndexVectorType;
+
+      /// auxiliary helper class type
+      typedef Intern::ADPAux<IndexVectorType> ADPAuxType;
+
+      /// the type for buffers used by our mirrors
+      typedef LAFEM::DenseVector<DataType, IndexType> BufferVectorType;
+
+      /// type of mirror for owned local dof indices
+      typedef MirrorType OwnedMirrorType;
+      /// type of mirror for neighbor owner local dof indices
+      typedef MirrorType OwnerMirrorType;
+      /// type of mirror for neighbor donee owned dof indices
+      typedef LAFEM::VectorMirror<DataType, IndexType> DoneeMirrorType;
+
+    //protected:
       /// our communicator
       const Dist::Comm* _comm;
       /// global dof offset of this process
-      IndexType _glob_dof_offset;
+      Index _global_dof_offset;
       /// global dof count over all processes
-      IndexType _glob_dof_count;
-      /// global dof indices, size = number of local DOFs
-      std::vector<IndexType> _glob_dof_idx;
+      Index _global_dof_count;
+      /// number of local dofs of this process
+      Index _local_dof_count;
+      /// number of owned dofs of this process
+      Index _owned_dof_count;
+      /// number of extra local dofs; may be different for each process
+      Index _extra_local_dof_count;
+      /// number of extra shared dofs; must be equal on all processes
+      Index _extra_shared_dof_count;
+      /// offset of first extra DOF
+      Index _extra_dof_offset;
+      /// global dof indices for each local dof
+      IndexVectorType _global_dof_idx;
       /// mirror for this process's owned DOFs
       MirrorType _owned_mirror;
+      /// ranks of DOF-owner neighbor processes
+      std::vector<int> _owner_ranks;
+      /// ranks of DOF-donee neighbor processes
+      std::vector<int> _donee_ranks;
       /// rank/mirror-pair of DOF-owner processes
-      std::vector<std::pair<int, MirrorType>> _neighbors_owner;
+      std::vector<OwnerMirrorType> _owner_mirrors;
       /// rank/mirror-pair of DOF-donee processes
-      std::vector<std::pair<int, MirrorType>> _neighbors_donee;
+      std::vector<DoneeMirrorType> _donee_mirrors;
+      /// a string containing the block information in XML format
+      String _block_information;
+
+      // Note: the following vectors hold int objects, because these are used as recvcount in an
+      // MPI_Allgatherv call, which only accepts int objects as counts; we have an XASSERT in
+      // place to ensure that we do not overflow the int datatype with more than a billion DOFs
 
       /// global DOF offsets of all processes, \see #allgather()
-      std::vector<int> _all_glob_dof_offset;
+      std::vector<int> _all_global_dof_offset;
       /// global DOF counts of all processes, \see #allgather()
-      std::vector<int> _all_glob_dof_counts;
+      std::vector<int> _all_global_dof_counts;
 
     public:
+      /// default constructor
       AlgDofParti() :
         _comm(nullptr),
-        _glob_dof_offset(0),
-        _glob_dof_count(0)
+        _global_dof_offset(0),
+        _global_dof_count(0),
+        _local_dof_count(0),
+        _owned_dof_count(0),
+        _extra_local_dof_count(0),
+        _extra_shared_dof_count(0),
+        _extra_dof_offset(0)
       {
       }
+
+      /// no copy, no problems
+      AlgDofParti(const AlgDofParti&) = delete;
+      /// no copy, no problems
+      AlgDofParti& operator=(const AlgDofParti&) = delete;
+
+      /// virtual destructor
+      virtual ~AlgDofParti() = default;
 
       /// Resets the whole object
       void clear()
       {
         _comm = nullptr;
-        _glob_dof_offset = IndexType(0);
-        _glob_dof_count = IndexType(0);
-        _glob_dof_idx.clear();
+        _global_dof_offset = IndexType(0);
+        _global_dof_count = IndexType(0);
+        _local_dof_count = IndexType(0);
+        _owned_dof_count = IndexType(0);
+        _extra_local_dof_count = IndexType(0);
+        _extra_shared_dof_count = IndexType(0);
+        _extra_dof_offset = Index(0);
+        _global_dof_idx.clear();
         _owned_mirror.clear();
-        _neighbors_owner.clear();
-        _neighbors_donee.clear();
-        _all_glob_dof_offset.clear();
-        _all_glob_dof_counts.clear();
+        _owner_mirrors.clear();
+        _donee_mirrors.clear();
+        _all_global_dof_offset.clear();
+        _all_global_dof_counts.clear();
       }
 
       /// \returns The communicator
@@ -147,86 +310,80 @@ namespace FEAT
         return _comm;
       }
 
-      /// \returns The number of global DOFs owned by this process.
-      IndexType get_num_owned_dofs() const
+      /// \returns The size of this object in bytes
+      std::size_t bytes() const
       {
-        return IndexType(this->_owned_mirror.num_indices());
+        std::size_t r = 0u;
+        r += _global_dof_idx.bytes();
+        r += _owned_mirror.bytes();
+        for(const auto& x : _owner_mirrors)
+          r += x.second.bytes();
+        for(const auto& x : _donee_mirrors)
+          r += x.second.bytes();
+        r += _all_global_dof_offset.size() * 4u;
+        r += _all_global_dof_counts.size() * 4u;
+        return r;
+      }
+
+      /**
+       * \brief Returns the block information of the algebraic dof partitioning as an XML string
+       *
+       */
+      String get_block_information() const
+      {
+        return this->_block_information;
+      }
+
+      /// \returns The number of local DOFs owned by this process.
+      Index get_num_owned_dofs() const
+      {
+        return this->_owned_dof_count;
       }
 
       /// \returns The number of local DOFs shared by this process.
-      IndexType get_num_local_dofs() const
+      Index get_num_local_dofs() const
       {
-        return IndexType(this->_owned_mirror.size());
+        return this->_local_dof_count;
       }
 
       /// \returns The total number of global DOFs.
-      IndexType get_num_global_dofs() const
+      Index get_num_global_dofs() const
       {
-        return this->_glob_dof_count;
+        return this->_global_dof_count;
       }
 
       /// \returns The index of the first global DOF owned by this process.
-      IndexType get_global_dof_offset() const
+      Index get_global_dof_offset() const
       {
-        return this->_glob_dof_offset;
+        return this->_global_dof_offset;
       }
 
       /**
        * \brief Returns the global-dof-indices array.
        */
-      const std::vector<IndexType> get_global_dof_indices() const
+      const IndexVectorType& get_global_dof_indices() const
       {
-        return this->_glob_dof_idx;
-      }
-
-      /**
-       * \brief Maps a local DOF index to the corresponding global DOF index.
-       *
-       * \param[in] local_dof_idx
-       * The local index of the DOF whose global index is to be returned.
-       *
-       * \returns
-       * The global index of the local DOF.
-       */
-      IndexType map_local_to_global_index(const IndexType local_dof_idx) const
-      {
-        ASSERT(local_dof_idx < this->_owned_mirror.size());
-        return this->_glob_dof_idx.at(local_dof_idx);
-      }
-
-      /**
-       * \brief Maps an owned DOF index to the corresponding local DOF index.
-       *
-       * \param[in] owned_dof_idx
-       * The owned index of the DOF whose local index is to be returned.
-       *
-       * \returns
-       * The local index of the owned DOF.
-       */
-      IndexType map_owned_to_local_index(const IndexType owned_dof_idx) const
-      {
-        ASSERT(owned_dof_idx < this->_owned_mirror.num_indices());
-        return this->_owned_mirror.indices()[owned_dof_idx];
+        return this->_global_dof_idx;
       }
 
       /**
        * \brief Returns the Mirror of the owned DOFs.
        */
-      const MirrorType& get_owned_mirror() const
+      const OwnedMirrorType& get_owned_mirror() const
       {
         return this->_owned_mirror;
       }
 
       /// \returns The number of owner neighbors.
-      IndexType get_num_owner_neighbors() const
+      Index get_num_owner_neighbors() const
       {
-        return IndexType(this->_neighbors_owner.size());
+        return Index(this->_owner_mirrors.size());
       }
 
       /// \returns The number of donee neighbors.
-      IndexType get_num_donee_neighbors() const
+      Index get_num_donee_neighbors() const
       {
-        return IndexType(this->_neighbors_donee.size());
+        return Index(this->_donee_mirrors.size());
       }
 
       /**
@@ -238,9 +395,9 @@ namespace FEAT
        * \returns
        * The rank of the i-th owner neighbor.
        */
-      int get_owner_rank(IndexType i) const
+      int get_owner_rank(Index i) const
       {
-        return this->_neighbors_owner.at(i).first;
+        return this->_owner_ranks.at(i);
       }
 
       /**
@@ -252,16 +409,16 @@ namespace FEAT
        * \returns
        * The rank of the i-th donee neighbor.
        */
-      int get_donee_rank(IndexType i) const
+      int get_donee_rank(Index i) const
       {
-        return this->_neighbors_donee.at(i).first;
+        return this->_donee_ranks.at(i);
       }
 
       /**
        * \brief Returns an owner neighbor mirror.
        *
        * \note
-       * The indices of an owner neighbor mirror are owned DOF indices.
+       * The indices of an owner neighbor mirror are local DOF indices.
        *
        * \param[in] i
        * The index of the owner neighbor.
@@ -269,16 +426,16 @@ namespace FEAT
        * \returns
        * The mirror of the i-th owner neighbor.
        */
-      const MirrorType& get_owner_mirror(IndexType i) const
+      const OwnerMirrorType& get_owner_mirror(Index i) const
       {
-        return this->_neighbors_owner.at(i).second;
+        return this->_owner_mirrors.at(i);
       }
 
       /**
        * \brief Returns a donee neighbor mirror.
        *
        * \note
-       * The indices of a donee neighbor mirror are local DOF indices.
+       * The indices of a donee neighbor mirror are owned DOF indices.
        *
        * \param[in] i
        * The index of the donee neighbor.
@@ -286,9 +443,9 @@ namespace FEAT
        * \returns
        * The mirror of the i-th donee neighbor.
        */
-      const MirrorType& get_donee_mirror(IndexType i) const
+      const DoneeMirrorType& get_donee_mirror(Index i) const
       {
-        return this->_neighbors_donee.at(i).second;
+        return this->_donee_mirrors.at(i);
       }
 
       /**
@@ -302,8 +459,8 @@ namespace FEAT
        */
       const std::vector<int>& get_all_global_dof_offsets() const
       {
-        XASSERTM(!this->_all_glob_dof_offset.empty(), "You did not ask to assemble the global dof offsets");
-        return this->_all_glob_dof_offset;
+        XASSERTM(!this->_all_global_dof_offset.empty(), "You did not ask to assemble the global dof offsets");
+        return this->_all_global_dof_offset;
       }
 
       /**
@@ -317,27 +474,29 @@ namespace FEAT
        */
       const std::vector<int>& get_all_global_dof_counts() const
       {
-        XASSERTM(!this->_all_glob_dof_counts.empty(), "You did not ask to assemble the global dof counts");
-        return this->_all_glob_dof_counts;
+        XASSERTM(!this->_all_global_dof_counts.empty(), "You did not ask to assemble the global dof counts");
+        return this->_all_global_dof_counts;
       }
 
       /**
-       * \brief Assembles the required data for the AlgDofPartiVector::allgather() and
-       * AlgDofPartiMatrix::apply() functions.
+       * \brief Assembles the required data for the AlgDofPartiSystem::apply() function.
        *
        * \warning
-       * Calling this function and (more importantly) the AlgDofPartiVector::allgather() function or
-       * the AlgDofPartiMatrix::apply() functions will *totally* screw up the scalability of your
-       * application, so the code *will* blow up in your face on bigger clusters.\n
+       * Calling this function and (more importantly) the AlgDofPartiSystem::apply() functions will *totally*
+       * screw up the scalability of your application, so the code *will* blow up in your face on bigger clusters.\n
        * Do not use this function except for <b>small-scale debugging</b> purposes. You have been warned.
        *
-       * \param[in] yes_i_really_want_this
+       * \param[in] yes_i_really_want_to_do_this
        * An assertion will fire if this is \c false. The only purpose of this parameter is
        * to force you to read the warning in this documentation first.
        */
-      void assemble_allgather(bool yes_i_really_want_this = false)
+      void assemble_allgather(bool yes_i_really_want_to_do_this = false)
       {
-        XASSERTM(yes_i_really_want_this, "You probably don't want to do this!");
+        XASSERTM(yes_i_really_want_to_do_this, "You probably don't want to do this!");
+
+        // ensure that we don't have more than a billion DOFs
+        XASSERTM(this->get_num_global_dofs() < 1'000'000'000,
+          "allgather assembly not possible for more than a billion DOFs!");
 
         std::size_t num_ranks = std::size_t(this->_comm->size());
 
@@ -345,20 +504,26 @@ namespace FEAT
         int my_off = int(this->get_global_dof_offset());
 
         // resize vectors
-        this->_all_glob_dof_offset.resize(num_ranks, 0);
-        this->_all_glob_dof_counts.resize(num_ranks, 0);
+        this->_all_global_dof_offset.resize(num_ranks, 0);
+        this->_all_global_dof_counts.resize(num_ranks, 0);
 
         // allgather offsets + counts
-        this->_comm->allgather(&my_off, 1, this->_all_glob_dof_offset.data(), 1);
-        this->_comm->allgather(&my_nod, 1, this->_all_glob_dof_counts.data(), 1);
+        this->_comm->allgather(&my_off, 1, this->_all_global_dof_offset.data(), 1);
+        this->_comm->allgather(&my_nod, 1, this->_all_global_dof_counts.data(), 1);
       }
 
       /**
        * \brief Assembles the AlgDofParti object from a given Global::Gate.
        *
        * This function performs the assembly of all required internal data structures.
+       *
+       * \param[in] extra_local
+       * The number of extra local dofs for this process.
+       *
+       * \param[in] extra_shared
+       * The number of extra shared dofs for all processes.
        */
-      void assemble_by_gate(const GateType& gate)
+      void assemble_by_gate(const GateType& gate, Index extra_local = 0u, Index extra_shared = 0u)
       {
         // set our communicator
         this->_comm = gate.get_comm();
@@ -371,91 +536,77 @@ namespace FEAT
         const int my_rank = comm.rank();
         const std::vector<int>& neighbor_ranks = gate._ranks;
 
-        // get number of local DOFs on our patch
-        const IndexType num_local_dofs = IndexType(gate._freqs.size());
+        // get a template vector
+        const LocalVectorType& vec_tmpl = gate.get_freqs();
 
-        // As a very first step, we have to decide which process will become the
-        // owner of each DOF. In this implementation, each DOF is owned by by the
-        // process with the lowest rank, which simplifies a lot of things.
+        // get number of total local DOFs on our patch
+        this->_local_dof_count = vec_tmpl.template size<LAFEM::Perspective::pod>();
+        this->_extra_local_dof_count = extra_local;
+        this->_extra_shared_dof_count = extra_shared;
+        //this->_local_dof_count += extra_local + extra_shared;
 
-        // So, first create a vector, which stores the rank of the owner process
-        // of each of our local DOFs and format the vector to our rank, i.e. at
-        // startup assume that we own all local DOFs.
-        std::vector<int> dof_owners(num_local_dofs, my_rank);
+        // As a very first step, we have to decide which process will become the owner of each DOF.
+        // In this implementation, each DOF is owned by by the process with the lowest rank, which
+        // simplifies a lot of things.
+
+        // So, first create a vector, which stores the rank of the owner process of each of our
+        // local DOFs and format the vector to our rank, i.e. at startup assume that we own all
+        // local DOFs.
+        IndexVectorType dof_owners;
+        ADPAuxType::alloc_idx_vector(dof_owners, vec_tmpl, IndexType(my_rank));
 
         // Now loop over all our neighbor processes
         for(std::size_t i(0); i < neighbor_ranks.size(); ++i)
         {
-          // Check whether the neighbors rank is less than our rank, as otherwise
-          // that particular neighbor can not own any of our local DOFs.
-          const int neighbor_rank = neighbor_ranks.at(i);
-          if(neighbor_rank < my_rank)
+          // Check whether the neighbors rank is less than our rank, as otherwise that particular
+          // neighbor can not own any of our local DOFs.
+          if(neighbor_ranks.at(i) < my_rank)
           {
-            // loop over all DOFs in the mirror of that neighbor
-            const MirrorType& mirror = gate._mirrors.at(i);
-            const Index num_indices = mirror.num_indices();
-            const IndexType* idx = mirror.indices();
-            for(Index j(0); j < num_indices; ++j)
-            {
-              // get a reference to the current owner rank of that DOF and
-              // update the DOF owner if that neighbor has a lower rank
-              // than the previous "owner candidate"
-              int& dof_owner = dof_owners.at(idx[j]);
-              if(neighbor_rank < dof_owner)
-                dof_owner = neighbor_rank;
-            }
+            // this neighbor has a lower rank than our process, so update the dof owners vector and
+            // update the ownership of these dofs by setting this neighbor as  their owner -- unless
+            // another neighbor with an even lower rank is already a candidate for ownership
+            ADPAuxType::update_owners(neighbor_ranks.at(i), dof_owners, gate.get_mirrors().at(i));
           }
         }
 
-        // Okay, at this point we (and all other processes) know the owners of
-        // each of our local DOFs. Now, we have to generate a vector of all
-        // local DOF indices of the DOFs that we own:
-        std::vector<IndexType> owned_dofs;
-        owned_dofs.reserve(num_local_dofs);
+        // Okay, at this point we (and all other processes) know the owners of each of our local DOFs.
+        // Now, we have to generate the mirror of all local DOF indices of the DOFs that we own:
+        this->_owned_dof_count = ADPAuxType::build_owned_mirror(my_rank, this->_owned_mirror, dof_owners);
 
-        // Furthermore, we need the 'inverse' information, i.e. for each of our
-        // local DOFs, we have to store the "owned DOF index" if we own this
-        // particular DOF. We initialize the vector with ~0, which stands for
-        // "not my DOF":
-        std::vector<IndexType> own_dof_idx(num_local_dofs, ~IndexType(0));
+        // Save current owned DOF count as extra DOF offset
+        this->_extra_dof_offset = this->_owned_dof_count;
 
-        // Loop over all local DOFs
-        for(IndexType i(0); i < num_local_dofs; ++i)
-        {
-          // Am I the owner of this DOF?
-          if(dof_owners[i] == my_rank)
-          {
-            // Yes, that's my DOF, so let's give it a new 'my owned DOF' index:
-            own_dof_idx.at(i) = IndexType(owned_dofs.size());
-            // And remember that I own this DOF:
-            owned_dofs.push_back(i);
-          }
-        }
+        // Now add the extra local DOFs for each process
+        this->_owned_dof_count += _extra_local_dof_count;
+
+        // The shared DOFs are always owned by the last process
+        const bool is_last_process = (this->_comm->rank()+1 == this->_comm->size());
+        if(is_last_process)
+          this->_owned_dof_count += _extra_shared_dof_count;
 
         /// \todo what do we do if owned_dofs==0 ?
-        XASSERTM(!owned_dofs.empty(), "this process has no DOFs!");
+        XASSERTM(this->_owned_dof_count > Index(0), "this process has no DOFs!");
 
-        // get number of my owned DOFS
-        const IndexType num_owned_dofs = IndexType(owned_dofs.size());
+        // Next, we have to determine the global offset of our first owned DOF, which is easily
+        // obtained by an exclusive-scan over each processes owned DOF count:
+        comm.exscan(&this->_owned_dof_count, &this->_global_dof_offset, 1, Dist::op_sum);
 
-        // Next, we have to determine the global offset of our first owned DOF, which
-        // is easily obtained by an exclusive-scan over each processes owned DOF count:
-        comm.exscan(&num_owned_dofs, &this->_glob_dof_offset, 1, Dist::op_sum);
+        // Furthermore, we also perform an allreduce to obtain the total number of global DOFs,
+        // which is generally helpful and can be used for sanity checks.
+        comm.allreduce(&this->_owned_dof_count, &this->_global_dof_count, 1, Dist::op_sum);
 
-        // Furthermore, we also perform an allreduce to obtain the total number of
-        // global DOFs, which is generally helpful and can be used for sanity checks.
-        comm.allreduce(&num_owned_dofs, &this->_glob_dof_count, 1, Dist::op_sum);
-
-        // Next, we have to set up the mirror for all of our owned DOFs, which we can
-        // easily generate from our "owned_dofs" vector:
-        this->_owned_mirror = _vidx2mirror(num_local_dofs, owned_dofs);
+        // Allocate an index vector that for each local DOF contains the "owned DOF index" if we
+        // own this particular DOF or ~Index(0) if this particular DOF is owned by another process:
+        IndexVectorType own_dof_idx;
+        ADPAuxType::alloc_idx_vector(own_dof_idx, vec_tmpl, ~IndexType(0));
+        ADPAuxType::build_owned_dofs(my_rank, own_dof_idx, dof_owners, 0u);
 
         // Now we also have to create the mirrors for each of our neighbor processes:
         for(std::size_t i(0); i < neighbor_ranks.size(); ++i)
         {
           // get the neighbor rank and its mirror
           const int neighbor_rank = neighbor_ranks.at(i);
-          const MirrorType& mirror = gate._mirrors.at(i);
+          const MirrorType& halo_mirror = gate.get_mirrors().at(i);
 
           // There are two cases now:
           // 1) The neighbor process has a lower rank, so it is a (potential) owner
@@ -464,415 +615,214 @@ namespace FEAT
           //    one of the neighbor process's local DOFs.
           if(neighbor_rank < my_rank)
           {
-            // This is a potential "owner-neighbor", which may own one or several of
-            // our local DOFs. We call a helper function, which will create a vector
-            // of all *local* DOF indices, which are owned by that neighbor process.
-            // Note that it is perfectly legit if the vector is empty, as this simply
-            // means that all our local DOFs, which are shared with that particular
-            // neighbor, are owned by some *other* neighbor process(es) and not by
+            // This is a potential "owner-neighbor", which may own one or several of our local DOFs.
+            // We call a helper function, which will create a vector of all *local* DOF indices,
+            // which are owned by that neighbor process. Note that it is perfectly legit if the
+            // vector is empty, as this simply means that all our local DOFs, which are shared with
+            // that particular neighbor, are owned by some *other* neighbor process(es) and not by
             // the particular neighbor that we are currently considering.
-            std::vector<IndexType> v = _owner_vidx(mirror, dof_owners, neighbor_rank);
-            if(!v.empty())
+            OwnerMirrorType owner_mirror;
+            if(ADPAuxType::build_owner_mirror(neighbor_rank, owner_mirror, halo_mirror, dof_owners) > Index(0))
             {
-              // That neighbor owns at least one of our local DOFs, so create a mirror
-              // from the index-vector and push it into our list of "owner-neighbors".
+              // That neighbor owns at least one of our local DOFs, so create a mirror from the
+              // index-vector and push it into our list of "owner-neighbors".
               // Note that the indices in the mirror are *local* DOF indices.
-              _neighbors_owner.emplace_back(std::make_pair(neighbor_rank, _vidx2mirror(num_local_dofs, v)));
+              _owner_ranks.push_back(neighbor_rank);
+              _owner_mirrors.emplace_back(std::move(owner_mirror));
             }
           }
           else
           {
-            // This is a potential "donee-neighbor", which shares one or several of
-            // our local DOFs, which we might own. We call a helper function, which
-            // will create a vector of all our *owned* DOF indices, which are shared
-            // with that particular neighbor process.
-            // Note that it is perfectly legit if the vector is empty, as this simply
-            // means that all our local DOFs, which are shared with that particular
-            // neighbor, are owned by some *other* neighbor process(es) and not by
-            // this process (i.e. us).
-            std::vector<IndexType> v = _donee_vidx(mirror, own_dof_idx);
-            if(!v.empty())
+            // This is a potential "donee-neighbor", which shares one or several of our local DOFs,
+            // which we might own. We call a helper function, which will create a vector of all our
+            // *owned* DOF indices, which are shared  with that particular neighbor process.
+            // Note that it is perfectly legit if the vector is empty, as this simply means that
+            // all our local DOFs, which are shared with that particular neighbor, are owned by
+            // some *other* neighbor process(es) and not by this process (i.e. us).
+            Index num_donee_dofs = ADPAuxType::count_donee_dofs(halo_mirror, own_dof_idx);
+            if(num_donee_dofs > Index(0))
             {
-              // We own at least of one of the neighbor's local DOFs, so create a mirror
-              // from the index-vector and push it into our list of "donee-neighbors".
+              // allocate and build the actual donee mirror
+              DoneeMirrorType donee_mirror(this->_owned_dof_count, num_donee_dofs);
+              ADPAuxType::build_donee_mirror(donee_mirror, halo_mirror, own_dof_idx, 0u);
+
+              // We own at least of one of the neighbor's local DOFs, so create a mirror from the
+              // index-vector and push it into our list of "donee-neighbors".
               // Note that the indices in the mirror are *owned* DOF indices.
-              _neighbors_donee.emplace_back(std::make_pair(neighbor_rank, _vidx2mirror(num_owned_dofs, v)));
+              _donee_ranks.push_back(neighbor_rank);
+              _donee_mirrors.emplace_back(std::move(donee_mirror));
             }
           }
         }
 
-        // Finally, we have to determine the global DOF index for each of our local DOFs,
-        // so that we can perform a "local-to-global" DOF index lookup. This information
-        // is required for the assembly of matrices later on, so we have to store this in
-        // a member-variable vector.
+        // Finally, we have to determine the global DOF index for each of our local DOFs, so that
+        // we can perform a "local-to-global" DOF index lookup. This information is required for
+        // the assembly of matrices later on, so we have to store this in a member-variable vector.
 
-        // Let's create the vector of the required length, initialize all its indices to
-        // ~0, which will can be used for a sanity check later on to ensure that we know
-        // the global indices of all our local DOFs:
-        this->_glob_dof_idx.resize(num_local_dofs, ~IndexType(0));
+        // Let's create the vector of the required length, initialize all its indices to ~0, which
+        // can be used for a sanity check later on to ensure that we know the global indices of all
+        // our local DOFs:
+        ADPAuxType::alloc_idx_vector(this->_global_dof_idx, vec_tmpl, ~IndexType(0));
 
-        // Next, let's loop over all DOFs that we own and assign their corresponding
-        // global DOF indices, starting with our global DOF offset, which we have already
-        // determined before:
-        for(std::size_t i(0); i < owned_dofs.size(); ++i)
-          this->_glob_dof_idx[owned_dofs[i]] = this->_glob_dof_offset + IndexType(i);
+        // Next, let's loop over all DOFs that we own and assign their corresponding global DOF
+        // indices, starting with our global DOF offset, which we have already determined before:
+        ADPAuxType::init_global_dof_idx(this->_global_dof_idx, this->_owned_mirror, this->_global_dof_offset);
 
-        // Finally, we also need to query the global DOF indices of all our local DOFs,
-        // which are owned by some neighbor process (i.e. we are the donee for these DOFs).
+        // Finally, we also need to query the global DOF indices of all our local DOFs, which are
+        // owned by some neighbor process (i.e. we are the donee for these DOFs).
         // Of course, we also have to send the global DOF indices of all DOFs that we own
         // to all of our "donee-neighbors".
 
         // Allocate index buffers and post receives for all of our owner-neighbors:
-        const IndexType num_neigh_owner = IndexType(_neighbors_owner.size());
+        const Index num_neigh_owner = Index(_owner_mirrors.size());
         Dist::RequestVector recv_reqs(num_neigh_owner);
         std::vector<std::vector<IndexType>> recv_bufs(num_neigh_owner);
-        for(IndexType i(0); i < num_neigh_owner; ++i)
+        for(Index i(0); i < num_neigh_owner; ++i)
         {
-          const std::size_t num_idx = _neighbors_owner.at(i).second.num_indices();
-          recv_bufs.at(i).resize(num_idx);
-          recv_reqs[i] = comm.irecv(recv_bufs.at(i).data(), num_idx, _neighbors_owner.at(i).first);
+          const std::size_t num_idx = _owner_mirrors.at(i).buffer_size(vec_tmpl);
+          recv_bufs.at(i).resize(num_idx, ~IndexType(0));
+          recv_reqs[i] = comm.irecv(recv_bufs.at(i).data(), num_idx, _owner_ranks.at(i));
         }
 
         // Allocate index buffers, fill them with the global DOF indices of our owned
         // DOFs and send them to the donee-neighbors:
-        const IndexType num_neigh_donee = IndexType(_neighbors_donee.size());
+        const Index num_neigh_donee = Index(_donee_mirrors.size());
         Dist::RequestVector send_reqs(num_neigh_donee);
         std::vector<std::vector<IndexType>> send_bufs(num_neigh_donee);
-        for(IndexType i(0); i < num_neigh_donee; ++i)
+        for(Index i(0); i < num_neigh_donee; ++i)
         {
-          // Get the mirror for this donee-neighbor:
-          const MirrorType& mirror = _neighbors_donee.at(i).second;
-          const Index num_idx = mirror.num_indices();
-          const IndexType* mir_idx = mirror.indices();
           // Allocate buffer of required size and translate the indices of our mirror,
           // which are "owned DOF indices", to global DOF indices, where:
           //   global_dof_index := global_dof_offset + owned_dof_index
-          send_bufs.at(i).resize(num_idx);
-          IndexType* jdx = send_bufs.at(i).data();
-          for(IndexType j(0); j < num_idx; ++j)
-            jdx[j] = this->_glob_dof_offset + mir_idx[j];
-          send_reqs[i] = comm.isend(send_bufs.at(i).data(), num_idx, _neighbors_donee.at(i).first);
+          const std::size_t num_idx = _donee_mirrors.at(i).num_indices();
+          send_bufs.at(i).resize(num_idx, ~IndexType(0));
+          _get_donee_dofs(send_bufs.at(i), _donee_mirrors.at(i), this->_global_dof_offset);
+          send_reqs[i] = comm.isend(send_bufs.at(i).data(), num_idx, _donee_ranks.at(i));
         }
 
         // Now process all receive requests from our owner-neighbors:
         for(std::size_t i(0u); recv_reqs.wait_any(i); )
         {
-          const MirrorType& mirror = _neighbors_owner.at(i).second;
-          const Index num_idx = mirror.num_indices();
-          const IndexType* mir_idx = mirror.indices();
-          const IndexType* jdx = recv_bufs.at(i).data();
           // Scatter the global DOF indices, which our friendly owner-neighbor has
           // provided us with, into our global DOF index vector:
-          for(IndexType j(0); j < num_idx; ++j)
-            this->_glob_dof_idx[mir_idx[j]] = jdx[j];
+          ADPAuxType::set_owner_dofs(this->_global_dof_idx, recv_bufs.at(i), _owner_mirrors.at(i), 0u);
         }
 
         // wait for all sends to finish
         send_reqs.wait_all();
 
-#ifdef DEBUG
-        // Last but not least: debug-mode sanity check
-        // We now should know the global DOF indices for all of our local DOFs:
-        for(IndexType gdi : this->_glob_dof_idx)
+        // get local counts
+        std::vector<Index> local_num;
+        ADPAuxType::get_local_dof_count(local_num, this->_global_dof_idx, this->_owned_mirror);
+
+        // compute global counts
+        std::vector<Index> global_num(local_num.size());
+        comm.allreduce(local_num.data(), global_num.data(), local_num.size(), Dist::op_sum);
+
+        // compute global offsets
+        std::vector<Index> global_first(local_num.size());
+        comm.exscan(local_num.data(), global_first.data(), local_num.size(), Dist::op_sum);
+
+        // build deques
+        std::deque<Index> loc_off, loc_num, glob_first, glob_num;
+        for(Index i(0), off(0); i < Index(local_num.size()); ++i)
         {
-          XASSERTM(gdi != ~IndexType(0), "invalid global DOF index");
+          loc_off.push_back(off);
+          loc_num.push_back(local_num[i]);
+          glob_num.push_back(global_num[i]);
+          glob_first.push_back(global_first[i]);
+          off += local_num[i];
         }
-#endif // DEBUG
+
+        // finally, build the block information
+        this->_block_information = ADPAuxType::build_block_info(this->_global_dof_idx, this->_global_dof_offset,
+          glob_first, glob_num, loc_off, loc_num);
       }
 
-    private:
-      // auxiliary function: create a mirror from a vector of indices
-      static MirrorType _vidx2mirror(const IndexType size, const std::vector<IndexType>& vidx)
+      template<typename DT2_>
+      void upload_vector(DT2_* owned_dofs, const LocalVectorType& local_vector,
+        const DataType* extra_local = nullptr, const DataType* extra_shared = nullptr) const
       {
-        const IndexType nidx = IndexType(vidx.size());
-        MirrorType mirror(size, nidx);
-        IndexType* idx = mirror.indices();
-        for(IndexType i(0); i < nidx; ++i)
-          idx[i] = vidx[i];
-        return mirror;
-      }
+        // gather owned DOFs
+        ADPAuxType::gather(owned_dofs, local_vector, this->_owned_mirror);
 
-      // auxiliary function: create an index vector of all *local DOFs*
-      // which are owned by the process with the given neighbor rank:
-      static std::vector<IndexType> _owner_vidx(const MirrorType& old_mir,
-        const std::vector<int>& dof_owners, const int neighbor_rank)
-      {
-        std::vector<IndexType> v;
-        v.reserve(old_mir.num_indices());
-
-        const IndexType* old_idx = old_mir.indices();
-        for(IndexType i(0); i < old_mir.num_indices(); ++i)
+        // gather extra local DOFs
+        if(this->_extra_local_dof_count > Index(0))
         {
-          // is this neighbor the owner?
-          if(neighbor_rank == dof_owners[old_idx[i]])
-            v.push_back(old_idx[i]);
+          XASSERT(extra_local != nullptr);
+          DT2_* dst = &owned_dofs[this->_extra_dof_offset];
+          for(Index i = 0u; i < this->_extra_local_dof_count; ++i)
+            dst[i] = DT2_(extra_local[i]);
         }
-        return v;
-      }
 
-      // auxiliary function: create an index vector all *owned DOFs*
-      // which are local DOFs of the process whose mirror is given:
-      static std::vector<IndexType> _donee_vidx(const MirrorType& old_mir,
-        const std::vector<IndexType>& own_dof_idx)
-      {
-        std::vector<IndexType> v;
-        v.reserve(old_mir.num_indices());
-
-        const IndexType* old_idx = old_mir.indices();
-        for(IndexType i(0); i < old_mir.num_indices(); ++i)
+        // gather extra shared DOFs on last process
+        if(this->_extra_shared_dof_count > Index(0))
         {
-          // do we own the DOF in this mirror?
-          if(own_dof_idx[old_idx[i]] != ~IndexType(0))
-            v.push_back(own_dof_idx[old_idx[i]]);
+          XASSERT(extra_shared != nullptr);
+          if(this->_comm->rank() + 1 == this->_comm->size())
+          {
+            DT2_* dst = &owned_dofs[this->_extra_dof_offset + this->_extra_local_dof_count];
+            for(Index i = 0u; i < this->_extra_shared_dof_count; ++i)
+              dst[i] = DT2_(extra_shared[i]);
+          }
         }
-        return v;
-      }
-    }; // class AlgDofParti
-
-    /**
-     * \brief Algebraic DOF Partitioned Vector class template
-     *
-     * This class implements the management of a distributed vector based on an algebraic
-     * DOF partitioning. A vector of this class will contain only the owned DOFs of this
-     * process. The two basic operations provided by this class are the \b upload and the
-     * \b download of vectors, where:
-     * - \b upload: copy the DOFs of a Global::Vector into this AlgDofPartiVector
-     * - \b download: copy the DOFs of this AlgDofPartiVector into a Global::Vector
-     *
-     * Note that objects of this class do not require any additional initialization as
-     * the constructor, which expects and AlgDofPartiObject as its parameters, will
-     * automatically allocate the internal vector.
-     *
-     * This class also offers a function named #allgather(), which creates a vector
-     * containing \e all global DOFs on each process. This function is only meant to
-     * be used for small-scale debugging purposes and shall not be used for actual
-     * production work, because it a) will totally screw the scalability of your code
-     * on a large number of processes and b) may easily lead to fatal out-of-memory
-     * events. You have been warned.
-     *
-     * \author Peter Zajac
-     */
-    template<typename LocalVector_, typename Mirror_>
-    class AlgDofPartiVector
-    {
-    public:
-      /// our data type
-      typedef typename LocalVector_::DataType DataType;
-      /// our index type
-      typedef typename LocalVector_::IndexType IndexType;
-
-      /// the local vector type
-      typedef LocalVector_ LocalVectorType;
-      /// the vector mirror type
-      typedef Mirror_ MirrorType;
-
-      /// the global vector type
-      typedef Global::Vector<LocalVector_, Mirror_> GlobalVectorType;
-
-      /// the algebraic DOF partitioning type
-      typedef Global::AlgDofParti<LocalVector_, Mirror_> AlgDofPartiType;
-
-      /// the buffer vector type used for communication
-      typedef LAFEM::DenseVector<DataType, IndexType> BufferVectorType;
-      /// the vector type used for the internal storage of our owned DOFs
-      typedef LAFEM::DenseVector<DataType, IndexType> OwnedVectorType;
-
-    protected:
-      /// the algebraic dof-partitioning
-      const AlgDofPartiType* _alg_dof_parti;
-      /// the internal vector object storing our owned dofs
-      OwnedVectorType _vector;
-
-    public:
-      /// default constructor
-      AlgDofPartiVector() :
-        _alg_dof_parti(nullptr),
-        _vector()
-      {
       }
 
-      /**
-       * \brief Creates a ADP vector based on an algebraic dof partitioning
-       *
-       * Once this constructor returns, this vector does not require any further
-       * initialization and is therefore ready-to-use.
-       *
-       * \param[in] adp_in
-       * The algebraic dof partitioning to be used for this vector.
-       */
-      explicit AlgDofPartiVector(const AlgDofPartiType* adp_in) :
-        _alg_dof_parti(adp_in),
-        _vector(adp_in->get_num_owned_dofs())
+      template<typename DT2_>
+      void download_vector(const DT2_* owned_dofs, LocalVectorType& local_vector,
+        DataType* extra_local = nullptr, DataType* extra_shared = nullptr) const
       {
-      }
-
-      /// Resets the whole object
-      void clear()
-      {
-        this->_alg_dof_parti = nullptr;
-        this->_vector.clear();
-      }
-
-      /// \returns A reference to the internal owned vector object.
-      OwnedVectorType& owned()
-      {
-        return this->_vector;
-      }
-
-      /// \returns A reference to the internal owned vector object.
-      const OwnedVectorType& owned() const
-      {
-        return this->_vector;
-      }
-
-      /// \return A pointer to the underlying algebraic dof partitioning object.
-      const AlgDofPartiType* get_alg_dof_parti() const
-      {
-        return this->_alg_dof_parti;
-      }
-
-      /// \return A pointer to the underlying communicator
-      const Dist::Comm* get_comm() const
-      {
-        XASSERT(this->_alg_dof_parti != nullptr);
-        return this->_alg_dof_parti->get_comm();
-      }
-
-      /**
-       * \brief Gathers the full global vector on all processes
-       *
-       * \attention
-       * This function makes use of the infamous allgatherv MPI operation, which is known
-       * to completely blow the scalability of an application running on a large number of
-       * processes. In addition to the scalability issues, please keep in mind that the
-       * global vector may be very large -- even potentially larger that the total amount
-       * of memory that this available for a single process, which would inevitably result
-       * in an application crash due to an out-of-memory event.\n
-       * Do not use this function except for <b>small-scale debugging</b> purposes. You have been warned.
-       *
-       * \param[inout] vec_full
-       * A vector that receives all global dofs. Its length is assumed to be initialized to
-       * the global number of degrees of freedom.
-       */
-      void allgather(BufferVectorType& vec_full) const
-      {
-        XASSERTM(!this->_alg_dof_parti->get_all_global_dof_counts().empty(),
-          "You did not ask to assemble the required allgather data");
-
-        XASSERT(vec_full.size() == this->_alg_dof_parti->get_num_global_dofs());
-        this->_alg_dof_parti->get_comm()->allgatherv(this->_vector.elements(),
-          this->_alg_dof_parti->get_num_owned_dofs(),
-          vec_full.elements(),
-          this->_alg_dof_parti->get_all_global_dof_counts().data(),
-          this->_alg_dof_parti->get_all_global_dof_offsets().data());
-      }
-
-      /**
-       * \brief Copies the DOF values from a global vector to this algebraic-dof-partitioned vector.
-       *
-       * \param[in] global_vector
-       * The global vector whose values are to be copied into this vector.
-       */
-      void upload(const GlobalVectorType& global_vector)
-      {
-        this->upload(global_vector.local());
-      }
-
-      /**
-       * \brief Copies the DOF values from a local vector to this algebraic-dof-partitioned vector.
-       *
-       * \param[in] local_vector
-       * The local vector whose values are to be copied into this vector.
-       */
-      void upload(const LocalVectorType& local_vector)
-      {
-        XASSERT(this->_alg_dof_parti != nullptr);
-        XASSERT(this->_vector.size() == this->_alg_dof_parti->get_num_owned_dofs());
-        XASSERT(local_vector.size() == this->_alg_dof_parti->get_num_local_dofs());
-
-        // Uploading is simple: we have a mirror that will extract all our owned DOFs
-        // from our local vector, so we just have to call this mirror's gather function:
-        this->_alg_dof_parti->get_owned_mirror().gather(this->_vector, local_vector);
-      }
-
-      /**
-       * \brief Copies the DOF values from this algebraic-dof-partitioned vector into a global vector.
-       *
-       * \param[inout] global_vector
-       * The global vector into which our DOF values are to be copied. The vector is assumed to be
-       * allocated to the correct length, but its DOF values upon call are ignored.
-       */
-      void download(GlobalVectorType& global_vector) const
-      {
-        this->download(global_vector.local());
-      }
-
-      /**
-       * \brief Copies the DOF values from this algebraic-dof-partitioned vector into a local vector.
-       *
-       * \param[inout] local_vector
-       * The local vector into which our DOF values are to be copied. The vector is assumed to be
-       * allocated to the correct length, but its DOF values upon call are ignored.
-       */
-      void download(LocalVectorType& local_vector) const
-      {
-        XASSERT(this->_alg_dof_parti != nullptr);
-        XASSERT(this->_vector.size() == this->_alg_dof_parti->get_num_owned_dofs());
-        XASSERT(local_vector.size() == this->_alg_dof_parti->get_num_local_dofs());
-
-        // get our algebraic dof partitioning object
-        const AlgDofPartiType& adp = *this->_alg_dof_parti;
-
-        // get the communicator
-        const Dist::Comm& comm = *this->get_comm();
+        // ensure we have a communicator
+        XASSERT(this->_comm != nullptr);
 
         // get the number of owner- and donee-neighbors
-        const IndexType num_neigh_owner = adp.get_num_owner_neighbors();
-        const IndexType num_neigh_donee = adp.get_num_donee_neighbors();
+        const std::size_t num_neigh_owner = this->_owner_mirrors.size();
+        const std::size_t num_neigh_donee = this->_donee_mirrors.size();
 
         // The basic idea is simple:
         // 1) Send the shared DOFs to all of our donee-neighbors
         // 2) Receive the shared DOFs from all of our owner-neighbors
         // 3) Scatter our own owned DOFs into our local vector
+        // 4) Scatter the dofs we received from our owner-neighbors
 
         // Create receive buffers and post receives for all owner-neighbors
         Dist::RequestVector recv_reqs(num_neigh_owner);
         std::vector<BufferVectorType> recv_bufs(num_neigh_owner);
-        for(IndexType i(0); i < num_neigh_owner; ++i)
+        for(std::size_t i(0); i < num_neigh_owner; ++i)
         {
           // create a vector buffer
           // note: owner mirrors relate to local DOF indices
-          recv_bufs.at(i) = adp.get_owner_mirror(i).create_buffer(local_vector);
+          recv_bufs.at(i) =  this->_owner_mirrors.at(i).create_buffer(local_vector);
           // post receive from owner neighbor
-          recv_reqs[i] = comm.irecv(recv_bufs.at(i).elements(), recv_bufs.at(i).size(), adp.get_owner_rank(i));
+          recv_reqs[i] = this->_comm->irecv(recv_bufs.at(i).elements(), recv_bufs.at(i).size(), this->_owner_ranks.at(i));
         }
 
         // Create send buffers, fill them with our owned DOFs and send this
         // to our donee-neighbors
         Dist::RequestVector send_reqs(num_neigh_donee);
         std::vector<BufferVectorType> send_bufs(num_neigh_donee);
-        for(IndexType i(0); i < num_neigh_donee; ++i)
+        for(Index i(0); i < num_neigh_donee; ++i)
         {
           // get mirror, create buffer and gather the shared DOFs
           // note: donee mirrors relate to owned DOF indices
-          const MirrorType& mir = adp.get_donee_mirror(i);
-          send_bufs.at(i) = mir.create_buffer(this->_vector);
-          mir.gather(send_bufs.at(i), this->_vector);
+          const DoneeMirrorType& mir = this->_donee_mirrors.at(i);
+          send_bufs.at(i) = BufferVectorType(mir.num_indices());
+          _gather(send_bufs.at(i), owned_dofs, mir);
           // post send to donee neighbor
-          send_reqs[i] = comm.isend(send_bufs.at(i).elements(), send_bufs.at(i).size(), adp.get_donee_rank(i));
+          send_reqs[i] = this->_comm->isend(send_bufs.at(i).elements(), send_bufs.at(i).size(), this->_donee_ranks.at(i));
         }
 
         // format the output vector
         local_vector.format();
 
         // scatter our own owned DOFs into our output vector
-        adp.get_owned_mirror().scatter_axpy(local_vector, this->_vector);
+        ADPAuxType::scatter(owned_dofs, local_vector, this->_owned_mirror);
 
         // process receives from our owner-neighbors
         for(std::size_t idx(0u); recv_reqs.wait_any(idx); )
         {
           // scatter received DOFs into our output vector
-          adp.get_owner_mirror(IndexType(idx)).scatter_axpy(local_vector, recv_bufs.at(idx));
+          ADPAuxType::scatter(recv_bufs.at(idx).elements(), local_vector, this->_owner_mirrors.at(idx));
         }
 
         // at this point, all receives should have finished
@@ -880,914 +830,913 @@ namespace FEAT
 
         // wait for all sends to finish
         send_reqs.wait_all();
-      }
-    }; // class AlgDofPartiVector
 
-    /**
-     * \brief Algebraic DOF Partitioned CSR matrix class template
-     *
-     * This class implements the management of a distributed CSR matrix based on an algebraic
-     * DOF partitioning. A matrix of this class will contain only the (full) rows corresponding
-     * to the owned DOFs of this process, where the column indices are global DOF indices.
-     *
-     * In contrast to the AlgDofPartiVector, objects of this class need further initialization
-     * after the call of the constructor. This additional initialization is performed by
-     * uploading at least the layout of a given Global::Matrix. In analogy to the concept of
-     * our (linear) solvers, the "upload" process is split into two functions:
-     * - upload_symbolic(): creates all internal data structures and computes the internal
-     *   matrix structure based on the given input matrix structure.
-     * - upload_numeric(): copies the numerical values of the input matrix into the owned
-     *   matrix and performs the required communication.
-     *
-     * Also in analogy to the solver concept, one may repeatedly call upload_numeric() with
-     * changing matrix values without the need to call upload_symbolic() every time, as long
-     * as the input matrix structure does not change. This can seriously reduce communication
-     * overhead in non-linear scenarios, where the matrix values change frequently.
-     *
-     * Note that, in contrast to the AlgDofPartiVector class, this matrix class does not
-     * offer a "download" functionality.
-     *
-     * \author Peter Zajac
-     */
-    template<typename LocalMatrix_, typename Mirror_>
-    class AlgDofPartiMatrix
+        // copy extra local DOFs
+        if(this->_extra_local_dof_count > Index(0))
+        {
+          XASSERT(extra_local != nullptr);
+          const DT2_* src = &owned_dofs[this->_extra_dof_offset];
+          for(Index i = 0u; i < this->_extra_local_dof_count; ++i)
+            extra_local[i] = DataType(src[i]);
+        }
+
+        // scatter extra shared DOFs
+        if(this->_extra_shared_dof_count > Index(0))
+        {
+          XASSERT(extra_shared != nullptr);
+
+          // the last process owns the shared DOFs
+          if(this->_comm->rank() + 1 == this->_comm->size())
+          {
+            const DT2_* src = &owned_dofs[this->_extra_dof_offset + this->_extra_local_dof_count];
+            for(Index i = 0u; i < this->_extra_shared_dof_count; ++i)
+              extra_shared[i] = DataType(src[i]);
+          }
+
+          // broadcast shared DOFs
+          this->_comm->bcast(extra_shared, std::size_t(this->_extra_shared_dof_count), this->_comm->size() - 1);
+        }
+      }
+
+    protected:
+      static Index _get_donee_dofs(std::vector<IndexType>& send_buf,
+        const LAFEM::VectorMirror<DataType, IndexType>& donee_mir, Index offset)
+      {
+        const Index num_idx = donee_mir.num_indices();
+        const IndexType* mir_idx = donee_mir.indices();
+        for(Index j(0); j < num_idx; ++j)
+          send_buf[j] = IndexType(offset) + mir_idx[j];
+
+        return num_idx;
+      }
+
+      template<typename DT2_>
+      static Index _gather(
+        LAFEM::DenseVector<DataType, IndexType>& buffer,
+        const DT2_* vector,
+        const LAFEM::VectorMirror<DataType, IndexType>& mirror)
+      {
+        const Index n = mirror.num_indices();
+        const IndexType* idx = mirror.indices();
+        DataType* buf = buffer.elements();
+        for(Index i = 0u; i < n; ++i)
+          buf[i] = DT2_(vector[idx[i]]);
+        return n;
+      }
+    }; // class AlgDofParti<...>
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /// \cond internal
+    namespace Intern
     {
-    public:
-      /// our data type
-      typedef typename LocalMatrix_::DataType DataType;
-      /// our index type
-      typedef typename LocalMatrix_::IndexType IndexType;
-
-      /// the local matrix type
-      typedef LocalMatrix_ LocalMatrixType;
-      /// the vector mirror type
-      typedef Mirror_ MirrorType;
-      /// the global matrix type
-      typedef Global::Matrix<LocalMatrixType, MirrorType, MirrorType> GlobalMatrixType;
-
-      /// the local vector type
-      typedef typename LocalMatrixType::VectorTypeR LocalVectorType;
-
-      /// the buffer vector type used for communication
-      typedef LAFEM::DenseVector<DataType, IndexType> BufferVectorType;
-      /// the buffer matrix type used for communication
-      typedef LAFEM::MatrixMirrorBuffer<DataType, IndexType> BufferMatrixType;
-
-      /// the matrix type used for the internal storage of our owned matrix rows
-      typedef LAFEM::SparseMatrixCSR<DataType, IndexType> OwnedMatrixType;
-
-      /// the algebraic DOF partitioning
-      typedef Global::AlgDofParti<LocalVectorType, MirrorType> AlgDofPartiType;
-      /// the compatible alg-dof-parti vector type
-      typedef Global::AlgDofPartiVector<LocalVectorType, MirrorType> AlgDofPartiVectorType;
-
-    protected:
-      /// the algebraic dof-partitioning
-      const AlgDofPartiType* _alg_dof_parti;
-      /// the internal matrix storing our owned matrix rows
-      OwnedMatrixType _matrix;
-
-      /// the matrix buffers for our donee and owner neighbors
-      std::vector<BufferMatrixType> _donee_bufs, _owner_bufs;
-      /// the data array mirrors for our donee and owner neighbors
-      std::vector<MirrorType> _data_donee_mirs, _data_owner_mirs;
-      /// the data array "mirror" for this process
-      std::vector<std::pair<IndexType,IndexType>> _my_data_mir;
-
-    public:
-      /// default constructor
-      AlgDofPartiMatrix() :
-        _alg_dof_parti(nullptr),
-        _matrix()
+      template<typename IT_>
+      class ADPAux<LAFEM::DenseVector<IT_, IT_>>
       {
-      }
-
-      /**
-       * \brief Creates a ADP matrix based on an algebraic dof partitioning
-       *
-       * \attention
-       * In contrast to the AlgDofPartiVector class, this matrix class is \b not
-       * fully initialized after this constructor returns. It is at least required
-       * to set up the internal data structures by calling the #upload_symbolic()
-       * or #upload() function and passing an initialized matrix to it.
-       *
-       * \param[in] adp_in
-       * The algebraic dof partitioning to be used for this matrix.
-       */
-      explicit AlgDofPartiMatrix(const AlgDofPartiType* adp_in) :
-        _alg_dof_parti(adp_in),
-        _matrix()
-      {
-      }
-
-      /// Resets the whole object
-      void clear()
-      {
-        _alg_dof_parti = nullptr;
-        _matrix.clear();
-        _donee_bufs.clear();
-        _owner_bufs.clear();
-        _data_donee_mirs.clear();
-        _data_owner_mirs.clear();
-        _my_data_mir.clear();
-      }
-
-      /// \returns A reference to the internal owned matrix object.
-      OwnedMatrixType& owned()
-      {
-        return this->_matrix;
-      }
-
-      /// \returns A reference to the internal owned matrix object.
-      const OwnedMatrixType& owned() const
-      {
-        return this->_matrix;
-      }
-
-      /// \returns A pointer to the underlying algebraic dof partitioning object.
-      const AlgDofPartiType* get_alg_dof_parti() const
-      {
-        return this->_alg_dof_parti;
-      }
-
-      /// \returns A pointer to the underlying communicator.
-      const Dist::Comm* get_comm() const
-      {
-        XASSERT(this->_alg_dof_parti != nullptr);
-        return this->_alg_dof_parti->get_comm();
-      }
-
-      /**
-       * \brief Performs a global matrix-vector product with this matrix.
-       *
-       * \attention
-       * As convenient and tempting as this function may look, please be aware that
-       * using this function will completely destroy the scalability of our code when
-       * running on a large number of processes. In addition to the scalability issues,
-       * please be aware that this function may cause a fatal out-of-memory event, as
-       * the underlying (naive) implementation gathers the full multiplicand vector
-       * on all processes using the AlgDofPartiVector::allgather() function.\n
-       * Do not use this function except for <b>small-scale debugging</b> purposes. You have been warned.
-       *
-       * \param[out] vec_r
-       * A reference to the algebraic-dof-partitioned vector that receives
-       * the result of the matrix-vector product.
-       *
-       * \param[in] vec_x
-       * A const reference to the algebraic-dof-partitioned vector that
-       * acts as a multiplicand vector.
-       */
-      void apply(AlgDofPartiVectorType& vec_r, const AlgDofPartiVectorType& vec_x) const
-      {
-        XASSERTM(!this->_alg_dof_parti->get_all_global_dof_counts().empty(),
-          "You did not ask to assemble the required allgather data");
-
-        // create full vector
-        LocalVectorType vec_full(this->_alg_dof_parti->get_num_global_dofs());
-
-        // gather full vector
-        vec_x.allgather(vec_full);
-
-        // apply our matrix
-        this->_matrix.apply(vec_r.owned(), vec_full);
-      }
-
-      /**
-       * \brief Initializes this algebraic dof-partitioned matrix from a global matrix.
-       *
-       * \param[in] mat_a
-       * The global matrix whose layout and values are to be used to initialize this matrix.
-       */
-      void upload(const GlobalMatrixType& mat_a)
-      {
-        upload(mat_a.local());
-      }
-
-      /**
-       * \brief Initializes this algebraic dof-partitioned matrix from a global matrix.
-       *
-       * \param[in] mat_a
-       * The global matrix whose layout and values are to be used to initialize this matrix.
-       */
-      void upload(const LocalMatrixType& mat_a)
-      {
-        upload_symbolic(mat_a);
-        upload_numeric(mat_a);
-      }
-
-      /**
-       * \brief Initializes this algebraic dof-partitioned matrix from a global matrix.
-       *
-       * This function performs the "symbolic" initialization of this algebraic-dof-partitioned
-       * matrix based on the layout of the given input matrix. After the call of ths function,
-       * this matrix object is fully initialized, although the actual numerical values of
-       * the matrix entries are still undefined and have to be copied from the global input
-       * matrix lateron by using the #upload_numeric() function.
-       *
-       * \param[in] mat_a
-       * The global matrix whose layout is to be used to initialize this matrix.
-       */
-      void upload_symbolic(const GlobalMatrixType& mat_a)
-      {
-        upload_symbolic(mat_a.local());
-      }
-
-      /**
-       * \brief Initializes this algebraic-dof-partitioned matrix from a local matrix.
-       *
-       * This function performs the "symbolic" initialization of this algebraic-dof-partitioned
-       * matrix based on the layout of the given input matrix. After the call of this function,
-       * this matrix object is fully initialized, although the actual numerical values of
-       * the matrix entries are still undefined and have to be copied from the local input
-       * matrix later on by using the #upload_numeric() function.
-       *
-       * \param[in] mat_a
-       * The local matrix whose layout is to be used to initialize this matrix.
-       */
-      void upload_symbolic(const LocalMatrixType& mat_a)
-      {
-        XASSERT(this->_alg_dof_parti != nullptr);
-
-        this->_assemble_buffers(mat_a);
-        this->_assemble_structure(mat_a);
-        this->_assemble_data_mirrors(mat_a);
-      }
-
-      /**
-       * \brief Copies the matrix entry values from the input matrix into this algebraic-dof-partitioned matrix.
-       *
-       * \param[in] mat_a
-       * The input matrix whose entry values are to be copied.
-       *
-       * \attention
-       * The input matrix is assumed to be an unfiltered type-0 matrix.
-       */
-      void upload_numeric(const GlobalMatrixType& mat_a)
-      {
-        upload_numeric(mat_a.local());
-      }
-
-      /**
-       * \brief Copies the matrix entry values from the input matrix into this algebraic-dof-partitioned matrix.
-       *
-       * \param[in] mat_a
-       * The input matrix whose entry values are to be copied.
-       *
-       * \attention
-       * The input matrix is assumed to be an unfiltered type-0 matrix.
-       */
-      void upload_numeric(const LocalMatrixType& mat_a)
-      {
-        XASSERT(this->_alg_dof_parti != nullptr);
-
-        // get our partitioning
-        const AlgDofPartiType& adp = *this->_alg_dof_parti;
-
-        // get our communicator
-        const Dist::Comm& comm = *this->get_comm();
-
-        // format our internal matrix
-        this->_matrix.format();
-
-        const IndexType num_neigh_owner = adp.get_num_owner_neighbors();
-        const IndexType num_neigh_donee = adp.get_num_donee_neighbors();
-
-        Dist::RequestVector recv_reqs(num_neigh_donee);
-        Dist::RequestVector send_reqs(num_neigh_owner);
-
-        std::vector<BufferVectorType> donee_vbufs(num_neigh_donee);
-        std::vector<BufferVectorType> owner_vbufs(num_neigh_owner);
-
-        // create receive buffers and post receives
-        for(IndexType i(0); i < num_neigh_donee; ++i)
+      public:
+        template<typename DT_>
+        static Index get_local_dof_count(std::vector<Index>& v,
+          const LAFEM::DenseVector<IT_, IT_>& DOXY(global_dof_idx),
+          const LAFEM::VectorMirror<DT_, IT_>& owned_mirror)
         {
-          // create buffer
-          BufferVectorType& buf = donee_vbufs.at(i);
-          buf = BufferVectorType(this->_data_donee_mirs.at(i).num_indices());
-
-          // post receive
-          recv_reqs[i] = comm.irecv(buf.elements(), buf.size(), adp.get_donee_rank(i));
+          v.push_back(owned_mirror.num_indices());
+          return v.back();
         }
 
-        // post sends
-        for(IndexType i(0); i < num_neigh_owner; ++i)
+        static String build_block_info(
+          const LAFEM::DenseVector<IT_, IT_>& DOXY(global_dof_idx), Index global_offset,
+          std::deque<Index>& global_first, std::deque<Index>& global_num,
+          std::deque<Index>& local_offset, std::deque<Index>& local_num)
         {
-          // create buffer
-          BufferVectorType& buf = owner_vbufs.at(i);
-          buf = BufferVectorType(this->_data_owner_mirs.at(i).num_indices());
-
-          // gather from mirror
-          this->_gather_data(buf, mat_a, this->_data_owner_mirs.at(i));
-
-          // post send
-          send_reqs[i] = comm.isend(buf.elements(), buf.size(), adp.get_owner_rank(i));
+          String s = "<Scalar";
+          s += " gc=\"" + stringify(global_num.front()) + "\"";
+          s += " gf=\"" + stringify(global_first.front()) + "\"";
+          s += " go=\"" + stringify(global_offset + local_offset.front()) + "\"";
+          s += " lc=\"" + stringify(local_num.front()) + "\"";
+          s += " lo=\"" + stringify(local_offset.front()) + "\"";
+          s += "/>";
+          global_first.pop_front();
+          global_num.pop_front();
+          local_offset.pop_front();
+          local_num.pop_front();
+          return s;
         }
 
-        // upload our own data
-        this->_upload_own(mat_a);
-
-        // process all pending receives
-        for(std::size_t idx(0u); recv_reqs.wait_any(idx); )
+        template<typename DT_>
+        static void alloc_idx_vector(LAFEM::DenseVector<IT_, IT_>& idx_vec,
+          const LAFEM::DenseVector<DT_, IT_>& tmpl_vec, IT_ value)
         {
-          // scatter from buffer
-          this->_scatter_data(this->_matrix, donee_vbufs.at(idx), this->_data_donee_mirs.at(idx));
+          idx_vec = LAFEM::DenseVector<IT_, IT_>(tmpl_vec.size(), value);
         }
 
-        // wait for all sends to finish
-        send_reqs.wait_all();
-      }
-
-      /**
-       * \brief Applies a global unit-filter into this matrix.
-       *
-       * \attention
-       * You must use this function to filter the internal partitioned matrix.
-       * You cannot use the filter_mat() function of the unit-filter here, because
-       * the indices of the unit-filter relate to local DOF indices, whereas our
-       * internal matrix object works in owned DOF indices.
-       *
-       * \param[in] filter
-       * The unit-filter that is to be applied onto the matrix. May be empty.
-       */
-      template<typename LocalFilter_>
-      void filter_matrix(const Global::Filter<LocalFilter_, MirrorType>& filter)
-      {
-        filter_matrix(filter.local());
-      }
-
-      /**
-       * \brief Applies a unit-filter into this matrix.
-       *
-       * \attention
-       * You must use this function to filter the internal partitioned matrix.
-       * You cannot use the filter_mat() function of the unit-filter here, because
-       * the indices of the unit-filter relate to local DOF indices, whereas our
-       * internal matrix object works in owned DOF indices.
-       *
-       * \param[in] filter
-       * The unit-filter that is to be applied onto the matrix. May be empty.
-       */
-      void filter_matrix(const LAFEM::UnitFilter<DataType, IndexType>& filter)
-      {
-        // empty filter?
-        if(filter.used_elements() <= IndexType(0))
-          return;
-
-        // get our partitioning
-        const AlgDofPartiType& adp = *this->_alg_dof_parti;
-
-        // get global owned DOF offset and count
-        const IndexType off_glob = adp.get_global_dof_offset();
-        const IndexType num_glob = adp.get_num_global_dofs();
-
-        // get local filter indices
-        const Index num_idx = filter.used_elements();
-        const IndexType* fil_idx = filter.get_indices();
-
-        // get owned matrix arrays
-        const IndexType* row_ptr = this->_matrix.row_ptr();
-        const IndexType* col_idx = this->_matrix.col_ind();
-        DataType* val = this->_matrix.val();
-
-        // loop over all filter indices
-        for(IndexType i(0); i < num_idx; ++i)
+        template<typename DT_>
+        static void update_owners(const IT_ neighbor_rank,
+          LAFEM::DenseVector<IT_, IT_>& dof_owners,
+          const LAFEM::VectorMirror<DT_, IT_>& mirror)
         {
-          // translate local to global filter DOF index
-          const IndexType gidx = adp.map_local_to_global_index(fil_idx[i]);
-
-          // determine whether we own this DOF
-          if((gidx < off_glob) || (off_glob + num_glob <= gidx))
-            continue; // not my DOF
-
-          // okay, that's my DOF, so filter the row
-          const IndexType row = gidx - off_glob;
-          for(IndexType j(row_ptr[row]); j < row_ptr[row+1]; ++j)
+          const Index num_indices = mirror.num_indices();
+          const IT_* mir_idx = mirror.indices();
+          IT_* dof_own = dof_owners.elements();
+          for(Index j(0); j < num_indices; ++j)
           {
-            val[j] = DataType(col_idx[j] == gidx ? 1 : 0);
-          }
-        }
-      }
-
-    protected:
-      /**
-       * \brief Auxiliary function: creates a matrix buffer for a given owner mirror
-       *
-       * This function creates a matrix buffer for a given owner mirror, which contains
-       * all matrix rows that correspond to the owned DOF indices stored in the mirror.
-       * The column indices of the buffer correspond to global DOF indices.
-       *
-       * \param[in] local_matrix
-       * The local matrix that acts as a layout template.\n
-       * Its layout must be initialized, but its numerical values are ignored.
-       *
-       * \param[in] mirror
-       * The mirror that contains the local DOF indices, which correspond to the
-       * row indices of the local matrix which are to be extracted into the buffer.
-       *
-       * \param[in] gdi
-       * An array containing the global DOF indices for all local DOFs.
-       *
-       * \param[in] num_glob_dofs
-       * The total number of global DOFs over all processes.
-       */
-      static BufferMatrixType _asm_mat_buf(
-        const LocalMatrixType& local_matrix, const MirrorType& mirror,
-        const std::vector<IndexType>& gdi, const IndexType num_glob_dofs)
-      {
-        const Index num_idx = mirror.num_indices();
-        const IndexType* mir_idx = mirror.indices();
-
-        const IndexType* row_ptr = local_matrix.row_ptr();
-        const IndexType* col_idx = local_matrix.col_ind();
-
-        // count number of non-zeros in matrix buffer
-        IndexType nnze = IndexType(0);
-        for(IndexType i(0); i < num_idx; ++i)
-        {
-          nnze += (row_ptr[mir_idx[i]+1] - row_ptr[mir_idx[i]]);
-        }
-
-        // allocate matrix buffer of appropriate dimensions
-        BufferMatrixType buf(num_idx, num_glob_dofs, nnze, 1);
-        IndexType* buf_ptr = buf.row_ptr();
-        IndexType* buf_idx = buf.col_ind();
-
-        // set up buffer structure
-        buf_ptr[0] = IndexType(0);
-        for(IndexType i(0); i < num_idx; ++i)
-        {
-          const IndexType row = mir_idx[i];
-          IndexType k = buf_ptr[i];
-          // map local DOFs to global DOFs
-          for(IndexType j(row_ptr[row]); j < row_ptr[row+1]; ++j, ++k)
-            buf_idx[k] = gdi[col_idx[j]];
-          buf_ptr[i+1] = k;
-        }
-
-        // Note: we leave the buffer indices unsorted
-
-        // okay
-        return buf;
-      }
-
-      /**
-       * \brief Assembles the owner and donee matrix buffers.
-       *
-       * \param[in] local_matrix
-       * The local matrix that acts as a layout template.\n
-       * Its layout must be initialized, but its numerical values are ignored.
-       */
-      void _assemble_buffers(const LocalMatrixType& local_matrix)
-      {
-        // get our partitioning
-        const AlgDofPartiType& adp = *this->_alg_dof_parti;
-
-        // get out communicator
-        const Dist::Comm& comm = *this->get_comm();
-
-        // get number of neighbors and allocate buffer vectors
-        const IndexType num_neigh_owner = adp.get_num_owner_neighbors();
-        const IndexType num_neigh_donee = adp.get_num_donee_neighbors();
-        _owner_bufs.resize(num_neigh_owner);
-        _donee_bufs.resize(num_neigh_donee);
-
-        // create the owner buffers by using the auxiliary helper function.
-        for(IndexType i(0); i < num_neigh_owner; ++i)
-        {
-          this->_owner_bufs.at(i) = _asm_mat_buf(local_matrix, adp.get_owner_mirror(i),
-            adp.get_global_dof_indices(), adp.get_num_global_dofs());
-        }
-
-        // We have assembled our owner-neighbor matrix buffers, however, we cannot
-        // assemble the donee-neighbor matrix buffers on our own. Instead, each owner
-        // neighbor has to receive its donee-buffers from its donee-neighbors, because
-        // only the donee knows the matrix layout of those buffers.
-        // Yes, this is brain-twisting, but believe me, it cannot be realized otherwise.
-
-        // Note:
-        // The following code is effectively just copy-&-paste from the SynchMatrix::init()
-        // function, as the same buffer problem also arises when converting global type-0
-        // matrices to local type-1 matrices.
-
-        Dist::RequestVector send_reqs(num_neigh_owner);
-        Dist::RequestVector recv_reqs(num_neigh_donee);
-
-        // receive buffer dimensions vector
-        std::vector<std::array<IndexType,4>> send_dims(num_neigh_owner);
-        std::vector<std::array<IndexType,4>> recv_dims(num_neigh_donee);
-
-        // post send-buffer dimension receives
-        for(IndexType i(0); i < num_neigh_donee; ++i)
-        {
-          recv_reqs[i] = comm.irecv(recv_dims.at(i).data(), std::size_t(4), adp.get_donee_rank(i));
-        }
-
-        // send owner-buffer dimensions
-        for(IndexType i(0); i < num_neigh_owner; ++i)
-        {
-          const BufferMatrixType& sbuf = this->_owner_bufs.at(i);
-          send_dims.at(i)[0] = IndexType(sbuf.rows());
-          send_dims.at(i)[1] = IndexType(sbuf.columns());
-          send_dims.at(i)[2] = IndexType(sbuf.entries_per_nonzero());
-          send_dims.at(i)[3] = IndexType(sbuf.used_elements());
-          send_reqs[i] = comm.isend(send_dims.at(i).data(), std::size_t(4), adp.get_owner_rank(i));
-        }
-
-        // wait for all receives to finish
-        recv_reqs.wait_all();
-
-        // allocate donee-buffers
-        for(IndexType i(0); i < num_neigh_donee; ++i)
-        {
-          // get the receive buffer dimensions
-          IndexType nrows = recv_dims.at(i)[0];
-          IndexType ncols = recv_dims.at(i)[1];
-          IndexType nepnz = recv_dims.at(i)[2];
-          IndexType nnze  = recv_dims.at(i)[3];
-
-          // allocate receive buffer
-          this->_donee_bufs.at(i) = BufferMatrixType(nrows, ncols, nnze, nepnz);
-        }
-
-        // post donee-buffer row-pointer array receives
-        for(IndexType i(0); i < num_neigh_donee; ++i)
-        {
-          recv_reqs[i] = comm.irecv(this->_donee_bufs.at(i).row_ptr(),
-            this->_donee_bufs.at(i).rows()+std::size_t(1), adp.get_donee_rank(i));
-        }
-
-        // wait for all previous sends to finish
-        send_reqs.wait_all();
-
-        // post owner-buffer row-pointer array sends
-        for(IndexType i(0); i < num_neigh_owner; ++i)
-        {
-          send_reqs[i] = comm.isend(this->_owner_bufs.at(i).row_ptr(),
-            this->_owner_bufs.at(i).rows()+std::size_t(1), adp.get_owner_rank(i));
-        }
-
-        // wait for all previous receives to finish
-        recv_reqs.wait_all();
-
-        // post donee-buffer column-index array receives
-        for(IndexType i(0); i < num_neigh_donee; ++i)
-        {
-          recv_reqs[i] = comm.irecv(this->_donee_bufs.at(i).col_ind(),
-            this->_donee_bufs.at(i).used_elements(), adp.get_donee_rank(i));
-        }
-
-        // wait for all previous sends to finish
-        send_reqs.wait_all();
-
-        // post owner-buffer column-index array sends
-        for(IndexType i(0); i < num_neigh_owner; ++i)
-        {
-          send_reqs[i] = comm.isend(this->_owner_bufs.at(i).col_ind(),
-            this->_owner_bufs.at(i).used_elements(), adp.get_owner_rank(i));
-        }
-
-        // wait for all receives and sends to finish
-        recv_reqs.wait_all();
-        send_reqs.wait_all();
-      }
-
-      /**
-       * \brief Assembles the matrix structure of the algebraic-DOF-partitioned matrix.
-       *
-       * \param[in] local_matrix
-       * The local matrix that acts as a layout template.\n
-       * Its layout must be initialized, but its numerical values are ignored.
-       */
-      void _assemble_structure(const LocalMatrixType& local_matrix)
-      {
-        // get our partitioning
-        const AlgDofPartiType& adp = *this->_alg_dof_parti;
-
-        // get our matrix dimensions:
-        // * each row of our matrix corresponds to one owned DOF
-        // * each column corresponds to one global DOF
-        const IndexType num_rows = adp.get_num_owned_dofs();
-        const IndexType num_cols = adp.get_num_global_dofs();
-
-        // Unfortunately, assembling the matrix structure is not that easy,
-        // because it is a union of our owned matrix structure and all of
-        // our donee matrix buffers. We don't have a chance to determine how
-        // many duplicate (i,j) pairs we will encounter here, so we use the
-        // DynamicGraph class here to keep things simple.
-
-        // create a dynamic graph for our matrix
-        Adjacency::DynamicGraph dynamic_graph(num_rows, num_cols);
-
-        // First, let us add all local matrix rows which correspond to the
-        // owned DOFs of this process, which are given by the "owned mirror"
-        const IndexType* loc_row_ptr = local_matrix.row_ptr();
-        const IndexType* loc_col_idx = local_matrix.col_ind();
-        const IndexType* own_mir_idx = adp.get_owned_mirror().indices();
-        for(IndexType i(0); i < num_rows; ++i)
-        {
-          // get the local DOF index of our i-th owned DOF
-          const IndexType lrow = own_mir_idx[i];
-          for(IndexType j(loc_row_ptr[lrow]); j < loc_row_ptr[lrow + 1]; ++j)
-          {
-            // translate the local column indices into global DOF indices
-            dynamic_graph.insert(i, adp.map_local_to_global_index(loc_col_idx[j]));
+            IT_& dof_owner = dof_own[mir_idx[j]];
+            if(neighbor_rank < dof_owner)
+              dof_owner = neighbor_rank;
           }
         }
 
-        // process all donee-neighbor buffers
-        const IndexType num_neigh_donee = adp.get_num_donee_neighbors();
-        for(IndexType ineigh(0); ineigh < num_neigh_donee; ++ineigh)
+        static Index build_owned_dofs(const IT_ my_rank,
+          LAFEM::DenseVector<IT_, IT_>& owned_dofs,
+          const LAFEM::DenseVector<IT_, IT_>& dof_owners, Index offset)
         {
-          // get the mirror and the matrix buffer of that donee neighbor
-          // note: the donee mirror indices are owned DOF indices
-          const MirrorType& mir = adp.get_donee_mirror(ineigh);
-          const BufferMatrixType& buf = this->_donee_bufs.at(ineigh);
-          XASSERT(mir.num_indices() == buf.rows());
-          const Index num_idx = mir.num_indices();
-          const IndexType* mir_idx = mir.indices();
-          const IndexType* buf_ptr = buf.row_ptr();
-          const IndexType* buf_idx = buf.col_ind();
+          const Index n = dof_owners.size();
+          const IT_* dof_own = dof_owners.elements();
+          IT_* own_idx = owned_dofs.elements();
 
-          // loop over all matrix buffer rows
-          for(IndexType i(0); i < num_idx; ++i)
+          Index k = 0;
+          for(Index i = 0; i < n; ++i)
           {
-            // the owned DOF index of our the buffer matrix row
-            const IndexType row = mir_idx[i];
+            if(dof_own[i] == my_rank)
+              own_idx[i] = IT_(offset + k++);
+          }
 
-            // loop over all buffer indices
-            for(IndexType j(buf_ptr[i]); j < buf_ptr[i + 1]; ++j)
+          return k;
+        }
+
+        template<typename DT_>
+        static Index build_owned_mirror(const IT_ owner_rank,
+          LAFEM::VectorMirror<DT_, IT_>& owner_mirror,
+          const LAFEM::DenseVector<IT_, IT_>& dof_owners)
+        {
+          // count the number of owned DOFs
+          const Index n = dof_owners.size();
+          const IT_* dof_own = dof_owners.elements();
+          Index num_owned = 0u;
+          for(Index i = 0; i < n; ++i)
+          {
+            if(dof_own[i] == owner_rank)
+              ++num_owned;
+          }
+
+          // allocate mirror
+          owner_mirror = LAFEM::VectorMirror<DT_, IT_>(n, num_owned);
+          IT_* mir_idx = owner_mirror.indices();
+
+          // store owned DOF indices
+          for(Index i = 0, k = 0; i < n; ++i)
+          {
+            if(dof_own[i] == owner_rank)
             {
-              // insert entry into our local matrix
-              dynamic_graph.insert(row, buf_idx[j]);
+              mir_idx[k++] = IT_(i);
+            }
+          }
+
+          return num_owned;
+        }
+
+        template<typename DT_>
+        static Index build_owner_mirror(const IT_ neighbor_rank,
+          LAFEM::VectorMirror<DT_, IT_>& owner_mirror,
+          const LAFEM::VectorMirror<DT_, IT_>& halo_mirror,
+          const LAFEM::DenseVector<IT_, IT_>& dof_owners)
+        {
+          // get halo mirror indices
+          const Index n = halo_mirror.num_indices();
+          const IT_* halo_idx = halo_mirror.indices();
+          const IT_* dof_own = dof_owners.elements();
+
+          // count number of owner dofs
+          Index num_owner = 0u;
+          for(Index i = 0; i < n; ++i)
+          {
+            if(dof_own[halo_idx[i]] == neighbor_rank)
+              ++num_owner;
+          }
+
+          // allocate mirror
+          owner_mirror = LAFEM::VectorMirror<DT_, IT_>(dof_owners.size(), num_owner);
+
+          if(num_owner <= Index(0))
+            return Index(0);
+
+          // store owner DOF indices
+          IT_* own_idx = owner_mirror.indices();
+          for(IT_ i = 0, k = 0; i < n; ++i)
+          {
+            if(dof_own[halo_idx[i]] == neighbor_rank)
+            {
+              own_idx[k++] = halo_idx[i];
+            }
+          }
+
+          return num_owner;
+        }
+
+        template<typename DT_>
+        static Index count_donee_dofs(
+          const LAFEM::VectorMirror<DT_, IT_>& halo_mirror,
+          const LAFEM::DenseVector<IT_, IT_>& own_dof_idx)
+        {
+          // get halo mirror indices
+          const Index n = halo_mirror.num_indices();
+          const IT_* halo_idx = halo_mirror.indices();
+          const IT_* own_idx = own_dof_idx.elements();
+
+          // count number of owner dofs
+          Index num_donee = 0u;
+          for(Index i = 0; i < n; ++i)
+          {
+            if(own_idx[halo_idx[i]] != ~IT_(0))
+              ++num_donee;
+          }
+
+          return num_donee;
+        }
+
+        template<typename DT_>
+        static Index build_donee_mirror(
+          LAFEM::VectorMirror<DT_, IT_>& donee_mirror,
+          const LAFEM::VectorMirror<DT_, IT_>& halo_mirror,
+          const LAFEM::DenseVector<IT_, IT_>& own_dof_idx, Index offset)
+        {
+          // get halo mirror indices
+          const Index n = halo_mirror.num_indices();
+          const IT_* halo_idx = halo_mirror.indices();
+          const IT_* own_idx = own_dof_idx.elements();
+          IT_* donee_idx = donee_mirror.indices();
+
+          // store donee DOF indices
+          Index k = 0u;
+          for(Index i = 0; i < n; ++i)
+          {
+            if(own_idx[halo_idx[i]] != ~IT_(0))
+            {
+              donee_idx[offset + k++] = own_idx[halo_idx[i]];
+            }
+          }
+
+          return k;
+        }
+
+        template<typename DT_>
+        static Index init_global_dof_idx(
+          LAFEM::DenseVector<IT_, IT_>& global_dof_idx,
+          const LAFEM::VectorMirror<DT_, IT_>& owned_mirror, Index offset)
+        {
+          IT_* g_dof_idx = global_dof_idx.elements();
+          const IT_* own_idx = owned_mirror.indices();
+          const Index n =  owned_mirror.num_indices();
+          for(Index i = 0; i < n; ++i)
+            g_dof_idx[own_idx[i]] = IT_(offset + i);
+          return n;
+        }
+
+        template<typename DT_>
+        static Index set_owner_dofs(
+          LAFEM::DenseVector<IT_, IT_>& glob_dof_idx,
+          const std::vector<IT_>& recv_buf,
+          const LAFEM::VectorMirror<DT_, IT_>& mirror, Index offset)
+        {
+          const Index num_indices = mirror.num_indices();
+          const IT_* mir_idx = mirror.indices();
+          IT_* g_dof_idx = glob_dof_idx.elements();
+          for(Index j(0); j < num_indices; ++j)
+            g_dof_idx[mir_idx[j]] = recv_buf[offset + j];
+          return num_indices;
+        }
+
+        template<typename DT_, typename DT2_>
+        static Index gather(DT2_* buf,
+          const LAFEM::DenseVector<DT_, IT_>& vector,
+          const LAFEM::VectorMirror<DT_, IT_>& mirror)
+        {
+          XASSERT(mirror.size() == vector.size());
+          const Index n = mirror.num_indices();
+          const IT_* idx = mirror.indices();
+          const DT_* val = vector.elements();
+          for(Index i = 0u; i < n; ++i)
+            buf[i] = DT2_(val[idx[i]]);
+          return n;
+        }
+
+        template<typename DT_, typename DT2_>
+        static Index scatter(const DT2_* buf,
+          LAFEM::DenseVector<DT_, IT_>& vector,
+          const LAFEM::VectorMirror<DT_, IT_>& mirror)
+        {
+          XASSERT(mirror.size() == vector.size());
+          const Index n = mirror.num_indices();
+          const IT_* idx = mirror.indices();
+          DT_* val = vector.elements();
+          for(Index i = 0u; i < n; ++i)
+            val[idx[i]] = DT_(buf[i]);
+          return n;
+        }
+      }; // class ADPAux<LAFEM::DenseVector<IT_, IT_>>
+
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      template<typename IT_, int bs_>
+      class ADPAux<LAFEM::DenseVectorBlocked<IT_, IT_, bs_>>
+      {
+      public:
+        template<typename DT_>
+        static Index get_local_dof_count(std::vector<Index>& v,
+          const LAFEM::DenseVectorBlocked<IT_, IT_, bs_>& DOXY(global_dof_idx),
+          const LAFEM::VectorMirror<DT_, IT_>& owned_mirror)
+        {
+          v.push_back(owned_mirror.num_indices() * Index(bs_));
+          return v.back();
+        }
+
+        static String build_block_info(
+          const LAFEM::DenseVectorBlocked<IT_, IT_, bs_>& DOXY(global_dof_idx), Index global_offset,
+          std::deque<Index>& global_first, std::deque<Index>& global_num,
+          std::deque<Index>& local_offset, std::deque<Index>& local_num)
+        {
+          String s = "<Blocked";
+          s += " bs=\"" + stringify(bs_) + "\"";
+          s += " gc=\"" + stringify(global_num.front()) + "\"";
+          s += " gf=\"" + stringify(global_first.front()) + "\"";
+          s += " go=\"" + stringify(global_offset + local_offset.front()) + "\"";
+          s += " lc=\"" + stringify(local_num.front()) + "\"";
+          s += " lo=\"" + stringify(local_offset.front()) + "\"";
+          s += "/>";
+          global_first.pop_front();
+          global_num.pop_front();
+          local_offset.pop_front();
+          local_num.pop_front();
+          return s;
+        }
+
+        template<typename DT_>
+        static void alloc_idx_vector(LAFEM::DenseVectorBlocked<IT_, IT_, bs_>& idx_vec,
+          const LAFEM::DenseVectorBlocked<DT_, IT_, bs_>& tmpl_vec, IT_ value)
+        {
+          idx_vec = LAFEM::DenseVectorBlocked<IT_, IT_, bs_>(tmpl_vec.size(), value);
+        }
+
+        template<typename DT_>
+        static void update_owners(const IT_ neighbor_rank,
+          LAFEM::DenseVectorBlocked<IT_, IT_, bs_>& dof_owners,
+          const LAFEM::VectorMirror<DT_, IT_>& mirror)
+        {
+          const Index num_indices = mirror.num_indices();
+          const IT_* mir_idx = mirror.indices();
+          auto* dof_own = dof_owners.elements(); // dof_own is a Tiny::Vector<IT_,...>*
+          for(Index j(0); j < num_indices; ++j)
+          {
+            auto& dof_owner = dof_own[mir_idx[j]];
+            if(neighbor_rank < dof_owner[0])
+            {
+              for(int k = 0; k < bs_; ++k)
+                dof_owner[k] = neighbor_rank;
             }
           }
         }
 
-        // render into a standard graph
-        Adjacency::Graph graph(Adjacency::RenderType::as_is, dynamic_graph);
-
-        // create our dof-partitoned matrix object
-        this->_matrix = OwnedMatrixType(graph);
-      }
-
-      /**
-       * \brief Auxiliary function: assembles a data-mirror for a donee-neighbor
-       *
-       * \param[in] local_matrix
-       * The local matrix that acts as a layout template.\n
-       * Its layout must be initialized, but its numerical values are ignored.
-       *
-       * \param[in] mirror
-       * The mirror of the donee-neighbor.
-       *
-       * \param[in] buffer
-       * The matrix buffer for the donee-mirror.
-       */
-      static MirrorType _asm_donee_data_mir(const LocalMatrixType& local_matrix,
-        const MirrorType& mirror, const BufferMatrixType& buffer)
-      {
-        // allocate mirror
-        const Index buf_rows = buffer.rows();
-        const Index num_idx = buffer.used_elements();
-        MirrorType dat_mir(local_matrix.used_elements(), num_idx);
-
-        const IndexType* row_idx = mirror.indices();
-        const IndexType* row_ptr = local_matrix.row_ptr();
-        const IndexType* col_idx = local_matrix.col_ind();
-        const IndexType* buf_ptr = buffer.row_ptr();
-        const IndexType* buf_idx = buffer.col_ind();
-        IndexType* dat_idx = dat_mir.indices();
-
-        // loop over all buffer matrix rows
-        for(IndexType i(0); i < buf_rows; ++i)
+        static Index build_owned_dofs(const IT_ my_rank,
+          LAFEM::DenseVectorBlocked<IT_, IT_, bs_>& owned_dofs,
+          const LAFEM::DenseVectorBlocked<IT_, IT_, bs_>& dof_owners, Index offset)
         {
-          // get local matrix row index
-          const IndexType row = row_idx[i];
-          for(IndexType j(buf_ptr[i]); j < buf_ptr[i + 1]; ++j)
-          {
-            // get global column index
-            const IndexType col = buf_idx[j];
+          const Index n = dof_owners.size();
+          const auto* dof_own = dof_owners.elements();
+          auto* own_idx = owned_dofs.elements();
 
-            // loop over the corresponding row of our matrix
-            for(IndexType k(row_ptr[row]); k < row_ptr[row + 1]; ++k)
+          Index k = 0;
+          for(Index i = 0; i < n; ++i)
+          {
+            if(dof_own[i][0] == my_rank)
             {
-              // is this the column we are looking for?
-              if(col_idx[k] == col)
-              {
-                // Yup, store this index in the mirror
-                dat_idx[j] = k;
-                break;
-              }
+              for(int j = 0; j < bs_; ++j)
+                own_idx[i][j] = IT_(offset + k++);
             }
           }
+
+          return k;
         }
 
-        return dat_mir;
-      }
-
-      /**
-       * \brief Auxiliary function: assembles a data-mirror for an owner-neighbor
-       *
-       * \param[in] local_matrix
-       * The local matrix that acts as a layout template.\n
-       * Its layout must be initialized, but its numerical values are ignored.
-       *
-       * \param[in] mirror
-       * The mirror of the owner-neighbor.
-       *
-       * \param[in] buffer
-       * The matrix buffer for the owner-mirror.
-       *
-       * \param[in] glob_dof_idx
-       * A vector containing the global DOF indices for all local DOFs.
-       */
-      static MirrorType _asm_owner_data_mir(const LocalMatrixType& local_matrix,
-        const MirrorType& mirror, const BufferMatrixType& buffer,
-        const std::vector<IndexType>& glob_dof_idx)
-      {
-        // allocate mirror
-        const Index buf_rows = buffer.rows();
-        const Index num_idx = buffer.used_elements();
-        MirrorType dat_mir(local_matrix.used_elements(), num_idx);
-
-        const IndexType* row_idx = mirror.indices();
-        const IndexType* row_ptr = local_matrix.row_ptr();
-        const IndexType* col_idx = local_matrix.col_ind();
-        const IndexType* buf_ptr = buffer.row_ptr();
-        const IndexType* buf_idx = buffer.col_ind();
-        IndexType* dat_idx = dat_mir.indices();
-
-        // loop over all buffer matrix rows
-        for(IndexType i(0); i < buf_rows; ++i)
+        template<typename DT_>
+        static Index build_owned_mirror(const IT_ owner_rank,
+          LAFEM::VectorMirror<DT_, IT_>& owner_mirror,
+          const LAFEM::DenseVectorBlocked<IT_, IT_, bs_>& dof_owners)
         {
-          // get local matrix row index
-          const IndexType row = row_idx[i];
-          for(IndexType j(buf_ptr[i]); j < buf_ptr[i + 1]; ++j)
+          // count the number of owned DOFs
+          const Index n = dof_owners.size();
+          const auto* dof_own = dof_owners.elements();
+          Index num_owned = 0u;
+          for(Index i = 0; i < n; ++i)
           {
-            // get global column index
-            const IndexType col = buf_idx[j];
+            if(dof_own[i][0] == owner_rank)
+              ++num_owned;
+          }
 
-            // loop over the corresponding row of our matrix
-            for(IndexType k(row_ptr[row]); k < row_ptr[row + 1]; ++k)
+          // allocate mirror
+          owner_mirror = LAFEM::VectorMirror<DT_, IT_>(n, num_owned);
+          IT_* mir_idx = owner_mirror.indices();
+
+          // store owned DOF indices
+          for(Index i = 0, k = 0; i < n; ++i)
+          {
+            if(dof_own[i][0] == owner_rank)
             {
-              // is this the column we are looking for?
-              if(glob_dof_idx[col_idx[k]] == col)
-              {
-                // Yup, store this index in the mirror
-                dat_idx[j] = k;
-                break;
-              }
+              mir_idx[k++] = IT_(i);
             }
           }
+
+          return num_owned * Index(bs_);
         }
 
-        return dat_mir;
-      }
-
-      /**
-       * \brief Assembles the data-mirrors for all owner- and donee-neighbors.
-       *
-       * This functions assembles the data-mirrors, which are used for the communication
-       * of the numerical values of a matrix in the #upload_numeric() function.
-       * This allows that the matrix values can be uploaded and synchronized without the
-       * need to re-communicate the unchanged matrix buffer layouts every time.
-       *
-       * \param[in] local_matrix
-       * The local matrix that acts as a layout template.\n
-       * Its layout must be initialized, but its numerical values are ignored.
-       */
-      void _assemble_data_mirrors(const LocalMatrixType& local_matrix)
-      {
-        // get our partitioning
-        const AlgDofPartiType& adp = *this->_alg_dof_parti;
-
-        // assemble donee data mirrors
-        this->_data_donee_mirs.resize(this->_donee_bufs.size());
-        for(IndexType i(0); i < this->_donee_bufs.size(); ++i)
-          this->_data_donee_mirs.at(i) = _asm_donee_data_mir(this->_matrix,
-            adp.get_donee_mirror(i), this->_donee_bufs.at(i));
-
-        // assemble owner data mirrors
-        this->_data_owner_mirs.resize(this->_owner_bufs.size());
-        for(IndexType i(0); i < this->_owner_bufs.size(); ++i)
-          this->_data_owner_mirs.at(i) = _asm_owner_data_mir(local_matrix,
-            adp.get_owner_mirror(i), this->_owner_bufs.at(i),
-            adp.get_global_dof_indices());
-
-        // get matrix arrays
-        const IndexType* row_ptr_x = this->_matrix.row_ptr();
-        const IndexType* col_idx_x = this->_matrix.col_ind();
-        const IndexType* row_ptr_a = local_matrix.row_ptr();
-        const IndexType* col_idx_a = local_matrix.col_ind();
-
-        // reset my data mirror
-        _my_data_mir.clear();
-        _my_data_mir.reserve(this->_matrix.used_elements());
-
-        const IndexType num_owned_dofs = adp.get_num_owned_dofs();
-        const IndexType* loc_dof_idx = adp.get_owned_mirror().indices();
-        const std::vector<IndexType>& glob_dof_idx = adp.get_global_dof_indices();
-
-        XASSERT(num_owned_dofs == this->_matrix.rows());
-
-        // loop over all our owned DOFS
-        for(IndexType own_dof(0); own_dof < num_owned_dofs; ++own_dof)
+        template<typename DT_>
+        static Index build_owner_mirror(const IT_ neighbor_rank,
+          LAFEM::VectorMirror<DT_, IT_>& owner_mirror,
+          const LAFEM::VectorMirror<DT_, IT_>& halo_mirror,
+          const LAFEM::DenseVectorBlocked<IT_, IT_, bs_>& dof_owners)
         {
-          // get the local DOF index for this owned DOF
-          const IndexType loc_dof = loc_dof_idx[own_dof];
+          // get halo mirror indices
+          const Index n = halo_mirror.num_indices();
+          const IT_* halo_idx = halo_mirror.indices();
+          const auto* dof_own = dof_owners.elements();
 
-          // loop over all columns of our owned DOF matrix
-          for(IndexType j(row_ptr_x[own_dof]); j < row_ptr_x[own_dof + 1]; ++j)
+          // count number of owner dofs
+          Index num_owner = 0u;
+          for(Index i = 0; i < n; ++i)
           {
-            // get the column index, which is a global DOF index
-            const IndexType col_x = col_idx_x[j];
+            if(dof_own[halo_idx[i]][0] == neighbor_rank)
+              ++num_owner;
+          }
 
-            // loop over the row of the local matrix
-            for(IndexType k(row_ptr_a[loc_dof]); k < row_ptr_a[loc_dof + 1]; ++k)
+          // allocate mirror
+          owner_mirror = LAFEM::VectorMirror<DT_, IT_>(dof_owners.size(), num_owner);
+
+          if(num_owner <= Index(0))
+            return Index(0);
+
+          // store owner DOF indices
+          IT_* own_idx = owner_mirror.indices();
+          for(IT_ i = 0, k = 0; i < n; ++i)
+          {
+            if(dof_own[halo_idx[i]][0] == neighbor_rank)
             {
-              // get the local column index and map it to a global one
-              const IndexType col_a = glob_dof_idx[col_idx_a[k]];
-
-              // match?
-              if(col_a == col_x)
-              {
-                // Okay, add this matrix entry to our mirror
-                _my_data_mir.push_back(std::make_pair(j, k));
-                break;
-              }
+              own_idx[k++] = halo_idx[i];
             }
           }
+
+          return num_owner * Index(bs_);
         }
-      }
 
-      /**
-       * \brief Uploads the values of the local matrix into our matrix partition
-       *
-       * \param[in] local_matrix
-       * The local matrix whose values are to be uploaded.
-       */
-      void _upload_own(const LocalMatrixType& local_matrix)
+        template<typename DT_>
+        static Index count_donee_dofs(
+          const LAFEM::VectorMirror<DT_, IT_>& halo_mirror,
+          const LAFEM::DenseVectorBlocked<IT_, IT_, bs_>& own_dof_idx)
+        {
+          // get halo mirror indices
+          const Index n = halo_mirror.num_indices();
+          const IT_* halo_idx = halo_mirror.indices();
+          const auto* own_idx = own_dof_idx.elements();
+
+          // count number of owner dofs
+          Index num_donee = 0u;
+          for(Index i = 0; i < n; ++i)
+          {
+            if(own_idx[halo_idx[i]][0] != ~IT_(0))
+              num_donee += Index(bs_);
+          }
+
+          return num_donee;
+        }
+
+        template<typename DT_>
+        static Index build_donee_mirror(
+          LAFEM::VectorMirror<DT_, IT_>& donee_mirror,
+          const LAFEM::VectorMirror<DT_, IT_>& halo_mirror,
+          const LAFEM::DenseVectorBlocked<IT_, IT_, bs_>& own_dof_idx, Index offset)
+        {
+          // get halo mirror indices
+          const Index n = halo_mirror.num_indices();
+          const IT_* halo_idx = halo_mirror.indices();
+          const auto* own_idx = own_dof_idx.elements();
+          IT_* donee_idx = donee_mirror.indices();
+
+          // store donee DOF indices
+          Index k = 0u;
+          for(Index i = 0; i < n; ++i)
+          {
+            if(own_idx[halo_idx[i]][0] != ~IT_(0))
+            {
+              for(int j = 0; j < bs_; ++j)
+                donee_idx[offset + k++] = own_idx[halo_idx[i]][j];
+            }
+          }
+
+          return k;
+        }
+
+        template<typename DT_>
+        static Index init_global_dof_idx(
+          LAFEM::DenseVectorBlocked<IT_, IT_, bs_>& global_dof_idx,
+          const LAFEM::VectorMirror<DT_, IT_>& owned_mirror, Index offset)
+        {
+          auto* g_dof_idx = global_dof_idx.elements();
+          const IT_* own_idx = owned_mirror.indices();
+          const Index n =  owned_mirror.num_indices();
+          for(Index i = 0; i < n; ++i)
+          {
+            for(int j = 0; j < bs_; ++j)
+              g_dof_idx[own_idx[i]][j] = IT_(offset + i*Index(bs_) + Index(j));
+          }
+          return n * Index(bs_);
+        }
+
+        template<typename DT_>
+        static Index set_owner_dofs(
+          LAFEM::DenseVectorBlocked<IT_, IT_, bs_>& glob_dof_idx,
+          const std::vector<IT_>& recv_buf,
+          const LAFEM::VectorMirror<DT_, IT_>& mirror, Index offset)
+        {
+          const Index num_indices = mirror.num_indices();
+          const IT_* mir_idx = mirror.indices();
+          auto* g_dof_idx = glob_dof_idx.elements();
+          for(Index i(0); i < num_indices; ++i)
+          {
+            for(int j = 0; j < bs_; ++j)
+              g_dof_idx[mir_idx[i]][j] = recv_buf[offset + i*IT_(bs_) + IT_(j)];
+          }
+          return num_indices * Index(bs_);
+        }
+
+        template<typename DT_, typename DT2_>
+        static Index gather(DT2_* buf,
+          const LAFEM::DenseVectorBlocked<DT_, IT_, bs_>& vector,
+          const LAFEM::VectorMirror<DT_, IT_>& mirror)
+        {
+          XASSERT(mirror.size() == vector.size());
+          const Index n = mirror.num_indices();
+          const IT_* idx = mirror.indices();
+          const auto* val = vector.elements();
+          for(Index i = 0u, k = 0u; i < n; ++i)
+          {
+            for(int j = 0; j < bs_; ++j, ++k)
+              buf[k] = DT2_(val[idx[i]][j]);
+          }
+          return n * Index(bs_);
+        }
+
+        template<typename DT_, typename DT2_>
+        static Index scatter(const DT2_* buf,
+          LAFEM::DenseVectorBlocked<DT_, IT_, bs_>& vector,
+          const LAFEM::VectorMirror<DT_, IT_>& mirror)
+        {
+          XASSERT(mirror.size() == vector.size());
+          const Index n = mirror.num_indices();
+          const IT_* idx = mirror.indices();
+          auto* val = vector.elements();
+          for(Index i = 0u, k = 0u; i < n; ++i)
+          {
+            for(int j = 0; j < bs_; ++j, ++k)
+              val[idx[i]][j] = DT_(buf[k]);
+          }
+          return n * Index(bs_);
+        }
+      }; // class ADPAux<LAFEM::DenseVectorBlocked<IT_, IT_, bs_>>
+
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      template<typename FirstIdxVec_, typename... RestIdxVec_>
+      class ADPAux<LAFEM::TupleVector<FirstIdxVec_, RestIdxVec_...>>
       {
-        // get our data arrays
-        const DataType* val_a = local_matrix.val();
-        DataType* val_x = this->_matrix.val();
+      public:
+        typedef typename FirstIdxVec_::IndexType IT_;
+        typedef ADPAux<FirstIdxVec_> ADPAuxFirst;
+        typedef ADPAux<LAFEM::TupleVector<RestIdxVec_...>> ADPAuxRest;
 
-        // loop over our own data mirror
-        for(auto ij : this->_my_data_mir)
-          val_x[ij.first] = val_a[ij.second];
-      }
+        template<typename FirstMirror_, typename... RestMirror_>
+        static Index get_local_dof_count_raw(std::vector<Index>& v,
+          const LAFEM::TupleVector<FirstIdxVec_, RestIdxVec_...>& global_dof_idx,
+          const LAFEM::TupleMirror<FirstMirror_, RestMirror_...>& owned_mirror)
+        {
+          Index n1 = ADPAuxFirst::get_local_dof_count(v, global_dof_idx.first(), owned_mirror.first());
+          Index n2 = ADPAuxRest::get_local_dof_count_raw(v, global_dof_idx.rest(), owned_mirror.rest());
+          return n1 + n2;
+        }
 
-      /**
-       * \brief Gathers the values of a local matrix into an owner-neighbor buffer-vector
-       *
-       * \param[out] buffer
-       * A buffer vector that receives the gathered values.
-       *
-       * \param[in] local_matrix
-       * The local matrix whose values are to be gathered.
-       *
-       * \param[in] data_mirror
-       * The owner-data mirror to be used.
-       */
-      static void _gather_data(BufferVectorType& buffer, const LocalMatrixType& local_matrix,
-        const MirrorType& data_mirror)
+        template<
+          typename FirstMirror_, typename... RestMirror_>
+        static Index get_local_dof_count(std::vector<Index>& v,
+          const LAFEM::TupleVector<FirstIdxVec_, RestIdxVec_...>& global_dof_idx,
+          const LAFEM::TupleMirror<FirstMirror_, RestMirror_...>& owned_mirror)
+        {
+          v.push_back(get_local_dof_count_raw(v, global_dof_idx, owned_mirror));
+          return v.back();
+        }
+
+        static String build_block_info_raw(
+          const LAFEM::TupleVector<FirstIdxVec_, RestIdxVec_...>& global_dof_idx, Index global_offset,
+          std::deque<Index>& global_first, std::deque<Index>& global_num,
+          std::deque<Index>& local_offset, std::deque<Index>& local_num)
+        {
+          String s = ADPAuxFirst::build_block_info(global_dof_idx.first(), global_offset, global_first, global_num, local_offset, local_num);
+          s += "\n";
+          s += ADPAuxRest::build_block_info_raw(global_dof_idx.rest(), global_offset, global_first, global_num, local_offset, local_num);
+          return s;
+        }
+
+        static String build_block_info(
+          const LAFEM::TupleVector<FirstIdxVec_, RestIdxVec_...>& global_dof_idx, Index global_offset,
+          std::deque<Index>& global_first, std::deque<Index>& global_num,
+          std::deque<Index>& local_offset, std::deque<Index>& local_num)
+        {
+          // offsets need to be processed BEFORE the call to '_build_block_info_raw' because
+          // the offsets of the tuple coincide with the offsets of the first tuple entry
+          String slo = stringify(local_offset.front());
+          String sgo = stringify(global_offset + local_offset.front());
+          String sraw = build_block_info_raw(global_dof_idx, global_offset, global_first, global_num, local_offset, local_num);
+          String s = "<Tuple";
+          // counts and first need to be processed AFTER the call to '_build_block_info_raw' because
+          // these correspond to the sums of the corresponding values of all the tuple entries
+          s += " gc=\"" + stringify(global_num.front()) + "\"";
+          s += " gf=\"" + stringify(global_first.front()) + "\"";
+          s += " go=\"" + sgo + "\"";
+          s += " lc=\"" + stringify(local_num.front()) + "\"";
+          s += " lo=\"" + slo + "\">\n";
+          s += sraw;
+          s += "\n</Tuple>";
+          global_first.pop_front();
+          global_num.pop_front();
+          local_offset.pop_front();
+          local_num.pop_front();
+          return s;
+        }
+
+        template<typename FirstTmplVector_, typename... RestTmplVector_>
+        static void alloc_idx_vector(LAFEM::TupleVector<FirstIdxVec_, RestIdxVec_...>& idx_vec,
+          const LAFEM::TupleVector<FirstTmplVector_, RestTmplVector_...>& tmpl_vec, IT_ value)
+        {
+          ADPAuxFirst::alloc_idx_vector(idx_vec.first(), tmpl_vec.first(), value);
+          ADPAuxRest::alloc_idx_vector(idx_vec.rest(), tmpl_vec.rest(), value);
+        }
+
+        template<typename FirstMirror_, typename... RestMirror_>
+        static void update_owners(const IT_ neighbor_rank,
+          LAFEM::TupleVector<FirstIdxVec_, RestIdxVec_...>& dof_owners,
+          const LAFEM::TupleMirror<FirstMirror_, RestMirror_...>& mirror)
+        {
+          ADPAuxFirst::update_owners(neighbor_rank, dof_owners.first(), mirror.first());
+          ADPAuxRest::update_owners(neighbor_rank, dof_owners.rest(), mirror.rest());
+        }
+
+        static Index build_owned_dofs(const IT_ my_rank,
+          LAFEM::TupleVector<FirstIdxVec_, RestIdxVec_...>& owned_dofs,
+          const LAFEM::TupleVector<FirstIdxVec_, RestIdxVec_...>& dof_owners, Index offset)
+        {
+          Index n1 = ADPAuxFirst::build_owned_dofs(my_rank, owned_dofs.first(), dof_owners.first(), offset);
+          Index n2 = ADPAuxRest::build_owned_dofs(my_rank, owned_dofs.rest(), dof_owners.rest(), offset + n1);
+          return n1 + n2;
+        }
+
+        template<typename FirstMirror_, typename... RestMirror_>
+        static Index build_owned_mirror(const IT_ owner_rank,
+          LAFEM::TupleMirror<FirstMirror_, RestMirror_...>& owner_mirror,
+          const LAFEM::TupleVector<FirstIdxVec_, RestIdxVec_...>& dof_owners)
+        {
+          Index n1 = ADPAuxFirst::build_owned_mirror(owner_rank, owner_mirror.first(), dof_owners.first());
+          Index n2 = ADPAuxRest::build_owned_mirror(owner_rank, owner_mirror.rest(), dof_owners.rest());
+          return n1 + n2;
+        }
+
+        template<typename FirstMirror_, typename... RestMirror_>
+        static Index build_owner_mirror(const IT_ neighbor_rank,
+          LAFEM::TupleMirror<FirstMirror_, RestMirror_...>& owner_mirror,
+          const LAFEM::TupleMirror<FirstMirror_, RestMirror_...>& halo_mirror,
+          const LAFEM::TupleVector<FirstIdxVec_, RestIdxVec_...>& dof_owners)
+        {
+          Index n1 = ADPAuxFirst::build_owner_mirror(neighbor_rank, owner_mirror.first(), halo_mirror.first(), dof_owners.first());
+          Index n2 = ADPAuxRest::build_owner_mirror(neighbor_rank, owner_mirror.rest(), halo_mirror.rest(), dof_owners.rest());
+          return n1 + n2;
+        }
+
+        template<typename FirstMirror_, typename... RestMirror_>
+        static Index count_donee_dofs(
+          const LAFEM::TupleMirror<FirstMirror_, RestMirror_...>& halo_mirror,
+          const LAFEM::TupleVector<FirstIdxVec_, RestIdxVec_...>& own_dof_idx)
+        {
+          Index n1 = ADPAuxFirst::count_donee_dofs(halo_mirror.first(), own_dof_idx.first());
+          Index n2 = ADPAuxRest::count_donee_dofs(halo_mirror.rest(), own_dof_idx.rest());
+          return n1 + n2;
+        }
+
+        template<typename DT_, typename FirstMirror_, typename... RestMirror_>
+        static Index build_donee_mirror(
+          LAFEM::VectorMirror<DT_, IT_>& donee_mirror,
+          const LAFEM::TupleMirror<FirstMirror_, RestMirror_...>& halo_mirror,
+          const LAFEM::TupleVector<FirstIdxVec_, RestIdxVec_...>& own_dof_idx, Index offset)
+        {
+          Index n1 = ADPAuxFirst::build_donee_mirror(donee_mirror, halo_mirror.first(), own_dof_idx.first(), offset);
+          Index n2 = ADPAuxRest::build_donee_mirror(donee_mirror, halo_mirror.rest(), own_dof_idx.rest(), offset + n1);
+          return n1 + n2;
+        }
+
+        template<typename FirstMirror_, typename... RestMirror_>
+        static Index init_global_dof_idx(
+          LAFEM::TupleVector<FirstIdxVec_, RestIdxVec_...>& global_dof_idx,
+          const LAFEM::TupleMirror<FirstMirror_, RestMirror_...>& owned_mirror, Index offset)
+        {
+          Index n1 = ADPAuxFirst::init_global_dof_idx(global_dof_idx.first(), owned_mirror.first(), offset);
+          Index n2 = ADPAuxRest::init_global_dof_idx(global_dof_idx.rest(), owned_mirror.rest(), offset + n1);
+          return n1 + n2;
+        }
+
+        template<typename FirstMirror_, typename... RestMirror_>
+        static Index set_owner_dofs(
+          LAFEM::TupleVector<FirstIdxVec_, RestIdxVec_...>& glob_dof_idx,
+          const std::vector<IT_>& recv_buf,
+          const LAFEM::TupleMirror<FirstMirror_, RestMirror_...>& mirror, Index offset)
+        {
+          Index n1 = ADPAuxFirst::set_owner_dofs(glob_dof_idx.first(), recv_buf, mirror.first(), offset);
+          Index n2 = ADPAuxRest::set_owner_dofs(glob_dof_idx.rest(), recv_buf, mirror.rest(), offset + n1);
+          return n1 + n2;
+        }
+
+        template<typename DT2_,
+          typename FirstVector_, typename... RestVector_,
+          typename FirstMirror_, typename... RestMirror_>
+        static Index gather(DT2_* buf,
+          const LAFEM::TupleVector<FirstVector_, RestVector_...>& vector,
+          const LAFEM::TupleMirror<FirstMirror_, RestMirror_...>& mirror)
+        {
+          Index n1 = ADPAuxFirst::gather(buf, vector.first(), mirror.first());
+          Index n2 = ADPAuxRest::gather(&buf[n1], vector.rest(), mirror.rest());
+          return n1 + n2;
+        }
+
+        template<typename DT2_,
+          typename FirstVector_, typename... RestVector_,
+          typename FirstMirror_, typename... RestMirror_>
+        static Index scatter(const DT2_* buf,
+          LAFEM::TupleVector<FirstVector_, RestVector_...>& vector,
+          const LAFEM::TupleMirror<FirstMirror_, RestMirror_...>& mirror)
+        {
+          Index n1 = ADPAuxFirst::scatter(buf, vector.first(), mirror.first());
+          Index n2 = ADPAuxRest::scatter(&buf[n1], vector.rest(), mirror.rest());
+          return n1 + n2;
+        }
+      }; // class ADPAux<LAFEM::TupleVector<FirstIdxVec_, RestIdxVec_...>>
+
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      template<typename FirstIdxVec_>
+      class ADPAux<LAFEM::TupleVector<FirstIdxVec_>>
       {
-        XASSERT(buffer.size() == data_mirror.num_indices());
-        XASSERT(data_mirror.size() == local_matrix.used_elements());
+      public:
+        typedef typename FirstIdxVec_::IndexType IT_;
+        typedef ADPAux<FirstIdxVec_> ADPAuxFirst;
 
-        DataType* buf_val = buffer.elements();
-        const DataType* mat_val = local_matrix.val();
-        const IndexType* mir_idx = data_mirror.indices();
-        const Index n = buffer.size();
-        for(IndexType i(0); i < n; ++i)
-          buf_val[i] = mat_val[mir_idx[i]];
-      }
+        template<typename FirstMirror_>
+        static Index get_local_dof_count_raw(std::vector<Index>& v,
+          const LAFEM::TupleVector<FirstIdxVec_>& global_dof_idx,
+          const LAFEM::TupleMirror<FirstMirror_>& owned_mirror)
+        {
+          return ADPAuxFirst::get_local_dof_count(v, global_dof_idx.first(), owned_mirror.first());
+        }
 
-      /**
-       * \brief Scatters the values of a donee-neighbor buffer-vector into a local matrix
-       *
-       * \param[inout] local_matrix
-       * The local matrix that receives the scattered values.
-       *
-       * \param[in] buffer
-       * The buffer vector whose values are to be scattered.
-       *
-       * \param[in] data_mirror
-       * The donee-data mirror to be used.
-       */
-      static void _scatter_data(LocalMatrixType& local_matrix, const BufferVectorType& buffer,
-        const MirrorType& data_mirror)
-      {
-        XASSERT(buffer.size() == data_mirror.num_indices());
-        XASSERT(data_mirror.size() == local_matrix.used_elements());
+        template<typename FirstMirror_>
+        static Index get_local_dof_count(std::vector<Index>& v,
+          const LAFEM::TupleVector<FirstIdxVec_>& global_dof_idx,
+          const LAFEM::TupleMirror<FirstMirror_>& owned_mirror)
+        {
+          v.push_back(get_local_dof_count_raw(v, global_dof_idx, owned_mirror));
+          return v.back();
+        }
 
-        DataType* mat_val = local_matrix.val();
-        const DataType* buf_val = buffer.elements();
-        const IndexType* mir_idx = data_mirror.indices();
-        const Index n = buffer.size();
-        for(IndexType i(0); i < n; ++i)
-          mat_val[mir_idx[i]] += buf_val[i];
-      }
-    }; // class AlgDofPartiMatrixCSR
+        static String build_block_info_raw(
+          const LAFEM::TupleVector<FirstIdxVec_>& global_dof_idx, Index global_offset,
+          std::deque<Index>& global_first, std::deque<Index>& global_num,
+          std::deque<Index>& local_offset, std::deque<Index>& local_num)
+        {
+          return ADPAuxFirst::build_block_info(global_dof_idx.first(), global_offset, global_first, global_num, local_offset, local_num);
+        }
+
+        static String build_block_info(
+          const LAFEM::TupleVector<FirstIdxVec_>& global_dof_idx, Index global_offset,
+          std::deque<Index>& global_first, std::deque<Index>& global_num,
+          std::deque<Index>& local_offset, std::deque<Index>& local_num)
+        {
+          // offsets need to be processed BEFORE the call to '_build_block_info_raw' because
+          // the offsets of the tuple coincide with the offsets of the first tuple entry
+          String slo = stringify(local_offset.front());
+          String sgo = stringify(global_offset + local_offset.front());
+          String sraw = build_block_info_raw(global_dof_idx, global_offset, global_first, global_num, local_offset, local_num);
+          String s = "<Tuple";
+          // counts and first need to be processed AFTER the call to '_build_block_info_raw' because
+          // these correspond to the sums of the corresponding values of all the tuple entries
+          s += " gc=\"" + stringify(global_num.front()) + "\"";
+          s += " gf=\"" + stringify(global_first.front()) + "\"";
+          s += " go=\"" + sgo + "\"";
+          s += " lc=\"" + stringify(local_num.front()) + "\"";
+          s += " lo=\"" + slo + "\">\n";
+          s += sraw;
+          s += "\n</Tuple>";
+          global_first.pop_front();
+          global_num.pop_front();
+          local_offset.pop_front();
+          local_num.pop_front();
+          return s;
+        }
+
+        template<typename FirstTmplVector_>
+        static void alloc_idx_vector(LAFEM::TupleVector<FirstIdxVec_>& idx_vec,
+          const LAFEM::TupleVector<FirstTmplVector_>& tmpl_vec, IT_ value)
+        {
+          ADPAuxFirst::alloc_idx_vector(idx_vec.first(), tmpl_vec.first(), value);
+        }
+
+        template<typename FirstMirror_>
+        static void update_owners(const IT_ neighbor_rank,
+          LAFEM::TupleVector<FirstIdxVec_>& dof_owners,
+          const LAFEM::TupleMirror<FirstMirror_>& mirror)
+        {
+          ADPAuxFirst::update_owners(neighbor_rank, dof_owners.first(), mirror.first());
+        }
+
+        static Index build_owned_dofs(const IT_ my_rank,
+          LAFEM::TupleVector<FirstIdxVec_>& owned_dofs,
+          const LAFEM::TupleVector<FirstIdxVec_>& dof_owners, Index offset)
+        {
+          return ADPAuxFirst::build_owned_dofs(my_rank, owned_dofs.first(), dof_owners.first(), offset);
+        }
+
+        template<typename FirstMirror_>
+        static Index build_owned_mirror(const IT_ owner_rank,
+          LAFEM::TupleMirror<FirstMirror_>& owner_mirror,
+          const LAFEM::TupleVector<FirstIdxVec_>& dof_owners)
+        {
+          return ADPAuxFirst::build_owned_mirror(owner_rank, owner_mirror.first(), dof_owners.first());
+        }
+
+        template<typename FirstMirror_>
+        static Index build_owner_mirror(const IT_ neighbor_rank,
+          LAFEM::TupleMirror<FirstMirror_>& owner_mirror,
+          const LAFEM::TupleMirror<FirstMirror_>& halo_mirror,
+          const LAFEM::TupleVector<FirstIdxVec_>& dof_owners)
+        {
+          return ADPAuxFirst::build_owner_mirror(neighbor_rank, owner_mirror.first(), halo_mirror.first(), dof_owners.first());
+        }
+
+        template<typename FirstMirror_>
+        static Index count_donee_dofs(
+          const LAFEM::TupleMirror<FirstMirror_>& halo_mirror,
+          const LAFEM::TupleVector<FirstIdxVec_>& own_dof_idx)
+        {
+          return ADPAuxFirst::count_donee_dofs(halo_mirror.first(), own_dof_idx.first());
+        }
+
+        template<typename DT_, typename FirstMirror_>
+        static Index build_donee_mirror(
+          LAFEM::VectorMirror<DT_, IT_>& donee_mirror,
+          const LAFEM::TupleMirror<FirstMirror_>& halo_mirror,
+          const LAFEM::TupleVector<FirstIdxVec_>& own_dof_idx, Index offset)
+        {
+          return ADPAuxFirst::build_donee_mirror(donee_mirror, halo_mirror.first(), own_dof_idx.first(), offset);
+        }
+
+        template<typename FirstMirror_>
+        static Index init_global_dof_idx(
+          LAFEM::TupleVector<FirstIdxVec_>& global_dof_idx,
+          const LAFEM::TupleMirror<FirstMirror_>& owned_mirror, Index offset)
+        {
+          return ADPAuxFirst::init_global_dof_idx(global_dof_idx.first(), owned_mirror.first(), offset);
+        }
+
+        template<typename FirstMirror_>
+        static Index set_owner_dofs(
+          LAFEM::TupleVector<FirstIdxVec_>& glob_dof_idx,
+          const std::vector<IT_>& recv_buf,
+          const LAFEM::TupleMirror<FirstMirror_>& mirror, Index offset)
+        {
+          return ADPAuxFirst::set_owner_dofs(glob_dof_idx.first(), recv_buf, mirror.first(), offset);
+        }
+
+        template<typename DT2_, typename FirstVector_, typename FirstMirror_>
+        static Index gather(DT2_* buf,
+          const LAFEM::TupleVector<FirstVector_>& vector,
+          const LAFEM::TupleMirror<FirstMirror_>& mirror)
+        {
+          return ADPAuxFirst::gather(buf, vector.first(), mirror.first());
+        }
+
+        template<typename DT2_, typename FirstVector_, typename FirstMirror_>
+        static Index scatter(const DT2_* buf,
+          LAFEM::TupleVector<FirstVector_>& vector,
+          const LAFEM::TupleMirror<FirstMirror_>& mirror)
+        {
+          return ADPAuxFirst::scatter(buf, vector.first(), mirror.first());
+        }
+      }; // class ADPAux<LAFEM::TupleVector<FirstIdxVec_>>
+    } // namespace Intern
+    /// \endcond
   } // namespace Global
 } // namespace FEAT

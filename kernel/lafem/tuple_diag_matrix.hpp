@@ -606,6 +606,47 @@ namespace FEAT
           this->rest().set_line_reverse(row - brows, pval_set, stride);
         }
       }
+
+      Index row_degree(const Index row) const
+      {
+        const Index first_rows = first().template rows<Perspective::pod>();
+        if(row < first_rows)
+          return first().row_degree(row);
+        else
+          return rest().row_degree(row - first_rows);
+      }
+
+      template<typename IT2_>
+      Index get_row_col_indices(const Index row, IT2_* const pcol_idx, const IT2_ col_offset) const
+      {
+        const Index first_rows = first().template rows<Perspective::pod>();
+        const Index first_cols = first().template columns<Perspective::pod>();
+        if(row < first_rows)
+          return first().get_row_col_indices(row, pcol_idx, col_offset);
+        else
+          return rest().get_row_col_indices(row - first_rows, pcol_idx, col_offset + IT2_(first_cols));
+      }
+
+      template<typename DT2_>
+      Index get_row_values(const Index row, DT2_ * const pvals) const
+      {
+        const Index first_rows = first().template rows<Perspective::pod>();
+        if(row < first_rows)
+          return first().get_row_values(row, pvals);
+        else
+          return rest().get_row_values(row - first_rows, pvals);
+      }
+
+      template<typename DT2_>
+      Index set_row_values(const Index row, const DT2_ * const pvals)
+      {
+        const Index first_rows = first().template rows<Perspective::pod>();
+        if(row < first_rows)
+          return first().set_row_values(row, pvals);
+        else
+          return rest().set_row_values(row - first_rows, pvals);
+      }
+
       /// \endcond
 
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
@@ -967,6 +1008,29 @@ namespace FEAT
       void set_line_reverse(const Index row, DataType * const pval_set, const Index stride = 1) const
       {
         this->first().set_line_reverse(row, pval_set, stride);
+      }
+
+      Index row_degree(const Index row) const
+      {
+        return first().row_degree(row);
+      }
+
+      template<typename IT2_>
+      Index get_row_col_indices(const Index row, IT2_* const pcol_idx, const IT2_ col_offset) const
+      {
+        return first().get_row_col_indices(row, pcol_idx, col_offset);
+      }
+
+      template<typename DT2_>
+      Index get_row_values(const Index row, DT2_ * const pvals) const
+      {
+        return first().get_row_values(row, pvals);
+      }
+
+      template<typename DT2_>
+      Index set_row_values(const Index row, const DT2_ * const pvals)
+      {
+        return first().set_row_values(row, pvals);
       }
 
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()

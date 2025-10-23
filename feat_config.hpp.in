@@ -189,4 +189,10 @@
 /// Activate special markers
 #cmakedefine FEAT_SPECIAL_MARKER_ACTIVATED
 
+/// whether HYPRE third-party library was built with 64 bit index interface
+#undef FEAT_TPL_HYPRE_INT64
+
+/// whether SuperLU third-party library was built with 64 bit index interface
+#define FEAT_TPL_SUPERLU_INT64
+
 #endif // FEAT_CONFIG_HPP

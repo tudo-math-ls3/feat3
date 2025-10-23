@@ -692,44 +692,93 @@ namespace FEAT
       }
 
       /**
+       * \brief Compute the counts required for an algebraic dof partitioning of this matrix.
+       *
+       * \param[out] global_dof_offset, global_dof_count, owned_dof_count, owned_num_nzes, global_num_nzes
+       * \transient references that receive the corresponding counts.
+       */
+      void adp_compute_counts(Index& global_dof_offset, Index& global_dof_count,
+        Index& owned_dof_count, Index& owned_num_nzes, Index& global_num_nzes) const
+      {
+        // initialize values for serial case
+        global_dof_offset = Index(0);
+        global_dof_count = owned_dof_count = _matrix_s.rows();
+
+        // compute number of non-zero entries
+        owned_num_nzes = _matrix_s.used_elements();
+        for(const auto& x : _neighbor_matrices)
+          owned_num_nzes += x.used_elements();
+        global_num_nzes = owned_num_nzes;
+
+        // compute our global DOF offset and count
+        if(!_ranks.empty())
+        {
+          this->get_comm()->exscan(&owned_dof_count, &global_dof_offset, std::size_t(1), Dist::op_sum);
+          this->get_comm()->allreduce(&owned_dof_count, &global_dof_count, std::size_t(1), Dist::op_sum);
+          this->get_comm()->allreduce(&owned_num_nzes, &global_num_nzes, std::size_t(1), Dist::op_sum);
+        }
+      }
+
+      /**
        * \brief Assembles the matrix structure of an algebraic DOF partitioned matrix.
        *
-       * This function computes the layout of the ADP matrix which corresponds to this
-       * PMDCDSC matrix, i.e. the matrix, which contains all rows of the virtual global
-       * matrix, which correspond to the global DOFs owned by this process.
-       * This function is used by the Solver::ADPSolverBase class specialization for
-       * this class.
+       * This function computes the layout of the ADP matrix which corresponds to this PMDCDSC
+       * matrix, i.e. the matrix, which contains all rows of the virtual global matrix, which
+       * correspond to the global DOFs owned by this process. This function is used by the
+       * Solver::ADPSolverBase class specialization for this class.
        *
-       * \param[out] glob_dof_offset
-       * Receives the global DOF offset of this process.
+       * \param[out] row_ptr
+       * A \transient array of length at least owned_dof_count+1 that receives the row-pointer
+       * array of the matrix slice owned by this process. Its contents upon entry are ignored.
        *
-       * \param[out] glob_dof_count
-       * Receives the global DOF count over all processes.
+       * \param[out] col_idx
+       * A \transient array of length at least owned_num_nzes that receives the column-index
+       * array of the matrix slice owned by this process. Its contents upon entry are ignored.
        *
-       * \returns
-       * A new local matrix object containing the rows of all DOFs that belong to this process.
+       * \param[in] glob_dof_offset
+       * The global dof offset as returned by the adp_compute_counts() function
        */
-      LocalMatrixTypeS asm_adp_symbolic(Index& glob_dof_offset, Index& glob_dof_count) const
+      template<typename RPT_, typename CIT_>
+      void adp_upload_symbolic(RPT_* row_ptr, CIT_* col_idx, Index global_dof_offset) const
       {
+        // maximum allowed row-pointer/column index values assuming signed int types
+        static constexpr std::uint64_t max_rpt = 1ull << (8*sizeof(RPT_) - 1);
+        static constexpr std::uint64_t max_cit = 1ull << (8*sizeof(CIT_) - 1);
+
+        // prevent "unused variable" warnings in non-debug builds
+        (void)max_rpt;
+        (void)max_cit;
+
         // no neighbors?
         if(_ranks.empty())
         {
-          glob_dof_offset = Index(0);
-          glob_dof_count = _matrix_s.rows();
-          return _matrix_s.clone(LAFEM::CloneMode::Layout);
+          // simply copy our local matrix S
+          const Index n = _matrix_s.rows();
+          const Index m = _matrix_s.used_elements();
+          const IndexType* row_ptr_s = _matrix_s.row_ptr();
+          const IndexType* col_idx_s = _matrix_s.col_ind();
+
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i <= n; ++i)
+          {
+            ASSERTM(std::uint64_t(row_ptr_s[i]) < max_rpt, "row-pointer exceeds RPT_ type range!");
+            row_ptr[i] = RPT_(row_ptr_s[i]);
+          }
+
+          FEAT_PRAGMA_OMP(parallel for)
+          for(Index i = 0; i < m; ++i)
+          {
+            ASSERTM(std::uint64_t(col_idx_s[i]) < max_cit, "column-index exceeds CIT_ type range!");
+            col_idx[i] = CIT_(col_idx_s[i]);
+          }
+
+          return;
         }
 
         // get our communicator
         const Dist::Comm& comm = *this->get_comm();
 
         const std::size_t num_neighs = this->_ranks.size();
-
-        // get number of local DOFs
-        const Index num_loc_dofs = _matrix_s.rows();
-
-        // compute our global DOF offset and count
-        comm.exscan(&num_loc_dofs, &glob_dof_offset, std::size_t(1), Dist::op_sum);
-        comm.allreduce(&num_loc_dofs, &glob_dof_count, std::size_t(1), Dist::op_sum);
 
         // The columns of our neighbor matrices correspond to the entries in the pressure mirror.
         // However, for the desired ADP matrix, we have to translate these into global DOF indices.
@@ -756,24 +805,22 @@ namespace FEAT
           send_dofs.at(i).resize(num_idx);
           IndexType* sidx = send_dofs.at(i).data();
           for(Index k(0); k < num_idx; ++k)
-            sidx[k] = glob_dof_offset + pidx[k];
+            sidx[k] = global_dof_offset + pidx[k];
           send_reqs[i] = comm.isend(send_dofs.at(i).data(), send_dofs.at(i).size(), this->_ranks.at(i));
         }
 
         // get local matrix stuff
-        const Index num_rows = num_loc_dofs;
+        const Index num_rows = _matrix_s.rows();
         const IndexType* row_ptr_s = _matrix_s.row_ptr();
         const IndexType* col_idx_s = _matrix_s.col_ind();
 
         // compute number of non-zeros per row and total
-        Index num_nzes = _matrix_s.used_elements();
         std::vector<IndexType> row_aux(num_rows, IndexType(0));
         for(Index i(0); i  < num_rows; ++i)
           row_aux[i] = (row_ptr_s[i+1] - row_ptr_s[i]);
 
         for(const auto& x : _neighbor_matrices)
         {
-          num_nzes += x.used_elements();
           const Index used_rows = x.used_rows();
           const IndexType* row_ptr_x = x.row_ptr();
           const IndexType* row_idx_x = x.row_numbers();
@@ -781,19 +828,12 @@ namespace FEAT
             row_aux[row_idx_x[i]] += (row_ptr_x[i+1] - row_ptr_x[i]);
         }
 
-        // allocate our matrix
-        LocalMatrixTypeS matrix_g(num_rows, glob_dof_count, num_nzes);
-
-        // get our index arrays
-        IndexType* row_ptr_g = matrix_g.row_ptr();
-        IndexType* col_idx_g = matrix_g.col_ind();
-
         // compute row pointer array and store backup in aux
-        row_ptr_g[0] = IndexType(0);
+        row_ptr[0] = RPT_(0);
         for(Index i(0); i  < num_rows; ++i)
         {
-          row_ptr_g[i+1] = row_ptr_g[i] + row_aux[i];
-          row_aux[i] = row_ptr_g[i];
+          row_ptr[i+1] = row_ptr[i] + row_aux[i];
+          row_aux[i] = IndexType(row_ptr[i]);
         }
 
         // Note: For the sake of compatibility with picky third-party libraries, we want to
@@ -829,7 +869,7 @@ namespace FEAT
           {
             IndexType& k = row_aux[row_idx_x[i]];
             for(IndexType j(row_ptr_x[i]); j < row_ptr_x[i + 1]; ++j, ++k)
-              col_idx_g[k] = dof_idx_x[col_idx_x[j]];
+              col_idx[k] = CIT_(dof_idx_x[col_idx_x[j]]);
           }
         }
 
@@ -838,7 +878,7 @@ namespace FEAT
         {
           IndexType k = row_aux[i];
           for(IndexType j(row_ptr_s[i]); j < row_ptr_s[i + 1]; ++j, ++k)
-            col_idx_g[k] = glob_dof_offset + col_idx_s[j];
+            col_idx[k] = CIT_(global_dof_offset + col_idx_s[j]);
           row_aux[i] = k;
         }
 
@@ -855,7 +895,7 @@ namespace FEAT
           {
             IndexType& k = row_aux[row_idx_x[i]];
             for(IndexType j(row_ptr_x[i]); j < row_ptr_x[i + 1]; ++j, ++k)
-              col_idx_g[k] = dof_idx_x[col_idx_x[j]];
+              col_idx[k] = CIT_(dof_idx_x[col_idx_x[j]]);
           }
         }
 
@@ -866,50 +906,58 @@ namespace FEAT
         // sanity check: ensure that the column indices are sorted correctly
         for(Index i = 0; i < num_rows; ++i)
         {
-          for(IndexType j(row_ptr_g[i]); j + 1 < row_ptr_g[i + 1]; ++j)
+          for(RPT_ j(row_ptr[i]); j + 1 < row_ptr[i + 1]; ++j)
           {
-            ASSERT(col_idx_g[j] < col_idx_g[j+1]);
+            ASSERT(col_idx[j] < col_idx[j+1]);
           }
         }
 #endif // DEBUG
-
-        // that's it
-        return matrix_g;
       }
 
       /**
-       * \brief Copies the numeric values of the matrix into an ADP matrix.
+       * \brief Uploads the numeric values of the matrix into an ADP matrix.
        *
-       * \param[inout] matrix
-       * A reference to the ADP matrix which receives the copy of the values,
-       * as returned by the #asm_adp_symoblic() function.
+       * \param[out] val
+       * A \transient array of length at least owned_num_nzes thar receives the matrix value
+       * array of the matrix slice owned by this process. Its contents upon entry are ignored.
+       *
+       * \param[in] row_ptr
+       * A \transient array of length at least owned_dof_count+1 that contains the row-pointer
+       * array of the matrix slice owned by this process as returned by adp_upload_symbolic().
+       *
+       * \param[in] col_idx
+       * A \transient array of length at least owned_num_nzes that contains the column-index
+       * array of the matrix slice owned by this process as returned by adp_upload_symbolic().
        */
-      void asm_adp_numeric(LocalMatrixTypeS& matrix) const
+      template<typename DTV_, typename RPT_, typename CIT_>
+      void adp_upload_numeric(DTV_* val, const RPT_* row_ptr, const CIT_* DOXY(col_idx)) const
       {
         // no neighbors?
         if(_ranks.empty())
         {
-          // copy values
-          matrix.copy(_matrix_s);
+          const Index num_nzes = _matrix_s.used_elements();
+          const DataType* val_s = _matrix_s.val();
+
+          FEAT_PRAGMA_OMP(parallel for)
+            for(Index i = 0; i < num_nzes; ++i)
+              val[i] = DTV_(val_s[i]);
+
           return;
         }
 
         // get number of local DOFs
         const Index num_rows = _matrix_s.rows();
-        XASSERT(matrix.rows() == _matrix_s.rows());
 
         // get row pointer arrays
         const IndexType* row_ptr_s = _matrix_s.row_ptr();
-        const IndexType* row_ptr_g = matrix.row_ptr();
         const DataType* val_s = _matrix_s.val();
-        DataType* val_g = matrix.val();
 
         // make a copy of the row pointer
         std::vector<IndexType> row_aux(num_rows);
 
         // copy the row-pointer array
         for(Index i(0); i < num_rows; ++i)
-          row_aux[i] = row_ptr_g[i];
+          row_aux[i] = IndexType(row_ptr[i]);
 
         // get this process's rank
         const int my_rank = this->get_comm()->rank();
@@ -936,7 +984,7 @@ namespace FEAT
           {
             IndexType& k = row_aux[row_idx_x[i]];
             for(IndexType j(row_ptr_x[i]); j < row_ptr_x[i + 1]; ++j, ++k)
-              val_g[k] = val_x[j];
+              val[k] = DTV_(val_x[j]);
           }
         }
 
@@ -945,7 +993,7 @@ namespace FEAT
         {
           Index k = row_aux[i];
           for(Index j(row_ptr_s[i]); j < row_ptr_s[i+1]; ++j, ++k)
-            val_g[k] = val_s[j];
+            val[k] = DTV_(val_s[j]);
           row_aux[i] = k;
         }
 
@@ -961,7 +1009,7 @@ namespace FEAT
           {
             IndexType& k = row_aux[row_idx_x[i]];
             for(IndexType j(row_ptr_x[i]); j < row_ptr_x[i + 1]; ++j, ++k)
-              val_g[k] = val_x[j];
+              val[k] = DTV_(val_x[j]);
           }
         }
 
@@ -969,7 +1017,7 @@ namespace FEAT
         // sanity check: ensure that all entries have been processed
         for(Index i(0); i < num_rows; ++i)
         {
-          ASSERT(row_aux[i] == row_ptr_g[i+1]);
+          ASSERT(row_aux[i] == IndexType(row_ptr[i+1]));
         }
 #endif // DEBUG
       }

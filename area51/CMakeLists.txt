@@ -29,8 +29,14 @@ target_link_libraries(cgal-analyse-mesh feat)
 add_executable(cgal-analyse-mesh-parallel cgal_analyse_mesh_parallel.cpp)
 target_link_libraries(cgal-analyse-mesh-parallel feat)
 
-add_executable(dbg-alg-dof-parti dbg_alg_dof_parti.cpp)
-target_link_libraries(dbg-alg-dof-parti feat)
+add_executable(dbg-alg-dof-parti-1 dbg_alg_dof_parti1.cpp)
+target_link_libraries(dbg-alg-dof-parti-1 feat)
+
+add_executable(dbg-alg-dof-parti-2 dbg_alg_dof_parti2.cpp)
+target_link_libraries(dbg-alg-dof-parti-2 feat)
+
+add_executable(dbg-alg-dof-parti-3 dbg_alg_dof_parti3.cpp)
+target_link_libraries(dbg-alg-dof-parti-3 feat)
 
 add_executable(dbg-amavanka dbg_amavanka.cpp)
 target_link_libraries(dbg-amavanka feat)

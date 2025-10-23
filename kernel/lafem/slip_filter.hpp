@@ -244,6 +244,11 @@ namespace FEAT
           return _sv.elements();
         }
 
+        bool empty() const
+        {
+          return _sv.used_elements() <= Index(0);
+        }
+
         /**
          * \brief Applies the filter onto the right-hand-side vector.
          *

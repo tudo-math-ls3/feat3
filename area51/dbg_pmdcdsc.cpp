@@ -356,10 +356,12 @@ namespace PoissonMixed
     {
       comm.print("\nApplying Richardson to PMDCDSCMatrix in ADP Manner...");
 
-      Index glob_dof_offset(0), glob_dof_count(0);
+      Index glob_dof_offset(0), glob_dof_count(0), owned_dof_count(0), owned_num_nzes(0), global_num_nzes(0);
 
-      auto matrix_s = matrix_pmdcdsc.asm_adp_symbolic(glob_dof_offset, glob_dof_count);
-      matrix_pmdcdsc.asm_adp_numeric(matrix_s);
+      matrix_pmdcdsc.adp_compute_counts(glob_dof_offset, glob_dof_count, owned_dof_count, owned_num_nzes, global_num_nzes);
+      LAFEM::SparseMatrixCSR<DataType, IndexType> matrix_s(owned_dof_count, glob_dof_count, owned_num_nzes);
+      matrix_pmdcdsc.adp_upload_symbolic(matrix_s.row_ptr(), matrix_s.col_ind(), glob_dof_offset);
+      matrix_pmdcdsc.adp_upload_numeric(matrix_s.val(), matrix_s.row_ptr(), matrix_s.col_ind());
 
       // validate sorting of column indices
       {

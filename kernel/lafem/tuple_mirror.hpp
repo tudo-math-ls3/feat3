@@ -254,6 +254,13 @@ namespace FEAT
         Index nr = _rest.template mask_scatter<perspective_>(vector.rest(), mask, value, offset + nf);
         return nf + nr;
       }
+
+      /// auxiliary function for operator<< implementation
+      void dump(std::ostream& os) const
+      {
+        os << this->first() << ",";
+        this->rest().dump(os);
+      }
     }; // class TupleMirror<...>
 
     /// \cond internal
@@ -397,7 +404,22 @@ namespace FEAT
       {
         return _first.template mask_scatter<perspective_>(vector.first(), mask, value, offset);
       }
+
+      /// auxiliary function for operator<< implementation
+      void dump(std::ostream& os) const
+      {
+        os << this->first();
+      }
     }; // class TupleMirror<First_>
+
+    template <typename First_, typename... Rest_>
+    inline std::ostream& operator<< (std::ostream & os, const TupleMirror<First_, Rest_...>& x)
+    {
+      os << "[";
+      x.dump(os);
+      os << "]";
+      return os;
+    }
     /// \endcond
   } // namespace LAFEM
 } // namespace FEAT

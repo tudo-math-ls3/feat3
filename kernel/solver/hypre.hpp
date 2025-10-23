@@ -21,6 +21,16 @@ namespace FEAT
     /// \cond internal
     namespace Hypre
     {
+      /// the data type used by HYPRE; must be identical to HYPRE_Real
+      typedef double HypreDataType;
+
+      /// the index type used by HYPRE; must be identical to HYPRE_Int
+#ifdef FEAT_TPL_HYPRE_INT64
+      typedef long long HypreIndexType;
+#else
+      typedef int HypreIndexType;
+#endif
+
       /**
        * \brief Creates a core wrapper object for HYPRE.
        *
@@ -38,31 +48,30 @@ namespace FEAT
        * \param[in] num_owned_dofs
        * The number of global DOFs owned by this process.
        *
-       * \param[in] row_ptr
-       * The row-pointer array of the partitioned CSR matrix.
-       *
-       * \param[in] col_idx
-       * The column-index array of the partitioned CSR matrix.
+       * \param[in] num_nonzeros
+       * The number of non-zero entries for this process
        *
        * \returns
        * A pointer to a newly allocated core wrapper object.
        */
-      void* create_core(const void* comm, Index dof_offset, Index num_owned_dofs,
-        const unsigned int* row_ptr, const unsigned int* col_idx);
-      void* create_core(const void* comm, Index dof_offset, Index num_owned_dofs,
-        const unsigned long* row_ptr, const unsigned long* col_idx);
-      void* create_core(const void* comm, Index dof_offset, Index num_owned_dofs,
-        const unsigned long long* row_ptr, const unsigned long long* col_idx);
+      void* create_core(const void* comm, Index dof_offset, Index num_owned_dofs, Index num_nonzeros);
 
       void destroy_core(void* core);
 
-      void set_matrix_values(void* core, const double* vals);
-      void set_vec_cor_values(void* core, const double* vals);
-      void set_vec_def_values(void* core, const double* vals);
-      void get_vec_cor_values(const void* core, double* vals);
-      void get_vec_def_values(const void* core, double* vals);
+      HypreIndexType* get_row_ptr(void* core);
+      HypreIndexType* get_col_idx(void* core);
+      HypreDataType* get_mat_val(void* core);
 
-      // Parasails Wrappers
+      HypreDataType* get_vec_def(void* core);
+      HypreDataType* get_vec_cor(void* core);
+
+      void upload_symbolic(void* core);
+      void upload_mat_val(void* core);
+      void upload_vec_def(void* core);
+      void download_vec_cor(void* core);
+      void format_vec_cor(void* core);
+
+      // ParaSails Wrappers
       void* create_parasails(void* core, int* iparam, double* dparam);
       void destroy_parasails(void* solver);
       void solve_parasails(void* core, void* solver);
@@ -87,7 +96,7 @@ namespace FEAT
      * "algebraic DOF partitioning", this class derives from the ADPSolverBase class, which
      * takes care of the translation between the system matrix and the ADP data structures.
      *
-     * This base-class takes care of allocating, initialising and updating the required
+     * This base-class takes care of allocating, initializing and updating the required
      * HYPRE matrix and vector objects, which are outsourced into an opaque core wrapper object.
      *
      * \author Peter Zajac
@@ -115,49 +124,40 @@ namespace FEAT
       /**
        * \brief Uploads the HYPRE defect vector
        *
-       * This function first uploads the given defect vector into its ADP defect vector
-       * counterpart and afterwards uploads that into the HYPRE vector counterpart.
+       * This function first uploads the given defect vector the internal buffer
+       * and notifies HYPRE that the vector values have changed.
        *
        * \param[in] vec_def
        * The defect vector to be uploaded from.
        */
       void _upload_def(const VectorType& vec_def)
       {
-        // upload defect to ADP vector
-        this->_upload_vec_def(vec_def);
-
-        // set HYPRE defect vector values
-        Hypre::set_vec_def_values(this->_core, this->_get_vec_def_vals(vec_def));
-      }
-
-      /**
-       * \brief Format the HYPRE correction vector
-       */
-      void _format_cor()
-      {
-        // format HYPRE correction vector
-        Hypre::set_vec_cor_values(this->_core, nullptr);
+        this->_upload_vector(Hypre::get_vec_def(this->_core), vec_def.local());
+        Hypre::upload_vec_def(this->_core);
       }
 
       /**
        * \brief Downloads the HYPRE correction vector
        *
-       * This function first downloads the HYPRE vector into its ADP correction vector
-       * counterpart and afterwards downloads that into the given correction vector.
+       * This function first queries the vector values from HYPRE into the internal buffer
+       * and then downloads the contents to the given correction vector.
        *
        * \param[out] vec_cor
        * The correction vector to download to.
        */
       void _download_cor(VectorType& vec_cor)
       {
-        // get HYPRE correction vector values
-        Hypre::get_vec_cor_values(this->_core, this->_get_vec_cor_vals(vec_cor));
-
-        // download correction from APD vector
-        this->_download_vec_cor(vec_cor);
+        Hypre::download_vec_cor(this->_core);
+        this->_download_vector(vec_cor.local(), Hypre::get_vec_cor(this->_core));
 
         // apply correction filter
         this->_system_filter.filter_cor(vec_cor);
+      }
+
+      /// Formats the HYPRE correction vector to zero
+      void _format_cor()
+      {
+        Hypre::format_vec_cor(this->_core);
       }
 
     public:
@@ -183,7 +183,14 @@ namespace FEAT
 #else
           nullptr, // no communicator for non-MPI builds
 #endif
-          this->_get_global_dof_offset(), this->_get_num_owned_dofs(), this->_get_mat_row_ptr(), this->_get_mat_col_idx());
+          this->_get_global_dof_offset(), this->_get_num_owned_dofs(), this->_get_adp_matrix_num_nzes());
+
+
+        // upload matrix structure
+        BaseClass::_upload_symbolic(Hypre::get_row_ptr(this->_core), Hypre::get_col_idx(this->_core));
+
+        // assemble system
+        Hypre::upload_symbolic(this->_core);
       }
 
       /**
@@ -198,8 +205,11 @@ namespace FEAT
 
         XASSERT(this->_core != nullptr);
 
-        // update matrix values of HYPRE matrix
-        Hypre::set_matrix_values(this->_core, this->_get_mat_vals());
+        // upload matrix values
+        this->_upload_numeric(Hypre::get_mat_val(this->_core),
+          Hypre::get_row_ptr(this->_core), Hypre::get_col_idx(this->_core));
+
+        Hypre::upload_mat_val(this->_core);
       }
 
       /**

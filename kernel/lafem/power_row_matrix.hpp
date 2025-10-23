@@ -608,6 +608,34 @@ namespace FEAT
         this->first().set_line_reverse(row, pval_set, stride);
         this->rest().set_line_reverse(row, pval_set + stride * length_of_base, stride);
       }
+
+      Index row_degree(const Index row) const
+      {
+        return first().row_degree(row) + rest().row_degree(row);
+      }
+
+      template<typename IT2_>
+      Index get_row_col_indices(const Index row, IT2_* const pcol_idx, const IT2_ col_offset) const
+      {
+        const Index first_cols = first().template columns<Perspective::pod>();
+        const Index first_degree = first().get_row_col_indices(row, pcol_idx, col_offset);
+        return first_degree + rest().get_row_col_indices(row, pcol_idx + first_degree, col_offset + IT2_(first_cols));
+      }
+
+      template<typename DT2_>
+      Index get_row_values(const Index row, DT2_ * const pvals) const
+      {
+        const Index first_degree = first().get_row_values(row, pvals);
+        return first_degree + rest().get_row_values(row, pvals + first_degree);
+      }
+
+      template<typename DT2_>
+      Index set_row_values(const Index row, const DT2_ * const pvals)
+      {
+        const Index first_degree = first().set_row_values(row, pvals);
+        return first_degree + rest().set_row_values(row, pvals + first_degree);
+      }
+
       /// \endcond
 
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
@@ -1004,6 +1032,29 @@ namespace FEAT
       void set_line_reverse(const Index row, const DataType * const pval_set, const Index stride = 1)
       {
         this->first().set_line_reverse(row, pval_set, stride);
+      }
+
+      Index row_degree(const Index row) const
+      {
+        return first().row_degree(row);
+      }
+
+      template<typename IT2_>
+      Index get_row_col_indices(const Index row, IT2_* const pcol_idx, const IT2_ col_offset) const
+      {
+        return first().get_row_col_indices(row, pcol_idx, col_offset);
+      }
+
+      template<typename DT2_>
+      Index get_row_values(const Index row, DT2_ * const pvals) const
+      {
+        return first().get_row_values(row, pvals);
+      }
+
+      template<typename DT2_>
+      Index set_row_values(const Index row, const DT2_ * const pvals)
+      {
+        return first().set_row_values(row, pvals);
       }
 
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()
