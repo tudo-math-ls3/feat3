@@ -1462,7 +1462,7 @@ namespace FEAT
           // do we have to combine the assembly?
           if(need_combine)
           {
-            FEAT_PRAGMA_OMP(master)
+            FEAT_PRAGMA_OMP(critical)
             {
               // combine the assembly
               task->combine();
