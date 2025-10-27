@@ -1,4 +1,5 @@
 #include <kernel/base_header.hpp>
+#include <string>
 
 #if defined(FEAT_HAVE_TRILINOS)
 
@@ -14,7 +15,7 @@
 #  error FROSch without MPI does not make sense.
 #endif // FEAT_HAVE_MPI
 
-#define FROSCH_TIMER_DETAILS 0
+#define FROSCH_TIMER_DETAILS 2
 
 #include <ShyLU_DDFROSch_config.h>
 
@@ -125,7 +126,9 @@ namespace FEAT
           enum PartitionType {
           PHG,       /* Parallel hyper-graph, Zoltan */
           PARMETIS,  /* Trilinos needs to be compiled with Parmetis */
-          BLOCK      /* Should work always (not good) */
+          BLOCK,     /* Should work always (not good) */
+          SCOTCH,    /* Scotch */
+          PTSCOTCH   /* Scotch */
         };
 
           enum PartitionApproach {
@@ -292,14 +295,12 @@ namespace FEAT
           void set_cspace_pres(const bool cspace_);
           void set_cspace_pres(const std::vector<bool>& cspace_);
 
-          void set_reuse_sf(const bool rsf_ao_, const bool rsf_cm_, const bool rsf_ext_);
-          void set_reuse_sf(const std::vector<bool> &rsf_ao_, const std::vector<bool> &rsf_cm_, const std::vector<bool> &rsf_ext_);
+          void set_reuse_sf(const bool rsf_ao_, const bool rsf_cm_);
+          void set_reuse_sf(const std::vector<bool> &rsf_ao_, const std::vector<bool> &rsf_cm_);
           void set_reuse_sf_ao(const bool rsf_ao_);
           void set_reuse_sf_ao(const std::vector<bool> &rsf_ao_);
           void set_reuse_sf_cm(const bool rsf_cm_);
           void set_reuse_sf_cm(const std::vector<bool> &rsf_cm_);
-          void set_reuse_sf_ext(const bool rsf_ext_);
-          void set_reuse_sf_ext(const std::vector<bool> &rsf_ext_);
 
           void set_reuse_coarse(const bool reuse_cm_, const bool reuse_cb_);
           void set_reuse_coarse(const std::vector<bool> &reuse_cm_, const std::vector<bool> &reuse_cb_);
@@ -310,6 +311,8 @@ namespace FEAT
 
           void set_phi_dropping_threshold(const double phi_dt_);
           void set_phi_dropping_threshold(const std::vector<double> &phi_dt_);
+
+          void set_verbose(const bool verbose_);
 
           bool parse_args(SimpleArgParser& args);
 
@@ -378,8 +381,6 @@ namespace FEAT
           std::vector<bool> _ao_rsf;
           /* reuse symbolic factorization: coarse matrix */
           std::vector<bool> _cm_rsf;
-          /* reuse symbolic factorization: extension solver */
-          std::vector<bool> _ext_rsf;
 
           /* reuse the complete coarse matrix */
           std::vector<bool> _cm_r;
@@ -396,6 +397,9 @@ namespace FEAT
           bool _print_list;
           /* use Trilinos timers for FROSch solver */
           bool _use_timer;
+
+          /* verbosity flag for the FROSch/Trilinos class */
+          bool _verbose;
 
           void init_defaults();
 
@@ -449,7 +453,12 @@ namespace FEAT
           XASSERTM(false, "Unkown FROSchParameterList::CombineLevel type");
       }
 
-      inline void parameterlist_header(const int dim, const int overlap, const int levelid, const int defblockid, const FROSchParameterList::Preconditioner precond, const std::string& nullspace, const FROSchParameterList::CombineLevel combine_lvl, const bool reuse, Teuchos::ParameterList &params)
+      inline void parameterlist_set_verbose(const bool verbose, Teuchos::ParameterList &params)
+      {
+        params.set("Verbose", verbose);
+      }
+
+      inline void parameterlist_header(const int dim, const int overlap, const int levelid, const int defblockid, const FROSchParameterList::Preconditioner precond, const std::string& nullspace, const FROSchParameterList::CombineLevel combine_lvl, const bool reuse, const bool verbose, Teuchos::ParameterList &params)
       {
         parameterlist_set_dim(dim, params);
         parameterlist_set_overlap(overlap, params);
@@ -457,6 +466,7 @@ namespace FEAT
         parameterlist_set_level_id(levelid, params);
         parameterlist_set_precond(precond, reuse, params);
         parameterlist_set_combine_lvl(combine_lvl, params);
+        parameterlist_set_verbose(verbose, params);
         params.set("Null Space Type", nullspace);
         params.set("OverlappingOperator Type", "AlgebraicOverlappingOperator");
         params.set("CoarseOperator Type", "IPOUHarmonicCoarseOperator");
@@ -522,6 +532,10 @@ namespace FEAT
         params.set("Zoltan2 Parameter", Teuchos::ParameterList("Zoltan2 Parameter"));
         if(parti_type == FROSchParameterList::PARMETIS)
           params.sublist("Zoltan2 Parameter").set("algorithm", "parmetis");
+        else if(parti_type == FROSchParameterList::SCOTCH)
+          params.sublist("Zoltan2 Parameter").set("algorithm", "scotch");
+        else if(parti_type == FROSchParameterList::PTSCOTCH)
+          params.sublist("Zoltan2 Parameter").set("algorithm", "ptscotch");
         else if(parti_type == FROSchParameterList::BLOCK)
           params.sublist("Zoltan2 Parameter").set("algorithm", "block");
         else if(parti_type == FROSchParameterList::PHG)
@@ -557,7 +571,7 @@ namespace FEAT
         params.sublist("Distribution").sublist("Gathering Communication").set("Send type", "Send");
       }
 
-      inline void parameterlist_set_ipou(const FROSchParameterList::IPOU ipou, Teuchos::ParameterList &params)
+      inline void parameterlist_set_ipou(const FROSchParameterList::IPOU ipou, const bool verbose, Teuchos::ParameterList &params)
       {
         std::string ipou_str;
         if(ipou == FROSchParameterList::GDSW)
@@ -569,31 +583,41 @@ namespace FEAT
         else
           XASSERTM(false, "Unkown FROSchParameterList::IPOU type");
         params.set("InterfacePartitionOfUnity", Teuchos::ParameterList("InterfacePartitionOfUnity"));
+        params.sublist("InterfacePartitionOfUnity").set("Verbose", verbose);
         params.sublist("InterfacePartitionOfUnity").set("Type", ipou_str);
         params.sublist("InterfacePartitionOfUnity").set(ipou_str, Teuchos::ParameterList(ipou_str));
+        params.sublist("InterfacePartitionOfUnity").sublist(ipou_str).set("Verbose", verbose);
         params.sublist("InterfacePartitionOfUnity").sublist(ipou_str).set("Type", "Full");
         params.sublist("InterfacePartitionOfUnity").sublist(ipou_str).set("Distance Function", "Constant");
         params.sublist("InterfacePartitionOfUnity").sublist(ipou_str).set("Custom", Teuchos::ParameterList("Custom"));
         params.sublist("InterfacePartitionOfUnity").sublist(ipou_str).sublist("Custom").set("Roots", true);
+
+        /* This suppresses the output for the constant partition of unity */
+        params.set("PartitionOfUnity", Teuchos::ParameterList("PartitionOfUnity"));
+        params.sublist("PartitionOfUnity").set("Constant", Teuchos::ParameterList("Constant"));
+        params.sublist("PartitionOfUnity").sublist("Constant").set("Verbose", verbose);
       }
 
-      inline void parameterlist_set_block(const int blockid, const bool use_cspace, const int exclude, const FROSchParameterList::IPOU ipou, Teuchos::ParameterList &params)
+      inline void parameterlist_set_block(const int blockid, const bool use_cspace, const int exclude, const FROSchParameterList::IPOU ipou, const bool verbose, Teuchos::ParameterList &params)
       {
         std::string blockid_str = std::to_string(blockid);
         std::string excl_str = std::to_string(exclude);
 
         params.set(blockid_str, Teuchos::ParameterList(blockid_str));
         params.sublist(blockid_str).set("Use For Coarse Space", use_cspace);
+        if(verbose)
+          params.sublist(blockid_str).set("Verbosity", "All");
+        else
+          params.sublist(blockid_str).set("Verbosity", "None");
         if(exclude > 0)
           params.sublist(blockid_str).set("Exclude", excl_str);
         params.sublist(blockid_str).set("Rotations", false);
-        parameterlist_set_ipou(ipou, params.sublist(blockid_str));
+        parameterlist_set_ipou(ipou, verbose, params.sublist(blockid_str));
       }
 
-      inline void parameterlist_set_reuse_coarse(const bool rsf_cm, const bool rsf_ext, const bool reuse_cm, const bool reuse_cb, Teuchos::ParameterList &params)
+      inline void parameterlist_set_reuse_coarse(const bool rsf_cm, const bool reuse_cm, const bool reuse_cb, Teuchos::ParameterList &params)
       {
         params.set("Reuse: Coarse Matrix Symbolic Factorization", rsf_cm);
-        params.set("Reuse: Extension Symbolic Factorization", rsf_ext);
         params.set("Reuse: Coarse Matrix", reuse_cm);
         params.set("Reuse: Coarse Basis", reuse_cb);
       }
@@ -677,9 +701,11 @@ namespace FEAT
         set_combine_overlap(FROSchParameterList::RESTRICTED);
         set_combine_lvl(FROSchParameterList::ADDITIVE);
 
-        set_reuse_sf(false, false, false);
+        set_reuse_sf(false, false);
         set_reuse_coarse(false, false);
         set_phi_dropping_threshold(1.e-8);
+
+        set_verbose(false);
       }
 
       void FROSchParameterList::print() const
@@ -727,13 +753,14 @@ namespace FEAT
         CombineOverlap mode;
         IPOU ipou_velo, ipou_pres;
         bool cspace_velo, cspace_pres, excl_velo_pres, excl_pres_velo;
-        bool rsf_ao, rsf_ext, rsf_cm, reuse_cm, reuse_cb;
+        bool rsf_ao, rsf_cm, reuse_cm, reuse_cb;
         double phi_dt;
         PartitionType partitype;
         PartitionApproach partiapp;
         double partiimbl;
         CombineLevel combine_lvl;
         bool reuse;
+        bool verbose;
 
         Teuchos::ParameterList *tmp_params = &(params->sublist("Preconditioner Types").sublist("FROSch"));
         for(int i = 0; i < _nlevels; ++i)
@@ -755,34 +782,36 @@ namespace FEAT
           gsteps = _gsteps.size() == 1 ? _gsteps.at(0) : _gsteps.at(i);
           rsf_ao = _ao_rsf.size() == 1 ? _ao_rsf.at(0) : _ao_rsf.at(i);
           rsf_cm = _cm_rsf.size() == 1 ? _cm_rsf.at(0) : _cm_rsf.at(i);
-          rsf_ext = _ext_rsf.size() == 1 ? _ext_rsf.at(0) : _ext_rsf.at(i);
           reuse_cm = _cm_r.size() == 1 ? _cm_r.at(0) : _cm_r.at(i);
           reuse_cb = _cb_r.size() == 1 ? _cb_r.at(0) : _cb_r.at(i);
           phi_dt = _phi_dt.size() == 1 ? _phi_dt.at(0) : _phi_dt.at(i);
 
-          reuse = rsf_ao || rsf_cm || rsf_ext || reuse_cb || reuse_cm;
+          reuse = rsf_ao || rsf_cm || reuse_cb || reuse_cm;
+          verbose = _verbose;
 
-          parameterlist_header(_dimension, overlap, i+1, 1, _preconditioner, (i == 0 ? "Input" : "Laplace"), combine_lvl, reuse, *tmp_params);
+          parameterlist_header(_dimension, overlap, i+1, 1, _preconditioner, (i == 0 ? "Input" : "Laplace"), combine_lvl, reuse, verbose, *tmp_params);
           parameterlist_set_aoo(solver_ao, *tmp_params);
           parameterlist_combine_overlap(mode, tmp_params->sublist("AlgebraicOverlappingOperator"));
           tmp_params->sublist("AlgebraicOverlappingOperator").set("Reuse: Symbolic Factorization", rsf_ao);
+          parameterlist_set_verbose(verbose, tmp_params->sublist("AlgebraicOverlappingOperator"));
 
           tmp_params->set("IPOUHarmonicCoarseOperator", Teuchos::ParameterList("IPOUHarmonicCoarseOperator"));
           tmp_params->sublist("IPOUHarmonicCoarseOperator").set("Blocks", Teuchos::ParameterList("Blocks"));
-          parameterlist_set_reuse_coarse(rsf_cm, rsf_ext, reuse_cm, reuse_cb, tmp_params->sublist("IPOUHarmonicCoarseOperator"));
+          parameterlist_set_reuse_coarse(rsf_cm, reuse_cm, reuse_cb, tmp_params->sublist("IPOUHarmonicCoarseOperator"));
           tmp_params->sublist("IPOUHarmonicCoarseOperator").set("Phi: Dropping Threshold", phi_dt);
+          parameterlist_set_verbose(verbose, tmp_params->sublist("IPOUHarmonicCoarseOperator"));
 
           if(_problem == FROSchParameterList::PRESSUREPOISSON)
           {
             /* for pressure poisson:  we always use the pressure in the coarse space and do not exclude the velocity (not existent) */
             /* pressure block */
-            parameterlist_set_block(1, true, -1, ipou_pres, tmp_params->sublist("IPOUHarmonicCoarseOperator").sublist("Blocks"));
+            parameterlist_set_block(1, true, -1, ipou_pres, _verbose, tmp_params->sublist("IPOUHarmonicCoarseOperator").sublist("Blocks"));
           }else if(_problem == FROSchParameterList::SADDLEPOINT)
           {
             /* velocity block */
-            parameterlist_set_block(1, cspace_velo, (excl_velo_pres ? 2 : -1), ipou_velo, tmp_params->sublist("IPOUHarmonicCoarseOperator").sublist("Blocks"));
+            parameterlist_set_block(1, cspace_velo, (excl_velo_pres ? 2 : -1), ipou_velo, _verbose, tmp_params->sublist("IPOUHarmonicCoarseOperator").sublist("Blocks"));
             /* pressure block */
-            parameterlist_set_block(2, cspace_pres, (excl_pres_velo ? 1 : -1), ipou_pres, tmp_params->sublist("IPOUHarmonicCoarseOperator").sublist("Blocks"));
+            parameterlist_set_block(2, cspace_pres, (excl_pres_velo ? 1 : -1), ipou_pres, _verbose, tmp_params->sublist("IPOUHarmonicCoarseOperator").sublist("Blocks"));
 
           }else
             XASSERTM(false, "Unkown FROSchParameterList::ProblemType type");
@@ -1135,18 +1164,16 @@ namespace FEAT
         _cspace_pres.assign(cspace_.begin(), cspace_.end());
       }
 
-      void FROSchParameterList::set_reuse_sf(const bool rsf_ao_, const bool rsf_cm_, const bool rsf_ext_)
+      void FROSchParameterList::set_reuse_sf(const bool rsf_ao_, const bool rsf_cm_)
       {
         set_reuse_sf_ao(rsf_ao_);
         set_reuse_sf_cm(rsf_cm_);
-        set_reuse_sf_ext(rsf_ext_);
       }
 
-      void FROSchParameterList::set_reuse_sf(const std::vector<bool> &rsf_ao_, const std::vector<bool> &rsf_cm_, const std::vector<bool> &rsf_ext_)
+      void FROSchParameterList::set_reuse_sf(const std::vector<bool> &rsf_ao_, const std::vector<bool> &rsf_cm_)
       {
         set_reuse_sf_ao(rsf_ao_);
         set_reuse_sf_cm(rsf_cm_);
-        set_reuse_sf_ext(rsf_ext_);
       }
 
       void FROSchParameterList::set_reuse_sf_ao(const bool rsf_ao_)
@@ -1169,17 +1196,6 @@ namespace FEAT
       {
         XASSERT(int(rsf_cm_.size()) == _nlevels);
         _cm_rsf.assign(rsf_cm_.begin(), rsf_cm_.end());
-      }
-
-      void FROSchParameterList::set_reuse_sf_ext(const bool rsf_ext_)
-      {
-        _ext_rsf.assign(_nlevels, rsf_ext_);
-      }
-
-      void FROSchParameterList::set_reuse_sf_ext(const std::vector<bool> &rsf_ext_)
-      {
-        XASSERT(int(rsf_ext_.size()) == _nlevels);
-        _ext_rsf.assign(rsf_ext_.begin(), rsf_ext_.end());
       }
 
       void FROSchParameterList::set_reuse_coarse(const bool reuse_cm_, const bool reuse_cb_)
@@ -1225,6 +1241,11 @@ namespace FEAT
       {
         XASSERT(int(phi_dt_.size()) == _nlevels);
         _phi_dt.assign(phi_dt_.begin(), phi_dt_.end());
+      }
+
+      void FROSchParameterList::set_verbose(const bool verbose_)
+      {
+        _verbose = verbose_;
       }
 
       inline bool parse_fpl_levels(const Dist::Comm &comm, SimpleArgParser &args, FROSchParameterList &params)
@@ -1396,6 +1417,12 @@ namespace FEAT
             if(!type.compare("parmetis"))
             {
               parti_type = Solver::Trilinos::FROSchParameterList::PARMETIS;
+            }else if(!type.compare("scotch"))
+            {
+              parti_type = Solver::Trilinos::FROSchParameterList::SCOTCH;
+            }else if(!type.compare("ptscotch"))
+            {
+              parti_type = Solver::Trilinos::FROSchParameterList::PTSCOTCH;
             }else if(!type.compare("block"))
             {
               parti_type = Solver::Trilinos::FROSchParameterList::BLOCK;
@@ -1419,10 +1446,16 @@ namespace FEAT
 
               if(!type.compare("parmetis"))
               {
-                parti_types.push_back(FROSchParameterList::PARMETIS);
+                parti_types.push_back(Solver::Trilinos::FROSchParameterList::PARMETIS);
+              }else if(!type.compare("scotch"))
+              {
+                parti_types.push_back(Solver::Trilinos::FROSchParameterList::SCOTCH);
+              }else if(!type.compare("ptscotch"))
+              {
+                parti_types.push_back(Solver::Trilinos::FROSchParameterList::PTSCOTCH);
               }else if(!type.compare("block"))
               {
-                parti_types.push_back(FROSchParameterList::BLOCK);
+                parti_types.push_back(Solver::Trilinos::FROSchParameterList::BLOCK);
               }else if(!type.compare("phg"))
               {
                 parti_types.push_back(Solver::Trilinos::FROSchParameterList::PHG);
@@ -2093,6 +2126,37 @@ namespace FEAT
         return true;
       }
 
+      inline bool parse_fpl_verbose(const Dist::Comm& comm, SimpleArgParser& args, FROSchParameterList &params)
+      {
+        auto it = args.query("frosch-verbose");
+        if(it != nullptr)
+        {
+          if(it->second.size() == 1)
+          {
+            bool verbose;
+            std::string type = it->second.front();
+            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            if(!type.compare("true"))
+            {
+              verbose = true;
+            }else if(!type.compare("false"))
+            {
+              verbose = false;
+            }else
+            {
+              comm.print("ERROR: unknown verbose '" + it->second.front() + "'");
+              return false;
+            }
+            params.set_verbose(verbose);
+          }else
+          {
+            comm.print("ERROR: more than one verbose arg given: number of args: " + std::to_string(it->second.size()) + "'");
+            return false;
+          }
+        }
+        return true;
+      }
+
       inline bool parse_fpl_timer(const Dist::Comm& comm, SimpleArgParser& args, FROSchParameterList &params)
       {
         auto it = args.query("frosch-use-timer");
@@ -2347,60 +2411,6 @@ namespace FEAT
         return true;
       }
 
-      inline bool parse_fpl_reuse_sf_ext(const Dist::Comm &comm, SimpleArgParser &args, FROSchParameterList &params)
-      {
-        auto it = args.query("frosch-reuse-sf-ext");
-        if(it != nullptr)
-        {
-          if(it->second.size() == 1u)
-          {
-            bool rsf_ext;
-            std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
-
-            if(!type.compare("true"))
-            {
-              rsf_ext = true;
-            }else if(!type.compare("false"))
-            {
-              rsf_ext = false;
-            }else
-            {
-              comm.print("ERROR: unknown reuse-sf-ext '" + it->second.front() + "'");
-              return false;
-            }
-            params.set_reuse_sf_ext(rsf_ext);
-          }else if(int(it->second.size()) == params.get_nlevels())
-          {
-            std::vector<bool> rsf_ext;
-            rsf_ext.reserve(params.get_nlevels());
-            for(const auto& t : it->second)
-            {
-              std::string type = t;
-              std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
-
-              if(!type.compare("true"))
-              {
-                rsf_ext.push_back(true);
-              }else if(!type.compare("false"))
-              {
-                rsf_ext.push_back(false);
-              }else
-              {
-                comm.print("ERROR: unknown reuse-sf-cm type '" + t + "'");
-                return false;
-              }
-            }
-            params.set_reuse_sf_ext(rsf_ext);
-          }else
-          {
-            comm.print("ERROR: not matching number of reuse-sf-ext: nlevels:  " + std::to_string(params.get_nlevels()) + " number of given reuse-sf-ext: " + std::to_string(it->second.size()) + "'");
-            return false;
-          }
-        }
-        return true;
-      }
-
       inline bool parse_fpl_reuse_coarse_matrix(const Dist::Comm &comm, SimpleArgParser &args, FROSchParameterList &params)
       {
         auto it = args.query("frosch-reuse-coarse-matrix");
@@ -2572,6 +2582,10 @@ namespace FEAT
         {
           return false;
         }
+        if(!parse_fpl_verbose(_comm, args, *this))
+        {
+          return false;
+        }
         if(!parse_fpl_timer(_comm, args, *this))
         {
           return false;
@@ -2661,10 +2675,6 @@ namespace FEAT
           return false;
         }
         if (!parse_fpl_reuse_sf_cm(_comm, args, *this))
-        {
-          return false;
-        }
-        if (!parse_fpl_reuse_sf_ext(_comm, args, *this))
         {
           return false;
         }

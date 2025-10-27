@@ -52,44 +52,46 @@ namespace FEAT
         public:
           /* Use MUMPS or UMFPACK or ILU */
           enum DirectSolver {
-          KLU,          /* Trilinos internal solver:  works always */
-          MUMPS,        /* Trilinos needs to be compiled with Amesos2 and Mumps */
-          UMFPACK,      /* Trilinos needs to be compiled with Amesos2 and Umfpack */
-          ILU           /* Trilinos needs to be compiled with Ifpack2 */
-        };
+            KLU,          /* Trilinos internal solver:  works always */
+            MUMPS,        /* Trilinos needs to be compiled with Amesos2 and Mumps */
+            UMFPACK,      /* Trilinos needs to be compiled with Amesos2 and Umfpack */
+            ILU           /* Trilinos needs to be compiled with Ifpack2 */
+          };
           /* Normally, use TWOLEVELBLOCK */
           enum Preconditioner {
-          ONELEVEL,          /*  one-level overlapping schwarz; just for testing */
-          TWOLEVEL,          /* works only for pressure Poisson and two-level neither for multi-level pressure Poisson nor for the saddle point problem */
-          TWOLEVELBLOCK      /* works for pressure Poisson (two-level and multi-level) and the saddle point problem (two-level and multi-level) */
-        };
+            ONELEVEL,          /*  one-level overlapping schwarz; just for testing */
+            TWOLEVEL,          /* works only for pressure Poisson and two-level neither for multi-level pressure Poisson nor for the saddle point problem */
+            TWOLEVELBLOCK      /* works for pressure Poisson (two-level and multi-level) and the saddle point problem (two-level and multi-level) */
+          };
 
           enum ProblemType {
-          PRESSUREPOISSON,
-          SADDLEPOINT
-        };
+            PRESSUREPOISSON,
+            SADDLEPOINT
+          };
 
           enum PartitionType {
-          PHG,       /* Parallel hyper-graph, Zoltan */
-          PARMETIS,  /* Trilinos needs to be compiled with Parmetis */
-          BLOCK      /* Should work always (not good) */
-        };
+            PHG,       /* Parallel hyper-graph, Zoltan */
+            PARMETIS,  /* Trilinos needs to be compiled with Parmetis */
+            BLOCK,     /* Should work always (not good) */
+            SCOTCH,    /* Scotch */
+            PTSCOTCH   /* Scotch */
+          };
 
           enum PartitionApproach {
-          PARTITION,
-          REPARTITION    /* probably the best, but I'm not sure */
-        };
+            PARTITION,
+            REPARTITION    /* probably the best, but I'm not sure */
+          };
 
           enum CombineOverlap {
-          FULL,          /* produces a symmetric preconditioner */
-          RESTRICTED,    /* __ATTENTION:__ produces a non-symmetric preconditioner.  As default: Restricted with (F)GMRES should work better than FULL with PCG. */
-          AVERAGING      /* __ATTENTION:__ produces a non-symmetric preconditioner.  Should work better than FULL with PCG. */
-        };
+            FULL,          /* produces a symmetric preconditioner */
+            RESTRICTED,    /* __ATTENTION:__ produces a non-symmetric preconditioner.  As default: Restricted with (F)GMRES should work better than FULL with PCG. */
+            AVERAGING      /* __ATTENTION:__ produces a non-symmetric preconditioner.  Should work better than FULL with PCG. */
+          };
 
           enum CombineLevel {
-          ADDITIVE,         /* Combine first and second level in an additive way */
-          MULTIPLICATIVE    /* Combine first and second level in a multiplicative way: __ATTENTION:__ this leads to an unsymmetric preconditioner */
-        };
+            ADDITIVE,         /* Combine first and second level in an additive way */
+            MULTIPLICATIVE    /* Combine first and second level in a multiplicative way: __ATTENTION:__ this leads to an unsymmetric preconditioner */
+          };
 
           /* interface partition of unity
            *
@@ -102,10 +104,10 @@ namespace FEAT
            *
            */
           enum IPOU {
-          GDSW,
-          GDSWSTAR,   /* Only for three dimensional problems */
-          RGDSW
-        };
+            GDSW,
+            GDSWSTAR,   /* Only for three dimensional problems */
+            RGDSW
+          };
 
           /**
            * \brief Interface-Class for a Teuchos::ParameterList object
@@ -239,7 +241,7 @@ namespace FEAT
           void set_cspace_pres(const bool cspace_);
           void set_cspace_pres(const std::vector<bool>& cspace_);
 
-          void set_reuse_sf(const bool rsf_ao_, const bool rsf_cm_, const bool rsf_ext_);
+          void set_reuse_sf(const bool rsf_ao_, const bool rsf_cm_);
           void set_reuse_sf(const std::vector<bool> &rsf_ao_, const std::vector<bool> &rsf_cm_);
           void set_reuse_sf_ao(const bool rsf_ao_);
           void set_reuse_sf_ao(const std::vector<bool> &rsf_ao_);
@@ -255,6 +257,8 @@ namespace FEAT
 
           void set_phi_dropping_threshold(const double phi_dt_);
           void set_phi_dropping_threshold(const std::vector<double> &phi_dt_);
+
+          void set_verbose(const bool verbose_);
 
           bool parse_args(SimpleArgParser& args);
 
@@ -323,8 +327,6 @@ namespace FEAT
           std::vector<bool> _ao_rsf;
           /* reuse symbolic factorization: coarse matrix */
           std::vector<bool> _cm_rsf;
-          /* reuse symbolic factorization: extension solver */
-          std::vector<bool> _ext_rsf;
 
           /* reuse the complete coarse matrix */
           std::vector<bool> _cm_r;
@@ -342,6 +344,9 @@ namespace FEAT
           /* use Trilinos timers for FROSch solver */
           bool _use_timer;
 
+          /* verbose flag for the FROSch/Trilinos class */
+          bool _verbose;
+
           void init_defaults();
 
       }; // FROSchParameterList
@@ -355,6 +360,10 @@ namespace FEAT
         );
         args.support("frosch-print-list", "<bool>\n"
                      "The Trilinos parameter list is print after the construction.\n"
+                     "May contain the following types: true, false."
+        );
+        args.support("frosch-verbose", "<bool>\n"
+                     "The Trilinos/FROSch verbose.  Print output of FROSch.\n"
                      "May contain the following types: true, false."
         );
         args.support("frosch-use-timer", "<bool>\n"
@@ -391,7 +400,7 @@ namespace FEAT
         args.support("frosch-parti-type", "<types | types...>\n"
                      "Specifies the paritioner for multi-level approach.\n"
                      "Number of arguments has be one or same as the value of the argument: frosch-nlevels (int).\n"
-                     "May contain the following types: block, parmetis, phg, zoltan"
+                     "May contain the following types: block, parmetis, phg, zoltan, scotch, ptscotch"
         );
         args.support("frosch-parti-approach", "<types | types...>\n"
                      "Specifies the paritioner approach for multi-level approach.\n"
@@ -469,11 +478,6 @@ namespace FEAT
         );
         args.support("frosch-reuse-sf-cm", "<bool | bool...>\n"
                      "Reuse the symbolic factorization of the coarse matrix.\n"
-                     "Number of arguments has be one or same as the value of the argument: frosch-nlevels (int).\n"
-                     "May contain the following types: true, false"
-        );
-        args.support("frosch-reuse-sf-ext", "<bool | bool...>\n"
-                     "Reuse the symbolic factorization of the extension solver.\n"
                      "Number of arguments has be one or same as the value of the argument: frosch-nlevels (int).\n"
                      "May contain the following types: true, false"
         );

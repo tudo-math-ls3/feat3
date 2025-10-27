@@ -31,6 +31,7 @@
 #include <kernel/adjacency/coloring.hpp>
 
 #include <memory>
+#include <vector>
 
 namespace Gendie
 {
@@ -395,12 +396,6 @@ namespace Gendie
     std::shared_ptr<FEAT::Solver::StokesFROSchPreconditioner<SystemMatrix, SystemFilter>> frosch_precond;
     std::shared_ptr<FEAT::Solver::Trilinos::FROSchParameterList> frosch_params;
     std::vector<int> _frosch_subregions;
-    FEAT::Index _frosch_gmres_dim;
-    FEAT::Index _frosch_miniter;
-    FEAT::Index _frosch_maxiter;
-    DataType _frosch_tol_rel;
-    DataType _frosch_inner_rescale;
-    int _frosch_nlevels;
     int _frosch_overlap;
     FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver _frosch_directsolver_coarse;
     FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver _frosch_directsolver_overlapping;
@@ -412,6 +407,7 @@ namespace Gendie
     FEAT::Solver::Trilinos::FROSchParameterList::CombineOverlap _frosch_combine_overlap;
     FEAT::Solver::Trilinos::FROSchParameterList::IPOU _frosch_ipou_velo;
     FEAT::Solver::Trilinos::FROSchParameterList::IPOU _frosch_ipou_pres;
+    bool _frosch_verbose;
     bool _frosch_exclude_velocity_pressure;
     bool _frosch_exclude_pressure_velocity;
     // reuse symbolic factorization of overlapping operator
@@ -428,6 +424,12 @@ namespace Gendie
     bool _frosch_use_timers;
     bool _frosch_print_internal;
     #endif
+    FEAT::Index _coarse_gmres_dim;
+    FEAT::Index _coarse_miniter;
+    FEAT::Index _coarse_maxiter;
+    DataType _coarse_tol_rel;
+    DataType _coarse_tol_abs;
+    DataType _coarse_inner_rescale;
 
     std::size_t domain_virtual_size;
     DataType smoother_damp;
@@ -473,6 +475,8 @@ namespace Gendie
       coarse_frosch |=  Gendie::check_for_config_option(prop->query("coarse-frosch"));
       coarse_solver_info |=  Gendie::check_for_config_option(prop->query("coarse-info"));
 
+      success &= this->_parse_coarse_params(prop->get_sub_section("coarse-parameters"));
+
     #ifdef FEAT_HAVE_TRILINOS
       success &= this->_parse_frosch_params(prop->get_sub_section("frosch-parameters"));
     #else
@@ -489,17 +493,29 @@ namespace Gendie
         return success;
 
       // _frosch_subregions(1, 1),
-      success &= prop->parse_entry("frosch-gmres-dim", _frosch_gmres_dim);
-      success &= prop->parse_entry("frosch-min-iter", _frosch_miniter);
-      success &= prop->parse_entry("frosch-max-iter", _frosch_maxiter);
-      success &= prop->parse_entry("frosch-tol-rel", _frosch_tol_rel);
-      success &= prop->parse_entry("frosch-inner-rescale", _frosch_inner_rescale);
       if(Gendie::check_for_config_option(prop->query("frosch-xml")))
       {
         _frosch_xml = prop->query("frosch-xml", "");
       }
-      success &= prop->parse_entry("frosch-nlevels", _frosch_nlevels);
-      XASSERTM(_frosch_nlevels == 1, "For now, only nlevels == 1 allowed");
+
+      std::pair<FEAT::String, bool> lvl_string_ = prop->query("frosch-subregions");
+      if(!lvl_string_.second)
+      {
+        _logger->print("You must provide a frosch-subregions field inside the frosch-parameters section!", error);
+        FEAT::Runtime::abort();
+      }
+      auto lvl_deque = lvl_string_.first.split_by_string(" ");
+      _frosch_subregions.resize(lvl_deque.size());
+      int counter = 0;
+      for(FEAT::String s : lvl_deque)
+      {
+        int sint;
+        s.parse(sint);
+        _frosch_subregions.at(counter++) = sint;
+      }
+
+      // success &= prop->parse_entry("frosch-nlevels", _frosch_levels);
+      XASSERTM(_frosch_subregions.back() == 1, "Last number of subregions needs to be == 1");
       success &= prop->parse_entry("frosch-overlap", _frosch_overlap);
 
       // parse directsolver coarse
@@ -610,6 +626,14 @@ namespace Gendie
           else if(!val.first.compare_no_case("PARMETIS"))
           {
             _frosch_parti = FEAT::Solver::Trilinos::FROSchParameterList::PartitionType::PARMETIS;
+          }
+          else if(!val.first.compare_no_case("SCOTCH"))
+          {
+            _frosch_parti = FEAT::Solver::Trilinos::FROSchParameterList::PartitionType::SCOTCH;
+          }
+          else if(!val.first.compare_no_case("PTSCOTCH"))
+          {
+            _frosch_parti = FEAT::Solver::Trilinos::FROSchParameterList::PartitionType::PTSCOTCH;
           }
           else if(!val.first.compare_no_case("BLOCK"))
           {
@@ -725,6 +749,10 @@ namespace Gendie
           }
         }
       }
+      // frosch verbose
+      {
+        _frosch_verbose = Gendie::check_for_config_option(prop->query("frosch-verbose"));
+      }
       // parse exclude velocity pressure coupling
       {
         _frosch_exclude_velocity_pressure = Gendie::check_for_config_option(prop->query("frosch-exclude-velocity-pressure"));
@@ -747,6 +775,23 @@ namespace Gendie
       return success;
     }
 
+    bool _parse_coarse_params(const FEAT::PropertyMap* prop)
+    {
+      bool success = true;
+      if(prop == nullptr)
+        return success;
+
+      // _frosch_subregions(1, 1),
+      success &= prop->parse_entry("gmres-dim", _coarse_gmres_dim);
+      success &= prop->parse_entry("min-iter", _coarse_miniter);
+      success &= prop->parse_entry("max-iter", _coarse_maxiter);
+      success &= prop->parse_entry("tol-rel", _coarse_tol_rel);
+      success &= prop->parse_entry("tol-abs", _coarse_tol_abs);
+      success &= prop->parse_entry("inner-rescale", _coarse_inner_rescale);
+
+      return success;
+    }
+
     bool _setup_frosch_params()
     {
       // for now local variables, will be used in class as configuration needs arise
@@ -759,7 +804,8 @@ namespace Gendie
         return true;
       }
 
-      this->frosch_params->set_nlevels(_frosch_nlevels);
+      this->frosch_params->set_nlevels(_frosch_subregions.size());
+      this->frosch_params->set_subregions(_frosch_subregions);
       this->frosch_params->set_precond(_frosch_precond_type);
       this->frosch_params->set_coarse_solver(_frosch_directsolver_coarse);
       this->frosch_params->set_solvers(_frosch_directsolver_overlapping, _frosch_directsolver_extension);
@@ -769,14 +815,14 @@ namespace Gendie
       this->frosch_params->set_parti_types(_frosch_parti);
       this->frosch_params->set_parti_approach(_frosch_approach);
       this->frosch_params->set_ipous(_frosch_ipou_velo, _frosch_ipou_pres);
-      this->frosch_params->set_subregions(_frosch_subregions);
       this->frosch_params->set_excludes_velo_pres(_frosch_exclude_velocity_pressure);
       this->frosch_params->set_excludes_pres_velo(_frosch_exclude_pressure_velocity);
-      this->frosch_params->set_reuse_sf(_frosch_reuse_sf_ao, _frosch_reuse_sf_cm, _frosch_reuse_sf_ext);
+      this->frosch_params->set_reuse_sf(_frosch_reuse_sf_ao, _frosch_reuse_sf_cm);
       this->frosch_params->set_reuse_coarse(_frosch_reuse_cm, _frosch_reuse_cb);
 
       this->frosch_params->set_print(_frosch_print_internal);
       this->frosch_params->set_use_timer(_frosch_use_timers);
+      this->frosch_params->set_verbose(_frosch_verbose);
 
       return true;
     }
@@ -842,7 +888,7 @@ namespace Gendie
 
           std::shared_ptr<FEAT::Solver::IterativeSolver<DefectVectorType>> solver_iterative;
 
-          if(_frosch_gmres_dim > 0)
+          if(_coarse_gmres_dim > 0)
           {
             solver_iterative = Solver::new_fgmres(matrix_sys, filter_sys, _frosch_gmres_dim, _frosch_inner_rescale, this->frosch_precond);
             solver_iterative->set_tol_rel(_frosch_tol_rel);
@@ -952,7 +998,7 @@ namespace Gendie
 
           std::shared_ptr<FEAT::Solver::IterativeSolver<DefectVectorType>> solver_iterative;
 
-          if(_frosch_gmres_dim > 0)
+          if(_coarse_gmres_dim > 0)
           {
             solver_iterative = Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, _frosch_gmres_dim, _frosch_inner_rescale, this->frosch_precond);
             solver_iterative->set_tol_rel(_frosch_tol_rel);
@@ -962,7 +1008,7 @@ namespace Gendie
             solver_iterative->set_max_iter(_frosch_maxiter);
           }
           else
-          {
+	  {
             solver_iterative = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, DataType(1), this->frosch_precond);
 
             solver_iterative->set_tol_rel(coarse_tol_rel);
@@ -996,9 +1042,12 @@ namespace Gendie
           auto schwarz = FEAT::Solver::new_schwarz_precond(vanka, lvl.filter_sys);
           schwarz->set_ignore_status(true);
           //auto coarse_solver = FEAT::Solver::new_bicgstab(lvl.matrix_sys, lvl.filter_sys, schwarz);
-          auto coarse_solver_t = FEAT::Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, coarse_gmres_dim, coarse_defect_rel, schwarz);
-          coarse_solver_t->set_max_iter(coarse_max_steps);
-          coarse_solver_t->set_tol_rel(coarse_tol_rel);
+          auto coarse_solver_t = FEAT::Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, _coarse_gmres_dim, _coarse_inner_rescale, schwarz);
+          coarse_solver_t->set_tol_rel(_coarse_tol_rel);
+          coarse_solver_t->set_tol_abs(_coarse_tol_abs);
+          coarse_solver_t->set_tol_abs_low(1e-14);
+          coarse_solver_t->set_min_iter(_coarse_miniter);
+          coarse_solver_t->set_max_iter(_coarse_maxiter);
           coarse_solver_t->set_plot_mode(coarse_solver_info ? FEAT::Solver::PlotMode::summary : FEAT::Solver::PlotMode::none);
 
           this->multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, coarse_solver_t);
@@ -1121,13 +1170,7 @@ namespace Gendie
   public:
     MultigridVankaComponent() :
 #ifdef FEAT_HAVE_TRILINOS
-        _frosch_subregions(1, 1),
-        _frosch_gmres_dim(FEAT::Index(16)),
-        _frosch_miniter(FEAT::Index(1)),
-        _frosch_maxiter(FEAT::Index(500)),
-        _frosch_tol_rel(DataType(1e-3)),
-        _frosch_inner_rescale(DataType(1.)),
-        _frosch_nlevels(1),
+        _frosch_subregions({1}),
         _frosch_overlap(1),
         _frosch_directsolver_coarse(FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::UMFPACK),
         _frosch_directsolver_overlapping(FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::UMFPACK),
@@ -1140,6 +1183,7 @@ namespace Gendie
         //_frosch_ipou_velo(dim == 3 ? FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSWSTAR : FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSW),
         _frosch_ipou_velo(FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSWSTAR),
         _frosch_ipou_pres(FEAT::Solver::Trilinos::FROSchParameterList::IPOU::RGDSW),
+        _frosch_verbose(false),
         _frosch_exclude_velocity_pressure(false),
         _frosch_exclude_pressure_velocity(false),
         _frosch_reuse_sf_ao(false),
@@ -1151,6 +1195,12 @@ namespace Gendie
         _frosch_use_timers(false),
         _frosch_print_internal(false),
 #endif
+        _coarse_gmres_dim(FEAT::Index(16)),
+        _coarse_miniter(FEAT::Index(1)),
+        _coarse_maxiter(FEAT::Index(500)),
+        _coarse_tol_rel(DataType(1e-3)),
+        _coarse_tol_abs(DataType(1) / FEAT::Math::sqr(FEAT::Math::eps<DataType>())),
+        _coarse_inner_rescale(DataType(0.)),
         domain_virtual_size(std::size_t(0)),
         smoother_damp(DataType(0.5)),
         mg_tol_rel(DataType(0)),
@@ -1182,12 +1232,6 @@ namespace Gendie
     MultigridVankaComponent(const Container_<std::shared_ptr<System_>>& sys_levels, const Domain_& domain, const FEAT::PropertyMap* prop) :
 #ifdef FEAT_HAVE_TRILINOS
         _frosch_subregions(1, 1),
-        _frosch_gmres_dim(FEAT::Index(16)),
-        _frosch_miniter(FEAT::Index(1)),
-        _frosch_maxiter(FEAT::Index(500)),
-        _frosch_tol_rel(DataType(1e-3)),
-        _frosch_inner_rescale(DataType(1.)),
-        _frosch_nlevels(1),
         _frosch_overlap(1),
         _frosch_directsolver_coarse(FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::UMFPACK),
         _frosch_directsolver_overlapping(FEAT::Solver::Trilinos::FROSchParameterList::DirectSolver::UMFPACK),
@@ -1200,6 +1244,7 @@ namespace Gendie
         //_frosch_ipou_velo(dim == 3 ? FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSWSTAR : FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSW),
         _frosch_ipou_velo(FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSWSTAR),
         _frosch_ipou_pres(FEAT::Solver::Trilinos::FROSchParameterList::IPOU::RGDSW),
+        _frosch_verbose(false),
         _frosch_exclude_velocity_pressure(false),
         _frosch_exclude_pressure_velocity(false),
         _frosch_reuse_sf_ao(false),
@@ -1211,6 +1256,12 @@ namespace Gendie
         _frosch_use_timers(false),
         _frosch_print_internal(false),
 #endif
+        _coarse_gmres_dim(FEAT::Index(16)),
+        _coarse_miniter(FEAT::Index(1)),
+        _coarse_maxiter(FEAT::Index(500)),
+        _coarse_tol_rel(DataType(1e-3)),
+        _coarse_tol_abs(DataType(1) / FEAT::Math::sqr(FEAT::Math::eps<DataType>())),
+        _coarse_inner_rescale(DataType(0.)),
         domain_virtual_size(domain.size_virtual()),
         smoother_damp(DataType(0.5)),
         mg_tol_rel(DataType(0)),
