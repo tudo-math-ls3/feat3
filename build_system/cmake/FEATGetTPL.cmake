@@ -23,6 +23,7 @@
 # - PATCH_COMMAND_LINUX, patch command to run for linux builds
 # - CONFIG, if set dependencies will be searched for in config mode
 # - EXCLUDE_FROM_ALL, if set targets defined by the TPL will not be added to the all target
+# - SYSTEM, if set targets defined by the TPL will be considered as system libraries
 #
 # Behavior
 #
@@ -43,7 +44,7 @@ function(feat_get_tpl)
   cmake_parse_arguments(
     PARSE_ARGV 0
     TPL
-    "CONFIG;EXLUDE_FROM_ALL" # Options
+    "CONFIG;EXLUDE_FROM_ALL;SYSTEM" # Options
     "PACKAGE_NAME;VERSION;URL;URL_HASH;SOURCE_SUBDIR" # Single value keywords
     "PATCH_COMMAND_WINDOWS;PATCH_COMMAND_LINUX" # Multi value keywords
   )
@@ -52,7 +53,7 @@ function(feat_get_tpl)
   message(STATUS "------------------------------------------------------")
 
   if(FEAT_PREFER_EXTERNAL_TPL OR ${TPL_PACKAGE_NAME}_DIR)
-    list(APPEND FIND_PACKAGE_ARGS ${TPL_PACKAGE_NAME} ${TPL_VERSION})
+    list(APPEND FIND_PACKAGE_ARGS ${TPL_PACKAGE_NAME} ${TPL_VERSION} QUIET)
 
     if(TPL_CONFIG)
         list(APPEND FIND_PACKAGE_ARGS CONFIG)
@@ -140,6 +141,10 @@ function(feat_get_tpl)
 
     if(TPL_EXCLUDE_FROM_ALL)
       list(APPEND DECLARE_ARGS EXCLUDE_FROM_ALL)
+    endif()
+
+    if(TPL_SYSTEM)
+      list(APPEND DECLARE_ARGS SYSTEM)
     endif()
 
     FetchContent_Declare(${DECLARE_ARGS})

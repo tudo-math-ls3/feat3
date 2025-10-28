@@ -89,6 +89,7 @@ if(FEAT_HAVE_UMFPACK)
     URL https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v7.10.2.zip
     URL_HASH MD5=b54b521b41f1468e37e0c0199a85e598
     CONFIG
+    SYSTEM
   )
 
   if(NOT UMFPACK_FOUND)
@@ -125,6 +126,7 @@ if(FEAT_HAVE_HYPRE)
     PATCH_COMMAND_WINDOWS python ${CMAKE_CURRENT_LIST_DIR}/patches/hypre_win.py .
     SOURCE_SUBDIR src
     CONFIG
+    SYSTEM
   )
 
   if(NOT HYPRE_FOUND)
@@ -147,6 +149,7 @@ if(FEAT_HAVE_PARMETIS)
     URL_HASH MD5=9bb15981d34adc3fd9e038bc7033388d
     PATCH_COMMAND_WINDOWS python ${CMAKE_CURRENT_LIST_DIR}/patches/parmetis_win.py .
     CONFIG
+    SYSTEM
   )
 
 endif(FEAT_HAVE_PARMETIS)
@@ -158,6 +161,7 @@ if(FEAT_HAVE_FPARSER)
     VERSION 4.5.2
     URL http://warp.povusers.org/FunctionParser/fparser4.5.2.zip
     URL_HASH MD5=ce805d2f827f25e61f266e176b8d338d
+    SYSTEM
   )
 endif()
 
@@ -168,6 +172,8 @@ if(FEAT_HAVE_BOOST)
     VERSION 1.88
     URL https://github.com/boostorg/boost/releases/download/boost-1.88.0/boost-1.88.0-cmake.zip
     URL_HASH MD5=419f6a9273cb90d4f3f65ca0ae02cd00
+    CONFIG
+    SYSTEM
   )
 
   if(NOT Boost_FOUND)
@@ -187,6 +193,7 @@ if(FEAT_HAVE_CGAL)
     URL_HASH MD5=f30c69bf83e294c44e936fa4ad2c2b2c
     SOURCE_SUBDIR Non-Existing # Use non-existing source dir to disable add_subdirectory call of MakeAvailable
     CONFIG
+    SYSTEM
   )
 endif()
 
@@ -197,6 +204,7 @@ if(FEAT_HAVE_ALGLIB)
     VERSION 4.04.0
     URL http://www.alglib.net/translator/re/alglib-4.04.0.cpp.gpl.zip
     URL_HASH MD5=c9a6b38c9b41ef1121fb0b33c8228394
+    SYSTEM
   )
 endif()
 
@@ -207,6 +215,7 @@ if(FEAT_HAVE_DEATH_HANDLER)
     VERSION 1.0
     URL https://github.com/vmarkovtsev/DeathHandler/archive/refs/heads/master.zip
     URL_HASH MD5=c1e443dbd6b1e5a6e0cb072a5726e9a0
+    SYSTEM
   )
 endif()
 
@@ -218,6 +227,7 @@ if(FEAT_HAVE_FLOATX)
     URL https://github.com/oprecomp/FloatX/archive/refs/heads/master.zip
     URL_HASH MD5=e8bd646b92de39ee2404ecafd08941de
     SOURCE_SUBDIR Non-existing
+    SYSTEM
   )
 endif()
 
@@ -229,6 +239,7 @@ if(FEAT_HAVE_ZFP)
     URL https://github.com/LLNL/zfp/releases/download/1.0.0/zfp-1.0.0.zip
     URL_HASH MD5=28c1a0a53931973b18eb4b3d3b7c5f63
     CONFIG
+    SYSTEM
   )
   if(NOT zfp_FOUND)
     set(ZFP_WITH_OPENMP ${FEAT_HAVE_OMP} CACHE BOOL "Enable OpenMP for ZFP" FORCE)
@@ -245,6 +256,7 @@ if(FEAT_HAVE_ZLIB)
     URL https://www.zlib.net/fossils/zlib-1.2.13.tar.gz
     URL_HASH MD5=9b8aa094c4e5765dabf4da391f00d15c
     SOURCE_SUBDIR Non-existing
+    SYSTEM
   )
 endif()
 
@@ -255,6 +267,7 @@ if(FEAT_HAVE_TRIANGLE)
     VERSION 1.0
     URL "http://www.netlib.org/voronoi/triangle.zip"
     URL_HASH MD5=10aff8d7950f5e0e2fb6dd2e340be2c9
+    SYSTEM
   )
 endif()
 
@@ -267,6 +280,7 @@ if(FEAT_HAVE_ZOLTAN)
     URL_HASH MD5=a951ef9b1529fed3a325d57e0be21734
     PATCH_COMMAND_WINDOWS python ${CMAKE_CURRENT_LIST_DIR}/patches/zoltan_win.py .
     SOURCE_SUBDIR Non-Existing
+    SYSTEM
   )
 endif()
 
@@ -281,6 +295,7 @@ if(FEAT_HAVE_SUPERLU_DIST)
     PATCH_COMMAND_LINUX python ${CMAKE_CURRENT_LIST_DIR}/patches/superlu.py .
     SOURCE_SUBDIR SRC
     EXCLUDE_FROM_ALL
+    SYSTEM
   )
 
   if(NOT superlu_FOUND)
@@ -324,6 +339,7 @@ if(FEAT_HAVE_PMP)
     URL_HASH MD5=7b7f9ce07a7a687c9d78a6583cf64a2c
     SOURCE_SUBDIR Non-Existing # Use non-existing source dir to disable add_subdirectory call of MakeAvailable
     CONFIG
+    SYSTEM
   )
 endif()
 
