@@ -419,7 +419,7 @@ class ThirdPartyAlglib(ThirdPartyPackage):
     self.file = self.name + "-" + self.version + ".cpp.gpl.zip"
     self.dir = self.name + "-" + self.version
     self.trunk = self.dir
-    self.license_files = [os.path.join("docs", "lgpl.txt")]
+    self.license_files = [os.path.join("alglib-cpp", "gpl3.txt")]
     self.url = "https://www.alglib.net/translator/re/" + self.file
     self.url_user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:137.0) Gecko/20100101 Firefox/137.0"
     self.page = "https://www.alglib.net"
@@ -1504,7 +1504,7 @@ class ThirdPartyParMETIS(ThirdPartyPackage):
     self.license_info = \
       "ParMETIS has a rather restrictive license, which is the first one shown here. Additionally,\n" +\
       "ParMETIS relies on METIS. which has its own license, which is the second license shown below\n\n"
-    self.license_files = ["LICENSE.txt", os.path.join("metis", "LICENSE.txt")]
+    self.license_files = ["LICENSE", os.path.join("metis", "LICENSE")]
     self.url = "https://github.com/tudo-math-ls3/ParMETIS/archive/refs/tags/v" + self.version + ".zip"
     self.page = "https://github.com/KarypisLab/ParMETIS"
     self.baseflags += " /DUSE_GKREGEX"
@@ -1699,7 +1699,7 @@ class ThirdPartyPmp(ThirdPartyPackage):
     self.file = self.name + "-library-" + self.version + ".zip"
     self.dir = self.name + "-library-" + self.version
     self.trunk = "."
-    self.license_files = ["LICENSE"]
+    self.license_files = ["LICENSE.txt"]
     self.url = "https://github.com/pmp-library/pmp-library/archive/refs/tags/" + self.version + ".zip"
     self.page = "https://www.pmp-library.org"
     self.baseflags += ' /wd"4244" /wd"4267" /wd"4305" /wd"4996"'
