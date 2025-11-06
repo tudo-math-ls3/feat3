@@ -54,7 +54,6 @@ endif (FEAT_HAVE_TRILINOS)
 
 if (FEAT_HAVE_CUDA)
   add_library(feat-kernel-solver-cuda STATIC
-    cusolver.cu
     ilu_precond.cu
     sor_precond.cu
     ssor_precond.cu
@@ -73,7 +72,6 @@ set(test_list
   amavanka-test
   basic_solver-test
   cudss-test
-  cusolver-test
   direct_stokes_solver-test
   hypre-test
   mkl_dss-test
