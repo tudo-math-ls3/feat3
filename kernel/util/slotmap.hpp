@@ -579,7 +579,9 @@ namespace FEAT::Util
         _slots.insert(_slots.end(), extend_by, Slot());
       }
 
+
       Slot& slot = _slots[key.index];
+      XASSERTM(slot.generation <= key.generation, "Trying to insert into SecondaryMap with outdated key!");
       slot.value = std::optional<V>(value);
       slot.generation = key.generation;
     }

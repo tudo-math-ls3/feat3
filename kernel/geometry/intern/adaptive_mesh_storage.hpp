@@ -7,6 +7,7 @@
 
 #include "kernel/util/string.hpp"
 #include "kernel/util/tiny_algebra.hpp"
+#include <iostream>
 #include <kernel/shape.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/slotmap.hpp>
@@ -1144,6 +1145,8 @@ namespace FEAT::Geometry::Intern
         return;
       }
 
+      std::cout << "Recalculating neighbors\n";
+
       // In the following we are calling mesh entities of dimension shape_dim - 1 facets.
       // We are using the fact that each facet is shared by at most 2 elements.
       // We are goint to first determine which elements are adjacent to each
@@ -1152,13 +1155,34 @@ namespace FEAT::Geometry::Intern
       // elements a second time and determine their neighbors as the element
       // registered for the facet, that is not itself.
 
-      // Map of facet neighbors
-      Util::SecondaryMap<std::array<ElementKey<shape_dim>, 2>, ElementKey<shape_dim - 1>>
-        facet_neighbors;
+      // Maps of facet neighbors
+      std::vector<std::vector<Util::SecondaryMap<std::array<ElementKey<shape_dim>, 2>, ElementKey<shape_dim - 1>>>>
+        permanent_facet_neighbors(num_layers());
+
+      std::vector<std::vector<Util::SecondaryMap<std::array<ElementKey<shape_dim>, 2>, ElementKey<shape_dim - 1>>>>
+        transient_facet_neighbors(num_layers());
+
+      for(Index i(0); i < num_layers(); i++)
+      {
+        permanent_facet_neighbors[i].resize(num_layers());
+        transient_facet_neighbors[i].resize(num_layers());
+      }
 
       // Register element with their adjacent facets. Fills the facet_neighbors map.
       auto determine_facet_neighbors = [&](Layer layer, auto slotmap_entry)
       {
+        // HACK: We have to recreate the "full" element key here.
+        // The keys returned by the SlotMap iterators do not contain the
+        // layer and permanency information we have added to the usual
+        // slotmap data.
+        // The proper way to this is to wrap the iterators in the MeshLayer
+        // class and add this information there. As this is currently the
+        // only place where we directly iterate over all elements of a layer
+        // via the iterators, I am leaving that boilerplate out for now.
+        ElementKey<shape_dim> element_key = slotmap_entry.key;
+        element_key.layer = layer;
+        element_key.is_permanent = slotmap_entry.value.type.is_zero_refinement();
+
         // Iterate over all facets
         for(int facet_idx = 0; facet_idx < num_facets; facet_idx++)
         {
@@ -1166,24 +1190,17 @@ namespace FEAT::Geometry::Intern
           auto key = slotmap_entry.value.topology.template key_by_dim<shape_dim - 1>(facet_idx).key;
 
           // Init secondary map, if this is the first time we see this facet
-          if(!facet_neighbors.contains_key(key))
+          if(key.is_permanent && !permanent_facet_neighbors[layer.idx][key.layer.idx].contains_key(key))
           {
-            facet_neighbors.insert(key, {neighbor_sentinel, neighbor_sentinel});
+            permanent_facet_neighbors[layer.idx][key.layer.idx].insert(key, {neighbor_sentinel, neighbor_sentinel});
           }
 
-          auto& neighbors = facet_neighbors[key];
+          if(!key.is_permanent && !transient_facet_neighbors[layer.idx][key.layer.idx].contains_key(key))
+          {
+            transient_facet_neighbors[layer.idx][key.layer.idx].insert(key, {neighbor_sentinel, neighbor_sentinel});
+          }
 
-          // HACK: We have to recreate the "full" element key here.
-          // The keys returned by the SlotMap iterators do not contain the
-          // layer and permanency information we have added to the usual
-          // slotmap data.
-          // The proper way to this is to wrap the iterators in the MeshLayer
-          // class and add this information there. As this is currently the
-          // only place where we directly iterate over all elements of a layer
-          // via the iterators, I am leaving that boilerplate out for now.
-          ElementKey<shape_dim> element_key = slotmap_entry.key;
-          element_key.layer = layer;
-          element_key.is_permanent = slotmap_entry.value.type.is_zero_refinement();
+          auto& neighbors = key.is_permanent ? permanent_facet_neighbors[layer.idx][key.layer.idx][key] : transient_facet_neighbors[layer.idx][key.layer.idx][key];
 
           if(neighbors[0] == neighbor_sentinel)
           {
@@ -1224,7 +1241,7 @@ namespace FEAT::Geometry::Intern
           element_key.is_permanent = slotmap_entry.value.type.is_zero_refinement();
 
           // Neighbor is the entity that is not the current entity
-          auto& candidates = facet_neighbors[key];
+          auto& candidates = key.is_permanent ? permanent_facet_neighbors[layer.idx][key.layer.idx][key] : transient_facet_neighbors[layer.idx][key.layer.idx][key];
           if(candidates[0] == element_key)
           {
             element.neighbors[facet_idx] = candidates[1];

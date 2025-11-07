@@ -869,7 +869,7 @@ namespace FEAT::Geometry
 
     /// Number of indices per entry
     static constexpr int num_indices =
-      Shape::FaceTraits<typename AdaptiveMeshType::ShapeType, AdaptiveMeshType_::shape_dim>::count;
+      Shape::FaceTraits<typename AdaptiveMeshType::ShapeType, AdaptiveMeshType_::shape_dim - 1>::count;
 
     /// Adjactor for AdaptiveIndexSet
     class AdaptiveNeighborsAdjactor
@@ -1007,6 +1007,16 @@ namespace FEAT::Geometry
       return _mesh->get_neighbor(_layer, i, j);
     }
 
+    IndexTuple<num_indices> operator[](Index i) const
+    {
+      IndexTuple<num_indices> result;
+      for(int j(0); j < num_indices; j++)
+      {
+        result[j] = (*this)(i, j);
+      }
+      return result;
+    }
+
     /**
      * \brief Returns the number of entities.
      */
@@ -1126,6 +1136,9 @@ namespace FEAT::Geometry
 
     /// Vertex type
     using VertexType = typename AdaptiveMeshType::VertexType;
+
+    /// Coord type
+    using CoordType = typename AdaptiveMeshType::CoordType;
 
     /// IndexSetHolder type
     using IndexSetHolderType = AdaptiveIndexSetHolder<AdaptiveMeshType, ShapeType>;

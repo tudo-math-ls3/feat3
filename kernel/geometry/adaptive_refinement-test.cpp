@@ -573,6 +573,9 @@ public:
     test_mesh_creation();
     test_simple();
     test_neighbors();
+    test_neighbors_2d();
+    test_coarsening();
+    test_neighbor_coarsening();
     test_stats();
     test_export_and_refine();
     test_import();
@@ -608,6 +611,49 @@ public:
     a_mesh.adapt(levels, AdaptiveMesh3D::ImportBehaviour::All);
   }
 
+  void test_coarsening() const
+  {
+    Geometry::RefinedUnitCubeFactory<Mesh3D> mesh_factory(1);
+    Mesh3D base_mesh(mesh_factory);
+
+    Geometry::SubdivisionLevels high(base_mesh.get_num_vertices(), 2);
+    Geometry::SubdivisionLevels zero(base_mesh.get_num_vertices(), 0);
+
+    auto a_mesh = std::make_shared<AdaptiveMesh3D>(base_mesh);
+    a_mesh->adapt(high, AdaptiveMesh3D::ImportBehaviour::All);
+    a_mesh->adapt(zero, AdaptiveMesh3D::ImportBehaviour::All);
+
+    TEST_CHECK_EQUAL(a_mesh->get_num_entities(Layer{0}, 3), 8);
+  }
+
+  void test_neighbor_coarsening() const
+  {
+    std::cout << "Test neighbor coarsening\n";
+    Geometry::RefinedUnitCubeFactory<Mesh3D> mesh_factory(1);
+    Mesh3D base_mesh(mesh_factory);
+
+    Geometry::SubdivisionLevels high_levels(base_mesh.get_num_vertices(), 3);
+
+    auto a_mesh = std::make_shared<AdaptiveMesh3D>(base_mesh);
+    a_mesh->adapt(high_levels, AdaptiveMesh3D::ImportBehaviour::All);
+
+    AdaptiveMeshLayer3D layer_high(a_mesh, Layer{a_mesh->num_layers() - 1});
+    layer_high.fill_neighbours();
+
+    Geometry::SubdivisionLevels low_levels(base_mesh.get_num_vertices(), 2);
+    const auto& vertices = base_mesh.get_vertex_set();
+    for(Index v(0); v < base_mesh.get_num_vertices(); v++)
+    {
+      const auto& vertex = vertices[v];
+      low_levels[v] = vertex[0] < DT_(0.5) ? 1 : 2;
+    }
+
+    a_mesh->adapt(low_levels, AdaptiveMesh3D::ImportBehaviour::All);
+
+    AdaptiveMeshLayer3D layer_low(a_mesh, Layer{a_mesh->num_layers() - 1});
+    layer_low.fill_neighbours();
+  }
+
   void test_neighbors() const
   {
     Geometry::RefinedUnitCubeFactory<Mesh3D> mesh_factory(1);
@@ -630,6 +676,28 @@ public:
     TEST_CHECK_EQUAL(neighbors(7, 0), 3);
     TEST_CHECK_EQUAL(neighbors(7, 2), 5);
     TEST_CHECK_EQUAL(neighbors(7, 4), 6);
+  }
+
+  void test_neighbors_2d() const
+  {
+    Geometry::RefinedUnitCubeFactory<Mesh2D> mesh_factory(1);
+    Mesh2D base_mesh(mesh_factory);
+
+    Geometry::SubdivisionLevels levels(base_mesh.get_num_vertices());
+    auto a_mesh = std::make_shared<AdaptiveMesh2D>(base_mesh);
+    a_mesh->adapt(levels, AdaptiveMesh2D::ImportBehaviour::All);
+
+    AdaptiveMeshLayer2D layer(a_mesh, Geometry::Layer{0});
+
+    layer.fill_neighbours();
+
+    auto neighbors = layer.get_neighbors();
+
+    TEST_CHECK_EQUAL(neighbors(0, 3), 1);
+    TEST_CHECK_EQUAL(neighbors(0, 1), 2);
+
+    TEST_CHECK_EQUAL(neighbors(3, 0), 1);
+    TEST_CHECK_EQUAL(neighbors(3, 2), 2);
   }
 
   void test_stats() const
