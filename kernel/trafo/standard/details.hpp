@@ -92,7 +92,7 @@ namespace FEAT
         template<typename VertexSetType_, typename IndexSetType_, typename IT_>
         CUDA_HOST_DEVICE static void inline set_coefficients(Tiny::Matrix<DataType, image_dim, num_verts>& coeffs, const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
-          typedef typename VertexSetType_::VertexType VertexType;
+          typedef std::remove_const_t<std::remove_reference_t<decltype(vertex_set[0])>> VertexType;
 
           const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
           const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
@@ -252,7 +252,7 @@ namespace FEAT
         template<typename VertexSetType_, typename IndexSetType_, typename IT_>
         CUDA_HOST_DEVICE static void inline set_coefficients(Tiny::Matrix<DataType, image_dim, num_verts>& coeffs, const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
-          typedef typename VertexSetType_::VertexType VertexType;
+          typedef std::remove_const_t<std::remove_reference_t<decltype(vertex_set[0])>> VertexType;
 
           const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
           const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
@@ -447,7 +447,7 @@ namespace FEAT
         CUDA_HOST_DEVICE static void inline set_coefficients(Tiny::Matrix<DataType, image_dim, num_verts>& coeffs, const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
           // fetch the vertices of the edge
-          typedef typename VertexSetType_::VertexType VertexType;
+          typedef std::remove_const_t<std::remove_reference_t<decltype(vertex_set[0])>> VertexType;
           const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
           const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
           const VertexType& v2 = vertex_set[index_set(cell_index, 2)];
@@ -644,7 +644,7 @@ namespace FEAT
         template<typename VertexSetType_, typename IndexSetType_, typename IT_>
         CUDA_HOST_DEVICE static void inline set_coefficients(Tiny::Matrix<DataType, image_dim, num_verts>& coeffs, const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
-          typedef typename VertexSetType_::VertexType VertexType;
+          typedef std::remove_const_t<std::remove_reference_t<decltype(vertex_set[0])>> VertexType;
 
           const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
           const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
@@ -803,7 +803,7 @@ namespace FEAT
         template<typename VertexSetType_, typename IndexSetType_, typename IT_>
         CUDA_HOST_DEVICE static void inline set_coefficients(Tiny::Matrix<DataType, image_dim, num_verts>& coeffs, const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
-          typedef typename VertexSetType_::VertexType VertexType;
+          typedef std::remove_const_t<std::remove_reference_t<decltype(vertex_set[0])>> VertexType;
 
           const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
           const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
@@ -878,7 +878,7 @@ namespace FEAT
         template<typename ThreadGroup_, typename VertexSetType_, typename IndexSetType_, typename IT_>
         CUDA_DEVICE static void inline grouped_set_coefficients(const ThreadGroup_& tg, DataType* coeffs, const VertexSetType_& vertex_set, const IndexSetType_& index_set, const IT_ cell_index)
         {
-          typedef typename VertexSetType_::VertexType VertexType;
+          typedef std::remove_const_t<std::remove_reference_t<decltype(vertex_set[0])>> VertexType;
           // get shared vertex set array
           __shared__ VertexType vn[8];
 
@@ -1106,7 +1106,7 @@ namespace FEAT
         template<typename VertexSetType_, typename IndexSetType_, typename IT_>
         CUDA_HOST_DEVICE static void inline set_coefficients(Tiny::Matrix<DataType, img_dim, num_verts>& coeffs, const VertexSetType_& vertex_set, const IndexSetType_& index_set, IT_ cell_index)
         {
-          typedef typename VertexSetType_::VertexType VertexType;
+          typedef std::remove_const_t<std::remove_reference_t<decltype(vertex_set[0])>> VertexType;
 
           const VertexType& v0 = vertex_set[index_set(cell_index, 0)];
           const VertexType& v1 = vertex_set[index_set(cell_index, 1)];
@@ -1185,7 +1185,7 @@ namespace FEAT
         template<typename ThreadGroup_, typename VertexSetType_, typename IndexSetType_, typename IT_>
         CUDA_DEVICE static void inline grouped_set_coefficients(const ThreadGroup_& tg, DataType* coeffs, const VertexSetType_& vertex_set, const IndexSetType_& index_set, const IT_ cell_index)
         {
-          typedef typename VertexSetType_::VertexType VertexType;
+          typedef std::remove_const_t<std::remove_reference_t<decltype(vertex_set[0])>> VertexType;
           // get shared vertex set array
           __shared__ VertexType vn[8];
 

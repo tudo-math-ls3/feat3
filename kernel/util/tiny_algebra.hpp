@@ -248,6 +248,26 @@ namespace FEAT
         }
       }
 
+      /// copy constructor
+      template<typename Tx_, int sx_>
+      CUDA_HOST_DEVICE explicit Vector(const Vector<Tx_, n_, sx_>& x)
+      {
+        for(int i(0); i < n_; ++i)
+        {
+          v[i] = ValueType(x.v[i]);
+        }
+      }
+
+      /// copy constructor
+      template<typename Tx_>
+      CUDA_HOST_DEVICE explicit Vector(const std::array<Tx_, n_>& x)
+      {
+        for(int i(0); i < n_; ++i)
+        {
+          v[i] = ValueType(x[i]);
+        }
+      }
+
       /// convert function, not callable with non convertable inner type
       template<typename Tx_, int sx_>
       CUDA_HOST_DEVICE static Vector convert_new(const Vector<Tx_, n_, sx_>& x)
@@ -282,7 +302,7 @@ namespace FEAT
        * The initializer list whose elements are to be assigned.
        */
       template<typename Tx_>
-      CUDA_HOST_DEVICE explicit Vector(const std::initializer_list<Tx_>& x)
+      CUDA_HOST_DEVICE Vector(const std::initializer_list<Tx_>& x)
       {
         XASSERTM(std::size_t(n_) == x.size(), "invalid initializer list size");
         auto it(x.begin());
@@ -307,6 +327,28 @@ namespace FEAT
         for(int i(0); i < n_; ++i)
         {
           v[i] = x.v[i];
+        }
+        return *this;
+      }
+
+      /// copy-assignment operator
+      template<typename Tx_, int sx_>
+      CUDA_HOST_DEVICE Vector& operator=(const Vector<Tx_, n_, sx_>& x)
+      {
+        for(int i(0); i < n_; ++i)
+        {
+          v[i] = ValueType(x.v[i]);
+        }
+        return *this;
+      }
+
+      /// copy-assignment operator
+      template<typename Tx_>
+      CUDA_HOST_DEVICE Vector& operator=(const std::array<Tx_, n_>& x)
+      {
+        for(int i(0); i < n_; ++i)
+        {
+          v[i] = ValueType(x[i]);
         }
         return *this;
       }

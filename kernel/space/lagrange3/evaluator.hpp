@@ -8,6 +8,7 @@
 // includes, FEAT
 #include <kernel/space/parametric_evaluator.hpp>
 #include <kernel/space/dof_mapping_common.hpp>
+#include <kernel/geometry/intern/sub_index_mapping.hpp>
 
 namespace FEAT
 {

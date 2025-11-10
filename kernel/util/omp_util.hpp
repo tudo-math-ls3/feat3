@@ -16,6 +16,34 @@
 namespace FEAT
 {
   /**
+   * \brief Returns the maximum number of omp threads
+   *
+   * \return Either the value of omp_get_max_threads() or 1
+   */
+  inline int feat_omp_get_max_threads()
+  {
+  #ifdef FEAT_HAVE_OMP
+    return omp_get_max_threads();
+  #else
+    return 1;
+  #endif
+  }
+
+  /**
+   * \brief Returns the momentary omp thread
+   *
+   * \return 0 if not in a parallel region or the current thread
+   */
+  inline int feat_omp_get_thread_num()
+  {
+  #ifdef FEAT_HAVE_OMP
+    return omp_get_thread_num();
+  #else
+    return 1;
+  #endif
+  }
+
+  /**
    * \brief Computes an OpenMP-parallel inclusive scan a.k.a. a prefix sum of an array, i.e.
    *
    * \f[ y_k := \sum_{i=0}^k x_i \f]

@@ -209,14 +209,16 @@ namespace FEAT
        */
       explicit InverseMapping(const TrafoType& trafo,
         DataType bbox_tol = DataType(1E-2),
-        DataType domain_tol = DataType(1E-4)
+        DataType domain_tol = DataType(1E-4),
+        bool init_boxes = true
         ) :
         _trafo(trafo),
         _domain_tol(domain_tol),
         _newton_tol(Math::pow(Math::eps<DataType>(), DataType(0.9))),
         _newton_max_iter(10u)
       {
-        init_bounding_boxes(bbox_tol);
+        if(init_boxes)
+          init_bounding_boxes(bbox_tol);
       }
 
       /// virtual destructor
@@ -462,6 +464,8 @@ namespace FEAT
        */
       bool find_candidate_cells(std::vector<Index>& cells, const ImagePointType& img_point) const
       {
+        if(_bboxes.size() != _trafo.get_mesh().get_num_elements())
+          init_bounding_boxes(DataType(1E-2));
         // loop over all cells/bounding boxes
         for(std::size_t cell(0); cell < _bboxes.size(); ++cell)
         {

@@ -156,6 +156,11 @@ namespace FEAT
         return IndexSet(this->_index_bound, this->_indices);
       }
 
+      void set_indices(std::vector<IndexTupleType>&& vec)
+      {
+        this->_indices = std::move(vec);
+      }
+
       /// \returns The size of dynamically allocated memory in bytes.
       std::size_t bytes() const
       {
