@@ -1283,7 +1283,7 @@ namespace FEAT
       {
       }
 
-      explicit ILUPrecondWithBackend(const String& section_name, const PropertyMap* section,
+      explicit ILUPrecondWithBackend(const String& DOXY(section_name), const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
         _matrix(matrix),
         _filter(filter)
@@ -1514,7 +1514,7 @@ namespace FEAT
        * The system filter.
        *
        */
-      explicit ILUPrecondWithBackend(const String& section_name, const PropertyMap* section,
+      explicit ILUPrecondWithBackend(const String& DOXY(section_name), const PropertyMap* section,
         const MatrixType& matrix, const FilterType& filter) :
         _matrix(matrix),
         _filter(filter)
