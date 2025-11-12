@@ -248,7 +248,7 @@
 #include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/gmres.hpp>
 #include <kernel/solver/umfpack.hpp>
-#include <kernel/solver/direct_stokes_solver.hpp>
+#include <kernel/solver/direct_sparse_solver.hpp>
 #include <kernel/solver/superlu.hpp>
 #include <kernel/solver/frosch.hpp>
 #include <kernel/util/dist.hpp>
@@ -259,8 +259,6 @@
 #include <control/scalar_basic.hpp>
 #include <control/checkpoint_control.hpp>
 #include <control/statistics.hpp>
-
-#include "scalexa_stokes_scalarize_helper.hpp"
 
 #ifdef FEAT_HAVE_OMP
 #include <omp.h>
@@ -1042,9 +1040,6 @@ int main(int argc, char* argv[])
   // define our solver level with (lower) solver precision
   typedef Control::StokesBlockedUnitVeloNonePresSystemLevel<dim, SolverDataType, IndexType> SolverLevelType;
 
-  // define our scalarized solver level for the coarse grid solver
-  typedef Control::ScalarUnitFilterSystemLevel<SolverDataType, IndexType> ScalarizedSystemLevelType;
-
   BenchmarkSummary summary;
   BenchmarkStats statistics;
   StopWatch watch_total_run;
@@ -1562,22 +1557,6 @@ int main(int argc, char* argv[])
     filter_char.filter_sol(vec_char);
   }
 
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  StopWatch watch_scalarize_symbolic, watch_scalarize_numeric;
-
-  watch_scalarize_symbolic.start();
-
-  // create scalarize helper
-  SCALEXA::StokesScalarizeHelper<SolverLevelType, ScalarizedSystemLevelType> scalarize_helper;
-  if(domain.num_local_layers() == domain.num_global_layers())
-    scalarize_helper.create(*solver_levels.back());
-
-  watch_scalarize_symbolic.stop();
-
-
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1597,12 +1576,8 @@ int main(int argc, char* argv[])
     typename SolverLevelType::LocalSystemMatrix,
     typename SolverLevelType::LocalSystemFilter>>> ama_vankas;
 
-  // scalarized coarse grid solver
-  std::shared_ptr<Solver::SolverBase<ScalarizedSystemLevelType::GlobalSystemVector>> scalar_coarse_solver;
-
-  // the wrapped coarse sole
-  std::shared_ptr<SCALEXA::StokesScalarizeWrapper<SolverLevelType, ScalarizedSystemLevelType>> wrapped_coarse_solver;
-
+  // the coarse solver
+  std::shared_ptr<Solver::SolverBase<SolverLevelType::GlobalSystemVector>> coarse_solver;
 
   // push levels into multigrid
   for(std::size_t i(0); i < solver_levels.size(); ++i)
@@ -1646,12 +1621,9 @@ int main(int argc, char* argv[])
 
 #ifdef FEAT_HAVE_TRILINOS
       {
-        Index num_owned_pres_dofs = lvl.gate_pres.get_num_local_dofs();
-        auto frosch_precond = Solver::new_stokes_frosch(scalarize_helper.scalarized_level.matrix_sys,
-          scalarize_helper.scalarized_level.filter_sys, num_owned_pres_dofs, *params);
+        auto frosch_precond = Solver::new_stokes_frosch(lvl.matrix_sys, lvl.filter_sys, *params);
 
-        auto solver_iterative = Solver::new_fgmres(scalarize_helper.scalarized_level.matrix_sys,
-          scalarize_helper.scalarized_level.filter_sys, krylov_dim, inner_res_scale, frosch_precond);
+        auto solver_iterative = Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, krylov_dim, inner_res_scale, frosch_precond);
         solver_iterative->set_tol_rel(tol_rel);
         solver_iterative->set_tol_abs(tol_abs);
         solver_iterative->set_tol_abs_low(1e-14);
@@ -1660,7 +1632,7 @@ int main(int argc, char* argv[])
         if(krylov_info)
           solver_iterative->set_plot_mode(Solver::PlotMode::iter);
 
-        scalar_coarse_solver = solver_iterative;
+        coarse_solver = solver_iterative;
       }
 #endif // FEAT_HAVE_TRILINOS
 
@@ -1677,23 +1649,13 @@ int main(int argc, char* argv[])
       }
 #endif
 
-      if(scalar_coarse_solver == nullptr)
+      if(coarse_solver == nullptr)
       {
-#ifdef FEAT_HAVE_MPI
-#ifdef FEAT_HAVE_SUPERLU_DIST
-        scalar_coarse_solver = Solver::new_superlu(scalarize_helper.scalarized_level.matrix_sys, scalarize_helper.scalarized_level.filter_sys);
-#endif // FEAT_HAVE_SUPERLU_DIST
-#else // no FEAT_HAVE_MPI
-#ifdef FEAT_HAVE_UMFPACK
-        scalar_coarse_solver = Solver::new_schwarz_precond(Solver::new_umfpack(scalarize_helper.scalarized_level.matrix_sys.local(), scalarize_helper.scalarized_level.filter_sys.local()));
-#endif // FEAT_HAVE_UMFPACK
-#endif // FEAT_HAVE_MPI
+        coarse_solver = Solver::new_direct_sparse_solver(lvl.matrix_sys, lvl.filter_sys);
       }
 
-      wrapped_coarse_solver = std::make_shared<SCALEXA::StokesScalarizeWrapper<SolverLevelType, ScalarizedSystemLevelType>>(scalarize_helper, scalar_coarse_solver);
-
       // create a direct coarse grid solver
-      multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, wrapped_coarse_solver);
+      multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, coarse_solver);
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2246,16 +2208,6 @@ int main(int argc, char* argv[])
   statistics.times[Times::mg_smooth] = multigrid_hierarchy->get_time_smooth();
   statistics.times[Times::mg_coarse] = multigrid_hierarchy->get_time_coarse();
   statistics.times[Times::mg_transfer] = multigrid_hierarchy->get_time_transfer();
-
-  if(wrapped_coarse_solver)
-  {
-    statistics.times[Times::scalar_coarse_helper_init_symbolic] = wrapped_coarse_solver->watch_helper_init_symbolic.elapsed();
-    statistics.times[Times::scalar_coarse_helper_init_numeric] = wrapped_coarse_solver->watch_helper_init_numeric.elapsed();
-    statistics.times[Times::scalar_coarse_solver_init_symbolic] = wrapped_coarse_solver->watch_solver_init_symbolic.elapsed();
-    statistics.times[Times::scalar_coarse_solver_init_numeric] = wrapped_coarse_solver->watch_solver_init_numeric.elapsed();
-    statistics.times[Times::scalar_coarse_solver_apply] = wrapped_coarse_solver->watch_solver_apply.elapsed();
-  }
-
 
   // accumulate vanka timings
   for(auto& v : ama_vankas)

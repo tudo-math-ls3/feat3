@@ -8,11 +8,11 @@
 #include <kernel/solver/iterative.hpp>
 #include <kernel/util/property_map.hpp>
 #include <kernel/util/math.hpp>
-#include "logger.hpp"
-#include "format_helper.hpp"
 #include <kernel/util/stop_watch.hpp>
 #include <kernel/util/string.hpp>
 //#include <applications/gendie/gendie_common.hpp>
+#include "logger.hpp"
+#include "format_helper.hpp"
 #include "template_helper.hpp"
 #include "parsing_helper.hpp"
 
@@ -20,6 +20,7 @@
 
 namespace Gendie
 {
+  using namespace FEAT;
   typedef FEAT::Index Index;
 
   /**
@@ -378,8 +379,8 @@ namespace Gendie
         this->flow_solver->init_numeric();
 
         // we only want to solve by 3 orders of magnitude or at maximum 10 solver iterations
-        this->flow_solver->set_tol_abs(SolverDataType(1E+100));
-        this->flow_solver->set_tol_rel(SolverDataType(1E-3));
+        this->flow_solver->set_tol_abs(Math::huge<SolverDataType>());
+        this->flow_solver->set_tol_rel(static_cast<SolverDataType>(1E-3));
         auto prev_max_iter = this->flow_solver->get_max_iter();
         this->flow_solver->set_max_iter(8);
 

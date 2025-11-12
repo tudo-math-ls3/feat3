@@ -990,7 +990,7 @@ namespace FBMTest
 
   /// define application dimension
   #ifndef FEAT_APP_DIM
-  #define FEAT_APP_DIM = 2
+  #define FEAT_APP_DIM 2
   #endif
   static constexpr int dim = FEAT_APP_DIM;
   static_assert((dim == 2) || (dim == 3), "invalid dimension");

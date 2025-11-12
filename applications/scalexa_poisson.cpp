@@ -352,7 +352,7 @@ namespace ScalexaPoisson
     typedef typename SystemLevelType::GlobalMatrixBlockD GlobalMatrixBlockD;
     typedef typename SystemLevelType::GlobalPresVector GlobalPresVector;
     typedef typename SystemLevelType::LocalPresVector LocalPresVector;
-    typedef typename SystemLevelType::LocalScalarMatrix LocalScalarMatrix;
+    //typedef typename SystemLevelType::LocalScalarMatrix LocalScalarMatrix;
 
     // invert lumped velocity mass matrix
     the_system_level.lumped_matrix_a.component_invert(the_system_level.lumped_matrix_a, DataType(1));
@@ -400,11 +400,12 @@ namespace ScalexaPoisson
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> //
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     comm.print(String(100u, '-'));
 
     // two stop watches for time measurement
     StopWatch watch_adp_convert;
+
+#if 0
 
     // Note: by default, IndexType is a typedef for unsigned long and DataType is a typedef for double
 
@@ -447,7 +448,7 @@ namespace ScalexaPoisson
       comm.allprint("#Rows: " + stringify(pcsr_num_rows).pad_front(9) + "  #Cols:" +
         stringify(pcsr_num_cols).pad_front(9) + "  #NZEs:" + stringify(pcsr_num_nze).pad_front(9));
     comm.print("");
-
+#endif
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> //

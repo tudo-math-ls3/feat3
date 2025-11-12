@@ -61,6 +61,7 @@
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/dist_file_io.hpp>
+#include <kernel/util/hash.hpp>
 
 // includes, system
 #include <vector>
@@ -2684,282 +2685,133 @@ namespace FEAT
       }
 
       /**
-       * \brief Tpetra wrapper core data class
+       * \brief Tpetra wrapper core data base class
        */
-      class TpetraCore
+      class TpetraCoreBase
       {
-        public:
-          // some typedefs
-          using UN = unsigned;
-          using SC = double;
-          using LO = int;
-          using GO = FROSch::DefaultGlobalOrdinal;
-          using NO = Tpetra::KokkosClassic::DefaultNode::DefaultNodeType;
+      public:
+        // some typedefs
+        using UN = unsigned;
+        using SC = double;
+        using LO = int;
+        using GO = FROSch::DefaultGlobalOrdinal;
+        using NO = Tpetra::KokkosClassic::DefaultNode::DefaultNodeType;
 
-          using AGS   = Teuchos::Array<GO>::size_type;
-          using ARCPS = Teuchos::ArrayRCP<std::size_t>::size_type;
-          using TGS   = Tpetra::global_size_t;
-          using VGS   = std::vector<GO>::size_type;
+        using AGS   = Teuchos::Array<GO>::size_type;
+        using ARCPS = Teuchos::ArrayRCP<std::size_t>::size_type;
+        using TGS   = Tpetra::global_size_t;
+        using VGS   = std::vector<GO>::size_type;
 
-          //----------------------------------------
-          Teuchos::RCP<const Teuchos::Comm<int>> _comm;
+        //----------------------------------------
+        Teuchos::RCP<const Teuchos::Comm<int>> _comm;
 
-          const LO _num_owned_dofs;
-          const GO _my_dof_offset;
-          const int _dpe_pres;
-          /// Tpetra number of non-zero entries per row array
-          Teuchos::ArrayRCP<TGS> _num_nze;
-          /// Tpetra column indices array
-          Teuchos::ArrayRCP<GO> _col_idx;
+        const LO _num_owned_dofs, _num_owned_nonzeros;
+        const GO _my_dof_offset, _num_global_dofs;
+        const int _dpe_pres;
+        /// Tpetra row pointer array
+        // note: TGS = Tpetra::global_size_t should usually have the same size as std::int64_t
+        Teuchos::ArrayRCP<std::int64_t> _row_ptr;
+        /// Tpetra number of non-zero entries per row array
+        Teuchos::ArrayRCP<TGS> _num_nze;
+        /// Tpetra column indices array
+        // note: GO = FROSch::DefaultGlobalOrdinal should usually have the same size as std::int32_t
+        Teuchos::ArrayRCP<std::int32_t> _col_idx;
+        /// Tpetra matrix values array
+        Teuchos::ArrayRCP<SC> _mat_val;
 
-          /// row and column maps are the same
-          Teuchos::RCP<const Tpetra::Map<LO, GO, NO>> _map;
+        /// row and column maps are the same
+        Teuchos::RCP<const Tpetra::Map<LO, GO, NO>> _map;
 
-          /// handles right hand side and solution
-          Teuchos::RCP<Tpetra::MultiVector<SC, LO,GO,NO>> _vec_def, _vec_cor;
-          Teuchos::RCP<Tpetra::CrsMatrix<SC,LO,GO,NO>> _matrix;
+        /// handles right hand side and solution
+        Teuchos::RCP<Tpetra::MultiVector<SC, LO,GO,NO>> _vec_def, _vec_cor;
+        Teuchos::RCP<Tpetra::CrsMatrix<SC,LO,GO,NO>> _matrix;
 
-          /// parameter list
-          Teuchos::RCP<Teuchos::ParameterList> _params;
+        /// parameter list
+        Teuchos::RCP<Teuchos::ParameterList> _params;
 
-          bool _use_timer;
-          Teuchos::RCP<Teuchos::StackedTimer> _stacked_timer;
+        bool _use_timer;
+        Teuchos::RCP<Teuchos::StackedTimer> _stacked_timer;
 
-          //template<typename IT_>
-          explicit TpetraCore(const void* comm, IndexType my_dof_offset, IndexType num_owned_dofs, const Trilinos::FROSchParameterList & params) :
-            _comm(Teuchos::rcp(new Teuchos::MpiComm<int>(*reinterpret_cast<const MPI_Comm*>(comm)))),
-            _num_owned_dofs(static_cast<LO>(num_owned_dofs)),
-            _my_dof_offset(static_cast<GO>(my_dof_offset)),
-            _dpe_pres(params.get_dpe_pres()),
-            _num_nze(static_cast<ARCPS>(_num_owned_dofs), static_cast<TGS>(0)),
-            _col_idx(static_cast<ARCPS>(_num_owned_dofs), static_cast<GO>(0)),
-            _map(nullptr),
-            _vec_def(nullptr),
-            _vec_cor(nullptr),
-            _matrix(nullptr),
-            _params(Teuchos::null),
-            _use_timer(params.get_use_timer()),
-            _stacked_timer(Teuchos::rcp(new Teuchos::StackedTimer("TpetraCore")))
+        explicit TpetraCoreBase(const void* comm, Index num_global_dofs, Index my_dof_offset,
+          Index num_owned_dofs, Index num_nonzeros, const Trilinos::FROSchParameterList & params) :
+          _comm(Teuchos::rcp(new Teuchos::MpiComm<int>(*reinterpret_cast<const MPI_Comm*>(comm)))),
+          _num_owned_dofs(static_cast<LO>(num_owned_dofs)),
+          _num_owned_nonzeros(static_cast<LO>(num_nonzeros)),
+          _my_dof_offset(static_cast<GO>(my_dof_offset)),
+          _num_global_dofs(static_cast<GO>(num_global_dofs)),
+          _dpe_pres(params.get_dpe_pres()),
+          _row_ptr(static_cast<ARCPS>(_num_owned_dofs+1u), static_cast<std::int64_t>(0)),
+          _num_nze(static_cast<ARCPS>(_num_owned_dofs), static_cast<TGS>(0)),
+          _col_idx(static_cast<ARCPS>(_num_owned_nonzeros), static_cast<std::int32_t>(0)),
+          _mat_val(static_cast<ARCPS>(_num_owned_nonzeros), static_cast<SC>(0.)),
+          _map(nullptr),
+          _vec_def(nullptr),
+          _vec_cor(nullptr),
+          _matrix(nullptr),
+          _params(Teuchos::null),
+          _use_timer(params.get_use_timer()),
+          _stacked_timer(Teuchos::rcp(new Teuchos::StackedTimer("TpetraCoreBase")))
+        {
+          void* pcore = params.get_core();
+          if(pcore != nullptr)
           {
-            void* pcore = params.get_core();
-            if(pcore != nullptr)
-            {
-              _params = Teuchos::rcp(reinterpret_cast<Teuchos::ParameterList*>(pcore), false);
-            }
-
-            if(_use_timer)
-            {
-              _comm->barrier();
-              Teuchos::TimeMonitor::setStackedTimer(_stacked_timer);
-            }
+            _params = Teuchos::rcp(reinterpret_cast<Teuchos::ParameterList*>(pcore), false);
           }
 
-          virtual ~TpetraCore()
+          if(_use_timer)
           {
-            if(_use_timer)
-            {
-              _comm->barrier();
-              _stacked_timer->stop("TpetraCore");
-              Teuchos::StackedTimer::OutputOptions options;
-              options.output_fraction = options.output_histogram = options.output_minmax = true;
-              Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::VerboseObjectBase::getDefaultOStream();
-              _stacked_timer->report(*out, _comm, options);
-
-            }
+            _comm->barrier();
+            Teuchos::TimeMonitor::setStackedTimer(_stacked_timer);
           }
+        }
 
-          template<typename IT_>
-          void init_core(const IT_* row_ptr, const IT_* col_idx)
+        virtual ~TpetraCoreBase()
+        {
+          if(_use_timer)
           {
-            if(_use_timer)
-            {
-              _stacked_timer->start("TpetraCore::init_core");
-              _stacked_timer->start("TpetraCore::init_core::build_map");
-            }
-            /// create Tpetra index vectors
-            _num_nze = Teuchos::ArrayRCP<TGS>(static_cast<ARCPS>(_num_owned_dofs), static_cast<TGS>(0));
+            _comm->barrier();
+            _stacked_timer->stop("TpetraCoreBase");
+            Teuchos::StackedTimer::OutputOptions options;
+            options.output_fraction = options.output_histogram = options.output_minmax = true;
+            Teuchos::RCP<Teuchos::FancyOStream> out = Teuchos::VerboseObjectBase::getDefaultOStream();
+            _stacked_timer->report(*out, _comm, options);
 
-            /// loop over all owned matrix rows
-            for(LO i(0); i < _num_owned_dofs; ++i)
-              _num_nze[i] = static_cast<TGS>(row_ptr[i+1] - row_ptr[i]);
-
-            /// create Tpetra map
-            /**
-             *  The default constructor of a contiguous distribution map is the same as
-             *  FEAT layout:
-             *
-             * Nevertheless, we use an slightly more complex constructor, just be sure
-             **/
-            std::vector<GO> element_list_vec(static_cast<VGS>(_num_owned_dofs));
-            for(IndexType i = 0; i < static_cast<IndexType>(_num_owned_dofs); ++i)
-              element_list_vec.at(i) = static_cast<GO>(_my_dof_offset + i);
-
-            GO num_total_dofs = 0;
-            GO my_dof_offset_tmp = static_cast<GO>(_num_owned_dofs);
-            Teuchos::reduceAll(*_comm, Teuchos::REDUCE_SUM, 1, &my_dof_offset_tmp, &num_total_dofs);
-
-            const GO _index_base = 0;
-            const Teuchos::ArrayView<const GO> element_list = Teuchos::arrayViewFromVector(element_list_vec);
-            _map = Teuchos::rcp(new Tpetra::Map(static_cast<TGS>(num_total_dofs), element_list, _index_base, _comm));
-
-            if(_use_timer)
-            {
-              _stacked_timer->stop("TpetraCore::init_core::build_map");
-              _stacked_timer->start("TpetraCore::init_core::build_system_matrix");
-            }
-
-            /// create matrix
-            auto crsgraph = Teuchos::rcp(new Tpetra::CrsGraph<LO, GO, NO >(_map, _num_nze()));
-            const TGS max_nnz_per_row = *std::max_element(_num_nze.begin(), _num_nze.end());
-            std::vector<GO> col_buffer(max_nnz_per_row);  // Reusable buffer
-
-            /// initialize crs graph matrix
-            /**
-             *  Good practice would be to initialize a crs graph, but this seems not to
-             *  be very practically for the Xpetra interfaces to maps and crs graphs
-             **/
-            AGS entries_start = 0;
-            for(GO i = 0; i < static_cast<GO>(_num_owned_dofs); ++i)
-            {
-              const auto num_entries = static_cast<AGS>(_num_nze[i]);
-
-              for(Teuchos::Array<GO>::size_type j = 0; j < num_entries; ++j)
-                col_buffer[j] = static_cast<GO>(col_idx[entries_start + j]);
-
-              crsgraph->insertGlobalIndices(static_cast<GO>(_my_dof_offset + i), num_entries, col_buffer.data());
-              entries_start += num_entries;
-            }
-            crsgraph->fillComplete();
-            _matrix = Teuchos::rcp(new Tpetra::CrsMatrix<SC, LO, GO, NO>(crsgraph));
-            if(_use_timer)
-            {
-              _stacked_timer->stop("TpetraCore::init_core::build_system_matrix");
-            }
-
-            // create vectors
-            const LO num_vectors = 1;
-            _vec_def = Teuchos::rcp(new Tpetra::MultiVector<SC, LO, GO, NO>(_map, num_vectors));
-            _vec_cor = Teuchos::rcp(new Tpetra::MultiVector<SC, LO, GO, NO>(_map, num_vectors));
-
-            GO _col_idx_size = static_cast<GO>(row_ptr[_num_owned_dofs]);
-            _col_idx.resize(static_cast<AGS>(_col_idx_size));
-            for(GO i = 0; i < _col_idx_size; ++i)
-              _col_idx[(static_cast<ARCPS>(i))] = static_cast<GO>(col_idx[i]);
-
-            // set entries for TwoLevelBlockPreconditionier
-            if (! sublist(sublist(_params, "Preconditioner Types"), "FROSch")->get("FROSch Preconditioner Type","TwoLevelPreconditioner").compare("TwoLevelBlockPreconditioner"))
-            {
-              const int NumberOfBlocks = 1;
-              Teuchos::ArrayRCP<Teuchos::RCP<Xpetra::Map<LO, GO, NO>>> XRepeatedMaps(NumberOfBlocks);
-              auto xcrsgraph = Teuchos::rcp(new const Xpetra::TpetraCrsGraph<LO, GO, NO>(Teuchos::rcp_const_cast<Tpetra::CrsGraph<LO, GO, NO >>(_matrix->getCrsGraph ())));
-              XRepeatedMaps[0] = FROSch::BuildRepeatedMapNonConst<LO, GO, NO>(xcrsgraph);
-              sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("Repeated Map Vector", XRepeatedMaps);
-
-              Teuchos::ArrayRCP<FROSch::DofOrdering> dofOrderings(NumberOfBlocks);
-              dofOrderings[0] = FROSch::NodeWise;
-              sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("DofOrdering Vector", dofOrderings);
-
-              Teuchos::ArrayRCP<unsigned> dofsPerNodeVector(NumberOfBlocks);
-              dofsPerNodeVector[0] = _dpe_pres;
-              sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("DofsPerNode Vector", dofsPerNodeVector);
-
-              /* NULL SPACE */
-              Teuchos::ArrayRCP<Teuchos::RCP<Xpetra::MultiVector<SC,LO,GO,NO>>> nullSpaceBasis(NumberOfBlocks);
-              nullSpaceBasis[0] = Xpetra::MultiVectorFactory<SC,LO,GO,NO>::Build(XRepeatedMaps[0].getConst(), 1);
-              unsigned i = 0;
-              for (unsigned j = 0; j < XRepeatedMaps[i]->getLocalNumElements(); j += dofsPerNodeVector[i]) {
-                nullSpaceBasis[0]->getDataNonConst(i)[XRepeatedMaps[i]->getLocalElement(XRepeatedMaps[i]->getGlobalElement(j))] = Teuchos::ScalarTraits<SC>::one();
-              }
-              sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("Null Space Vector", nullSpaceBasis);
-            }else if(! sublist(sublist(_params, "Preconditioner Types"), "FROSch")->get("FROSch Preconditioner Type","TwoLevelPreconditioner").compare("TwoLevelPreconditioner"))
-            {
-              /* NULL SPACE */
-              auto xcrsgraph = Teuchos::rcp(new const Xpetra::TpetraCrsGraph<LO, GO, NO>(Teuchos::rcp_const_cast<Tpetra::CrsGraph<LO, GO, NO >>(_matrix->getCrsGraph ())));
-              Teuchos::RCP<Xpetra::Map<LO, GO, NO>> XRepeatedMap = FROSch::BuildRepeatedMapNonConst<LO, GO, NO>(xcrsgraph);
-              sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("Repeated Map", XRepeatedMap);
-
-              Teuchos::RCP<Xpetra::MultiVector<SC,LO,GO,NO>> nullSpaceBasis = Xpetra::MultiVectorFactory<SC,LO,GO,NO>::Build(XRepeatedMap.getConst(), 1);
-              for (unsigned j = 0; j < XRepeatedMap->getLocalNumElements(); j += _dpe_pres) {
-                nullSpaceBasis->getDataNonConst(0)[XRepeatedMap->getLocalElement(XRepeatedMap->getGlobalElement(j))] = Teuchos::ScalarTraits<SC>::one();
-              }
-              sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("Null Space", nullSpaceBasis);
-            }
-
-            if(_use_timer)
-            {
-              _stacked_timer->stop("TpetraCore::init_core");
-            }
           }
+        }
 
-          virtual void set_matrix_values(const double* vals)
-          {
-            if(this->_use_timer)
-            {
-              this->_stacked_timer->start("TpetraCore::SetValues");
-            }
+        virtual void init_symbolic() = 0;
 
-            Teuchos::ArrayView<const LO> Indices;
+        virtual void init_numeric() = 0;
 
-            _matrix->resumeFill();
-            AGS entries_start = 0;
+        virtual std::int64_t* get_row_ptr()
+        {
+          return this->_row_ptr.get();
+        }
 
-            for(LO i(0); i < _num_owned_dofs; ++i)
-            {
-              const auto num_entries = static_cast<Teuchos::Array<SC>::size_type>(_num_nze[i]);
-              // copy vals to Teuchos::Array
-              Teuchos::Array<SC> vals_ar(num_entries);
-              for(Teuchos::Array<SC>::size_type j = 0; j < num_entries; ++j)
-                vals_ar[j] = static_cast<SC>(vals[static_cast<VGS>(entries_start + j)]);
+        virtual std::int32_t* get_col_idx()
+        {
+          return this->_col_idx.get();
+        }
 
-              Teuchos::Array<GO> cols(num_entries);
-              for(Teuchos::Array<GO>::size_type j = 0; j < num_entries; ++j)
-                cols[j] = static_cast<GO>(_col_idx[entries_start + j]);
-              _matrix->replaceGlobalValues(_my_dof_offset + static_cast<GO>(i),
-                                           cols.view(0, static_cast<AGS>(num_entries)),
-                                           vals_ar.view(0, static_cast<Teuchos::Array<SC>::size_type>(num_entries)));
+        virtual double* get_mat_val()
+        {
+          return this->_mat_val.get();
+        }
 
-              entries_start += num_entries;
-            }
+        virtual double* get_vec_def()
+        {
+          return this->_vec_def->getDataNonConst(0).get();
+        }
 
-            _matrix->fillComplete();
+        virtual double* get_vec_cor()
+        {
+          return this->_vec_cor->getDataNonConst(0).get();
+        }
 
-            if(_use_timer)
-            {
-              _stacked_timer->stop("TpetraCore::SetValues");
-            }
-          }
-
-          void set_vec_cor_values(const double* vals)
-          {
-            if(vals != nullptr)
-              for(LO i(0); i < _num_owned_dofs; ++i)
-                _vec_cor->replaceLocalValue(i, 0, static_cast<SC>(vals[i]));
-            else
-              _vec_cor->putScalar(static_cast<SC>(0.));
-          }
-
-          void set_vec_def_values(const double* vals)
-          {
-            if(vals != nullptr)
-              for(LO i(0); i < _num_owned_dofs; ++i)
-                _vec_def->replaceLocalValue(i, 0, static_cast<SC>(vals[i]));
-            else
-              _vec_def->putScalar(static_cast<SC>(0.));
-          }
-
-          void get_vec_cor_values(double* vals) const
-          {
-            auto data_vec = _vec_cor->getData(0);
-            for(LO i(0); i < _num_owned_dofs; ++i)
-              vals[i] = data_vec[i];
-          }
-
-          void get_vec_def_values(double* vals) const
-          {
-            auto data_vec = _vec_def->getData(0);
-            for(LO i(0); i < _num_owned_dofs; ++i)
-              vals[i] = data_vec[i];
-          }
+        virtual void format_vec_cor()
+        {
+          return this->_vec_cor->putScalar(0.0);
+        }
       }; // class TpetraCore
 
       void set_parameter_list(void* core, const FROSchParameterList& params)
@@ -2967,66 +2819,250 @@ namespace FEAT
         void* pcore = params.get_core();
         if(pcore == nullptr)
         {
-          reinterpret_cast<TpetraCore*>(core)->_params = Teuchos::null;
-        }else
+          reinterpret_cast<TpetraCoreBase*>(core)->_params = Teuchos::null;
+        }
+        else
         {
-          reinterpret_cast<TpetraCore*>(core)->_params
+          reinterpret_cast<TpetraCoreBase*>(core)->_params
             = Teuchos::rcp(reinterpret_cast<Teuchos::ParameterList*>(pcore), false);
         }
       }
 
-      void* create_core(const void* comm, IndexType dof_offset, IndexType num_owned_dofs,
-                        const unsigned int* row_ptr, const unsigned int* col_idx, const FROSchParameterList& params)
-      {
-        TpetraCore *core = new TpetraCore(comm, dof_offset, num_owned_dofs, params);
-        core->init_core(row_ptr, col_idx);
-        return (void*)core;
-      }
-
-      void* create_core(const void* comm, IndexType dof_offset, IndexType num_owned_dofs,
-                        const unsigned long* row_ptr, const unsigned long* col_idx, const FROSchParameterList& params)
-      {
-        TpetraCore *core = new TpetraCore(comm, dof_offset, num_owned_dofs, params);
-        core->init_core(row_ptr, col_idx);
-        return (void*)core;
-      }
-
-      void* create_core(const void* comm, IndexType dof_offset, IndexType num_owned_dofs,
-                        const unsigned long long* row_ptr, const unsigned long long* col_idx, const FROSchParameterList& params)
-      {
-        TpetraCore *core = new TpetraCore(comm, dof_offset, num_owned_dofs, params);
-        core->init_core(row_ptr, col_idx);
-        return (void*)core;
-      }
-
       void destroy_core(void* core)
       {
-        delete reinterpret_cast<TpetraCore*>(core);
+        delete reinterpret_cast<TpetraCoreBase*>(core);
       }
 
-      void set_matrix_values(void* core, const double* vals)
+      void init_symbolic(void* core)
       {
-        reinterpret_cast<TpetraCore*>(core)->set_matrix_values(vals);
+        reinterpret_cast<TpetraCoreBase*>(core)->init_symbolic();
       }
 
-      void set_vec_cor_values(void* core, const double* vals)
+      void init_numeric(void* core)
       {
-        reinterpret_cast<TpetraCore*>(core)->set_vec_cor_values(vals);
+        reinterpret_cast<TpetraCoreBase*>(core)->init_numeric();
       }
 
-      void set_vec_def_values(void* core, const double* vals)
+      std::int64_t* get_row_ptr(void* core)
       {
-        reinterpret_cast<TpetraCore*>(core)->set_vec_def_values(vals);
+        return reinterpret_cast<TpetraCoreBase*>(core)->get_row_ptr();
       }
 
-      void get_vec_cor_values(const void* core, double* vals)
+      std::int32_t* get_col_idx(void* core)
       {
-        reinterpret_cast<const TpetraCore*>(core)->get_vec_cor_values(vals);
+        return reinterpret_cast<TpetraCoreBase*>(core)->get_col_idx();
       }
 
-      void get_vec_def_values(const void* core, double* vals)
+      double* get_mat_val(void* core)
       {
-        reinterpret_cast<const TpetraCore*>(core)->get_vec_def_values(vals);
+        return reinterpret_cast<TpetraCoreBase*>(core)->get_mat_val();
+      }
+
+      double* get_vec_def(void* core)
+      {
+        return reinterpret_cast<TpetraCoreBase*>(core)->get_vec_def();
+      }
+
+      double* get_vec_cor(void* core)
+      {
+        return reinterpret_cast<TpetraCoreBase*>(core)->get_vec_cor();
+      }
+
+      void format_vec_cor(void* core)
+      {
+        return reinterpret_cast<TpetraCoreBase*>(core)->format_vec_cor();
+      }
+
+      /**
+       * \brief Tpetra wrapper core data class for scalar problems (e.g. Poisson)
+       */
+      class TpetraCoreScalar : public TpetraCoreBase
+      {
+      public:
+        // some typedefs
+        typedef TpetraCoreBase BaseClass;
+        using UN = unsigned;
+        using SC = double;
+        using LO = int;
+        using GO = FROSch::DefaultGlobalOrdinal;
+        using NO = Tpetra::KokkosClassic::DefaultNode::DefaultNodeType;
+
+        using AGS   = Teuchos::Array<GO>::size_type;
+        using ARCPS = Teuchos::ArrayRCP<std::size_t>::size_type;
+        using TGS   = Tpetra::global_size_t;
+        using VGS   = std::vector<GO>::size_type;
+
+        explicit TpetraCoreScalar(const void* comm, Index num_global_dofs, Index my_dof_offset,
+          Index num_owned_dofs, Index num_nonzeros, const Trilinos::FROSchParameterList & params) :
+          TpetraCoreBase(comm, num_global_dofs, my_dof_offset, num_owned_dofs, num_nonzeros, params)
+        {
+        }
+
+        virtual void init_symbolic() override
+        {
+          if(_use_timer)
+          {
+            _stacked_timer->start("TpetraCoreScalar::init_core");
+            _stacked_timer->start("TpetraCoreScalar::init_core::build_map");
+          }
+
+          /// create Tpetra index vectors
+          _num_nze = Teuchos::ArrayRCP<TGS>(static_cast<ARCPS>(_num_owned_dofs), static_cast<TGS>(0));
+
+          /// loop over all owned matrix rows
+          for(LO i(0); i < _num_owned_dofs; ++i)
+            _num_nze[i] = static_cast<TGS>(_row_ptr[i+1] - _row_ptr[i]);
+
+          /// create Tpetra map
+          /**
+            *  The default constructor of a contiguous distribution map is the same as
+            *  FEAT layout:
+            *
+            * Nevertheless, we use an slightly more complex constructor, just be sure
+            **/
+          std::vector<GO> element_list_vec(static_cast<VGS>(_num_owned_dofs));
+          for(IndexType i = 0; i < static_cast<IndexType>(_num_owned_dofs); ++i)
+            element_list_vec.at(i) = static_cast<GO>(_my_dof_offset + i);
+
+          GO num_total_dofs = 0;
+          GO my_dof_offset_tmp = static_cast<GO>(_num_owned_dofs);
+          Teuchos::reduceAll(*_comm, Teuchos::REDUCE_SUM, 1, &my_dof_offset_tmp, &num_total_dofs);
+
+          const GO _index_base = 0;
+          const Teuchos::ArrayView<const GO> element_list = Teuchos::arrayViewFromVector(element_list_vec);
+          _map = Teuchos::rcp(new Tpetra::Map(static_cast<TGS>(num_total_dofs), element_list, _index_base, _comm));
+
+          if(_use_timer)
+          {
+            _stacked_timer->stop("TpetraCoreScalar::init_core::build_map");
+            _stacked_timer->start("TpetraCoreScalar::init_core::build_system_matrix");
+          }
+
+          /// create matrix
+          auto crsgraph = Teuchos::rcp(new Tpetra::CrsGraph<LO, GO, NO >(_map, _num_nze()));
+          const TGS max_nnz_per_row = *std::max_element(_num_nze.begin(), _num_nze.end());
+          std::vector<GO> col_buffer(max_nnz_per_row);  // Reusable buffer
+
+          /// initialize crs graph matrix
+          /**
+            *  Good practice would be to initialize a crs graph, but this seems not to
+            *  be very practically for the Xpetra interfaces to maps and crs graphs
+            **/
+          AGS entries_start = 0;
+          for(GO i = 0; i < static_cast<GO>(_num_owned_dofs); ++i)
+          {
+            const auto num_entries = static_cast<AGS>(_num_nze[i]);
+
+            for(Teuchos::Array<GO>::size_type j = 0; j < num_entries; ++j)
+              col_buffer[j] = static_cast<GO>(this->_col_idx[entries_start + j]);
+
+            crsgraph->insertGlobalIndices(static_cast<GO>(_my_dof_offset + i), num_entries, col_buffer.data());
+            entries_start += num_entries;
+          }
+          crsgraph->fillComplete();
+          _matrix = Teuchos::rcp(new Tpetra::CrsMatrix<SC, LO, GO, NO>(crsgraph));
+          if(_use_timer)
+          {
+            _stacked_timer->stop("TpetraCoreScalar::init_core::build_system_matrix");
+          }
+
+          // create vectors
+          const LO num_vectors = 1;
+          _vec_def = Teuchos::rcp(new Tpetra::MultiVector<SC, LO, GO, NO>(_map, num_vectors));
+          _vec_cor = Teuchos::rcp(new Tpetra::MultiVector<SC, LO, GO, NO>(_map, num_vectors));
+
+          // set entries for TwoLevelBlockPreconditionier
+          if (! sublist(sublist(_params, "Preconditioner Types"), "FROSch")->get("FROSch Preconditioner Type","TwoLevelPreconditioner").compare("TwoLevelBlockPreconditioner"))
+          {
+            const int NumberOfBlocks = 1;
+            Teuchos::ArrayRCP<Teuchos::RCP<Xpetra::Map<LO, GO, NO>>> XRepeatedMaps(NumberOfBlocks);
+            auto xcrsgraph = Teuchos::rcp(new const Xpetra::TpetraCrsGraph<LO, GO, NO>(Teuchos::rcp_const_cast<Tpetra::CrsGraph<LO, GO, NO >>(_matrix->getCrsGraph ())));
+            XRepeatedMaps[0] = FROSch::BuildRepeatedMapNonConst<LO, GO, NO>(xcrsgraph);
+            sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("Repeated Map Vector", XRepeatedMaps);
+
+            Teuchos::ArrayRCP<FROSch::DofOrdering> dofOrderings(NumberOfBlocks);
+            dofOrderings[0] = FROSch::NodeWise;
+            sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("DofOrdering Vector", dofOrderings);
+
+            Teuchos::ArrayRCP<unsigned> dofsPerNodeVector(NumberOfBlocks);
+            dofsPerNodeVector[0] = _dpe_pres;
+            sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("DofsPerNode Vector", dofsPerNodeVector);
+
+            /* NULL SPACE */
+            Teuchos::ArrayRCP<Teuchos::RCP<Xpetra::MultiVector<SC,LO,GO,NO>>> nullSpaceBasis(NumberOfBlocks);
+            nullSpaceBasis[0] = Xpetra::MultiVectorFactory<SC,LO,GO,NO>::Build(XRepeatedMaps[0].getConst(), 1);
+            unsigned i = 0;
+            for (unsigned j = 0; j < XRepeatedMaps[i]->getLocalNumElements(); j += dofsPerNodeVector[i])
+            {
+              nullSpaceBasis[0]->getDataNonConst(i)[XRepeatedMaps[i]->getLocalElement(XRepeatedMaps[i]->getGlobalElement(j))] = Teuchos::ScalarTraits<SC>::one();
+            }
+            sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("Null Space Vector", nullSpaceBasis);
+          }
+          else if(! sublist(sublist(_params, "Preconditioner Types"), "FROSch")->get("FROSch Preconditioner Type","TwoLevelPreconditioner").compare("TwoLevelPreconditioner"))
+          {
+            /* NULL SPACE */
+            auto xcrsgraph = Teuchos::rcp(new const Xpetra::TpetraCrsGraph<LO, GO, NO>(Teuchos::rcp_const_cast<Tpetra::CrsGraph<LO, GO, NO >>(_matrix->getCrsGraph ())));
+            Teuchos::RCP<Xpetra::Map<LO, GO, NO>> XRepeatedMap = FROSch::BuildRepeatedMapNonConst<LO, GO, NO>(xcrsgraph);
+            sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("Repeated Map", XRepeatedMap);
+
+            Teuchos::RCP<Xpetra::MultiVector<SC,LO,GO,NO>> nullSpaceBasis = Xpetra::MultiVectorFactory<SC,LO,GO,NO>::Build(XRepeatedMap.getConst(), 1);
+            for (unsigned j = 0; j < XRepeatedMap->getLocalNumElements(); j += _dpe_pres)
+            {
+              nullSpaceBasis->getDataNonConst(0)[XRepeatedMap->getLocalElement(XRepeatedMap->getGlobalElement(j))] = Teuchos::ScalarTraits<SC>::one();
+            }
+            sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("Null Space", nullSpaceBasis);
+          }
+
+          if(_use_timer)
+          {
+            _stacked_timer->stop("TpetraCoreScalar::init_core");
+          }
+        }
+
+        virtual void init_numeric() override
+        {
+          if(this->_use_timer)
+          {
+            this->_stacked_timer->start("TpetraCoreScalar::SetValues");
+          }
+
+          Teuchos::ArrayView<const LO> Indices;
+
+          _matrix->resumeFill();
+          AGS entries_start = 0;
+
+          for(LO i(0); i < _num_owned_dofs; ++i)
+          {
+            const auto num_entries = static_cast<Teuchos::Array<SC>::size_type>(_num_nze[i]);
+            // copy vals to Teuchos::Array
+            Teuchos::Array<SC> vals_ar(num_entries);
+            for(Teuchos::Array<SC>::size_type j = 0; j < num_entries; ++j)
+              vals_ar[j] = _mat_val[static_cast<VGS>(entries_start + j)];
+
+            Teuchos::Array<GO> cols(num_entries);
+            for(Teuchos::Array<GO>::size_type j = 0; j < num_entries; ++j)
+              cols[j] = static_cast<GO>(_col_idx[entries_start + j]);
+
+            _matrix->replaceGlobalValues(_my_dof_offset + static_cast<GO>(i),
+                                          cols.view(0, static_cast<AGS>(num_entries)),
+                                          vals_ar.view(0, static_cast<Teuchos::Array<SC>::size_type>(num_entries)));
+
+            entries_start += num_entries;
+          }
+
+          _matrix->fillComplete();
+
+          if(_use_timer)
+          {
+            _stacked_timer->stop("TpetraCoreScalar::SetValues");
+          }
+        }
+      }; // class TpetraCoreScalar
+
+      void* create_core_scalar(const void* comm, Index num_global_dofs, Index my_dof_offset,
+        Index num_owned_dofs, Index num_nonzeros, const FROSchParameterList& params)
+      {
+        return new TpetraCoreScalar(comm, num_global_dofs, my_dof_offset, num_owned_dofs, num_nonzeros, params);
       }
 
       /**
@@ -3034,255 +3070,156 @@ namespace FEAT
        *
        * __ATTENTION:__ Only for discontinuous pressure
        */
-      class TpetraCoreStokes : public TpetraCore
+      class TpetraCoreStokes : public TpetraCoreBase
       {
-        public:
-          // some typedefs
-          typedef TpetraCore BaseClass;
-          using UN = unsigned;
-          using SC = double;
-          using LO = int;
-          using GO = FROSch::DefaultGlobalOrdinal;
-          using NO = Tpetra::KokkosClassic::DefaultNode::DefaultNodeType;
+      public:
+        // some typedefs
+        typedef TpetraCoreBase BaseClass;
+        using UN = unsigned;
+        using SC = double;
+        using LO = int;
+        using GO = FROSch::DefaultGlobalOrdinal;
+        using NO = Tpetra::KokkosClassic::DefaultNode::DefaultNodeType;
 
-          using AGS   = Teuchos::Array<GO>::size_type;
-          using ARCPS = Teuchos::ArrayRCP<std::size_t>::size_type;
-          using TGS   = Tpetra::global_size_t;
-          using VGS   = std::vector<GO>::size_type;
+        using AGS   = Teuchos::Array<GO>::size_type;
+        using ARCPS = Teuchos::ArrayRCP<std::size_t>::size_type;
+        using TGS   = Tpetra::global_size_t;
+        using VGS   = std::vector<GO>::size_type;
 
-          //----------------------------------------
-          const int _dpe_velo;
-          // number of velocity/pressure dofs owned by this process
-          const IndexType _num_owned_velo_dofs;
-          const IndexType _num_owned_pres_dofs; // <- given to constructor
-          // index of first velocity/pressure dof owned by this process
-          const IndexType _first_owned_velo_dof;
-          const IndexType _first_owned_pres_dof;
-          // total number of velocity/pressure dofs
-          const IndexType _num_global_velo_dofs;
-          const IndexType _num_global_pres_dofs;
+        //----------------------------------------
+        const int _dpe_velo;
+        // number of velocity/pressure dofs owned by this process
+        const IndexType _num_owned_velo_dofs;
+        const IndexType _num_owned_pres_dofs; // <- given to constructor
+        // index of first velocity/pressure dof owned by this process
+        const IndexType _first_owned_velo_dof;
+        const IndexType _first_owned_pres_dof;
+        // total number of velocity/pressure dofs
+        const IndexType _num_global_velo_dofs;
+        const IndexType _num_global_pres_dofs;
+        /// mapped column indices array
+        Teuchos::ArrayRCP<std::int32_t> _col_idx_mapped;
 
-          Teuchos::ArrayRCP<GO> _all_global_dof_offset;
-          Teuchos::ArrayRCP<IndexType> _all_num_owned_velo_dofs, _all_num_owned_pres_dofs;
-          Teuchos::ArrayRCP<IndexType> _all_first_owned_velo_dof, _all_first_owned_pres_dof;
+        Teuchos::ArrayRCP<GO> _all_global_dof_offset;
+        Teuchos::ArrayRCP<IndexType> _all_num_owned_velo_dofs, _all_num_owned_pres_dofs;
+        Teuchos::ArrayRCP<IndexType> _all_first_owned_velo_dof, _all_first_owned_pres_dof;
 
-          explicit TpetraCoreStokes(const void* comm,
-                                    IndexType my_dof_offset, IndexType num_owned_dofs,
-                                    IndexType num_owned_velo_dofs, IndexType num_owned_pres_dofs,
-                                    IndexType first_owned_velo_dof, IndexType first_owned_pres_dof,
-                                    IndexType num_global_velo_dofs, IndexType num_global_pres_dofs,
-                                    const Trilinos::FROSchParameterList & params) :
-            BaseClass(comm, my_dof_offset, num_owned_dofs, params),
-            _dpe_velo(params.get_dpe_velo()),
-            _num_owned_velo_dofs(num_owned_velo_dofs),
-            _num_owned_pres_dofs(num_owned_pres_dofs),
-            _first_owned_velo_dof(first_owned_velo_dof),
-            _first_owned_pres_dof(first_owned_pres_dof),
-            _num_global_velo_dofs(num_global_velo_dofs),
-            _num_global_pres_dofs(num_global_pres_dofs),
-            _all_global_dof_offset(static_cast<ARCPS>(this->_comm->getSize())),
-            _all_num_owned_velo_dofs(static_cast<ARCPS>(this->_comm->getSize())),
-            _all_num_owned_pres_dofs(static_cast<ARCPS>(this->_comm->getSize())),
-            _all_first_owned_velo_dof(static_cast<ARCPS>(this->_comm->getSize())),
-            _all_first_owned_pres_dof(static_cast<ARCPS>(this->_comm->getSize()))
+        explicit TpetraCoreStokes(const void* comm,
+                                  Index num_global_dofs, Index my_dof_offset,
+                                  Index num_owned_dofs, Index num_nonzeros,
+                                  IndexType num_owned_velo_dofs, IndexType num_owned_pres_dofs,
+                                  IndexType first_owned_velo_dof, IndexType first_owned_pres_dof,
+                                  IndexType num_global_velo_dofs, IndexType num_global_pres_dofs,
+                                  const Trilinos::FROSchParameterList & params) :
+          BaseClass(comm, num_global_dofs, my_dof_offset, num_owned_dofs, num_nonzeros, params),
+          _dpe_velo(params.get_dpe_velo()),
+          _num_owned_velo_dofs(num_owned_velo_dofs),
+          _num_owned_pres_dofs(num_owned_pres_dofs),
+          _first_owned_velo_dof(first_owned_velo_dof),
+          _first_owned_pres_dof(first_owned_pres_dof),
+          _num_global_velo_dofs(num_global_velo_dofs),
+          _num_global_pres_dofs(num_global_pres_dofs),
+          _col_idx_mapped(static_cast<ARCPS>(_num_owned_nonzeros), 0),
+          _all_global_dof_offset(static_cast<ARCPS>(this->_comm->getSize())),
+          _all_num_owned_velo_dofs(static_cast<ARCPS>(this->_comm->getSize())),
+          _all_num_owned_pres_dofs(static_cast<ARCPS>(this->_comm->getSize())),
+          _all_first_owned_velo_dof(static_cast<ARCPS>(this->_comm->getSize())),
+          _all_first_owned_pres_dof(static_cast<ARCPS>(this->_comm->getSize()))
+        {
+        }
+
+        virtual void init_symbolic() override
+        {
+          if(_use_timer)
           {
+            _comm->barrier();
+            Teuchos::TimeMonitor::setStackedTimer(this->_stacked_timer);
+            _stacked_timer->start("TpetraCoreStokes::init_symbolic");
           }
 
-          template<typename IT_>
-          void init_core(const IT_* row_ptr, const IT_* col_idx)
+          // ceate a deep copy of the original column indices array, as it will be mapped later on
+          this->_col_idx_mapped.assign(this->_col_idx.begin(), this->_col_idx.end());
+
+          if(_use_timer)
+          {
+            _stacked_timer->start("TpetraCoreStokes::init_symbolic::gather");
+          }
+          /// gather global information
+          Teuchos::gatherAll(*(_comm), static_cast<int>(1), &_my_dof_offset, static_cast<int>(1*_comm->getSize()), _all_global_dof_offset.getRawPtr());
+          Teuchos::gatherAll(*(_comm), static_cast<int>(1), &_num_owned_velo_dofs, static_cast<int>(1*_comm->getSize()), _all_num_owned_velo_dofs.getRawPtr());
+          Teuchos::gatherAll(*(_comm), static_cast<int>(1), &_num_owned_pres_dofs, static_cast<int>(1*_comm->getSize()), _all_num_owned_pres_dofs.getRawPtr());
+          Teuchos::gatherAll(*(_comm), static_cast<int>(1), &_first_owned_velo_dof, static_cast<int>(1*_comm->getSize()), _all_first_owned_velo_dof.getRawPtr());
+          Teuchos::gatherAll(*(_comm), static_cast<int>(1), &_first_owned_pres_dof, static_cast<int>(1*_comm->getSize()), _all_first_owned_pres_dof.getRawPtr());
+          if(_use_timer)
+          {
+            _stacked_timer->stop("TpetraCoreStokes::init_symbolic::gather");
+            _stacked_timer->start("TpetraCoreStokes::init_symbolic::build_map");
+          }
+
+          /// create Tpetra index vectors
+          _num_nze = Teuchos::ArrayRCP<TGS>(static_cast<ARCPS>(_num_owned_dofs), static_cast<TGS>(0));
+
+          /// loop over all owned matrix rows
+          for(LO i(0); i < _num_owned_dofs; ++i)
+            _num_nze[i] = static_cast<TGS>(this->_row_ptr[i+1] - this->_row_ptr[i]);
+
+          /// construct map.  we need to change the global order:
+          /// The order of the scalarized matrix is, e.g.:
+          ///
+          ///       170  48  138  48  144  48
+          /// 170 : A11 B11  A12 B12  A13 B13
+          ///  48 : D11  0   D12 0    D13 0
+          /// -------------------------
+          /// 138 : A21 B21  A22 B22  A23 B23
+          ///  48 : D21  0   D22  0   D23  0
+          /// -------------------------
+          /// 144 : A31 B31  A32 B32  A33 B33
+          ///  48 : D31  0   D32  0   D33  0
+          ///
+          const GO _index_base = 0;
+          std::vector<GO> element_list_vec(static_cast<VGS>(_num_owned_dofs));
+          for(IndexType i = 0; i < static_cast<IndexType>(_num_owned_velo_dofs); ++i)
+            element_list_vec.at(i) = static_cast<GO>(_first_owned_velo_dof + i);
+          for(IndexType i = 0; i < static_cast<IndexType>(_num_owned_pres_dofs); ++i)
+            element_list_vec.at(_num_owned_velo_dofs + i) = static_cast<GO>(_num_global_velo_dofs + _first_owned_pres_dof + i);
+          const Teuchos::ArrayView<const GO> element_list = Teuchos::arrayViewFromVector(element_list_vec);
+
+          _map = Teuchos::rcp(new Tpetra::Map(static_cast<TGS>(_num_global_velo_dofs + _num_global_pres_dofs), element_list, _index_base, _comm));
+
+          if(_use_timer)
+          {
+            _stacked_timer->stop("TpetraCoreStokes::init_symbolic::build_map");
+            _stacked_timer->start("TpetraCoreStokes::init_symbolic::build_repeated_maps");
+          }
+          const int NumberOfBlocks = 2;
+
+          // Pre-compute rank boundaries for O(1) access
+          std::vector<GO> rank_start(_comm->getSize());
+          std::vector<GO> rank_velo_end(_comm->getSize());
+          std::vector<GO> rank_total_end(_comm->getSize());
+          for (int rank = 0; rank < _comm->getSize(); ++rank)
+          {
+            rank_start[rank] = _all_global_dof_offset[rank];
+            rank_velo_end[rank] = _all_global_dof_offset[rank] + _all_num_owned_velo_dofs[rank];
+            rank_total_end[rank] = _all_global_dof_offset[rank] + _all_num_owned_velo_dofs[rank] + _all_num_owned_pres_dofs[rank];
+          }
+
+          /// build repeated maps and set
           {
             if(_use_timer)
             {
-              _comm->barrier();
-              Teuchos::TimeMonitor::setStackedTimer(this->_stacked_timer);
-              _stacked_timer->start("TpetraCoreStokes::init_core");
+              _stacked_timer->start("TpetraCoreStokes::init_symbolic::build_repeated_maps::velocity_graph");
             }
 
-            if(_use_timer)
-            {
-              _stacked_timer->start("TpetraCoreStokes::init_core::gather");
-            }
-            /// gather global information
-            Teuchos::gatherAll(*(_comm), static_cast<int>(1), &_my_dof_offset, static_cast<int>(1*_comm->getSize()), _all_global_dof_offset.getRawPtr());
-            Teuchos::gatherAll(*(_comm), static_cast<int>(1), &_num_owned_velo_dofs, static_cast<int>(1*_comm->getSize()), _all_num_owned_velo_dofs.getRawPtr());
-            Teuchos::gatherAll(*(_comm), static_cast<int>(1), &_num_owned_pres_dofs, static_cast<int>(1*_comm->getSize()), _all_num_owned_pres_dofs.getRawPtr());
-            Teuchos::gatherAll(*(_comm), static_cast<int>(1), &_first_owned_velo_dof, static_cast<int>(1*_comm->getSize()), _all_first_owned_velo_dof.getRawPtr());
-            Teuchos::gatherAll(*(_comm), static_cast<int>(1), &_first_owned_pres_dof, static_cast<int>(1*_comm->getSize()), _all_first_owned_pres_dof.getRawPtr());
-            if(_use_timer)
-            {
-              _stacked_timer->stop("TpetraCoreStokes::init_core::gather");
-              _stacked_timer->start("TpetraCoreStokes::init_core::build_map");
-            }
-
-            /// create Tpetra index vectors
-            _num_nze = Teuchos::ArrayRCP<TGS>(static_cast<ARCPS>(_num_owned_dofs), static_cast<TGS>(0));
-
-            /// loop over all owned matrix rows
-            for(LO i(0); i < _num_owned_dofs; ++i)
-              _num_nze[i] = static_cast<TGS>(row_ptr[i+1] - row_ptr[i]);
-
-            /// construct map.  we need to change the global order:
-            /// The order of the scalarized matrix is, e.g.:
-            ///
-            ///       170  48  138  48  144  48
-            /// 170 : A11 B11  A12 B12  A13 B13
-            ///  48 : D11  0   D12 0    D13 0
-            /// -------------------------
-            /// 138 : A21 B21  A22 B22  A23 B23
-            ///  48 : D21  0   D22  0   D23  0
-            /// -------------------------
-            /// 144 : A31 B31  A32 B32  A33 B33
-            ///  48 : D31  0   D32  0   D33  0
-            ///
-            const GO _index_base = 0;
-            std::vector<GO> element_list_vec(static_cast<VGS>(_num_owned_dofs));
+            std::vector<GO> element_list_vec_velo(static_cast<VGS>(_num_owned_velo_dofs));
             for(IndexType i = 0; i < static_cast<IndexType>(_num_owned_velo_dofs); ++i)
-              element_list_vec.at(i) = static_cast<GO>(_first_owned_velo_dof + i);
-            for(IndexType i = 0; i < static_cast<IndexType>(_num_owned_pres_dofs); ++i)
-              element_list_vec.at(_num_owned_velo_dofs + i) = static_cast<GO>(_num_global_velo_dofs + _first_owned_pres_dof + i);
-            const Teuchos::ArrayView<const GO> element_list = Teuchos::arrayViewFromVector(element_list_vec);
+              element_list_vec_velo.at(i) = static_cast<GO>(_first_owned_velo_dof + i);
+            const Teuchos::ArrayView<const GO> element_list_velo = Teuchos::arrayViewFromVector(element_list_vec_velo);
+            Teuchos::RCP<const Tpetra::Map<LO, GO, NO>> _map_velo = Teuchos::rcp(new Tpetra::Map(static_cast<TGS>(_num_global_velo_dofs), element_list_velo, _index_base, _comm));
 
-            _map = Teuchos::rcp(new Tpetra::Map(static_cast<TGS>(_num_global_velo_dofs + _num_global_pres_dofs), element_list, _index_base, _comm));
-
-            if(_use_timer)
-            {
-              _stacked_timer->stop("TpetraCoreStokes::init_core::build_map");
-              _stacked_timer->start("TpetraCoreStokes::init_core::build_repeated_maps");
-            }
-            const int NumberOfBlocks = 2;
-
-            // Pre-compute rank boundaries for O(1) access
-            std::vector<GO> rank_start(_comm->getSize());
-            std::vector<GO> rank_velo_end(_comm->getSize());
-            std::vector<GO> rank_total_end(_comm->getSize());
-            for (int rank = 0; rank < _comm->getSize(); ++rank)
-            {
-              rank_start[rank] = _all_global_dof_offset[rank];
-              rank_velo_end[rank] = _all_global_dof_offset[rank] + _all_num_owned_velo_dofs[rank];
-              rank_total_end[rank] = _all_global_dof_offset[rank] + _all_num_owned_velo_dofs[rank] + _all_num_owned_pres_dofs[rank];
-            }
-
-            /// build repeated maps and set
-            {
-              if(_use_timer)
-              {
-                _stacked_timer->start("TpetraCoreStokes::init_core::build_repeated_maps::velocity_graph");
-              }
-
-              std::vector<GO> element_list_vec_velo(static_cast<VGS>(_num_owned_velo_dofs));
-              for(IndexType i = 0; i < static_cast<IndexType>(_num_owned_velo_dofs); ++i)
-                element_list_vec_velo.at(i) = static_cast<GO>(_first_owned_velo_dof + i);
-              const Teuchos::ArrayView<const GO> element_list_velo = Teuchos::arrayViewFromVector(element_list_vec_velo);
-              Teuchos::RCP<const Tpetra::Map<LO, GO, NO>> _map_velo = Teuchos::rcp(new Tpetra::Map(static_cast<TGS>(_num_global_velo_dofs), element_list_velo, _index_base, _comm));
-
-              auto crsgraph = Teuchos::rcp(new Tpetra::CrsGraph<LO, GO, NO >(_map_velo, _num_nze.view(0, static_cast<AGS>(_num_owned_velo_dofs))));
-              const TGS max_nnz_per_row = *std::max_element(_num_nze.begin(), _num_nze.end());
-              std::vector<GO> col_buffer(max_nnz_per_row);  // Reusable buffer
-
-              /// insert entries for velocity
-              for(IndexType row(0); row < _num_owned_velo_dofs; ++row)
-              {
-                Teuchos::Array<GO> cols(static_cast<GO>(_num_nze[static_cast<ARCPS>(row)]));
-                GO counter = 0;
-
-                // Start scanning from rank 0 for each row
-                int current_rank = 0;
-
-                for(auto colidx = row_ptr[row]; colidx < row_ptr[row+1]; ++colidx)
-                {
-                  auto col = col_idx[colidx];
-
-                  // Advance rank until we find one that might contain this column
-                  while(current_rank < int(_comm->getSize()) && GO(col) >= rank_total_end[current_rank])
-                  {
-                    current_rank++;
-                  }
-
-                  // Check if current rank contains this column
-                  if(current_rank < int(_comm->getSize()) && GO(col) >= rank_start[current_rank])
-                  {
-                    if(GO(col) < rank_velo_end[current_rank])
-                    {
-                      // Velocity DOF
-                      GO mapped_dof = _all_first_owned_velo_dof[current_rank] + (col - rank_start[current_rank]);
-                      cols[counter++] = mapped_dof;
-                    }
-                  }
-                  // Note: current_rank is NOT reset - it continues from where it left off
-                }
-
-                crsgraph->insertGlobalIndices(static_cast<GO>(_first_owned_velo_dof + row),
-                                              cols.view(0, static_cast<AGS>(counter)));
-              }
-              crsgraph->fillComplete();
-
-              if(_use_timer)
-              {
-                _stacked_timer->stop("TpetraCoreStokes::init_core::build_repeated_maps::velocity_graph");
-              }
-
-              Teuchos::ArrayRCP<Teuchos::RCP<Tpetra::Map<LO, GO, NO>>> RepeatedMaps(NumberOfBlocks);
-              Teuchos::ArrayRCP<Teuchos::RCP<Xpetra::Map<LO, GO, NO>>> XRepeatedMaps(NumberOfBlocks);
-
-              const GO _index_base_tmp = 0;
-              /* pressure map */
-              std::vector<GO> element_list_vec_tmp(static_cast<VGS>(_num_owned_pres_dofs));
-              for(IndexType i = 0; i < static_cast<IndexType>(_num_owned_pres_dofs); ++i)
-                element_list_vec_tmp.at(i) = static_cast<GO>(_first_owned_pres_dof + i);
-              const Teuchos::ArrayView<const GO> element_list_tmp = Teuchos::arrayViewFromVector(element_list_vec_tmp);
-              RepeatedMaps[1] = Teuchos::rcp(new Tpetra::Map(static_cast<TGS>(_num_owned_pres_dofs), element_list_tmp, _index_base_tmp, _comm));
-
-              auto xcrsgraph = Teuchos::rcp(new Xpetra::TpetraCrsGraph<LO, GO, NO>(crsgraph));
-              XRepeatedMaps[0] = FROSch::BuildRepeatedMapNonConst<LO, GO, NO>(xcrsgraph);
-              // __ATTENTION:__ This works only for a discontinuous pressure
-              XRepeatedMaps[1] = Teuchos::rcp(new Xpetra::TpetraMap<LO, GO, NO>(RepeatedMaps[1]));
-
-              sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("Repeated Map Vector", XRepeatedMaps);
-
-              /// set dof ordering and dofs per node
-              Teuchos::ArrayRCP<FROSch::DofOrdering> dofOrderings(NumberOfBlocks);
-              dofOrderings[0] = FROSch::NodeWise;
-              dofOrderings[1] = FROSch::NodeWise;
-              sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("DofOrdering Vector", dofOrderings);
-
-              Teuchos::ArrayRCP<unsigned> dofsPerNodeVector(NumberOfBlocks);
-              dofsPerNodeVector[0] = _dpe_velo;
-              dofsPerNodeVector[1] = _dpe_pres;
-              sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("DofsPerNode Vector", dofsPerNodeVector);
-
-              /* Null Space */
-              Teuchos::ArrayRCP<Teuchos::RCP<Xpetra::MultiVector<SC,LO,GO,NO>>> nullSpaceBasis(NumberOfBlocks);
-              Teuchos::ArrayRCP<Teuchos::RCP<const Xpetra::Map<LO, GO, NO>>> XRepeatedMapsTmp(NumberOfBlocks);
-              XRepeatedMapsTmp[0] = XRepeatedMaps[0].getConst();
-              XRepeatedMapsTmp[1] = XRepeatedMaps[1].getConst();
-              Teuchos::RCP<const Xpetra::Map<LO, GO, NO>> repeatedMap = FROSch::MergeMaps(XRepeatedMapsTmp);
-
-              nullSpaceBasis[0] = Xpetra::MultiVectorFactory<SC,LO,GO,NO>::Build(repeatedMap, dofsPerNodeVector[0]);
-              nullSpaceBasis[1] = Xpetra::MultiVectorFactory<SC,LO,GO,NO>::Build(repeatedMap, 1);
-              for(unsigned i = 0; i < dofsPerNodeVector[0]; i++)
-                for (unsigned j = i; j < XRepeatedMaps[0]->getLocalNumElements(); j += dofsPerNodeVector[0]) {
-                  nullSpaceBasis[0]->getDataNonConst(i)[XRepeatedMaps[0]->getLocalElement(XRepeatedMaps[0]->getGlobalElement(j))] = Teuchos::ScalarTraits<SC>::one();
-                }
-              LO offset = XRepeatedMaps[0]->getLocalNumElements();
-              for (unsigned j = 0; j < XRepeatedMaps[1]->getLocalNumElements(); j += dofsPerNodeVector[1]) {
-                nullSpaceBasis[1]->getDataNonConst(0)[offset + XRepeatedMaps[1]->getLocalElement(XRepeatedMaps[1]->getGlobalElement(j))] = Teuchos::ScalarTraits<SC>::one();
-              }
-
-              sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("Null Space Vector", nullSpaceBasis);
-            }
-            if(_use_timer)
-            {
-              _stacked_timer->stop("TpetraCoreStokes::init_core::build_repeated_maps");
-              _stacked_timer->start("TpetraCoreStokes::init_core::build_crsgraph_system");
-            }
-
-            /// _col_idx is for the method set_matrix_values
-            GO _col_idx_size = static_cast<GO>(row_ptr[_num_owned_dofs]);
-            _col_idx.resize(static_cast<AGS>(_col_idx_size));
-            GO counter_col_idx = 0;
-
-            /// build crsgraph
-            auto crsgraph = Teuchos::rcp(new Tpetra::CrsGraph<LO, GO, NO >(_map, _num_nze.view(0, static_cast<AGS>(_num_owned_dofs))));
+            auto crsgraph = Teuchos::rcp(new Tpetra::CrsGraph<LO, GO, NO >(_map_velo, _num_nze.view(0, static_cast<AGS>(_num_owned_velo_dofs))));
+            const TGS max_nnz_per_row = *std::max_element(_num_nze.begin(), _num_nze.end());
+            std::vector<GO> col_buffer(max_nnz_per_row);  // Reusable buffer
 
             /// insert entries for velocity
             for(IndexType row(0); row < _num_owned_velo_dofs; ++row)
@@ -3293,181 +3230,275 @@ namespace FEAT
               // Start scanning from rank 0 for each row
               int current_rank = 0;
 
-              for(auto colidx = row_ptr[row]; colidx < row_ptr[row+1]; ++colidx)
+              for(auto colidx = this->_row_ptr[row]; colidx < this->_row_ptr[row+1]; ++colidx)
               {
-                auto col = col_idx[colidx];
+                GO col = static_cast<GO>(this->_col_idx_mapped[colidx]);
 
                 // Advance rank until we find one that might contain this column
-                while(current_rank < int(_comm->getSize()) && GO(col) >= rank_total_end[current_rank])
+                while(current_rank < int(_comm->getSize()) && col >= rank_total_end[current_rank])
                 {
                   current_rank++;
                 }
 
                 // Check if current rank contains this column
-                if(current_rank < int(_comm->getSize()) && GO(col) >= rank_start[current_rank])
+                if(current_rank < int(_comm->getSize()) && col >= rank_start[current_rank])
                 {
-                  if(GO(col) < rank_velo_end[current_rank])
+                  if(col < rank_velo_end[current_rank])
                   {
                     // Velocity DOF
                     GO mapped_dof = _all_first_owned_velo_dof[current_rank] + (col - rank_start[current_rank]);
                     cols[counter++] = mapped_dof;
-                    _col_idx[counter_col_idx++] = mapped_dof;
-                  } else if (GO(col) < rank_total_end[current_rank]) {
-                    // Pressure DOF
-                    GO pres_offset = col - rank_velo_end[current_rank];
-                    GO mapped_dof = _num_global_velo_dofs + _all_first_owned_pres_dof[current_rank] + pres_offset;
-                    cols[counter++] = mapped_dof;
-                    _col_idx[counter_col_idx++] = mapped_dof;
                   }
                 }
                 // Note: current_rank is NOT reset - it continues from where it left off
               }
 
-              crsgraph->insertGlobalIndices(static_cast<GO>(_first_owned_velo_dof + row), cols.view(0, static_cast<AGS>(counter)));
-            }
-            /// insert entries for pressure
-            for(IndexType row(_num_owned_velo_dofs); row < (_num_owned_velo_dofs + _num_owned_pres_dofs); ++row)
-            {
-              Teuchos::Array<GO> cols(static_cast<GO>(_num_nze[static_cast<ARCPS>(row)]));
-              GO counter = 0;
-
-              // Start scanning from rank 0 for each row
-              int current_rank = 0;
-
-              for(auto colidx = row_ptr[row]; colidx < row_ptr[row+1]; ++colidx)
-              {
-                auto col = col_idx[colidx];
-
-                // Advance rank until we find one that might contain this column
-                while(current_rank < int(_comm->getSize()) && GO(col) >= rank_total_end[current_rank])
-                {
-                  current_rank++;
-                }
-
-                // Check if current rank contains this column
-                if(current_rank < int(_comm->getSize()) && GO(col) >= rank_start[current_rank])
-                {
-
-                  if(GO(col) < rank_velo_end[current_rank])
-                  {
-                    // Velocity DOF
-                    GO mapped_dof = _all_first_owned_velo_dof[current_rank] + (col - rank_start[current_rank]);
-                    cols[counter++] = mapped_dof;
-                    _col_idx[counter_col_idx++] = mapped_dof;
-                  } else if(GO(col) < rank_total_end[current_rank])
-                  {
-                    // Pressure DOF
-                    GO pres_offset = col - rank_velo_end[current_rank];
-                    GO mapped_dof = _num_global_velo_dofs + _all_first_owned_pres_dof[current_rank] + pres_offset;
-                    cols[counter++] = mapped_dof;
-                    _col_idx[counter_col_idx++] = mapped_dof;
-                  }
-                }
-              }
-              crsgraph->insertGlobalIndices(static_cast<GO>(_num_global_velo_dofs + _first_owned_pres_dof + (row - _num_owned_velo_dofs)),
+              crsgraph->insertGlobalIndices(static_cast<GO>(_first_owned_velo_dof + row),
                                             cols.view(0, static_cast<AGS>(counter)));
             }
             crsgraph->fillComplete();
 
             if(_use_timer)
             {
-              _stacked_timer->stop("TpetraCoreStokes::init_core::build_crsgraph_system");
-              _stacked_timer->start("TpetraCoreStokes::init_core::build_system_matrix");
+              _stacked_timer->stop("TpetraCoreStokes::init_symbolic::build_repeated_maps::velocity_graph");
             }
 
-            /// create matrix
-            _matrix = Teuchos::rcp(new Tpetra::CrsMatrix<SC, LO, GO, NO>(crsgraph, _params));
+            Teuchos::ArrayRCP<Teuchos::RCP<Tpetra::Map<LO, GO, NO>>> RepeatedMaps(NumberOfBlocks);
+            Teuchos::ArrayRCP<Teuchos::RCP<Xpetra::Map<LO, GO, NO>>> XRepeatedMaps(NumberOfBlocks);
 
-            // create vectors
-            const LO num_vectors = 1;
-            _vec_def = Teuchos::rcp(new Tpetra::MultiVector<SC, LO, GO, NO>(_map, num_vectors));
-            _vec_cor = Teuchos::rcp(new Tpetra::MultiVector<SC, LO, GO, NO>(_map, num_vectors));
+            const GO _index_base_tmp = 0;
+            /* pressure map */
+            std::vector<GO> element_list_vec_tmp(static_cast<VGS>(_num_owned_pres_dofs));
+            for(IndexType i = 0; i < static_cast<IndexType>(_num_owned_pres_dofs); ++i)
+              element_list_vec_tmp.at(i) = static_cast<GO>(_first_owned_pres_dof + i);
+            const Teuchos::ArrayView<const GO> element_list_tmp = Teuchos::arrayViewFromVector(element_list_vec_tmp);
+            RepeatedMaps[1] = Teuchos::rcp(new Tpetra::Map(static_cast<TGS>(_num_owned_pres_dofs), element_list_tmp, _index_base_tmp, _comm));
 
-            if(_use_timer)
-            {
-              _stacked_timer->stop("TpetraCoreStokes::init_core::build_system_matrix");
-              _stacked_timer->stop("TpetraCoreStokes::init_core");
+            auto xcrsgraph = Teuchos::rcp(new Xpetra::TpetraCrsGraph<LO, GO, NO>(crsgraph));
+            XRepeatedMaps[0] = FROSch::BuildRepeatedMapNonConst<LO, GO, NO>(xcrsgraph);
+            // __ATTENTION:__ This works only for a discontinuous pressure
+            XRepeatedMaps[1] = Teuchos::rcp(new Xpetra::TpetraMap<LO, GO, NO>(RepeatedMaps[1]));
+
+            sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("Repeated Map Vector", XRepeatedMaps);
+
+            /// set dof ordering and dofs per node
+            Teuchos::ArrayRCP<FROSch::DofOrdering> dofOrderings(NumberOfBlocks);
+            dofOrderings[0] = FROSch::NodeWise;
+            dofOrderings[1] = FROSch::NodeWise;
+            sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("DofOrdering Vector", dofOrderings);
+
+            Teuchos::ArrayRCP<unsigned> dofsPerNodeVector(NumberOfBlocks);
+            dofsPerNodeVector[0] = _dpe_velo;
+            dofsPerNodeVector[1] = _dpe_pres;
+            sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("DofsPerNode Vector", dofsPerNodeVector);
+
+            /* Null Space */
+            Teuchos::ArrayRCP<Teuchos::RCP<Xpetra::MultiVector<SC,LO,GO,NO>>> nullSpaceBasis(NumberOfBlocks);
+            Teuchos::ArrayRCP<Teuchos::RCP<const Xpetra::Map<LO, GO, NO>>> XRepeatedMapsTmp(NumberOfBlocks);
+            XRepeatedMapsTmp[0] = XRepeatedMaps[0].getConst();
+            XRepeatedMapsTmp[1] = XRepeatedMaps[1].getConst();
+            Teuchos::RCP<const Xpetra::Map<LO, GO, NO>> repeatedMap = FROSch::MergeMaps(XRepeatedMapsTmp);
+
+            nullSpaceBasis[0] = Xpetra::MultiVectorFactory<SC,LO,GO,NO>::Build(repeatedMap, dofsPerNodeVector[0]);
+            nullSpaceBasis[1] = Xpetra::MultiVectorFactory<SC,LO,GO,NO>::Build(repeatedMap, 1);
+            for(unsigned i = 0; i < dofsPerNodeVector[0]; i++)
+              for (unsigned j = i; j < XRepeatedMaps[0]->getLocalNumElements(); j += dofsPerNodeVector[0]) {
+                nullSpaceBasis[0]->getDataNonConst(i)[XRepeatedMaps[0]->getLocalElement(XRepeatedMaps[0]->getGlobalElement(j))] = Teuchos::ScalarTraits<SC>::one();
+              }
+            LO offset = XRepeatedMaps[0]->getLocalNumElements();
+            for (unsigned j = 0; j < XRepeatedMaps[1]->getLocalNumElements(); j += dofsPerNodeVector[1]) {
+              nullSpaceBasis[1]->getDataNonConst(0)[offset + XRepeatedMaps[1]->getLocalElement(XRepeatedMaps[1]->getGlobalElement(j))] = Teuchos::ScalarTraits<SC>::one();
             }
 
+            sublist(sublist(_params, "Preconditioner Types"), "FROSch")->set("Null Space Vector", nullSpaceBasis);
           }
-
-          virtual void set_matrix_values(const double* vals) override
+          if(_use_timer)
           {
-            if(_use_timer)
-              _stacked_timer->start("TpetraCoreStokes::SetValues");
-
-            Teuchos::ArrayView<const LO> Indices;
-
-            _matrix->resumeFill();
-
-            AGS entries_start = 0;
-            /// velocity
-            for(IndexType row(0); row < _num_owned_velo_dofs; ++row)
-            {
-              const auto num_entries = static_cast<Teuchos::Array<SC>::size_type>(_num_nze[static_cast<AGS>(row)]);
-
-              // copy vals to Teuchos::Array
-              Teuchos::Array<SC> vals_ar(num_entries);
-              for(Teuchos::Array<SC>::size_type j = 0; j < num_entries; ++j)
-                vals_ar[j] = static_cast<SC>(vals[static_cast<VGS>(entries_start + j)]);
-
-              _matrix->replaceGlobalValues(static_cast<GO>(_first_owned_velo_dof + row),
-                                           _col_idx.view(entries_start, static_cast<AGS>(num_entries)),
-                                           vals_ar.view(0, static_cast<Teuchos::Array<SC>::size_type>(num_entries)));
-
-              entries_start += num_entries;
-            }
-
-            /// pressure
-            for(IndexType row(0); row < _num_owned_pres_dofs; ++row)
-            {
-              const auto num_entries = static_cast<Teuchos::Array<SC>::size_type>(_num_nze[static_cast<AGS>(_num_owned_velo_dofs+row)]);
-
-              // copy vals to Teuchos::Array
-              Teuchos::Array<SC> vals_ar(num_entries);
-              for(Teuchos::Array<SC>::size_type j = 0; j < num_entries; ++j)
-                vals_ar[j] = static_cast<SC>(vals[static_cast<VGS>(entries_start + j)]);
-
-              _matrix->replaceGlobalValues(static_cast<GO>(_num_global_velo_dofs + _first_owned_pres_dof + row),
-                                           _col_idx.view(entries_start, static_cast<AGS>(num_entries)),
-                                           vals_ar.view(0, static_cast<Teuchos::Array<SC>::size_type>(num_entries)));
-
-              entries_start += num_entries;
-            }
-
-            _matrix->fillComplete();
-
-            if(this->_use_timer)
-            {
-              this->_stacked_timer->stop("TpetraCoreStokes::SetValues");
-            }
+            _stacked_timer->stop("TpetraCoreStokes::init_symbolic::build_repeated_maps");
+            _stacked_timer->start("TpetraCoreStokes::init_symbolic::build_crsgraph_system");
           }
+
+          /// _col_idx is for the method set_matrix_values
+          GO counter_col_idx = 0;
+
+          /// build crsgraph
+          auto crsgraph = Teuchos::rcp(new Tpetra::CrsGraph<LO, GO, NO >(_map, _num_nze.view(0, static_cast<AGS>(_num_owned_dofs))));
+
+          /// insert entries for velocity
+          for(IndexType row(0); row < _num_owned_velo_dofs; ++row)
+          {
+            Teuchos::Array<GO> cols(static_cast<GO>(_num_nze[static_cast<ARCPS>(row)]));
+            GO counter = 0;
+
+            // Start scanning from rank 0 for each row
+            int current_rank = 0;
+
+            for(auto colidx = this->_row_ptr[row]; colidx < this->_row_ptr[row+1]; ++colidx)
+            {
+              GO col = static_cast<GO>(this->_col_idx_mapped[colidx]);
+
+              // Advance rank until we find one that might contain this column
+              while(current_rank < int(_comm->getSize()) && col >= rank_total_end[current_rank])
+              {
+                current_rank++;
+              }
+
+              // Check if current rank contains this column
+              if(current_rank < int(_comm->getSize()) && col >= rank_start[current_rank])
+              {
+                if(col < rank_velo_end[current_rank])
+                {
+                  // Velocity DOF
+                  GO mapped_dof = _all_first_owned_velo_dof[current_rank] + (col - rank_start[current_rank]);
+                  cols[counter++] = mapped_dof;
+                  this->_col_idx_mapped[counter_col_idx++] = mapped_dof;
+                }
+                else if (col < rank_total_end[current_rank])
+                {
+                  // Pressure DOF
+                  GO pres_offset = col - rank_velo_end[current_rank];
+                  GO mapped_dof = _num_global_velo_dofs + _all_first_owned_pres_dof[current_rank] + pres_offset;
+                  cols[counter++] = mapped_dof;
+                  this->_col_idx_mapped[counter_col_idx++] = mapped_dof;
+                }
+              }
+              // Note: current_rank is NOT reset - it continues from where it left off
+            }
+
+            crsgraph->insertGlobalIndices(static_cast<GO>(_first_owned_velo_dof + row), cols.view(0, static_cast<AGS>(counter)));
+          }
+          /// insert entries for pressure
+          for(IndexType row(_num_owned_velo_dofs); row < (_num_owned_velo_dofs + _num_owned_pres_dofs); ++row)
+          {
+            Teuchos::Array<GO> cols(static_cast<GO>(_num_nze[static_cast<ARCPS>(row)]));
+            GO counter = 0;
+
+            // Start scanning from rank 0 for each row
+            int current_rank = 0;
+
+            for(auto colidx = this->_row_ptr[row]; colidx < this->_row_ptr[row+1]; ++colidx)
+            {
+              GO col = this->_col_idx_mapped[colidx];
+
+              // Advance rank until we find one that might contain this column
+              while(current_rank < int(_comm->getSize()) && col >= rank_total_end[current_rank])
+              {
+                current_rank++;
+              }
+
+              // Check if current rank contains this column
+              if(current_rank < int(_comm->getSize()) && col >= rank_start[current_rank])
+              {
+
+                if(col < rank_velo_end[current_rank])
+                {
+                  // Velocity DOF
+                  GO mapped_dof = _all_first_owned_velo_dof[current_rank] + (col - rank_start[current_rank]);
+                  cols[counter++] = mapped_dof;
+                  this->_col_idx_mapped[counter_col_idx++] = mapped_dof;
+                }
+                else if(col < rank_total_end[current_rank])
+                {
+                  // Pressure DOF
+                  GO pres_offset = col - rank_velo_end[current_rank];
+                  GO mapped_dof = _num_global_velo_dofs + _all_first_owned_pres_dof[current_rank] + pres_offset;
+                  cols[counter++] = mapped_dof;
+                  this->_col_idx_mapped[counter_col_idx++] = mapped_dof;
+                }
+              }
+            }
+            crsgraph->insertGlobalIndices(static_cast<GO>(_num_global_velo_dofs + _first_owned_pres_dof + (row - _num_owned_velo_dofs)),
+                                          cols.view(0, static_cast<AGS>(counter)));
+          }
+          crsgraph->fillComplete();
+
+          if(_use_timer)
+          {
+            _stacked_timer->stop("TpetraCoreStokes::init_symbolic::build_crsgraph_system");
+            _stacked_timer->start("TpetraCoreStokes::init_symbolic::build_system_matrix");
+          }
+
+          /// create matrix
+          _matrix = Teuchos::rcp(new Tpetra::CrsMatrix<SC, LO, GO, NO>(crsgraph, _params));
+
+          // create vectors
+          const LO num_vectors = 1;
+          _vec_def = Teuchos::rcp(new Tpetra::MultiVector<SC, LO, GO, NO>(_map, num_vectors));
+          _vec_cor = Teuchos::rcp(new Tpetra::MultiVector<SC, LO, GO, NO>(_map, num_vectors));
+
+          if(_use_timer)
+          {
+            _stacked_timer->stop("TpetraCoreStokes::init_symbolic::build_system_matrix");
+            _stacked_timer->stop("TpetraCoreStokes::init_symbolic");
+          }
+        }
+
+        virtual void init_numeric() override
+        {
+          if(_use_timer)
+            _stacked_timer->start("TpetraCoreStokes::init_numeric");
+
+          Teuchos::ArrayView<const LO> Indices;
+
+          _matrix->resumeFill();
+
+          AGS entries_start = 0;
+          /// velocity
+          for(IndexType row(0); row < _num_owned_velo_dofs; ++row)
+          {
+            const auto num_entries = static_cast<Teuchos::Array<SC>::size_type>(_num_nze[static_cast<AGS>(row)]);
+
+            // copy vals to Teuchos::Array
+            Teuchos::Array<SC> vals_ar(num_entries);
+            for(Teuchos::Array<SC>::size_type j = 0; j < num_entries; ++j)
+              vals_ar[j] = static_cast<SC>(this->_mat_val[static_cast<VGS>(entries_start + j)]);
+
+            Teuchos::Array<GO> cols(num_entries);
+            for(Teuchos::Array<GO>::size_type j = 0; j < num_entries; ++j)
+              cols[j] = static_cast<GO>(this->_col_idx_mapped[entries_start + j]);
+
+            _matrix->replaceGlobalValues(static_cast<GO>(_first_owned_velo_dof + row),
+                                         cols.view(0, static_cast<AGS>(num_entries)),
+                                         vals_ar.view(0, static_cast<Teuchos::Array<SC>::size_type>(num_entries)));
+
+            entries_start += num_entries;
+          }
+
+          /// pressure
+          for(IndexType row(0); row < _num_owned_pres_dofs; ++row)
+          {
+            const auto num_entries = static_cast<Teuchos::Array<SC>::size_type>(_num_nze[static_cast<AGS>(_num_owned_velo_dofs+row)]);
+
+            // copy vals to Teuchos::Array
+            Teuchos::Array<SC> vals_ar(num_entries);
+            for(Teuchos::Array<SC>::size_type j = 0; j < num_entries; ++j)
+              vals_ar[j] = static_cast<SC>(this->_mat_val[static_cast<VGS>(entries_start + j)]);
+
+            Teuchos::Array<GO> cols(num_entries);
+            for(Teuchos::Array<GO>::size_type j = 0; j < num_entries; ++j)
+              cols[j] = static_cast<GO>(this->_col_idx_mapped[entries_start + j]);
+
+            _matrix->replaceGlobalValues(static_cast<GO>(_num_global_velo_dofs + _first_owned_pres_dof + row),
+                                         cols.view(0, static_cast<AGS>(num_entries)),
+                                         vals_ar.view(0, static_cast<Teuchos::Array<SC>::size_type>(num_entries)));
+
+            entries_start += num_entries;
+          }
+
+          _matrix->fillComplete();
+
+          if(this->_use_timer)
+          {
+            this->_stacked_timer->stop("TpetraCoreStokes::init_numeric");
+          }
+        }
       };
 
-      void* create_core_stokes(const void* comm, IndexType dof_offset, IndexType num_owned_dofs, IndexType num_owned_velo_dofs, IndexType num_owned_pres_dofs, IndexType first_owned_velo_dof, IndexType first_owned_pres_dof, IndexType num_global_velo_dofs, IndexType num_global_pres_dofs, const unsigned int* row_ptr, const unsigned int* col_idx, const Trilinos::FROSchParameterList & params)
+      void* create_core_stokes(const void* comm, Index num_global_dofs, Index my_dof_offset, Index num_owned_dofs, Index num_nonzeros,
+        IndexType num_owned_velo_dofs, IndexType num_owned_pres_dofs, IndexType first_owned_velo_dof,
+        IndexType first_owned_pres_dof, IndexType num_global_velo_dofs, IndexType num_global_pres_dofs, const Trilinos::FROSchParameterList & params)
       {
-        TpetraCoreStokes *core = new TpetraCoreStokes(comm, dof_offset, num_owned_dofs, num_owned_velo_dofs, num_owned_pres_dofs, first_owned_velo_dof, first_owned_pres_dof, num_global_velo_dofs, num_global_pres_dofs, params);
-        core->init_core(row_ptr, col_idx);
-        return core;
-      }
-
-      void* create_core_stokes(const void* comm, IndexType dof_offset, IndexType num_owned_dofs, IndexType num_owned_velo_dofs, IndexType num_owned_pres_dofs, IndexType first_owned_velo_dof, IndexType first_owned_pres_dof, IndexType num_global_velo_dofs, IndexType num_global_pres_dofs, const unsigned long* row_ptr, const unsigned long* col_idx, const Trilinos::FROSchParameterList & params)
-      {
-        TpetraCoreStokes *core = new TpetraCoreStokes(comm, dof_offset, num_owned_dofs, num_owned_velo_dofs, num_owned_pres_dofs, first_owned_velo_dof, first_owned_pres_dof, num_global_velo_dofs, num_global_pres_dofs, params);
-        core->init_core(row_ptr, col_idx);
-        return core;
-      }
-
-      void* create_core_stokes(const void* comm, IndexType dof_offset, IndexType num_owned_dofs, IndexType num_owned_velo_dofs, IndexType num_owned_pres_dofs, IndexType first_owned_velo_dof, IndexType first_owned_pres_dof, IndexType num_global_velo_dofs, IndexType num_global_pres_dofs, const unsigned long long* row_ptr, const unsigned long long* col_idx, const Trilinos::FROSchParameterList & params)
-      {
-        TpetraCoreStokes *core = new TpetraCoreStokes(comm, dof_offset, num_owned_dofs, num_owned_velo_dofs, num_owned_pres_dofs, first_owned_velo_dof, first_owned_pres_dof, num_global_velo_dofs, num_global_pres_dofs, params);
-        core->init_core(row_ptr, col_idx);
-        return core;
-      }
-
-      void destroy_core_stokes(void* core)
-      {
-        delete reinterpret_cast<TpetraCoreStokes*>(core);
+        return new TpetraCoreStokes(comm, num_global_dofs, my_dof_offset, num_owned_dofs, num_nonzeros, num_owned_velo_dofs, num_owned_pres_dofs, first_owned_velo_dof, first_owned_pres_dof, num_global_velo_dofs, num_global_pres_dofs, params);
       }
 
       /* *********************************************************************************************************** */
@@ -3476,7 +3507,7 @@ namespace FEAT
 
       typedef struct FROSchPrecond
       {
-        using SC = TpetraCore::SC;
+        using SC = TpetraCoreBase::SC;
         Teuchos::RCP<Thyra::PreconditionerFactoryBase<SC>> pfbFactory;
         Teuchos::RCP<const Thyra::LinearOpBase<SC>> K_thyra;
         Teuchos::RCP<Thyra::PreconditionerBase<SC>> ThyraPrec;
@@ -3485,12 +3516,12 @@ namespace FEAT
       //----------------------------------------
       void* create_frosch(void* cr)
       {
-        using SC = TpetraCore::SC;
-        using LO = TpetraCore::LO;
-        using GO = TpetraCore::GO;
-        using NO = TpetraCore::NO;
+        using SC = TpetraCoreBase::SC;
+        using LO = TpetraCoreBase::LO;
+        using GO = TpetraCoreBase::GO;
+        using NO = TpetraCoreBase::NO;
 
-        TpetraCore *core = reinterpret_cast<TpetraCore *>(cr);
+        TpetraCoreBase *core = reinterpret_cast<TpetraCoreBase*>(cr);
 
         Stratimikos::DefaultLinearSolverBuilder linearSolverBuilder;
         Stratimikos::enableFROSch<SC, LO, GO, NO>(linearSolverBuilder);
@@ -3536,14 +3567,14 @@ namespace FEAT
 
       void reinit_frosch(void *pre)
       {
-        using SC = TpetraCore::SC;
+        using SC = TpetraCoreBase::SC;
         FROSchPrecond *precond = reinterpret_cast<FROSchPrecond *>(pre);
         Thyra::initializePrec<SC>(*(precond->pfbFactory), precond->K_thyra, precond->ThyraPrec.ptr());
       }
 
       void destroy_frosch(void *pre)
       {
-        // using SC = TpetraCore::SC;
+        // using SC = TpetraCoreBase::SC;
         // Teuchos::RCP<Thyra::LinearOpBase<SC>> *precond = reinterpret_cast<Teuchos::RCP<Thyra::LinearOpBase<SC>> *>(pre);
         // delete precond;
         FROSchPrecond *precond = reinterpret_cast<FROSchPrecond*>(pre);
@@ -3552,12 +3583,12 @@ namespace FEAT
 
       void solve_frosch(void* cr, void* pre)
       {
-        using SC = TpetraCore::SC;
-        using LO = TpetraCore::LO;
-        using GO = TpetraCore::GO;
-        using NO = TpetraCore::NO;
+        using SC = TpetraCoreBase::SC;
+        using LO = TpetraCoreBase::LO;
+        using GO = TpetraCoreBase::GO;
+        using NO = TpetraCoreBase::NO;
 
-        TpetraCore *core = reinterpret_cast<TpetraCore *>(cr);
+        TpetraCoreBase *core = reinterpret_cast<TpetraCoreBase *>(cr);
         FROSchPrecond *fprecond = reinterpret_cast<FROSchPrecond *>(pre);
         // Teuchos::RCP<Thyra::LinearOpBase<SC>> *precond = reinterpret_cast<Teuchos::RCP<Thyra::LinearOpBase<SC>> *>(pre);
 

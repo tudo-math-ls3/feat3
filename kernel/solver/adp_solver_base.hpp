@@ -79,6 +79,9 @@ namespace FEAT
       /// \returns The index of the first global DOF owned by this process
       Index _get_global_dof_offset() const;
 
+      /// \returns The block information of the algebraic dof partitioning as an XML string.
+      String _get_adp_block_information() const;
+
       /**
        * \brief Uploads the ADP matrix structure to the given arrays
        *
@@ -308,6 +311,12 @@ namespace FEAT
       Index _get_global_dof_offset() const
       {
         return this->_adp_system->get_global_dof_offset();
+      }
+
+      /// \returns The block information of the algebraic dof partitioning as an XML string.
+      String _get_adp_block_information() const
+      {
+        return this->_adp_system->get_alg_dof_parti()->get_block_information();
       }
 
       /**
@@ -573,6 +582,13 @@ namespace FEAT
       Index _get_global_dof_offset() const
       {
         return _global_dof_offset;
+      }
+
+      /// \returns The block information of the algebraic dof partitioning as an XML string.
+      String _get_adp_block_information() const
+      {
+        XABORTM("Block information for ADPSolverBase<PMDCDSCMatrix> not available yet!");
+        return "-N/A-";
       }
 
       /**
@@ -851,6 +867,13 @@ namespace FEAT
       Index _get_global_dof_offset() const
       {
         return Index(0);
+      }
+
+      /// \returns The block information of the algebraic dof partitioning as an XML string.
+      String _get_adp_block_information() const
+      {
+        XABORTM("Block information for ADPSolverBase<...> not available yet!");
+        return "-N/A-";
       }
 
       /**

@@ -1,6 +1,4 @@
 #pragma once
-#ifndef KERNEL_SOLVER_FROSCH_HPP
-#define KERNEL_SOLVER_FROSCH_HPP 1
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
@@ -15,6 +13,7 @@
 
 // includes, system
 #include <vector>
+#include <regex>
 
 namespace FEAT
 {
@@ -640,17 +639,17 @@ namespace FEAT
        * A pointer to an MPI_Comm object that represents the communicator.
        * This argument is ignored in non-MPI builds.
        *
-       * \param[in] dof_offset
+       * \param[in] num_global_dofs
+       * The number of global DOFs across all processes.
+       *
+       * \param[in] my_dof_offset
        * The global DOF offset for this process.
        *
        * \param[in] num_owned_dofs
        * The number of global DOFs owned by this process.
        *
-       * \param[in] row_ptr
-       * The row-pointer array of the partitioned CSR matrix.
-       *
-       * \param[in] col_idx
-       * The column-index array of the partitioned CSR matrix.
+       * \param[in] num_nonzeros
+       * The number of non-zero entries for this process.
        *
        * \param[in] params
        * The FROSchParameterList object for Trilinos.
@@ -660,28 +659,29 @@ namespace FEAT
        *
        * \author Stephan Köhler
        */
-      void* create_core(const void* comm, Index dof_offset, Index num_owned_dofs,
-                        const unsigned int* row_ptr, const unsigned int* col_idx, const FROSchParameterList & params);
-      void* create_core(const void* comm, Index dof_offset, Index num_owned_dofs,
-                        const unsigned long* row_ptr, const unsigned long* col_idx, const FROSchParameterList & params);
-      void* create_core(const void* comm, Index dof_offset, Index num_owned_dofs,
-                        const unsigned long long* row_ptr, const unsigned long long* col_idx, const FROSchParameterList & params);
+      void* create_core_scalar(const void* comm, Index num_global_dofs, Index my_dof_offset,
+        Index num_owned_dofs, Index num_nonzeros, const FROSchParameterList & params);
+
+      // Trilinos FROSch Stokes
+      void* create_core_stokes(const void* comm, Index num_global_dofs, Index my_dof_offset,
+        Index num_owned_dofs, Index num_nonzeros, Index num_owned_velo_dofs, Index num_owned_pres_dofs,
+        Index first_owned_velo_dof, Index first_owned_pres_dof,
+        Index num_global_velo_dofs, Index num_global_pres_dofs,
+        const Trilinos::FROSchParameterList & params);
 
       void destroy_core(void* core);
 
       void set_parameter_list(void* core, const FROSchParameterList & params);
 
-      void set_matrix_values(void* core, const double* vals);
-      void set_vec_cor_values(void* core, const double* vals);
-      void set_vec_def_values(void* core, const double* vals);
-      void get_vec_cor_values(const void* core, double* vals);
-      void get_vec_def_values(const void* core, double* vals);
+      void init_symbolic(void* core);
+      void init_numeric(void* core);
 
-      // Trilinos FROSch Stokes
-      void* create_core_stokes(const void* comm, Index dof_offset, Index num_owned_dofs, Index num_owned_velo_dofs, Index num_owned_pres_dofs, Index first_owned_velo_dof, Index first_owned_pres_dof, Index num_global_velo_dofs, Index num_global_pres_dofs, const unsigned int* row_ptr, const unsigned int* col_idx, const Trilinos::FROSchParameterList & params);
-      void* create_core_stokes(const void* comm, Index dof_offset, Index num_owned_dofs, Index num_owned_velo_dofs, Index num_owned_pres_dofs, Index first_owned_velo_dof, Index first_owned_pres_dof, Index num_global_velo_dofs, Index num_global_pres_dofs, const unsigned long* row_ptr, const unsigned long* col_idx, const Trilinos::FROSchParameterList & params);
-      void* create_core_stokes(const void* comm, Index dof_offset, Index num_owned_dofs, Index num_owned_velo_dofs, Index num_owned_pres_dofs, Index first_owned_velo_dof, Index first_owned_pres_dof, Index num_global_velo_dofs, Index num_global_pres_dofs, const unsigned long long* row_ptr, const unsigned long long* col_idx, const Trilinos::FROSchParameterList & params);
-      void destroy_core_stokes(void* core);
+      std::int64_t* get_row_ptr(void* core);
+      std::int32_t* get_col_idx(void* core);
+      double* get_mat_val(void* core);
+      double* get_vec_def(void* core);
+      double* get_vec_cor(void* core);
+      void format_vec_cor(void* core);
 
       // FROSch Wrappers
       void* create_frosch(void* core);
@@ -739,11 +739,7 @@ namespace FEAT
        */
       void _upload_def(const VectorType& vec_def)
       {
-        // upload defect to ADP vector
-        this->_upload_vec_def(vec_def);
-
-        // set Tpetra defect vector values
-        Trilinos::set_vec_def_values(this->_core, this->_get_vec_def_vals(vec_def));
+        this->_upload_vector(Trilinos::get_vec_def(this->_core), vec_def.local());
       }
 
       /**
@@ -752,7 +748,7 @@ namespace FEAT
       void _format_cor()
       {
         // format Tpetra correction vector
-        Trilinos::set_vec_cor_values(this->_core, nullptr);
+        Trilinos::format_vec_cor(this->_core);
       }
 
       /**
@@ -766,43 +762,13 @@ namespace FEAT
        */
       void _download_cor(VectorType& vec_cor)
       {
-        // get Tpetra correction vector values
-        Trilinos::get_vec_cor_values(this->_core, this->_get_vec_cor_vals(vec_cor));
-
-        // download correction from APD vector
-        this->_download_vec_cor(vec_cor);
+        this->_download_vector(vec_cor.local(), Trilinos::get_vec_cor(this->_core));
 
         // apply correction filter
         this->_system_filter.filter_cor(vec_cor);
       }
 
     public:
-      /**
-       * \brief Symbolic Initialization
-       *
-       * This function creates the Tpetra matrix and vector objects and initializes their
-       * structure/layout by using the algebraic DOF partitioning (ADP) that is managed by the
-       * base-class. This function also performs an initial upload of the matrix and vector
-       * values from the ADP structures (because Tpetra requires this), although these values
-       * may be undefined (but existent) at this point.
-       */
-      virtual void init_symbolic() override
-      {
-        BaseClass::init_symbolic();
-
-        XASSERT(this->_core == nullptr);
-
-        // create our Tpetra core wrapper object
-        this->_core = Trilinos::create_core(
-          &this->_get_comm()->mpi_comm(),
-          this->_get_global_dof_offset(),
-          this->_get_num_owned_dofs(),
-          this->_get_mat_row_ptr(),
-          this->_get_mat_col_idx(),
-          this->_params);
-
-      }
-
       /**
        * \brief Numeric Initialization
        *
@@ -816,7 +782,10 @@ namespace FEAT
         XASSERT(this->_core != nullptr);
 
         // update matrix values of Trilinos matrix
-        Trilinos::set_matrix_values(this->_core, this->_get_mat_vals());
+        this->_upload_numeric(Trilinos::get_mat_val(this->_core),
+          Trilinos::get_row_ptr(this->_core), Trilinos::get_col_idx(this->_core));
+
+        Trilinos::init_numeric(this->_core);
       }
 
       /**
@@ -879,6 +848,35 @@ namespace FEAT
         return "FROSchPreconditioner";
       }
 
+      /**
+       * \brief Symbolic Initialization
+       *
+       * This function creates the Tpetra matrix and vector objects and initializes their
+       * structure/layout by using the algebraic DOF partitioning (ADP) that is managed by the
+       * base-class. This function also performs an initial upload of the matrix and vector
+       * values from the ADP structures (because Tpetra requires this), although these values
+       * may be undefined (but existent) at this point.
+       */
+      virtual void init_symbolic() override
+      {
+        BaseClass::init_symbolic();
+
+        XASSERT(this->_core == nullptr);
+
+        // create our Tpetra core wrapper object
+        this->_core = Trilinos::create_core_scalar(
+          &this->_get_comm()->mpi_comm(),
+          this->_get_num_global_dofs(),
+          this->_get_global_dof_offset(),
+          this->_get_num_owned_dofs(),
+          this->_get_adp_matrix_num_nzes(),
+          this->_params);
+
+        BaseClass::_upload_symbolic(Trilinos::get_row_ptr(this->_core), Trilinos::get_col_idx(this->_core));
+
+        Trilinos::init_symbolic(this->_core);
+      }
+
       virtual void init_numeric() override
       {
         BaseClass::init_numeric();
@@ -887,7 +885,8 @@ namespace FEAT
         if(_solver == nullptr)
         {
           this->_solver = Trilinos::create_frosch(this->_core);
-        }else
+        }
+        else
         {
           Trilinos::reinit_frosch(this->_solver);
         }
@@ -1006,17 +1005,20 @@ namespace FEAT
      */
     template<typename Matrix_, typename Filter_>
     class StokesFROSchPreconditioner :
-        public FROSchPreconditioner<Matrix_, Filter_>
+      public TpetraSolverBase<Matrix_, Filter_>
     {
     public:
       /// our base-class
-      typedef TpetraSolverBase<Matrix_, Filter_> TpetraBaseClass;
-      typedef FROSchPreconditioner<Matrix_, Filter_> BaseClass;
+      typedef TpetraSolverBase<Matrix_, Filter_> BaseClass;
+      /// the vector type
+      typedef typename BaseClass::VectorType VectorType;
 
     protected:
+      /// the FROSchPreconditioner solver object
+      void* _solver;
       // number of velocity/pressure dofs owned by this process
       Index _num_owned_velo_dofs;
-      Index _num_owned_pres_dofs; // <- given to constructor
+      Index _num_owned_pres_dofs;
       // index of first velocity/pressure dof owned by this process
       Index _first_owned_velo_dof;
       Index _first_owned_pres_dof;
@@ -1025,22 +1027,32 @@ namespace FEAT
       Index _num_global_pres_dofs;
 
     public:
-      explicit StokesFROSchPreconditioner(const Matrix_& matrix, const Filter_& filter, const Index num_owned_pres_dofs, const Trilinos::FROSchParameterList & params) :
-      BaseClass(matrix, filter, params),
-      _num_owned_velo_dofs(0),
-      _num_owned_pres_dofs(num_owned_pres_dofs),
-      _first_owned_velo_dof(0),
-      _first_owned_pres_dof(0),
-      _num_global_velo_dofs(0),
-      _num_global_pres_dofs(0)
+      explicit StokesFROSchPreconditioner(const Matrix_& matrix, const Filter_& filter, const Trilinos::FROSchParameterList & params) :
+        BaseClass(matrix, filter, params),
+        _solver(nullptr),
+        _num_owned_velo_dofs(0),
+        _num_owned_pres_dofs(0),
+        _first_owned_velo_dof(0),
+        _first_owned_pres_dof(0),
+        _num_global_velo_dofs(0),
+        _num_global_pres_dofs(0)
       {
       }
 
       explicit StokesFROSchPreconditioner(const String& DOXY(section_name), PropertyMap* DOXY(section),
-                                          const Matrix_& matrix, const Filter_& filter, const Index num_owned_pres_dofs) :
-        StokesFROSchPreconditioner(matrix, filter, num_owned_pres_dofs)
+                                          const Matrix_& matrix, const Filter_& filter) :
+        StokesFROSchPreconditioner(matrix, filter)
       {
         /// \todo parse parameters
+      }
+
+      virtual ~StokesFROSchPreconditioner() override
+      {
+        if (_solver != nullptr)
+        {
+          Trilinos::destroy_frosch(_solver);
+          _solver = nullptr;
+        }
       }
 
       virtual String name() const override
@@ -1066,8 +1078,124 @@ namespace FEAT
         // but the FROSchPreconditioner class does not override
         // the method of the TpetraSolverClass
 
-        TpetraBaseClass::BaseClass::init_symbolic();
+        BaseClass::init_symbolic();
 
+        this->_deduct_sizes();
+
+        XASSERT(this->_num_global_velo_dofs + this->_num_global_pres_dofs == this->_get_num_global_dofs());
+        XASSERT(this->_first_owned_velo_dof + this->_first_owned_pres_dof == this->_get_global_dof_offset());
+        XASSERT(this->_core == nullptr);
+
+        /*this->_get_comm()->allprint(
+          "this->_get_num_global_dofs() = "     + stringify(this->_get_num_global_dofs()) + "\n" +
+          "this->_get_global_dof_offset() = "   + stringify(this->_get_global_dof_offset()) + "\n" +
+          "this->_get_num_owned_dofs() = "      + stringify(this->_get_num_owned_dofs()) + "\n" +
+          "this->_get_adp_matrix_num_nzes() = " + stringify(this->_get_adp_matrix_num_nzes()) + "\n" +
+          "this->_num_owned_velo_dofs = "       + stringify(this->_num_owned_velo_dofs) + "\n" +
+          "this->_num_owned_pres_dofs = "       + stringify(this->_num_owned_pres_dofs) + "\n" +
+          "this->_first_owned_velo_dof = "      + stringify(this->_first_owned_velo_dof) + "\n" +
+          "this->_first_owned_pres_dof = "      + stringify(this->_first_owned_pres_dof) + "\n" +
+          "this->_num_global_velo_dofs = "      + stringify(this->_num_global_velo_dofs) + "\n" +
+          "this->_num_global_pres_dofs = "      + stringify(this->_num_global_pres_dofs));*/
+
+        // create our Tpetra Stokes core wrapper object
+        this->_core = Trilinos::create_core_stokes(
+          &this->_get_comm()->mpi_comm(),
+          this->_get_num_global_dofs(),
+          this->_get_global_dof_offset(),
+          this->_get_num_owned_dofs(),
+          this->_get_adp_matrix_num_nzes(),
+          this->_num_owned_velo_dofs,
+          this->_num_owned_pres_dofs,
+          this->_first_owned_velo_dof,
+          this->_first_owned_pres_dof,
+          this->_num_global_velo_dofs,
+          this->_num_global_pres_dofs,
+          this->_params);
+
+        BaseClass::_upload_symbolic(Trilinos::get_row_ptr(this->_core), Trilinos::get_col_idx(this->_core));
+
+        Trilinos::init_symbolic(this->_core);
+       }
+
+      virtual void init_numeric() override
+      {
+        BaseClass::init_numeric();
+
+        // create FROSchPreconditioner
+        if(_solver == nullptr)
+        {
+          this->_solver = Trilinos::create_frosch(this->_core);
+        }
+        else
+        {
+          Trilinos::reinit_frosch(this->_solver);
+        }
+      }
+
+      virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
+      {
+        // upload defect vector and format correction
+        this->_upload_def(vec_def);
+        this->_format_cor();
+
+        // apply FROSchPreconditioner
+        Trilinos::solve_frosch(this->_core, this->_solver);
+
+        // download correction
+        this->_download_cor(vec_cor);
+
+        // okay
+        return Status::success;
+      }
+
+    private:
+      void _deduct_sizes()
+      {
+        // get and split the block information
+        auto vbi = this->_get_adp_block_information().split_by_charset("\n");
+
+        // block information must consist of 4 entries
+        XASSERTM(vbi.size() == std::size_t(4), "invalid block information for StokesFROSchPreconditioner");
+
+        // last block must terminate the tuple block
+        XASSERTM(vbi[3] == "</Tuple>", "invalid block information for StokesFROSchPreconditioner");
+
+        // try to parse the block information for the entire tuple
+        std::regex rext("<Tuple gc=\"(\\d+)\" gf=\"(\\d+)\" go=\"(\\d+)\" lc=\"(\\d+)\" lo=\"0\">");
+        std::smatch rmt;
+        if(!std::regex_match(vbi.at(0), rmt, rext))
+          throw InternalError("invalid Tuple block information for StokesFROSchPreconditioner:\n" + vbi.at(0));
+
+        // try to parse the block information for the velocity component
+        std::regex rexv("<Blocked bs=\"(\\d+)\" gc=\"(\\d+)\" gf=\"(\\d+)\" go=\"(\\d+)\" lc=\"(\\d+)\" lo=\"0\"/>");
+        std::smatch rmv;
+        if(!std::regex_match(vbi.at(1), rmv, rexv))
+          throw InternalError("invalid velocity block information for StokesFROSchPreconditioner:\n" + vbi.at(1));
+
+        if(!String(rmv[2]).parse(this->_num_global_velo_dofs))
+          throw InternalError("invalid velocity block information for StokesFROSchPreconditioner: failed to parse global velocity dof count");
+        if(!String(rmv[3]).parse(this->_first_owned_velo_dof))
+          throw InternalError("invalid velocity block information for StokesFROSchPreconditioner: failed to parse first owned global velocity dof");
+        if(!String(rmv[5]).parse(this->_num_owned_velo_dofs))
+          throw InternalError("invalid velocity block information for StokesFROSchPreconditioner: failed to parse local velocity dof count");
+
+        // try to parse the block information for the pressure component
+        std::regex rexp("<Scalar gc=\"(\\d+)\" gf=\"(\\d+)\" go=\"(\\d+)\" lc=\"(\\d+)\" lo=\"(\\d+)\"/>");
+        std::smatch rmp;
+        if(!std::regex_match(vbi.at(2), rmp, rexp))
+          throw InternalError("invalid velocity block information for StokesFROSchPreconditioner:\n" + vbi.at(2));
+
+        if(!String(rmp[1]).parse(this->_num_global_pres_dofs))
+          throw InternalError("invalid velocity block information for StokesFROSchPreconditioner: failed to parse global velocity dof count");
+        if(!String(rmp[2]).parse(this->_first_owned_pres_dof))
+          throw InternalError("invalid velocity block information for StokesFROSchPreconditioner: failed to parse first owned global velocity dof");
+        if(!String(rmp[4]).parse(this->_num_owned_pres_dofs))
+          throw InternalError("invalid velocity block information for StokesFROSchPreconditioner: failed to parse local velocity dof count");
+      }
+
+      /*void _deduct_sizes_old()
+      {
         this->_num_owned_velo_dofs = this->_get_num_owned_dofs() - this->_num_owned_pres_dofs;
 
         this->_num_global_velo_dofs = this->_num_owned_velo_dofs;
@@ -1079,27 +1207,8 @@ namespace FEAT
         this->_first_owned_pres_dof = 0;
         this->_get_comm()->exscan(&this->_num_owned_velo_dofs, &this->_first_owned_velo_dof, 1u, Dist::op_sum);
         this->_get_comm()->exscan(&this->_num_owned_pres_dofs, &this->_first_owned_pres_dof, 1u, Dist::op_sum);
-
-        XASSERT(this->_num_global_velo_dofs + this->_num_global_pres_dofs == this->_get_num_global_dofs());
-        XASSERT(this->_first_owned_velo_dof + this->_first_owned_pres_dof == this->_get_global_dof_offset());
-        XASSERT(this->_core == nullptr);
-
-        // create our Tpetra Stokes core wrapper object
-        this->_core = Trilinos::create_core_stokes(
-          &this->_get_comm()->mpi_comm(),
-          this->_get_global_dof_offset(),
-          this->_get_num_owned_dofs(),
-          this->_num_owned_velo_dofs,
-          this->_num_owned_pres_dofs,
-          this->_first_owned_velo_dof,
-          this->_first_owned_pres_dof,
-          this->_num_global_velo_dofs,
-          this->_num_global_pres_dofs,
-          this->_get_mat_row_ptr(),
-          this->_get_mat_col_idx(),
-          this->_params);
-      }
-    };
+      }*/
+    }; // class StokesFROSchPreconditioner
 
     /**
      * \brief Creates a new StokesFROSchPreconditioner solver object
@@ -1138,18 +1247,15 @@ namespace FEAT
      * \param[in] filter
      * The system filter.
      *
-     * \param[in] num_owned_pres_dofs
-     * The number of owned pressure dofs.
-     *
      * \returns
      * A shared pointer to a new FROSchPreconditioner object.
      **/
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<StokesFROSchPreconditioner<Matrix_, Filter_>> new_stokes_frosch(
       const String& section_name, PropertyMap* section,
-      const Matrix_& matrix, const Filter_& filter, const Index num_owned_pres_dofs)
+      const Matrix_& matrix, const Filter_& filter)
     {
-      return std::make_shared<StokesFROSchPreconditioner<Matrix_, Filter_>>(section_name, section, matrix, filter, num_owned_pres_dofs);
+      return std::make_shared<StokesFROSchPreconditioner<Matrix_, Filter_>>(section_name, section, matrix, filter);
     }
 
     /**
@@ -1164,21 +1270,16 @@ namespace FEAT
      * \param[in] filter
      * The system filter.
      *
-     * \param[in] num_owned_pres_dofs
-     * The number of owned pressure dofs.
-     *
      * \returns
      * A shared pointer to a new StokesFROSchPreconditioner object.
      */
     template<typename Matrix_, typename Filter_>
     inline std::shared_ptr<StokesFROSchPreconditioner<Matrix_, Filter_>> new_stokes_frosch(
-      const Matrix_& matrix, const Filter_& filter, const Index num_owned_pres_dofs, const Trilinos::FROSchParameterList & params)
+      const Matrix_& matrix, const Filter_& filter, const Trilinos::FROSchParameterList & params)
     {
-      return std::make_shared<StokesFROSchPreconditioner<Matrix_, Filter_>>(matrix, filter, num_owned_pres_dofs, params);
+      return std::make_shared<StokesFROSchPreconditioner<Matrix_, Filter_>>(matrix, filter, params);
     }
-
   } // namespace Solver
 } // namespace FEAT
 
 #endif // defined(FEAT_HAVE_TRILINOS) || defined(DOXYGEN)
-#endif // KERNEL_SOLVER_FROSCH_HPP
