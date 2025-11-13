@@ -2799,7 +2799,7 @@ namespace FEAT
               // process the entire block
               for(int k = 0; k < bs_; ++k)
               {
-                if(!ignore_nans && !Math::isnan(fil_val[i][k]))
+                if(!ignore_nans || !Math::isnan(fil_val[i][k]))
                   unit_rows.add(IT_(row_offset + j*Index(bs_) + Index(k)), DT_(0));
               }
               ++i;
