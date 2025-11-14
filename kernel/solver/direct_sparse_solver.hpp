@@ -831,6 +831,10 @@ namespace FEAT
        */
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
+        // silence compiler warnings about unused variables if no backend is available
+        (void)vec_cor;
+        (void)vec_def;
+
 #ifdef FEAT_HAVE_CUDSS
         if(this->_core_cudss)
         {

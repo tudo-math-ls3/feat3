@@ -244,11 +244,6 @@ namespace FEAT
       if(z_rank > 0)
         return true;
 
-      // compute total element count
-      Index num_elems(0);
-      for(Index i(0); i < z_size; ++i)
-        num_elems += recv_buf[i*max_local_elems];
-
       // allocate ranks vector
       this->_coloring = Adjacency::Coloring(this->_num_elems, this->_num_parts);
       Index* col = this->_coloring.get_coloring();

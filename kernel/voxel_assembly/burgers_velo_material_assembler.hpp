@@ -193,6 +193,11 @@ namespace FEAT
 
         loc_mat.format();
 
+        // silence unused variables warnings
+        (void)sd_delta;
+        (void)sd_nu;
+        (void)sd_v_norm;
+        (void)local_delta;
 
         if constexpr(need_streamline) //need streamdiff? constexpr since we need this relatively rarely
         {
@@ -498,6 +503,12 @@ namespace FEAT
         cg::invoke_one(tg, [&](){need_frechet = CudaMath::cuda_abs(frechet_beta) > DataType(0);});
         tg.sync();
 
+        // silence unused variables warnings
+        (void)sd_delta;
+        (void)sd_nu;
+        (void)sd_v_norm;
+        (void)mean_v_p;
+        (void)streamdiff_coeffs_p;
 
         if constexpr(need_streamline) //need streamdiff?
         {
@@ -878,7 +889,7 @@ namespace FEAT
         const int t_idx = tg.thread_rank();
         const int g_size = tg.num_threads();
 
-        const DataType& nu{burgers_params.nu};
+        //const DataType& nu{burgers_params.nu};
         const DataType& theta{burgers_params.theta};
         const DataType& beta{burgers_params.beta};
         // const DataType& frechet_beta{burgers_params.frechet_beta};
