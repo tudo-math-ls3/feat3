@@ -386,8 +386,8 @@ parser.add_argument("--likwid-explicit-path", "--likwid_explicit_path", help=(
 parser.add_argument("--likwid-markers" "--likwid_markers", action="extend", nargs="+", choices = ["kernel", "app", "special", "cuda"], help=
 "list of performance markers to activate. Defaults to 'app'")
 
-parser.add_argument("--mkl-sparse-executor", "--mkl_sparse_executor", action="store_true", help=
-"use the Intel MKL sparse executor interface")
+parser.add_argument("--mkl-legacy-spmv", action="store_true", help=
+"use the deprecated Intel MKL Sparse Matrix-Vector kernels based on legacy SparseBLAS")
 
 parser.add_argument("--mpi-c", "--mpi_c", help=
 "set MPI C compiler wrapper")
@@ -580,8 +580,8 @@ if args.likwid_explicit_path:
     error("Likwid path", args.likwid_explicit_path, "does not exist")
   config.cache_entry("FEAT_EXPLICIT_LIKWID_PATH", args.likwid_explicit_path, "FILEPATH")
 
-if args.mkl_sparse_executor:
-  config.cache_entry("FEAT_USE_MKL_SPARSE_EXECUTOR", "ON", "BOOL")
+if args.mkl_legacy_spmv:
+  config.cache_entry("FEAT_USE_MKL_LEGACY_SPMV", "OFF", "BOOL")
 
 if args.mpi_c:
   if not os.path.exists(args.mpi_c):

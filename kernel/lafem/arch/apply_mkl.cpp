@@ -15,12 +15,6 @@ FEAT_DISABLE_WARNINGS
 #include <mkl_spblas.h>
 FEAT_RESTORE_WARNINGS
 
-/// \todo remove this pragma once MKL is switched to sparse executor interface
-// disable 'deprecated' warnings for MKL functions, because this file won't compile otherwise
-#ifdef FEAT_COMPILER_MICROSOFT
-#pragma warning(disable: 4996)
-#endif
-
 using namespace FEAT;
 using namespace FEAT::LAFEM;
 using namespace FEAT::LAFEM::Arch;
@@ -39,7 +33,7 @@ void Apply::csr_mkl(float * r, const float a, const float * const x, const float
       scopy(&mrows, (const float*)y, &one, r, &one);
   }
 
-#ifdef FEAT_USE_MKL_SPARSE_EXECUTOR
+#ifndef FEAT_USE_MKL_LEGACY_SPMV
 
   sparse_operation_t opt;
   if (transposed)
@@ -95,7 +89,7 @@ void Apply::csr_mkl(double * r, const double a, const double * const x, const do
       dcopy(&mrows, (const double*)y, &one, r, &one);
   }
 
-#ifdef FEAT_USE_MKL_SPARSE_EXECUTOR
+#ifndef FEAT_USE_MKL_LEGACY_SPMV
 
   sparse_operation_t opt;
   if (transposed)
@@ -151,7 +145,7 @@ void Apply::bcsr_mkl(float * r, const float a, const float * const x, const floa
   }
 
 
-#ifdef FEAT_USE_MKL_SPARSE_EXECUTOR
+#ifndef FEAT_USE_MKL_LEGACY_SPMV
 
   sparse_operation_t opt = SPARSE_OPERATION_NON_TRANSPOSE;
 
@@ -194,7 +188,7 @@ void Apply::bcsr_mkl(double * r, const double a, const double * const x, const d
   }
 
 
-#ifdef FEAT_USE_MKL_SPARSE_EXECUTOR
+#ifndef FEAT_USE_MKL_LEGACY_SPMV
 
   sparse_operation_t opt = SPARSE_OPERATION_NON_TRANSPOSE;
 
@@ -236,8 +230,7 @@ void Apply::bcsr_transposed_mkl(float * r, const float a, const float * const x,
     scopy(&mcopysize, (const float*)y, &one, r, &one);
   }
 
-
-#ifdef FEAT_USE_MKL_SPARSE_EXECUTOR
+#ifndef FEAT_USE_MKL_LEGACY_SPMV
 
   sparse_operation_t opt = SPARSE_OPERATION_NON_TRANSPOSE;
 
@@ -279,8 +272,7 @@ void Apply::bcsr_transposed_mkl(double * r, const double a, const double * const
     dcopy(&mcopysize, (const double*)y, &one, r, &one);
   }
 
-
-#ifdef FEAT_USE_MKL_SPARSE_EXECUTOR
+#ifndef FEAT_USE_MKL_LEGACY_SPMV
 
   sparse_operation_t opt = SPARSE_OPERATION_NON_TRANSPOSE;
 

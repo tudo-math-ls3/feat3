@@ -218,10 +218,10 @@ void Runtime::initialize(int& argc, char**& argv)
 #else
         std::cout << "FEAT_OVERRIDE_MPI_OPS.........: no\n";
 #endif
-#ifdef FEAT_USE_MKL_SPARSE_EXECUTOR
-        std::cout << "FEAT_USE_MKL_SPARSE_EXECUTOR..: yes\n";
+#ifdef FEAT_USE_MKL_LEGACY_SPMV
+        std::cout << "FEAT_USE_MKL_LEGACY_SPMV......: yes\n";
 #else
-        std::cout << "FEAT_USE_MKL_SPARSE_EXECUTOR..: no\n";
+        std::cout << "FEAT_USE_MKL_LEGACY_SPMV......: no\n";
 #endif
 #ifdef FEAT_UNROLL_BANDED
         std::cout << "FEAT_UNROLL_BANDED............: yes\n";

@@ -64,6 +64,12 @@ void run(PreferredBackend backend)
 int main(int argc, char ** argv)
 {
   FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
+  run<SparseMatrixCSR<double, Index> >(PreferredBackend::generic);
+  run<SparseMatrixCSR<float, Index> >(PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+  run<SparseMatrixCSR<double, Index> >(PreferredBackend::mkl);
+  run<SparseMatrixCSR<float, Index> >(PreferredBackend::mkl);
+#endif
 #ifdef FEAT_HAVE_CUDA
   run<SparseMatrixCSR<double, Index> >(PreferredBackend::cuda);
   run<SparseMatrixCSR<double, unsigned int> >(PreferredBackend::cuda);
@@ -74,16 +80,5 @@ int main(int argc, char ** argv)
   run<SparseMatrixCSR<Half, unsigned int> >(PreferredBackend::cuda);
 #endif
 #endif
-  //run<Algo::Generic, SparseMatrixCSR<Mem::Main, double, Index> >();
-  //run<Algo::Generic, SparseMatrixCSR<Mem::Main, double, unsigned int> >();
-#ifdef FEAT_HAVE_MKL
-  //run<Algo::MKL, SparseMatrixCSR<Mem::Main, double, unsigned long> >();
-#endif
-/*#ifdef FEAT_HAVE_CUDA
-  run<Algo::CUDA, SparseMatrixBanded<Mem::CUDA, double, Index> >();
-  run<Algo::CUDA, SparseMatrixBanded<Mem::CUDA, double, unsigned int> >();
-#endif
-  run<Algo::Generic, SparseMatrixBanded<Mem::Main, double, Index> >();
-  run<Algo::Generic, SparseMatrixBanded<Mem::Main, double, unsigned int> >();*/
   return 0;
 }
