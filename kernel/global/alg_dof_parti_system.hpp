@@ -9,7 +9,9 @@
 #include <kernel/global/alg_dof_parti.hpp>
 #include <kernel/global/filter.hpp>
 #include <kernel/global/matrix.hpp>
+#include <kernel/lafem/null_matrix.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
+#include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/saddle_point_matrix.hpp>
 #include <kernel/lafem/tuple_matrix.hpp>
 #include <kernel/lafem/unit_filter.hpp>
@@ -1738,6 +1740,84 @@ namespace FEAT
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+      template<typename DT_, typename IT_, int bh_, int bw_>
+      class ADPDOMM<LAFEM::NullMatrix<DT_, IT_, bh_, bw_>>
+      {
+      public:
+        Index num_indices() const
+        {
+          return Index(0);
+        }
+
+        Index buf_size() const
+        {
+          return Index(0);
+        }
+
+        Index loc_size() const
+        {
+          return Index(0);
+        }
+
+        String dump() const
+        {
+          return "[null]";
+        }
+
+        Index asm_neighbor_owner_data_mir(
+          const LAFEM::NullMatrix<DT_, IT_, bh_, bw_>&,
+          const LAFEM::VectorMirror<DT_, IT_>& row_mirror,
+          const LAFEM::MatrixMirrorBuffer<DT_, IT_>&,
+          const LAFEM::DenseVectorBlocked<IT_, IT_, bw_>&,
+          Index)
+        {
+          return row_mirror.num_indices() * Index(bh_);
+        }
+
+        Index asm_neighbor_owner_data_mir(
+          const LAFEM::NullMatrix<DT_, IT_, bh_, 1>&,
+          const LAFEM::VectorMirror<DT_, IT_>& row_mirror,
+          const LAFEM::MatrixMirrorBuffer<DT_, IT_>&,
+          const LAFEM::DenseVector<IT_, IT_>&,
+          Index)
+        {
+          return row_mirror.num_indices() * Index(bh_);
+        }
+
+        Index asm_owned_data_mir(
+          const LAFEM::NullMatrix<DT_, IT_, bh_, bw_>&,
+          const Adjacency::Graph&,
+          const LAFEM::VectorMirror<DT_, IT_>& row_mirror,
+          const LAFEM::DenseVectorBlocked<IT_, IT_, bw_>&,
+          Index)
+        {
+          return row_mirror.num_indices() * Index(bh_);
+        }
+
+        Index asm_owned_data_mir(
+          const LAFEM::NullMatrix<DT_, IT_, bh_, 1>&,
+          const Adjacency::Graph&,
+          const LAFEM::VectorMirror<DT_, IT_>& row_mirror,
+          const LAFEM::DenseVector<IT_, IT_>&,
+          Index)
+        {
+          return row_mirror.num_indices() * Index(bh_);
+        }
+
+        template<typename DTA_>
+        void upload_owned_data(DTA_*, const LAFEM::NullMatrix<DT_, IT_, bh_, bw_>&) const
+        {
+        }
+
+        void gather_owner_data(
+          LAFEM::DenseVector<DT_, IT_>&,
+          const LAFEM::NullMatrix<DT_, IT_, bh_, bw_>&) const
+        {
+        }
+      }; // class ADPDOMM<LAFEM::NullMatrix<DT_, IT_, bh_, bw_>>
+
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
       template<typename FirstMatrix_, typename... RestMatrix_>
       class ADPDOMM<LAFEM::TupleMatrixRow<FirstMatrix_, RestMatrix_...>>
       {
@@ -2386,6 +2466,68 @@ namespace FEAT
           return num_rows * Index(bh_);
         }
       }; // class ADPMatAux<LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>>
+
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+      template<typename DT_, typename IT_, int bh_, int bw_>
+      class ADPMatAux<LAFEM::NullMatrix<DT_, IT_, bh_, bw_>>
+      {
+      public:
+        static Index calc_mat_buf_num_rows(
+          const LAFEM::NullMatrix<DT_, IT_, bh_, bw_>&,
+          const LAFEM::VectorMirror<DT_, IT_>& row_mirror)
+        {
+          return row_mirror.num_indices() * Index(bh_);
+        }
+
+        static Index calc_mat_buf_row_nze(
+          IT_*,
+          const LAFEM::NullMatrix<DT_, IT_, bh_, bw_>&,
+          const LAFEM::VectorMirror<DT_, IT_>& row_mirror)
+        {
+          return row_mirror.num_indices() * Index(bh_);
+        }
+
+        static Index gather_mat_buf_col_idx(
+          IT_*,
+          IT_*,
+          const LAFEM::NullMatrix<DT_, IT_, bh_, bw_>&,
+          const LAFEM::VectorMirror<DT_, IT_>& row_mirror,
+          const LAFEM::DenseVectorBlocked<IT_, IT_, bw_>&)
+        {
+          return row_mirror.num_indices() * Index(bh_);
+        }
+
+        static Index gather_mat_buf_col_idx(
+          IT_*,
+          IT_*,
+          const LAFEM::NullMatrix<DT_, IT_, bh_, 1>&,
+          const LAFEM::VectorMirror<DT_, IT_>& row_mirror,
+          const LAFEM::DenseVector<IT_, IT_>&)
+        {
+          return row_mirror.num_indices() * Index(bh_);
+        }
+
+        static Index gather_owned_struct(
+          Adjacency::DynamicGraph&,
+          const LAFEM::NullMatrix<DT_, IT_, bh_, bw_>&,
+          const LAFEM::VectorMirror<DT_, IT_>& row_mirror,
+          const LAFEM::DenseVectorBlocked<IT_, IT_, bw_>&,
+          const Index)
+        {
+          return row_mirror.num_indices() * Index(bh_);
+        }
+
+        static Index gather_owned_struct(
+          Adjacency::DynamicGraph&,
+          const LAFEM::NullMatrix<DT_, IT_, bh_, 1>&,
+          const LAFEM::VectorMirror<DT_, IT_>& row_mirror,
+          const LAFEM::DenseVector<IT_, IT_>&,
+          const Index)
+        {
+          return row_mirror.num_indices() * Index(bh_);
+        }
+      }; // class ADPMatAux<LAFEM::NullMatrix<DT_, IT_, bh_, bw_>>
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
