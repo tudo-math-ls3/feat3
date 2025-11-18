@@ -135,6 +135,12 @@ namespace FEAT
                                           const bool need_convection, const typename SpaceHelp_::DataType tol_eps,
                                           ViscFunc_ visco_func, ViscDerFunc_ visco_d_func)
       {
+        // disable unused variable warnings
+#ifdef __CUDACC__
+#pragma nv_diag_suppress = 177
+#pragma nv_diag_suppress = 550
+#endif
+
         typedef SpaceHelp_ SpaceHelp;
         constexpr int dim = SpaceHelp::dim;
         typedef typename SpaceHelp::SpaceType SpaceType;
@@ -184,20 +190,19 @@ namespace FEAT
         // local vector and matrix defines
         typedef Tiny::Vector<DataType, dim> VecValueType;
         typedef Tiny::Matrix<DataType, dim, dim> MatValueType;
-
         VecValueType loc_v(DataType(0));
         MatValueType loc_grad_v(DataType(0)), strain_rate_tensor_2(DataType(0));
         DataType local_delta(DataType(0));
         DataType nu_loc(DataType(0));
         DataType gamma_dot(DataType(0));
 
-        loc_mat.format();
+        // reenable unused variable warnings
+#ifdef __CUDACC__
+#pragma nv_diag_default = 550
+#pragma nv_diag_default = 177
+#endif
 
-        // silence unused variables warnings
-        (void)sd_delta;
-        (void)sd_nu;
-        (void)sd_v_norm;
-        (void)local_delta;
+        loc_mat.format();
 
         if constexpr(need_streamline) //need streamdiff? constexpr since we need this relatively rarely
         {
@@ -431,6 +436,10 @@ namespace FEAT
                                           const bool need_convection, const typename SpaceHelp_::DataType tol_eps,
                                           ViscFunc_ visco_func, ViscDerFunc_ visco_d_func)
       {
+        // disable unused variable warnings
+#pragma nv_diag_suppress = 177
+#pragma nv_diag_suppress = 550
+
         typedef SpaceHelp_ SpaceHelp;
         constexpr int dim = SpaceHelp::dim;
         typedef typename SpaceHelp::SpaceType SpaceType;
@@ -503,12 +512,9 @@ namespace FEAT
         cg::invoke_one(tg, [&](){need_frechet = CudaMath::cuda_abs(frechet_beta) > DataType(0);});
         tg.sync();
 
-        // silence unused variables warnings
-        (void)sd_delta;
-        (void)sd_nu;
-        (void)sd_v_norm;
-        (void)mean_v_p;
-        (void)streamdiff_coeffs_p;
+        // reenable unused variable warnings
+#pragma nv_diag_default = 550
+#pragma nv_diag_default = 177
 
         if constexpr(need_streamline) //need streamdiff?
         {
