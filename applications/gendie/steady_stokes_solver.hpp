@@ -695,8 +695,8 @@ namespace Gendie
       this->smoother.clear();
     }
 
-    template<typename Domain_, typename System_, template<typename> typename Container_>
-    void set_solver(const Container_<std::shared_ptr<System_>>& system_levels, const Domain_& domain)
+    template<typename Domain_, typename System_, typename... TArgs, template<typename...> typename Container_>
+    void set_solver(const Container_<std::shared_ptr<System_>, TArgs...>& system_levels, const Domain_& domain)
     {
       // typedef System_ SystemLevelType;
       // XASSERTM(this->_init_params, "You have to initialize the system before calling this function");
@@ -1165,7 +1165,8 @@ namespace Gendie
       XASSERTM(this->_init_params, "You have to initialize the system before calling this function");
       XASSERTM(this->system_levels.size() > 0, "System levels not set");
       this->_clear_solver();
-      multigrid_solver.set_solver(this->system_levels, domain);
+      multigrid_solver.template set_solver<>(this->system_levels, domain);
+      // multigrid_solver.template set_solver<decltype(this->system_levels), decltype(domain)>(this->system_levels, domain);
       this->base_solver = multigrid_solver.base_solver;
       this->iter_solver = multigrid_solver.iter_solver;
       watch_create_solver.stop();

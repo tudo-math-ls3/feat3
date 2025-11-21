@@ -447,17 +447,19 @@ namespace FEAT
       protected:
         const Geometry::Atlas::ChartBase<Mesh_>& _chart;
         const CoordType _inv;
+        const CoordType _tol;
 
       public:
-        explicit ChartHitFunction(const Geometry::Atlas::ChartBase<Mesh_>& chart, bool invert) :
+        explicit ChartHitFunction(const Geometry::Atlas::ChartBase<Mesh_>& chart, bool invert, CoordType tol = CoordType(0)) :
           _chart(chart),
-          _inv(CoordType(invert ? -1 : 1))
+          _inv(CoordType(invert ? -1 : 1)),
+          _tol(tol)
         {
         }
 
         bool operator()(const WorldPointType& point) const
         {
-          return _inv * _chart.signed_dist(point) <= CoordType(0);
+          return _inv * _chart.signed_dist(point) <= _tol;
         }
       };
 
@@ -481,12 +483,16 @@ namespace FEAT
        *
        * \param[in] invert
        * If \c true, then the mesh part will contain all mesh entities, which are outside of the chart,
-       * i.e. have a signed distance >= 0, otherwise it will contain all entities which are inside of
-       * the chart, i.e. have a signed distance <= 0.
+       * i.e. have a signed distance >= -tol, otherwise it will contain all entities which are inside of
+       * the chart, i.e. have a signed distance <= tol.
+       *
+       * \param[in] tol
+       * Set tolerance to check if an entity is inside. While 0 makes sense here, in some cases it might be
+       * sensible to skew the chances to either direction to accomidate for rounding errors.
        */
-      explicit ChartHitTestFactory(const Mesh_& mesh, const Chart_& chart, bool invert = false) :
+      explicit ChartHitTestFactory(const Mesh_& mesh, const Chart_& chart, bool invert = false, typename Mesh_::CoordType tol = typename Mesh_::CoordType(0)) :
         _mesh(mesh),
-        _hit_func(chart, invert),
+        _hit_func(chart, invert, tol),
         _target_data(std::size_t(_mesh.shape_dim+1))
       {
         Intern::hittest_compute_target_data<ChartHitFunction, Mesh_>(_target_data, _mesh, _hit_func);
@@ -509,10 +515,14 @@ namespace FEAT
        * If \c true, then the mesh part will contain all mesh entities, which are outside of the chart,
        * i.e. have a signed distance >= 0, otherwise it will contain all entities which are inside of
        * the chart, i.e. have a signed distance <= 0.
+       *
+       * \param[in] tol
+       * Set tolerance to check if an entity is inside. While 0 makes sense here, in some cases it might be
+       * sensible to skew the chances to either direction to accomidate for rounding errors.
        */
-      explicit ChartHitTestFactory(const Mesh_& mesh, const MeshType& filter, const Chart_& chart, bool invert = false) :
+      explicit ChartHitTestFactory(const Mesh_& mesh, const MeshType& filter, const Chart_& chart, bool invert = false, typename Mesh_::CoordType tol = typename Mesh_::CoordType(0)) :
         _mesh(mesh),
-        _hit_func(chart, invert),
+        _hit_func(chart, invert, tol),
         _target_data(std::size_t(_mesh.shape_dim+1))
       {
         Intern::hittest_compute_filtered_target_data<ChartHitFunction, Mesh_>(_target_data, _mesh, filter, _hit_func);
@@ -549,13 +559,22 @@ namespace FEAT
      * \param[in] chart
      * A chart object whose signed-distance function is to be used for hit-testing.
      *
+     * \param[in] invert
+     * If \c true, then the mesh part will contain all mesh entities, which are outside of the chart,
+     * i.e. have a signed distance >= 0, otherwise it will contain all entities which are inside of
+     * the chart, i.e. have a signed distance <= 0.
+     *
+     * \param[in] tol
+     * Set tolerance to check if an entity is inside. While 0 makes sense here, in some cases it might be
+     * sensible to skew the chances to either direction to accomidate for rounding errors.
+     *
      * \returns
-     * A mesh-part containing all entities for which the chart signed distance is <= 0.
+     * A mesh-part containing all entities for which the chart signed distance is <= tol.
      */
     template<typename Mesh_, typename Chart_>
-    MeshPart<Mesh_> make_meshpart_by_chart_hit_test(const Mesh_& mesh, const Chart_& chart, bool invert = false)
+    MeshPart<Mesh_> make_meshpart_by_chart_hit_test(const Mesh_& mesh, const Chart_& chart, bool invert = false, typename Mesh_::CoordType tol = typename Mesh_::CoordType(0))
     {
-      ChartHitTestFactory<Mesh_, Chart_> factory(mesh, chart, invert);
+      ChartHitTestFactory<Mesh_, Chart_> factory(mesh, chart, invert, tol);
       return factory.make();
     }
 
@@ -572,13 +591,22 @@ namespace FEAT
      * \param[in] chart
      * A chart object whose signed-distance function is to be used for hit-testing.
      *
+     * \param[in] invert
+     * If \c true, then the mesh part will contain all mesh entities, which are outside of the chart,
+     * i.e. have a signed distance >= 0, otherwise it will contain all entities which are inside of
+     * the chart, i.e. have a signed distance <= 0.
+     *
+     * \param[in] tol
+     * Set tolerance to check if an entity is inside. While 0 makes sense here, in some cases it might be
+     * sensible to skew the chances to either direction to accomidate for rounding errors.
+     *
      * \returns
-     * A mesh-part containing all entities for which the chart signed distance is <= 0.
+     * A mesh-part containing all entities for which the chart signed distance is <= tol.
      */
     template<typename Mesh_, typename Chart_>
-    MeshPart<Mesh_> make_meshpart_by_filtered_chart_hit_test(const Mesh_& mesh, const MeshPart<Mesh_>& filter, const Chart_& chart, bool invert = false)
+    MeshPart<Mesh_> make_meshpart_by_filtered_chart_hit_test(const Mesh_& mesh, const MeshPart<Mesh_>& filter, const Chart_& chart, bool invert = false, typename Mesh_::CoordType tol = typename Mesh_::CoordType(0))
     {
-      ChartHitTestFactory<Mesh_, Chart_> factory(mesh, filter, chart, invert);
+      ChartHitTestFactory<Mesh_, Chart_> factory(mesh, filter, chart, invert, tol);
       return factory.make();
     }
 
@@ -591,13 +619,22 @@ namespace FEAT
      * \param[in] chart
      * A chart object whose signed-distance function is to be used for hit-testing.
      *
+     * \param[in] invert
+     * If \c true, then the mesh part will contain all mesh entities, which are outside of the chart,
+     * i.e. have a signed distance >= 0, otherwise it will contain all entities which are inside of
+     * the chart, i.e. have a signed distance <= 0.
+     *
+     * \param[in] tol
+     * Set tolerance to check if an entity is inside. While 0 makes sense here, in some cases it might be
+     * sensible to skew the chances to either direction to accomidate for rounding errors.
+     *
      * \returns
-     * A unique-pointer to a mesh-part containing all entities for which the chart signed distance is <= 0.
+     * A unique-pointer to a mesh-part containing all entities for which the chart signed distance is <= tol.
      */
     template<typename Mesh_, typename Chart_>
-    std::unique_ptr<MeshPart<Mesh_>> make_unique_meshpart_by_chart_hit_test(const Mesh_& mesh, const Chart_& chart, bool invert = false)
+    std::unique_ptr<MeshPart<Mesh_>> make_unique_meshpart_by_chart_hit_test(const Mesh_& mesh, const Chart_& chart, bool invert = false, typename Mesh_::CoordType tol = typename Mesh_::CoordType(0))
     {
-      ChartHitTestFactory<Mesh_, Chart_> factory(mesh, chart, invert);
+      ChartHitTestFactory<Mesh_, Chart_> factory(mesh, chart, invert, tol);
       return factory.make_unique();
     }
 
@@ -614,13 +651,22 @@ namespace FEAT
      * \param[in] chart
      * A chart object whose signed-distance function is to be used for hit-testing.
      *
+     * \param[in] invert
+     * If \c true, then the mesh part will contain all mesh entities, which are outside of the chart,
+     * i.e. have a signed distance >= 0, otherwise it will contain all entities which are inside of
+     * the chart, i.e. have a signed distance <= 0.
+     *
+     * \param[in] tol
+     * Set tolerance to check if an entity is inside. While 0 makes sense here, in some cases it might be
+     * sensible to skew the chances to either direction to accomidate for rounding errors.
+     *
      * \returns
-     * A unique-pointer to a mesh-part containing all entities for which the chart signed distance is <= 0.
+     * A unique-pointer to a mesh-part containing all entities for which the chart signed distance is <= tol.
      */
     template<typename Mesh_, typename Chart_>
-    std::unique_ptr<MeshPart<Mesh_>> make_unique_meshpart_by_filtered_chart_hit_test(const Mesh_& mesh, const MeshPart<Mesh_>& filter, const Chart_& chart, bool invert = false)
+    std::unique_ptr<MeshPart<Mesh_>> make_unique_meshpart_by_filtered_chart_hit_test(const Mesh_& mesh, const MeshPart<Mesh_>& filter, const Chart_& chart, bool invert = false, typename Mesh_::CoordType tol = typename Mesh_::CoordType(0))
     {
-      ChartHitTestFactory<Mesh_, Chart_> factory(mesh, filter, chart, invert);
+      ChartHitTestFactory<Mesh_, Chart_> factory(mesh, filter, chart, invert, tol);
       return factory.make_unique();
     }
 

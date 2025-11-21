@@ -105,11 +105,14 @@ namespace FEAT::Assembly
             pt_helper.push_back(_cell_helper[k]);
           }
         }
-        const auto& inv_mapping_data = _inv_mapping.unmap_point(ImagePointType(points[pti]), pt_helper, true);
+        if(pt_helper.empty())
+          continue;
 
+        const auto& inv_mapping_data = _inv_mapping.unmap_point(ImagePointType(points[pti]), pt_helper, true);
 
         // extract the cell -> point information from the inv mapping
         const DataType point_weight = DataType(integration_weights[pti])/DataType(inv_mapping_data.size());
+        // std::cout << "Cur point " << points[pti] << " with " << inv_mapping_data.size() << " per cell found\n";
         for(std::size_t l = 0; l < inv_mapping_data.size(); ++l)
         {
           _domain_points.push_back(inv_mapping_data.dom_points[l]);
@@ -148,10 +151,16 @@ namespace FEAT::Assembly
     template<typename AsmTraits_, typename DataType_, int domain_dim_, int image_dim_>
     struct LocalFEValueHolder
     {
+      static constexpr int domain_dim = domain_dim_;
+      static constexpr int image_dim = image_dim_;
+      typedef Tiny::Vector<DataType_, image_dim_> ValueType;
+      typedef Tiny::Matrix<DataType_, image_dim_, domain_dim_> GradType;
+      typedef Tiny::Tensor3<DataType_, image_dim_, domain_dim_, domain_dim_> HessType;
+
       struct Empty {};
-      std::conditional_t<*(AsmTraits_::space_config & SpaceTags::value), Tiny::Vector<DataType_, image_dim_>, Empty> value;
-      std::conditional_t<*(AsmTraits_::space_config & SpaceTags::grad), Tiny::Matrix<DataType_, image_dim_, domain_dim_>, Empty> grad;
-      std::conditional_t<*(AsmTraits_::space_config & SpaceTags::hess), Tiny::Tensor3<DataType_, image_dim_, domain_dim_, domain_dim_>, Empty> hess;
+      std::conditional_t<*(AsmTraits_::space_config & SpaceTags::value), ValueType, Empty> value;
+      std::conditional_t<*(AsmTraits_::space_config & SpaceTags::grad), GradType, Empty> grad;
+      std::conditional_t<*(AsmTraits_::space_config & SpaceTags::hess), HessType, Empty> hess;
 
       static constexpr bool has_value = *(AsmTraits_::space_config & SpaceTags::value);
       static constexpr bool has_grad = *(AsmTraits_::space_config & SpaceTags::grad);
@@ -161,10 +170,16 @@ namespace FEAT::Assembly
     template<typename AsmTraits_, typename DataType_, int domain_dim_>
     struct LocalFEValueHolder<AsmTraits_, DataType_, domain_dim_, 1>
     {
+      static constexpr int domain_dim = domain_dim_;
+      static constexpr int image_dim = 1;
+      typedef DataType_ ValueType;
+      typedef Tiny::Vector<DataType_, domain_dim_> GradType;
+      typedef Tiny::Matrix<DataType_, domain_dim_, domain_dim_> HessType;
+
       struct Empty {};
-      std::conditional_t<*(AsmTraits_::space_config & SpaceTags::value), DataType_, Empty> value;
-      std::conditional_t<*(AsmTraits_::space_config & SpaceTags::grad), Tiny::Vector<DataType_, domain_dim_>, Empty> grad;
-      std::conditional_t<*(AsmTraits_::space_config & SpaceTags::hess), Tiny::Matrix<DataType_, domain_dim_, domain_dim_>, Empty> hess;
+      std::conditional_t<*(AsmTraits_::space_config & SpaceTags::value), ValueType, Empty> value;
+      std::conditional_t<*(AsmTraits_::space_config & SpaceTags::grad), GradType, Empty> grad;
+      std::conditional_t<*(AsmTraits_::space_config & SpaceTags::hess), HessType, Empty> hess;
 
       static constexpr bool has_value = *(AsmTraits_::space_config & SpaceTags::value);
       static constexpr bool has_grad = *(AsmTraits_::space_config & SpaceTags::grad);
@@ -197,6 +212,7 @@ namespace FEAT::Assembly
     typedef typename AsmTraits_::DataType DataType;
     typedef typename FEVector_::ValueType ValueType;
     static constexpr int image_dim = Intern::ValueTypeHelper<ValueType>::dim;
+    typedef Intern::LocalFEValueHolder<AsmTraits, DataType, dim, image_dim> LocalValueHolder;
 
   protected:
     Derived_& cast()
@@ -229,7 +245,7 @@ namespace FEAT::Assembly
     /// the gather object
     typename FEVector_::GatherAxpy gather_axpy;
     /// local fe point/grad/hess values
-    Intern::LocalFEValueHolder<AsmTraits, DataType, dim, image_dim> loc_value_holder;
+    LocalValueHolder loc_value_holder;
 
   public:
     /**
@@ -262,7 +278,7 @@ namespace FEAT::Assembly
       trafo_eval(trafo_data, point);
       space_eval(space_data, trafo_data);
       const int num_loc_dofs = this->space_eval.get_num_local_dofs();
-      if constexpr(loc_value_holder.has_value)
+      if constexpr(LocalValueHolder::has_value)
       {
         loc_value_holder.value = ValueType(0);
         for(int i = 0; i < num_loc_dofs; ++i)
@@ -270,7 +286,7 @@ namespace FEAT::Assembly
           Tiny::axpy(loc_value_holder.value, local_vector[i], space_data.phi[i].value);
         }
       }
-      if constexpr(loc_value_holder.has_grad)
+      if constexpr(LocalValueHolder::has_grad)
       {
         loc_value_holder.grad.format();
         for(int i = 0; i < num_loc_dofs; ++i)
@@ -281,13 +297,13 @@ namespace FEAT::Assembly
             loc_value_holder.grad.add_outer_product(local_vector[i], space_data.phi[i].grad);
         }
       }
-      if constexpr(loc_value_holder.has_hess)
+      if constexpr(LocalValueHolder::has_hess)
       {
         XABORTM("Hessian not implemented yet");
       }
     }
 
-    void _integrate(DataType weight, IndexType point_idx)
+    void _integrate(DataType DOXY(weight), IndexType DOXY(point_idx))
     {
       XABORTM("Has to be implmented by derived class");
     }
@@ -326,7 +342,7 @@ namespace FEAT::Assembly
 
     void prepare_point(const DomainPointType& point)
     {
-      this->cast()._prepare_cell(point);
+      this->cast()._prepare_point(point);
     }
 
     void assemble()

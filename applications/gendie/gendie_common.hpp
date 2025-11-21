@@ -327,9 +327,6 @@ namespace Gendie
         // assemble fbm parts
         {
           auto& fbm_asm = *domain.at(i)->fbm_assembler;
-          // auto& filter_fbm_p = solver_levels.at(i)->get_local_pres_unit_filter();
-          // auto& filter_fbm_v = solver_levels.at(i)->get_local_velo_unit_filter_seq().find_or_add("fbm");
-          auto& filter_fbm_int_v = solver_levels.at(i)->filter_interface_fbm;
           const bool q2_fbm = use_q2_fbm && ((unsigned short)(i) <= min_q2_fbm_level || use_coarse_fbm);
           solver_levels.at(i)->assemble_fbm_filters(fbm_asm, domain.at(i)->space_velo, domain.at(i)->space_pres, (i==0u), q2_fbm, false);
         }

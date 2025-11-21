@@ -80,6 +80,143 @@ namespace FBMTest
     }; // class InflowHelper
 
     template<typename FaceVector_, typename FEVector_, typename Space_>
+    class FaceValueTraceAssemblyJob
+    {
+    public:
+      typedef typename FEVector_::DataType DataType;
+      typedef typename FEVector_::ValueType ValueType;
+      typedef typename FaceVector_::ValueType FaceValueType;
+
+      static constexpr TrafoTags trafo_config = TrafoTags::none;
+      static constexpr SpaceTags space_config = SpaceTags::value;
+      static constexpr TrafoTags facet_trafo_config = TrafoTags::jac_det | TrafoTags::normal;
+
+      class Task :
+        public FEAT::Assembly::TraceAssemblyBasicTaskBase1<DataType, Space_, trafo_config, facet_trafo_config, space_config>
+      {
+      public:
+        /// our base-class typedef
+        typedef FEAT::Assembly::TraceAssemblyBasicTaskBase1<DataType, Space_, trafo_config, facet_trafo_config, space_config> BaseClass;
+
+        /// our assembly traits
+        typedef typename BaseClass::AsmTraits AsmTraits;
+
+        // we do not support pairwise assembly
+        static constexpr bool assemble_pairwise = false;
+        /// this task needs to scatter
+        static constexpr bool need_scatter = false;
+        /// this task has no combine
+        static constexpr bool need_combine = false;
+
+        using typename BaseClass::TrafoEvalData;
+        using typename BaseClass::TrafoFacetEvalData;
+
+      protected:
+        FaceVector_& face_vector;
+        /// the vector that is to be integrated
+        const FEVector_& vector;
+        static constexpr int fe_dim = FEVector_::BlockSize;
+        /// the cubature rule used for integration
+        typename BaseClass::CubatureRuleType cubature_rule;
+        /// the local vector to be assembled
+        typename AsmTraits::template TLocalVector<ValueType> local_vector;
+        /// the vector gather object
+        typename FEVector_::GatherAxpy gather_axpy;
+        Tiny::Vector<DataType, fe_dim> loc_v;
+        FaceValueType loc_face_val;
+
+      public:
+        explicit Task(FaceValueTraceAssemblyJob& job) :
+          BaseClass(job.space),
+          face_vector(job.face_vector),
+          vector(job.vector),
+          cubature_rule(Cubature::ctor_factory, job.cubature_factory),
+          local_vector(),
+          gather_axpy(vector),
+          loc_v(),
+          loc_face_val()
+        {
+        }
+
+        /// \brief Performs the local assembly.
+        void assemble()
+        {
+          // format local vector
+          local_vector.format();
+
+          // gather local vector data
+          gather_axpy(local_vector, this->dof_mapping);
+
+          // fetch number of local dofs
+          const int num_loc_dofs = this->space_eval.get_num_local_dofs();
+          loc_face_val = FaceValueType(DataType(0));
+
+          // loop over all quadrature points and integrate
+          for(int k(0); k < cubature_rule.get_num_points(); ++k)
+          {
+            // prepare point
+            this->prepare_point(cubature_rule.get_point(k));
+
+            loc_v.format();
+            // calculate local gradient
+            for(int l = 0; l < num_loc_dofs; ++l)
+            {
+              loc_v.axpy(this->space_data.phi[l].value, local_vector[l]);
+            }
+
+            // do the dirty work
+            Tiny::axpy(loc_face_val, loc_v, cubature_rule.get_weight(k)*this->trafo_facet_data.jac_det);
+          } // continue with next cubature point
+
+          // scatter our face value
+          face_vector(this->trafo_facet_eval.get_cell_index(), (DataType(1) / this->trafo_facet_eval.volume()) * loc_face_val);
+        }
+
+        /// \brief Scatters the local assembly.
+        void scatter()
+        {
+          // nothing to do here
+        }
+
+        /// \brief Finalizes the assembly.
+        void combine()
+        {
+        }
+      }; // class Task
+
+    protected:
+      FaceVector_& face_vector;
+      /// a reference to the vector that is to be integrated
+      const FEVector_& vector;
+      /// a reference to the finite element space to be used as test-/trial-space
+      const Space_& space;
+      /// the cubature factory to be used for integration
+      Cubature::DynamicFactory cubature_factory;
+
+    public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in] vector_
+       * A \resident reference to the coefficient vector of the discrete function.
+       *
+       * \param[in] space_
+       * A \resident reference to the finite element space used for the discretization
+       *
+       * \param[in] cubature_
+       * The name of the cubature rule to use for integration.
+       */
+      explicit FaceValueTraceAssemblyJob(FaceVector_& face_vec, const FEVector_& vector_, const Space_& space_, const String& cubature_):
+        face_vector(face_vec),
+        vector(vector_),
+        space(space_),
+        cubature_factory(cubature_)
+      {
+      }
+
+    }; // class FaceValueTraceAssemblyJob<...>
+
+    template<typename FaceVector_, typename FEVector_, typename Space_>
     class FaceGradientTraceAssemblyJob
     {
     public:
@@ -171,7 +308,7 @@ namespace FBMTest
             Tiny::axpy(loc_face_val, normal_grad, cubature_rule.get_weight(k)*this->trafo_facet_data.jac_det);
           } // continue with next cubature point
           // scatter our face value
-          face_vector(this->trafo_facet_eval.get_cell_index(), DataType(1) / this->trafo_facet_eval.volume() * loc_face_val);
+          face_vector(this->trafo_facet_eval.get_cell_index(), (DataType(1) / this->trafo_facet_eval.volume()) * loc_face_val);
         }
 
         /// \brief Scatters the local assembly.
@@ -217,6 +354,89 @@ namespace FBMTest
       }
 
     }; // class FaceGradientTraceAssemblyJob<...>
+
+    template<typename FaceVector_, typename Space_, typename FEVector_>
+    class FaceValueIntegratorJob
+    {
+    public:
+      typedef Space_ SpaceType;
+      typedef FEVector_ FEVector;
+      typedef FaceVector_ FaceVector;
+      /// the data-type of the vector
+      typedef typename FEVector_::DataType DataType;
+      /// the value-type of the vector
+      typedef typename FEVector_::ValueType ValueType;
+      typedef typename FaceVector_::ValueType FaceValueType;
+
+      static constexpr TrafoTags trafo_config_ = TrafoTags::img_point | TrafoTags::dom_point;
+      static constexpr SpaceTags space_config_ = SpaceTags::value;
+
+      /// our assembly traits
+      typedef Assembly::AsmTraits1<
+        DataType,
+        Space_,
+        trafo_config_,
+        space_config_
+      > AsmTraits;
+
+
+
+
+      class Task :
+        public FEAT::Assembly::FEVectorIntegratorTaskCRTP<Task, AsmTraits, Space_, FEVector_>
+      {
+      public:
+        typedef FEAT::Assembly::FEVectorIntegratorTaskCRTP<Task, AsmTraits, Space_, FEVector_> BaseClass;
+        typedef typename BaseClass::IndexType IndexType;
+        typedef typename BaseClass::DomainPointType DomainPointType;
+        static constexpr int dim = BaseClass::dim;
+        /// the vector that is to be assembled
+        FaceVector_& vector;
+        FaceValueType face_val;
+        /// the scatter scaling factor
+        DataType scatter_alpha;
+
+      public:
+        /**
+        * \brief Constructor
+        */
+        explicit Task(FaceValueIntegratorJob& job) :
+                BaseClass(job.space, job.primal_vec),
+                vector(job.face_vec),
+                face_val(),
+                scatter_alpha(job.scatter_alpha)
+        {
+        }
+
+        void _assemble()
+        {
+          face_val.format();
+
+          BaseClass::_assemble();
+
+          this->vector(this->_cur_surface_index, (DataType(1) / this->_face_volume) * face_val);
+        }
+
+        void _integrate(DataType weight, [[maybe_unused]] IndexType point_idx)
+        {
+          Tiny::axpy(face_val, this->loc_value_holder.value, weight * scatter_alpha);
+        }
+
+      }; // class Task
+
+      FaceVector_& face_vec;
+      const FEVector_& primal_vec;
+      const Space_& space;
+      DataType scatter_alpha;
+
+      explicit FaceValueIntegratorJob(FaceVector_& face_vec_, const FEVector_& primal_vec_, const Space_& space_, DataType scatter_alpha_ = DataType(1)) :
+        face_vec(face_vec_),
+        primal_vec(primal_vec_),
+        space(space_),
+        scatter_alpha(scatter_alpha_)
+      {
+      }
+    };
 
     template<typename FaceVector_, typename Space_, typename FEVector_>
     class FaceGradientIntegratorJob
@@ -277,7 +497,7 @@ namespace FBMTest
 
           BaseClass::_assemble();
 
-          this->vector(this->_cur_surface_index, DataType(1) / this->_face_volume * face_val);
+          this->vector(this->_cur_surface_index, (DataType(1) / this->_face_volume) * face_val);
         }
 
         void _integrate(DataType weight, [[maybe_unused]] IndexType point_idx)
@@ -301,6 +521,471 @@ namespace FBMTest
       {
       }
     };
+
+    template<typename FaceVector_, typename Space_, typename FEVector_, typename MaskSpace_, typename MaskVector_>
+    class FaceGradientFBMDeltaPeakIntegratorJob
+    {
+    public:
+      typedef Space_ SpaceType;
+      typedef MaskSpace_ MaskSpaceType;
+      typedef FEVector_ FEVector;
+      typedef FaceVector_ FaceVector;
+      typedef MaskVector_ MaskVector;
+      /// the data-type of the vector
+      typedef typename FEVector_::DataType DataType;
+      /// the value-type of the vector
+      typedef typename FEVector_::ValueType ValueType;
+      typedef typename FaceVector_::ValueType FaceValueType;
+
+      static constexpr TrafoTags trafo_config_ = TrafoTags::img_point | TrafoTags::dom_point | TrafoTags::jac_det | TrafoTags::jac_mat;
+      static constexpr SpaceTags space_config_ = SpaceTags::grad;
+      static constexpr SpaceTags mask_config_ = SpaceTags::ref_grad | SpaceTags::grad;
+
+      /// our assembly traits
+      typedef Assembly::AsmTraits1<
+        DataType,
+        Space_,
+        trafo_config_,
+        space_config_
+      > AsmTraits;
+
+      /// our assembly traits
+      typedef Assembly::AsmTraits1<
+        DataType,
+        MaskSpace_,
+        trafo_config_,
+        mask_config_
+      > MaskAsmTraits;
+
+
+
+      class Task :
+        public FEAT::Assembly::SurfaceIntegratorTaskBase<AsmTraits>
+      {
+      public:
+        typedef FEAT::Assembly::SurfaceIntegratorTaskBase<AsmTraits> BaseClass;
+        typedef typename BaseClass::IndexType IndexType;
+        typedef typename BaseClass::DomainPointType DomainPointType;
+        static constexpr int dim = BaseClass::dim;
+        typedef typename AsmTraits::DataType DataType;
+        typedef typename FEVector_::ValueType ValueType;
+        static constexpr int image_dim = FEAT::Assembly::Intern::ValueTypeHelper<ValueType>::dim;
+
+        /// the vector that is to be assembled
+        FaceVector_& vector;
+        const FEVector& fe_vector;
+        const MaskVector& mask_vector;
+
+        const Space_& space;
+        const MaskSpace_& mask_space;
+        typename AsmTraits::TrafoEvaluator trafo_eval;
+        /// the space evaluator
+        typename AsmTraits::SpaceEvaluator space_eval;
+        typename MaskAsmTraits::SpaceEvaluator mask_space_eval;
+        /// the space dof-mapping
+        typename AsmTraits::DofMapping dof_mapping;
+        typename MaskAsmTraits::DofMapping mask_dof_mapping;
+        /// the trafo evaluation data
+        typename AsmTraits::TrafoEvalData trafo_data;
+        /// the space evaluation data
+        typename AsmTraits::SpaceEvalData space_data;
+        typename MaskAsmTraits::SpaceEvalData mask_space_data;
+        /// the local vector to be gathered
+        typename AsmTraits::template TLocalVector<ValueType> local_vector;
+        typename MaskAsmTraits::template TLocalVector<typename MaskAsmTraits::DataType> local_mask_vector;
+        /// the gather object
+        typename FEVector_::GatherAxpy gather_axpy;
+        typename MaskVector_::GatherAxpy mask_gather_axpy;
+        /// local fe point/grad/hess values
+        FEAT::Assembly::Intern::LocalFEValueHolder<AsmTraits, DataType, dim, image_dim> loc_value_holder;
+        FEAT::Assembly::Intern::LocalFEValueHolder<AsmTraits, DataType, dim, 1> loc_mask_value_holder;
+
+        Cubature::Rule<typename AsmTraits::ShapeType> cubature_rule;
+
+        FaceValueType face_val;
+        FaceValueType loc_cell_val;
+        /// the scatter scaling factor
+        DataType scatter_alpha;
+
+      public:
+        /**
+        * \brief Constructor
+        */
+        explicit Task(FaceGradientFBMDeltaPeakIntegratorJob& job) :
+                BaseClass(job.space.get_trafo()),
+                vector(job.face_vec),
+                fe_vector(job.primal_vec),
+                mask_vector(job.mask_vec),
+                space(job.space),
+                mask_space(job.mask_space),
+                trafo_eval(this->_trafo),
+                space_eval(space),
+                mask_space_eval(mask_space),
+                dof_mapping(space),
+                mask_dof_mapping(mask_space),
+                gather_axpy(fe_vector),
+                mask_gather_axpy(mask_vector),
+                cubature_rule(Cubature::ctor_factory, job.cubature_factory),
+                face_val(),
+                loc_cell_val(),
+                scatter_alpha(job.scatter_alpha)
+        {
+        }
+
+
+        template<typename ValueHolder_, typename LocVecType_, typename SpaceEval_, typename SpaceData_>
+        void gather_point_values(ValueHolder_& val_holder_, const LocVecType_& loc_vec_, const SpaceEval_& space_eval_, const SpaceData_& space_data_)
+        {
+          const int num_loc_dofs = space_eval_.get_num_local_dofs();
+          if constexpr(ValueHolder_::has_value)
+          {
+            val_holder_.value = typename ValueHolder_::ValueType(0);
+            for(int i = 0; i < num_loc_dofs; ++i)
+            {
+              Tiny::axpy(val_holder_.value, loc_vec_[i], space_data_.phi[i].value);
+            }
+          }
+          if constexpr(ValueHolder_::has_grad)
+          {
+            val_holder_.grad.format();
+            for(int i = 0; i < num_loc_dofs; ++i)
+            {
+              if constexpr(ValueHolder_::image_dim == 1)
+                Tiny::axpy(val_holder_.grad, space_data_.phi[i].grad, loc_vec_[i]);
+              else
+                val_holder_.grad.add_outer_product(loc_vec_[i], space_data_.phi[i].grad);
+            }
+          }
+          if constexpr(ValueHolder_::has_hess)
+          {
+            XABORTM("Hessian not implemented yet");
+          }
+
+        }
+
+        template<typename ValueHolder_, typename LocVecType_, typename SpaceEval_, typename SpaceData_>
+        void gather_ref_point_values(ValueHolder_& val_holder_, const LocVecType_& loc_vec_, const SpaceEval_& space_eval_, const SpaceData_& space_data_)
+        {
+          const int num_loc_dofs = space_eval_.get_num_local_dofs();
+          if constexpr(ValueHolder_::has_value)
+          {
+            val_holder_.value = typename ValueHolder_::ValueType(0);
+            for(int i = 0; i < num_loc_dofs; ++i)
+            {
+              Tiny::axpy(val_holder_.value, loc_vec_[i], space_data_.phi[i].ref_value);
+            }
+          }
+          if constexpr(ValueHolder_::has_grad)
+          {
+            val_holder_.grad.format();
+            for(int i = 0; i < num_loc_dofs; ++i)
+            {
+              if constexpr(ValueHolder_::image_dim == 1)
+                Tiny::axpy(val_holder_.grad, space_data_.phi[i].ref_grad, loc_vec_[i]);
+              else
+                val_holder_.grad.add_outer_product(loc_vec_[i], space_data_.phi[i].ref_grad);
+            }
+          }
+          if constexpr(ValueHolder_::has_hess)
+          {
+            XABORTM("Hessian not implemented yet");
+          }
+
+        }
+
+        void _eval_point_cell_val(DataType point_weight)
+        {
+          Tiny::axpy(loc_cell_val, loc_value_holder.grad*this->_normal, point_weight);
+        }
+
+        void _integrate_local_cell()
+        {
+          loc_cell_val = FaceValueType(0);
+
+          const DataType cell_vol = trafo_eval.volume();
+
+          for(int pt = 0; pt < cubature_rule.get_num_points(); ++pt)
+          {
+            auto dom_point = cubature_rule.get_point(pt);
+            DataType weight = cubature_rule.get_weight(pt);
+            trafo_eval(trafo_data, dom_point);
+            space_eval(space_data, trafo_data);
+            mask_space_eval(mask_space_data, trafo_data);
+            // construct local fe values
+            gather_point_values(loc_value_holder, local_vector, space_eval, space_data);
+            gather_ref_point_values(loc_mask_value_holder, local_mask_vector, mask_space_eval, mask_space_data);
+
+            // construct our mask gradient norm, in normal direction, integrating our folding has to
+            // evaluate to one, which corresponds to one h term of the gradient
+            // but since we evaluate a point representing the whole integral, we have to correct for the volume
+            // of the d-1 manifold. Its easier to simply evaluate the reference gradient instead and divide by the volume
+            // of our d-dimensional cell
+            auto gradient_norm = DataType(2) * loc_mask_value_holder.grad.norm_euclid() / cell_vol;
+
+            this->_eval_point_cell_val(weight*gradient_norm*trafo_data.jac_det);
+
+          }
+        }
+
+        void _prepare_cell(IndexType cell)
+        {
+          dof_mapping.prepare(cell);
+          mask_dof_mapping.prepare(cell);
+          trafo_eval.prepare(cell);
+          space_eval.prepare(trafo_eval);
+          mask_space_eval.prepare(trafo_eval);
+          local_vector.format();
+          gather_axpy(local_vector, dof_mapping);
+          local_mask_vector.format();
+          mask_gather_axpy(local_mask_vector, mask_dof_mapping);
+          this->_integrate_local_cell();
+        }
+
+        void _assemble_cell(const std::vector<IndexType>& domain_point_idx)
+        {
+          for(auto pti : domain_point_idx)
+          {
+            Tiny::axpy(face_val, loc_cell_val, this->_point_weights[pti] / this->_face_volume);
+          }
+
+        }
+
+
+      public:
+        void assemble()
+        {
+          face_val = DataType(0);
+          for(IndexType k=0; k < this->_cell_helper.size(); ++k)
+          {
+            const auto& domain_point_idx = this->_cell_to_domain_point.at(k);
+            if(domain_point_idx.empty())
+              continue;
+
+            this->_prepare_cell(this->_cell_helper[k]);
+            this->_assemble_cell(domain_point_idx);
+          }
+          this->vector(this->_cur_surface_index, face_val*scatter_alpha);
+
+
+        }
+      }; // class Task
+
+      FaceVector_& face_vec;
+      const FEVector_& primal_vec;
+      const MaskVector& mask_vec;
+      const Space_& space;
+      const MaskSpace_& mask_space;
+      Cubature::DynamicFactory cubature_factory;
+      DataType scatter_alpha;
+
+      explicit FaceGradientFBMDeltaPeakIntegratorJob(FaceVector_& face_vec_, const FEVector_& primal_vec_, const MaskVector_& mask_vec_, const Space_& space_, const MaskSpace_& mask_space_, DataType scatter_alpha_ = DataType(1)) :
+        face_vec(face_vec_),
+        primal_vec(primal_vec_),
+        mask_vec(mask_vec_),
+        space(space_),
+        mask_space(mask_space_),
+        cubature_factory("gauss-legendre:3"),
+        scatter_alpha(scatter_alpha_)
+      {
+      }
+    };
+
+    template<typename FaceVector_, typename Space_, typename FEVector_>
+    class FaceGradientCellMeanIntegratorJob
+    {
+    public:
+      typedef Space_ SpaceType;
+      typedef FEVector_ FEVector;
+      typedef FaceVector_ FaceVector;
+      /// the data-type of the vector
+      typedef typename FEVector_::DataType DataType;
+      /// the value-type of the vector
+      typedef typename FEVector_::ValueType ValueType;
+      typedef typename FaceVector_::ValueType FaceValueType;
+
+      static constexpr TrafoTags trafo_config_ = TrafoTags::img_point | TrafoTags::dom_point | TrafoTags::jac_det | TrafoTags::jac_mat;
+      static constexpr SpaceTags space_config_ = SpaceTags::grad;
+
+      /// our assembly traits
+      typedef Assembly::AsmTraits1<
+        DataType,
+        Space_,
+        trafo_config_,
+        space_config_
+      > AsmTraits;
+
+      class Task :
+        public FEAT::Assembly::SurfaceIntegratorTaskBase<AsmTraits>
+      {
+      public:
+        typedef FEAT::Assembly::SurfaceIntegratorTaskBase<AsmTraits> BaseClass;
+        typedef typename BaseClass::IndexType IndexType;
+        typedef typename BaseClass::DomainPointType DomainPointType;
+        static constexpr int dim = BaseClass::dim;
+        typedef typename AsmTraits::DataType DataType;
+        typedef typename FEVector_::ValueType ValueType;
+        static constexpr int image_dim = FEAT::Assembly::Intern::ValueTypeHelper<ValueType>::dim;
+
+        /// the vector that is to be assembled
+        FaceVector_& vector;
+        const FEVector& fe_vector;
+
+        const Space_& space;
+        typename AsmTraits::TrafoEvaluator trafo_eval;
+        /// the space evaluator
+        typename AsmTraits::SpaceEvaluator space_eval;
+        /// the space dof-mapping
+        typename AsmTraits::DofMapping dof_mapping;
+        /// the trafo evaluation data
+        typename AsmTraits::TrafoEvalData trafo_data;
+        /// the space evaluation data
+        typename AsmTraits::SpaceEvalData space_data;
+        /// the local vector to be gathered
+        typename AsmTraits::template TLocalVector<ValueType> local_vector;
+        /// the gather object
+        typename FEVector_::GatherAxpy gather_axpy;
+        /// local fe point/grad/hess values
+        FEAT::Assembly::Intern::LocalFEValueHolder<AsmTraits, DataType, dim, image_dim> loc_value_holder;
+
+        Cubature::Rule<typename AsmTraits::ShapeType> cubature_rule;
+
+        FaceValueType face_val;
+        FaceValueType loc_cell_val;
+        /// the scatter scaling factor
+        DataType scatter_alpha;
+
+      public:
+        /**
+        * \brief Constructor
+        */
+        explicit Task(FaceGradientCellMeanIntegratorJob& job) :
+                BaseClass(job.space.get_trafo()),
+                vector(job.face_vec),
+                fe_vector(job.primal_vec),
+                space(job.space),
+                trafo_eval(this->_trafo),
+                space_eval(space),
+                dof_mapping(space),
+                gather_axpy(fe_vector),
+                cubature_rule(Cubature::ctor_factory, job.cubature_factory),
+                face_val(),
+                loc_cell_val(),
+                scatter_alpha(job.scatter_alpha)
+        {
+        }
+
+
+        template<typename ValueHolder_, typename LocVecType_, typename SpaceEval_, typename SpaceData_>
+        void gather_point_values(ValueHolder_& val_holder_, const LocVecType_& loc_vec_, const SpaceEval_& space_eval_, const SpaceData_& space_data_)
+        {
+          const int num_loc_dofs = space_eval_.get_num_local_dofs();
+          if constexpr(ValueHolder_::has_value)
+          {
+            val_holder_.value = typename ValueHolder_::ValueType(0);
+            for(int i = 0; i < num_loc_dofs; ++i)
+            {
+              Tiny::axpy(val_holder_.value, loc_vec_[i], space_data_.phi[i].value);
+            }
+          }
+          if constexpr(ValueHolder_::has_grad)
+          {
+            val_holder_.grad.format();
+            for(int i = 0; i < num_loc_dofs; ++i)
+            {
+              if constexpr(ValueHolder_::image_dim == 1)
+                Tiny::axpy(val_holder_.grad, space_data_.phi[i].grad, loc_vec_[i]);
+              else
+                val_holder_.grad.add_outer_product(loc_vec_[i], space_data_.phi[i].grad);
+            }
+          }
+          if constexpr(ValueHolder_::has_hess)
+          {
+            XABORTM("Hessian not implemented yet");
+          }
+
+        }
+
+        void _eval_point_cell_val(DataType point_weight)
+        {
+          Tiny::axpy(loc_cell_val, loc_value_holder.grad*this->_normal, point_weight);
+        }
+
+        void _integrate_local_cell()
+        {
+          loc_cell_val = FaceValueType(0);
+
+          const DataType cell_vol = trafo_eval.volume();
+
+          //integrate value over cell
+          for(int pt = 0; pt < cubature_rule.get_num_points(); ++pt)
+          {
+            auto dom_point = cubature_rule.get_point(pt);
+            DataType weight = cubature_rule.get_weight(pt);
+            trafo_eval(trafo_data, dom_point);
+            space_eval(space_data, trafo_data);
+            // construct local fe values
+            gather_point_values(loc_value_holder, local_vector, space_eval, space_data);
+
+            this->_eval_point_cell_val(weight*trafo_data.jac_det);
+          }
+          // calculate cell mean value
+          loc_cell_val *= DataType(1) / cell_vol;
+        }
+
+        void _prepare_cell(IndexType cell)
+        {
+          dof_mapping.prepare(cell);
+          trafo_eval.prepare(cell);
+          space_eval.prepare(trafo_eval);
+          local_vector.format();
+          gather_axpy(local_vector, dof_mapping);
+          this->_integrate_local_cell();
+        }
+
+        void _assemble_cell(const std::vector<IndexType>& domain_point_idx)
+        {
+          for(auto pti : domain_point_idx)
+          {
+            Tiny::axpy(face_val, loc_cell_val, this->_point_weights[pti] / this->_face_volume);
+          }
+
+        }
+
+
+      public:
+        void assemble()
+        {
+          face_val = DataType(0);
+          for(IndexType k=0; k < this->_cell_helper.size(); ++k)
+          {
+            const auto& domain_point_idx = this->_cell_to_domain_point.at(k);
+            if(domain_point_idx.empty())
+              continue;
+
+            this->_prepare_cell(this->_cell_helper[k]);
+            this->_assemble_cell(domain_point_idx);
+          }
+          this->vector(this->_cur_surface_index, face_val*scatter_alpha);
+
+
+        }
+      }; // class Task
+
+      FaceVector_& face_vec;
+      const FEVector_& primal_vec;
+      const Space_& space;
+      Cubature::DynamicFactory cubature_factory;
+      DataType scatter_alpha;
+
+      explicit FaceGradientCellMeanIntegratorJob(FaceVector_& face_vec_, const FEVector_& primal_vec_, const Space_& space_, DataType scatter_alpha_ = DataType(1)) :
+        face_vec(face_vec_),
+        primal_vec(primal_vec_),
+        space(space_),
+        cubature_factory("gauss-legendre:3"),
+        scatter_alpha(scatter_alpha_)
+      {
+      }
+    };
   }
 
   /// define application dimension
@@ -311,10 +996,10 @@ namespace FBMTest
   static_assert((dim == 2) || (dim == 3), "invalid dimension");
 
   /// output padding length
-  static constexpr std::size_t pad_len = 30u;
+  // static constexpr std::size_t pad_len = 30u;
 
   /// output padding character
-  static constexpr char pad_char = '.';
+  // static constexpr char pad_char = '.';
 
   /// helper function to parse arguments
   template<typename T_>
@@ -352,12 +1037,12 @@ namespace FBMTest
 #ifdef FEAT_CCND_APP_QUADMATH
 #  define Q_(x) (x##Q)
   typedef __float128 DataType;
-  static constexpr int fp_num_digs = 35;
-  static const char* fp_typename = "quadruple";
+  // static constexpr int fp_num_digs = 35;
+  // static const char* fp_typename = "quadruple";
 #else
 #  define Q_(x) x
   typedef double DataType;
-  static constexpr int fp_num_digs = 15;
+  // static constexpr int fp_num_digs = 15;
   // static const char* fp_typename = "double";
 #endif
 
@@ -382,10 +1067,10 @@ namespace FBMTest
 
   // define our trafo type: standard or isoparametric
 #ifdef FEAT_APP_ISOPARAM
-  static constexpr bool isoparam = true;
+  // static constexpr bool isoparam = true;
   typedef Trafo::Isoparam::Mapping<MeshType, 2> TrafoType;
 #else
-  static constexpr bool isoparam = false;
+  // static constexpr bool isoparam = false;
   typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 #endif
 
@@ -579,6 +1264,48 @@ namespace FBMTest
     }
   }
 
+  enum surface_integration_type : std::uint8_t
+  {
+    point_values = 0,
+    delta_peak = 1,
+    cell_mean = 2,
+    unkown = 3
+  };
+
+  static inline surface_integration_type parse_integration_type(const FEAT::String& type_string)
+  {
+    if((type_string.compare_no_case("point") == 0) || (type_string.compare_no_case("point_value") == 0) || (type_string.compare_no_case("point-value") == 0))
+    {
+      return surface_integration_type::point_values;
+    }
+    else if((type_string.compare_no_case("delta") == 0) || (type_string.compare_no_case("peak") == 0) || (type_string.compare_no_case("delta-peak") == 0)|| (type_string.compare_no_case("delta_peak") == 0))
+    {
+      return surface_integration_type::delta_peak;
+    }
+    else if((type_string.compare_no_case("cell") == 0) || (type_string.compare_no_case("mean") == 0) || (type_string.compare_no_case("cell-mean") == 0)|| (type_string.compare_no_case("cell_mean") == 0))
+    {
+      return surface_integration_type::cell_mean;
+    }
+
+    return unkown;
+  }
+
+  static inline FEAT::String print_integration_type(surface_integration_type type)
+  {
+    switch (type)
+    {
+      case point_values:
+        return FEAT::String("Point Values");
+      case delta_peak:
+        return FEAT::String("Delta Peak");
+      case cell_mean:
+        return FEAT::String("Cell Mean");
+      case unkown:
+        return FEAT::String("unkown");
+    }
+
+    return FEAT::String();
+  }
 
   void run_fbm(Dist::Comm& comm, SimpleArgParser& args, Gendie::Logger& logger)
   {
@@ -589,17 +1316,33 @@ namespace FBMTest
     args.support("v-max");
     args.support("vtk");
     args.support("use-q2-fbm");
-    String cubature_face_int = "gauss-legendre:3";
     args.support("face-cub-deg");
+    args.support("summed-cub");
     args.support("use-external-fbm-chart");
     args.support("use-fbm-function", "Use an analyic chart for the circle (not recommended)");
+    args.support("calc-face-values", "Instead of normal gradients, integrate the actual values of our FE function (which analytical should be zero)");
+    args.support("integrator-type", "Integrate surface by integrating either point-value; delta-peak; cell-mean");
+    args.support("fbm-chart", "Which chart to use for our fbm assembly");
+    args.support("ref-shape-type", "The shape type of the reference face integrals (not used for now)");
+
+    bool face_values = args.check("calc-face-values") >= 0;
+    surface_integration_type integrator_type = surface_integration_type::point_values;
+    String cubature_face_int = "gauss-legendre:3";
+    if(args.check("integrator-type") > 0)
+    {
+      integrator_type = parse_integration_type(args.query("integrator-type")->second.front());
+    }
     String external_fbm_chart_file;
     if(args.check("use-external-fbm-chart") > 0)
     {
       external_fbm_chart_file = args.query("use-external-fbm-chart")->second.front();
     }
+    if(args.check("summed-cub")>0)
+      cubature_face_int = "refine*" + args.query("summed-cub")->second.front() + ":";
     if(args.check("face-cub-deg")>0)
-      cubature_face_int = "gauss-legendre:" + args.query("face-cub-deg")->second.front();
+      cubature_face_int = cubature_face_int + "gauss-legendre:" + args.query("face-cub-deg")->second.front();
+    else
+      cubature_face_int += "gauss-legendre:3";
     nu = args.parse_default("nu", 0.001);
     navier = !args.parse_default("stokes", false);
     beta = navier ? DataType(1) : DataType(0);
@@ -609,6 +1352,8 @@ namespace FBMTest
     logger.print("Running with v-max: " + stringify(vmax), Gendie::info);
     logger.print("Running with nu: " + stringify(nu), Gendie::info);
     logger.print("Running navier: " + stringify(navier), Gendie::info);
+    logger.print("Calc face values: " + String(face_values ? "Yes" : "No"), Gendie::info);
+    logger.print("Surface Integrator Type: " + print_integration_type(integrator_type), Gendie::info);
     logger.print("Using q2 FBM: " + String(use_q2_fbm ? "Yes" : "No") , Gendie::info);
     logger.print("Setting up domain", Gendie::info);
     PartitionControl<FBMDomainLevel> domain(comm, true);
@@ -624,8 +1369,6 @@ namespace FBMTest
 
     read_mesh_file(domain, comm, args, logger);
 
-    // for now, we only support fbm charts
-    args.support("fbm-chart", "Which chart to use for our fbm assembly");
     String fbm_chart_name = "fbm";
     if(args.check("fbm-chart") >= 0)
     {
@@ -675,7 +1418,7 @@ namespace FBMTest
         }
         XASSERTM(fbm_chart, "Could not find fbm chart with the name "+ fbm_chart_name);
 
-        cur_dom.get_mesh_node()->add_mesh_part(fbm_meshpart_name, FEAT::Geometry::make_unique_meshpart_by_chart_hit_test(*cur_dom.get_mesh_node()->get_mesh(), *fbm_chart, true));
+        cur_dom.get_mesh_node()->add_mesh_part(fbm_meshpart_name, FEAT::Geometry::make_unique_meshpart_by_chart_hit_test(*cur_dom.get_mesh_node()->get_mesh(), *fbm_chart, true, DataType(1E-5)));
       }
 
       cur_dom.create_fbm_assembler(domain.at(i).layer().comm(), fbm_meshpart_name);
@@ -796,7 +1539,6 @@ namespace FBMTest
 
     LAFEM::DenseVectorBlocked<DataType, IndexType, dim> verts(FEAT::LAFEM::FileMode::fm_binary, stream_in);
 
-    args.support("ref-shape-type", "The shape type of the reference face integrals");
 
     LAFEM::DenseVectorBlocked<DataType, IndexType, dim> face_val;
 
@@ -814,17 +1556,66 @@ namespace FBMTest
         }
         surf_integrator.add_face_vertices(face_verts);
       }
+      surf_integrator.set_mask_vector(domain.front()->fbm_assembler->get_fbm_mask_vector(dim));
 
       surf_integrator.compile();
 
       face_val = LAFEM::DenseVectorBlocked<DataType, IndexType, dim>(verts.size()/num_verts);
       face_val.format();
 
-      Intern::FaceGradientIntegratorJob int_job(face_val, sol_vec.local().template at<0>(), domain.front()->space_velo);
+      if(face_values)
+      {
+        Intern::FaceValueIntegratorJob int_job(face_val, sol_vec.local().template at<0>(), domain.front()->space_velo);
 
-      surf_integrator.assemble(int_job);
+        surf_integrator.assemble(int_job);
 
+      }
+      else
+      {
+        switch (integrator_type)
+        {
+          case point_values:
+          {
+            Intern::FaceGradientIntegratorJob int_job(face_val, sol_vec.local().template at<0>(), domain.front()->space_velo);
 
+            surf_integrator.assemble(int_job);
+            break;
+          }
+          case delta_peak:
+          {
+            FEAT::Space::Lagrange1::Element<TrafoType> mask_space(domain.front()->trafo);
+            // for now, use lagrange2 -> lagrange1 ordering to construct our mask vector
+            LAFEM::DenseVector<DataType, IndexType> mask_vector(domain.front()->space_velo.get_num_dofs());
+            mask_vector.format();
+            {
+              const auto& loc_fbm_filter_vec = system.front()->get_local_velo_unit_filter_seq().find_or_add("fbm").get_filter_vector();
+              const auto& index_array = loc_fbm_filter_vec.indices();
+              auto* mask_elem = mask_vector.elements();
+              for(Index k = 0; k < loc_fbm_filter_vec.used_elements(); ++k)
+              {
+                mask_elem[index_array[k]] = DataType(1);
+              }
+            }
+            Intern::FaceGradientFBMDeltaPeakIntegratorJob int_job( face_val, sol_vec.local().template at<0>(), mask_vector, domain.front()->space_velo, mask_space);
+            int_job.scatter_alpha = DataType(1);
+
+            surf_integrator.assemble(int_job);
+            break;
+          }
+          case cell_mean:
+          {
+            Intern::FaceGradientCellMeanIntegratorJob int_job(face_val, sol_vec.local().template at<0>(), domain.front()->space_velo);
+
+            surf_integrator.assemble(int_job);
+            break;
+          }
+          default:
+          {
+            XABORTM("Unkown Integrator Case");
+            break;
+          }
+        }
+      }
     }
 
     LAFEM::DenseVectorBlocked<DataType, IndexType, dim> all_face_val(comm.rank()==0 ? face_val.size() : 0);
@@ -872,9 +1663,12 @@ namespace FBMTest
     navier = !args.parse_default("stokes", false);
     beta = navier ? DataType(1) : DataType(0);
     DataType vmax =args.parse_default("v-max", 0.3);
+    args.support("calc-face-values", "Instead of normal gradients, integrate the actual values of our FE function (which are zero due to boundary conditions)");
+    bool face_values = args.check("calc-face-values") >= 0;
     logger.print("Running with v-max: " + stringify(vmax), Gendie::info);
     logger.print("Running with nu: " + stringify(nu), Gendie::info);
     logger.print("Running navier: " + stringify(navier), Gendie::info);
+    logger.print("Calc face values: " + String(face_values ? "Yes" : "No"), Gendie::info);
     logger.print("Setting up domain", Gendie::info);
 
     args.support("vtk");
@@ -1010,7 +1804,7 @@ namespace FBMTest
         const auto& loc_face_set = face_to_vert[cur_face];
         for(Index l = 0; l < Index(face_to_vert.get_num_indices()); ++l)
         {
-          part_vertices(k*Index(face_to_vert.get_num_indices()) + l, vertex_set[loc_face_set[l]]);
+          part_vertices(k*Index(face_to_vert.get_num_indices()) + l, vertex_set[loc_face_set[int(l)]]);
         }
       }
 
@@ -1023,8 +1817,17 @@ namespace FBMTest
       FEAT::LAFEM::DenseVectorBlocked<DataType, IndexType, dim> vec_face_whole_mesh(domain.front()->get_mesh().get_num_entities(dim-1));
       vec_face_whole_mesh.format();
 
-      Intern::FaceGradientTraceAssemblyJob trace_asm_job(vec_face_whole_mesh, sol_vec.local().template at<0>(), domain.front()->space_velo, cubature_matrix_a);
-      trace_asm.assemble(trace_asm_job);
+      if(face_values)
+      {
+        Intern::FaceValueTraceAssemblyJob trace_asm_job(vec_face_whole_mesh, sol_vec.local().template at<0>(), domain.front()->space_velo, cubature_matrix_a);
+        trace_asm.assemble(trace_asm_job);
+
+      }
+      else
+      {
+        Intern::FaceGradientTraceAssemblyJob trace_asm_job(vec_face_whole_mesh, sol_vec.local().template at<0>(), domain.front()->space_velo, cubature_matrix_a);
+        trace_asm.assemble(trace_asm_job);
+      }
 
       vec_face = LAFEM::DenseVectorBlocked<DataType, IndexType, dim>(target_set.get_num_entities());
       vec_face.format();
@@ -1084,7 +1887,7 @@ namespace FBMTest
         {
           if(num_faces_per_rank[k] > 0)
           {
-            requests.push_back(comm.irecv(recv_buffer.at(k).data(), num_faces_per_rank[k]*dim*(1+face_to_vert.get_num_indices()), k));
+            requests.push_back(comm.irecv(recv_buffer.at(k).data(), num_faces_per_rank[k]*dim*(1+face_to_vert.get_num_indices()), int(k)));
           }
         }
 
