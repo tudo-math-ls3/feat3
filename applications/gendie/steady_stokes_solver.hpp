@@ -358,6 +358,7 @@ namespace Gendie
     {
       return this->watch_total.elapsed();
     }
+
   }; // class SteadyFlowSolverBaseCRTP<...>
 
   template<typename SystemMatrix_, typename SystemTransfer_, typename SystemFilter_>
@@ -430,6 +431,7 @@ namespace Gendie
     DataType smoother_damp;
     DataType mg_tol_rel;
     DataType coarse_tol_rel;
+    DataType coarse_defect_rel;
     FEAT::Index smooth_gmres_dim;
     FEAT::Index solve_gmres_dim;
     FEAT::Index smooth_steps;
@@ -437,6 +439,7 @@ namespace Gendie
     FEAT::Index min_iter;
     FEAT::Index max_iter;
     FEAT::Index min_stag_iter;
+    FEAT::Index coarse_gmres_dim;
     FEAT::PreferredBackend solver_backend;
     FEAT::Solver::MultiGridCycle cycle;
     mutable FEAT::StopWatch watch_mg_hirarch;
@@ -459,10 +462,12 @@ namespace Gendie
       success &= prop->parse_entry("solve-gmres", solve_gmres_dim);
       success &= prop->parse_entry("smooth-steps", smooth_steps);
       success &= prop->parse_entry("smooth-damp", smoother_damp);
-      success &= prop->parse_entry("coarse-tol", coarse_tol_rel);
       success &= prop->parse_entry("coarse-max-iter", coarse_max_steps);
+      success &= prop->parse_entry("coarse-tol-rel", coarse_tol_rel);
+      success &= prop->parse_entry("coarse-gmres-dim", coarse_gmres_dim);
+      success &= prop->parse_entry("coarse-defect-rel", coarse_defect_rel);
       solver_backend = Gendie::parse_backend(prop->query("backend", "generic"));
-      coarse_gmres |=  Gendie::check_for_config_option(prop->query("coarse-gmres"));
+      coarse_gmres |=  Gendie::check_for_config_option(prop->query("coarse-gmres"), true);
       coarse_frosch |=  Gendie::check_for_config_option(prop->query("coarse-frosch"));
       coarse_solver_info |=  Gendie::check_for_config_option(prop->query("coarse-info"));
 
@@ -880,9 +885,9 @@ namespace Gendie
           this->vanka_solver.front()->set_skip_singular(true);
           auto schwarz = FEAT::Solver::new_schwarz_precond(this->vanka_solver.front(), filter_sys);
           if(solve_gmres_dim > FEAT::Index(0)) // todo: is this smart?
-            this->base_solver = this->iter_solver = FEAT::Solver::new_fgmres(matrix_sys, filter_sys, solve_gmres_dim, DataType(0.4), schwarz);
+            this->base_solver = this->iter_solver = FEAT::Solver::new_fgmres(matrix_sys, filter_sys, solve_gmres_dim, coarse_defect_rel, schwarz);
           else
-            this->base_solver = this->iter_solver = FEAT::Solver::new_fgmres(matrix_sys, filter_sys, 16, DataType(0.4), schwarz);
+            this->base_solver = this->iter_solver = FEAT::Solver::new_fgmres(matrix_sys, filter_sys, 16, coarse_defect_rel, schwarz);
 
           // configure solver
           this->iter_solver->set_plot_name("FGMRES-AmaVanka");
@@ -996,7 +1001,7 @@ namespace Gendie
           auto schwarz = FEAT::Solver::new_schwarz_precond(vanka, lvl.filter_sys);
           schwarz->set_ignore_status(true);
           //auto coarse_solver = FEAT::Solver::new_bicgstab(lvl.matrix_sys, lvl.filter_sys, schwarz);
-          auto coarse_solver_t = FEAT::Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, 16, 0.0, schwarz);
+          auto coarse_solver_t = FEAT::Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, coarse_gmres_dim, coarse_defect_rel, schwarz);
           coarse_solver_t->set_max_iter(coarse_max_steps);
           coarse_solver_t->set_tol_rel(coarse_tol_rel);
           coarse_solver_t->set_plot_mode(coarse_solver_info ? FEAT::Solver::PlotMode::summary : FEAT::Solver::PlotMode::none);
@@ -1155,13 +1160,15 @@ namespace Gendie
         smoother_damp(DataType(0.5)),
         mg_tol_rel(DataType(0)),
         coarse_tol_rel(DataType(1E-3)),
+        coarse_defect_rel(DataType(0.8)),
         smooth_gmres_dim(0u),
         solve_gmres_dim(4u),
         smooth_steps(12u),
-        coarse_max_steps(500u),
+        coarse_max_steps(3000u),
         min_iter(1u),
         max_iter(50u),
         min_stag_iter(3u),
+        coarse_gmres_dim(200u),
         solver_backend(FEAT::PreferredBackend::generic),
         cycle(FEAT::Solver::MultiGridCycle::V),
         coarse_frosch(false),
@@ -1213,13 +1220,15 @@ namespace Gendie
         smoother_damp(DataType(0.5)),
         mg_tol_rel(DataType(0)),
         coarse_tol_rel(DataType(1E-3)),
+        coarse_defect_rel(DataType(0.8)),
         smooth_gmres_dim(0u),
         solve_gmres_dim(4u),
         smooth_steps(12u),
-        coarse_max_steps(500u),
+        coarse_max_steps(3000u),
         min_iter(1u),
         max_iter(50u),
         min_stag_iter(3u),
+        coarse_gmres_dim(200u),
         solver_backend(FEAT::PreferredBackend::generic),
         cycle(FEAT::Solver::MultiGridCycle::V),
         coarse_frosch(false),
