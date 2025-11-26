@@ -264,16 +264,23 @@ namespace FEAT
         /// \copydoc ChartBase:transform()
         virtual void transform(const WorldPoint& origin, const WorldPoint& angles, const WorldPoint& offset) override
         {
-          // create rotation matrix
-          Tiny::Matrix<DataType, 2, 2> rot;
-          rot.set_rotation_2d(angles(0));
-
-          // transform all world points
-          WorldPoint tmp;
-          for(auto& pt : _world)
+          if constexpr(Mesh_::shape_dim == 2)
           {
-            tmp = pt - origin;
-            pt.set_mat_vec_mult(rot, tmp) += offset;
+            // create rotation matrix
+            Tiny::Matrix<DataType, 2, 2> rot;
+            rot.set_rotation_2d(angles(0));
+
+            // transform all world points
+            WorldPoint tmp;
+            for(auto& pt : _world)
+            {
+              tmp = pt - origin;
+              pt.set_mat_vec_mult(rot, tmp) += offset;
+            }
+          }
+          else
+          {
+            XABORTM("Trying to call Bezier Chart routines for a 3d mesh");
           }
         }
 
