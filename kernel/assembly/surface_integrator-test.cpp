@@ -97,13 +97,13 @@ public:
     Assembly::Interpolator::project(primal_vec, simple_lambda, space);
 
     std::vector<std::array<DataType, dim>> vtx{
-      {0.1, 0.1, 0.1},
-      {0.2, 0.18, 0.1},
-      {0.15, 0.34, 0.2},
-      {0.3, 0.56, 0.15}
+      {DataType(0.1), DataType(0.1), DataType(0.1)},
+      {DataType(0.2), DataType(0.18), DataType(0.1)},
+      {DataType(0.15), DataType(0.34), DataType(0.2)},
+      {DataType(0.3), DataType(0.56), DataType(0.15)}
     };
     std::vector<std::array<IndexType, 3>> indx{
-      {0, 1, 2}, {1, 3, 2}
+      {IndexType(0), IndexType(1), IndexType(2)}, {IndexType(1), IndexType(3), IndexType(2)}
     };
 
     const String cubature_string = "auto-degree:3";
