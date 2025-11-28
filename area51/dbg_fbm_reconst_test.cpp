@@ -1907,7 +1907,11 @@ namespace FBMTest
 
         for(std::size_t idx(0u); requests.wait_any(idx); )
         {
+          #ifdef FEAT_HAVE_MPI
           Index rcomm_rank = Index(requests.get_status(idx).source());
+          #else
+          Index rcomm_rank = Index(0);
+          #endif
           Index cur_offset = num_faces_offsets[rcomm_rank]*dim;
           for(Index k = 0; k < num_faces_per_rank.at(rcomm_rank)*dim; ++k)
           {
