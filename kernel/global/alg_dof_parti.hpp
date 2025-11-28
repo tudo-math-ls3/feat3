@@ -880,7 +880,7 @@ namespace FEAT
         const IndexType* idx = mirror.indices();
         DataType* buf = buffer.elements();
         for(Index i = 0u; i < n; ++i)
-          buf[i] = DT2_(vector[idx[i]]);
+          buf[i] = DataType(vector[idx[i]]);
         return n;
       }
     }; // class AlgDofParti<...>
