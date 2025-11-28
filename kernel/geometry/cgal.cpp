@@ -70,6 +70,7 @@ namespace FEAT::Geometry
     typedef DT_ CGALDT_;
     typedef typename CGAL::Simple_cartesian<DT_> K;
     typedef typename K::Point_3 Point_;
+    typedef typename K::Vector_3 Vector_;
     typedef typename K::Segment_3 Segment_;
     typedef typename CGAL::Surface_mesh<Point_> Polyhedron_;
     typedef typename CGAL::AABB_face_graph_triangle_primitive<Polyhedron_> Primitive_;
@@ -137,6 +138,7 @@ namespace FEAT::Geometry
     typedef double CGALDT_;
     typedef typename CGAL::Simple_cartesian<double> K;
     typedef typename K::Point_3 Point_;
+    typedef typename K::Vector_3 Vector_;
     typedef typename K::Segment_3 Segment_;
     typedef typename CGAL::Surface_mesh<Point_> Polyhedron_;
     typedef typename CGAL::AABB_face_graph_triangle_primitive<Polyhedron_> Primitive_;
@@ -355,6 +357,17 @@ namespace FEAT::Geometry
   }
 
   template<typename DT_>
+  std::vector<typename CGALWrapper<DT_>::PointType> CGALWrapper<DT_>::points() const
+  {
+    std::vector<PointType> result(get_num_entities(0));
+    for(std::uint32_t i(0); i < result.size(); i++)
+    {
+      result[i] = point(i);
+    }
+    return result;
+  }
+
+  template<typename DT_>
   void CGALWrapper<DT_>::_parse_mesh(std::istream & file, CGALFileMode file_mode)
   {
     delete (CGALWrapperData<DT_>*)_cgal_data;
@@ -525,6 +538,100 @@ namespace FEAT::Geometry
   }
 
   template<typename DT_>
+  void CGALWrapper<DT_>::displace_vertices(const std::vector<PointType>& offsets)
+  {
+    using Point = typename CGALTypeWrapper<DT_>::Point_;
+    using Vector = typename CGALTypeWrapper<DT_>::Vector_;
+
+    ASSERT(get_num_vertices() == offset.size());
+
+    auto* cd = static_cast<CGALWrapperData<DT_>*>(_cgal_data);
+
+    _delete_tree();
+    int i(0);
+    for(auto vertex_idx : cd->_polyhedron->vertices())
+    {
+      Point& vertex = cd->_polyhedron->point(vertex_idx);
+      const auto& offset = offsets[i++];
+      vertex += Vector(offset[0], offset[1], offset[2]);
+    }
+    _init_wrapper();
+  }
+
+  template<typename DT_>
+  Index CGALWrapper<DT_>::get_num_vertices() const
+  {
+    auto* cd = static_cast<CGALWrapperData<DT_>*>(_cgal_data);
+    return cd->_polyhedron->number_of_vertices();
+  }
+
+  template<typename DT_>
+  Index CGALWrapper<DT_>::get_num_entities(int dim) const
+  {
+    ASSERT(0<= dim && dim <= 2);
+
+    auto* cd = static_cast<CGALWrapperData<DT_>*>(_cgal_data);
+    switch(dim)
+    {
+      case 0: return cd->_polyhedron->number_of_vertices();
+      case 1: return cd->_polyhedron->number_of_edges();
+      case 2: return cd->_polyhedron->number_of_faces();
+      default: XABORTM("Unsupported dimension!");
+    }
+
+    return 0;
+  }
+
+  template<typename DT_>
+  Index CGALVerticesAroundFaceAdjactor<DT_>::get_num_nodes_domain() const
+  {
+    return Index(_wrapper->get_num_entities(2));
+  }
+
+  template<typename DT_>
+  Index CGALVerticesAroundFaceAdjactor<DT_>::get_num_nodes_image() const
+  {
+    return Index(_wrapper->get_num_entities(0));
+  }
+
+  template<typename DT_>
+  CGALValueIteratorWrapper<Index> CGALVerticesAroundFaceAdjactor<DT_>::image_begin(Index face) const
+  {
+    using PolyhedronType = typename CGALTypeWrapper<DT_>::Polyhedron_;
+    using FaceIndex = typename PolyhedronType::Face_index;
+
+    ASSERT(face < _wrapper->get_num_entities(2));
+
+    auto* cd = static_cast<CGALWrapperData<DT_>*>(_wrapper->_cgal_data);
+
+    auto range = cd->_polyhedron->vertices_around_face(cd->_polyhedron->halfedge(FaceIndex(face)));
+    return CGALValueIteratorWrapper<Index>([it = range.begin(), end = range.end()]() mutable {
+      if(it != end)
+      {
+        auto val = *it;
+        it++;
+        return std::optional<Index>(val);
+      }
+      else
+      {
+        return std::optional<Index>{};
+      }
+    });
+  }
+
+  template<typename DT_>
+  CGALValueIteratorWrapper<Index> CGALVerticesAroundFaceAdjactor<DT_>::image_end(Index /*face*/) const
+  {
+    return CGALValueIteratorWrapper<Index>([]() { return std::nullopt; });
+  }
+
+  template<typename DT_>
+  CGALVerticesAroundFaceAdjactor<DT_> CGALWrapper<DT_>::vertices_around_face() const
+  {
+    return CGALVerticesAroundFaceAdjactor<DT_>(this);
+  }
+
+  template<typename DT_>
   std::size_t CGALWrapper<DT_>::bytes() const
   {
     auto* cd = static_cast<CGALWrapperData<DT_>*>(_cgal_data);
@@ -620,12 +727,19 @@ namespace FEAT::Geometry
 // explicitly instantiate templates for all sensible datatype
 
 template class FEAT::Geometry::CGALWrapper<double>;
+template class FEAT::Geometry::CGALVerticesAroundFaceAdjactor<double>;
+
 template class FEAT::Geometry::CGALWrapper<float>;
+template class FEAT::Geometry::CGALVerticesAroundFaceAdjactor<float>;
+
 #ifdef FEAT_HAVE_HALFMATH
 template class FEAT::Geometry::CGALWrapper<Half>;
+template class FEAT::Geometry::CGALVerticesAroundFaceAdjactor<Half>;
 #endif
+
 #ifdef FEAT_HAVE_QUADMATH
 template class FEAT::Geometry::CGALWrapper<__float128>;
+template class FEAT::Geometry::CGALVerticesAroundFaceAdjactor<__float128>;
 #endif
 
 #elif !defined(DOXYGEN)

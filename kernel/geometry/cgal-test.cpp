@@ -127,6 +127,10 @@ public:
     test_intersect_lines();
     test_feature_detection(tol);
     test_mesh_constructor(tol);
+    test_num_entities();
+    test_displacement(tol);
+    test_vertices_around_face();
+    test_point_accessors(tol);
   }
 
   void test_move_constructor() const
@@ -392,6 +396,96 @@ public:
     TEST_CHECK_EQUAL(fnet.size(), 12);
 
     TEST_CHECK_EQUAL_WITHIN_EPS(wrapper.squared_distance(5.0, 0.5, 0.5), DT_(16), tol);
+  }
+
+  void test_num_entities() const
+  {
+    std::stringstream mts = tetrahedron_mesh();
+    CGALWrapper<DT_> cw(mts, CGALFileMode::fm_off);
+
+    TEST_CHECK_EQUAL(cw.get_num_vertices(), 4);
+    TEST_CHECK_EQUAL(cw.get_num_entities(0), 4);
+    TEST_CHECK_EQUAL(cw.get_num_entities(1), 6);
+    TEST_CHECK_EQUAL(cw.get_num_entities(2), 4);
+  }
+
+  void test_displacement(DT_ tol) const
+  {
+    using PointType = typename CGALWrapper<DT_>::PointType;
+
+    std::stringstream mts = quad_mesh();
+    CGALWrapper<DT_> cw(mts, CGALFileMode::fm_off);
+
+    PointType offset{{DT_(1), DT_(0.0), DT_(0.0)}};
+
+    std::vector<PointType> points{cw.point(0), cw.point(1), cw.point(2), cw.point(3)};
+    std::vector<PointType> offsets{offset, offset, offset, offset};
+
+    cw.displace_vertices(offsets);
+
+    for(Index i(0); i < 4; i++)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS((cw.point(i) - (points[i] + offsets[i])).norm_euclid(), 0, tol);
+    }
+  }
+
+  void test_vertices_around_face() const
+  {
+    std::stringstream mts = tetrahedron_mesh();
+    CGALWrapper<DT_> cw(mts, CGALFileMode::fm_off);
+
+    CGALVerticesAroundFaceAdjactor<DT_> adj = cw.vertices_around_face();
+
+    // Face 0
+    {
+      auto it = adj.image_begin(0);
+      TEST_CHECK_EQUAL(*it++, Index(1));
+      TEST_CHECK_EQUAL(*it++, Index(0));
+      TEST_CHECK_EQUAL(*it++, Index(3));
+      TEST_CHECK(it == adj.image_end(0));
+    }
+
+    // Face 1
+    {
+      auto it = adj.image_begin(1);
+      TEST_CHECK_EQUAL(*it++, Index(2));
+      TEST_CHECK_EQUAL(*it++, Index(0));
+      TEST_CHECK_EQUAL(*it++, Index(1));
+      TEST_CHECK(it == adj.image_end(1));
+    }
+
+    // Face 2
+    {
+      auto it = adj.image_begin(2);
+      TEST_CHECK_EQUAL(*it++, Index(3));
+      TEST_CHECK_EQUAL(*it++, Index(0));
+      TEST_CHECK_EQUAL(*it++, Index(2));
+      TEST_CHECK(it == adj.image_end(2));
+    }
+
+    // Face 3
+    {
+      auto it = adj.image_begin(3);
+      TEST_CHECK_EQUAL(*it++, Index(3));
+      TEST_CHECK_EQUAL(*it++, Index(2));
+      TEST_CHECK_EQUAL(*it++, Index(1));
+      TEST_CHECK(it == adj.image_end(3));
+    }
+  }
+
+  void test_point_accessors(DT_ tol) const
+  {
+    std::stringstream mts = tetrahedron_mesh();
+    CGALWrapper<DT_> cw(mts, CGALFileMode::fm_off);
+
+    auto points = cw.points();
+
+    TEST_CHECK_EQUAL(points.size(), cw.get_num_vertices());
+
+    for(std::uint32_t i(0); i < points.size(); i++)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS((points[i] - cw.point(i)).norm_euclid(), 0, tol);
+    }
   }
 };
 

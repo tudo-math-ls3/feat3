@@ -4,6 +4,7 @@
 // see the file 'copyright.txt' in the top level directory for details.
 #pragma once
 
+#include <iterator>
 #include <kernel/base_header.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 #include <kernel/shape.hpp>
@@ -13,6 +14,8 @@
 #if defined(FEAT_HAVE_CGAL) || defined(DOXYGEN)
 
 #include <cstddef>
+#include <optional>
+#include <functional>
 
 namespace FEAT
 {
@@ -43,6 +46,118 @@ namespace FEAT
     using CGALFeatureNetwork = std::vector<CGALFeature>;
 
     /**
+     * \brief Wrapper for arbitrary iterators that produce values
+     *
+     * \tparam T_ Value type
+     *
+     * Works by accepting a `std::function<std::optional<T_>()>` as a generator function.
+     * All non-empty values produced by this function are output as iterator values.
+     * An empty value indicates no further values are to be produced.
+     * The function serves to hide the type of any underlying iterator.
+     *
+     * Incrementing this iterator after the first empty value has been observed is forbiden.
+     */
+    template<typename T_>
+    class CGALValueIteratorWrapper
+    {
+      using iterator_category = std::input_iterator_tag;
+      using difference_type = Index;
+      using value_type = T_;
+      using pointer = T_*;
+      using reference = T_&;
+
+      using GeneratorType = std::function<std::optional<T_>()>;
+
+    private:
+      GeneratorType _generator;
+      std::optional<T_> _current;
+
+    public:
+      explicit CGALValueIteratorWrapper(GeneratorType&& g) : _generator(std::move(g)), _current(_generator())
+      {
+      }
+
+      T_ operator*()
+      {
+        return _current.value();
+      }
+
+      T_ operator->()
+      {
+        return _current.value();
+      }
+
+      CGALValueIteratorWrapper& operator++()
+      {
+        ASSERT(current.has_value());
+        _current = _generator();
+        return *this;
+      }
+
+      CGALValueIteratorWrapper operator++(int)
+      {
+        ASSERT(current.has_value());
+        CGALValueIteratorWrapper tmp = *this;
+        ++(*this);
+        return tmp;
+      }
+
+      explicit operator bool() const
+      {
+        return static_cast<bool>(_current);
+      }
+
+      friend bool operator==(const CGALValueIteratorWrapper& a, const CGALValueIteratorWrapper& b)
+      {
+        if(!a && !b)
+        {
+          // Both empty
+          return true;
+        }
+        if(!a || !b)
+        {
+          // One empty
+          return false;
+        }
+        // None empty
+        return true;
+      }
+
+      friend bool operator!=(const CGALValueIteratorWrapper& a, const CGALValueIteratorWrapper& b)
+      {
+        return !(a == b);
+      }
+    };
+
+    template<typename DT_>
+    class CGALWrapper;
+
+    /// Adjactor for vertices around a face
+    template<typename DT_>
+    class CGALVerticesAroundFaceAdjactor
+    {
+      const CGALWrapper<DT_>* _wrapper;
+    public:
+
+      /// Constructor
+      explicit CGALVerticesAroundFaceAdjactor(const CGALWrapper<DT_>* w) : _wrapper(w)
+      {
+      }
+
+      /// Number of faces
+      Index get_num_nodes_domain() const;
+
+      /// Number of vertices
+      Index get_num_nodes_image() const;
+
+      /// Adjactor begin
+      CGALValueIteratorWrapper<Index> image_begin(Index face) const;
+
+      /// Adjactor end
+      CGALValueIteratorWrapper<Index> image_end(Index face) const;
+    };
+
+    /**
      * \brief Wrapper for the CGAL Library
      *
      * \tparam DT_ The dataype tp be used.
@@ -65,6 +180,8 @@ namespace FEAT
 
       /// read in stream in prescibed file format and preprocess search tree for in/out test
       void _parse_mesh(std::istream & file, CGALFileMode file_mode);
+
+      friend CGALVerticesAroundFaceAdjactor<DT_>;
 
     public:
       /// rule of five
@@ -108,6 +225,9 @@ namespace FEAT
       /// Returns the point of the surface mesh with the given index
       PointType point(std::uint32_t idx) const;
 
+      /// Returns a vector of all points of the surface mesh
+      std::vector<PointType> points() const;
+
       /// Returns the nearest point regarding on all input primitives defined at objects' construction.
       PointType closest_point(const PointType& point) const;
 
@@ -133,6 +253,25 @@ namespace FEAT
       /// Returns the size in bytes
       std::size_t bytes() const;
 
+      /**
+       * \brief Displace each vertex of the mesh by its given offset
+       *
+       * \param[in] offsets Offsets for each vertex
+       *
+       * \pre `this->get_num_vertices() == offsets.size()`
+       *
+       * Causes the octree stored by the CGALWrapper to be rebuilt.
+       */
+      void displace_vertices(const std::vector<PointType>& offsets);
+
+      /// Returns the number of vertices of the underlying polyhedron
+      Index get_num_vertices() const;
+
+      /// Returns the number of entities of dimension \c dim of the underlying polyhedron
+      Index get_num_entities(int dim) const;
+
+      /// Returns an adjactor for vertices around faces of the mesh
+      CGALVerticesAroundFaceAdjactor<DT_> vertices_around_face() const;
 
     private:
       /// Delete tree, which also requires to delete the inside tester
