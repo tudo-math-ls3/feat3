@@ -184,31 +184,31 @@ namespace Gendie
     /**
       * \brief Formats the velocity information as a string.
       *
-      * \param[in] precision
+      * \param[in] precision_
       * The precision for floating point values.
       *
-      * \param[in] pad_size
+      * \param[in] pad_size_
       * The leading string padding size. Should be >= 10 to achieve vertical alignment.
       *
-      * \param[in] pad_char
+      * \param[in] pad_char_
       * The leading string padding character.
       *
       * \returns
       * A string containing the formatted velocity field info.
       */
-    String format_string(int precision = 0, std::size_t pad_size = 10u, char pad_char = '.') const
+    String format_string(int precision_ = 0, std::size_t pad_size_ = 10u, char pad_char_ = '.') const
     {
       String s;
-      s += String("H0-Norm").pad_back(pad_size, pad_char) + ": " + stringify_fp_sci(norm_h0, precision) + " [";
+      s += String("H0-Norm").pad_back(pad_size_, pad_char_) + ": " + stringify_fp_sci(norm_h0, precision_) + " [";
       for(int i(0); i < dim_; ++i)
-        (s += " ") += stringify_fp_sci(norm_h0_comp[i], precision);
+        (s += " ") += stringify_fp_sci(norm_h0_comp[i], precision_);
       s += " ]\n";
-      s += String("H1-Norm").pad_back(pad_size, pad_char) + ": " + stringify_fp_sci(norm_h1, precision) + " [";
+      s += String("H1-Norm").pad_back(pad_size_, pad_char_) + ": " + stringify_fp_sci(norm_h1, precision_) + " [";
       for(int i(0); i < dim_; ++i)
-        (s += " ") += stringify_fp_sci(norm_h1_comp[i], precision);
+        (s += " ") += stringify_fp_sci(norm_h1_comp[i], precision_);
       s += " ]\n";
-      s += String("Divergence").pad_back(pad_size, pad_char) + ": " + stringify_fp_sci(divergence, precision) + "\n";
-      s += String("Vorticity").pad_back(pad_size, pad_char) + ": " + stringify_fp_sci(vorticity, precision) + "\n";
+      s += String("Divergence").pad_back(pad_size_, pad_char_) + ": " + stringify_fp_sci(divergence, precision_) + "\n";
+      s += String("Vorticity").pad_back(pad_size_, pad_char_) + ": " + stringify_fp_sci(vorticity, precision_) + "\n";
       // s += String("Min velocities").pad_back(pad_size, pad_char) + ": [";
       // for(int i(0); i < dim_; ++i)
       //   (s += " ") += stringify_fp_sci(min_velo_node[i], precision);

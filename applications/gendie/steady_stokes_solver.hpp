@@ -782,9 +782,9 @@ namespace Gendie
           this->vanka_solver.front()->set_skip_singular(true);
           auto schwarz = FEAT::Solver::new_schwarz_precond(this->vanka_solver.front(), filter_sys);
           if(solve_gmres_dim > FEAT::Index(0)) // todo: is this smart?
-            this->base_solver = this->iter_solver = FEAT::Solver::new_fgmres(matrix_sys, filter_sys, solve_gmres_dim, 0.4, schwarz);
+            this->base_solver = this->iter_solver = FEAT::Solver::new_fgmres(matrix_sys, filter_sys, solve_gmres_dim, DataType(0.4), schwarz);
           else
-            this->base_solver = this->iter_solver = FEAT::Solver::new_fgmres(matrix_sys, filter_sys, 16, 0.4, schwarz);
+            this->base_solver = this->iter_solver = FEAT::Solver::new_fgmres(matrix_sys, filter_sys, 16, DataType(0.4), schwarz);
 
           // configure solver
           this->iter_solver->set_plot_name("FGMRES-AmaVanka");
@@ -907,9 +907,9 @@ namespace Gendie
       this->multigrid = FEAT::Solver::new_multigrid(this->multigrid_hierarchy, cycle);
       // create our solver
       if(solve_gmres_dim > FEAT::Index(0))
-        this->base_solver = this->iter_solver = FEAT::Solver::new_fgmres(matrix_sys, filter_sys, solve_gmres_dim, 0.7, this->multigrid);
+        this->base_solver = this->iter_solver = FEAT::Solver::new_fgmres(matrix_sys, filter_sys, solve_gmres_dim, DataType(0.7), this->multigrid);
       else
-        this->base_solver = this->iter_solver = FEAT::Solver::new_richardson(matrix_sys, filter_sys, 1.0, this->multigrid);
+        this->base_solver = this->iter_solver = FEAT::Solver::new_richardson(matrix_sys, filter_sys, DataType(1.0), this->multigrid);
 
       // configure iterative solver
       if(this->iter_solver)

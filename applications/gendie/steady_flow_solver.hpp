@@ -284,8 +284,8 @@ namespace Gendie
         this->flow_solver->init_numeric();
 
         // we only want to solve by 3 orders of magnitude or at maximum 10 solver iterations
-        this->flow_solver->set_tol_abs(1E+100);
-        this->flow_solver->set_tol_rel(1E-3);
+        this->flow_solver->set_tol_abs(SolverDataType(1E+100));
+        this->flow_solver->set_tol_rel(SolverDataType(1E-3));
         auto prev_max_iter = this->flow_solver->get_max_iter();
         this->flow_solver->set_max_iter(8);
 

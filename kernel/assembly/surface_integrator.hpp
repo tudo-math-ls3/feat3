@@ -400,7 +400,7 @@ namespace FEAT::Assembly
           // our weights
           std::vector<DataType> weights(_cubature_rule.get_num_points());
           // averaged normal (we assume we have planar normals, in theory this should also be a vector)
-          NormalVecType normal;
+          NormalVecType normal(DataType(0));
 
           // now iterate through our cubature points
           for(int pt = 0; pt < _cubature_rule.get_num_points(); ++pt)
