@@ -71,6 +71,7 @@ namespace FEAT
 
       void init_symbolic(void* core);
       int init_numeric(void* core);
+      void done_numeric(void* core);
 
       /**
        * \brief Solves a linear system
@@ -178,6 +179,15 @@ namespace FEAT
           else // info > N: out of memory
             throw SolverException("SuperLU: out of memory");
         }
+      }
+
+      virtual void done_numeric() override
+      {
+        XASSERT(this->_core != nullptr);
+
+        SuperLU_Aux::done_numeric(this->_core);
+
+        BaseClass::done_numeric();
       }
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override

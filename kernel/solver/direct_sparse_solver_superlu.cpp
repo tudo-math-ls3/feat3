@@ -122,7 +122,6 @@ namespace FEAT
         ~SuperLU_Core()
         {
           PStatFree(&slu_stats);
-          dDestroy_LU(slu_matrix.nrow, &slu_grid, &slu_lu_struct);
           dLUstructFree(&slu_lu_struct);
           dScalePermstructFree(&slu_scale_perm);
           dSolveFinalize(&slu_opts, &slu_solve_struct);
@@ -195,6 +194,11 @@ namespace FEAT
           {
             throw DirectSparseSolverException("SuperLU", "out of memory");
           }
+        }
+
+        void done_numeric()
+        {
+          dDestroy_LU(slu_num_global_dofs, &slu_grid, &slu_lu_struct);
         }
 
         void solve()
@@ -283,6 +287,12 @@ namespace FEAT
       {
         XASSERT(core != nullptr);
         reinterpret_cast<SuperLU_Core*>(core)->init_numeric();
+      }
+
+      void done_superlu_numeric(void* core)
+      {
+        XASSERT(core != nullptr);
+        reinterpret_cast<SuperLU_Core*>(core)->done_numeric();
       }
 
       void solve_superlu(void* core)

@@ -131,6 +131,7 @@ namespace FEAT
 
       void init_superlu_symbolic(void* core);
       void init_superlu_numeric(void* core);
+      void done_superlu_numeric(void* core);
 
       void solve_superlu(void* core);
 #else
@@ -810,6 +811,12 @@ namespace FEAT
        */
       virtual void done_numeric() override
       {
+#ifdef FEAT_HAVE_SUPERLU_DIST
+        if(this->_core_superlu)
+        {
+          DSS::done_superlu_numeric(this->_core_superlu);
+        }
+#endif // FEAT_HAVE_SUPERLU_DIST
 #ifdef FEAT_HAVE_UMFPACK
         if(this->_core_umfpack)
         {

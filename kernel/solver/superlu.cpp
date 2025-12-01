@@ -117,7 +117,6 @@ namespace FEAT
         ~Core()
         {
           PStatFree(&slu_stats);
-          dDestroy_LU(slu_matrix.nrow, &slu_grid, &slu_lu_struct);
           dLUstructFree(&slu_lu_struct);
           dScalePermstructFree(&slu_scale_perm);
           dSolveFinalize(&slu_opts, &slu_solve_struct);
@@ -184,6 +183,11 @@ namespace FEAT
           return slu_info;
         }
 
+        void done_numeric()
+        {
+          dDestroy_LU(slu_matrix.nrow, &slu_grid, &slu_lu_struct);
+        }
+
         int solve()
         {
           // matrix was already factorized in set_matrix_values() call
@@ -248,6 +252,11 @@ namespace FEAT
       int init_numeric(void* core)
       {
         return reinterpret_cast<Core*>(core)->init_numeric();
+      }
+
+      void done_numeric(void* core)
+      {
+        reinterpret_cast<Core*>(core)->done_numeric();
       }
 
       int solve(void* core)
