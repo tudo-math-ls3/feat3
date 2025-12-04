@@ -9,10 +9,7 @@
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/util/cuda_math.cuh>
 
-#include "omp.h"
 #include "assert.h"
-
-#include <numeric>
 
 
 namespace FEAT
@@ -452,7 +449,7 @@ namespace FEAT
         typedef Tiny::Vector<VecValueType, num_loc_dofs> LocalVectorType;
         typedef Tiny::Matrix<MatValueType, num_loc_dofs, num_loc_dofs> LocalMatrixType;
 
-        #pragma omp parallel for
+        FEAT_PRAGMA_OMP(parallel for)
         for(Index idx = 0; idx < coloring_size; ++idx)
         {
           // define local coefficients
@@ -523,7 +520,7 @@ namespace FEAT
         typedef Tiny::Vector<VecValueType, num_loc_dofs> LocalVectorType;
         typedef Tiny::Matrix<MatValueType, num_loc_dofs, num_loc_dofs> LocalMatrixType;
 
-        #pragma omp parallel for
+        FEAT_PRAGMA_OMP(parallel for)
         for(Index idx = 0; idx < coloring_size; ++idx)
         {
           //define local array

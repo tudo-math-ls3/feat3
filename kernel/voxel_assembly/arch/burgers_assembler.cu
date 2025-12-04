@@ -14,7 +14,6 @@
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/util/cuda_math.cuh>
 
-#include "omp.h"
 #include "assert.h"
 
 //include for cooperative groups
@@ -25,8 +24,6 @@
 #include <cooperative_groups.h>
 // Optionally include for memcpy_async() collective
 #include <cooperative_groups/memcpy_async.h>
-
-#include <numeric>
 
 namespace cg = cooperative_groups;
 
