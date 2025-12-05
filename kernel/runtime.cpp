@@ -288,6 +288,11 @@ void Runtime::initialize(int& argc, char**& argv)
 #else
         std::cout << "FEAT_HAVE_MKL.................: no\n";
 #endif
+#ifdef FEAT_HAVE_MUMPS
+        std::cout << "FEAT_HAVE_MUMPS...............: yes\n";
+#else
+        std::cout << "FEAT_HAVE_MUMPS...............: no\n";
+#endif
 #ifdef FEAT_HAVE_MPI
         std::cout << "FEAT_HAVE_MPI.................: yes\n";
 #else

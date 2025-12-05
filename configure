@@ -295,6 +295,7 @@ description = (
   "  - 'floatx':       enable floatx TPL\n"
   "  - 'hypre':        enable HYPRE TPL\n"
   "  - 'metis':        enable METIS and ParMETIS TPLs\n"
+  "  - 'mumps'         enable MUMPS TPL\n"
   "  - 'pmp':          enable PMP TPL\n"
   "  - 'superlu':      enable SuperLU_Dist TPL\n"
   "  - 'triangle':     enable triangle TPL\n"
@@ -870,6 +871,8 @@ for token in buildid:
     config.cache_entry("FEAT_HAVE_HYPRE", "ON", "BOOL")
   elif token == "metis":
     config.cache_entry("FEAT_HAVE_PARMETIS", "ON", "BOOL")
+  elif token == "mumps":
+    config.cache_entry("FEAT_HAVE_MUMPS", "ON", "BOOL")
   elif token == "pmp":
     config.cache_entry("FEAT_HAVE_PMP", "ON", "BOOL")
   elif token == "superlu":

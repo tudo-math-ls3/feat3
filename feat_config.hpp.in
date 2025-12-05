@@ -62,6 +62,9 @@
 /// Do we have MKL support enabled?
 #cmakedefine FEAT_HAVE_MKL
 
+/// Do we have MUMPS support enabled?
+#cmakedefine FEAT_HAVE_MUMPS
+
 /// Do we have OpenMP support enabled?
 #cmakedefine FEAT_HAVE_OMP
 

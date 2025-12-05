@@ -8,25 +8,26 @@
 # Downloaded dependencies are stored in a "_deps" folder in the build-tree.
 
 # Third-party dependencies supported by FEAT3:
-# +----------------+------------------------+----------------------------+
-# |   Dependency   |          Flag          |           Target           |
-# +----------------+------------------------+----------------------------+
-# | Umfpack        | FEAT_HAVE_UMFPACK      | SuiteSparse::UMFPACK       |
-# | Hypre          | FEAT_HAVE_HYPRE        | HYPRE::HYPRE               |
-# | ParMETIS       | FEAT_HAVE_PARMETIS     | ParMETIS::ParMETIS         |
-# | fparser        | FEAT_HAVE_FPARSER      | fparser::fparser           |
-# | CGAL           | FEAT_HAVE_CGAL         | CGAL::CGAL                 |
-# | Alglib         | FEAT_HAVE_ALGLIB       | Alglib::Alglib             |
-# | deathhandler   | FEAT_HAVE_DEATHHANDLER | deathhandler::deathhandler |
-# | floatx         | FEAT_HAVE_FLOATX       | FloatX::FloatX             |
-# | ZFP            | FEAT_HAVE_ZFP          | ZFP::ZFP                   |
-# | Zlib           | FEAT_HAVE_ZLIB         | zlib::zlib                 |
-# | Triangle       | FEAT_HAVE_TRIANGLE     | triangle::triangle         |
-# | Zoltan         | FEAT_HAVE_ZOLTAN       | Zoltan::Zoltan             |
-# | SuperLU (dist) | FEAT_HAVE_SUPERLU_DIST | SuperLU::SuperLU           |
-# | cuDSS          | FEAT_HAVE_CUDSS        | cuDSS::cuDSS               |
-# | pmp            | FEAT_HAVE_PMP          | pmp::pmp                   |
-# +----------------+------------------------+----------------------------+
+# +----------------+-------------------------+----------------------------+
+# |   Dependency   |          Flag           |           Target           |
+# +----------------+-------------------------+----------------------------+
+# | Alglib         | FEAT_HAVE_ALGLIB        | Alglib::Alglib             |
+# | CGAL           | FEAT_HAVE_CGAL          | CGAL::CGAL                 |
+# | cuDSS          | FEAT_HAVE_CUDSS         | cuDSS::cuDSS               |
+# | deathhandler   | FEAT_HAVE_DEATH_HANDLER | deathhandler::deathhandler |
+# | floatx         | FEAT_HAVE_FLOATX        | FloatX::FloatX             |
+# | fparser        | FEAT_HAVE_FPARSER       | fparser::fparser           |
+# | Hypre          | FEAT_HAVE_HYPRE         | HYPRE::HYPRE               |
+# | MUMPS          | FEAT_HAVE_MUMPS         | mumps::mumps
+# | ParMETIS       | FEAT_HAVE_PARMETIS      | ParMETIS::ParMETIS         |
+# | pmp            | FEAT_HAVE_PMP           | pmp::pmp                   |
+# | SuperLU (dist) | FEAT_HAVE_SUPERLU_DIST  | SuperLU::SuperLU           |
+# | Triangle       | FEAT_HAVE_TRIANGLE      | triangle::triangle         |
+# | Umfpack        | FEAT_HAVE_UMFPACK       | SuiteSparse::UMFPACK       |
+# | ZFP            | FEAT_HAVE_ZFP           | ZFP::ZFP                   |
+# | Zlib           | FEAT_HAVE_ZLIB          | zlib::zlib                 |
+# | Zoltan         | FEAT_HAVE_ZOLTAN        | Zoltan::Zoltan             |
+# +----------------+-------------------------+----------------------------+
 
 # first of all, load fetchContent modul
 include(FetchContent)
@@ -88,86 +89,13 @@ if(FEAT_TPL_CACHE_DIRECTORY)
   file(MAKE_DIRECTORY ${FEAT_TPL_CACHE_DIRECTORY})
 endif()
 
-option(FEAT_HAVE_UMFPACK "Use umfpack solver of suitesparse?" OFF)
-if(FEAT_HAVE_UMFPACK)
+option(FEAT_HAVE_ALGLIB "Enable Alglib" OFF)
+if(FEAT_HAVE_ALGLIB)
   feat_get_tpl(
-    PACKAGE_NAME UMFPACK
-    VERSION 6.3.5
-    URL https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v7.10.2.zip
-    URL_HASH MD5=b54b521b41f1468e37e0c0199a85e598
-    CONFIG
-    SYSTEM
-  )
-
-  if(NOT UMFPACK_FOUND)
-    ## set cmake variables for suitesparse
-    # this should build everything necessary for umfpack
-    set(SUITESPARSE_ENABLE_PROJECTS "umfpack" CACHE STRING "which projects to build?" FORCE)
-    # build static libraries, are these options local?
-    set(BUILD_STATIC_LIBS "ON" CACHE BOOL "build static libs" FORCE)
-    # do not build shared libries
-    set(BUILD_SHARED_LIBS "OFF" CACHE BOOL "build shared libs" FORCE)
-    # i think we should disable cuda
-    set(SUITESPARSE_USE_CUDA "OFF" CACHE BOOL "build with cuda support" FORCE)
-    # do not use fortran compiler to determine blas function names
-    # warning: this requires SUITESPARSE_C_TO_FORTRAN to be set correctly
-    set(SUITESPARSE_USE_FORTRAN "OFF" CACHE BOOL "build with cuda support" FORCE)
-    # Enable Suitesparse OpenMP only if FEAT OpenMP is enabled
-    set(SUITESPARSE_USE_OPENMP ${FEAT_HAVE_OMP} CACHE BOOL "build with OpenMP support" FORCE)
-
-    # TODO: Check if we can find out if the available blas is 32 or 64 bit
-    set(SUITESPARSE_USE_64BIT_BLAS "ON" CACHE BOOL "use 64 bit blas" FORCE)
-
-    # Disable CHOLDMOD tests
-    set(BUILD_TESTING "OFF")
-  endif()
-endif()
-
-option(FEAT_HAVE_HYPRE "Use hypre solvers?" OFF)
-if(FEAT_HAVE_HYPRE)
-  feat_get_tpl(
-    PACKAGE_NAME HYPRE
-    VERSION 2.33
-    URL https://github.com/hypre-space/hypre/archive/refs/tags/v2.33.0.zip
-    URL_HASH MD5=6fe2c8ef054836d88bb8fad9794c4db5
-    PATCH_COMMAND_WINDOWS python ${CMAKE_CURRENT_LIST_DIR}/patches/hypre_win.py .
-    SOURCE_SUBDIR src
-    CONFIG
-    SYSTEM
-  )
-
-  if(NOT HYPRE_FOUND)
-    # Enable hypre MPI support if FEAT is build with MPI support
-    set(HYPRE_ENABLE_MPI ${FEAT_HAVE_MPI} CACHE BOOL "Build Hypre with MPI support" FORCE)
-    set(HYPRE_HAVE_MPI ${FEAT_HAVE_MPI} CACHE BOOL "Build Hypre with MPI support" FORCE)
-    set(HYPRE_WITH_MPI ${FEAT_HAVE_MPI} CACHE BOOL "Build Hypre with MPI support" FORCE)
-
-    # Enable Hypre OpenMP support if FEAT is build with OpenMP support
-    set(HYPRE_WITH_OPENMP ${FEAT_HAVE_OMP} CACHE BOOL "Build Hypre with OMP support" FORCE)
-  endif()
-endif()
-
-option(FEAT_HAVE_PARMETIS "Enable ParMETIS" OFF)
-if(FEAT_HAVE_PARMETIS)
-  feat_get_tpl(
-    PACKAGE_NAME parmetis
-    VERSION 4.0.3
-    URL https://github.com/otkmesser/ParMETIS/archive/refs/tags/v4.0.3.zip
-    URL_HASH MD5=9bb15981d34adc3fd9e038bc7033388d
-    PATCH_COMMAND_WINDOWS python ${CMAKE_CURRENT_LIST_DIR}/patches/parmetis_win.py .
-    CONFIG
-    SYSTEM
-  )
-
-endif(FEAT_HAVE_PARMETIS)
-
-option(FEAT_HAVE_FPARSER "Enable FParser" OFF)
-if(FEAT_HAVE_FPARSER)
-  feat_get_tpl(
-    PACKAGE_NAME fparser
-    VERSION 4.5.2
-    URL http://warp.povusers.org/FunctionParser/fparser4.5.2.zip
-    URL_HASH MD5=ce805d2f827f25e61f266e176b8d338d
+    PACKAGE_NAME Alglib
+    VERSION 4.04.0
+    URL http://www.alglib.net/translator/re/alglib-4.04.0.cpp.gpl.zip
+    URL_HASH MD5=c9a6b38c9b41ef1121fb0b33c8228394
     SYSTEM
   )
 endif()
@@ -204,14 +132,21 @@ if(FEAT_HAVE_CGAL)
   )
 endif()
 
-option(FEAT_HAVE_ALGLIB "Enable Alglib" OFF)
-if(FEAT_HAVE_ALGLIB)
+option(FEAT_HAVE_CUDSS "Enable cuDSS" OFF)
+if(FEAT_HAVE_CUDSS)
+  if(WIN32)
+    set(cudss_url "https://developer.download.nvidia.com/compute/cudss/redist/libcudss/windows-x86_64/libcudss-windows-x86_64-0.6.0.5_cuda12-archive.zip")
+    set(cudss_hash "c1036a4cbadc7b201e08acaac13fcac6")
+  else()
+    set(cudss_url "https://developer.download.nvidia.com/compute/cudss/redist/libcudss/linux-x86_64/libcudss-linux-x86_64-0.6.0.5_cuda12-archive.tar.xz")
+    set(cudss_hash "4ac17f5b35a4ecc550c4d7c479a5c5b5")
+  endif()
+
   feat_get_tpl(
-    PACKAGE_NAME Alglib
-    VERSION 4.04.0
-    URL http://www.alglib.net/translator/re/alglib-4.04.0.cpp.gpl.zip
-    URL_HASH MD5=c9a6b38c9b41ef1121fb0b33c8228394
-    SYSTEM
+    PACKAGE_NAME cudss
+    VERSION 0.6.0.5
+    URL ${cudss_url}
+    URL_HASH MD5=${cudss_hash}
   )
 endif()
 
@@ -238,55 +173,68 @@ if(FEAT_HAVE_FLOATX)
   )
 endif()
 
-option(FEAT_HAVE_ZFP "Enable zfp" OFF)
-if(FEAT_HAVE_ZFP)
+option(FEAT_HAVE_FPARSER "Enable FParser" OFF)
+if(FEAT_HAVE_FPARSER)
   feat_get_tpl(
-    PACKAGE_NAME zfp
-    VERSION 1.0.0
-    URL https://github.com/LLNL/zfp/releases/download/1.0.0/zfp-1.0.0.zip
-    URL_HASH MD5=28c1a0a53931973b18eb4b3d3b7c5f63
+    PACKAGE_NAME fparser
+    VERSION 4.5.2
+    URL http://warp.povusers.org/FunctionParser/fparser4.5.2.zip
+    URL_HASH MD5=ce805d2f827f25e61f266e176b8d338d
+    SYSTEM
+  )
+endif()
+
+option(FEAT_HAVE_HYPRE "Use hypre solvers?" OFF)
+if(FEAT_HAVE_HYPRE)
+  feat_get_tpl(
+    PACKAGE_NAME HYPRE
+    VERSION 2.33
+    URL https://github.com/hypre-space/hypre/archive/refs/tags/v2.33.0.zip
+    URL_HASH MD5=6fe2c8ef054836d88bb8fad9794c4db5
+    PATCH_COMMAND_WINDOWS python ${CMAKE_CURRENT_LIST_DIR}/patches/hypre_win.py .
+    SOURCE_SUBDIR src
     CONFIG
     SYSTEM
   )
-  if(NOT zfp_FOUND)
-    set(ZFP_WITH_OPENMP ${FEAT_HAVE_OMP} CACHE BOOL "Enable OpenMP for ZFP" FORCE)
-    # Disable zfp tests
-    set(BUILD_TESTING "OFF")
- endif()
+
+  if(NOT HYPRE_FOUND)
+    # Enable hypre MPI support if FEAT is build with MPI support
+    set(HYPRE_ENABLE_MPI ${FEAT_HAVE_MPI} CACHE BOOL "Build Hypre with MPI support" FORCE)
+    set(HYPRE_HAVE_MPI ${FEAT_HAVE_MPI} CACHE BOOL "Build Hypre with MPI support" FORCE)
+    set(HYPRE_WITH_MPI ${FEAT_HAVE_MPI} CACHE BOOL "Build Hypre with MPI support" FORCE)
+
+    # Enable Hypre OpenMP support if FEAT is build with OpenMP support
+    set(HYPRE_WITH_OPENMP ${FEAT_HAVE_OMP} CACHE BOOL "Build Hypre with OMP support" FORCE)
+  endif()
 endif()
 
-option(FEAT_HAVE_ZLIB "Enable zlib" OFF)
-if(FEAT_HAVE_ZLIB)
+option(FEAT_HAVE_MUMPS "Enable MUMPS" OFF)
+if(FEAT_HAVE_MUMPS)
+  find_package(mumps REQUIRED)
+endif()
+
+option(FEAT_HAVE_PARMETIS "Enable ParMETIS" OFF)
+if(FEAT_HAVE_PARMETIS)
   feat_get_tpl(
-    PACKAGE_NAME zlib
-    VERSION 1.2.13
-    URL https://www.zlib.net/fossils/zlib-1.2.13.tar.gz
-    URL_HASH MD5=9b8aa094c4e5765dabf4da391f00d15c
-    SOURCE_SUBDIR Non-existing
+    PACKAGE_NAME parmetis
+    VERSION 4.0.3
+    URL https://github.com/otkmesser/ParMETIS/archive/refs/tags/v4.0.3.zip
+    URL_HASH MD5=9bb15981d34adc3fd9e038bc7033388d
+    PATCH_COMMAND_WINDOWS python ${CMAKE_CURRENT_LIST_DIR}/patches/parmetis_win.py .
+    CONFIG
     SYSTEM
   )
 endif()
 
-option(FEAT_HAVE_TRIANGLE "Enable triangle" OFF)
-if(FEAT_HAVE_TRIANGLE)
+option(FEAT_HAVE_PMP "Enable pmp" OFF)
+if(FEAT_HAVE_PMP)
   feat_get_tpl(
-    PACKAGE_NAME triangle
-    VERSION 1.0
-    URL "http://www.netlib.org/voronoi/triangle.zip"
-    URL_HASH MD5=10aff8d7950f5e0e2fb6dd2e340be2c9
-    SYSTEM
-  )
-endif()
-
-option(FEAT_HAVE_ZOLTAN "Enable zoltan" OFF)
-if(FEAT_HAVE_ZOLTAN)
-  feat_get_tpl(
-    PACKAGE_NAME zoltan
-    VERSION 3.901
-    URL "https://github.com/sandialabs/Zoltan/archive/refs/tags/v3.901.tar.gz"
-    URL_HASH MD5=a951ef9b1529fed3a325d57e0be21734
-    PATCH_COMMAND_WINDOWS python ${CMAKE_CURRENT_LIST_DIR}/patches/zoltan_win.py .
-    SOURCE_SUBDIR Non-Existing
+    PACKAGE_NAME pmp
+    VERSION 3.0.0
+    URL https://github.com/pmp-library/pmp-library/archive/refs/tags/3.0.0.zip
+    URL_HASH MD5=7b7f9ce07a7a687c9d78a6583cf64a2c
+    SOURCE_SUBDIR Non-Existing # Use non-existing source dir to disable add_subdirectory call of MakeAvailable
+    CONFIG
     SYSTEM
   )
 endif()
@@ -319,33 +267,90 @@ if(FEAT_HAVE_SUPERLU_DIST)
   endif()
 endif()
 
-option(FEAT_HAVE_CUDSS "Enable cuDSS" OFF)
-if(FEAT_HAVE_CUDSS)
-  if(WIN32)
-    set(cudss_url "https://developer.download.nvidia.com/compute/cudss/redist/libcudss/windows-x86_64/libcudss-windows-x86_64-0.6.0.5_cuda12-archive.zip")
-    set(cudss_hash "c1036a4cbadc7b201e08acaac13fcac6")
-  else()
-    set(cudss_url "https://developer.download.nvidia.com/compute/cudss/redist/libcudss/linux-x86_64/libcudss-linux-x86_64-0.6.0.5_cuda12-archive.tar.xz")
-    set(cudss_hash "4ac17f5b35a4ecc550c4d7c479a5c5b5")
-  endif()
-
+option(FEAT_HAVE_TRIANGLE "Enable triangle" OFF)
+if(FEAT_HAVE_TRIANGLE)
   feat_get_tpl(
-    PACKAGE_NAME cudss
-    VERSION 0.6.0.5
-    URL ${cudss_url}
-    URL_HASH MD5=${cudss_hash}
+    PACKAGE_NAME triangle
+    VERSION 1.0
+    URL "http://www.netlib.org/voronoi/triangle.zip"
+    URL_HASH MD5=10aff8d7950f5e0e2fb6dd2e340be2c9
+    SYSTEM
   )
 endif()
 
-option(FEAT_HAVE_PMP "Enable pmp" OFF)
-if(FEAT_HAVE_PMP)
+option(FEAT_HAVE_UMFPACK "Use umfpack solver of suitesparse?" OFF)
+if(FEAT_HAVE_UMFPACK)
   feat_get_tpl(
-    PACKAGE_NAME pmp
-    VERSION 3.0.0
-    URL https://github.com/pmp-library/pmp-library/archive/refs/tags/3.0.0.zip
-    URL_HASH MD5=7b7f9ce07a7a687c9d78a6583cf64a2c
-    SOURCE_SUBDIR Non-Existing # Use non-existing source dir to disable add_subdirectory call of MakeAvailable
+    PACKAGE_NAME UMFPACK
+    VERSION 6.3.5
+    URL https://github.com/DrTimothyAldenDavis/SuiteSparse/archive/refs/tags/v7.10.2.zip
+    URL_HASH MD5=b54b521b41f1468e37e0c0199a85e598
     CONFIG
+    SYSTEM
+  )
+
+  if(NOT UMFPACK_FOUND)
+    ## set cmake variables for suitesparse
+    # this should build everything necessary for umfpack
+    set(SUITESPARSE_ENABLE_PROJECTS "umfpack" CACHE STRING "which projects to build?" FORCE)
+    # build static libraries, are these options local?
+    set(BUILD_STATIC_LIBS "ON" CACHE BOOL "build static libs" FORCE)
+    # do not build shared libries
+    set(BUILD_SHARED_LIBS "OFF" CACHE BOOL "build shared libs" FORCE)
+    # i think we should disable cuda
+    set(SUITESPARSE_USE_CUDA "OFF" CACHE BOOL "build with cuda support" FORCE)
+    # do not use fortran compiler to determine blas function names
+    # warning: this requires SUITESPARSE_C_TO_FORTRAN to be set correctly
+    set(SUITESPARSE_USE_FORTRAN "OFF" CACHE BOOL "build with cuda support" FORCE)
+    # Enable Suitesparse OpenMP only if FEAT OpenMP is enabled
+    set(SUITESPARSE_USE_OPENMP ${FEAT_HAVE_OMP} CACHE BOOL "build with OpenMP support" FORCE)
+
+    # TODO: Check if we can find out if the available blas is 32 or 64 bit
+    set(SUITESPARSE_USE_64BIT_BLAS "ON" CACHE BOOL "use 64 bit blas" FORCE)
+
+    # Disable CHOLDMOD tests
+    set(BUILD_TESTING "OFF")
+  endif()
+endif()
+
+option(FEAT_HAVE_ZFP "Enable zfp" OFF)
+if(FEAT_HAVE_ZFP)
+  feat_get_tpl(
+    PACKAGE_NAME zfp
+    VERSION 1.0.0
+    URL https://github.com/LLNL/zfp/releases/download/1.0.0/zfp-1.0.0.zip
+    URL_HASH MD5=28c1a0a53931973b18eb4b3d3b7c5f63
+    CONFIG
+    SYSTEM
+  )
+  if(NOT zfp_FOUND)
+    set(ZFP_WITH_OPENMP ${FEAT_HAVE_OMP} CACHE BOOL "Enable OpenMP for ZFP" FORCE)
+    # Disable zfp tests
+    set(BUILD_TESTING "OFF")
+ endif()
+endif()
+
+option(FEAT_HAVE_ZLIB "Enable zlib" OFF)
+if(FEAT_HAVE_ZLIB)
+  feat_get_tpl(
+    PACKAGE_NAME zlib
+    VERSION 1.2.13
+    URL https://www.zlib.net/fossils/zlib-1.2.13.tar.gz
+    URL_HASH MD5=9b8aa094c4e5765dabf4da391f00d15c
+    SOURCE_SUBDIR Non-existing
+    SYSTEM
+  )
+endif()
+
+option(FEAT_HAVE_ZOLTAN "Enable zoltan" OFF)
+if(FEAT_HAVE_ZOLTAN)
+  feat_get_tpl(
+    PACKAGE_NAME zoltan
+    VERSION 3.901
+    URL "https://github.com/sandialabs/Zoltan/archive/refs/tags/v3.901.tar.gz"
+    URL_HASH MD5=a951ef9b1529fed3a325d57e0be21734
+    PATCH_COMMAND_WINDOWS python ${CMAKE_CURRENT_LIST_DIR}/patches/zoltan_win.py .
+    SOURCE_SUBDIR Non-Existing
     SYSTEM
   )
 endif()
