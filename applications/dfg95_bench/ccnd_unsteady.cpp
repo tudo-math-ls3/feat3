@@ -424,7 +424,7 @@ namespace DFG95
       if(umf_cgs)
         comm.print(String("Coarse Solver").pad_back(pl, pc) + ": UMFPACK");
       else
-        comm.print(String("Coarse Solver").pad_back(pl, pc) + ": BiCGStab-AmaVanka");
+        comm.print(String("Coarse Solver").pad_back(pl, pc) + ": GMRES[k]-AmaVanka");
       if(vtk_step > Index(0))
       {
         if(!vtk_name2.empty())
@@ -831,11 +831,11 @@ namespace DFG95
 #endif //  FEAT_HAVE_UMFPACK
       else
       {
-        // create BiCGStab-AmaVanka coarse grid solver
+        // create GMRES(25)-AmaVanka coarse grid solver
         auto vanka = Solver::new_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local());
         ama_vankas.push_back(vanka);
         auto schwarz = Solver::new_schwarz_precond(vanka, lvl.filter_sys);
-        auto cgsolver = Solver::new_bicgstab(lvl.matrix_sys, lvl.filter_sys, schwarz);
+        auto cgsolver = Solver::new_gmres(lvl.matrix_sys, lvl.filter_sys, 25, 0.9, schwarz);
         cgsolver->set_max_iter(500);
         cgsolver->set_tol_rel(1e-3);
         //cgsolver->set_plot_mode(Solver::PlotMode::summary);

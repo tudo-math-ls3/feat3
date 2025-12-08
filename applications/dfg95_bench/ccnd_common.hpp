@@ -28,7 +28,7 @@
 #include <kernel/solver/amavanka.hpp>
 #include <kernel/solver/vanka.hpp>
 #include <kernel/solver/bicgstab.hpp>
-#include <kernel/solver/fgmres.hpp>
+#include <kernel/solver/gmres.hpp>
 #include <kernel/solver/umfpack.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/util/stop_watch.hpp>

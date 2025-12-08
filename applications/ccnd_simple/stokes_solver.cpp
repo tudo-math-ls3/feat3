@@ -310,7 +310,7 @@ namespace CCNDSimple
         amavankas.push_back(vanka);
         auto schwarz = Solver::new_schwarz_precond(vanka, lvl.filter_sys);
         schwarz->set_ignore_status(true);
-        auto cgsolver = Solver::new_bicgstab(lvl.matrix_sys, lvl.filter_sys, schwarz);
+        auto cgsolver = Solver::new_gmres(lvl.matrix_sys, lvl.filter_sys, 25, 0.9, schwarz);
         cgsolver->set_max_iter(500);
         cgsolver->set_tol_rel(1e-3);
         //cgsolver->set_plot_mode(Solver::PlotMode::summary);
