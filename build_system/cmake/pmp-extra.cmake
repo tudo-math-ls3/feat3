@@ -15,7 +15,14 @@ if(NOT TARGET pmp::pmp)
 
   target_compile_features(feat-extern-pmp PRIVATE cxx_std_20)
 
-  target_compile_options(feat-extern-pmp PRIVATE -w)
+  # disable warnings for this TPL
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    string(REGEX REPLACE "/W[1|2|3|4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+    string(REGEX REPLACE "/W[1|2|3|4]" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    target_compile_options(feat-extern-pmp PRIVATE /W0 /wd4267)
+  else()
+    target_compile_options(feat-extern-pmp PRIVATE -w)
+  endif()
 
   if(WIN32)
     # NOTE(mmuegge): Windows does not define M_PI by default

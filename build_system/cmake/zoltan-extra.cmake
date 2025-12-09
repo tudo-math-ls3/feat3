@@ -190,6 +190,14 @@ if(NOT TARGET Zoltan::Zoltan)
   endif (WIN32 AND (${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang"))
     #target_link_options(thirdparty-zoltan PRIVATE "LINKER:-w")
 
+  # disable warnings for this TPL
+  if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+    string(REGEX REPLACE "/W[1|2|3|4]" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+    target_compile_options(feat-zoltan-extern PRIVATE /W0)
+  else()
+    target_compile_options(feat-zoltan-extern PRIVATE -w)
+  endif()
+
   find_package(MPI REQUIRED)
   target_link_libraries(feat-zoltan-extern PRIVATE MPI::MPI_C)
 

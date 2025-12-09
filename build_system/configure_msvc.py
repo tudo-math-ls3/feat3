@@ -24,7 +24,7 @@ def configure_msvc(cpu, buildid, compiler, restrict_errors):
     "/GR",
     "/std:c++17",
     "/permissive-",
-    "/external:W4",
+    "/external:W0",
     "/Gd",
     "/TP",
     "/FC",

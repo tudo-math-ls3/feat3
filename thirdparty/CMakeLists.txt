@@ -75,11 +75,12 @@ mark_as_advanced(MAKE_AVAIL_LIST)
 set(CMAKE_CXX_FLAGS_BACKUP ${CMAKE_CXX_FLAGS})
 set(CMAKE_C_FLAGS_BACKUP ${CMAKE_C_FLAGS})
 
-if(WIN32)
-  # Setting /w causes warnings about supressing higher warning levels
-  # Setting /wd9025 supresses that warning
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /w")
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /w")
+# disable warnings for third-party libs
+if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+  string(REGEX REPLACE "/W[1|2|3|4]" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  string(REGEX REPLACE "/W[1|2|3|4]" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W0")
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /W0")
 else()
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -w")
   set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -w")
