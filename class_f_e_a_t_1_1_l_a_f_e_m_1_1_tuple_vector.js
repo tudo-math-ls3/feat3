@@ -21,6 +21,7 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector =
     [ "clone", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a93ec9424f64afc350b9163f16892c5b3", null ],
     [ "convert", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a57fdfb40250022d5b847bca837a6db5a", null ],
     [ "copy", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a477a7871587276efb290ea2cbcdd8da3", null ],
+    [ "dump", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#adbf342c8066bc58c725d2ae5bf914f91", null ],
     [ "format", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a4a3fc278d145d9c1ec38522e1c8f501d", null ],
     [ "format", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#aa271523d1feda96821f05cab7e7c292c", null ],
     [ "get_checkpoint_size", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html#a9d279cf7af9730e4855bb227e48d9a5e", null ],

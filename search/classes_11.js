@@ -31,8 +31,9 @@ var searchData=
   ['rule_28',['Rule',['../class_f_e_a_t_1_1_cubature_1_1_rule.html',1,'FEAT::Cubature::Rule&lt; Shape_, Weight_, Coord_, Point_ &gt;'],['../class_f_e_a_t_1_1_cubature_1_1_scalar_1_1_rule.html',1,'FEAT::Cubature::Scalar::Rule&lt; Weight_, Coord_ &gt;']]],
   ['rule_3c_20facettype_2c_20datatype_5f_2c_20datatype_5f_2c_20domainpointtype_20_3e_29',['Rule&lt; FacetType, DataType_, DataType_, DomainPointType &gt;',['../class_f_e_a_t_1_1_cubature_1_1_rule.html',1,'FEAT::Cubature']]],
   ['rule_3c_20shapetype_2c_20datatype_5f_2c_20datatype_5f_2c_20domainpointtype_20_3e_30',['Rule&lt; ShapeType, DataType_, DataType_, DomainPointType &gt;',['../class_f_e_a_t_1_1_cubature_1_1_rule.html',1,'FEAT::Cubature']]],
-  ['rumpffunctional_31',['RumpfFunctional',['../class_f_e_a_t_1_1_meshopt_1_1_rumpf_functional.html',1,'FEAT::Meshopt']]],
-  ['rumpffunctionalbase_32',['RumpfFunctionalBase',['../class_f_e_a_t_1_1_meshopt_1_1_rumpf_functional_base.html',1,'FEAT::Meshopt']]],
-  ['rumpftrafo_33',['RumpfTrafo',['../struct_f_e_a_t_1_1_meshopt_1_1_rumpf_trafo.html',1,'FEAT::Meshopt']]],
-  ['runtime_34',['Runtime',['../class_f_e_a_t_1_1_runtime.html',1,'FEAT']]]
+  ['rule_3c_20surfaceshapetype_2c_20datatype_2c_20datatype_2c_20refcoordvectype_20_3e_31',['Rule&lt; SurfaceShapeType, DataType, DataType, RefCoordVecType &gt;',['../class_f_e_a_t_1_1_cubature_1_1_rule.html',1,'FEAT::Cubature']]],
+  ['rumpffunctional_32',['RumpfFunctional',['../class_f_e_a_t_1_1_meshopt_1_1_rumpf_functional.html',1,'FEAT::Meshopt']]],
+  ['rumpffunctionalbase_33',['RumpfFunctionalBase',['../class_f_e_a_t_1_1_meshopt_1_1_rumpf_functional_base.html',1,'FEAT::Meshopt']]],
+  ['rumpftrafo_34',['RumpfTrafo',['../struct_f_e_a_t_1_1_meshopt_1_1_rumpf_trafo.html',1,'FEAT::Meshopt']]],
+  ['runtime_35',['Runtime',['../class_f_e_a_t_1_1_runtime.html',1,'FEAT']]]
 ];

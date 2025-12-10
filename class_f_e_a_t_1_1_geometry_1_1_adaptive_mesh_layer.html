@@ -131,6 +131,9 @@ Public Types</h2></td></tr>
 <tr class="memitem:ae4f32a2995f27b29f671b8dfd1601376"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html#ae4f32a2995f27b29f671b8dfd1601376">AdaptiveNeighborsType</a> = <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_neighbors.html">AdaptiveNeighbors</a>&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html#aa97568aa3cf1c5e8bf2eab416da5e847">AdaptiveMeshType</a> &gt;</td></tr>
 <tr class="memdesc:ae4f32a2995f27b29f671b8dfd1601376"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t_1_1_type.html" title="Type namespace.">Type</a> of neighbors wrapper.  <a href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html#ae4f32a2995f27b29f671b8dfd1601376">More...</a><br /></td></tr>
 <tr class="separator:ae4f32a2995f27b29f671b8dfd1601376"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2f0c4b0fa1883bc8cedd1829263ecc5"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html#ac2f0c4b0fa1883bc8cedd1829263ecc5">CoordType</a> = typename AdaptiveMeshType::CoordType</td></tr>
+<tr class="memdesc:ac2f0c4b0fa1883bc8cedd1829263ecc5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Coord type.  <a href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html#ac2f0c4b0fa1883bc8cedd1829263ecc5">More...</a><br /></td></tr>
+<tr class="separator:ac2f0c4b0fa1883bc8cedd1829263ecc5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad7e6780d2f15c1d82b2cb818090883af"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html#ad7e6780d2f15c1d82b2cb818090883af">IndexSetHolderType</a> = <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_index_set_holder.html">AdaptiveIndexSetHolder</a>&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html#aa97568aa3cf1c5e8bf2eab416da5e847">AdaptiveMeshType</a>, <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html#a2f8afb482b60cab59f413fe79a6277e8">ShapeType</a> &gt;</td></tr>
 <tr class="memdesc:ad7e6780d2f15c1d82b2cb818090883af"><td class="mdescLeft">&#160;</td><td class="mdescRight">IndexSetHolder type.  <a href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html#ad7e6780d2f15c1d82b2cb818090883af">More...</a><br /></td></tr>
 <tr class="separator:ad7e6780d2f15c1d82b2cb818090883af"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -279,7 +282,7 @@ class FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;</div><p ><a c
 <p >This class template is a compatability layer between the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh.html" title="Dynamic mesh data structure.">AdaptiveMesh</a> class and the rest of <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a>. It presents a normal <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_conformal_mesh.html" title="Conformal mesh class template.">ConformalMesh</a> interface for a single layer of an <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh.html" title="Dynamic mesh data structure.">AdaptiveMesh</a>. This allows using the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html" title="ConformalMesh interface for adaptive meshes.">AdaptiveMeshLayer</a> like any other mesh class.</p>
 <dl class="section author"><dt>Author</dt><dd>Markus Muegge </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01110">1110</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01120">1120</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="aa97568aa3cf1c5e8bf2eab416da5e847" name="aa97568aa3cf1c5e8bf2eab416da5e847"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aa97568aa3cf1c5e8bf2eab416da5e847">&#9670;&#160;</a></span>AdaptiveMeshType</h2>
@@ -297,7 +300,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p><a class="el" href="namespace_f_e_a_t_1_1_type.html" title="Type namespace.">Type</a> of underlying mesh. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01114">1114</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01124">1124</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -317,7 +320,27 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p><a class="el" href="namespace_f_e_a_t_1_1_type.html" title="Type namespace.">Type</a> of neighbors wrapper. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01117">1117</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01127">1127</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ac2f0c4b0fa1883bc8cedd1829263ecc5" name="ac2f0c4b0fa1883bc8cedd1829263ecc5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2f0c4b0fa1883bc8cedd1829263ecc5">&#9670;&#160;</a></span>CoordType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename AdaptiveMeshType_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">using <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html">FEAT::Geometry::AdaptiveMeshLayer</a>&lt; AdaptiveMeshType_ &gt;::CoordType =  typename AdaptiveMeshType::CoordType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Coord type. </p>
+
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01141">1141</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -337,7 +360,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>IndexSetHolder type. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01131">1131</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01144">1144</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -357,7 +380,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>Mesh permutation type. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01143">1143</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01156">1156</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -377,7 +400,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p><a class="el" href="namespace_f_e_a_t_1_1_shape.html" title="Shape namespace.">Shape</a> type. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01122">1122</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01132">1132</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -397,7 +420,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>Vertex set type. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01125">1125</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01135">1135</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -417,7 +440,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>Vertex type. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01128">1128</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01138">1138</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -467,7 +490,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01168">1168</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01181">1181</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -499,7 +522,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>accessor for adaptive mesh </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01558">1558</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01571">1571</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -528,7 +551,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01201">1201</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01214">1214</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -557,7 +580,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01192">1192</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01205">1205</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -587,7 +610,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01183">1183</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01196">1196</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -628,7 +651,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 <dl class="section note"><dt>Note</dt><dd>If you want to use a custom permutation other than one of the standard permutation strategies then use <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html#aab6004997b3de838aeca7c5a9c406a41" title="Sets a custom mesh permutation for this mesh.">set_permutation()</a> instead.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>A mesh can only be permuted once and therefore this function will fire an assertion if the mesh is already permuted. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01267">1267</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01280">1280</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="mesh__permutation_8hpp_source.html#l00585">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::create()</a>, <a class="el" href="mesh__permutation_8hpp_source.html#l00490">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::empty()</a>, <a class="el" href="mesh__permutation_8hpp_source.html#l00522">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::get_perm()</a>, <a class="el" href="mesh__permutation_8hpp_source.html#l00502">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::get_perms()</a>, <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00149">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::permute()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
@@ -659,7 +682,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01428">1428</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01441">1441</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -690,7 +713,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>accessor for foundation mesh </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01552">1552</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01565">1565</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -740,7 +763,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The index of the parent on the next layer, if the parent has no children, the requested child's index, if the parent has at least <code>child</code> children, std::nullopt else. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01521">1521</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01534">1534</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -780,7 +803,7 @@ template&lt;int cell_dim_, int face_dim_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01466">1466</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01479">1479</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -820,7 +843,7 @@ template&lt;int cell_dim_, int face_dim_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01478">1478</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01491">1491</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -851,7 +874,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>Returns a reference to the index set holder of this mesh. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01486">1486</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01499">1499</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -882,7 +905,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>Returns a reference to the index set holder of this mesh. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01494">1494</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01507">1507</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -913,9 +936,9 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>Returns the permutation applied to the mesh. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01245">1245</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01258">1258</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01330">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::validate_element_coloring()</a>, and <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01380">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::validate_element_layering()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01343">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::validate_element_coloring()</a>, and <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01393">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::validate_element_layering()</a>.</p>
 
 </div>
 </div>
@@ -944,7 +967,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01433">1433</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01446">1446</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -973,7 +996,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01438">1438</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01451">1451</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -1011,7 +1034,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01531">1531</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01544">1544</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -1042,9 +1065,9 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>Returns the number of elements (highest dimension entities) in the mesh. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01227">1227</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01240">1240</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01211">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::get_num_entities()</a>.</p>
+<p class="reference">References <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01224">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::get_num_entities()</a>.</p>
 
 </div>
 </div>
@@ -1082,9 +1105,9 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01211">1211</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01224">1224</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01227">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::get_num_elements()</a>, <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01219">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::get_num_vertices()</a>, and <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01298">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::set_permutation()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01240">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::get_num_elements()</a>, <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01232">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::get_num_vertices()</a>, and <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01311">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::set_permutation()</a>.</p>
 
 </div>
 </div>
@@ -1115,9 +1138,9 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>Returns the number of vertices in the mesh. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01219">1219</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01232">1232</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01211">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::get_num_entities()</a>.</p>
+<p class="reference">References <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01224">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::get_num_entities()</a>.</p>
 
 </div>
 </div>
@@ -1146,7 +1169,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01499">1499</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01512">1512</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -1175,7 +1198,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01504">1504</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01517">1517</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -1206,7 +1229,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>Returns the vertex set of this mesh. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01446">1446</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01459">1459</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -1237,7 +1260,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>Returns the vertex set of this mesh. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01454">1454</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01467">1467</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -1270,7 +1293,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 <p>Indicates whether any mesh element adjacent to the given vertex has changed on the given layer. </p>
 <p >This is intended to be used with the BPX solver to determine which vertices participate on the given layer. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01546">1546</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01559">1559</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -1302,7 +1325,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 <p>Checks whether the mesh is permuted. </p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if the mesh is permuted, otherwise <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01237">1237</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01250">1250</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="mesh__permutation_8hpp_source.html#l00490">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::empty()</a>.</p>
 
@@ -1333,7 +1356,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01536">1536</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01549">1549</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -1374,9 +1397,9 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </dl>
 <dl class="section attention"><dt>Attention</dt><dd>A mesh can only be permuted once and therefore this function will fire an assertion if the mesh is already permuted. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01298">1298</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01311">1311</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__permutation_8hpp_source.html#l00490">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::empty()</a>, <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01211">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::get_num_entities()</a>, <a class="el" href="mesh__permutation_8hpp_source.html#l00522">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::get_perm()</a>, <a class="el" href="mesh__permutation_8hpp_source.html#l00502">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::get_perms()</a>, <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00149">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::permute()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="mesh__permutation_8hpp_source.html#l00490">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::empty()</a>, <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01224">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::get_num_entities()</a>, <a class="el" href="mesh__permutation_8hpp_source.html#l00522">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::get_perm()</a>, <a class="el" href="mesh__permutation_8hpp_source.html#l00502">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::get_perms()</a>, <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00149">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::permute()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -1409,9 +1432,9 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 <p >An element coloring is valid, if any pair of two different elements, which share at least one common vertex, have different colors.</p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if the element coloring is either valid or empty, otherwise <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01330">1330</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01343">1343</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__permutation_8hpp_source.html#l00551">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::get_element_coloring()</a>, <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01245">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::get_mesh_permutation()</a>, <a class="el" href="graph_8hpp_source.html#l00958">FEAT::Adjacency::Graph::image_begin()</a>, <a class="el" href="graph_8hpp_source.html#l00966">FEAT::Adjacency::Graph::image_end()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>.</p>
+<p class="reference">References <a class="el" href="mesh__permutation_8hpp_source.html#l00551">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::get_element_coloring()</a>, <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01258">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::get_mesh_permutation()</a>, <a class="el" href="graph_8hpp_source.html#l00964">FEAT::Adjacency::Graph::image_begin()</a>, <a class="el" href="graph_8hpp_source.html#l00972">FEAT::Adjacency::Graph::image_end()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>.</p>
 
 </div>
 </div>
@@ -1444,9 +1467,9 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 <p >An element layering is valid, if any pair of two different elements, which share at least one common vertex, have different colors.</p>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if the element layering is either valid or empty, otherwise <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01380">1380</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01393">1393</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__permutation_8hpp_source.html#l00564">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::get_element_layering()</a>, <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01245">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::get_mesh_permutation()</a>, <a class="el" href="graph_8hpp_source.html#l00958">FEAT::Adjacency::Graph::image_begin()</a>, <a class="el" href="graph_8hpp_source.html#l00966">FEAT::Adjacency::Graph::image_end()</a>, <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, <a class="el" href="math_8hpp_source.html#l00123">FEAT::Math::min()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>.</p>
+<p class="reference">References <a class="el" href="mesh__permutation_8hpp_source.html#l00564">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::get_element_layering()</a>, <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01258">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::get_mesh_permutation()</a>, <a class="el" href="graph_8hpp_source.html#l00964">FEAT::Adjacency::Graph::image_begin()</a>, <a class="el" href="graph_8hpp_source.html#l00972">FEAT::Adjacency::Graph::image_end()</a>, <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, <a class="el" href="math_8hpp_source.html#l00123">FEAT::Math::min()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7a382eb179a7d78f25d89c085988b37e95">FEAT::Adjacency::transpose</a>.</p>
 
 </div>
 </div>
@@ -1473,7 +1496,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01157">1157</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01170">1170</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -1499,7 +1522,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01154">1154</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01167">1167</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -1525,7 +1548,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01153">1153</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01166">1166</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -1551,7 +1574,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01159">1159</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01172">1172</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -1577,7 +1600,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01156">1156</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01169">1169</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -1605,7 +1628,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>This is an unstructured mesh. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01140">1140</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01153">1153</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -1633,7 +1656,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p><a class="el" href="namespace_f_e_a_t_1_1_shape.html" title="Shape namespace.">Shape</a> dimension. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01134">1134</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01147">1147</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -1661,7 +1684,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>World dimension. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01137">1137</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01150">1150</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>

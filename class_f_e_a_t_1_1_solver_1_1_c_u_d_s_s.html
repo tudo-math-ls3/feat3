@@ -183,11 +183,11 @@ Private Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Nvidia CUDA Direct Sparse <a class="el" href="namespace_f_e_a_t_1_1_solver.html" title="Solver namespace.">Solver</a> wrapper. </p>
 <p >This class provides an implementation of the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html" title="Polymorphic solver interface.">SolverBase</a> interface using the Nvidia CUDA direct sparse solver "cuDSS" for doing the actual dirty work.</p>
-<dl class="section note"><dt>Note</dt><dd>This solver can only be applied onto <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html">SparseMatrixCSR&lt;double,Index&gt;</a> matrices.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>This solver can only be applied onto <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html">SparseMatrixCSR&lt;double,Index&gt;</a> matrices. If you require more flexibility and/or if you want to use cuDSS as a parallel direct solver, please consider using the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html" title="Front-end wrapper class for (parallel) third-party direct sparse solvers.">DirectSparseSolver</a> class, which can also use cuDSS as a solver backend.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This class is only declared if <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> was configured to build and link against the <code>Nvidia</code> cuDSS library.</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="cudss_8hpp_source.html#l00043">43</a> of file <a class="el" href="cudss_8hpp_source.html">cudss.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cudss_8hpp_source.html#l00045">45</a> of file <a class="el" href="cudss_8hpp_source.html">cudss.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="ae8cfeae51ca45dbb5bc802995a0d6d90" name="ae8cfeae51ca45dbb5bc802995a0d6d90"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae8cfeae51ca45dbb5bc802995a0d6d90">&#9670;&#160;</a></span>BaseClass</h2>
@@ -203,7 +203,7 @@ Private Attributes</h2></td></tr>
 
 <p>our base class </p>
 
-<p class="definition">Definition at line <a class="el" href="cudss_8hpp_source.html#l00053">53</a> of file <a class="el" href="cudss_8hpp_source.html">cudss.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cudss_8hpp_source.html#l00055">55</a> of file <a class="el" href="cudss_8hpp_source.html">cudss.hpp</a>.</p>
 
 </div>
 </div>
@@ -221,7 +221,7 @@ Private Attributes</h2></td></tr>
 
 <p>compatible matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="cudss_8hpp_source.html#l00048">48</a> of file <a class="el" href="cudss_8hpp_source.html">cudss.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cudss_8hpp_source.html#l00050">50</a> of file <a class="el" href="cudss_8hpp_source.html">cudss.hpp</a>.</p>
 
 </div>
 </div>
@@ -239,7 +239,7 @@ Private Attributes</h2></td></tr>
 
 <p>compatible vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="cudss_8hpp_source.html#l00050">50</a> of file <a class="el" href="cudss_8hpp_source.html">cudss.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cudss_8hpp_source.html#l00052">52</a> of file <a class="el" href="cudss_8hpp_source.html">cudss.hpp</a>.</p>
 
 </div>
 </div>
@@ -583,7 +583,7 @@ Before this function can be called, the symbolic initialization must be performe
 
 <p>Implements <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ab7e792923921c7dbe2a1fefafd73ef0a">FEAT::Solver::SolverBase&lt; LAFEM::DenseVector&lt; double, Index &gt; &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="cudss_8hpp_source.html#l00073">73</a> of file <a class="el" href="cudss_8hpp_source.html">cudss.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cudss_8hpp_source.html#l00075">75</a> of file <a class="el" href="cudss_8hpp_source.html">cudss.hpp</a>.</p>
 
 </div>
 </div>
@@ -608,7 +608,7 @@ Before this function can be called, the symbolic initialization must be performe
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="cudss_8hpp_source.html#l00058">58</a> of file <a class="el" href="cudss_8hpp_source.html">cudss.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cudss_8hpp_source.html#l00060">60</a> of file <a class="el" href="cudss_8hpp_source.html">cudss.hpp</a>.</p>
 
 </div>
 </div>
@@ -634,7 +634,7 @@ Before this function can be called, the symbolic initialization must be performe
 
 <p>system matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="cudss_8hpp_source.html#l00057">57</a> of file <a class="el" href="cudss_8hpp_source.html">cudss.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="cudss_8hpp_source.html#l00059">59</a> of file <a class="el" href="cudss_8hpp_source.html">cudss.hpp</a>.</p>
 
 </div>
 </div>

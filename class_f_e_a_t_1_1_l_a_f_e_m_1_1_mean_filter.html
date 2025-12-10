@@ -161,6 +161,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ada8516decce58df5a1eba47856d3dca6"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter.html#ada8516decce58df5a1eba47856d3dca6">convert</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter.html">MeanFilter</a>&lt; DT2_, IT2_ &gt; &amp;other)</td></tr>
 <tr class="memdesc:ada8516decce58df5a1eba47856d3dca6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion method.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter.html#ada8516decce58df5a1eba47856d3dca6">More...</a><br /></td></tr>
 <tr class="separator:ada8516decce58df5a1eba47856d3dca6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a707bbdfa9fa2adbd034a2b70788733cd"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter.html#a707bbdfa9fa2adbd034a2b70788733cd">empty</a> () const</td></tr>
+<tr class="separator:a707bbdfa9fa2adbd034a2b70788733cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6979151f56d7b7940b7025f731f41726"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter.html#a6979151f56d7b7940b7025f731f41726">filter_cor</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter.html#a7ff67497d511f19dbca41577bc6dd7ed">VectorType</a> &amp;vector) const</td></tr>
 <tr class="memdesc:a6979151f56d7b7940b7025f731f41726"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto a correction vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter.html#a6979151f56d7b7940b7025f731f41726">More...</a><br /></td></tr>
 <tr class="separator:a6979151f56d7b7940b7025f731f41726"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -671,6 +673,35 @@ template&lt;typename DT2_ , typename IT2_ &gt; </div>
 
 </div>
 </div>
+<a id="a707bbdfa9fa2adbd034a2b70788733cd" name="a707bbdfa9fa2adbd034a2b70788733cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a707bbdfa9fa2adbd034a2b70788733cd">&#9670;&#160;</a></span>empty()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename DT_ , typename IT_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter.html">FEAT::LAFEM::MeanFilter</a>&lt; DT_, IT_ &gt;::empty </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00206">206</a> of file <a class="el" href="lafem_2mean__filter_8hpp_source.html">mean_filter.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a6979151f56d7b7940b7025f731f41726" name="a6979151f56d7b7940b7025f731f41726"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6979151f56d7b7940b7025f731f41726">&#9670;&#160;</a></span>filter_cor()</h2>
 
@@ -705,7 +736,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00257">257</a> of file <a class="el" href="lafem_2mean__filter_8hpp_source.html">mean_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00262">262</a> of file <a class="el" href="lafem_2mean__filter_8hpp_source.html">mean_filter.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00043">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::_vec_dual</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00041">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::_vec_prim</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00045">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::_volume</a>, <a class="el" href="dense__vector_8hpp_source.html#l00813">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::axpy()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00921">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::dot()</a>, and <a class="el" href="container_8hpp_source.html#l01165">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::empty()</a>.</p>
 
@@ -745,9 +776,9 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00245">245</a> of file <a class="el" href="lafem_2mean__filter_8hpp_source.html">mean_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00250">250</a> of file <a class="el" href="lafem_2mean__filter_8hpp_source.html">mean_filter.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00212">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_rhs()</a>.</p>
+<p class="reference">References <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00217">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_rhs()</a>.</p>
 
 </div>
 </div>
@@ -787,7 +818,7 @@ template&lt;typename MT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00271">271</a> of file <a class="el" href="lafem_2mean__filter_8hpp_source.html">mean_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00276">276</a> of file <a class="el" href="lafem_2mean__filter_8hpp_source.html">mean_filter.hpp</a>.</p>
 
 </div>
 </div>
@@ -825,11 +856,11 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00212">212</a> of file <a class="el" href="lafem_2mean__filter_8hpp_source.html">mean_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00217">217</a> of file <a class="el" href="lafem_2mean__filter_8hpp_source.html">mean_filter.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00043">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::_vec_dual</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00041">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::_vec_prim</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00045">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::_volume</a>, <a class="el" href="dense__vector_8hpp_source.html#l00813">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::axpy()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00921">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::dot()</a>, and <a class="el" href="container_8hpp_source.html#l01165">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::empty()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00245">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_def()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00250">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_def()</a>.</p>
 
 </div>
 </div>
@@ -867,7 +898,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00225">225</a> of file <a class="el" href="lafem_2mean__filter_8hpp_source.html">mean_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00230">230</a> of file <a class="el" href="lafem_2mean__filter_8hpp_source.html">mean_filter.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00047">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::_sol_mean</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00043">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::_vec_dual</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00041">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::_vec_prim</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00045">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::_volume</a>, <a class="el" href="dense__vector_8hpp_source.html#l00813">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::axpy()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00921">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::dot()</a>, and <a class="el" href="container_8hpp_source.html#l01165">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::empty()</a>.</p>
 
@@ -934,7 +965,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00047">47</a> of file <a class="el" href="lafem_2mean__filter_8hpp_source.html">mean_filter.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00167">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clear()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00135">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00154">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00225">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_sol()</a>, and <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00114">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::operator=()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00167">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clear()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00135">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00154">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00230">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_sol()</a>, and <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00114">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::operator=()</a>.</p>
 
 </div>
 </div>
@@ -964,7 +995,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00043">43</a> of file <a class="el" href="lafem_2mean__filter_8hpp_source.html">mean_filter.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00167">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clear()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00135">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00154">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00257">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_cor()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00212">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_rhs()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00225">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_sol()</a>, and <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00114">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::operator=()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00167">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clear()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00135">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00154">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00262">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_cor()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00217">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_rhs()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00230">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_sol()</a>, and <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00114">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::operator=()</a>.</p>
 
 </div>
 </div>
@@ -994,7 +1025,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00041">41</a> of file <a class="el" href="lafem_2mean__filter_8hpp_source.html">mean_filter.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00068">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::MeanFilter()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00167">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clear()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00135">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00154">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00257">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_cor()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00212">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_rhs()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00225">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_sol()</a>, and <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00114">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::operator=()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00068">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::MeanFilter()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00167">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clear()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00135">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00154">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00262">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_cor()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00217">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_rhs()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00230">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_sol()</a>, and <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00114">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::operator=()</a>.</p>
 
 </div>
 </div>
@@ -1024,7 +1055,7 @@ template&lt;typename DT_ , typename IT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00045">45</a> of file <a class="el" href="lafem_2mean__filter_8hpp_source.html">mean_filter.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00068">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::MeanFilter()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00167">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clear()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00135">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00154">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00257">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_cor()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00212">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_rhs()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00225">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_sol()</a>, and <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00114">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::operator=()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00068">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::MeanFilter()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00167">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clear()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00135">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::clone()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00154">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00262">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_cor()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00217">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_rhs()</a>, <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00230">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::filter_sol()</a>, and <a class="el" href="lafem_2mean__filter_8hpp_source.html#l00114">FEAT::LAFEM::MeanFilter&lt; DT_, IT_ &gt;::operator=()</a>.</p>
 
 </div>
 </div>

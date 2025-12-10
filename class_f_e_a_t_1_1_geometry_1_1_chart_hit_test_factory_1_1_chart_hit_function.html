@@ -111,8 +111,8 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_geometry_1_1_chart_h
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a9c31c15d7570669b9b1890d948779c26"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_chart_hit_test_factory_1_1_chart_hit_function.html#a9c31c15d7570669b9b1890d948779c26">ChartHitFunction</a> (const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base.html">Geometry::Atlas::ChartBase</a>&lt; Mesh_ &gt; &amp;chart, bool invert)</td></tr>
-<tr class="separator:a9c31c15d7570669b9b1890d948779c26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c3216ac5a1bcf8d25eeb793870f01cd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_chart_hit_test_factory_1_1_chart_hit_function.html#a0c3216ac5a1bcf8d25eeb793870f01cd">ChartHitFunction</a> (const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_atlas_1_1_chart_base.html">Geometry::Atlas::ChartBase</a>&lt; Mesh_ &gt; &amp;chart, bool invert, CoordType tol=CoordType(0))</td></tr>
+<tr class="separator:a0c3216ac5a1bcf8d25eeb793870f01cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab1d0105794a63bd73192480dac159dc9"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_chart_hit_test_factory_1_1_chart_hit_function.html#ab1d0105794a63bd73192480dac159dc9">operator()</a> (const WorldPointType &amp;point) const</td></tr>
 <tr class="separator:ab1d0105794a63bd73192480dac159dc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -122,6 +122,8 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:a0b265d119ab26aa4193caa3f7068a0be"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abdef8085196ac77e0d4716a279022214"><td class="memItemLeft" align="right" valign="top">const CoordType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_chart_hit_test_factory_1_1_chart_hit_function.html#abdef8085196ac77e0d4716a279022214">_inv</a></td></tr>
 <tr class="separator:abdef8085196ac77e0d4716a279022214"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a75cdba37408add5b92a1a634a80f8ac3"><td class="memItemLeft" align="right" valign="top">const CoordType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_chart_hit_test_factory_1_1_chart_hit_function.html#a75cdba37408add5b92a1a634a80f8ac3">_tol</a></td></tr>
+<tr class="separator:a75cdba37408add5b92a1a634a80f8ac3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-types" name="pri-types"></a>
 Private Types</h2></td></tr>
@@ -188,8 +190,8 @@ template&lt;typename Mesh_ , typename Chart_  = Atlas::ChartBase&lt;Mesh_&gt;&gt
 </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a9c31c15d7570669b9b1890d948779c26" name="a9c31c15d7570669b9b1890d948779c26"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9c31c15d7570669b9b1890d948779c26">&#9670;&#160;</a></span>ChartHitFunction()</h2>
+<a id="a0c3216ac5a1bcf8d25eeb793870f01cd" name="a0c3216ac5a1bcf8d25eeb793870f01cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0c3216ac5a1bcf8d25eeb793870f01cd">&#9670;&#160;</a></span>ChartHitFunction()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -209,7 +211,13 @@ template&lt;typename Mesh_ , typename Chart_  = Atlas::ChartBase&lt;Mesh_&gt;&gt
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">bool&#160;</td>
-          <td class="paramname"><em>invert</em>&#160;</td>
+          <td class="paramname"><em>invert</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">CoordType&#160;</td>
+          <td class="paramname"><em>tol</em> = <code>CoordType(0)</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -224,7 +232,7 @@ template&lt;typename Mesh_ , typename Chart_  = Atlas::ChartBase&lt;Mesh_&gt;&gt
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="hit__test__factory_8hpp_source.html#l00452">452</a> of file <a class="el" href="hit__test__factory_8hpp_source.html">hit_test_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hit__test__factory_8hpp_source.html#l00453">453</a> of file <a class="el" href="hit__test__factory_8hpp_source.html">hit_test_factory.hpp</a>.</p>
 
 </div>
 </div>
@@ -255,7 +263,7 @@ template&lt;typename Mesh_ , typename Chart_  = Atlas::ChartBase&lt;Mesh_&gt;&gt
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="hit__test__factory_8hpp_source.html#l00458">458</a> of file <a class="el" href="hit__test__factory_8hpp_source.html">hit_test_factory.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hit__test__factory_8hpp_source.html#l00460">460</a> of file <a class="el" href="hit__test__factory_8hpp_source.html">hit_test_factory.hpp</a>.</p>
 
 </div>
 </div>
@@ -309,6 +317,32 @@ template&lt;typename Mesh_ , typename Chart_  = Atlas::ChartBase&lt;Mesh_&gt;&gt
 </div><div class="memdoc">
 
 <p class="definition">Definition at line <a class="el" href="hit__test__factory_8hpp_source.html#l00449">449</a> of file <a class="el" href="hit__test__factory_8hpp_source.html">hit_test_factory.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a75cdba37408add5b92a1a634a80f8ac3" name="a75cdba37408add5b92a1a634a80f8ac3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a75cdba37408add5b92a1a634a80f8ac3">&#9670;&#160;</a></span>_tol</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Mesh_ , typename Chart_  = Atlas::ChartBase&lt;Mesh_&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const CoordType <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_chart_hit_test_factory.html">FEAT::Geometry::ChartHitTestFactory</a>&lt; Mesh_, Chart_ &gt;::ChartHitFunction::_tol</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="hit__test__factory_8hpp_source.html#l00450">450</a> of file <a class="el" href="hit__test__factory_8hpp_source.html">hit_test_factory.hpp</a>.</p>
 
 </div>
 </div>

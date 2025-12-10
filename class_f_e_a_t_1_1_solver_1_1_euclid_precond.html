@@ -120,9 +120,10 @@ Inheritance diagram for FEAT::Solver::EuclidPrecond&lt; Matrix_, Filter_ &gt;:</
  <div class="center">
   <img src="class_f_e_a_t_1_1_solver_1_1_euclid_precond.png" usemap="#FEAT::Solver::EuclidPrecond_3C_20Matrix_5F_2C_20Filter_5F_20_3E_map" alt=""/>
   <map id="FEAT::Solver::EuclidPrecond_3C_20Matrix_5F_2C_20Filter_5F_20_3E_map" name="FEAT::Solver::EuclidPrecond_3C_20Matrix_5F_2C_20Filter_5F_20_3E_map">
-<area href="class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html" title="Base-Class for solvers/preconditioners borrowed from HYPRE library." alt="FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;" shape="rect" coords="0,112,616,136"/>
-<area href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html" title="Base-Class for Solvers based on Algebraic-DOF-Partitioning." alt="FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;" shape="rect" coords="0,56,616,80"/>
+<area href="class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html" title="Base-Class for solvers/preconditioners borrowed from HYPRE library." alt="FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;" shape="rect" coords="313,112,929,136"/>
+<area href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html" title="Base-Class for solvers based on Algebraic-DOF-Partitioning." alt="FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;" shape="rect" coords="313,56,929,80"/>
 <area href="class_f_e_a_t_1_1_solver_1_1_solver_base.html" title="Polymorphic solver interface." alt="FEAT::Solver::SolverBase&lt; Vector_ &gt;" shape="rect" coords="0,0,616,24"/>
+<area href="class_f_e_a_t_1_1_solver_1_1_solver_base.html" title="Polymorphic solver interface." alt="FEAT::Solver::SolverBase&lt; Vector_ &gt;" shape="rect" coords="626,0,1242,24"/>
   </map>
 </div></div>
 <table class="memberdecls">
@@ -131,6 +132,18 @@ Public Types</h2></td></tr>
 <tr class="memitem:ac9358c16656ffaff5ab99a2acc3a63d4"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html">HypreSolverBase</a>&lt; Matrix_, Filter_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#ac9358c16656ffaff5ab99a2acc3a63d4">BaseClass</a></td></tr>
 <tr class="memdesc:ac9358c16656ffaff5ab99a2acc3a63d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">our base-class  <a href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#ac9358c16656ffaff5ab99a2acc3a63d4">More...</a><br /></td></tr>
 <tr class="separator:ac9358c16656ffaff5ab99a2acc3a63d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af58fbbea5320c083bf0b7f3de4cf4fbd"><td class="memItemLeft" align="right" valign="top">typedef MatrixType::DataType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#af58fbbea5320c083bf0b7f3de4cf4fbd">DataType</a></td></tr>
+<tr class="memdesc:af58fbbea5320c083bf0b7f3de4cf4fbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">our internal data type  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#af58fbbea5320c083bf0b7f3de4cf4fbd">More...</a><br /></td></tr>
+<tr class="separator:af58fbbea5320c083bf0b7f3de4cf4fbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac221eadb2c2ff02e318a46370d518b5a"><td class="memItemLeft" align="right" valign="top">typedef Filter_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ac221eadb2c2ff02e318a46370d518b5a">FilterType</a></td></tr>
+<tr class="memdesc:ac221eadb2c2ff02e318a46370d518b5a"><td class="mdescLeft">&#160;</td><td class="mdescRight">the (local) filter type  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ac221eadb2c2ff02e318a46370d518b5a">More...</a><br /></td></tr>
+<tr class="separator:ac221eadb2c2ff02e318a46370d518b5a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a770b2d5eacd8031306cc2f40382ad6d8"><td class="memItemLeft" align="right" valign="top">typedef MatrixType::IndexType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a770b2d5eacd8031306cc2f40382ad6d8">IndexType</a></td></tr>
+<tr class="memdesc:a770b2d5eacd8031306cc2f40382ad6d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">our internal index type  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a770b2d5eacd8031306cc2f40382ad6d8">More...</a><br /></td></tr>
+<tr class="separator:a770b2d5eacd8031306cc2f40382ad6d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5ae58d38f8a98ab81805a03b51244a2"><td class="memItemLeft" align="right" valign="top">typedef Matrix_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ae5ae58d38f8a98ab81805a03b51244a2">MatrixType</a></td></tr>
+<tr class="memdesc:ae5ae58d38f8a98ab81805a03b51244a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">this specialization expects a local matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ae5ae58d38f8a98ab81805a03b51244a2">More...</a><br /></td></tr>
+<tr class="separator:ae5ae58d38f8a98ab81805a03b51244a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2aa29852f980cf66edeb3c340a35f4e6"><td class="memItemLeft" align="right" valign="top">typedef BaseClass::VectorType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#a2aa29852f980cf66edeb3c340a35f4e6">VectorType</a></td></tr>
 <tr class="memdesc:a2aa29852f980cf66edeb3c340a35f4e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">the vector type  <a href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#a2aa29852f980cf66edeb3c340a35f4e6">More...</a><br /></td></tr>
 <tr class="separator:a2aa29852f980cf66edeb3c340a35f4e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -173,45 +186,114 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a8c34d07a55cd09eaafef49269f140536"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#a8c34d07a55cd09eaafef49269f140536">_download_cor</a> (<a class="el" href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#a2aa29852f980cf66edeb3c340a35f4e6">VectorType</a> &amp;vec_cor)</td></tr>
 <tr class="memdesc:a8c34d07a55cd09eaafef49269f140536"><td class="mdescLeft">&#160;</td><td class="mdescRight">Downloads the HYPRE correction vector.  <a href="class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#a8c34d07a55cd09eaafef49269f140536">More...</a><br /></td></tr>
 <tr class="separator:a8c34d07a55cd09eaafef49269f140536"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71026e1b65bb662a65070d016e24ca0b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a71026e1b65bb662a65070d016e24ca0b">_download_vec_cor</a> (<a class="el" href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#a2aa29852f980cf66edeb3c340a35f4e6">VectorType</a> &amp;vec_cor)</td></tr>
-<tr class="separator:a71026e1b65bb662a65070d016e24ca0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a61acb04bb9f6091f557181fdbdc314b4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61acb04bb9f6091f557181fdbdc314b4">_download_vec_def</a> (<a class="el" href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#a2aa29852f980cf66edeb3c340a35f4e6">VectorType</a> &amp;vec_def)</td></tr>
-<tr class="separator:a61acb04bb9f6091f557181fdbdc314b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a789568423271ce99012675fb81019e9b"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ &gt; </td></tr>
+<tr class="memitem:a789568423271ce99012675fb81019e9b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a789568423271ce99012675fb81019e9b">_download_vector</a> (LocalVectorType &amp;vector, const DTV_ *val)</td></tr>
+<tr class="memdesc:a789568423271ce99012675fb81019e9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Downloads the ADP vector values from the given array.  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a789568423271ce99012675fb81019e9b">More...</a><br /></td></tr>
+<tr class="separator:a789568423271ce99012675fb81019e9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acc86b8ad222aecb780b509702577921e"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ &gt; </td></tr>
+<tr class="memitem:acc86b8ad222aecb780b509702577921e"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#acc86b8ad222aecb780b509702577921e">_download_vector</a> (<a class="el" href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#a2aa29852f980cf66edeb3c340a35f4e6">VectorType</a> &amp;vector, const DTV_ *val)</td></tr>
+<tr class="memdesc:acc86b8ad222aecb780b509702577921e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Downloads the ADP vector values from the given array.  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#acc86b8ad222aecb780b509702577921e">More...</a><br /></td></tr>
+<tr class="separator:acc86b8ad222aecb780b509702577921e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2a221a2c315a5b03acb7cece72019b0"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </td></tr>
+<tr class="memitem:ac2a221a2c315a5b03acb7cece72019b0"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ac2a221a2c315a5b03acb7cece72019b0">_filter_mat</a> (DTV_ *, const RPT_ *, const CIT_ *, const <a class="el" href="class_f_e_a_t_1_1_global_1_1_mean_filter.html">Global::MeanFilter</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#af58fbbea5320c083bf0b7f3de4cf4fbd">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a770b2d5eacd8031306cc2f40382ad6d8">IndexType</a> &gt; &amp;filter)</td></tr>
+<tr class="memdesc:ac2a221a2c315a5b03acb7cece72019b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">auxiliary function: filters the local ADP matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ac2a221a2c315a5b03acb7cece72019b0">More...</a><br /></td></tr>
+<tr class="separator:ac2a221a2c315a5b03acb7cece72019b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a705fa6fa252ff552732351ee4f363c49"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </td></tr>
+<tr class="memitem:a705fa6fa252ff552732351ee4f363c49"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a705fa6fa252ff552732351ee4f363c49">_filter_mat</a> (DTV_ *, const RPT_ *, const CIT_ *, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter.html">LAFEM::MeanFilter</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#af58fbbea5320c083bf0b7f3de4cf4fbd">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a770b2d5eacd8031306cc2f40382ad6d8">IndexType</a> &gt; &amp;filter)</td></tr>
+<tr class="memdesc:a705fa6fa252ff552732351ee4f363c49"><td class="mdescLeft">&#160;</td><td class="mdescRight">auxiliary function: filters the local ADP matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a705fa6fa252ff552732351ee4f363c49">More...</a><br /></td></tr>
+<tr class="separator:a705fa6fa252ff552732351ee4f363c49"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9002bc7d51bcd73fa2322b7a5c9c5bbb"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </td></tr>
+<tr class="memitem:a9002bc7d51bcd73fa2322b7a5c9c5bbb"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a9002bc7d51bcd73fa2322b7a5c9c5bbb">_filter_mat</a> (DTV_ *, const RPT_ *, const CIT_ *, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter.html">LAFEM::NoneFilter</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#af58fbbea5320c083bf0b7f3de4cf4fbd">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a770b2d5eacd8031306cc2f40382ad6d8">IndexType</a> &gt; &amp;)</td></tr>
+<tr class="memdesc:a9002bc7d51bcd73fa2322b7a5c9c5bbb"><td class="mdescLeft">&#160;</td><td class="mdescRight">auxiliary function: filters the local ADP matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a9002bc7d51bcd73fa2322b7a5c9c5bbb">More...</a><br /></td></tr>
+<tr class="separator:a9002bc7d51bcd73fa2322b7a5c9c5bbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e3e7089e538e043f0a0ed3733873ac2"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ , typename RPT_ , typename CIT_ , typename First_ &gt; </td></tr>
+<tr class="memitem:a5e3e7089e538e043f0a0ed3733873ac2"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5e3e7089e538e043f0a0ed3733873ac2">_filter_mat</a> (DTV_ *val, const RPT_ *row_ptr, const CIT_ *col_idx, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain.html">LAFEM::FilterChain</a>&lt; First_ &gt; &amp;filter)</td></tr>
+<tr class="memdesc:a5e3e7089e538e043f0a0ed3733873ac2"><td class="mdescLeft">&#160;</td><td class="mdescRight">auxiliary function: filters the local ADP matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5e3e7089e538e043f0a0ed3733873ac2">More...</a><br /></td></tr>
+<tr class="separator:a5e3e7089e538e043f0a0ed3733873ac2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61b54de6260cb80db15b98e27720d0dd"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ , typename RPT_ , typename CIT_ , typename First_ , typename... Rest_&gt; </td></tr>
+<tr class="memitem:a61b54de6260cb80db15b98e27720d0dd"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61b54de6260cb80db15b98e27720d0dd">_filter_mat</a> (DTV_ *val, const RPT_ *row_ptr, const CIT_ *col_idx, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain.html">LAFEM::FilterChain</a>&lt; First_, Rest_... &gt; &amp;filter)</td></tr>
+<tr class="memdesc:a61b54de6260cb80db15b98e27720d0dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">auxiliary function: filters the local ADP matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61b54de6260cb80db15b98e27720d0dd">More...</a><br /></td></tr>
+<tr class="separator:a61b54de6260cb80db15b98e27720d0dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26c01317f4519371cde4ccd73ffd3796"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ , typename RPT_ , typename CIT_ , typename SubFilter_ &gt; </td></tr>
+<tr class="memitem:a26c01317f4519371cde4ccd73ffd3796"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a26c01317f4519371cde4ccd73ffd3796">_filter_mat</a> (DTV_ *val, const RPT_ *row_ptr, const CIT_ *col_idx, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_sequence.html">LAFEM::FilterSequence</a>&lt; SubFilter_ &gt; &amp;filter)</td></tr>
+<tr class="memdesc:a26c01317f4519371cde4ccd73ffd3796"><td class="mdescLeft">&#160;</td><td class="mdescRight">auxiliary function: filters the local ADP matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a26c01317f4519371cde4ccd73ffd3796">More...</a><br /></td></tr>
+<tr class="separator:a26c01317f4519371cde4ccd73ffd3796"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7b014c44a27fb1b4e07f0b0ad520b0b"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </td></tr>
+<tr class="memitem:ad7b014c44a27fb1b4e07f0b0ad520b0b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ad7b014c44a27fb1b4e07f0b0ad520b0b">_filter_mat</a> (DTV_ *val, const RPT_ *row_ptr, const CIT_ *col_idx, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html">LAFEM::UnitFilter</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#af58fbbea5320c083bf0b7f3de4cf4fbd">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a770b2d5eacd8031306cc2f40382ad6d8">IndexType</a> &gt; &amp;filter)</td></tr>
+<tr class="memdesc:ad7b014c44a27fb1b4e07f0b0ad520b0b"><td class="mdescLeft">&#160;</td><td class="mdescRight">auxiliary function: filters the local ADP matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ad7b014c44a27fb1b4e07f0b0ad520b0b">More...</a><br /></td></tr>
+<tr class="separator:ad7b014c44a27fb1b4e07f0b0ad520b0b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af5d0964b882f92756e92d3e94bd56772"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#af5d0964b882f92756e92d3e94bd56772">_format_cor</a> ()</td></tr>
-<tr class="memdesc:af5d0964b882f92756e92d3e94bd56772"><td class="mdescLeft">&#160;</td><td class="mdescRight">Format the HYPRE correction vector.  <a href="class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#af5d0964b882f92756e92d3e94bd56772">More...</a><br /></td></tr>
+<tr class="memdesc:af5d0964b882f92756e92d3e94bd56772"><td class="mdescLeft">&#160;</td><td class="mdescRight">Formats the HYPRE correction vector to zero.  <a href="class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#af5d0964b882f92756e92d3e94bd56772">More...</a><br /></td></tr>
 <tr class="separator:af5d0964b882f92756e92d3e94bd56772"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49bb14b2fdf83babbaf47fc72b2835d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a49bb14b2fdf83babbaf47fc72b2835d9">_get_adp_matrix_num_cols</a> () const</td></tr>
+<tr class="separator:a49bb14b2fdf83babbaf47fc72b2835d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a49bb14b2fdf83babbaf47fc72b2835d9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a49bb14b2fdf83babbaf47fc72b2835d9">_get_adp_matrix_num_cols</a> () const</td></tr>
+<tr class="separator:a49bb14b2fdf83babbaf47fc72b2835d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad87c27c7d905efdeafb574306117ddb9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ad87c27c7d905efdeafb574306117ddb9">_get_adp_matrix_num_nzes</a> () const</td></tr>
+<tr class="separator:ad87c27c7d905efdeafb574306117ddb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad87c27c7d905efdeafb574306117ddb9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ad87c27c7d905efdeafb574306117ddb9">_get_adp_matrix_num_nzes</a> () const</td></tr>
+<tr class="separator:ad87c27c7d905efdeafb574306117ddb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1a798867103a1ab77313c5f429626ca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ae1a798867103a1ab77313c5f429626ca">_get_adp_matrix_num_rows</a> () const</td></tr>
+<tr class="separator:ae1a798867103a1ab77313c5f429626ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1a798867103a1ab77313c5f429626ca"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ae1a798867103a1ab77313c5f429626ca">_get_adp_matrix_num_rows</a> () const</td></tr>
+<tr class="separator:ae1a798867103a1ab77313c5f429626ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae0dbe1f8aa005dd40e12d0cb37f4cd6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#aae0dbe1f8aa005dd40e12d0cb37f4cd6">_get_adp_vector_size</a> () const</td></tr>
+<tr class="separator:aae0dbe1f8aa005dd40e12d0cb37f4cd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aae0dbe1f8aa005dd40e12d0cb37f4cd6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#aae0dbe1f8aa005dd40e12d0cb37f4cd6">_get_adp_vector_size</a> () const</td></tr>
+<tr class="separator:aae0dbe1f8aa005dd40e12d0cb37f4cd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a010e5439714453aa3faf23b0b6d27a48"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a010e5439714453aa3faf23b0b6d27a48">_get_comm</a> () const</td></tr>
+<tr class="separator:a010e5439714453aa3faf23b0b6d27a48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a010e5439714453aa3faf23b0b6d27a48"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a010e5439714453aa3faf23b0b6d27a48">_get_comm</a> () const</td></tr>
 <tr class="separator:a010e5439714453aa3faf23b0b6d27a48"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a58807855dce338b8e5fb950b223e61"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a6a58807855dce338b8e5fb950b223e61">_get_global_dof_offset</a> () const</td></tr>
 <tr class="separator:a6a58807855dce338b8e5fb950b223e61"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a37367c98f42d457dbfc34fb36bc8da7a"><td class="memItemLeft" align="right" valign="top">const IndexType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a37367c98f42d457dbfc34fb36bc8da7a">_get_mat_col_idx</a> () const</td></tr>
-<tr class="separator:a37367c98f42d457dbfc34fb36bc8da7a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a244937dccdd2c22ebaf9a43d72bcf665"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a244937dccdd2c22ebaf9a43d72bcf665">_get_mat_num_nze</a> () const</td></tr>
-<tr class="separator:a244937dccdd2c22ebaf9a43d72bcf665"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8c2248c533b58422b9cb1316f349f9f8"><td class="memItemLeft" align="right" valign="top">const IndexType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a8c2248c533b58422b9cb1316f349f9f8">_get_mat_row_ptr</a> () const</td></tr>
-<tr class="separator:a8c2248c533b58422b9cb1316f349f9f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1567b0a5c6f11440e58f02a0cd852f96"><td class="memItemLeft" align="right" valign="top">const DataType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a1567b0a5c6f11440e58f02a0cd852f96">_get_mat_vals</a> () const</td></tr>
-<tr class="separator:a1567b0a5c6f11440e58f02a0cd852f96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a58807855dce338b8e5fb950b223e61"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a6a58807855dce338b8e5fb950b223e61">_get_global_dof_offset</a> () const</td></tr>
+<tr class="separator:a6a58807855dce338b8e5fb950b223e61"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab934585a0eb28b50149e32ff156685bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ab934585a0eb28b50149e32ff156685bc">_get_num_global_dofs</a> () const</td></tr>
 <tr class="separator:ab934585a0eb28b50149e32ff156685bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab934585a0eb28b50149e32ff156685bc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ab934585a0eb28b50149e32ff156685bc">_get_num_global_dofs</a> () const</td></tr>
+<tr class="separator:ab934585a0eb28b50149e32ff156685bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99b7d0d16e851aa0d96b916e8d50bca4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a99b7d0d16e851aa0d96b916e8d50bca4">_get_num_global_nonzeros</a> () const</td></tr>
+<tr class="separator:a99b7d0d16e851aa0d96b916e8d50bca4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a99b7d0d16e851aa0d96b916e8d50bca4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a99b7d0d16e851aa0d96b916e8d50bca4">_get_num_global_nonzeros</a> () const</td></tr>
+<tr class="separator:a99b7d0d16e851aa0d96b916e8d50bca4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a61697a335687bd2b7f1c3df5563f342d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">_get_num_owned_dofs</a> () const</td></tr>
 <tr class="separator:a61697a335687bd2b7f1c3df5563f342d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a447deed01c4ab959bdf899682921b542"><td class="memItemLeft" align="right" valign="top">DataType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a447deed01c4ab959bdf899682921b542">_get_vec_cor_vals</a> (<a class="el" href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#a2aa29852f980cf66edeb3c340a35f4e6">VectorType</a> &amp;vec_cor)</td></tr>
-<tr class="separator:a447deed01c4ab959bdf899682921b542"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b319348e75d0163e9273ef052ae2d37"><td class="memItemLeft" align="right" valign="top">const DataType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a6b319348e75d0163e9273ef052ae2d37">_get_vec_def_vals</a> (const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#a2aa29852f980cf66edeb3c340a35f4e6">VectorType</a> &amp;vec_def)</td></tr>
-<tr class="separator:a6b319348e75d0163e9273ef052ae2d37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a532c98d18789ce3f5ff67f5c12d95833"><td class="memItemLeft" align="right" valign="top">DataType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a532c98d18789ce3f5ff67f5c12d95833">_get_vec_def_vals</a> (<a class="el" href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#a2aa29852f980cf66edeb3c340a35f4e6">VectorType</a> &amp;vec_def)</td></tr>
-<tr class="separator:a532c98d18789ce3f5ff67f5c12d95833"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61697a335687bd2b7f1c3df5563f342d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">_get_num_owned_dofs</a> () const</td></tr>
+<tr class="separator:a61697a335687bd2b7f1c3df5563f342d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae6bedcbf11e2f8710f3c0a9b577a4e35"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#ae6bedcbf11e2f8710f3c0a9b577a4e35">_upload_def</a> (const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#a2aa29852f980cf66edeb3c340a35f4e6">VectorType</a> &amp;vec_def)</td></tr>
 <tr class="memdesc:ae6bedcbf11e2f8710f3c0a9b577a4e35"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads the HYPRE defect vector.  <a href="class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#ae6bedcbf11e2f8710f3c0a9b577a4e35">More...</a><br /></td></tr>
 <tr class="separator:ae6bedcbf11e2f8710f3c0a9b577a4e35"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad91ccd9edb259b13c5e776b77e3046a3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ad91ccd9edb259b13c5e776b77e3046a3">_upload_vec_cor</a> (const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#a2aa29852f980cf66edeb3c340a35f4e6">VectorType</a> &amp;vec_cor)</td></tr>
-<tr class="separator:ad91ccd9edb259b13c5e776b77e3046a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad397089b8379671698683bcb1e32e0d7"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ad397089b8379671698683bcb1e32e0d7">_upload_vec_def</a> (const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#a2aa29852f980cf66edeb3c340a35f4e6">VectorType</a> &amp;vec_def)</td></tr>
-<tr class="separator:ad397089b8379671698683bcb1e32e0d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdc8520e21ad255c8c577b9ec7893c6a"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </td></tr>
+<tr class="memitem:afdc8520e21ad255c8c577b9ec7893c6a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#afdc8520e21ad255c8c577b9ec7893c6a">_upload_numeric</a> (DTV_ *val, const RPT_ *row_ptr, const CIT_ *col_idx)</td></tr>
+<tr class="memdesc:afdc8520e21ad255c8c577b9ec7893c6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads the (filtered) ADP matrix values to the given array.  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#afdc8520e21ad255c8c577b9ec7893c6a">More...</a><br /></td></tr>
+<tr class="separator:afdc8520e21ad255c8c577b9ec7893c6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afdc8520e21ad255c8c577b9ec7893c6a"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </td></tr>
+<tr class="memitem:afdc8520e21ad255c8c577b9ec7893c6a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#afdc8520e21ad255c8c577b9ec7893c6a">_upload_numeric</a> (DTV_ *val, const RPT_ *row_ptr, const CIT_ *col_idx)</td></tr>
+<tr class="memdesc:afdc8520e21ad255c8c577b9ec7893c6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads the (filtered) ADP matrix values to the given array.  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#afdc8520e21ad255c8c577b9ec7893c6a">More...</a><br /></td></tr>
+<tr class="separator:afdc8520e21ad255c8c577b9ec7893c6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b254d7be485ba5d3fd6667ff7c115c6"><td class="memTemplParams" colspan="2">template&lt;typename RPT_ , typename CIT_ &gt; </td></tr>
+<tr class="memitem:a5b254d7be485ba5d3fd6667ff7c115c6"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5b254d7be485ba5d3fd6667ff7c115c6">_upload_symbolic</a> (RPT_ *row_ptr, CIT_ *col_idx)</td></tr>
+<tr class="memdesc:a5b254d7be485ba5d3fd6667ff7c115c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads the ADP matrix structure to the given arrays.  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5b254d7be485ba5d3fd6667ff7c115c6">More...</a><br /></td></tr>
+<tr class="separator:a5b254d7be485ba5d3fd6667ff7c115c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b254d7be485ba5d3fd6667ff7c115c6"><td class="memTemplParams" colspan="2">template&lt;typename RPT_ , typename CIT_ &gt; </td></tr>
+<tr class="memitem:a5b254d7be485ba5d3fd6667ff7c115c6"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5b254d7be485ba5d3fd6667ff7c115c6">_upload_symbolic</a> (RPT_ *row_ptr, CIT_ *col_idx)</td></tr>
+<tr class="memdesc:a5b254d7be485ba5d3fd6667ff7c115c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads the ADP matrix structure to the given arrays.  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5b254d7be485ba5d3fd6667ff7c115c6">More...</a><br /></td></tr>
+<tr class="separator:a5b254d7be485ba5d3fd6667ff7c115c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8719d02f608f9e0d17f7f06415c1d9be"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ &gt; </td></tr>
+<tr class="memitem:a8719d02f608f9e0d17f7f06415c1d9be"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a8719d02f608f9e0d17f7f06415c1d9be">_upload_vector</a> (DTV_ *val, const LocalVectorType &amp;vector)</td></tr>
+<tr class="memdesc:a8719d02f608f9e0d17f7f06415c1d9be"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads the ADP vector values to the given array.  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a8719d02f608f9e0d17f7f06415c1d9be">More...</a><br /></td></tr>
+<tr class="separator:a8719d02f608f9e0d17f7f06415c1d9be"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f0b06042c8a3216a14da82cc90864dc"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ &gt; </td></tr>
+<tr class="memitem:a5f0b06042c8a3216a14da82cc90864dc"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5f0b06042c8a3216a14da82cc90864dc">_upload_vector</a> (DTV_ *val, const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#a2aa29852f980cf66edeb3c340a35f4e6">VectorType</a> &amp;vector)</td></tr>
+<tr class="memdesc:a5f0b06042c8a3216a14da82cc90864dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads the ADP vector values to the given array.  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5f0b06042c8a3216a14da82cc90864dc">More...</a><br /></td></tr>
+<tr class="separator:a5f0b06042c8a3216a14da82cc90864dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
+<tr class="memitem:a3cd993260b72e64a99fae533594e0e70"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a3cd993260b72e64a99fae533594e0e70">_comm_self</a></td></tr>
+<tr class="memdesc:a3cd993260b72e64a99fae533594e0e70"><td class="mdescLeft">&#160;</td><td class="mdescRight">self-communicator object  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a3cd993260b72e64a99fae533594e0e70">More...</a><br /></td></tr>
+<tr class="separator:a3cd993260b72e64a99fae533594e0e70"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9f5d7f67b85c27d9995b31e4604699a8"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#a9f5d7f67b85c27d9995b31e4604699a8">_core</a></td></tr>
 <tr class="memdesc:a9f5d7f67b85c27d9995b31e4604699a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">a pointer to our opaque core wrapper object  <a href="class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#a9f5d7f67b85c27d9995b31e4604699a8">More...</a><br /></td></tr>
 <tr class="separator:a9f5d7f67b85c27d9995b31e4604699a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -224,15 +306,21 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a0030014ba86dfa6d5123860bcaab816c"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#a0030014ba86dfa6d5123860bcaab816c">_solver</a></td></tr>
 <tr class="memdesc:a0030014ba86dfa6d5123860bcaab816c"><td class="mdescLeft">&#160;</td><td class="mdescRight">the HYPRE solver object  <a href="class_f_e_a_t_1_1_solver_1_1_euclid_precond.html#a0030014ba86dfa6d5123860bcaab816c">More...</a><br /></td></tr>
 <tr class="separator:a0030014ba86dfa6d5123860bcaab816c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a07f5437d9e62afe0be9ead7bac2056ff"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ac221eadb2c2ff02e318a46370d518b5a">FilterType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a07f5437d9e62afe0be9ead7bac2056ff">_system_filter</a></td></tr>
+<tr class="memdesc:a07f5437d9e62afe0be9ead7bac2056ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">the system filter  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a07f5437d9e62afe0be9ead7bac2056ff">More...</a><br /></td></tr>
+<tr class="separator:a07f5437d9e62afe0be9ead7bac2056ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa105cd9e1e6028655917866c8eb43427"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ae5ae58d38f8a98ab81805a03b51244a2">MatrixType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#aa105cd9e1e6028655917866c8eb43427">_system_matrix</a></td></tr>
+<tr class="memdesc:aa105cd9e1e6028655917866c8eb43427"><td class="mdescLeft">&#160;</td><td class="mdescRight">the system matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#aa105cd9e1e6028655917866c8eb43427">More...</a><br /></td></tr>
+<tr class="separator:aa105cd9e1e6028655917866c8eb43427"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename Matrix_, typename Filter_&gt;<br />
 class FEAT::Solver::EuclidPrecond&lt; Matrix_, Filter_ &gt;</div><p >HYPRE Euclid Preconditioner Wrapper class template. </p>
 <p >This class acts as a wrapper around the Euclid preconditioner from the HYPRE library. Euclid is some sort of parallel ILU preconditioner, see the documentation of HYPRE for details.</p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000049">Todo:</a></b></dt><dd>support setting of solver parameters</dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000050">Todo:</a></b></dt><dd>support setting of solver parameters</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00389">389</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00399">399</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="ac9358c16656ffaff5ab99a2acc3a63d4" name="ac9358c16656ffaff5ab99a2acc3a63d4"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac9358c16656ffaff5ab99a2acc3a63d4">&#9670;&#160;</a></span>BaseClass</h2>
@@ -250,7 +338,120 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>our base-class </p>
 
-<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00394">394</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00404">404</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+
+</div>
+</div>
+<a id="af58fbbea5320c083bf0b7f3de4cf4fbd" name="af58fbbea5320c083bf0b7f3de4cf4fbd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af58fbbea5320c083bf0b7f3de4cf4fbd">&#9670;&#160;</a></span>DataType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef MatrixType::DataType <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::DataType</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>our internal data type </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00767">767</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ac221eadb2c2ff02e318a46370d518b5a" name="ac221eadb2c2ff02e318a46370d518b5a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac221eadb2c2ff02e318a46370d518b5a">&#9670;&#160;</a></span>FilterType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef Filter_ <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::FilterType</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>the (local) filter type </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00761">761</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a770b2d5eacd8031306cc2f40382ad6d8" name="a770b2d5eacd8031306cc2f40382ad6d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a770b2d5eacd8031306cc2f40382ad6d8">&#9670;&#160;</a></span>IndexType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef MatrixType::IndexType <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::IndexType</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>our internal index type </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00769">769</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ae5ae58d38f8a98ab81805a03b51244a2" name="ae5ae58d38f8a98ab81805a03b51244a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae5ae58d38f8a98ab81805a03b51244a2">&#9670;&#160;</a></span>MatrixType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef Matrix_ <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::MatrixType</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>this specialization expects a local matrix </p>
+<p >the (local) matrix type </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00757">757</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -270,7 +471,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>the vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00396">396</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00406">406</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
 
 </div>
 </div>
@@ -311,7 +512,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00411">411</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00421">421</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
 
 </div>
 </div>
@@ -363,7 +564,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00419">419</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00429">429</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
 
 </div>
 </div>
@@ -395,7 +596,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 
 <p>Downloads the HYPRE correction vector. </p>
-<p >This function first downloads the HYPRE vector into its ADP correction vector counterpart and afterwards downloads that into the given correction vector.</p>
+<p >This function first queries the vector values from HYPRE into the internal buffer and then downloads the contents to the given correction vector.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[out]</td><td class="paramname">vec_cor</td><td>The correction vector to download to. </td></tr>
@@ -403,29 +604,41 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00151">151</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00148">148</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a71026e1b65bb662a65070d016e24ca0b">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_download_vec_cor()</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a447deed01c4ab959bdf899682921b542">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_vec_cor_vals()</a>.</p>
+<p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a789568423271ce99012675fb81019e9b">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_download_vector()</a>, and <a class="el" href="adp__solver__base_8hpp_source.html#l00783">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_filter</a>.</p>
 
 </div>
 </div>
-<a id="a71026e1b65bb662a65070d016e24ca0b" name="a71026e1b65bb662a65070d016e24ca0b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a71026e1b65bb662a65070d016e24ca0b">&#9670;&#160;</a></span>_download_vec_cor()</h2>
+<a id="a789568423271ce99012675fb81019e9b" name="a789568423271ce99012675fb81019e9b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a789568423271ce99012675fb81019e9b">&#9670;&#160;</a></span>_download_vector() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_download_vec_cor </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_download_vector </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ab0d6444c02a5529db06acddb7f178fbb">VectorType</a> &amp;&#160;</td>
-          <td class="paramname"><em>vec_cor</em></td><td>)</td>
+          <td class="paramtype">LocalVectorType &amp;&#160;</td>
+          <td class="paramname"><em>vector</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const DTV_ *&#160;</td>
+          <td class="paramname"><em>val</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -434,38 +647,472 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>Downloads a correction vector. </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00151">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_download_cor()</a>.</p>
+<p>Downloads the ADP vector values from the given array. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the local vector that receives the downloaded ADP value array. It is assumed to be allocated to the correct size, but its contents on entry are ignored.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">val</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to an array of length <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#aae0dbe1f8aa005dd40e12d0cb37f4cd6">_get_adp_vector_size()</a> that contains the ADP values that are to be downloaded to the output vector given by <code>vector</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00148">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_download_cor()</a>, and <a class="el" href="direct__sparse__solver_8hpp_source.html#l00839">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::apply()</a>.</p>
 
 </div>
 </div>
-<a id="a61acb04bb9f6091f557181fdbdc314b4" name="a61acb04bb9f6091f557181fdbdc314b4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a61acb04bb9f6091f557181fdbdc314b4">&#9670;&#160;</a></span>_download_vec_def()</h2>
+<a id="acc86b8ad222aecb780b509702577921e" name="acc86b8ad222aecb780b509702577921e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#acc86b8ad222aecb780b509702577921e">&#9670;&#160;</a></span>_download_vector() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_download_vec_def </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_download_vector </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ab0d6444c02a5529db06acddb7f178fbb">VectorType</a> &amp;&#160;</td>
-          <td class="paramname"><em>vec_def</em></td><td>)</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ab827642ce2cbf6422a99966960d9e3d7">VectorType</a> &amp;&#160;</td>
+          <td class="paramname"><em>vector</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const DTV_ *&#160;</td>
+          <td class="paramname"><em>val</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>Downloads a defect vector. </dd></dl>
+
+<p>Downloads the ADP vector values from the given array. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the local vector that receives the downloaded ADP value array. It is assumed to be allocated to the correct size, but its contents on entry are ignored.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">val</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to an array of length <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#aae0dbe1f8aa005dd40e12d0cb37f4cd6">_get_adp_vector_size()</a> that contains the ADP values that are to be downloaded to the output vector given by <code>vector</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00933">933</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ac2a221a2c315a5b03acb7cece72019b0" name="ac2a221a2c315a5b03acb7cece72019b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac2a221a2c315a5b03acb7cece72019b0">&#9670;&#160;</a></span>_filter_mat() <span class="overload">[1/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat </td>
+          <td>(</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const RPT_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const CIT_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_global_1_1_mean_filter.html">Global::MeanFilter</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#af58fbbea5320c083bf0b7f3de4cf4fbd">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a770b2d5eacd8031306cc2f40382ad6d8">IndexType</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>filter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>auxiliary function: filters the local ADP matrix </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00971">971</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+
+</div>
+</div>
+<a id="a705fa6fa252ff552732351ee4f363c49" name="a705fa6fa252ff552732351ee4f363c49"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a705fa6fa252ff552732351ee4f363c49">&#9670;&#160;</a></span>_filter_mat() <span class="overload">[2/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat </td>
+          <td>(</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const RPT_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const CIT_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter.html">LAFEM::MeanFilter</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#af58fbbea5320c083bf0b7f3de4cf4fbd">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a770b2d5eacd8031306cc2f40382ad6d8">IndexType</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>filter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>auxiliary function: filters the local ADP matrix </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00963">963</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+
+</div>
+</div>
+<a id="a9002bc7d51bcd73fa2322b7a5c9c5bbb" name="a9002bc7d51bcd73fa2322b7a5c9c5bbb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9002bc7d51bcd73fa2322b7a5c9c5bbb">&#9670;&#160;</a></span>_filter_mat() <span class="overload">[3/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat </td>
+          <td>(</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const RPT_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const CIT_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter.html">LAFEM::NoneFilter</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#af58fbbea5320c083bf0b7f3de4cf4fbd">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a770b2d5eacd8031306cc2f40382ad6d8">IndexType</a> &gt; &amp;&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>auxiliary function: filters the local ADP matrix </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00940">940</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="adp__solver__base_8hpp_source.html#l00705">FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_filter_mat()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00979">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00611">FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_upload_numeric()</a>, and <a class="el" href="adp__solver__base_8hpp_source.html#l00894">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_numeric()</a>.</p>
+
+</div>
+</div>
+<a id="a5e3e7089e538e043f0a0ed3733873ac2" name="a5e3e7089e538e043f0a0ed3733873ac2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5e3e7089e538e043f0a0ed3733873ac2">&#9670;&#160;</a></span>_filter_mat() <span class="overload">[4/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ , typename RPT_ , typename CIT_ , typename First_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat </td>
+          <td>(</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const RPT_ *&#160;</td>
+          <td class="paramname"><em>row_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const CIT_ *&#160;</td>
+          <td class="paramname"><em>col_idx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain.html">LAFEM::FilterChain</a>&lt; First_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>filter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>auxiliary function: filters the local ADP matrix </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00997">997</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00940">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat()</a>.</p>
+
+</div>
+</div>
+<a id="a61b54de6260cb80db15b98e27720d0dd" name="a61b54de6260cb80db15b98e27720d0dd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61b54de6260cb80db15b98e27720d0dd">&#9670;&#160;</a></span>_filter_mat() <span class="overload">[5/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ , typename RPT_ , typename CIT_ , typename First_ , typename... Rest_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat </td>
+          <td>(</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const RPT_ *&#160;</td>
+          <td class="paramname"><em>row_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const CIT_ *&#160;</td>
+          <td class="paramname"><em>col_idx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain.html">LAFEM::FilterChain</a>&lt; First_, Rest_... &gt; &amp;&#160;</td>
+          <td class="paramname"><em>filter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>auxiliary function: filters the local ADP matrix </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00988">988</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00940">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat()</a>.</p>
+
+</div>
+</div>
+<a id="a26c01317f4519371cde4ccd73ffd3796" name="a26c01317f4519371cde4ccd73ffd3796"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a26c01317f4519371cde4ccd73ffd3796">&#9670;&#160;</a></span>_filter_mat() <span class="overload">[6/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ , typename RPT_ , typename CIT_ , typename SubFilter_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat </td>
+          <td>(</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const RPT_ *&#160;</td>
+          <td class="paramname"><em>row_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const CIT_ *&#160;</td>
+          <td class="paramname"><em>col_idx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_sequence.html">LAFEM::FilterSequence</a>&lt; SubFilter_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>filter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>auxiliary function: filters the local ADP matrix </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00979">979</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00940">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat()</a>.</p>
+
+</div>
+</div>
+<a id="ad7b014c44a27fb1b4e07f0b0ad520b0b" name="ad7b014c44a27fb1b4e07f0b0ad520b0b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7b014c44a27fb1b4e07f0b0ad520b0b">&#9670;&#160;</a></span>_filter_mat() <span class="overload">[7/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat </td>
+          <td>(</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const RPT_ *&#160;</td>
+          <td class="paramname"><em>row_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const CIT_ *&#160;</td>
+          <td class="paramname"><em>col_idx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html">LAFEM::UnitFilter</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#af58fbbea5320c083bf0b7f3de4cf4fbd">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a770b2d5eacd8031306cc2f40382ad6d8">IndexType</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>filter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>auxiliary function: filters the local ADP matrix </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00948">948</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -494,14 +1141,258 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </table>
 </div><div class="memdoc">
 
-<p>Format the HYPRE correction vector. </p>
+<p>Formats the HYPRE correction vector to zero. </p>
 
-<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00136">136</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00158">158</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a49bb14b2fdf83babbaf47fc72b2835d9" name="a49bb14b2fdf83babbaf47fc72b2835d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49bb14b2fdf83babbaf47fc72b2835d9">&#9670;&#160;</a></span>_get_adp_matrix_num_cols() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_matrix_num_cols </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number of columns of the local ADP matrix; equal to <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ab934585a0eb28b50149e32ff156685bc">_get_num_global_dofs()</a> </dd></dl>
+
+</div>
+</div>
+<a id="a49bb14b2fdf83babbaf47fc72b2835d9" name="a49bb14b2fdf83babbaf47fc72b2835d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a49bb14b2fdf83babbaf47fc72b2835d9">&#9670;&#160;</a></span>_get_adp_matrix_num_cols() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_matrix_num_cols </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number of columns of the local ADP matrix; equal to <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ab934585a0eb28b50149e32ff156685bc">_get_num_global_dofs()</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00821">821</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00781">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
+
+</div>
+</div>
+<a id="ad87c27c7d905efdeafb574306117ddb9" name="ad87c27c7d905efdeafb574306117ddb9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad87c27c7d905efdeafb574306117ddb9">&#9670;&#160;</a></span>_get_adp_matrix_num_nzes() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_matrix_num_nzes </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number of nonzero entries of the local ADP matrix </dd></dl>
+
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00955">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00982">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01009">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01036">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+
+</div>
+</div>
+<a id="ad87c27c7d905efdeafb574306117ddb9" name="ad87c27c7d905efdeafb574306117ddb9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad87c27c7d905efdeafb574306117ddb9">&#9670;&#160;</a></span>_get_adp_matrix_num_nzes() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_matrix_num_nzes </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number of nonzero entries of the local ADP matrix </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00827">827</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00781">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
+
+</div>
+</div>
+<a id="ae1a798867103a1ab77313c5f429626ca" name="ae1a798867103a1ab77313c5f429626ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1a798867103a1ab77313c5f429626ca">&#9670;&#160;</a></span>_get_adp_matrix_num_rows() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_matrix_num_rows </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number of rows of the local ADP matrix; equal to <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">_get_num_owned_dofs()</a> </dd></dl>
+
+</div>
+</div>
+<a id="ae1a798867103a1ab77313c5f429626ca" name="ae1a798867103a1ab77313c5f429626ca"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1a798867103a1ab77313c5f429626ca">&#9670;&#160;</a></span>_get_adp_matrix_num_rows() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_matrix_num_rows </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number of rows of the local ADP matrix; equal to <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">_get_num_owned_dofs()</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00815">815</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00781">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
+
+</div>
+</div>
+<a id="aae0dbe1f8aa005dd40e12d0cb37f4cd6" name="aae0dbe1f8aa005dd40e12d0cb37f4cd6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae0dbe1f8aa005dd40e12d0cb37f4cd6">&#9670;&#160;</a></span>_get_adp_vector_size() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_vector_size </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The size of the local ADP vector; equal to <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">_get_num_owned_dofs()</a> </dd></dl>
+
+<p class="reference">Referenced by <a class="el" href="adp__solver__base_8hpp_source.html#l00652">FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_download_vector()</a>, and <a class="el" href="adp__solver__base_8hpp_source.html#l00628">FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_upload_vector()</a>.</p>
+
+</div>
+</div>
+<a id="aae0dbe1f8aa005dd40e12d0cb37f4cd6" name="aae0dbe1f8aa005dd40e12d0cb37f4cd6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aae0dbe1f8aa005dd40e12d0cb37f4cd6">&#9670;&#160;</a></span>_get_adp_vector_size() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_vector_size </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The size of the local ADP vector; equal to <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">_get_num_owned_dofs()</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00809">809</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00781">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
 
 </div>
 </div>
 <a id="a010e5439714453aa3faf23b0b6d27a48" name="a010e5439714453aa3faf23b0b6d27a48"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a010e5439714453aa3faf23b0b6d27a48">&#9670;&#160;</a></span>_get_comm()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a010e5439714453aa3faf23b0b6d27a48">&#9670;&#160;</a></span>_get_comm() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -526,12 +1417,44 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the underlying communicator </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00120">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00955">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00982">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01009">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01036">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00640">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>, <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+
+</div>
+</div>
+<a id="a010e5439714453aa3faf23b0b6d27a48" name="a010e5439714453aa3faf23b0b6d27a48"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a010e5439714453aa3faf23b0b6d27a48">&#9670;&#160;</a></span>_get_comm() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a> * <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_comm </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>A pointer to the underlying (self) communicator </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00803">803</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00779">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_comm_self</a>.</p>
 
 </div>
 </div>
 <a id="a6a58807855dce338b8e5fb950b223e61" name="a6a58807855dce338b8e5fb950b223e61"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6a58807855dce338b8e5fb950b223e61">&#9670;&#160;</a></span>_get_global_dof_offset()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a58807855dce338b8e5fb950b223e61">&#9670;&#160;</a></span>_get_global_dof_offset() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -554,14 +1477,14 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The offset of the first global DOF index of this process. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The index of the first global DOF owned by this process </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00120">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00955">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00982">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01009">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01036">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
-<a id="a37367c98f42d457dbfc34fb36bc8da7a" name="a37367c98f42d457dbfc34fb36bc8da7a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a37367c98f42d457dbfc34fb36bc8da7a">&#9670;&#160;</a></span>_get_mat_col_idx()</h2>
+<a id="a6a58807855dce338b8e5fb950b223e61" name="a6a58807855dce338b8e5fb950b223e61"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6a58807855dce338b8e5fb950b223e61">&#9670;&#160;</a></span>_get_global_dof_offset() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -572,7 +1495,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const IndexType * <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_mat_col_idx </td>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_global_dof_offset </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -580,106 +1503,18 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The column-index array of the matrix partition. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The index of the first global DOF owned by this process </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00120">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
-
-</div>
-</div>
-<a id="a244937dccdd2c22ebaf9a43d72bcf665" name="a244937dccdd2c22ebaf9a43d72bcf665"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a244937dccdd2c22ebaf9a43d72bcf665">&#9670;&#160;</a></span>_get_mat_num_nze()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_mat_num_nze </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The number of non-zero entries in this process's matrix partition </dd></dl>
-
-</div>
-</div>
-<a id="a8c2248c533b58422b9cb1316f349f9f8" name="a8c2248c533b58422b9cb1316f349f9f8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8c2248c533b58422b9cb1316f349f9f8">&#9670;&#160;</a></span>_get_mat_row_ptr()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const IndexType * <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_mat_row_ptr </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The row-pointer array of the matrix partition. </dd></dl>
-
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00120">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
-
-</div>
-</div>
-<a id="a1567b0a5c6f11440e58f02a0cd852f96" name="a1567b0a5c6f11440e58f02a0cd852f96"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1567b0a5c6f11440e58f02a0cd852f96">&#9670;&#160;</a></span>_get_mat_vals()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const DataType * <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_mat_vals </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The value array of the matrix partition. </dd></dl>
-
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00195">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_numeric()</a>, and <a class="el" href="superlu_8hpp_source.html#l00149">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_numeric()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00851">851</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
 <a id="ab934585a0eb28b50149e32ff156685bc" name="ab934585a0eb28b50149e32ff156685bc"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab934585a0eb28b50149e32ff156685bc">&#9670;&#160;</a></span>_get_num_global_dofs()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ab934585a0eb28b50149e32ff156685bc">&#9670;&#160;</a></span>_get_num_global_dofs() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -702,14 +1537,108 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The total number of DOFs over all processes. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The total number of global DOFs on all processes </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="superlu_8hpp_source.html#l00149">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, and <a class="el" href="superlu_8hpp_source.html#l00120">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00955">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00982">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01009">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01036">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00543">FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_adp_matrix_num_cols()</a>, <a class="el" href="superlu_8hpp_source.html#l00159">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+
+</div>
+</div>
+<a id="ab934585a0eb28b50149e32ff156685bc" name="ab934585a0eb28b50149e32ff156685bc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab934585a0eb28b50149e32ff156685bc">&#9670;&#160;</a></span>_get_num_global_dofs() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_dofs </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The total number of global DOFs on all processes </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00839">839</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00781">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
+
+</div>
+</div>
+<a id="a99b7d0d16e851aa0d96b916e8d50bca4" name="a99b7d0d16e851aa0d96b916e8d50bca4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99b7d0d16e851aa0d96b916e8d50bca4">&#9670;&#160;</a></span>_get_num_global_nonzeros() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_nonzeros </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The total number of nonzero entries of the global ADP matrix </dd></dl>
+
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00955">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00982">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01009">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, and <a class="el" href="direct__sparse__solver_8hpp_source.html#l01036">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>.</p>
+
+</div>
+</div>
+<a id="a99b7d0d16e851aa0d96b916e8d50bca4" name="a99b7d0d16e851aa0d96b916e8d50bca4"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a99b7d0d16e851aa0d96b916e8d50bca4">&#9670;&#160;</a></span>_get_num_global_nonzeros() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_nonzeros </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The total number of nonzero entries of the global ADP matrix </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00833">833</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00781">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
 
 </div>
 </div>
 <a id="a61697a335687bd2b7f1c3df5563f342d" name="a61697a335687bd2b7f1c3df5563f342d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a61697a335687bd2b7f1c3df5563f342d">&#9670;&#160;</a></span>_get_num_owned_dofs()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a61697a335687bd2b7f1c3df5563f342d">&#9670;&#160;</a></span>_get_num_owned_dofs() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -732,14 +1661,14 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The number of DOFs owned by this process. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of global DOFs owned by this process </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00120">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00955">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00982">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01009">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01036">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00537">FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_adp_matrix_num_rows()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00531">FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_adp_vector_size()</a>, <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
-<a id="a447deed01c4ab959bdf899682921b542" name="a447deed01c4ab959bdf899682921b542"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a447deed01c4ab959bdf899682921b542">&#9670;&#160;</a></span>_get_vec_cor_vals()</h2>
+<a id="a61697a335687bd2b7f1c3df5563f342d" name="a61697a335687bd2b7f1c3df5563f342d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61697a335687bd2b7f1c3df5563f342d">&#9670;&#160;</a></span>_get_num_owned_dofs() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -750,82 +1679,23 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">DataType * <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_vec_cor_vals </td>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_owned_dofs </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ab0d6444c02a5529db06acddb7f178fbb">VectorType</a> &amp;&#160;</td>
-          <td class="paramname"><em>vec_cor</em></td><td>)</td>
-          <td></td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
         </tr>
       </table>
   </td>
   <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The data array of the owned correction vector. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of global DOFs owned by this process </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00151">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_download_cor()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00845">845</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
-</div>
-</div>
-<a id="a6b319348e75d0163e9273ef052ae2d37" name="a6b319348e75d0163e9273ef052ae2d37"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6b319348e75d0163e9273ef052ae2d37">&#9670;&#160;</a></span>_get_vec_def_vals() <span class="overload">[1/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const DataType * <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_vec_def_vals </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ab0d6444c02a5529db06acddb7f178fbb">VectorType</a> &amp;&#160;</td>
-          <td class="paramname"><em>vec_def</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The data array of the owned defect vector. </dd></dl>
-
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00124">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_def()</a>.</p>
-
-</div>
-</div>
-<a id="a532c98d18789ce3f5ff67f5c12d95833" name="a532c98d18789ce3f5ff67f5c12d95833"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a532c98d18789ce3f5ff67f5c12d95833">&#9670;&#160;</a></span>_get_vec_def_vals() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">DataType * <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_vec_def_vals </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ab0d6444c02a5529db06acddb7f178fbb">VectorType</a> &amp;&#160;</td>
-          <td class="paramname"><em>vec_def</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The data array of the owned defect vector. </dd></dl>
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00781">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
 
 </div>
 </div>
@@ -856,7 +1726,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 
 <p>Uploads the HYPRE defect vector. </p>
-<p >This function first uploads the given defect vector into its ADP defect vector counterpart and afterwards uploads that into the HYPRE vector counterpart.</p>
+<p >This function first uploads the given defect vector the internal buffer and notifies HYPRE that the vector values have changed.</p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">vec_def</td><td>The defect vector to be uploaded from. </td></tr>
@@ -864,29 +1734,47 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00124">124</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00133">133</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a6b319348e75d0163e9273ef052ae2d37">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_vec_def_vals()</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ad397089b8379671698683bcb1e32e0d7">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_vec_def()</a>.</p>
+<p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a8719d02f608f9e0d17f7f06415c1d9be">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_vector()</a>.</p>
 
 </div>
 </div>
-<a id="ad91ccd9edb259b13c5e776b77e3046a3" name="ad91ccd9edb259b13c5e776b77e3046a3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad91ccd9edb259b13c5e776b77e3046a3">&#9670;&#160;</a></span>_upload_vec_cor()</h2>
+<a id="afdc8520e21ad255c8c577b9ec7893c6a" name="afdc8520e21ad255c8c577b9ec7893c6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afdc8520e21ad255c8c577b9ec7893c6a">&#9670;&#160;</a></span>_upload_numeric() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_vec_cor </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_numeric </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ab0d6444c02a5529db06acddb7f178fbb">VectorType</a> &amp;&#160;</td>
-          <td class="paramname"><em>vec_cor</em></td><td>)</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const RPT_ *&#160;</td>
+          <td class="paramname"><em>row_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const CIT_ *&#160;</td>
+          <td class="paramname"><em>col_idx</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -895,27 +1783,110 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>Uploads a correction vector. </dd></dl>
+
+<p>Uploads the (filtered) ADP matrix values to the given array. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">val</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to an array of length <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ad87c27c7d905efdeafb574306117ddb9">_get_adp_matrix_num_nzes()</a> that receives the filtered matrix values of the local ADP matrix.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">row_ptr</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to the row-pointer array of the ADP matrix as returned by the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5b254d7be485ba5d3fd6667ff7c115c6" title="Uploads the ADP matrix structure to the given arrays.">_upload_symbolic()</a> function.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">col_idx</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to the column-index array of the ADP matrix as returned by the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5b254d7be485ba5d3fd6667ff7c115c6" title="Uploads the ADP matrix structure to the given arrays.">_upload_symbolic()</a> function. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00760">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, <a class="el" href="hypre_8hpp_source.html#l00202">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_numeric()</a>, and <a class="el" href="superlu_8hpp_source.html#l00159">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_numeric()</a>.</p>
 
 </div>
 </div>
-<a id="ad397089b8379671698683bcb1e32e0d7" name="ad397089b8379671698683bcb1e32e0d7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad397089b8379671698683bcb1e32e0d7">&#9670;&#160;</a></span>_upload_vec_def()</h2>
+<a id="afdc8520e21ad255c8c577b9ec7893c6a" name="afdc8520e21ad255c8c577b9ec7893c6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afdc8520e21ad255c8c577b9ec7893c6a">&#9670;&#160;</a></span>_upload_numeric() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_vec_def </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_numeric </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ab0d6444c02a5529db06acddb7f178fbb">VectorType</a> &amp;&#160;</td>
-          <td class="paramname"><em>vec_def</em></td><td>)</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const RPT_ *&#160;</td>
+          <td class="paramname"><em>row_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const CIT_ *&#160;</td>
+          <td class="paramname"><em>col_idx</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Uploads the (filtered) ADP matrix values to the given array. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">val</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to an array of length <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ad87c27c7d905efdeafb574306117ddb9">_get_adp_matrix_num_nzes()</a> that receives the filtered matrix values of the local ADP matrix.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">row_ptr</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to the row-pointer array of the ADP matrix as returned by the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5b254d7be485ba5d3fd6667ff7c115c6" title="Uploads the ADP matrix structure to the given arrays.">_upload_symbolic()</a> function.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">col_idx</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to the column-index array of the ADP matrix as returned by the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5b254d7be485ba5d3fd6667ff7c115c6" title="Uploads the ADP matrix structure to the given arrays.">_upload_symbolic()</a> function. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00894">894</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00940">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat()</a>, and <a class="el" href="adp__solver__base_8hpp_source.html#l00781">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
+
+</div>
+</div>
+<a id="a5b254d7be485ba5d3fd6667ff7c115c6" name="a5b254d7be485ba5d3fd6667ff7c115c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b254d7be485ba5d3fd6667ff7c115c6">&#9670;&#160;</a></span>_upload_symbolic() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename RPT_ , typename CIT_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_symbolic </td>
+          <td>(</td>
+          <td class="paramtype">RPT_ *&#160;</td>
+          <td class="paramname"><em>row_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">CIT_ *&#160;</td>
+          <td class="paramname"><em>col_idx</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -924,9 +1895,172 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>Uploads a defect vector. </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00124">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_def()</a>.</p>
+<p>Uploads the ADP matrix structure to the given arrays. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">row_ptr</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to an array of length <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ae1a798867103a1ab77313c5f429626ca">_get_adp_matrix_num_rows()</a>+1 that receives the the row-pointer array of the local ADP matrix.</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">col_idx</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to an array of length <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ad87c27c7d905efdeafb574306117ddb9">_get_adp_matrix_num_nzes()</a> that receives the column index array of the local ADP matrix. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00955">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00982">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01009">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01036">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+
+</div>
+</div>
+<a id="a5b254d7be485ba5d3fd6667ff7c115c6" name="a5b254d7be485ba5d3fd6667ff7c115c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b254d7be485ba5d3fd6667ff7c115c6">&#9670;&#160;</a></span>_upload_symbolic() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename RPT_ , typename CIT_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_symbolic </td>
+          <td>(</td>
+          <td class="paramtype">RPT_ *&#160;</td>
+          <td class="paramname"><em>row_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">CIT_ *&#160;</td>
+          <td class="paramname"><em>col_idx</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Uploads the ADP matrix structure to the given arrays. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">row_ptr</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to an array of length <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ae1a798867103a1ab77313c5f429626ca">_get_adp_matrix_num_rows()</a>+1 that receives the the row-pointer array of the ADP matrix.</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">col_idx</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to an array of length <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ad87c27c7d905efdeafb574306117ddb9">_get_adp_matrix_num_nzes()</a> that receives the column index array of the ADP matrix. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00868">868</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00781">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
+
+</div>
+</div>
+<a id="a8719d02f608f9e0d17f7f06415c1d9be" name="a8719d02f608f9e0d17f7f06415c1d9be"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8719d02f608f9e0d17f7f06415c1d9be">&#9670;&#160;</a></span>_upload_vector() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_vector </td>
+          <td>(</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const LocalVectorType &amp;&#160;</td>
+          <td class="paramname"><em>vector</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Uploads the ADP vector values to the given array. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">val</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to an array of length <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#aae0dbe1f8aa005dd40e12d0cb37f4cd6">_get_adp_vector_size()</a> that receives the local ADP values of the input vector given by <code>vector</code>.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the local vector that is to be uploaded to the ADP value array. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00133">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_def()</a>, and <a class="el" href="direct__sparse__solver_8hpp_source.html#l00839">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::apply()</a>.</p>
+
+</div>
+</div>
+<a id="a5f0b06042c8a3216a14da82cc90864dc" name="a5f0b06042c8a3216a14da82cc90864dc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5f0b06042c8a3216a14da82cc90864dc">&#9670;&#160;</a></span>_upload_vector() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_vector </td>
+          <td>(</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ab827642ce2cbf6422a99966960d9e3d7">VectorType</a> &amp;&#160;</td>
+          <td class="paramname"><em>vector</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Uploads the ADP vector values to the given array. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">val</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to an array of length <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#aae0dbe1f8aa005dd40e12d0cb37f4cd6">_get_adp_vector_size()</a> that receives the local ADP values of the input vector given by <code>vector</code>.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the local vector that is to be uploaded to the ADP value array. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00916">916</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -979,7 +2113,7 @@ template&lt;typename Vector_ &gt; </div>
 <dl class="section attention"><dt>Attention</dt><dd>vec_cor and vec_def must <b>not</b> refer to the same vector object!</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A Status code that represents the status of the solution step. </dd></dl>
 
-<p>Implemented in <a class="el" href="class_f_e_a_t_1_1_solver_1_1_schwarz_precond_3_01_global_1_1_vector_3_01_local_vector___00_01_mic9e5dece21cb7735a0bc194fb3569eb4.html#a7abb7fdbfb63af0449380cfe00e64581">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_cu_solver_l_u.html#ab48e96782fca46ce3f5402459dbc3ff7">FEAT::Solver::CuSolverLU</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_cu_solver_q_r.html#a1e322f37ae5596b78e204839c4ff5e10">FEAT::Solver::CuSolverQR</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_scale_precond.html#a6863ca5947832845346c0055e0d92353">FEAT::Solver::ScalePrecond&lt; Vector_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_diagonal_precond.html#aaccc117c2d4b9dc6258c031ae63d6d86">FEAT::Solver::DiagonalPrecond&lt; Vector_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_multi_grid.html#aabd170793f680bfac13c4d93a5cf61c2">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#ad1cec9e45d8eade586876bba21c749af">FEAT::Solver::NLOptPrecond&lt; VectorType_, FilterType_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a3e590173c8ec33ae1b0c81a7b4bf4962">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_convert_precond.html#a0206d9b5622a8d64e69fcca25eee6564">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_convert_precond_3_01_global_1_1_vector_3_01_local_vector_outer___00120b74f43424364c71ee3ecd9deab297.html#acf7af73fe541769c7b1eca01984d3b48">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_b_f_b_t.html#a182ca3e2d7650e70520e1c1b493f6cd8">FEAT::Solver::BFBT&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;</a>.</p>
+<p>Implemented in <a class="el" href="class_f_e_a_t_1_1_solver_1_1_schwarz_precond_3_01_global_1_1_vector_3_01_local_vector___00_01_mic9e5dece21cb7735a0bc194fb3569eb4.html#a7abb7fdbfb63af0449380cfe00e64581">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_scale_precond.html#a6863ca5947832845346c0055e0d92353">FEAT::Solver::ScalePrecond&lt; Vector_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_diagonal_precond.html#aaccc117c2d4b9dc6258c031ae63d6d86">FEAT::Solver::DiagonalPrecond&lt; Vector_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_multi_grid.html#aabd170793f680bfac13c4d93a5cf61c2">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#ad1cec9e45d8eade586876bba21c749af">FEAT::Solver::NLOptPrecond&lt; VectorType_, FilterType_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a3e590173c8ec33ae1b0c81a7b4bf4962">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_convert_precond.html#a0206d9b5622a8d64e69fcca25eee6564">FEAT::Solver::ConvertPrecond&lt; VectorOuter_, VectorInner_ &gt;</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_convert_precond_3_01_global_1_1_vector_3_01_local_vector_outer___00120b74f43424364c71ee3ecd9deab297.html#acf7af73fe541769c7b1eca01984d3b48">FEAT::Solver::ConvertPrecond&lt; Global::Vector&lt; LocalVectorOuter_, MirrorOuter_ &gt;, Global::Vector&lt; LocalVectorInner_, MirrorInner_ &gt; &gt;</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_b_f_b_t.html#a182ca3e2d7650e70520e1c1b493f6cd8">FEAT::Solver::BFBT&lt; MatrixA_, MatrixB_, MatrixD_, FilterV_, FilterP_ &gt;</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00347">FEAT::Solver::solve()</a>.</p>
 
@@ -1021,7 +2155,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00455">455</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00465">465</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
 
 </div>
 </div>
@@ -1090,9 +2224,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#af2ea6e8c96de45c8408f3dcc59b8f186">FEAT::Solver::SolverBase&lt; Vector_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00446">446</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00456">456</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="hypre_8hpp_source.html#l00400">FEAT::Solver::EuclidPrecond&lt; Matrix_, Filter_ &gt;::_solver</a>.</p>
+<p class="reference">References <a class="el" href="hypre_8hpp_source.html#l00410">FEAT::Solver::EuclidPrecond&lt; Matrix_, Filter_ &gt;::_solver</a>.</p>
 
 </div>
 </div>
@@ -1126,7 +2260,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#a70018a5e4ca2cd3dfc0cac9db3df051e">FEAT::Solver::SolverBase&lt; Vector_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00211">211</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00221">221</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00255">FEAT::Solver::SolverBase&lt; Vector_ &gt;::done_symbolic()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
@@ -1197,9 +2331,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#a7d998362977e9c2a91bb3ebe2edd8829">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00438">438</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00448">448</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="hypre_8hpp_source.html#l00107">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_core</a>, and <a class="el" href="hypre_8hpp_source.html#l00195">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_numeric()</a>.</p>
+<p class="reference">References <a class="el" href="hypre_8hpp_source.html#l00116">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_core</a>, and <a class="el" href="hypre_8hpp_source.html#l00202">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_numeric()</a>.</p>
 
 </div>
 </div>
@@ -1235,7 +2369,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 
 <p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00173">173</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a010e5439714453aa3faf23b0b6d27a48">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_comm()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a6a58807855dce338b8e5fb950b223e61">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_global_dof_offset()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a37367c98f42d457dbfc34fb36bc8da7a">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_mat_col_idx()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a8c2248c533b58422b9cb1316f349f9f8">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_mat_row_ptr()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_owned_dofs()</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00227">FEAT::Solver::SolverBase&lt; Vector_ &gt;::init_symbolic()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ad87c27c7d905efdeafb574306117ddb9">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_matrix_num_nzes()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a010e5439714453aa3faf23b0b6d27a48">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_comm()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a6a58807855dce338b8e5fb950b223e61">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_global_dof_offset()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_owned_dofs()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5b254d7be485ba5d3fd6667ff7c115c6">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_symbolic()</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00227">FEAT::Solver::SolverBase&lt; Vector_ &gt;::init_symbolic()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
 </div>
 </div>
@@ -1269,11 +2403,42 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Implements <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ab7e792923921c7dbe2a1fefafd73ef0a">FEAT::Solver::SolverBase&lt; Vector_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00433">433</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00443">443</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="a3cd993260b72e64a99fae533594e0e70" name="a3cd993260b72e64a99fae533594e0e70"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3cd993260b72e64a99fae533594e0e70">&#9670;&#160;</a></span>_comm_self</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_comm_self</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>self-communicator object </p>
+<p >Many third-party libraries always expect a MPI_Comm object even if we operate only on a single MPI process, therefore this class creates a custom self-communicator that can be passed on to the third-party libraries. </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00779">779</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="adp__solver__base_8hpp_source.html#l00803">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_comm()</a>.</p>
+
+</div>
+</div>
 <a id="a9f5d7f67b85c27d9995b31e4604699a8" name="a9f5d7f67b85c27d9995b31e4604699a8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9f5d7f67b85c27d9995b31e4604699a8">&#9670;&#160;</a></span>_core</h2>
 
@@ -1298,9 +2463,9 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 
 <p>a pointer to our opaque core wrapper object </p>
 
-<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00107">107</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00116">116</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00296">FEAT::Solver::ParaSailsPrecond&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, <a class="el" href="hypre_8hpp_source.html#l00438">FEAT::Solver::EuclidPrecond&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, and <a class="el" href="hypre_8hpp_source.html#l00572">FEAT::Solver::BoomerAMG&lt; Matrix_, Filter_ &gt;::init_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00306">FEAT::Solver::ParaSailsPrecond&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, <a class="el" href="hypre_8hpp_source.html#l00448">FEAT::Solver::EuclidPrecond&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, and <a class="el" href="hypre_8hpp_source.html#l00582">FEAT::Solver::BoomerAMG&lt; Matrix_, Filter_ &gt;::init_numeric()</a>.</p>
 
 </div>
 </div>
@@ -1328,7 +2493,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>double parameters: </p>
 
-<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00408">408</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00418">418</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
 
 </div>
 </div>
@@ -1356,7 +2521,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>integer parameters: </p>
 
-<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00404">404</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00414">414</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
 
 </div>
 </div>
@@ -1384,9 +2549,69 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>the HYPRE solver object </p>
 
-<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00400">400</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="hypre_8hpp_source.html#l00410">410</a> of file <a class="el" href="hypre_8hpp_source.html">hypre.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00446">FEAT::Solver::EuclidPrecond&lt; Matrix_, Filter_ &gt;::done_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00456">FEAT::Solver::EuclidPrecond&lt; Matrix_, Filter_ &gt;::done_numeric()</a>.</p>
+
+</div>
+</div>
+<a id="a07f5437d9e62afe0be9ead7bac2056ff" name="a07f5437d9e62afe0be9ead7bac2056ff"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a07f5437d9e62afe0be9ead7bac2056ff">&#9670;&#160;</a></span>_system_filter</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ac221eadb2c2ff02e318a46370d518b5a">FilterType</a>&amp; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_filter</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>the system filter </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00783">783</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00148">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_download_cor()</a>.</p>
+
+</div>
+</div>
+<a id="aa105cd9e1e6028655917866c8eb43427" name="aa105cd9e1e6028655917866c8eb43427"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa105cd9e1e6028655917866c8eb43427">&#9670;&#160;</a></span>_system_matrix</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver::SolverBase&lt;typename Matrix_::VectorTypeL&gt;&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ae5ae58d38f8a98ab81805a03b51244a2">MatrixType</a>&amp; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>the system matrix </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00781">781</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="adp__solver__base_8hpp_source.html#l00821">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_matrix_num_cols()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00827">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_matrix_num_nzes()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00815">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_matrix_num_rows()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00809">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_vector_size()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00839">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_dofs()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00833">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_nonzeros()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00845">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_owned_dofs()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00611">FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_upload_numeric()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00894">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_numeric()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00590">FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_upload_symbolic()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00868">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_symbolic()</a>, and <a class="el" href="adp__solver__base_8hpp_source.html#l00521">FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>

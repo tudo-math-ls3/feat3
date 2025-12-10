@@ -189,6 +189,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a5ca81590a10780fc2fd0c0d262d95ebd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_index_set.html#a5ca81590a10780fc2fd0c0d262d95ebd">set_index_bound</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> bound)</td></tr>
 <tr class="memdesc:a5ca81590a10780fc2fd0c0d262d95ebd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the index bound.  <a href="class_f_e_a_t_1_1_geometry_1_1_index_set.html#a5ca81590a10780fc2fd0c0d262d95ebd">More...</a><br /></td></tr>
 <tr class="separator:a5ca81590a10780fc2fd0c0d262d95ebd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a35360ad7c6ed06e5d364f9c65bc3f721"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_index_set.html#a35360ad7c6ed06e5d364f9c65bc3f721">set_indices</a> (std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_index_set.html#ada9bb2e7091806ad12a4cd65eb9e9810">IndexTupleType</a> &gt; &amp;&amp;vec)</td></tr>
+<tr class="separator:a35360ad7c6ed06e5d364f9c65bc3f721"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -451,7 +453,7 @@ template&lt;int num_indices_&gt; </div>
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The size of dynamically allocated memory in bytes. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00160">160</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00165">165</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>.</p>
 
@@ -515,11 +517,11 @@ template&lt;int num_indices_&gt; </div>
 <p>Returns the index bound. </p>
 <dl class="section return"><dt>Returns</dt><dd>The index bound. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00190">190</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00195">195</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00098">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_index_bound</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="stokes__fbm__assembler_8hpp_source.html#l00651">FEAT::Assembly::StokesFBMAssembler&lt; MeshType_ &gt;::_process_mask()</a>, <a class="el" href="struct__index__set_8hpp_source.html#l00258">FEAT::Geometry::StructIndexSet&lt; shape_dim_, cell_dim_, face_dim_ &gt;::copy_to()</a>, and <a class="el" href="index__set_8hpp_source.html#l00292">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::permute()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="stokes__fbm__assembler_8hpp_source.html#l00651">FEAT::Assembly::StokesFBMAssembler&lt; MeshType_ &gt;::_process_mask()</a>, <a class="el" href="struct__index__set_8hpp_source.html#l00258">FEAT::Geometry::StructIndexSet&lt; shape_dim_, cell_dim_, face_dim_ &gt;::copy_to()</a>, and <a class="el" href="index__set_8hpp_source.html#l00297">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::permute()</a>.</p>
 
 </div>
 </div>
@@ -551,7 +553,7 @@ template&lt;int num_indices_&gt; </div>
 <p>Returns the index vector array. </p>
 <dl class="section return"><dt>Returns</dt><dd>The index vector array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00200">200</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00205">205</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>.</p>
 
@@ -585,7 +587,7 @@ template&lt;int num_indices_&gt; </div>
 <p>Returns the index vector array.  </p>
 <dl class="section return"><dt>Returns</dt><dd>The index vector array.  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00206">206</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00211">211</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>.</p>
 
@@ -619,11 +621,11 @@ template&lt;int num_indices_&gt; </div>
 <p>Returns the number of entities. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of entities; </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00180">180</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00185">185</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="stokes__fbm__assembler_8hpp_source.html#l00651">FEAT::Assembly::StokesFBMAssembler&lt; MeshType_ &gt;::_process_mask()</a>, <a class="el" href="struct__index__set_8hpp_source.html#l00258">FEAT::Geometry::StructIndexSet&lt; shape_dim_, cell_dim_, face_dim_ &gt;::copy_to()</a>, <a class="el" href="index__set_8hpp_source.html#l00328">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_nodes_domain()</a>, <a class="el" href="index__set_8hpp_source.html#l00340">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::image_begin()</a>, <a class="el" href="index__set_8hpp_source.html#l00347">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::image_end()</a>, <a class="el" href="index__set_8hpp_source.html#l00245">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::operator()()</a>, <a class="el" href="index__set_8hpp_source.html#l00220">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::operator[]()</a>, and <a class="el" href="index__set_8hpp_source.html#l00292">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::permute()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="stokes__fbm__assembler_8hpp_source.html#l00651">FEAT::Assembly::StokesFBMAssembler&lt; MeshType_ &gt;::_process_mask()</a>, <a class="el" href="struct__index__set_8hpp_source.html#l00258">FEAT::Geometry::StructIndexSet&lt; shape_dim_, cell_dim_, face_dim_ &gt;::copy_to()</a>, <a class="el" href="index__set_8hpp_source.html#l00333">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_nodes_domain()</a>, <a class="el" href="index__set_8hpp_source.html#l00345">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::image_begin()</a>, <a class="el" href="index__set_8hpp_source.html#l00352">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::image_end()</a>, <a class="el" href="index__set_8hpp_source.html#l00250">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::operator()()</a>, <a class="el" href="index__set_8hpp_source.html#l00225">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::operator[]()</a>, and <a class="el" href="index__set_8hpp_source.html#l00297">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::permute()</a>.</p>
 
 </div>
 </div>
@@ -655,7 +657,7 @@ template&lt;int num_indices_&gt; </div>
 <p>Returns the number of indices per entity. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of indices per entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00170">170</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00175">175</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="stokes__fbm__assembler_8hpp_source.html#l00651">FEAT::Assembly::StokesFBMAssembler&lt; MeshType_ &gt;::_process_mask()</a>.</p>
 
@@ -689,9 +691,9 @@ template&lt;int num_indices_&gt; </div>
 <p>Returns the number of domain nodes.  </p>
 <dl class="section return"><dt>Returns</dt><dd>The total number of domain nodes in the adjactor.  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00328">328</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00333">333</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00180">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>.</p>
+<p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00185">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>.</p>
 
 </div>
 </div>
@@ -723,7 +725,7 @@ template&lt;int num_indices_&gt; </div>
 <p>Returns the number of image nodes.  </p>
 <dl class="section return"><dt>Returns</dt><dd>The total number of image nodes in the adjactor.  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00334">334</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00339">339</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00098">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_index_bound</a>.</p>
 
@@ -764,9 +766,9 @@ template&lt;int num_indices_&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator representing the first image node adjacent to <code>domain_node</code>, or image_end(domain_node) if no adjacent image nodes exist.  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00340">340</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00345">345</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>, <a class="el" href="assertion_8hpp_source.html#l00229">ASSERT</a>, and <a class="el" href="index__set_8hpp_source.html#l00180">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>.</p>
+<p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>, <a class="el" href="assertion_8hpp_source.html#l00229">ASSERT</a>, and <a class="el" href="index__set_8hpp_source.html#l00185">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>.</p>
 
 </div>
 </div>
@@ -805,9 +807,9 @@ template&lt;int num_indices_&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An iterator representing the first position past the last image node adjacent to <code>domain_node</code>.  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00347">347</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00352">352</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>, <a class="el" href="assertion_8hpp_source.html#l00229">ASSERT</a>, and <a class="el" href="index__set_8hpp_source.html#l00180">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>.</p>
+<p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>, <a class="el" href="assertion_8hpp_source.html#l00229">ASSERT</a>, and <a class="el" href="index__set_8hpp_source.html#l00185">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>.</p>
 
 </div>
 </div>
@@ -839,7 +841,7 @@ template&lt;int num_indices_&gt; </div>
 <p>Returns the name of the class. </p>
 <dl class="section return"><dt>Returns</dt><dd>The name of the class as a <a class="el" href="class_f_e_a_t_1_1_string.html" title="String class implementation.">String</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00319">319</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00324">324</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="string_8hpp_source.html#l00944">FEAT::stringify()</a>.</p>
 
@@ -891,9 +893,9 @@ template&lt;int num_indices_&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A (const) reference to the index of the local face <code>j</code> on entity <code>i</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00245">245</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00250">250</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>, <a class="el" href="assertion_8hpp_source.html#l00229">ASSERT</a>, <a class="el" href="index__set_8hpp_source.html#l00180">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>, and <a class="el" href="index__set_8hpp_source.html#l00087">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::num_indices</a>.</p>
+<p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>, <a class="el" href="assertion_8hpp_source.html#l00229">ASSERT</a>, <a class="el" href="index__set_8hpp_source.html#l00185">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>, and <a class="el" href="index__set_8hpp_source.html#l00087">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::num_indices</a>.</p>
 
 </div>
 </div>
@@ -943,9 +945,9 @@ template&lt;int num_indices_&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A (const) reference to the index of the local face <code>j</code> on entity <code>i</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00265">265</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00270">270</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>, <a class="el" href="assertion_8hpp_source.html#l00229">ASSERT</a>, <a class="el" href="index__set_8hpp_source.html#l00180">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>, and <a class="el" href="index__set_8hpp_source.html#l00087">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::num_indices</a>.</p>
+<p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>, <a class="el" href="assertion_8hpp_source.html#l00229">ASSERT</a>, <a class="el" href="index__set_8hpp_source.html#l00185">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>, and <a class="el" href="index__set_8hpp_source.html#l00087">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::num_indices</a>.</p>
 
 </div>
 </div>
@@ -1018,9 +1020,9 @@ template&lt;int num_indices_&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A (const) reference to the index tuple of the entity. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00220">220</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00225">225</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>, <a class="el" href="assertion_8hpp_source.html#l00229">ASSERT</a>, and <a class="el" href="index__set_8hpp_source.html#l00180">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>.</p>
+<p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>, <a class="el" href="assertion_8hpp_source.html#l00229">ASSERT</a>, and <a class="el" href="index__set_8hpp_source.html#l00185">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>.</p>
 
 </div>
 </div>
@@ -1059,9 +1061,9 @@ template&lt;int num_indices_&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A (const) reference to the index tuple of the entity.  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00227">227</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00232">232</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>, <a class="el" href="assertion_8hpp_source.html#l00229">ASSERT</a>, and <a class="el" href="index__set_8hpp_source.html#l00180">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>.</p>
+<p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>, <a class="el" href="assertion_8hpp_source.html#l00229">ASSERT</a>, and <a class="el" href="index__set_8hpp_source.html#l00185">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>.</p>
 
 </div>
 </div>
@@ -1110,9 +1112,9 @@ template&lt;int num_indices_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00292">292</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00297">297</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>, <a class="el" href="permutation_8hpp_source.html#l00198">FEAT::Adjacency::Permutation::apply()</a>, <a class="el" href="permutation_8hpp_source.html#l00143">FEAT::Adjacency::Permutation::empty()</a>, <a class="el" href="index__set_8hpp_source.html#l00190">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_index_bound()</a>, <a class="el" href="index__set_8hpp_source.html#l00180">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>, <a class="el" href="permutation_8hpp_source.html#l00136">FEAT::Adjacency::Permutation::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00101">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_indices</a>, <a class="el" href="permutation_8hpp_source.html#l00198">FEAT::Adjacency::Permutation::apply()</a>, <a class="el" href="permutation_8hpp_source.html#l00143">FEAT::Adjacency::Permutation::empty()</a>, <a class="el" href="index__set_8hpp_source.html#l00195">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_index_bound()</a>, <a class="el" href="index__set_8hpp_source.html#l00185">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>, <a class="el" href="permutation_8hpp_source.html#l00136">FEAT::Adjacency::Permutation::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
 </div>
 </div>
@@ -1150,9 +1152,39 @@ template&lt;int num_indices_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00278">278</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00283">283</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="index__set_8hpp_source.html#l00098">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::_index_bound</a>.</p>
+
+</div>
+</div>
+<a id="a35360ad7c6ed06e5d364f9c65bc3f721" name="a35360ad7c6ed06e5d364f9c65bc3f721"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a35360ad7c6ed06e5d364f9c65bc3f721">&#9670;&#160;</a></span>set_indices()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;int num_indices_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_index_set.html">FEAT::Geometry::IndexSet</a>&lt; num_indices_ &gt;::set_indices </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_index_set.html#ada9bb2e7091806ad12a4cd65eb9e9810">IndexTupleType</a> &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"><em>vec</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00159">159</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
 </div>
 </div>
@@ -1182,7 +1214,7 @@ template&lt;int num_indices_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00098">98</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="index__set_8hpp_source.html#l00190">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_index_bound()</a>, <a class="el" href="index__set_8hpp_source.html#l00334">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_nodes_image()</a>, <a class="el" href="index__set_8hpp_source.html#l00136">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::operator=()</a>, and <a class="el" href="index__set_8hpp_source.html#l00278">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::set_index_bound()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="index__set_8hpp_source.html#l00195">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_index_bound()</a>, <a class="el" href="index__set_8hpp_source.html#l00339">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_nodes_image()</a>, <a class="el" href="index__set_8hpp_source.html#l00136">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::operator=()</a>, and <a class="el" href="index__set_8hpp_source.html#l00283">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::set_index_bound()</a>.</p>
 
 </div>
 </div>
@@ -1212,7 +1244,7 @@ template&lt;int num_indices_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00101">101</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="index__set_8hpp_source.html#l00160">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::bytes()</a>, <a class="el" href="index__set_8hpp_source.html#l00200">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_indices()</a>, <a class="el" href="index__set_8hpp_source.html#l00180">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>, <a class="el" href="index__set_8hpp_source.html#l00340">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::image_begin()</a>, <a class="el" href="index__set_8hpp_source.html#l00347">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::image_end()</a>, <a class="el" href="index__set_8hpp_source.html#l00245">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::operator()()</a>, <a class="el" href="index__set_8hpp_source.html#l00136">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::operator=()</a>, <a class="el" href="index__set_8hpp_source.html#l00220">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::operator[]()</a>, and <a class="el" href="index__set_8hpp_source.html#l00292">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::permute()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="index__set_8hpp_source.html#l00165">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::bytes()</a>, <a class="el" href="index__set_8hpp_source.html#l00205">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_indices()</a>, <a class="el" href="index__set_8hpp_source.html#l00185">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::get_num_entities()</a>, <a class="el" href="index__set_8hpp_source.html#l00345">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::image_begin()</a>, <a class="el" href="index__set_8hpp_source.html#l00352">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::image_end()</a>, <a class="el" href="index__set_8hpp_source.html#l00250">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::operator()()</a>, <a class="el" href="index__set_8hpp_source.html#l00136">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::operator=()</a>, <a class="el" href="index__set_8hpp_source.html#l00225">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::operator[]()</a>, and <a class="el" href="index__set_8hpp_source.html#l00297">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::permute()</a>.</p>
 
 </div>
 </div>
@@ -1242,7 +1274,7 @@ template&lt;int num_indices_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="index__set_8hpp_source.html#l00087">87</a> of file <a class="el" href="index__set_8hpp_source.html">index_set.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00140">FEAT::Geometry::PartiParMETIS::_compute_midpoints()</a>, and <a class="el" href="index__set_8hpp_source.html#l00245">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::operator()()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__parmetis_8hpp_source.html#l00140">FEAT::Geometry::PartiParMETIS::_compute_midpoints()</a>, and <a class="el" href="index__set_8hpp_source.html#l00250">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::operator()()</a>.</p>
 
 </div>
 </div>

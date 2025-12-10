@@ -100,19 +100,1877 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_global_1_1_alg_dof_p
 </div>
 
 <div class="header">
+  <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
+<a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
+<a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt; Class Template Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
-<p>Algebraic DOF Partitioning implementation class template.  
+<p>Algebraic DOF Partitioning implementation.  
  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#details">More...</a></p>
+
+<p><code>#include &lt;<a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>&gt;</code></p>
+<table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a7619a5d72848830101f6af90dd3c55a1"><td class="memItemLeft" align="right" valign="top">typedef Intern::ADPAux&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a8ebaed5d084a2e805e1c1259097ee29b">IndexVectorType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a7619a5d72848830101f6af90dd3c55a1">ADPAuxType</a></td></tr>
+<tr class="memdesc:a7619a5d72848830101f6af90dd3c55a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">auxiliary helper class type  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a7619a5d72848830101f6af90dd3c55a1">More...</a><br /></td></tr>
+<tr class="separator:a7619a5d72848830101f6af90dd3c55a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0221ede1282770141fbbbdb398a9328c"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">IndexType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a0221ede1282770141fbbbdb398a9328c">BufferVectorType</a></td></tr>
+<tr class="memdesc:a0221ede1282770141fbbbdb398a9328c"><td class="mdescLeft">&#160;</td><td class="mdescRight">the type for buffers used by our mirrors  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a0221ede1282770141fbbbdb398a9328c">More...</a><br /></td></tr>
+<tr class="separator:a0221ede1282770141fbbbdb398a9328c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa13958d0a5991f3a22678dd194c6d1da"><td class="memItemLeft" align="right" valign="top">typedef LocalVectorType::DataType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a></td></tr>
+<tr class="memdesc:aa13958d0a5991f3a22678dd194c6d1da"><td class="mdescLeft">&#160;</td><td class="mdescRight">our data type  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">More...</a><br /></td></tr>
+<tr class="separator:aa13958d0a5991f3a22678dd194c6d1da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abb5ae17f2c10cde441c75ec798255897"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_vector_mirror.html">LAFEM::VectorMirror</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">IndexType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#abb5ae17f2c10cde441c75ec798255897">DoneeMirrorType</a></td></tr>
+<tr class="memdesc:abb5ae17f2c10cde441c75ec798255897"><td class="mdescLeft">&#160;</td><td class="mdescRight">type of mirror for neighbor donee owned dof indices  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#abb5ae17f2c10cde441c75ec798255897">More...</a><br /></td></tr>
+<tr class="separator:abb5ae17f2c10cde441c75ec798255897"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad797984ffc05362be7e4635707c09ba7"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html">Global::Gate</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4d17090377b1df3d550c0084815b2701">LocalVectorType</a>, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a1622877cc7938dfc752455ad5ee7f253">MirrorType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#ad797984ffc05362be7e4635707c09ba7">GateType</a></td></tr>
+<tr class="memdesc:ad797984ffc05362be7e4635707c09ba7"><td class="mdescLeft">&#160;</td><td class="mdescRight">the global gate type  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#ad797984ffc05362be7e4635707c09ba7">More...</a><br /></td></tr>
+<tr class="separator:ad797984ffc05362be7e4635707c09ba7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4caa91bbf1abb741583c404d8c8bf891"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html">Global::Vector</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4d17090377b1df3d550c0084815b2701">LocalVectorType</a>, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a1622877cc7938dfc752455ad5ee7f253">MirrorType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4caa91bbf1abb741583c404d8c8bf891">GlobalVectorType</a></td></tr>
+<tr class="memdesc:a4caa91bbf1abb741583c404d8c8bf891"><td class="mdescLeft">&#160;</td><td class="mdescRight">the global vector type  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4caa91bbf1abb741583c404d8c8bf891">More...</a><br /></td></tr>
+<tr class="separator:a4caa91bbf1abb741583c404d8c8bf891"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af086cf4acdf066510a8e9eefd82e8c5d"><td class="memItemLeft" align="right" valign="top">typedef LocalVectorType::IndexType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">IndexType</a></td></tr>
+<tr class="memdesc:af086cf4acdf066510a8e9eefd82e8c5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">our index type  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">More...</a><br /></td></tr>
+<tr class="separator:af086cf4acdf066510a8e9eefd82e8c5d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8ebaed5d084a2e805e1c1259097ee29b"><td class="memItemLeft" align="right" valign="top">typedef LocalVectorType::template ContainerTypeByDI&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">IndexType</a>, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">IndexType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a8ebaed5d084a2e805e1c1259097ee29b">IndexVectorType</a></td></tr>
+<tr class="memdesc:a8ebaed5d084a2e805e1c1259097ee29b"><td class="mdescLeft">&#160;</td><td class="mdescRight">the index vector type, this one is required for internal computations  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a8ebaed5d084a2e805e1c1259097ee29b">More...</a><br /></td></tr>
+<tr class="separator:a8ebaed5d084a2e805e1c1259097ee29b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d17090377b1df3d550c0084815b2701"><td class="memItemLeft" align="right" valign="top">typedef LocalVector_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4d17090377b1df3d550c0084815b2701">LocalVectorType</a></td></tr>
+<tr class="memdesc:a4d17090377b1df3d550c0084815b2701"><td class="mdescLeft">&#160;</td><td class="mdescRight">the local vector type  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4d17090377b1df3d550c0084815b2701">More...</a><br /></td></tr>
+<tr class="separator:a4d17090377b1df3d550c0084815b2701"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1622877cc7938dfc752455ad5ee7f253"><td class="memItemLeft" align="right" valign="top">typedef Mirror_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a1622877cc7938dfc752455ad5ee7f253">MirrorType</a></td></tr>
+<tr class="memdesc:a1622877cc7938dfc752455ad5ee7f253"><td class="mdescLeft">&#160;</td><td class="mdescRight">the vector mirror type  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a1622877cc7938dfc752455ad5ee7f253">More...</a><br /></td></tr>
+<tr class="separator:a1622877cc7938dfc752455ad5ee7f253"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72d03511777972a90a8aea9186617de9"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a1622877cc7938dfc752455ad5ee7f253">MirrorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a72d03511777972a90a8aea9186617de9">OwnedMirrorType</a></td></tr>
+<tr class="memdesc:a72d03511777972a90a8aea9186617de9"><td class="mdescLeft">&#160;</td><td class="mdescRight">type of mirror for owned local dof indices  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a72d03511777972a90a8aea9186617de9">More...</a><br /></td></tr>
+<tr class="separator:a72d03511777972a90a8aea9186617de9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a31168a7ffce34e0dd8d6a566215c1055"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a1622877cc7938dfc752455ad5ee7f253">MirrorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a31168a7ffce34e0dd8d6a566215c1055">OwnerMirrorType</a></td></tr>
+<tr class="memdesc:a31168a7ffce34e0dd8d6a566215c1055"><td class="mdescLeft">&#160;</td><td class="mdescRight">type of mirror for neighbor owner local dof indices  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a31168a7ffce34e0dd8d6a566215c1055">More...</a><br /></td></tr>
+<tr class="separator:a31168a7ffce34e0dd8d6a566215c1055"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
+Public Member Functions</h2></td></tr>
+<tr class="memitem:a5724ed024f08a6c5b07c972f51cd7e01"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a5724ed024f08a6c5b07c972f51cd7e01">AlgDofParti</a> ()</td></tr>
+<tr class="memdesc:a5724ed024f08a6c5b07c972f51cd7e01"><td class="mdescLeft">&#160;</td><td class="mdescRight">default constructor  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a5724ed024f08a6c5b07c972f51cd7e01">More...</a><br /></td></tr>
+<tr class="separator:a5724ed024f08a6c5b07c972f51cd7e01"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa28588c48c60beee11c7fa50567c7497"><td class="memItemLeft" align="right" valign="top"><a id="aa28588c48c60beee11c7fa50567c7497" name="aa28588c48c60beee11c7fa50567c7497"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>AlgDofParti</b> (const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">AlgDofParti</a> &amp;)=delete</td></tr>
+<tr class="memdesc:aa28588c48c60beee11c7fa50567c7497"><td class="mdescLeft">&#160;</td><td class="mdescRight">no copy, no problems <br /></td></tr>
+<tr class="separator:aa28588c48c60beee11c7fa50567c7497"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80f15d6ee079a6ead3c4b0ccd079c143"><td class="memItemLeft" align="right" valign="top"><a id="a80f15d6ee079a6ead3c4b0ccd079c143" name="a80f15d6ee079a6ead3c4b0ccd079c143"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~AlgDofParti</b> ()=default</td></tr>
+<tr class="memdesc:a80f15d6ee079a6ead3c4b0ccd079c143"><td class="mdescLeft">&#160;</td><td class="mdescRight">virtual destructor <br /></td></tr>
+<tr class="separator:a80f15d6ee079a6ead3c4b0ccd079c143"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6b2a4ee0aca0aeeb1e45b1ca33514d91"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a6b2a4ee0aca0aeeb1e45b1ca33514d91">assemble_allgather</a> (bool yes_i_really_want_to_do_this=false)</td></tr>
+<tr class="memdesc:a6b2a4ee0aca0aeeb1e45b1ca33514d91"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles the required data for the <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti_system.html#a627c1d30d6b92ed9575d2a4c7e4351b6" title="Performs a global matrix-vector product with this matrix.">AlgDofPartiSystem::apply()</a> function.  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a6b2a4ee0aca0aeeb1e45b1ca33514d91">More...</a><br /></td></tr>
+<tr class="separator:a6b2a4ee0aca0aeeb1e45b1ca33514d91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d06e7f50f83c53326268b09abcf138e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a3d06e7f50f83c53326268b09abcf138e">assemble_by_gate</a> (const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#ad797984ffc05362be7e4635707c09ba7">GateType</a> &amp;gate, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> extra_local=0u, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> extra_shared=0u)</td></tr>
+<tr class="memdesc:a3d06e7f50f83c53326268b09abcf138e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Assembles the <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html" title="Algebraic DOF Partitioning implementation.">AlgDofParti</a> object from a given <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html" title="Global gate implementation.">Global::Gate</a>.  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a3d06e7f50f83c53326268b09abcf138e">More...</a><br /></td></tr>
+<tr class="separator:a3d06e7f50f83c53326268b09abcf138e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa409f646c1d7009ff86786fb695983a"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aaa409f646c1d7009ff86786fb695983a">bytes</a> () const</td></tr>
+<tr class="separator:aaa409f646c1d7009ff86786fb695983a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29768aad6526017fa90c2678ebf4921b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a29768aad6526017fa90c2678ebf4921b">clear</a> ()</td></tr>
+<tr class="memdesc:a29768aad6526017fa90c2678ebf4921b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Resets the whole object.  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a29768aad6526017fa90c2678ebf4921b">More...</a><br /></td></tr>
+<tr class="separator:a29768aad6526017fa90c2678ebf4921b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4a1789bd3dd6d09dbf14b198e4f7524"><td class="memTemplParams" colspan="2">template&lt;typename DT2_ &gt; </td></tr>
+<tr class="memitem:af4a1789bd3dd6d09dbf14b198e4f7524"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af4a1789bd3dd6d09dbf14b198e4f7524">download_vector</a> (const DT2_ *owned_dofs, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4d17090377b1df3d550c0084815b2701">LocalVectorType</a> &amp;local_vector, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a> *extra_local=nullptr, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a> *extra_shared=nullptr) const</td></tr>
+<tr class="separator:af4a1789bd3dd6d09dbf14b198e4f7524"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a61ff17bbedf56023f5041bba732425b2"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a61ff17bbedf56023f5041bba732425b2">get_all_global_dof_counts</a> () const</td></tr>
+<tr class="memdesc:a61ff17bbedf56023f5041bba732425b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the all-global-dof-counts vector.  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a61ff17bbedf56023f5041bba732425b2">More...</a><br /></td></tr>
+<tr class="separator:a61ff17bbedf56023f5041bba732425b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2cf401f5432504c8681f21aff04f3da9"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; int &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a2cf401f5432504c8681f21aff04f3da9">get_all_global_dof_offsets</a> () const</td></tr>
+<tr class="memdesc:a2cf401f5432504c8681f21aff04f3da9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the all-global-dof-offsets vector.  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a2cf401f5432504c8681f21aff04f3da9">More...</a><br /></td></tr>
+<tr class="separator:a2cf401f5432504c8681f21aff04f3da9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a176bc81a6c1385dabe633c8b47d228f7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_string.html">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a176bc81a6c1385dabe633c8b47d228f7">get_block_information</a> () const</td></tr>
+<tr class="memdesc:a176bc81a6c1385dabe633c8b47d228f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the block information of the algebraic dof partitioning as an XML string.  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a176bc81a6c1385dabe633c8b47d228f7">More...</a><br /></td></tr>
+<tr class="separator:a176bc81a6c1385dabe633c8b47d228f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab22cd5fb0efbf1ccde63cc7e71b14b71"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#ab22cd5fb0efbf1ccde63cc7e71b14b71">get_comm</a> () const</td></tr>
+<tr class="separator:ab22cd5fb0efbf1ccde63cc7e71b14b71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad0922e20c82b9987542cd3b94be968a1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#abb5ae17f2c10cde441c75ec798255897">DoneeMirrorType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#ad0922e20c82b9987542cd3b94be968a1">get_donee_mirror</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i) const</td></tr>
+<tr class="memdesc:ad0922e20c82b9987542cd3b94be968a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a donee neighbor mirror.  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#ad0922e20c82b9987542cd3b94be968a1">More...</a><br /></td></tr>
+<tr class="separator:ad0922e20c82b9987542cd3b94be968a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a357d36e8d926bde3a31103d78c3414ee"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a357d36e8d926bde3a31103d78c3414ee">get_donee_rank</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i) const</td></tr>
+<tr class="memdesc:a357d36e8d926bde3a31103d78c3414ee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an donee neighbor rank.  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a357d36e8d926bde3a31103d78c3414ee">More...</a><br /></td></tr>
+<tr class="separator:a357d36e8d926bde3a31103d78c3414ee"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9090fe037608f1fd202f8cb352c72527"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a8ebaed5d084a2e805e1c1259097ee29b">IndexVectorType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a9090fe037608f1fd202f8cb352c72527">get_global_dof_indices</a> () const</td></tr>
+<tr class="memdesc:a9090fe037608f1fd202f8cb352c72527"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the global-dof-indices array.  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a9090fe037608f1fd202f8cb352c72527">More...</a><br /></td></tr>
+<tr class="separator:a9090fe037608f1fd202f8cb352c72527"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a51798fa27902cc55fbc9ec92ae5981a3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a51798fa27902cc55fbc9ec92ae5981a3">get_global_dof_offset</a> () const</td></tr>
+<tr class="separator:a51798fa27902cc55fbc9ec92ae5981a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0adf92b8b53f5b2719ae57dcd7fbfb9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#ac0adf92b8b53f5b2719ae57dcd7fbfb9">get_num_donee_neighbors</a> () const</td></tr>
+<tr class="separator:ac0adf92b8b53f5b2719ae57dcd7fbfb9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad18b15d3a2b1cb32a0955a205621813f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#ad18b15d3a2b1cb32a0955a205621813f">get_num_global_dofs</a> () const</td></tr>
+<tr class="separator:ad18b15d3a2b1cb32a0955a205621813f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3643b92d210b374a2b0ac0593797f21a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a3643b92d210b374a2b0ac0593797f21a">get_num_local_dofs</a> () const</td></tr>
+<tr class="separator:a3643b92d210b374a2b0ac0593797f21a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad4274406e04a2a23a81408e208fb3851"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#ad4274406e04a2a23a81408e208fb3851">get_num_owned_dofs</a> () const</td></tr>
+<tr class="separator:ad4274406e04a2a23a81408e208fb3851"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab57da92429eda23298788e50d24d8104"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#ab57da92429eda23298788e50d24d8104">get_num_owner_neighbors</a> () const</td></tr>
+<tr class="separator:ab57da92429eda23298788e50d24d8104"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a778906f156d9ae734752ab2d40fc85a1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a72d03511777972a90a8aea9186617de9">OwnedMirrorType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a778906f156d9ae734752ab2d40fc85a1">get_owned_mirror</a> () const</td></tr>
+<tr class="memdesc:a778906f156d9ae734752ab2d40fc85a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the Mirror of the owned DOFs.  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a778906f156d9ae734752ab2d40fc85a1">More...</a><br /></td></tr>
+<tr class="separator:a778906f156d9ae734752ab2d40fc85a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c3b6174b5859b16742d9c92928d51aa"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a31168a7ffce34e0dd8d6a566215c1055">OwnerMirrorType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a7c3b6174b5859b16742d9c92928d51aa">get_owner_mirror</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i) const</td></tr>
+<tr class="memdesc:a7c3b6174b5859b16742d9c92928d51aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an owner neighbor mirror.  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a7c3b6174b5859b16742d9c92928d51aa">More...</a><br /></td></tr>
+<tr class="separator:a7c3b6174b5859b16742d9c92928d51aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5d7d9db8059c8f79a86dfe2e8e63721"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa5d7d9db8059c8f79a86dfe2e8e63721">get_owner_rank</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> i) const</td></tr>
+<tr class="memdesc:aa5d7d9db8059c8f79a86dfe2e8e63721"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns an owner neighbor rank.  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa5d7d9db8059c8f79a86dfe2e8e63721">More...</a><br /></td></tr>
+<tr class="separator:aa5d7d9db8059c8f79a86dfe2e8e63721"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af4b91f63d125cd8fd21eaf67d834457c"><td class="memItemLeft" align="right" valign="top"><a id="af4b91f63d125cd8fd21eaf67d834457c" name="af4b91f63d125cd8fd21eaf67d834457c"></a>
+<a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">AlgDofParti</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><b>operator=</b> (const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">AlgDofParti</a> &amp;)=delete</td></tr>
+<tr class="memdesc:af4b91f63d125cd8fd21eaf67d834457c"><td class="mdescLeft">&#160;</td><td class="mdescRight">no copy, no problems <br /></td></tr>
+<tr class="separator:af4b91f63d125cd8fd21eaf67d834457c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a730ca91fd7011c3fee02e922125b963c"><td class="memTemplParams" colspan="2">template&lt;typename DT2_ &gt; </td></tr>
+<tr class="memitem:a730ca91fd7011c3fee02e922125b963c"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a730ca91fd7011c3fee02e922125b963c">upload_vector</a> (DT2_ *owned_dofs, const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4d17090377b1df3d550c0084815b2701">LocalVectorType</a> &amp;local_vector, const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a> *extra_local=nullptr, const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a> *extra_shared=nullptr) const</td></tr>
+<tr class="separator:a730ca91fd7011c3fee02e922125b963c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a70528b4d6d5cee31015097031492fff0"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a70528b4d6d5cee31015097031492fff0">_all_global_dof_counts</a></td></tr>
+<tr class="memdesc:a70528b4d6d5cee31015097031492fff0"><td class="mdescLeft">&#160;</td><td class="mdescRight">global DOF counts of all processes,  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a70528b4d6d5cee31015097031492fff0">More...</a><br /></td></tr>
+<tr class="separator:a70528b4d6d5cee31015097031492fff0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a576d8378b88be255dd45b58ccac172bd"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a576d8378b88be255dd45b58ccac172bd">_all_global_dof_offset</a></td></tr>
+<tr class="memdesc:a576d8378b88be255dd45b58ccac172bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">global DOF offsets of all processes,  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a576d8378b88be255dd45b58ccac172bd">More...</a><br /></td></tr>
+<tr class="separator:a576d8378b88be255dd45b58ccac172bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa9c29151e5a02a7734420e489e5fd0c5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_string.html">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa9c29151e5a02a7734420e489e5fd0c5">_block_information</a></td></tr>
+<tr class="memdesc:aa9c29151e5a02a7734420e489e5fd0c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">a string containing the block information in XML format  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa9c29151e5a02a7734420e489e5fd0c5">More...</a><br /></td></tr>
+<tr class="separator:aa9c29151e5a02a7734420e489e5fd0c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aefd316997f72bb7c7a4a61fc2744f29e"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aefd316997f72bb7c7a4a61fc2744f29e">_comm</a></td></tr>
+<tr class="memdesc:aefd316997f72bb7c7a4a61fc2744f29e"><td class="mdescLeft">&#160;</td><td class="mdescRight">our communicator  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aefd316997f72bb7c7a4a61fc2744f29e">More...</a><br /></td></tr>
+<tr class="separator:aefd316997f72bb7c7a4a61fc2744f29e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f974a45350a021effac32c80d78ae25"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#abb5ae17f2c10cde441c75ec798255897">DoneeMirrorType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a3f974a45350a021effac32c80d78ae25">_donee_mirrors</a></td></tr>
+<tr class="memdesc:a3f974a45350a021effac32c80d78ae25"><td class="mdescLeft">&#160;</td><td class="mdescRight">rank/mirror-pair of DOF-donee processes  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a3f974a45350a021effac32c80d78ae25">More...</a><br /></td></tr>
+<tr class="separator:a3f974a45350a021effac32c80d78ae25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9217d86737dbff5c3aaae104c97ba0fa"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a9217d86737dbff5c3aaae104c97ba0fa">_donee_ranks</a></td></tr>
+<tr class="memdesc:a9217d86737dbff5c3aaae104c97ba0fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">ranks of DOF-donee neighbor processes  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a9217d86737dbff5c3aaae104c97ba0fa">More...</a><br /></td></tr>
+<tr class="separator:a9217d86737dbff5c3aaae104c97ba0fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a77f2ebc4d23a62a27f74a2f84f687fa1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a77f2ebc4d23a62a27f74a2f84f687fa1">_extra_dof_offset</a></td></tr>
+<tr class="memdesc:a77f2ebc4d23a62a27f74a2f84f687fa1"><td class="mdescLeft">&#160;</td><td class="mdescRight">offset of first extra DOF  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a77f2ebc4d23a62a27f74a2f84f687fa1">More...</a><br /></td></tr>
+<tr class="separator:a77f2ebc4d23a62a27f74a2f84f687fa1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b8ae0e46c716cdcd2596c10e6fe0ab3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a3b8ae0e46c716cdcd2596c10e6fe0ab3">_extra_local_dof_count</a></td></tr>
+<tr class="memdesc:a3b8ae0e46c716cdcd2596c10e6fe0ab3"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of extra local dofs; may be different for each process  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a3b8ae0e46c716cdcd2596c10e6fe0ab3">More...</a><br /></td></tr>
+<tr class="separator:a3b8ae0e46c716cdcd2596c10e6fe0ab3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a040524836fef57c4c0cfe02abc224adb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a040524836fef57c4c0cfe02abc224adb">_extra_shared_dof_count</a></td></tr>
+<tr class="memdesc:a040524836fef57c4c0cfe02abc224adb"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of extra shared dofs; must be equal on all processes  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a040524836fef57c4c0cfe02abc224adb">More...</a><br /></td></tr>
+<tr class="separator:a040524836fef57c4c0cfe02abc224adb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d83e0fa63187a69b349efd5648714f2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4d83e0fa63187a69b349efd5648714f2">_global_dof_count</a></td></tr>
+<tr class="memdesc:a4d83e0fa63187a69b349efd5648714f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">global dof count over all processes  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4d83e0fa63187a69b349efd5648714f2">More...</a><br /></td></tr>
+<tr class="separator:a4d83e0fa63187a69b349efd5648714f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae73ab93dd50b53bd4ba7c3297e9fdc68"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a8ebaed5d084a2e805e1c1259097ee29b">IndexVectorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#ae73ab93dd50b53bd4ba7c3297e9fdc68">_global_dof_idx</a></td></tr>
+<tr class="memdesc:ae73ab93dd50b53bd4ba7c3297e9fdc68"><td class="mdescLeft">&#160;</td><td class="mdescRight">global dof indices for each local dof  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#ae73ab93dd50b53bd4ba7c3297e9fdc68">More...</a><br /></td></tr>
+<tr class="separator:ae73ab93dd50b53bd4ba7c3297e9fdc68"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b14d6cbe6f6e2e2fbf428dbe668e187"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4b14d6cbe6f6e2e2fbf428dbe668e187">_global_dof_offset</a></td></tr>
+<tr class="memdesc:a4b14d6cbe6f6e2e2fbf428dbe668e187"><td class="mdescLeft">&#160;</td><td class="mdescRight">global dof offset of this process  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4b14d6cbe6f6e2e2fbf428dbe668e187">More...</a><br /></td></tr>
+<tr class="separator:a4b14d6cbe6f6e2e2fbf428dbe668e187"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a27aba18984c6364df94e5b2bb59fa029"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a27aba18984c6364df94e5b2bb59fa029">_local_dof_count</a></td></tr>
+<tr class="memdesc:a27aba18984c6364df94e5b2bb59fa029"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of local dofs of this process  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a27aba18984c6364df94e5b2bb59fa029">More...</a><br /></td></tr>
+<tr class="separator:a27aba18984c6364df94e5b2bb59fa029"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa58fd4dc7760e483aaf86edc0d6806da"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa58fd4dc7760e483aaf86edc0d6806da">_owned_dof_count</a></td></tr>
+<tr class="memdesc:aa58fd4dc7760e483aaf86edc0d6806da"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of owned dofs of this process  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa58fd4dc7760e483aaf86edc0d6806da">More...</a><br /></td></tr>
+<tr class="separator:aa58fd4dc7760e483aaf86edc0d6806da"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b0191de0bf5c3d7959e879bb4ca892e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a1622877cc7938dfc752455ad5ee7f253">MirrorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a5b0191de0bf5c3d7959e879bb4ca892e">_owned_mirror</a></td></tr>
+<tr class="memdesc:a5b0191de0bf5c3d7959e879bb4ca892e"><td class="mdescLeft">&#160;</td><td class="mdescRight">mirror for this process's owned DOFs  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a5b0191de0bf5c3d7959e879bb4ca892e">More...</a><br /></td></tr>
+<tr class="separator:a5b0191de0bf5c3d7959e879bb4ca892e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9435a9adcaebeeafeb73361ac24c23d"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a31168a7ffce34e0dd8d6a566215c1055">OwnerMirrorType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af9435a9adcaebeeafeb73361ac24c23d">_owner_mirrors</a></td></tr>
+<tr class="memdesc:af9435a9adcaebeeafeb73361ac24c23d"><td class="mdescLeft">&#160;</td><td class="mdescRight">rank/mirror-pair of DOF-owner processes  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af9435a9adcaebeeafeb73361ac24c23d">More...</a><br /></td></tr>
+<tr class="separator:af9435a9adcaebeeafeb73361ac24c23d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4e81aae4ca08a2014ea947a5511db84d"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4e81aae4ca08a2014ea947a5511db84d">_owner_ranks</a></td></tr>
+<tr class="memdesc:a4e81aae4ca08a2014ea947a5511db84d"><td class="mdescLeft">&#160;</td><td class="mdescRight">ranks of DOF-owner neighbor processes  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4e81aae4ca08a2014ea947a5511db84d">More...</a><br /></td></tr>
+<tr class="separator:a4e81aae4ca08a2014ea947a5511db84d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-static-methods" name="pro-static-methods"></a>
+Static Protected Member Functions</h2></td></tr>
+<tr class="memitem:af6f16fff5c83a00946c0de7160601b6b"><td class="memTemplParams" colspan="2">template&lt;typename DT2_ &gt; </td></tr>
+<tr class="memitem:af6f16fff5c83a00946c0de7160601b6b"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af6f16fff5c83a00946c0de7160601b6b">_gather</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">IndexType</a> &gt; &amp;buffer, const DT2_ *vector, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_vector_mirror.html">LAFEM::VectorMirror</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">IndexType</a> &gt; &amp;mirror)</td></tr>
+<tr class="separator:af6f16fff5c83a00946c0de7160601b6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a089965ca6aa3640fefc5dc737d16fe9f"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a089965ca6aa3640fefc5dc737d16fe9f">_get_donee_dofs</a> (std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">IndexType</a> &gt; &amp;send_buf, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_vector_mirror.html">LAFEM::VectorMirror</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">IndexType</a> &gt; &amp;donee_mir, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> offset)</td></tr>
+<tr class="separator:a089965ca6aa3640fefc5dc737d16fe9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename LocalVector_, typename Mirror_&gt;<br />
-class FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;</div><p >Algebraic DOF Partitioning implementation class template. </p>
-<p >See the documentation of the specialization of this class template for details. </p>
+class FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;</div><p >Algebraic DOF Partitioning implementation. </p>
+<p >This class implements the functionality to generate and manage a distributed partitioning of the degrees of freedom of a (linear) system in an algebraic sense instead of the usual domain-decomposition approach. With this <b>algebraic dof partitioning approach (ADP)</b>, each process in a given communicator becomes the unique owner of a set of consecutively enumerated global dofs, whereas in the domain-decomposition approach a single global dof may be shared by several processes, thus having no unique owner. The primary purpose of this class and the closely related <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti_system.html" title="Algebraic DOF partitioning linear system conversion class.">AlgDofPartiSystem</a> class is to offer the capability of embedding various third-party linear solver libraries as solvers, preconditioners or smoothers within the solver framework used in <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a>.</p>
+<p >To use this class, one needs to have a fully assembled <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html" title="Global gate implementation.">Global::Gate</a> object, which contains all the partitioning information in the usual domain-decomposition sense, which is used as a "starting point" for an algebraic DOF partitioning in the <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a3d06e7f50f83c53326268b09abcf138e" title="Assembles the AlgDofParti object from a given Global::Gate.">assemble_by_gate()</a> function.</p>
+<p >Throughout this class and the closely related <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti_system.html" title="Algebraic DOF partitioning linear system conversion class.">AlgDofPartiSystem</a> class, you will frequently find the terms "local DOF", "shared DOF" and "owned DOF" and "donee DOF", which are defined as follows:</p><ul>
+<li>"local" DOFs always means the DOFs as they are used in the domain decomposition world.</li>
+<li>"shared" DOFs are all local DOFs are "shared" by at least two processes in the domain decomposition world. In other words: Each local DOF, which is part of at least one neighbor mirror in the <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html" title="Global gate implementation.">Global::Gate</a>, is a shared DOF.</li>
+<li>"owned" DOFs are all local DOFs, which:<ul>
+<li>are not shared with any other process</li>
+<li>are only shared with processes of higher comm rank</li>
+</ul>
+</li>
+<li>"donee" DOFs are all shared DOFs, which are not owned DOFs</li>
+</ul>
+<p >Furthermore, the neighbor ranks and mirrors, which are used in the <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html" title="Global gate implementation.">Global::Gate</a> of the domain-decomposition based approach, are converted into "owner" and "donee" neighbor ranks and mirrors in this algebraic approach. The basic idea is the following: Assume that three processes A, B and C share a common set of DOFs, i.e. they are neighbors in the domain-decomposition sense, and assume that process A has a lower rank than process B and process C. Due to the "ownership" rule (lowest rank is owner), process A becomes the "owner" of the shared DOFs and thus is responsible for enumerating and managing all DOFs shared by A, B and C, which in turn makes processes B and C "donees". Now, because process A owns at least one DOF that is also a local DOF of process B and a local DOF of process C in the domain decomposition sense, we have that:</p><ul>
+<li>process A is an "owner neighbor" of process B</li>
+<li>process A is an "owner neighbor" of process C</li>
+<li>process B is a "donee neighbor" of process A</li>
+<li>process C is a "donee neighbor" of process A</li>
+</ul>
+<p ><u><b>Algebraic DOF partitioning of combined discretizations:</b></u><br  />
+This class supports the algebraic dof partitioning of simple scalar FE spaces, which are represented by the <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html" title="Dense data vector class template.">LAFEM::DenseVector</a> class, as well as more complex space combinations, which are represented by a hierarchy of meta containers, such as the <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html" title="Variadic TupleVector class template.">LAFEM::TupleVector</a>, and basic containers like <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html" title="Dense data vector class template.">LAFEM::DenseVector</a> and/or <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html" title="Blocked Dense data vector class template.">LAFEM::DenseVectorBlocked</a>; one prominent example is the velocity-pressure space pair used in Stokes systems which is typically represented by a <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html" title="Blocked Dense data vector class template.">LAFEM::DenseVectorBlocked</a> for the velocity components and a (scalar) <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html" title="Dense data vector class template.">LAFEM::DenseVector</a> for the pressure component, which are then joined together by a <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html" title="Variadic TupleVector class template.">LAFEM::TupleVector</a> meta container to form a single class that contains the entire velocity-pressure pair.</p>
+<p >In the case of a combined discretization (such as the velocity-pressure pair), the algebraic dof partitioning distributes the DOFs of the individual components in an <b>interleaved</b> fashion among the processes, i.e. each process owns a set of DOFs of the first component followed by a set of DOFs of the second component, etc., so in the example of the velocity-pressure pair each process owns a set of consecutively numbered velocity DOFs followed by a set of consecutively numbered pressure DOFs, and so from a global perspective, the global DOFs alternate between sets of velocity and pressure DOFs across all processes.</p>
+<p ><b>Example:</b><br  />
+Let's assume that we have 25x2=50 velocity DOFs (V0.0, V0.1, V1.0, ..., V24.0, V24.1) and 12 pressure DOFs (P0, ..., P11) in total partitioned among 4 processes and let's assume that each process owns 3 pressure DOFs and that the four processes own 18, 12, 12 and 8 velocity dofs, respectively, then the algebraic DOF partitioning of the 62 total global DOFs would look like in the table below: </p><pre class="fragment">+------------------------------+-------------------------------+--------------------------------+----------------------------------+
+|          Process 0           |           Process 1           |            Process 2           |            Process 3             |
++------------------------------+-------------------------------+--------------------------------+----------------------------------+
+|    0, ...,    17, 18, 19, 20 |    21, ...,    32, 33, 34, 35 |     36, ...,    47, 48, 49, 50 |    51, ...,     58, 59,  60,  61 | &lt;- global algebraic DOF
++------------------------------+-------------------------------+--------------------------------+----------------------------------+
+|    0, ...,    17, 18, 19, 20 |     0, ...,    11, 12, 13, 14 |      0, ...,    11, 12, 13, 14 |     0, ...,      8,  9,  10,  11 | &lt;- owned (local) algebraic DOF
++------------------------------+-------------------------------+--------------------------------+----------------------------------+
+| V0.0, ...,  V8.1             |  V9.0, ..., V14.1             |  V15.0, ..., V20.1             |  V21.0, ..., V24.1               | &lt;- global velocity DOF (interpreted as blocked DOFs)
+|  V'0, ...,  V'17             |  V'18, ...,  V'29             |   V'30, ...,  V'41             |   V'42, ...,  V'49               | &lt;- global velocity DOF (interpreted as scalar DOFs)
+|                   P0, P1, P2 |                    P3, P4, P5 |                     P6, P7, P8 |                     P9, P10, P11 | &lt;- global pressure DOF (scalar)
++------------------------------+-------------------------------+--------------------------------+----------------------------------+
+| v0.0, ...,  v8.1             |  v0.0, ...,  v5.1             |   v0.0, ...,  v5.1             |   v0.0, ...,  v4.1               | &lt;- owned (local) velocity DOF (interpreted as blocked DOFs)
+|  v'0, ...,  v'17             |   v'0, ...,  v'11             |    v'0, ...,  v'11             |    v'0, ...,   v'7               | &lt;- owned (local) velocity DOF (interpreted as scalar DOFs)
+|                   p0, p1, p2 |                    p0, p1, p2 |                     p0, p1, p2 |                     p0,  p1,  p2 | &lt;- owned (local) pressure DOF
++------------------------------+-------------------------------+--------------------------------+----------------------------------+
+</pre><p> So in the above example, global algebraic DOF 33 corresponds to global pressure DOF 3 (P3), which is owned by process 1 and which corresponds to the owned pressure DOF 1 (p1) on that process, whereas global DOF 47 corresponds to the second block-component (index 1) of the global velocity DOF 20 (V20.1), which is owned by process 2 and which corresponds to the owned velocity DOF 5 (v5.1), etc.</p>
+<p ><u><b>Retrieving ADP block information for combined discretizations:</b></u><br  />
+Some third-party libraries, which are used as solver backends for ADP based solvers, do not treat the system as a black box, but require information about the composition of the system components within the algebraic DOF partitioning &ndash; or in simpler terms: the library needs to know which DOF is a velocity DOF and which DOF is a pressure DOF in the example above. This information can be queried by calling the <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a176bc81a6c1385dabe633c8b47d228f7" title="Returns the block information of the algebraic dof partitioning as an XML string.">get_block_information()</a> member function, which returns a <a class="el" href="class_f_e_a_t_1_1_string.html" title="String class implementation.">String</a> object containing the relevant offsets and counts encoded in XML format.</p>
+<p >The returned XML string consists of one or more lines and each line contains a single XML marker, which currently is either</p><ul>
+<li>a closed <code>&lt;Scalar .../&gt;</code> marker that represents a scalar component that corresponds to a <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html" title="Dense data vector class template.">LAFEM::DenseVector</a> container</li>
+<li>a closed <code>&lt;Blocked .../&gt;</code> marker that represents a blocked/vector-valued component that corresponds to a <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html" title="Blocked Dense data vector class template.">LAFEM::DenseVectorBlocked</a> container</li>
+<li>an open <code>&lt;Tuple ...&gt;</code> marker that represents a meta component that combines one or more other components and which corresponds to the <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html" title="Variadic TupleVector class template.">LAFEM::TupleVector</a> container</li>
+<li>a <code>&lt;/Tuple&gt;</code> marker that closes a previously opened <code>&lt;Tuple ...&gt;</code> marker</li>
+</ul>
+<p >Each of the above XML markers contains the following five attributes in alphabetical order:</p><ul>
+<li><code>gc</code> ("global count"): contains the total number of global DOFs on all processes of the corresponding component; this quantity is identical on all processes</li>
+<li><code>gf</code> ("global first"): represents the index of the first DOF of this component that is is owned by the current process</li>
+<li><code>go</code> ("global offset"): represents the index of the first global DOF owned by this process, which corresponds to the first global DOF of the corresponding component</li>
+<li><code>lc</code> ("local count"): contains the number of local DOFs within this component that are owned by the current process.</li>
+<li><code>lo</code> ("local offset"): represents the index of the first local DOF owned by this process, which corresponds to the first local DOF of the corresponding component</li>
+</ul>
+<p >Additionally, the <code>&lt;Blocked .../&gt;</code> marker also contains the following attribute:</p><ul>
+<li><code>bs</code> ("block size"): contains the total number values per DOF block</li>
+</ul>
+<p >In the example above, the four processes would contain the following block information strings:</p><ul>
+<li>Process 0: <pre class="fragment">&lt;Tuple gc="62" gf="0" go="0" lc="21" lo="0"&gt;
+&lt;Blocked bs="2" gc="50" gf="0" go="0" lc="18" lo="0"/&gt;
+&lt;Scalar gc="12" gf="0" go="18" lc="3" lo="18"/&gt;
+&lt;/Tuple&gt;
+</pre></li>
+<li>Process 1: <pre class="fragment">&lt;Tuple gc="62" gf="21" go="21" lc="15" lo="0"&gt;
+&lt;Blocked bs="2" gc="50" gf="18" go="21" lc="12" lo="0"/&gt;
+&lt;Scalar gc="12" gf="3" go="33" lc="3" lo="12"/&gt;
+&lt;/Tuple&gt;
+</pre></li>
+<li>Process 2: <pre class="fragment">&lt;Tuple gc="62" gf="36" go="36" lc="15" lo="0"&gt;
+&lt;Blocked bs="2" gc="50" gf="30" go="36" lc="12" lo="0"/&gt;
+&lt;Scalar gc="12" gf="6" go="48" lc="3" lo="12"/&gt;
+&lt;/Tuple&gt;
+</pre></li>
+<li><p class="startli">Process 3: </p><pre class="fragment">&lt;Tuple gc="62" gf="51" go="51" lc="11" lo="0"&gt;
+&lt;Blocked bs="2" gc="50" gf="42" go="51" lc="8" lo="0"/&gt;
+&lt;Scalar gc="12" gf="9" go="59" lc="3" lo="8"/&gt;
+&lt;/Tuple&gt;
+</pre><dl class="todo"><dt><b><a class="el" href="todo.html#_todo000028">Todo:</a></b></dt><dd><p class="startdd">decide what happens if this process owns no dofs at all </p>
+<p class="interdd">make sure that this works for discontinuous elements, too </p>
+<p class="enddd">ensure that extra local and extra shared dofs are handled appropriately</p>
+</dd></dl>
+</li>
+</ul>
+<dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00032">32</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
-</div><hr/>The documentation for this class was generated from the following file:<ul>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00191">191</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+</div><h2 class="groupheader">Member Typedef Documentation</h2>
+<a id="a7619a5d72848830101f6af90dd3c55a1" name="a7619a5d72848830101f6af90dd3c55a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7619a5d72848830101f6af90dd3c55a1">&#9670;&#160;</a></span>ADPAuxType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef Intern::ADPAux&lt;<a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a8ebaed5d084a2e805e1c1259097ee29b">IndexVectorType</a>&gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::ADPAuxType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>auxiliary helper class type </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00213">213</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a0221ede1282770141fbbbdb398a9328c" name="a0221ede1282770141fbbbdb398a9328c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0221ede1282770141fbbbdb398a9328c">&#9670;&#160;</a></span>BufferVectorType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt;<a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">IndexType</a>&gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::BufferVectorType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>the type for buffers used by our mirrors </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00216">216</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aa13958d0a5991f3a22678dd194c6d1da" name="aa13958d0a5991f3a22678dd194c6d1da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa13958d0a5991f3a22678dd194c6d1da">&#9670;&#160;</a></span>DataType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef LocalVectorType::DataType <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::DataType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>our data type </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00200">200</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+</div>
+</div>
+<a id="abb5ae17f2c10cde441c75ec798255897" name="abb5ae17f2c10cde441c75ec798255897"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abb5ae17f2c10cde441c75ec798255897">&#9670;&#160;</a></span>DoneeMirrorType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_vector_mirror.html">LAFEM::VectorMirror</a>&lt;<a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">IndexType</a>&gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::DoneeMirrorType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>type of mirror for neighbor donee owned dof indices </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00223">223</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ad797984ffc05362be7e4635707c09ba7" name="ad797984ffc05362be7e4635707c09ba7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad797984ffc05362be7e4635707c09ba7">&#9670;&#160;</a></span>GateType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html">Global::Gate</a>&lt;<a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4d17090377b1df3d550c0084815b2701">LocalVectorType</a>, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a1622877cc7938dfc752455ad5ee7f253">MirrorType</a>&gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::GateType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>the global gate type </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00207">207</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a4caa91bbf1abb741583c404d8c8bf891" name="a4caa91bbf1abb741583c404d8c8bf891"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4caa91bbf1abb741583c404d8c8bf891">&#9670;&#160;</a></span>GlobalVectorType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html">Global::Vector</a>&lt;<a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4d17090377b1df3d550c0084815b2701">LocalVectorType</a>, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a1622877cc7938dfc752455ad5ee7f253">MirrorType</a>&gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::GlobalVectorType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>the global vector type </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00205">205</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+</div>
+</div>
+<a id="af086cf4acdf066510a8e9eefd82e8c5d" name="af086cf4acdf066510a8e9eefd82e8c5d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af086cf4acdf066510a8e9eefd82e8c5d">&#9670;&#160;</a></span>IndexType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef LocalVectorType::IndexType <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::IndexType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>our index type </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00202">202</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a8ebaed5d084a2e805e1c1259097ee29b" name="a8ebaed5d084a2e805e1c1259097ee29b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8ebaed5d084a2e805e1c1259097ee29b">&#9670;&#160;</a></span>IndexVectorType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef LocalVectorType::template ContainerTypeByDI&lt;<a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">IndexType</a>, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">IndexType</a>&gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::IndexVectorType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>the index vector type, this one is required for internal computations </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00210">210</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a4d17090377b1df3d550c0084815b2701" name="a4d17090377b1df3d550c0084815b2701"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d17090377b1df3d550c0084815b2701">&#9670;&#160;</a></span>LocalVectorType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef LocalVector_ <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::LocalVectorType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>the local vector type </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00195">195</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a1622877cc7938dfc752455ad5ee7f253" name="a1622877cc7938dfc752455ad5ee7f253"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1622877cc7938dfc752455ad5ee7f253">&#9670;&#160;</a></span>MirrorType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef Mirror_ <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::MirrorType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>the vector mirror type </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00197">197</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a72d03511777972a90a8aea9186617de9" name="a72d03511777972a90a8aea9186617de9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a72d03511777972a90a8aea9186617de9">&#9670;&#160;</a></span>OwnedMirrorType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a1622877cc7938dfc752455ad5ee7f253">MirrorType</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::OwnedMirrorType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>type of mirror for owned local dof indices </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00219">219</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a31168a7ffce34e0dd8d6a566215c1055" name="a31168a7ffce34e0dd8d6a566215c1055"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a31168a7ffce34e0dd8d6a566215c1055">&#9670;&#160;</a></span>OwnerMirrorType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a1622877cc7938dfc752455ad5ee7f253">MirrorType</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::OwnerMirrorType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>type of mirror for neighbor owner local dof indices </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00221">221</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a5724ed024f08a6c5b07c972f51cd7e01" name="a5724ed024f08a6c5b07c972f51cd7e01"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5724ed024f08a6c5b07c972f51cd7e01">&#9670;&#160;</a></span>AlgDofParti()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::AlgDofParti </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>default constructor </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00268">268</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="af6f16fff5c83a00946c0de7160601b6b" name="af6f16fff5c83a00946c0de7160601b6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af6f16fff5c83a00946c0de7160601b6b">&#9670;&#160;</a></span>_gather()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename DT2_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_gather </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">IndexType</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>buffer</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const DT2_ *&#160;</td>
+          <td class="paramname"><em>vector</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_vector_mirror.html">LAFEM::VectorMirror</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">IndexType</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>mirror</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00874">874</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a089965ca6aa3640fefc5dc737d16fe9f" name="a089965ca6aa3640fefc5dc737d16fe9f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a089965ca6aa3640fefc5dc737d16fe9f">&#9670;&#160;</a></span>_get_donee_dofs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_get_donee_dofs </td>
+          <td>(</td>
+          <td class="paramtype">std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">IndexType</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>send_buf</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_vector_mirror.html">LAFEM::VectorMirror</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#af086cf4acdf066510a8e9eefd82e8c5d">IndexType</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>donee_mir</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>offset</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00862">862</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a6b2a4ee0aca0aeeb1e45b1ca33514d91" name="a6b2a4ee0aca0aeeb1e45b1ca33514d91"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6b2a4ee0aca0aeeb1e45b1ca33514d91">&#9670;&#160;</a></span>assemble_allgather()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::assemble_allgather </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>yes_i_really_want_to_do_this</em> = <code>false</code></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Assembles the required data for the <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti_system.html#a627c1d30d6b92ed9575d2a4c7e4351b6" title="Performs a global matrix-vector product with this matrix.">AlgDofPartiSystem::apply()</a> function. </p>
+<dl class="section warning"><dt>Warning</dt><dd>Calling this function and (more importantly) the <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti_system.html#a627c1d30d6b92ed9575d2a4c7e4351b6" title="Performs a global matrix-vector product with this matrix.">AlgDofPartiSystem::apply()</a> functions will <em>totally</em> screw up the scalability of your application, so the code <em>will</em> blow up in your face on bigger clusters.<br  />
+Do not use this function except for <b>small-scale debugging</b> purposes. You have been warned.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">yes_i_really_want_to_do_this</td><td>An assertion will fire if this is <code>false</code>. The only purpose of this parameter is to force you to read the warning in this documentation first. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00493">493</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00589">FEAT::Dist::Comm::allgather()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00356">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_global_dof_offset()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00350">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00338">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_owned_dofs()</a>, <a class="el" href="dist_8hpp_source.html#l01506">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+
+</div>
+</div>
+<a id="a3d06e7f50f83c53326268b09abcf138e" name="a3d06e7f50f83c53326268b09abcf138e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d06e7f50f83c53326268b09abcf138e">&#9670;&#160;</a></span>assemble_by_gate()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::assemble_by_gate </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#ad797984ffc05362be7e4635707c09ba7">GateType</a> &amp;&#160;</td>
+          <td class="paramname"><em>gate</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>extra_local</em> = <code>0u</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>extra_shared</em> = <code>0u</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Assembles the <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html" title="Algebraic DOF Partitioning implementation.">AlgDofParti</a> object from a given <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html" title="Global gate implementation.">Global::Gate</a>. </p>
+<p >This function performs the assembly of all required internal data structures.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">extra_local</td><td>The number of extra local dofs for this process.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">extra_shared</td><td>The number of extra shared dofs for all processes. </td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000029">Todo:</a></b></dt><dd>what do we do if owned_dofs==0 ? </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00526">526</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="alg__dof__parti_8hpp_source.html#l00227">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_comm</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00253">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_donee_mirrors</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00249">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_donee_ranks</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00237">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_extra_local_dof_count</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00239">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_extra_shared_dof_count</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00235">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_owned_dof_count</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00251">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_owner_mirrors</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00247">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_owner_ranks</a>, <a class="el" href="gate_8hpp_source.html#l00071">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>, <a class="el" href="dist_8cpp_source.html#l00655">FEAT::Dist::Comm::allreduce()</a>, <a class="el" href="dist_8cpp_source.html#l00683">FEAT::Dist::Comm::exscan()</a>, <a class="el" href="gate_8hpp_source.html#l00138">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_comm()</a>, <a class="el" href="gate_8hpp_source.html#l00179">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_freqs()</a>, <a class="el" href="gate_8hpp_source.html#l00169">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_mirrors()</a>, <a class="el" href="dist_8cpp_source.html#l00716">FEAT::Dist::Comm::irecv()</a>, <a class="el" href="dist_8cpp_source.html#l00704">FEAT::Dist::Comm::isend()</a>, <a class="el" href="dist_8hpp_source.html#l00271">FEAT::Dist::op_sum</a>, <a class="el" href="dist_8hpp_source.html#l01494">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01506">FEAT::Dist::Comm::size()</a>, <a class="el" href="dist_8cpp_source.html#l00324">FEAT::Dist::RequestVector::wait_all()</a>, <a class="el" href="dist_8cpp_source.html#l00329">FEAT::Dist::RequestVector::wait_any()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+
+</div>
+</div>
+<a id="aaa409f646c1d7009ff86786fb695983a" name="aaa409f646c1d7009ff86786fb695983a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa409f646c1d7009ff86786fb695983a">&#9670;&#160;</a></span>bytes()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::size_t <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::bytes </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The size of this object in bytes </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00314">314</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="alg__dof__parti_8hpp_source.html#l00264">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_all_global_dof_counts</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00262">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_all_global_dof_offset</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00253">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_donee_mirrors</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00243">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_global_dof_idx</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00245">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_owned_mirror</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00251">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_owner_mirrors</a>.</p>
+
+</div>
+</div>
+<a id="a29768aad6526017fa90c2678ebf4921b" name="a29768aad6526017fa90c2678ebf4921b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29768aad6526017fa90c2678ebf4921b">&#9670;&#160;</a></span>clear()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::clear </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Resets the whole object. </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00289">289</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="alg__dof__parti_8hpp_source.html#l00264">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_all_global_dof_counts</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00262">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_all_global_dof_offset</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00227">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_comm</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00253">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_donee_mirrors</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00241">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_extra_dof_offset</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00237">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_extra_local_dof_count</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00239">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_extra_shared_dof_count</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00231">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_global_dof_count</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00243">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_global_dof_idx</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00229">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_global_dof_offset</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00233">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_local_dof_count</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00235">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_owned_dof_count</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00245">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_owned_mirror</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00251">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_owner_mirrors</a>.</p>
+
+</div>
+</div>
+<a id="af4a1789bd3dd6d09dbf14b198e4f7524" name="af4a1789bd3dd6d09dbf14b198e4f7524"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af4a1789bd3dd6d09dbf14b198e4f7524">&#9670;&#160;</a></span>download_vector()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename DT2_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::download_vector </td>
+          <td>(</td>
+          <td class="paramtype">const DT2_ *&#160;</td>
+          <td class="paramname"><em>owned_dofs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4d17090377b1df3d550c0084815b2701">LocalVectorType</a> &amp;&#160;</td>
+          <td class="paramname"><em>local_vector</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a> *&#160;</td>
+          <td class="paramname"><em>extra_local</em> = <code>nullptr</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a> *&#160;</td>
+          <td class="paramname"><em>extra_shared</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00772">772</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a61ff17bbedf56023f5041bba732425b2" name="a61ff17bbedf56023f5041bba732425b2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a61ff17bbedf56023f5041bba732425b2">&#9670;&#160;</a></span>get_all_global_dof_counts()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; int &gt; &amp; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::get_all_global_dof_counts </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the all-global-dof-counts vector. </p>
+<dl class="section attention"><dt>Attention</dt><dd>This vector is only allocated after <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a6b2a4ee0aca0aeeb1e45b1ca33514d91" title="Assembles the required data for the AlgDofPartiSystem::apply() function.">assemble_allgather()</a> has been called.<br  />
+Don't use this unless you really know what you are doing!</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The all-global-dof-counts vector. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00475">475</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="alg__dof__parti_8hpp_source.html#l00264">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_all_global_dof_counts</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+
+</div>
+</div>
+<a id="a2cf401f5432504c8681f21aff04f3da9" name="a2cf401f5432504c8681f21aff04f3da9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2cf401f5432504c8681f21aff04f3da9">&#9670;&#160;</a></span>get_all_global_dof_offsets()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const std::vector&lt; int &gt; &amp; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::get_all_global_dof_offsets </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the all-global-dof-offsets vector. </p>
+<dl class="section attention"><dt>Attention</dt><dd>This vector is only allocated after <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a6b2a4ee0aca0aeeb1e45b1ca33514d91" title="Assembles the required data for the AlgDofPartiSystem::apply() function.">assemble_allgather()</a> has been called.<br  />
+Don't use this unless you really know what you are doing!</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The all-global-dof-offsets vector. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00460">460</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="alg__dof__parti_8hpp_source.html#l00262">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_all_global_dof_offset</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+
+</div>
+</div>
+<a id="a176bc81a6c1385dabe633c8b47d228f7" name="a176bc81a6c1385dabe633c8b47d228f7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a176bc81a6c1385dabe633c8b47d228f7">&#9670;&#160;</a></span>get_block_information()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_string.html">String</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::get_block_information </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the block information of the algebraic dof partitioning as an XML string. </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00332">332</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="alg__dof__parti_8hpp_source.html#l00255">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_block_information</a>.</p>
+
+</div>
+</div>
+<a id="ab22cd5fb0efbf1ccde63cc7e71b14b71" name="ab22cd5fb0efbf1ccde63cc7e71b14b71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab22cd5fb0efbf1ccde63cc7e71b14b71">&#9670;&#160;</a></span>get_comm()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a> * <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::get_comm </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The communicator </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00308">308</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="alg__dof__parti_8hpp_source.html#l00227">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_comm</a>.</p>
+
+</div>
+</div>
+<a id="ad0922e20c82b9987542cd3b94be968a1" name="ad0922e20c82b9987542cd3b94be968a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad0922e20c82b9987542cd3b94be968a1">&#9670;&#160;</a></span>get_donee_mirror()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#abb5ae17f2c10cde441c75ec798255897">DoneeMirrorType</a> &amp; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::get_donee_mirror </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a donee neighbor mirror. </p>
+<dl class="section note"><dt>Note</dt><dd>The indices of a donee neighbor mirror are owned DOF indices.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">i</td><td>The index of the donee neighbor.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The mirror of the i-th donee neighbor. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00446">446</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00994">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_data_mirrors()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00878">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_structure()</a>.</p>
+
+</div>
+</div>
+<a id="a357d36e8d926bde3a31103d78c3414ee" name="a357d36e8d926bde3a31103d78c3414ee"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a357d36e8d926bde3a31103d78c3414ee">&#9670;&#160;</a></span>get_donee_rank()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::get_donee_rank </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns an donee neighbor rank. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">i</td><td>The index of the donee neighbor.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The rank of the i-th donee neighbor. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00412">412</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00760">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_buffers()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00550">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_matrix_numeric()</a>.</p>
+
+</div>
+</div>
+<a id="a9090fe037608f1fd202f8cb352c72527" name="a9090fe037608f1fd202f8cb352c72527"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9090fe037608f1fd202f8cb352c72527">&#9670;&#160;</a></span>get_global_dof_indices()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a8ebaed5d084a2e805e1c1259097ee29b">IndexVectorType</a> &amp; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::get_global_dof_indices </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the global-dof-indices array. </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00364">364</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="alg__dof__parti_8hpp_source.html#l00243">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_global_dof_idx</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00760">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_buffers()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00994">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_data_mirrors()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00878">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_structure()</a>.</p>
+
+</div>
+</div>
+<a id="a51798fa27902cc55fbc9ec92ae5981a3" name="a51798fa27902cc55fbc9ec92ae5981a3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a51798fa27902cc55fbc9ec92ae5981a3">&#9670;&#160;</a></span>get_global_dof_offset()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::get_global_dof_offset </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The index of the first global DOF owned by this process. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00356">356</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="alg__dof__parti_8hpp_source.html#l00229">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_global_dof_offset</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00493">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_allgather()</a>.</p>
+
+</div>
+</div>
+<a id="ac0adf92b8b53f5b2719ae57dcd7fbfb9" name="ac0adf92b8b53f5b2719ae57dcd7fbfb9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac0adf92b8b53f5b2719ae57dcd7fbfb9">&#9670;&#160;</a></span>get_num_donee_neighbors()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::get_num_donee_neighbors </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number of donee neighbors. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00384">384</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00760">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_buffers()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00878">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_structure()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00550">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_matrix_numeric()</a>.</p>
+
+</div>
+</div>
+<a id="ad18b15d3a2b1cb32a0955a205621813f" name="ad18b15d3a2b1cb32a0955a205621813f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad18b15d3a2b1cb32a0955a205621813f">&#9670;&#160;</a></span>get_num_global_dofs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The total number of global DOFs. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00350">350</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="alg__dof__parti_8hpp_source.html#l00231">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_global_dof_count</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00760">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_buffers()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00878">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_structure()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00493">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_allgather()</a>.</p>
+
+</div>
+</div>
+<a id="a3643b92d210b374a2b0ac0593797f21a" name="a3643b92d210b374a2b0ac0593797f21a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3643b92d210b374a2b0ac0593797f21a">&#9670;&#160;</a></span>get_num_local_dofs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::get_num_local_dofs </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number of local DOFs shared by this process. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00344">344</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="alg__dof__parti_8hpp_source.html#l00233">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_local_dof_count</a>.</p>
+
+</div>
+</div>
+<a id="ad4274406e04a2a23a81408e208fb3851" name="ad4274406e04a2a23a81408e208fb3851"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad4274406e04a2a23a81408e208fb3851">&#9670;&#160;</a></span>get_num_owned_dofs()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::get_num_owned_dofs </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number of local DOFs owned by this process. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00338">338</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="alg__dof__parti_8hpp_source.html#l00235">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_owned_dof_count</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00878">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_structure()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00493">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_allgather()</a>.</p>
+
+</div>
+</div>
+<a id="ab57da92429eda23298788e50d24d8104" name="ab57da92429eda23298788e50d24d8104"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab57da92429eda23298788e50d24d8104">&#9670;&#160;</a></span>get_num_owner_neighbors()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::get_num_owner_neighbors </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number of owner neighbors. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00378">378</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00760">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_buffers()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00550">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_matrix_numeric()</a>.</p>
+
+</div>
+</div>
+<a id="a778906f156d9ae734752ab2d40fc85a1" name="a778906f156d9ae734752ab2d40fc85a1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a778906f156d9ae734752ab2d40fc85a1">&#9670;&#160;</a></span>get_owned_mirror()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a72d03511777972a90a8aea9186617de9">OwnedMirrorType</a> &amp; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::get_owned_mirror </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the Mirror of the owned DOFs. </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00372">372</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="alg__dof__parti_8hpp_source.html#l00245">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::_owned_mirror</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00994">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_data_mirrors()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00878">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_structure()</a>.</p>
+
+</div>
+</div>
+<a id="a7c3b6174b5859b16742d9c92928d51aa" name="a7c3b6174b5859b16742d9c92928d51aa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7c3b6174b5859b16742d9c92928d51aa">&#9670;&#160;</a></span>get_owner_mirror()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a31168a7ffce34e0dd8d6a566215c1055">OwnerMirrorType</a> &amp; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::get_owner_mirror </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns an owner neighbor mirror. </p>
+<dl class="section note"><dt>Note</dt><dd>The indices of an owner neighbor mirror are local DOF indices.</dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">i</td><td>The index of the owner neighbor.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The mirror of the i-th owner neighbor. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00429">429</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00760">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_buffers()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00994">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_data_mirrors()</a>.</p>
+
+</div>
+</div>
+<a id="aa5d7d9db8059c8f79a86dfe2e8e63721" name="aa5d7d9db8059c8f79a86dfe2e8e63721"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5d7d9db8059c8f79a86dfe2e8e63721">&#9670;&#160;</a></span>get_owner_rank()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">int <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::get_owner_rank </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>i</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns an owner neighbor rank. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">i</td><td>The index of the owner neighbor.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>The rank of the i-th owner neighbor. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00398">398</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00760">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_buffers()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00550">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_matrix_numeric()</a>.</p>
+
+</div>
+</div>
+<a id="a730ca91fd7011c3fee02e922125b963c" name="a730ca91fd7011c3fee02e922125b963c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a730ca91fd7011c3fee02e922125b963c">&#9670;&#160;</a></span>upload_vector()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename DT2_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::upload_vector </td>
+          <td>(</td>
+          <td class="paramtype">DT2_ *&#160;</td>
+          <td class="paramname"><em>owned_dofs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a4d17090377b1df3d550c0084815b2701">LocalVectorType</a> &amp;&#160;</td>
+          <td class="paramname"><em>local_vector</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a> *&#160;</td>
+          <td class="paramname"><em>extra_local</em> = <code>nullptr</code>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#aa13958d0a5991f3a22678dd194c6d1da">DataType</a> *&#160;</td>
+          <td class="paramname"><em>extra_shared</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00743">743</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Data Documentation</h2>
+<a id="a70528b4d6d5cee31015097031492fff0" name="a70528b4d6d5cee31015097031492fff0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a70528b4d6d5cee31015097031492fff0">&#9670;&#160;</a></span>_all_global_dof_counts</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;int&gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_all_global_dof_counts</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>global DOF counts of all processes, </p>
+<dl class="section see"><dt>See also</dt><dd>#allgather() </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00264">264</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00314">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::bytes()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00289">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::clear()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00475">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_all_global_dof_counts()</a>.</p>
+
+</div>
+</div>
+<a id="a576d8378b88be255dd45b58ccac172bd" name="a576d8378b88be255dd45b58ccac172bd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a576d8378b88be255dd45b58ccac172bd">&#9670;&#160;</a></span>_all_global_dof_offset</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;int&gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_all_global_dof_offset</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>global DOF offsets of all processes, </p>
+<dl class="section see"><dt>See also</dt><dd>#allgather() </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00262">262</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00314">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::bytes()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00289">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::clear()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00460">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_all_global_dof_offsets()</a>.</p>
+
+</div>
+</div>
+<a id="aa9c29151e5a02a7734420e489e5fd0c5" name="aa9c29151e5a02a7734420e489e5fd0c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa9c29151e5a02a7734420e489e5fd0c5">&#9670;&#160;</a></span>_block_information</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_string.html">String</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_block_information</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>a string containing the block information in XML format </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00255">255</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00332">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_block_information()</a>.</p>
+
+</div>
+</div>
+<a id="aefd316997f72bb7c7a4a61fc2744f29e" name="aefd316997f72bb7c7a4a61fc2744f29e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aefd316997f72bb7c7a4a61fc2744f29e">&#9670;&#160;</a></span>_comm</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a>* <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_comm</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>our communicator </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00227">227</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00526">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_by_gate()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00289">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::clear()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00308">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_comm()</a>.</p>
+
+</div>
+</div>
+<a id="a3f974a45350a021effac32c80d78ae25" name="a3f974a45350a021effac32c80d78ae25"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f974a45350a021effac32c80d78ae25">&#9670;&#160;</a></span>_donee_mirrors</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#abb5ae17f2c10cde441c75ec798255897">DoneeMirrorType</a>&gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_donee_mirrors</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>rank/mirror-pair of DOF-donee processes </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00253">253</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00526">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_by_gate()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00314">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::bytes()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00289">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::clear()</a>.</p>
+
+</div>
+</div>
+<a id="a9217d86737dbff5c3aaae104c97ba0fa" name="a9217d86737dbff5c3aaae104c97ba0fa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9217d86737dbff5c3aaae104c97ba0fa">&#9670;&#160;</a></span>_donee_ranks</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;int&gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_donee_ranks</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>ranks of DOF-donee neighbor processes </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00249">249</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00526">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_by_gate()</a>.</p>
+
+</div>
+</div>
+<a id="a77f2ebc4d23a62a27f74a2f84f687fa1" name="a77f2ebc4d23a62a27f74a2f84f687fa1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a77f2ebc4d23a62a27f74a2f84f687fa1">&#9670;&#160;</a></span>_extra_dof_offset</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_extra_dof_offset</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>offset of first extra DOF </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00241">241</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00289">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::clear()</a>.</p>
+
+</div>
+</div>
+<a id="a3b8ae0e46c716cdcd2596c10e6fe0ab3" name="a3b8ae0e46c716cdcd2596c10e6fe0ab3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3b8ae0e46c716cdcd2596c10e6fe0ab3">&#9670;&#160;</a></span>_extra_local_dof_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_extra_local_dof_count</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>number of extra local dofs; may be different for each process </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00237">237</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00526">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_by_gate()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00289">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::clear()</a>.</p>
+
+</div>
+</div>
+<a id="a040524836fef57c4c0cfe02abc224adb" name="a040524836fef57c4c0cfe02abc224adb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a040524836fef57c4c0cfe02abc224adb">&#9670;&#160;</a></span>_extra_shared_dof_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_extra_shared_dof_count</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>number of extra shared dofs; must be equal on all processes </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00239">239</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00526">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_by_gate()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00289">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::clear()</a>.</p>
+
+</div>
+</div>
+<a id="a4d83e0fa63187a69b349efd5648714f2" name="a4d83e0fa63187a69b349efd5648714f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d83e0fa63187a69b349efd5648714f2">&#9670;&#160;</a></span>_global_dof_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_global_dof_count</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>global dof count over all processes </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00231">231</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00289">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::clear()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00350">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>.</p>
+
+</div>
+</div>
+<a id="ae73ab93dd50b53bd4ba7c3297e9fdc68" name="ae73ab93dd50b53bd4ba7c3297e9fdc68"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae73ab93dd50b53bd4ba7c3297e9fdc68">&#9670;&#160;</a></span>_global_dof_idx</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a8ebaed5d084a2e805e1c1259097ee29b">IndexVectorType</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_global_dof_idx</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>global dof indices for each local dof </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00243">243</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00314">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::bytes()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00289">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::clear()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00364">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_global_dof_indices()</a>.</p>
+
+</div>
+</div>
+<a id="a4b14d6cbe6f6e2e2fbf428dbe668e187" name="a4b14d6cbe6f6e2e2fbf428dbe668e187"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4b14d6cbe6f6e2e2fbf428dbe668e187">&#9670;&#160;</a></span>_global_dof_offset</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_global_dof_offset</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>global dof offset of this process </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00229">229</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00289">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::clear()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00356">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_global_dof_offset()</a>.</p>
+
+</div>
+</div>
+<a id="a27aba18984c6364df94e5b2bb59fa029" name="a27aba18984c6364df94e5b2bb59fa029"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a27aba18984c6364df94e5b2bb59fa029">&#9670;&#160;</a></span>_local_dof_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_local_dof_count</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>number of local dofs of this process </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00233">233</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00289">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::clear()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00344">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_local_dofs()</a>.</p>
+
+</div>
+</div>
+<a id="aa58fd4dc7760e483aaf86edc0d6806da" name="aa58fd4dc7760e483aaf86edc0d6806da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa58fd4dc7760e483aaf86edc0d6806da">&#9670;&#160;</a></span>_owned_dof_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_owned_dof_count</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>number of owned dofs of this process </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00235">235</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00526">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_by_gate()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00289">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::clear()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00338">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_owned_dofs()</a>.</p>
+
+</div>
+</div>
+<a id="a5b0191de0bf5c3d7959e879bb4ca892e" name="a5b0191de0bf5c3d7959e879bb4ca892e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b0191de0bf5c3d7959e879bb4ca892e">&#9670;&#160;</a></span>_owned_mirror</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a1622877cc7938dfc752455ad5ee7f253">MirrorType</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_owned_mirror</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>mirror for this process's owned DOFs </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00245">245</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00314">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::bytes()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00289">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::clear()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00372">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_owned_mirror()</a>.</p>
+
+</div>
+</div>
+<a id="af9435a9adcaebeeafeb73361ac24c23d" name="af9435a9adcaebeeafeb73361ac24c23d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af9435a9adcaebeeafeb73361ac24c23d">&#9670;&#160;</a></span>_owner_mirrors</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html#a31168a7ffce34e0dd8d6a566215c1055">OwnerMirrorType</a>&gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_owner_mirrors</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>rank/mirror-pair of DOF-owner processes </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00251">251</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00526">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_by_gate()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00314">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::bytes()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00289">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::clear()</a>.</p>
+
+</div>
+</div>
+<a id="a4e81aae4ca08a2014ea947a5511db84d" name="a4e81aae4ca08a2014ea947a5511db84d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4e81aae4ca08a2014ea947a5511db84d">&#9670;&#160;</a></span>_owner_ranks</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;int&gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html">FEAT::Global::AlgDofParti</a>&lt; LocalVector_, Mirror_ &gt;::_owner_ranks</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>ranks of DOF-owner neighbor processes </p>
+
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti_8hpp_source.html#l00247">247</a> of file <a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00526">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_by_gate()</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>kernel/global/<a class="el" href="alg__dof__parti_8hpp_source.html">alg_dof_parti.hpp</a></li>
 </ul>
 </div><!-- contents -->

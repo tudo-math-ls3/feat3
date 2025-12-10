@@ -3,6 +3,7 @@ var class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer =
     [ "IndexSet", "struct_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer_1_1_index_set.html", null ],
     [ "AdaptiveMeshType", "class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html#aa97568aa3cf1c5e8bf2eab416da5e847", null ],
     [ "AdaptiveNeighborsType", "class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html#ae4f32a2995f27b29f671b8dfd1601376", null ],
+    [ "CoordType", "class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html#ac2f0c4b0fa1883bc8cedd1829263ecc5", null ],
     [ "IndexSetHolderType", "class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html#ad7e6780d2f15c1d82b2cb818090883af", null ],
     [ "MeshPermutationType", "class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html#acb3fb8da4fec978963f6854c807bd1ba", null ],
     [ "ShapeType", "class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html#a2f8afb482b60cab59f413fe79a6277e8", null ],

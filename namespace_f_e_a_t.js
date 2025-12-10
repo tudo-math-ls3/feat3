@@ -95,6 +95,8 @@ var namespace_f_e_a_t =
     [ "abortion", "namespace_f_e_a_t.html#a881f84ab2c02e235ac8b688a6100f1f6", null ],
     [ "assertion", "namespace_f_e_a_t.html#a295d025ff52fcef38ee443016a2bf8f5", null ],
     [ "feat_omp_ex_scan", "namespace_f_e_a_t.html#a148e444c4e284a335d89327304f5af20", null ],
+    [ "feat_omp_get_max_threads", "namespace_f_e_a_t.html#ae47bbf5f021b9b3b110cf81260172a3e", null ],
+    [ "feat_omp_get_thread_num", "namespace_f_e_a_t.html#a829be1b94c7b345f6bb4941516182497", null ],
     [ "feat_omp_in_scan", "namespace_f_e_a_t.html#a1cfd9376de2f4a78743c5a2ebfedb08f", null ],
     [ "operator&", "namespace_f_e_a_t.html#aad5962774e04a08691f4e9ff0d2c353c", null ],
     [ "operator&", "namespace_f_e_a_t.html#acf92a649a38de9336e758d9ef0880668", null ],

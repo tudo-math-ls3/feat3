@@ -15,6 +15,7 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror =
     [ "clone", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#af899dcf62bbdf65460fa32bc2a49c167", null ],
     [ "convert", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#ac93986385e1d706342a566c4df53ef5e", null ],
     [ "create_buffer", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#a553a942a032ec40ad8644a815ad1d484", null ],
+    [ "dump", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#ac7fa8a049569d808bf4974b279389b82", null ],
     [ "empty", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#a0391b5908013144feca8a144a1d9bae2", null ],
     [ "gather", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#a96ebd51ab88bab5384e77af4079b1087", null ],
     [ "make_empty", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#a9a966a0591abe85c7bcb5c8c2610e3ed", null ],

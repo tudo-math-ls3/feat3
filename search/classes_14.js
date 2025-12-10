@@ -8,12 +8,13 @@ var searchData=
   ['unitcubefactory_5',['UnitCubeFactory',['../class_f_e_a_t_1_1_geometry_1_1_unit_cube_factory.html',1,'FEAT::Geometry']]],
   ['unitcubepatchgenerator_6',['UnitCubePatchGenerator',['../class_f_e_a_t_1_1_geometry_1_1_unit_cube_patch_generator.html',1,'FEAT::Geometry']]],
   ['unitfilter_7',['UnitFilter',['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html',1,'FEAT::LAFEM']]],
-  ['unitfilterassembler_8',['UnitFilterAssembler',['../class_f_e_a_t_1_1_assembly_1_1_unit_filter_assembler.html',1,'FEAT::Assembly']]],
-  ['unitfilterblocked_9',['UnitFilterBlocked',['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html',1,'FEAT::LAFEM']]],
-  ['unitspherefactory_10',['UnitSphereFactory',['../class_f_e_a_t_1_1_geometry_1_1_unit_sphere_factory.html',1,'FEAT::Geometry']]],
-  ['unitstarcubefactory_11',['UnitStarCubeFactory',['../class_f_e_a_t_1_1_geometry_1_1_unit_star_cube_factory.html',1,'FEAT::Geometry']]],
-  ['unittest_12',['UnitTest',['../class_f_e_a_t_1_1_test_system_1_1_unit_test.html',1,'FEAT::TestSystem']]],
-  ['unknownrule_13',['UnknownRule',['../class_f_e_a_t_1_1_cubature_1_1_unknown_rule.html',1,'FEAT::Cubature']]],
-  ['uzawaprecond_14',['UzawaPrecond',['../class_f_e_a_t_1_1_solver_1_1_uzawa_precond.html',1,'FEAT::Solver']]],
-  ['uzawaprecond_3c_20global_3a_3amatrix_3c_20matrixa_5f_2c_20mirrorv_5f_2c_20mirrorv_5f_20_3e_2c_20global_3a_3amatrix_3c_20matrixb_5f_2c_20mirrorv_5f_2c_20mirrorp_5f_20_3e_2c_20global_3a_3amatrix_3c_20matrixd_5f_2c_20mirrorp_5f_2c_20mirrorv_5f_20_3e_2c_20global_3a_3afilter_3c_20filterv_5f_2c_20mirrorv_5f_20_3e_2c_20global_3a_3afilter_3c_20filterp_5f_2c_20mirrorp_5f_20_3e_20_3e_15',['UzawaPrecond&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;',['../class_f_e_a_t_1_1_solver_1_1_uzawa_precond_3_01_global_1_1_matrix_3_01_matrix_a___00_01_mirror_v267746ef0d8b831732ecfa70b7d32300.html',1,'FEAT::Solver']]]
+  ['unitfilter_3c_20datatype_2c_20indextype_20_3e_8',['UnitFilter&lt; DataType, IndexType &gt;',['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html',1,'FEAT::LAFEM']]],
+  ['unitfilterassembler_9',['UnitFilterAssembler',['../class_f_e_a_t_1_1_assembly_1_1_unit_filter_assembler.html',1,'FEAT::Assembly']]],
+  ['unitfilterblocked_10',['UnitFilterBlocked',['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter_blocked.html',1,'FEAT::LAFEM']]],
+  ['unitspherefactory_11',['UnitSphereFactory',['../class_f_e_a_t_1_1_geometry_1_1_unit_sphere_factory.html',1,'FEAT::Geometry']]],
+  ['unitstarcubefactory_12',['UnitStarCubeFactory',['../class_f_e_a_t_1_1_geometry_1_1_unit_star_cube_factory.html',1,'FEAT::Geometry']]],
+  ['unittest_13',['UnitTest',['../class_f_e_a_t_1_1_test_system_1_1_unit_test.html',1,'FEAT::TestSystem']]],
+  ['unknownrule_14',['UnknownRule',['../class_f_e_a_t_1_1_cubature_1_1_unknown_rule.html',1,'FEAT::Cubature']]],
+  ['uzawaprecond_15',['UzawaPrecond',['../class_f_e_a_t_1_1_solver_1_1_uzawa_precond.html',1,'FEAT::Solver']]],
+  ['uzawaprecond_3c_20global_3a_3amatrix_3c_20matrixa_5f_2c_20mirrorv_5f_2c_20mirrorv_5f_20_3e_2c_20global_3a_3amatrix_3c_20matrixb_5f_2c_20mirrorv_5f_2c_20mirrorp_5f_20_3e_2c_20global_3a_3amatrix_3c_20matrixd_5f_2c_20mirrorp_5f_2c_20mirrorv_5f_20_3e_2c_20global_3a_3afilter_3c_20filterv_5f_2c_20mirrorv_5f_20_3e_2c_20global_3a_3afilter_3c_20filterp_5f_2c_20mirrorp_5f_20_3e_20_3e_16',['UzawaPrecond&lt; Global::Matrix&lt; MatrixA_, MirrorV_, MirrorV_ &gt;, Global::Matrix&lt; MatrixB_, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; MatrixD_, MirrorP_, MirrorV_ &gt;, Global::Filter&lt; FilterV_, MirrorV_ &gt;, Global::Filter&lt; FilterP_, MirrorP_ &gt; &gt;',['../class_f_e_a_t_1_1_solver_1_1_uzawa_precond_3_01_global_1_1_matrix_3_01_matrix_a___00_01_mirror_v267746ef0d8b831732ecfa70b7d32300.html',1,'FEAT::Solver']]]
 ];

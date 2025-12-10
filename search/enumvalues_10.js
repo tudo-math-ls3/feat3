@@ -11,7 +11,8 @@ var searchData=
   ['steepest_8',['steepest',['../namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7aa28d8f7ff8168d4aa740054357bcac61',1,'FEAT::Solver']]],
   ['success_9',['success',['../namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda260ca9dd8a4577fc00b7bd5810298076',1,'FEAT::Solver']]],
   ['summary_10',['summary',['../namespace_f_e_a_t_1_1_solver.html#a892c0210316c5cb1cf89035147242c36aa80da1282f2c775bbc5f2c92c836968b',1,'FEAT::Solver']]],
-  ['swap_11',['swap',['../class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8eaf0a1dfdc675b0a14a64099f7ac1cee83',1,'FEAT::Adjacency::Permutation']]],
-  ['symmetric_12',['symmetric',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278afeca3c730601be7fd57f1f0b668b4637',1,'FEAT::LAFEM']]],
-  ['symmetric_5fstruct_13',['symmetric_struct',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278ade3aaf9039f90d1f38d202b821d27776',1,'FEAT::LAFEM']]]
+  ['superlu_11',['superlu',['../namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aef31a9bc50c89d729abd9684bc1893b2',1,'FEAT::Solver']]],
+  ['swap_12',['swap',['../class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8eaf0a1dfdc675b0a14a64099f7ac1cee83',1,'FEAT::Adjacency::Permutation']]],
+  ['symmetric_13',['symmetric',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278afeca3c730601be7fd57f1f0b668b4637',1,'FEAT::LAFEM']]],
+  ['symmetric_5fstruct_14',['symmetric_struct',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278ade3aaf9039f90d1f38d202b821d27776',1,'FEAT::LAFEM']]]
 ];

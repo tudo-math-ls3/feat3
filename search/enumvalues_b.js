@@ -7,5 +7,6 @@ var searchData=
   ['mindefect_4',['MinDefect',['../namespace_f_e_a_t_1_1_solver.html#a9d7f089c4ca7981d407aa7a7038f6e23a4e8e2d409757b43a89e7e03a70f34b54',1,'FEAT::Solver']]],
   ['minenergy_5',['MinEnergy',['../namespace_f_e_a_t_1_1_solver.html#a9d7f089c4ca7981d407aa7a7038f6e23ae2ff515050bfd1fe926c0c1f3764dc45',1,'FEAT::Solver']]],
   ['minimum_5fdegree_6',['minimum_degree',['../class_f_e_a_t_1_1_adjacency_1_1_cuthill_mc_kee.html#a012aeb1b0b0435bac9a59114e6932e52acdad0400d5eb3f62e144cefa9eb1b5c9',1,'FEAT::Adjacency::CuthillMcKee']]],
-  ['mkl_7',['mkl',['../namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a324ddb5e2f605b34cce9110cbf390f6b',1,'FEAT']]]
+  ['mkl_7',['mkl',['../namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a324ddb5e2f605b34cce9110cbf390f6b',1,'FEAT']]],
+  ['mkldss_8',['mkldss',['../namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa7e50eecfc88a2f0d1939637ef836a3d',1,'FEAT::Solver']]]
 ];

@@ -12,6 +12,7 @@ var class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_assembly_task_base =
     [ "finish", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_assembly_task_base.html#a4b0f648dd3f1c32f602154a4c73a8d5d", null ],
     [ "prepare", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_assembly_task_base.html#a292a09f05426e7838e5b816b616fb5e3", null ],
     [ "prepare_point", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_assembly_task_base.html#ade32a12249e4aab9f82d5405fd57ee65", null ],
+    [ "alpha", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_assembly_task_base.html#a56faffd7256b9d2b897a3ee00f631328", null ],
     [ "barycenter", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_assembly_task_base.html#a09c40fffde21adf120c338152bbf6827", null ],
     [ "beta", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_assembly_task_base.html#af80337cfa1a32793a469d2656f292426", null ],
     [ "conv_dim", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_assembly_task_base.html#a8e6d7a03ac19e89bd11b490fd99c81ff", null ],

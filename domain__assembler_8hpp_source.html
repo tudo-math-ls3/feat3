@@ -1005,7 +1005,7 @@ $(document).ready(function(){initNavTree('domain__assembler_8hpp_source.html',''
 <div class="line"><a id="l01462" name="l01462"></a><span class="lineno"> 1462</span>          <span class="comment">// do we have to combine the assembly?</span></div>
 <div class="line"><a id="l01463" name="l01463"></a><span class="lineno"> 1463</span>          <span class="keywordflow">if</span>(need_combine)</div>
 <div class="line"><a id="l01464" name="l01464"></a><span class="lineno"> 1464</span>          {</div>
-<div class="line"><a id="l01465" name="l01465"></a><span class="lineno"> 1465</span>            FEAT_PRAGMA_OMP(master)</div>
+<div class="line"><a id="l01465" name="l01465"></a><span class="lineno"> 1465</span>            FEAT_PRAGMA_OMP(critical)</div>
 <div class="line"><a id="l01466" name="l01466"></a><span class="lineno"> 1466</span>            {</div>
 <div class="line"><a id="l01467" name="l01467"></a><span class="lineno"> 1467</span>              <span class="comment">// combine the assembly</span></div>
 <div class="line"><a id="l01468" name="l01468"></a><span class="lineno"> 1468</span>              task-&gt;combine();</div>

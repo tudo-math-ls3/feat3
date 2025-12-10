@@ -10,6 +10,7 @@ var class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_vector_assembly_job =
     [ "calc_sd_v_norm", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_vector_assembly_job.html#a34f836bb6de7a3f2304de70d46516716", null ],
     [ "calc_sd_v_norm", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_vector_assembly_job.html#abfba980460d5a619a9da83ab1e78eb7f", null ],
     [ "set_sd_v_norm", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_vector_assembly_job.html#a3b10e6340b78da910ce99c28d24ebcd9", null ],
+    [ "alpha", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_vector_assembly_job.html#a0c785c1fe3f932b76ea476440caab4cf", null ],
     [ "beta", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_vector_assembly_job.html#a42373c206757aea13cf306baf8c69cee", null ],
     [ "block_size", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_vector_assembly_job.html#af37350009d2e6bb61efe642f2034591d", null ],
     [ "convection_vector", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_vector_assembly_job.html#a00b930e7da391f20c390129766c457b7", null ],

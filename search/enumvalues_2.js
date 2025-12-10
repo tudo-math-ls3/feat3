@@ -12,6 +12,7 @@ var searchData=
   ['compression_5foff_9',['compression_off',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#a82e983d75b2911bc2cd014a541d50711abe41229f32371e34904684d0dcee0712',1,'FEAT::LAFEM']]],
   ['conformal_10',['conformal',['../class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#abef75c771edd48fe54f531fe8ccf1999add786cecc4c061d74f79de1c7abf040e',1,'FEAT::Geometry::MeshFileReader']]],
   ['cuda_11',['cuda',['../namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a39466fe22b062a34cfe09f3cc8c24868',1,'FEAT']]],
-  ['cuthill_5fmckee_12',['cuthill_mckee',['../namespace_f_e_a_t_1_1_geometry.html#a9a08208ef110199cc9c70de1f8b83de6a7ad8d46b523ea7e2918a6f5c1b80d01f',1,'FEAT::Geometry']]],
-  ['cuthill_5fmckee_5freversed_13',['cuthill_mckee_reversed',['../namespace_f_e_a_t_1_1_geometry.html#a9a08208ef110199cc9c70de1f8b83de6a65ca520f30bbe0884c8e47c99e653e3e',1,'FEAT::Geometry']]]
+  ['cudss_12',['cudss',['../namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ae3aa5b6b7b1ea1afbbc3134b7af923fe',1,'FEAT::Solver']]],
+  ['cuthill_5fmckee_13',['cuthill_mckee',['../namespace_f_e_a_t_1_1_geometry.html#a9a08208ef110199cc9c70de1f8b83de6a7ad8d46b523ea7e2918a6f5c1b80d01f',1,'FEAT::Geometry']]],
+  ['cuthill_5fmckee_5freversed_14',['cuthill_mckee_reversed',['../namespace_f_e_a_t_1_1_geometry.html#a9a08208ef110199cc9c70de1f8b83de6a65ca520f30bbe0884c8e47c99e653e3e',1,'FEAT::Geometry']]]
 ];

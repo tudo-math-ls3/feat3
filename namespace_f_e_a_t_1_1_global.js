@@ -1,9 +1,7 @@
 var namespace_f_e_a_t_1_1_global =
 [
-    [ "AlgDofParti", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html", null ],
-    [ "AlgDofParti< LAFEM::DenseVector< DT_, IT_ >, LAFEM::VectorMirror< DT_, IT_ > >", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_3_01_l_a_f_e_m_1_1_dense_vector_3_01_d_t___00_01_i_t_914574362a1d637068ac8fa9eb1a3de4.html", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_3_01_l_a_f_e_m_1_1_dense_vector_3_01_d_t___00_01_i_t_914574362a1d637068ac8fa9eb1a3de4" ],
-    [ "AlgDofPartiMatrix", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_matrix.html", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_matrix" ],
-    [ "AlgDofPartiVector", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector.html", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_vector" ],
+    [ "AlgDofParti", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti" ],
+    [ "AlgDofPartiSystem", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_system.html", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_system" ],
     [ "Filter", "class_f_e_a_t_1_1_global_1_1_filter.html", "class_f_e_a_t_1_1_global_1_1_filter" ],
     [ "Gate", "class_f_e_a_t_1_1_global_1_1_gate.html", "class_f_e_a_t_1_1_global_1_1_gate" ],
     [ "Matrix", "class_f_e_a_t_1_1_global_1_1_matrix.html", "class_f_e_a_t_1_1_global_1_1_matrix" ],

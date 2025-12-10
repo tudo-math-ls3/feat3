@@ -111,7 +111,7 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_solver_1_1_a_d_p_sol
 </div><!--header-->
 <div class="contents">
 
-<p>Implementation of <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html" title="Base-Class for Solvers based on Algebraic-DOF-Partitioning.">ADPSolverBase</a> interface for <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html" title="Pre-Multiplied Discontinuous Diagonal Schur-Complement Matrix.">Global::PMDCDSCMatrix</a> instances.  
+<p>Implementation of <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html" title="Base-Class for solvers based on Algebraic-DOF-Partitioning.">ADPSolverBase</a> interface for <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html" title="Pre-Multiplied Discontinuous Diagonal Schur-Complement Matrix.">Global::PMDCDSCMatrix</a> instances.  
  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>&gt;</code></p>
@@ -125,94 +125,142 @@ Inheritance diagram for FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
 <tr class="memitem:abb812b3c1f79e6480ec0e0e9ea10c3b6"><td class="memItemLeft" align="right" valign="top">typedef SolverBase_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#abb812b3c1f79e6480ec0e0e9ea10c3b6">BaseClass</a></td></tr>
+<tr class="memdesc:abb812b3c1f79e6480ec0e0e9ea10c3b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">our base class  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#abb812b3c1f79e6480ec0e0e9ea10c3b6">More...</a><br /></td></tr>
 <tr class="separator:abb812b3c1f79e6480ec0e0e9ea10c3b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e8931869979d9a49c7fb78919cf4b35"><td class="memItemLeft" align="right" valign="top">typedef LocalMatrixTypeS::DataType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a7e8931869979d9a49c7fb78919cf4b35">DataType</a></td></tr>
+<tr class="memdesc:a7e8931869979d9a49c7fb78919cf4b35"><td class="mdescLeft">&#160;</td><td class="mdescRight">our internal data type  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a7e8931869979d9a49c7fb78919cf4b35">More...</a><br /></td></tr>
 <tr class="separator:a7e8931869979d9a49c7fb78919cf4b35"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acb91986fbfdb274cead3384f5c65c6c2"><td class="memItemLeft" align="right" valign="top">typedef GlobalFilter_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#acb91986fbfdb274cead3384f5c65c6c2">GlobalFilterType</a></td></tr>
+<tr class="memdesc:acb91986fbfdb274cead3384f5c65c6c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">the global filter type  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#acb91986fbfdb274cead3384f5c65c6c2">More...</a><br /></td></tr>
 <tr class="separator:acb91986fbfdb274cead3384f5c65c6c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a456afb92ecad526dd548ed453c4e0452"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a456afb92ecad526dd548ed453c4e0452">GlobalMatrixType</a></td></tr>
+<tr class="memdesc:a456afb92ecad526dd548ed453c4e0452"><td class="mdescLeft">&#160;</td><td class="mdescRight">the global matrix type  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a456afb92ecad526dd548ed453c4e0452">More...</a><br /></td></tr>
 <tr class="separator:a456afb92ecad526dd548ed453c4e0452"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a16cddd70bd6bd9ce067d73a04edb22e0"><td class="memItemLeft" align="right" valign="top">typedef GlobalMatrixType::VectorTypeL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a16cddd70bd6bd9ce067d73a04edb22e0">GlobalVectorType</a></td></tr>
+<tr class="memdesc:a16cddd70bd6bd9ce067d73a04edb22e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">the global vector type  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a16cddd70bd6bd9ce067d73a04edb22e0">More...</a><br /></td></tr>
 <tr class="separator:a16cddd70bd6bd9ce067d73a04edb22e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ad2c4a41a889eef8f58ffe1cfdf5307"><td class="memItemLeft" align="right" valign="top">typedef LocalMatrixTypeS::IndexType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0ad2c4a41a889eef8f58ffe1cfdf5307">IndexType</a></td></tr>
+<tr class="memdesc:a0ad2c4a41a889eef8f58ffe1cfdf5307"><td class="mdescLeft">&#160;</td><td class="mdescRight">our internal index type  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0ad2c4a41a889eef8f58ffe1cfdf5307">More...</a><br /></td></tr>
 <tr class="separator:a0ad2c4a41a889eef8f58ffe1cfdf5307"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac196ffb8c68eab6a36cff34939188006"><td class="memItemLeft" align="right" valign="top">typedef GlobalMatrixType::LocalMatrixTypeS&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ac196ffb8c68eab6a36cff34939188006">LocalMatrixTypeS</a></td></tr>
+<tr class="memdesc:ac196ffb8c68eab6a36cff34939188006"><td class="mdescLeft">&#160;</td><td class="mdescRight">the local Schur-complement matrix type  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ac196ffb8c68eab6a36cff34939188006">More...</a><br /></td></tr>
 <tr class="separator:ac196ffb8c68eab6a36cff34939188006"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a66c427b0ead5d46ebb61181071b164aa"><td class="memItemLeft" align="right" valign="top">typedef GlobalVectorType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a66c427b0ead5d46ebb61181071b164aa">VectorType</a></td></tr>
+<tr class="memitem:ad443fc3f3aff0d15ec687ca078e63a4d"><td class="memItemLeft" align="right" valign="top">typedef LocalMatrixTypeS::VectorTypeL&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ad443fc3f3aff0d15ec687ca078e63a4d">LocalVectorType</a></td></tr>
+<tr class="memdesc:ad443fc3f3aff0d15ec687ca078e63a4d"><td class="mdescLeft">&#160;</td><td class="mdescRight">our internal local vector type; always a <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector&lt;DataType, IndexType&gt;</a>  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ad443fc3f3aff0d15ec687ca078e63a4d">More...</a><br /></td></tr>
+<tr class="separator:ad443fc3f3aff0d15ec687ca078e63a4d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a66c427b0ead5d46ebb61181071b164aa"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a16cddd70bd6bd9ce067d73a04edb22e0">GlobalVectorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a66c427b0ead5d46ebb61181071b164aa">VectorType</a></td></tr>
+<tr class="memdesc:a66c427b0ead5d46ebb61181071b164aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">the system vector type  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a66c427b0ead5d46ebb61181071b164aa">More...</a><br /></td></tr>
 <tr class="separator:a66c427b0ead5d46ebb61181071b164aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:ad1784a4febdae0ab3ec0fe2adbad8eab"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ad1784a4febdae0ab3ec0fe2adbad8eab">_get_comm</a> () const</td></tr>
 <tr class="separator:ad1784a4febdae0ab3ec0fe2adbad8eab"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af6bb49c09148ece0dab7b5edc6f94eed"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#af6bb49c09148ece0dab7b5edc6f94eed">done_symbolic</a> () override</td></tr>
-<tr class="separator:af6bb49c09148ece0dab7b5edc6f94eed"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5a961736ea5ef136cb681d16b0bad79d"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a5a961736ea5ef136cb681d16b0bad79d">init_numeric</a> () override</td></tr>
-<tr class="separator:a5a961736ea5ef136cb681d16b0bad79d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2d73efcc9e756e737237358f7889b0c2"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a2d73efcc9e756e737237358f7889b0c2">init_symbolic</a> () override</td></tr>
+<tr class="memdesc:a2d73efcc9e756e737237358f7889b0c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Symbolic initialization.  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a2d73efcc9e756e737237358f7889b0c2">More...</a><br /></td></tr>
 <tr class="separator:a2d73efcc9e756e737237358f7889b0c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:acd866b063c8105c28d7c86fb4763e708"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#acd866b063c8105c28d7c86fb4763e708">ADPSolverBase</a> (const <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">GlobalMatrixType</a> &amp;matrix, const GlobalFilterType &amp;filter)</td></tr>
+<tr class="memitem:acd866b063c8105c28d7c86fb4763e708"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#acd866b063c8105c28d7c86fb4763e708">ADPSolverBase</a> (const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a456afb92ecad526dd548ed453c4e0452">GlobalMatrixType</a> &amp;matrix, const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#acb91986fbfdb274cead3384f5c65c6c2">GlobalFilterType</a> &amp;filter)</td></tr>
+<tr class="memdesc:acd866b063c8105c28d7c86fb4763e708"><td class="mdescLeft">&#160;</td><td class="mdescRight">protected constructor  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#acd866b063c8105c28d7c86fb4763e708">More...</a><br /></td></tr>
 <tr class="separator:acd866b063c8105c28d7c86fb4763e708"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a501a2ad57fc586fd745d0b79ad41eb85"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a501a2ad57fc586fd745d0b79ad41eb85">_download_vec_cor</a> (VectorType &amp;)</td></tr>
-<tr class="separator:a501a2ad57fc586fd745d0b79ad41eb85"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a32bde744a84f62eb95b098cab3ae31e3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a32bde744a84f62eb95b098cab3ae31e3">_download_vec_def</a> (VectorType &amp;)</td></tr>
-<tr class="separator:a32bde744a84f62eb95b098cab3ae31e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6912fd8658f4ce16e7c0b15a6107ac15"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ &gt; </td></tr>
+<tr class="memitem:a6912fd8658f4ce16e7c0b15a6107ac15"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a6912fd8658f4ce16e7c0b15a6107ac15">_download_vector</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a7e8931869979d9a49c7fb78919cf4b35">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0ad2c4a41a889eef8f58ffe1cfdf5307">IndexType</a> &gt; &amp;vector, const DTV_ *val)</td></tr>
+<tr class="memdesc:a6912fd8658f4ce16e7c0b15a6107ac15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Downloads the ADP vector values from the given array.  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a6912fd8658f4ce16e7c0b15a6107ac15">More...</a><br /></td></tr>
+<tr class="separator:a6912fd8658f4ce16e7c0b15a6107ac15"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3b0ed51b64db3e1684427945fc2b90a"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </td></tr>
+<tr class="memitem:ae3b0ed51b64db3e1684427945fc2b90a"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ae3b0ed51b64db3e1684427945fc2b90a">_filter_mat</a> (DTV_ *, const RPT_ *, const CIT_ *, const <a class="el" href="class_f_e_a_t_1_1_global_1_1_mean_filter.html">Global::MeanFilter</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a7e8931869979d9a49c7fb78919cf4b35">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0ad2c4a41a889eef8f58ffe1cfdf5307">IndexType</a> &gt; &amp;filter)</td></tr>
+<tr class="memdesc:ae3b0ed51b64db3e1684427945fc2b90a"><td class="mdescLeft">&#160;</td><td class="mdescRight">auxiliary function: filters the local ADP matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ae3b0ed51b64db3e1684427945fc2b90a">More...</a><br /></td></tr>
+<tr class="separator:ae3b0ed51b64db3e1684427945fc2b90a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b29f6e684c0aee7738ba57f2281d740"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </td></tr>
+<tr class="memitem:a5b29f6e684c0aee7738ba57f2281d740"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a5b29f6e684c0aee7738ba57f2281d740">_filter_mat</a> (DTV_ *, const RPT_ *, const CIT_ *, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter.html">LAFEM::MeanFilter</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a7e8931869979d9a49c7fb78919cf4b35">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0ad2c4a41a889eef8f58ffe1cfdf5307">IndexType</a> &gt; &amp;filter)</td></tr>
+<tr class="memdesc:a5b29f6e684c0aee7738ba57f2281d740"><td class="mdescLeft">&#160;</td><td class="mdescRight">auxiliary function: filters the local ADP matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a5b29f6e684c0aee7738ba57f2281d740">More...</a><br /></td></tr>
+<tr class="separator:a5b29f6e684c0aee7738ba57f2281d740"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a582dd7c264e145f502cd836e9fa57e1c"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </td></tr>
+<tr class="memitem:a582dd7c264e145f502cd836e9fa57e1c"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a582dd7c264e145f502cd836e9fa57e1c">_filter_mat</a> (DTV_ *, const RPT_ *, const CIT_ *, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter.html">LAFEM::NoneFilter</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a7e8931869979d9a49c7fb78919cf4b35">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0ad2c4a41a889eef8f58ffe1cfdf5307">IndexType</a> &gt; &amp;)</td></tr>
+<tr class="memdesc:a582dd7c264e145f502cd836e9fa57e1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">auxiliary function: filters the local ADP matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a582dd7c264e145f502cd836e9fa57e1c">More...</a><br /></td></tr>
+<tr class="separator:a582dd7c264e145f502cd836e9fa57e1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c757bc2ad2ae71556efac1b91fda88d"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ , typename RPT_ , typename CIT_ , typename First_ &gt; </td></tr>
+<tr class="memitem:a2c757bc2ad2ae71556efac1b91fda88d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a2c757bc2ad2ae71556efac1b91fda88d">_filter_mat</a> (DTV_ *val, const RPT_ *row_ptr, const CIT_ *col_idx, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain.html">LAFEM::FilterChain</a>&lt; First_ &gt; &amp;filter)</td></tr>
+<tr class="memdesc:a2c757bc2ad2ae71556efac1b91fda88d"><td class="mdescLeft">&#160;</td><td class="mdescRight">auxiliary function: filters the local ADP matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a2c757bc2ad2ae71556efac1b91fda88d">More...</a><br /></td></tr>
+<tr class="separator:a2c757bc2ad2ae71556efac1b91fda88d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbe1392a88c229e6cd29cc1ab535067e"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ , typename RPT_ , typename CIT_ , typename First_ , typename... Rest_&gt; </td></tr>
+<tr class="memitem:abbe1392a88c229e6cd29cc1ab535067e"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#abbe1392a88c229e6cd29cc1ab535067e">_filter_mat</a> (DTV_ *val, const RPT_ *row_ptr, const CIT_ *col_idx, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain.html">LAFEM::FilterChain</a>&lt; First_, Rest_... &gt; &amp;filter)</td></tr>
+<tr class="memdesc:abbe1392a88c229e6cd29cc1ab535067e"><td class="mdescLeft">&#160;</td><td class="mdescRight">auxiliary function: filters the local ADP matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#abbe1392a88c229e6cd29cc1ab535067e">More...</a><br /></td></tr>
+<tr class="separator:abbe1392a88c229e6cd29cc1ab535067e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec0041516d808fe023d5abad27ba0031"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ , typename RPT_ , typename CIT_ , typename SubFilter_ &gt; </td></tr>
+<tr class="memitem:aec0041516d808fe023d5abad27ba0031"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#aec0041516d808fe023d5abad27ba0031">_filter_mat</a> (DTV_ *val, const RPT_ *row_ptr, const CIT_ *col_idx, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_sequence.html">LAFEM::FilterSequence</a>&lt; SubFilter_ &gt; &amp;filter)</td></tr>
+<tr class="memdesc:aec0041516d808fe023d5abad27ba0031"><td class="mdescLeft">&#160;</td><td class="mdescRight">auxiliary function: filters the local ADP matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#aec0041516d808fe023d5abad27ba0031">More...</a><br /></td></tr>
+<tr class="separator:aec0041516d808fe023d5abad27ba0031"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72f23823ec0f9e055c6717ddffe1a50f"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </td></tr>
+<tr class="memitem:a72f23823ec0f9e055c6717ddffe1a50f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a72f23823ec0f9e055c6717ddffe1a50f">_filter_mat</a> (DTV_ *val, const RPT_ *row_ptr, const CIT_ *col_idx, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html">LAFEM::UnitFilter</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a7e8931869979d9a49c7fb78919cf4b35">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0ad2c4a41a889eef8f58ffe1cfdf5307">IndexType</a> &gt; &amp;filter)</td></tr>
+<tr class="memdesc:a72f23823ec0f9e055c6717ddffe1a50f"><td class="mdescLeft">&#160;</td><td class="mdescRight">auxiliary function: filters the local ADP matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a72f23823ec0f9e055c6717ddffe1a50f">More...</a><br /></td></tr>
+<tr class="separator:a72f23823ec0f9e055c6717ddffe1a50f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f50781e8fa2e850ab926a3a46f7e293"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a3f50781e8fa2e850ab926a3a46f7e293">_get_adp_matrix_num_cols</a> () const</td></tr>
+<tr class="separator:a3f50781e8fa2e850ab926a3a46f7e293"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f3af28980691b4bebc702c96dec6152"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0f3af28980691b4bebc702c96dec6152">_get_adp_matrix_num_nzes</a> () const</td></tr>
+<tr class="separator:a0f3af28980691b4bebc702c96dec6152"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13c0a1f73d87b48c672f45fb60883ac1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a13c0a1f73d87b48c672f45fb60883ac1">_get_adp_matrix_num_rows</a> () const</td></tr>
+<tr class="separator:a13c0a1f73d87b48c672f45fb60883ac1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17ff11033a54b4077d37e8344ec53357"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a17ff11033a54b4077d37e8344ec53357">_get_adp_vector_size</a> () const</td></tr>
+<tr class="separator:a17ff11033a54b4077d37e8344ec53357"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae73c34247baf14b77ade47d980a41bdd"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ae73c34247baf14b77ade47d980a41bdd">_get_global_dof_offset</a> () const</td></tr>
 <tr class="separator:ae73c34247baf14b77ade47d980a41bdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad570043f038befb28623e410f933e966"><td class="memItemLeft" align="right" valign="top">const IndexType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ad570043f038befb28623e410f933e966">_get_mat_col_idx</a> () const</td></tr>
-<tr class="separator:ad570043f038befb28623e410f933e966"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aff2eceee55ffa083c9b69de20298284c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#aff2eceee55ffa083c9b69de20298284c">_get_mat_num_nze</a> () const</td></tr>
-<tr class="separator:aff2eceee55ffa083c9b69de20298284c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9ba4e26bf638beb080af415526d5d40d"><td class="memItemLeft" align="right" valign="top">const IndexType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a9ba4e26bf638beb080af415526d5d40d">_get_mat_row_ptr</a> () const</td></tr>
-<tr class="separator:a9ba4e26bf638beb080af415526d5d40d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a987f1b502ee8ff2c7431912665a40591"><td class="memItemLeft" align="right" valign="top">const DataType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a987f1b502ee8ff2c7431912665a40591">_get_mat_vals</a> () const</td></tr>
-<tr class="separator:a987f1b502ee8ff2c7431912665a40591"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af2e2fe610ff0c3b63fe23b73ed0316b7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#af2e2fe610ff0c3b63fe23b73ed0316b7">_get_num_global_dofs</a> () const</td></tr>
 <tr class="separator:af2e2fe610ff0c3b63fe23b73ed0316b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80a3454853a015edfb26dcdfa8a7897f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a80a3454853a015edfb26dcdfa8a7897f">_get_num_global_nonzeros</a> () const</td></tr>
+<tr class="separator:a80a3454853a015edfb26dcdfa8a7897f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4da3d5390745d8a5a1746d831e58ef70"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a4da3d5390745d8a5a1746d831e58ef70">_get_num_owned_dofs</a> () const</td></tr>
 <tr class="separator:a4da3d5390745d8a5a1746d831e58ef70"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a38fb9254a7f72dc027a78a1f5d293e9e"><td class="memItemLeft" align="right" valign="top">DataType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a38fb9254a7f72dc027a78a1f5d293e9e">_get_vec_cor_vals</a> (VectorType &amp;vec_cor)</td></tr>
-<tr class="separator:a38fb9254a7f72dc027a78a1f5d293e9e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab2f160686f2c6334b7edf63bb87bc3e2"><td class="memItemLeft" align="right" valign="top">const DataType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ab2f160686f2c6334b7edf63bb87bc3e2">_get_vec_def_vals</a> (const VectorType &amp;vec_def)</td></tr>
-<tr class="separator:ab2f160686f2c6334b7edf63bb87bc3e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a82199253c2020983097e5842bc01c098"><td class="memItemLeft" align="right" valign="top">DataType *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a82199253c2020983097e5842bc01c098">_get_vec_def_vals</a> (VectorType &amp;vec_def)</td></tr>
-<tr class="separator:a82199253c2020983097e5842bc01c098"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afff65f0ebf61008d050bf3b03ea89649"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#afff65f0ebf61008d050bf3b03ea89649">_upload_vec_cor</a> (const VectorType &amp;)</td></tr>
-<tr class="separator:afff65f0ebf61008d050bf3b03ea89649"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac48f41d4b9037bdc295cffe11c79885"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#aac48f41d4b9037bdc295cffe11c79885">_upload_vec_def</a> (const VectorType &amp;)</td></tr>
-<tr class="separator:aac48f41d4b9037bdc295cffe11c79885"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4917562a124dd9aa38ad348e927eaa21"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </td></tr>
+<tr class="memitem:a4917562a124dd9aa38ad348e927eaa21"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a4917562a124dd9aa38ad348e927eaa21">_upload_numeric</a> (DTV_ *val, const RPT_ *row_ptr, const CIT_ *col_idx)</td></tr>
+<tr class="memdesc:a4917562a124dd9aa38ad348e927eaa21"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads the (filtered) ADP matrix values to the given array.  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a4917562a124dd9aa38ad348e927eaa21">More...</a><br /></td></tr>
+<tr class="separator:a4917562a124dd9aa38ad348e927eaa21"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab78d745176914da966c8ebe909e28959"><td class="memTemplParams" colspan="2">template&lt;typename RPT_ , typename CIT_ &gt; </td></tr>
+<tr class="memitem:ab78d745176914da966c8ebe909e28959"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ab78d745176914da966c8ebe909e28959">_upload_symbolic</a> (RPT_ *row_ptr, CIT_ *col_idx)</td></tr>
+<tr class="memdesc:ab78d745176914da966c8ebe909e28959"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads the ADP matrix structure to the given arrays.  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ab78d745176914da966c8ebe909e28959">More...</a><br /></td></tr>
+<tr class="separator:ab78d745176914da966c8ebe909e28959"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac054ab52d2c245b61f3a68deb1359dfd"><td class="memTemplParams" colspan="2">template&lt;typename DTV_ &gt; </td></tr>
+<tr class="memitem:ac054ab52d2c245b61f3a68deb1359dfd"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ac054ab52d2c245b61f3a68deb1359dfd">_upload_vector</a> (DTV_ *val, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a7e8931869979d9a49c7fb78919cf4b35">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0ad2c4a41a889eef8f58ffe1cfdf5307">IndexType</a> &gt; &amp;vector)</td></tr>
+<tr class="memdesc:ac054ab52d2c245b61f3a68deb1359dfd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Uploads the ADP vector values to the given array.  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ac054ab52d2c245b61f3a68deb1359dfd">More...</a><br /></td></tr>
+<tr class="separator:ac054ab52d2c245b61f3a68deb1359dfd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a36b87d9ca52ca9a3fc3286f42dae3ea8"><td class="memItemLeft" align="right" valign="top">const GlobalFilterType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a36b87d9ca52ca9a3fc3286f42dae3ea8">_system_filter</a></td></tr>
+<tr class="memitem:a36b87d9ca52ca9a3fc3286f42dae3ea8"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#acb91986fbfdb274cead3384f5c65c6c2">GlobalFilterType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a36b87d9ca52ca9a3fc3286f42dae3ea8">_system_filter</a></td></tr>
 <tr class="memdesc:a36b87d9ca52ca9a3fc3286f42dae3ea8"><td class="mdescLeft">&#160;</td><td class="mdescRight">the global system filter  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a36b87d9ca52ca9a3fc3286f42dae3ea8">More...</a><br /></td></tr>
 <tr class="separator:a36b87d9ca52ca9a3fc3286f42dae3ea8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aedbf8870140e4ba06a13850873c709c9"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">GlobalMatrixType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#aedbf8870140e4ba06a13850873c709c9">_system_matrix</a></td></tr>
+<tr class="memitem:aedbf8870140e4ba06a13850873c709c9"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a456afb92ecad526dd548ed453c4e0452">GlobalMatrixType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#aedbf8870140e4ba06a13850873c709c9">_system_matrix</a></td></tr>
 <tr class="memdesc:aedbf8870140e4ba06a13850873c709c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">the global system matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#aedbf8870140e4ba06a13850873c709c9">More...</a><br /></td></tr>
 <tr class="separator:aedbf8870140e4ba06a13850873c709c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:a55c6dc23c602ac9d1d78733167249e38"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a55c6dc23c602ac9d1d78733167249e38">_glob_dof_count</a></td></tr>
-<tr class="separator:a55c6dc23c602ac9d1d78733167249e38"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac9eca1b7e5aaf829c441a82290649da0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ac9eca1b7e5aaf829c441a82290649da0">_glob_dof_offset</a></td></tr>
-<tr class="memdesc:ac9eca1b7e5aaf829c441a82290649da0"><td class="mdescLeft">&#160;</td><td class="mdescRight">our global DOF offset  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ac9eca1b7e5aaf829c441a82290649da0">More...</a><br /></td></tr>
-<tr class="separator:ac9eca1b7e5aaf829c441a82290649da0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac143a26c44f714f6eb49d5688d612a28"><td class="memItemLeft" align="right" valign="top">LocalMatrixTypeS&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ac143a26c44f714f6eb49d5688d612a28">_matrix_slice</a></td></tr>
-<tr class="memdesc:ac143a26c44f714f6eb49d5688d612a28"><td class="mdescLeft">&#160;</td><td class="mdescRight">our Schur-complement matrix slice  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ac143a26c44f714f6eb49d5688d612a28">More...</a><br /></td></tr>
-<tr class="separator:ac143a26c44f714f6eb49d5688d612a28"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9543fefe7f8952e4ac467e4f2559e42d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a9543fefe7f8952e4ac467e4f2559e42d">_global_dof_count</a></td></tr>
+<tr class="memdesc:a9543fefe7f8952e4ac467e4f2559e42d"><td class="mdescLeft">&#160;</td><td class="mdescRight">the total global DOF count  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a9543fefe7f8952e4ac467e4f2559e42d">More...</a><br /></td></tr>
+<tr class="separator:a9543fefe7f8952e4ac467e4f2559e42d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a668fe8bad8952566c5f547d398421727"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a668fe8bad8952566c5f547d398421727">_global_dof_offset</a></td></tr>
+<tr class="memdesc:a668fe8bad8952566c5f547d398421727"><td class="mdescLeft">&#160;</td><td class="mdescRight">our global DOF offset  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a668fe8bad8952566c5f547d398421727">More...</a><br /></td></tr>
+<tr class="separator:a668fe8bad8952566c5f547d398421727"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a7293e516d0a5e47ed896eb0a89cbb5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a3a7293e516d0a5e47ed896eb0a89cbb5">_global_num_nzes</a></td></tr>
+<tr class="memdesc:a3a7293e516d0a5e47ed896eb0a89cbb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">the number of global non-zero entries  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a3a7293e516d0a5e47ed896eb0a89cbb5">More...</a><br /></td></tr>
+<tr class="separator:a3a7293e516d0a5e47ed896eb0a89cbb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae76745dd119b211e56f772d843d6a79b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ae76745dd119b211e56f772d843d6a79b">_owned_dof_count</a></td></tr>
+<tr class="memdesc:ae76745dd119b211e56f772d843d6a79b"><td class="mdescLeft">&#160;</td><td class="mdescRight">the owned DOF count  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ae76745dd119b211e56f772d843d6a79b">More...</a><br /></td></tr>
+<tr class="separator:ae76745dd119b211e56f772d843d6a79b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12d119958c079c7af0bdfc16172c809f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a12d119958c079c7af0bdfc16172c809f">_owned_num_nzes</a></td></tr>
+<tr class="memdesc:a12d119958c079c7af0bdfc16172c809f"><td class="mdescLeft">&#160;</td><td class="mdescRight">the number of owned non-zero entries  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a12d119958c079c7af0bdfc16172c809f">More...</a><br /></td></tr>
+<tr class="separator:a12d119958c079c7af0bdfc16172c809f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename MatrixB_, typename MatrixD_, typename GlobalFilter_, typename SolverBase_&gt;<br />
-class FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;</div><p >Implementation of <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html" title="Base-Class for Solvers based on Algebraic-DOF-Partitioning.">ADPSolverBase</a> interface for <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html" title="Pre-Multiplied Discontinuous Diagonal Schur-Complement Matrix.">Global::PMDCDSCMatrix</a> instances. </p>
-<p >This class implements the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html" title="Base-Class for Solvers based on Algebraic-DOF-Partitioning.">ADPSolverBase</a> interface for <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html" title="Pre-Multiplied Discontinuous Diagonal Schur-Complement Matrix.">Global::PMDCDSCMatrix</a> instances, which are used to implement the global Schur-complement matrices appearing in Navier-Stokes equations with discontinuous pressure spaces. The most prominent use of this specialization is the Pressure-Poisson-Problem solver of the infamous "PP" application.</p>
-<p >Most of the dirty work is outsourced to the <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html" title="Pre-Multiplied Discontinuous Diagonal Schur-Complement Matrix.">Global::PMDCDSCMatrix</a> class, most notably to its two member functions Global::PMDCDSCMatrix::asm_adp_symbolic() and Global::PMDCDSCMatrix::asm_adp_numeric().</p>
+class FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;</div><p >Implementation of <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html" title="Base-Class for solvers based on Algebraic-DOF-Partitioning.">ADPSolverBase</a> interface for <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html" title="Pre-Multiplied Discontinuous Diagonal Schur-Complement Matrix.">Global::PMDCDSCMatrix</a> instances. </p>
+<p >This class implements the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html" title="Base-Class for solvers based on Algebraic-DOF-Partitioning.">ADPSolverBase</a> interface for <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html" title="Pre-Multiplied Discontinuous Diagonal Schur-Complement Matrix.">Global::PMDCDSCMatrix</a> instances, which are used to implement the global Schur-complement matrices appearing in Navier-Stokes equations with discontinuous pressure spaces. The most prominent use of this specialization is the Pressure-Poisson-Problem solver of the infamous "PP" application.</p>
+<p >Most of the dirty work is outsourced to the <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html" title="Pre-Multiplied Discontinuous Diagonal Schur-Complement Matrix.">Global::PMDCDSCMatrix</a> class, most notably to its three member functions Global::PMDCDSCMatrix::adp_compute_counts(), Global::PMDCDSCMatrix::adp_upload_symbolic() and Global::PMDCDSCMatrix::adp_upload_numeric().</p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00316">316</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00441">441</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="abb812b3c1f79e6480ec0e0e9ea10c3b6" name="abb812b3c1f79e6480ec0e0e9ea10c3b6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abb812b3c1f79e6480ec0e0e9ea10c3b6">&#9670;&#160;</a></span>BaseClass</h2>
@@ -228,7 +276,9 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00329">329</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p>our base class </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00458">458</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -246,7 +296,9 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00333">333</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p>our internal data type </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00464">464</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -264,7 +316,9 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00322">322</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p>the global filter type </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00450">450</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -282,7 +336,9 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00321">321</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p>the global matrix type </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00446">446</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -300,7 +356,9 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00326">326</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p>the global vector type </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00448">448</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -318,7 +376,9 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00334">334</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p>our internal index type </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00466">466</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -336,7 +396,29 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00324">324</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p>the local Schur-complement matrix type </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00453">453</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ad443fc3f3aff0d15ec687ca078e63a4d" name="ad443fc3f3aff0d15ec687ca078e63a4d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad443fc3f3aff0d15ec687ca078e63a4d">&#9670;&#160;</a></span>LocalVectorType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef LocalMatrixTypeS::VectorTypeL <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::LocalVectorType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>our internal local vector type; always a <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector&lt;DataType, IndexType&gt;</a> </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00455">455</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -349,12 +431,14 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">typedef GlobalVectorType <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::VectorType</td>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a16cddd70bd6bd9ce067d73a04edb22e0">GlobalVectorType</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::VectorType</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00331">331</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p>the system vector type </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00461">461</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -373,13 +457,13 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
         <tr>
           <td class="memname"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::ADPSolverBase </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">GlobalMatrixType</a> &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a456afb92ecad526dd548ed453c4e0452">GlobalMatrixType</a> &amp;&#160;</td>
           <td class="paramname"><em>matrix</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const GlobalFilterType &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#acb91986fbfdb274cead3384f5c65c6c2">GlobalFilterType</a> &amp;&#160;</td>
           <td class="paramname"><em>filter</em>&#160;</td>
         </tr>
         <tr>
@@ -395,13 +479,477 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00350">350</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p>protected constructor </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">matrix</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_resident">resident</a> reference to the system matrix</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">filter</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_resident">resident</a> reference to the system filter </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00496">496</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a501a2ad57fc586fd745d0b79ad41eb85" name="a501a2ad57fc586fd745d0b79ad41eb85"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a501a2ad57fc586fd745d0b79ad41eb85">&#9670;&#160;</a></span>_download_vec_cor()</h2>
+<a id="a6912fd8658f4ce16e7c0b15a6107ac15" name="a6912fd8658f4ce16e7c0b15a6107ac15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6912fd8658f4ce16e7c0b15a6107ac15">&#9670;&#160;</a></span>_download_vector()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_download_vector </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a7e8931869979d9a49c7fb78919cf4b35">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0ad2c4a41a889eef8f58ffe1cfdf5307">IndexType</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>vector</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const DTV_ *&#160;</td>
+          <td class="paramname"><em>val</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Downloads the ADP vector values from the given array. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the local vector that receives the downloaded ADP value array. It is assumed to be allocated to the correct size, but its contents on entry are ignored.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">val</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to an array of length <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a17ff11033a54b4077d37e8344ec53357">_get_adp_vector_size()</a> that contains the ADP values that are to be downloaded to the output vector given by <code>vector</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00652">652</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#aae0dbe1f8aa005dd40e12d0cb37f4cd6">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_vector_size()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00737">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="container_8hpp_source.html#l01136">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+
+</div>
+</div>
+<a id="ae3b0ed51b64db3e1684427945fc2b90a" name="ae3b0ed51b64db3e1684427945fc2b90a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae3b0ed51b64db3e1684427945fc2b90a">&#9670;&#160;</a></span>_filter_mat() <span class="overload">[1/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_filter_mat </td>
+          <td>(</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const RPT_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const CIT_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_global_1_1_mean_filter.html">Global::MeanFilter</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a7e8931869979d9a49c7fb78919cf4b35">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0ad2c4a41a889eef8f58ffe1cfdf5307">IndexType</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>filter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>auxiliary function: filters the local ADP matrix </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00697">697</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+
+</div>
+</div>
+<a id="a5b29f6e684c0aee7738ba57f2281d740" name="a5b29f6e684c0aee7738ba57f2281d740"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5b29f6e684c0aee7738ba57f2281d740">&#9670;&#160;</a></span>_filter_mat() <span class="overload">[2/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_filter_mat </td>
+          <td>(</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const RPT_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const CIT_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter.html">LAFEM::MeanFilter</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a7e8931869979d9a49c7fb78919cf4b35">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0ad2c4a41a889eef8f58ffe1cfdf5307">IndexType</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>filter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>auxiliary function: filters the local ADP matrix </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00689">689</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+
+</div>
+</div>
+<a id="a582dd7c264e145f502cd836e9fa57e1c" name="a582dd7c264e145f502cd836e9fa57e1c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a582dd7c264e145f502cd836e9fa57e1c">&#9670;&#160;</a></span>_filter_mat() <span class="overload">[3/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_filter_mat </td>
+          <td>(</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const RPT_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const CIT_ *&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter.html">LAFEM::NoneFilter</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a7e8931869979d9a49c7fb78919cf4b35">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0ad2c4a41a889eef8f58ffe1cfdf5307">IndexType</a> &gt; &amp;&#160;</td>
+          <td class="paramname">&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>auxiliary function: filters the local ADP matrix </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00666">666</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a2c757bc2ad2ae71556efac1b91fda88d" name="a2c757bc2ad2ae71556efac1b91fda88d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2c757bc2ad2ae71556efac1b91fda88d">&#9670;&#160;</a></span>_filter_mat() <span class="overload">[4/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ , typename RPT_ , typename CIT_ , typename First_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_filter_mat </td>
+          <td>(</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const RPT_ *&#160;</td>
+          <td class="paramname"><em>row_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const CIT_ *&#160;</td>
+          <td class="paramname"><em>col_idx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain.html">LAFEM::FilterChain</a>&lt; First_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>filter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>auxiliary function: filters the local ADP matrix </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00723">723</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00940">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat()</a>.</p>
+
+</div>
+</div>
+<a id="abbe1392a88c229e6cd29cc1ab535067e" name="abbe1392a88c229e6cd29cc1ab535067e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#abbe1392a88c229e6cd29cc1ab535067e">&#9670;&#160;</a></span>_filter_mat() <span class="overload">[5/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ , typename RPT_ , typename CIT_ , typename First_ , typename... Rest_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_filter_mat </td>
+          <td>(</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const RPT_ *&#160;</td>
+          <td class="paramname"><em>row_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const CIT_ *&#160;</td>
+          <td class="paramname"><em>col_idx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain.html">LAFEM::FilterChain</a>&lt; First_, Rest_... &gt; &amp;&#160;</td>
+          <td class="paramname"><em>filter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>auxiliary function: filters the local ADP matrix </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00714">714</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00940">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat()</a>.</p>
+
+</div>
+</div>
+<a id="aec0041516d808fe023d5abad27ba0031" name="aec0041516d808fe023d5abad27ba0031"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec0041516d808fe023d5abad27ba0031">&#9670;&#160;</a></span>_filter_mat() <span class="overload">[6/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ , typename RPT_ , typename CIT_ , typename SubFilter_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_filter_mat </td>
+          <td>(</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const RPT_ *&#160;</td>
+          <td class="paramname"><em>row_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const CIT_ *&#160;</td>
+          <td class="paramname"><em>col_idx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_sequence.html">LAFEM::FilterSequence</a>&lt; SubFilter_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>filter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>auxiliary function: filters the local ADP matrix </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00705">705</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00940">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat()</a>.</p>
+
+</div>
+</div>
+<a id="a72f23823ec0f9e055c6717ddffe1a50f" name="a72f23823ec0f9e055c6717ddffe1a50f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a72f23823ec0f9e055c6717ddffe1a50f">&#9670;&#160;</a></span>_filter_mat() <span class="overload">[7/7]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_filter_mat </td>
+          <td>(</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const RPT_ *&#160;</td>
+          <td class="paramname"><em>row_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const CIT_ *&#160;</td>
+          <td class="paramname"><em>col_idx</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html">LAFEM::UnitFilter</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a7e8931869979d9a49c7fb78919cf4b35">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0ad2c4a41a889eef8f58ffe1cfdf5307">IndexType</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>filter</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>auxiliary function: filters the local ADP matrix </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00674">674</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a3f50781e8fa2e850ab926a3a46f7e293" name="a3f50781e8fa2e850ab926a3a46f7e293"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3f50781e8fa2e850ab926a3a46f7e293">&#9670;&#160;</a></span>_get_adp_matrix_num_cols()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -412,11 +960,10 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_download_vec_cor </td>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_adp_matrix_num_cols </td>
           <td>(</td>
-          <td class="paramtype">VectorType &amp;&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -425,13 +972,16 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number of columns of the local ADP matrix; equal to <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#af2e2fe610ff0c3b63fe23b73ed0316b7">_get_num_global_dofs()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00458">458</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00543">543</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ab934585a0eb28b50149e32ff156685bc">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_dofs()</a>.</p>
 
 </div>
 </div>
-<a id="a32bde744a84f62eb95b098cab3ae31e3" name="a32bde744a84f62eb95b098cab3ae31e3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a32bde744a84f62eb95b098cab3ae31e3">&#9670;&#160;</a></span>_download_vec_def()</h2>
+<a id="a0f3af28980691b4bebc702c96dec6152" name="a0f3af28980691b4bebc702c96dec6152"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0f3af28980691b4bebc702c96dec6152">&#9670;&#160;</a></span>_get_adp_matrix_num_nzes()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -442,11 +992,10 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_download_vec_def </td>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_adp_matrix_num_nzes </td>
           <td>(</td>
-          <td class="paramtype">VectorType &amp;&#160;</td>
           <td class="paramname"></td><td>)</td>
-          <td></td>
+          <td> const</td>
         </tr>
       </table>
   </td>
@@ -455,8 +1004,73 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number of nonzero entries of the local ADP matrix </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00453">453</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00549">549</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a13c0a1f73d87b48c672f45fb60883ac1" name="a13c0a1f73d87b48c672f45fb60883ac1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a13c0a1f73d87b48c672f45fb60883ac1">&#9670;&#160;</a></span>_get_adp_matrix_num_rows()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_adp_matrix_num_rows </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number of rows of the local ADP matrix; equal to <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a4da3d5390745d8a5a1746d831e58ef70">_get_num_owned_dofs()</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00537">537</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_owned_dofs()</a>.</p>
+
+</div>
+</div>
+<a id="a17ff11033a54b4077d37e8344ec53357" name="a17ff11033a54b4077d37e8344ec53357"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a17ff11033a54b4077d37e8344ec53357">&#9670;&#160;</a></span>_get_adp_vector_size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_adp_vector_size </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The size of the local ADP vector; equal to <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a4da3d5390745d8a5a1746d831e58ef70">_get_num_owned_dofs()</a> </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00531">531</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_owned_dofs()</a>.</p>
 
 </div>
 </div>
@@ -486,7 +1100,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the underlying communicator </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00361">361</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00510">510</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -514,124 +1128,9 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The index of the first global DOF owned by this process </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00398">398</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
-
-</div>
-</div>
-<a id="ad570043f038befb28623e410f933e966" name="ad570043f038befb28623e410f933e966"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad570043f038befb28623e410f933e966">&#9670;&#160;</a></span>_get_mat_col_idx()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const IndexType * <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_mat_col_idx </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00423">423</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
-
-</div>
-</div>
-<a id="aff2eceee55ffa083c9b69de20298284c" name="aff2eceee55ffa083c9b69de20298284c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aff2eceee55ffa083c9b69de20298284c">&#9670;&#160;</a></span>_get_mat_num_nze()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_mat_num_nze </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00408">408</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a9ba4e26bf638beb080af415526d5d40d" name="a9ba4e26bf638beb080af415526d5d40d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9ba4e26bf638beb080af415526d5d40d">&#9670;&#160;</a></span>_get_mat_row_ptr()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const IndexType * <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_mat_row_ptr </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00418">418</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a987f1b502ee8ff2c7431912665a40591" name="a987f1b502ee8ff2c7431912665a40591"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a987f1b502ee8ff2c7431912665a40591">&#9670;&#160;</a></span>_get_mat_vals()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const DataType * <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_mat_vals </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00413">413</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00573">573</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -659,8 +1158,39 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The total number of global DOFs on all processes </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00393">393</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00561">561</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a80a3454853a015edfb26dcdfa8a7897f" name="a80a3454853a015edfb26dcdfa8a7897f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a80a3454853a015edfb26dcdfa8a7897f">&#9670;&#160;</a></span>_get_num_global_nonzeros()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_num_global_nonzeros </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The total number of nonzero entries of the global ADP matrix </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00555">555</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -688,28 +1218,47 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
   </tr>
 </table>
 </div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The number of global DOFs owned by this process </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00403">403</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00567">567</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a38fb9254a7f72dc027a78a1f5d293e9e" name="a38fb9254a7f72dc027a78a1f5d293e9e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a38fb9254a7f72dc027a78a1f5d293e9e">&#9670;&#160;</a></span>_get_vec_cor_vals()</h2>
+<a id="a4917562a124dd9aa38ad348e927eaa21" name="a4917562a124dd9aa38ad348e927eaa21"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4917562a124dd9aa38ad348e927eaa21">&#9670;&#160;</a></span>_upload_numeric()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">DataType * <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_vec_cor_vals </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_upload_numeric </td>
           <td>(</td>
-          <td class="paramtype">VectorType &amp;&#160;</td>
-          <td class="paramname"><em>vec_cor</em></td><td>)</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const RPT_ *&#160;</td>
+          <td class="paramname"><em>row_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const CIT_ *&#160;</td>
+          <td class="paramname"><em>col_idx</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -719,27 +1268,51 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00438">438</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p>Uploads the (filtered) ADP matrix values to the given array. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">val</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to an array of length <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0f3af28980691b4bebc702c96dec6152">_get_adp_matrix_num_nzes()</a> that receives the filtered matrix values of the local ADP matrix.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">row_ptr</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to the row-pointer array of the ADP matrix as returned by the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ab78d745176914da966c8ebe909e28959" title="Uploads the ADP matrix structure to the given arrays.">_upload_symbolic()</a> function.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">col_idx</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to the column-index array of the ADP matrix as returned by the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ab78d745176914da966c8ebe909e28959" title="Uploads the ADP matrix structure to the given arrays.">_upload_symbolic()</a> function. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00611">611</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00940">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat()</a>, and <a class="el" href="adp__solver__base_8hpp_source.html#l00781">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
 
 </div>
 </div>
-<a id="ab2f160686f2c6334b7edf63bb87bc3e2" name="ab2f160686f2c6334b7edf63bb87bc3e2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab2f160686f2c6334b7edf63bb87bc3e2">&#9670;&#160;</a></span>_get_vec_def_vals() <span class="overload">[1/2]</span></h2>
+<a id="ab78d745176914da966c8ebe909e28959" name="ab78d745176914da966c8ebe909e28959"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab78d745176914da966c8ebe909e28959">&#9670;&#160;</a></span>_upload_symbolic()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename RPT_ , typename CIT_ &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const DataType * <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_vec_def_vals </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_upload_symbolic </td>
           <td>(</td>
-          <td class="paramtype">const VectorType &amp;&#160;</td>
-          <td class="paramname"><em>vec_def</em></td><td>)</td>
+          <td class="paramtype">RPT_ *&#160;</td>
+          <td class="paramname"><em>row_ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">CIT_ *&#160;</td>
+          <td class="paramname"><em>col_idx</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -749,27 +1322,50 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00428">428</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p>Uploads the ADP matrix structure to the given arrays. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">row_ptr</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to an array of length <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a13c0a1f73d87b48c672f45fb60883ac1">_get_adp_matrix_num_rows()</a>+1 that receives the the row-pointer array of the ADP matrix.</td></tr>
+    <tr><td class="paramdir">[out]</td><td class="paramname">col_idx</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to an array of length <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0f3af28980691b4bebc702c96dec6152">_get_adp_matrix_num_nzes()</a> that receives the column index array of the ADP matrix. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00590">590</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00781">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
 
 </div>
 </div>
-<a id="a82199253c2020983097e5842bc01c098" name="a82199253c2020983097e5842bc01c098"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a82199253c2020983097e5842bc01c098">&#9670;&#160;</a></span>_get_vec_def_vals() <span class="overload">[2/2]</span></h2>
+<a id="ac054ab52d2c245b61f3a68deb1359dfd" name="ac054ab52d2c245b61f3a68deb1359dfd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac054ab52d2c245b61f3a68deb1359dfd">&#9670;&#160;</a></span>_upload_vector()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename DTV_ &gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">DataType * <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_vec_def_vals </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_upload_vector </td>
           <td>(</td>
-          <td class="paramtype">VectorType &amp;&#160;</td>
-          <td class="paramname"><em>vec_def</em></td><td>)</td>
+          <td class="paramtype">DTV_ *&#160;</td>
+          <td class="paramname"><em>val</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a7e8931869979d9a49c7fb78919cf4b35">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0ad2c4a41a889eef8f58ffe1cfdf5307">IndexType</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>vector</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -779,125 +1375,18 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00433">433</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p>Uploads the ADP vector values to the given array. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[out]</td><td class="paramname">val</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> pointer to an array of length <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a17ff11033a54b4077d37e8344ec53357">_get_adp_vector_size()</a> that receives the local ADP values of the input vector given by <code>vector</code>.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the local vector that is to be uploaded to the ADP value array. </td></tr>
+  </table>
+  </dd>
+</dl>
 
-</div>
-</div>
-<a id="afff65f0ebf61008d050bf3b03ea89649" name="afff65f0ebf61008d050bf3b03ea89649"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afff65f0ebf61008d050bf3b03ea89649">&#9670;&#160;</a></span>_upload_vec_cor()</h2>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00628">628</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_upload_vec_cor </td>
-          <td>(</td>
-          <td class="paramtype">const VectorType &amp;&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00448">448</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
-
-</div>
-</div>
-<a id="aac48f41d4b9037bdc295cffe11c79885" name="aac48f41d4b9037bdc295cffe11c79885"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aac48f41d4b9037bdc295cffe11c79885">&#9670;&#160;</a></span>_upload_vec_def()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_upload_vec_def </td>
-          <td>(</td>
-          <td class="paramtype">const VectorType &amp;&#160;</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00443">443</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
-
-</div>
-</div>
-<a id="af6bb49c09148ece0dab7b5edc6f94eed" name="af6bb49c09148ece0dab7b5edc6f94eed"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af6bb49c09148ece0dab7b5edc6f94eed">&#9670;&#160;</a></span>done_symbolic()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::done_symbolic </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00385">385</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a5a961736ea5ef136cb681d16b0bad79d" name="a5a961736ea5ef136cb681d16b0bad79d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5a961736ea5ef136cb681d16b0bad79d">&#9670;&#160;</a></span>init_numeric()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::init_numeric </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">override</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00374">374</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#aae0dbe1f8aa005dd40e12d0cb37f4cd6">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_vector_size()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00737">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="container_8hpp_source.html#l01136">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
 </div>
 </div>
@@ -926,13 +1415,18 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00366">366</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p>Symbolic initialization. </p>
+<p >This function performs the symbolic initialization of the algebraic DOF partitioning, which boils down to computing the ADP matrix dimensions for this specialization. </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00521">521</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00781">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="a55c6dc23c602ac9d1d78733167249e38" name="a55c6dc23c602ac9d1d78733167249e38"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a55c6dc23c602ac9d1d78733167249e38">&#9670;&#160;</a></span>_glob_dof_count</h2>
+<a id="a9543fefe7f8952e4ac467e4f2559e42d" name="a9543fefe7f8952e4ac467e4f2559e42d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9543fefe7f8952e4ac467e4f2559e42d">&#9670;&#160;</a></span>_global_dof_count</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -943,7 +1437,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_glob_dof_count</td>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_global_dof_count</td>
         </tr>
       </table>
   </td>
@@ -953,12 +1447,14 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00340">340</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p>the total global DOF count </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00476">476</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ac9eca1b7e5aaf829c441a82290649da0" name="ac9eca1b7e5aaf829c441a82290649da0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac9eca1b7e5aaf829c441a82290649da0">&#9670;&#160;</a></span>_glob_dof_offset</h2>
+<a id="a668fe8bad8952566c5f547d398421727" name="a668fe8bad8952566c5f547d398421727"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a668fe8bad8952566c5f547d398421727">&#9670;&#160;</a></span>_global_dof_offset</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -969,7 +1465,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_glob_dof_offset</td>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_global_dof_offset</td>
         </tr>
       </table>
   </td>
@@ -981,12 +1477,12 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>our global DOF offset </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00338">338</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00478">478</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ac143a26c44f714f6eb49d5688d612a28" name="ac143a26c44f714f6eb49d5688d612a28"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac143a26c44f714f6eb49d5688d612a28">&#9670;&#160;</a></span>_matrix_slice</h2>
+<a id="a3a7293e516d0a5e47ed896eb0a89cbb5" name="a3a7293e516d0a5e47ed896eb0a89cbb5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a7293e516d0a5e47ed896eb0a89cbb5">&#9670;&#160;</a></span>_global_num_nzes</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -997,7 +1493,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">LocalMatrixTypeS <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_matrix_slice</td>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_global_num_nzes</td>
         </tr>
       </table>
   </td>
@@ -1007,9 +1503,65 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 </table>
 </div><div class="memdoc">
 
-<p>our Schur-complement matrix slice </p>
+<p>the number of global non-zero entries </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00342">342</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00484">484</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ae76745dd119b211e56f772d843d6a79b" name="ae76745dd119b211e56f772d843d6a79b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae76745dd119b211e56f772d843d6a79b">&#9670;&#160;</a></span>_owned_dof_count</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_owned_dof_count</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>the owned DOF count </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00480">480</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a12d119958c079c7af0bdfc16172c809f" name="a12d119958c079c7af0bdfc16172c809f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a12d119958c079c7af0bdfc16172c809f">&#9670;&#160;</a></span>_owned_num_nzes</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_owned_num_nzes</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>the number of owned non-zero entries </p>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00482">482</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1025,7 +1577,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const GlobalFilterType&amp; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_system_filter</td>
+          <td class="memname">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#acb91986fbfdb274cead3384f5c65c6c2">GlobalFilterType</a>&amp; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_system_filter</td>
         </tr>
       </table>
   </td>
@@ -1037,7 +1589,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>the global system filter </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00348">348</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00472">472</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1053,7 +1605,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">const <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">GlobalMatrixType</a>&amp; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_system_matrix</td>
+          <td class="memname">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a456afb92ecad526dd548ed453c4e0452">GlobalMatrixType</a>&amp; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_system_matrix</td>
         </tr>
       </table>
   </td>
@@ -1065,7 +1617,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>the global system matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00346">346</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00470">470</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>

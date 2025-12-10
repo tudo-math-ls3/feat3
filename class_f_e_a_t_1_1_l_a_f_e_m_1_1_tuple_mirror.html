@@ -172,6 +172,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a553a942a032ec40ad8644a815ad1d484"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector</a>&lt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#a20c014ed7929ca7d3437bdba4e82d514">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#acd0560c83c880bf5e294d497bcc29d73">IndexType</a> &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#a553a942a032ec40ad8644a815ad1d484">create_buffer</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html">TupleVector</a>&lt; Tv_, Tw_... &gt; &amp;vector) const</td></tr>
 <tr class="memdesc:a553a942a032ec40ad8644a815ad1d484"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a new buffer vector for a <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_vector.html" title="Variadic TupleVector class template.">TupleVector</a>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#a553a942a032ec40ad8644a815ad1d484">More...</a><br /></td></tr>
 <tr class="separator:a553a942a032ec40ad8644a815ad1d484"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac7fa8a049569d808bf4974b279389b82"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#ac7fa8a049569d808bf4974b279389b82">dump</a> (std::ostream &amp;os) const</td></tr>
+<tr class="memdesc:ac7fa8a049569d808bf4974b279389b82"><td class="mdescLeft">&#160;</td><td class="mdescRight">auxiliary function for operator&lt;&lt; implementation  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#ac7fa8a049569d808bf4974b279389b82">More...</a><br /></td></tr>
+<tr class="separator:ac7fa8a049569d808bf4974b279389b82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0391b5908013144feca8a144a1d9bae2"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#a0391b5908013144feca8a144a1d9bae2">empty</a> () const</td></tr>
 <tr class="memdesc:a0391b5908013144feca8a144a1d9bae2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the mirror is empty.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html#a0391b5908013144feca8a144a1d9bae2">More...</a><br /></td></tr>
 <tr class="separator:a0391b5908013144feca8a144a1d9bae2"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -779,6 +782,38 @@ template&lt;typename Tv_ , typename... Tw_&gt; </div>
 
 </div>
 </div>
+<a id="ac7fa8a049569d808bf4974b279389b82" name="ac7fa8a049569d808bf4974b279389b82"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac7fa8a049569d808bf4974b279389b82">&#9670;&#160;</a></span>dump()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename First_ , typename... Rest_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_mirror.html">FEAT::LAFEM::TupleMirror</a>&lt; First_, Rest_ &gt;::dump </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>auxiliary function for operator&lt;&lt; implementation </p>
+
+<p class="definition">Definition at line <a class="el" href="tuple__mirror_8hpp_source.html#l00259">259</a> of file <a class="el" href="tuple__mirror_8hpp_source.html">tuple_mirror.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a0391b5908013144feca8a144a1d9bae2" name="a0391b5908013144feca8a144a1d9bae2"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0391b5908013144feca8a144a1d9bae2">&#9670;&#160;</a></span>empty()</h2>
 
@@ -862,8 +897,8 @@ template&lt;typename Tv_ , typename... Tw_&gt; </div>
 <p>Gathers the buffer entries from a <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html" title="Dense data vector class template.">DenseVector</a>.  </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">buffer</td><td>A reference to the buffer.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">vector</td><td>A vector whose entries are to be gathered.</td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">buffer</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the buffer.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the vector whose entries are to be gathered.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">buffer_offset</td><td>The offset within the buffer.  </td></tr>
   </table>
   </dd>
@@ -1078,8 +1113,8 @@ template&lt;typename Tv_ , typename... Tw_&gt; </div>
 <p>Scatters the buffer entries onto a <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html" title="Dense data vector class template.">DenseVector</a>.  </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">vector</td><td>A reference to the vector.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">buffer</td><td>A reference to the buffer whose entries are to be scattered.</td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the vector to scatter onto.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">buffer</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the buffer whose entries are to be scattered.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>A scaling factor for the operation.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">buffer_offset</td><td>The offset within the buffer.  </td></tr>
   </table>

@@ -13,6 +13,7 @@ var class_f_e_a_t_1_1_adjacency_1_1_graph =
     [ "Graph", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#ad13eed68a6ce0a583a03d436dc1d49ac", null ],
     [ "Graph", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#a03f2f3533f527f40df9e8d830675921f", null ],
     [ "~Graph", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#ac370dc720b4d8f3bb028a110254c105f", null ],
+    [ "bytes", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#ad366b9d99a58f2f6585d49aca6ede042", null ],
     [ "clear", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#abe7d5a6fe5422d5015835bfd53cfb633", null ],
     [ "clone", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#a1b7be414b3cf24ce4879fe3453b1a757", null ],
     [ "degree", "class_f_e_a_t_1_1_adjacency_1_1_graph.html#a7e247d1e688d96d4c4bb497011b97db4", null ],

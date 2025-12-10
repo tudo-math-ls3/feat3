@@ -32,6 +32,8 @@ var dir_f6ae2f7434b54b47883a194cb018900f =
     [ "slip_filter_assembler.hpp", "slip__filter__assembler_8hpp_source.html", null ],
     [ "space_transfer.hpp", "space__transfer_8hpp_source.html", null ],
     [ "stokes_fbm_assembler.hpp", "stokes__fbm__assembler_8hpp_source.html", null ],
+    [ "surface_integrator.hpp", "surface__integrator_8hpp_source.html", null ],
+    [ "surface_integrator_basic_jobs.hpp", "surface__integrator__basic__jobs_8hpp_source.html", null ],
     [ "symbolic_assembler.hpp", "symbolic__assembler_8hpp_source.html", null ],
     [ "trace_assembler.hpp", "trace__assembler_8hpp_source.html", null ],
     [ "trace_assembler_basic_jobs.hpp", "trace__assembler__basic__jobs_8hpp_source.html", null ],

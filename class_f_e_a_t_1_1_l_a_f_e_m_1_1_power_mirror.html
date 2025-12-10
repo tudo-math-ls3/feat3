@@ -797,8 +797,8 @@ template&lt;typename Tv_ &gt; </div>
 <p>Gathers the buffer entries from a <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html" title="Dense data vector class template.">DenseVector</a>.  </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">buffer</td><td>A reference to the buffer.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">vector</td><td>A vector whose entries are to be gathered.</td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">buffer</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the buffer.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the vector whose entries are to be gathered.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">buffer_offset</td><td>The offset within the buffer.  </td></tr>
   </table>
   </dd>
@@ -1091,8 +1091,8 @@ template&lt;typename Tv_ &gt; </div>
 <p>Scatters the buffer entries onto a <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html" title="Dense data vector class template.">DenseVector</a>.  </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramdir">[in,out]</td><td class="paramname">vector</td><td>A reference to the vector.</td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">buffer</td><td>A reference to the buffer whose entries are to be scattered.</td></tr>
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">vector</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the vector to scatter onto.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">buffer</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the buffer whose entries are to be scattered.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">alpha</td><td>A scaling factor for the operation.</td></tr>
     <tr><td class="paramdir">[in]</td><td class="paramname">buffer_offset</td><td>The offset within the buffer.  </td></tr>
   </table>
