@@ -10,6 +10,7 @@ to the main development code branch of FEAT3:
 2010 - 2016,   Markus Geveler
 2010 - 2012,   Dominik Goeddeke
 2013 - 2017,   Christoph Lohmann
+2024 - 2025,   Markus Muegge
 2014 - 2017,   Jordi Paul
 2019 - 2020,   Heiko Poelstra
 2020 - 2021,   Gesa Pottbrock
