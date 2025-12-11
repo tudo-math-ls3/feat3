@@ -298,22 +298,22 @@ description = (
   "* Additional third-party libraries (TPL):\n"
   "  - 'alglib':       enable ALGLIB library TPL\n"
   "  - 'boost':        enable BOOST TPL\n"
-  "  - 'cgal':         enable CGAL TPL, requires BOOST\n"
-  "  - 'cudss':        enable CUDSS cuda direct sparse solver TPL\n"
+  "  - 'cgal':         enable CGAL TPL (requires BOOST)\n"
+  "  - 'cudss':        enable CUDSS TPL  (requires CUDA)\n"
   "  - 'deathhandler': enable deathhandler TPL\n"
   "  - 'fparser':      enable fparser TPL\n"
   "  - 'floatx':       enable floatx TPL\n"
   "  - 'hypre':        enable HYPRE TPL\n"
-  "  - 'metis':        enable METIS and ParMETIS TPLs\n"
+  "  - 'metis':        enable METIS and ParMETIS TPLs (requires MPI)\n"
   "  - 'mumps'         enable MUMPS TPL\n"
   "  - 'pmp':          enable PMP TPL\n"
-  "  - 'superlu':      enable SuperLU_Dist TPL\n"
+  "  - 'superlu':      enable SuperLU_Dist TPL (requires MPI)\n"
   "  - 'triangle':     enable triangle TPL\n"
   "  - 'trilinos':     link against pre-built Trilinos library\n"
   "  - 'umfpack':      enable UMFPACK TPL\n"
   "  - 'zfp':          enable zfp TPL\n"
   "  - 'zlib':         enable ZLIB TPL\n"
-  "  - 'zoltan':       enable Zoltan TPL\n"
+  "  - 'zoltan':       enable Zoltan TPL (requires MPI)\n"
   "\n"
   "Note that the actual compiler version and mpi implementation is chosen by the\n"
   "'first come, first served' principle corresponding to your $PATH settings.\n"
@@ -519,35 +519,37 @@ if len(mode_tags) == 0:
 if len(mode_tags) > 1:
   error("More than one build mode tag in build-id")
 
-if "half" in buildid and not "cuda" in buildid:
-  error("Tag 'half' requires tag 'cuda'")
-
-# prevent parmetis without mpi enabled (needed by parmetis)
-if "mpi" not in buildid and "metis" in buildid:
-  error("Tag 'metis' requires tag 'mpi'")
-
-if "mpi" not in buildid and "parmetis" in buildid:
-  error("Tag 'parmetis' requires tag 'mpi'")
-
-# SuperLU needs MPI, because we only use SuperLU_DIST
-if ("mpi" not in buildid) and ("superlu" in buildid):
-  error("Tag 'superlu' requires tag 'mpi'")
-
-# Zoltan needs MPI
-if ("mpi" not in buildid) and ("zoltan" in buildid):
-  error("Tag 'zoltan' requires tag 'mpi'")
-
-if "lto" in buildid and not "opt" in buildid:
-  error("LTO is only usable in opt mode")
-
-if "cudamemcheck" in buildid and not "cuda" in buildid:
+if "cudamemcheck" in buildid and "cuda" not in buildid:
   error("Tag 'cudamemcheck' requires tag 'cuda'")
 
-if "cudss" in buildid and not "cuda" in buildid:
+if "cudss" in buildid and "cuda" not in buildid:
   error("Tag 'cudss' requires tag 'cuda'")
 
 if "ccache" in buildid and "scorep" in buildid:
   error("Tags 'ccache' and 'scorep' cannot be used together")
+
+if "half" in buildid and "cuda" not in buildid:
+  error("Tag 'half' requires tag 'cuda'")
+
+if "lto" in buildid and "opt" not in buildid:
+  error("LTO is only usable in opt mode")
+
+if "metis" in buildid and "mpi" not in buildid:
+  error("Tag 'metis' requires tag 'mpi'")
+
+if "parmetis" in buildid and "mpi" not in buildid:
+  error("Tag 'parmetis' requires tag 'mpi'")
+
+if "mumps" in buildid and "mpi" not in buildid:
+  error("Tag 'mumps' requires tag 'mpi'")
+
+# SuperLU needs MPI, because we only use SuperLU_DIST
+if "superlu" in buildid and "mpi" not in buildid:
+  error("Tag 'superlu' requires tag 'mpi'")
+
+# Zoltan needs MPI
+if "zoltan" in buildid and "mpi" not in buildid:
+  error("Tag 'zoltan' requires tag 'mpi'")
 
 config = FeatConfig()
 

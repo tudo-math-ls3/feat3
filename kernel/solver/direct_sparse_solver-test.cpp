@@ -354,6 +354,10 @@ DirectSparseSolverTest<double, Index> direct_sparse_solver_test_double_index_cud
 DirectSparseSolverTest<double, Index> direct_sparse_solver_test_double_index_mkldss("mkldss");
 #endif
 
+#ifdef FEAT_HAVE_MUMPS
+DirectSparseSolverTest<double, Index> direct_sparse_solver_test_double_index_mumps("mumps");
+#endif
+
 void direct_sparse_solver_test_dummy()
 {
   // just to keep linkers from complaining

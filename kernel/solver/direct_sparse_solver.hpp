@@ -102,6 +102,40 @@ namespace FEAT
 #endif // FEAT_HAVE_MKL
 
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      // MUMPS
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#ifdef FEAT_HAVE_MUMPS
+      // SuperLU is available as backend
+      static constexpr bool have_mumps = true;
+
+      /// native data type of MUMPS solver
+      typedef double MUMPS_DT;
+
+      /// index type of MUMPS solver; this is independent of 'MUMPS_INT', because we have to convert the
+      /// 0-based CSR arrays to 1-based COO arrays anyways
+      typedef std::int64_t MUMPS_IT;
+
+      void* create_mumps_core(const Dist::Comm* comm, Index num_global_dofs, Index dof_offset,
+        Index num_owned_dofs, Index num_owned_nzes, Index num_global_nzes);
+
+      void destroy_mumps_core(void* core);
+
+      MUMPS_IT* get_mumps_row_ptr(void* core);
+      MUMPS_IT* get_mumps_col_idx(void* core);
+      MUMPS_DT* get_mumps_mat_val(void* core);
+      MUMPS_DT* get_mumps_vector(void* core);
+
+      void init_mumps_symbolic(void* core);
+      void init_mumps_numeric(void* core);
+      void done_mumps_numeric(void* core);
+
+      void solve_mumps(void* core);
+#else
+      // MUMPS is not available as backend
+      static constexpr bool have_mumps = false;
+#endif // FEAT_HAVE_MUMPS_DIST
+
+      /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
       // SUPERLU_DIST
       /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #ifdef FEAT_HAVE_SUPERLU_DIST
@@ -193,10 +227,11 @@ namespace FEAT
     {
       none     = 0x0000, ///< no backend allowed
       cudss    = 0x0001, ///< cuDSS backend
-      mkldss   = 0x0002, ///< MKL-DSS backend
-      superlu  = 0x0004, ///< SuperLU backend
-      umfpack  = 0x0008, ///< UMFPACK backend
-      all      = 0x000F  ///< all backends allowed
+      mumps    = 0x0002, ///< MUMPS backend
+      mkldss   = 0x0003, ///< MKL-DSS backend
+      superlu  = 0x0008, ///< SuperLU backend
+      umfpack  = 0x0010, ///< UMFPACK backend
+      all      = 0x001F  ///< all backends allowed
     };
 
     /// bit-wise OR operator for DSSBackend enum values
@@ -233,6 +268,12 @@ namespace FEAT
         if(++n > 1)
           os << '|';
         os << "mkldss";
+      }
+      if(*(a & DSSBackend::mumps))
+      {
+        if(++n > 1)
+          os << '|';
+        os << "mumps";
       }
       if(*(a & DSSBackend::superlu))
       {
@@ -275,7 +316,7 @@ namespace FEAT
         SolverException("DirectSparseSolver [" + backend + "]: " + msg)
       {
       }
-    };
+    }; // class DirectSparseSolverException
 
     /**
      * \brief DirectSparseSolver backend not found exception
@@ -296,7 +337,7 @@ namespace FEAT
         DirectSparseSolverException("DirectSparseSolver: Backend not available: " + stringify(b))
       {
       }
-    };
+    }; // class DSSBackendNotFoundException
 
     /**
      * \brief Front-end wrapper class for (parallel) third-party direct sparse solvers
@@ -311,6 +352,7 @@ namespace FEAT
      *   process.
      * - MKL-DSS: A MPI-parallel direct solver, which is part of the Intel oneAPI MKL libraries,
      *   which is typically the best choice if the solver is applied on multiple processes.
+     * - MUMPS: A MPI-parallel direct solver written in Fortran.
      * - SuperLU: A MPI-parallel direct solver implemented in the SuperLU_Dist library. This solver
      *   is usually slower that UMFPACK in the single-process case and slower that MKL-DSS in the
      *   multi-process case, so it serves as a fallback if the other ones are not available or not
@@ -357,6 +399,7 @@ namespace FEAT
      * the algorithm will check them in the following order:
      * -# cuDSS
      * -# MKL-DSS
+     * -# MUMPS
      * -# UMFPACK
      * -# SuperLU
      *
@@ -388,6 +431,7 @@ namespace FEAT
      *    order:
      *    -# cuDSS
      *    -# MKL-DSS
+     *    -# MUMPS
      *    -# UMFPACK
      *    -# SuperLU
      * -# If none of the above backends are available, it throws a DSSBackendNotFoundException.
@@ -418,6 +462,8 @@ namespace FEAT
       static constexpr bool have_backend_cudss = DSS::have_cudss;
       /// specifies whether the MKL-DSS solver backend is available
       static constexpr bool have_backend_mkldss = DSS::have_mkldss;
+      /// specifies whether the MUMPS solver backend is available
+      static constexpr bool have_backend_mumps = DSS::have_mumps;
       /// specifies whether the SuperLU solver backend is available
       static constexpr bool have_backend_superlu = DSS::have_superlu;
       /// specifies whether the UMFPACK solver backend is available
@@ -436,6 +482,8 @@ namespace FEAT
       void* _core_cudss;
       /// Intel MKLDSS core
       void* _core_mkldss;
+      /// MUMPS core
+      void* _core_mumps;
       /// SuperLU core
       void* _core_superlu;
       /// UMFPACK core
@@ -461,6 +509,7 @@ namespace FEAT
         _preferred_backend(Backend::get_preferred_backend()),
         _core_cudss(nullptr),
         _core_mkldss(nullptr),
+        _core_mumps(nullptr),
         _core_superlu(nullptr),
         _core_umfpack(nullptr)
       {
@@ -479,6 +528,8 @@ namespace FEAT
           s += " [cuDSS]";
         if(_core_mkldss)
           s += " [MKL-DSS]";
+        if(_core_mumps)
+          s += " [MUMPS]";
         if(_core_superlu)
           s += " [SuperLU]";
         if(_core_umfpack)
@@ -555,6 +606,7 @@ namespace FEAT
        * - DSSBackend::all: "all"
        * - DSSBackend::cudss: "cudss"
        * - DSSBackend::mkldss: "mkldss" or "mkl-dss"
+       * - DSSBackend::mumps: "mumps"
        * - DSSBackend::superlu: "superlu"
        * - DSSBackend::umfpack: "umfpack"
        */
@@ -574,6 +626,8 @@ namespace FEAT
             b = b | DSSBackend::mkldss;
           else if(s.compare_no_case("mkl-dss") == 0)
             b = b | DSSBackend::mkldss;
+          else if(s.compare_no_case("mumps") == 0)
+            b = b | DSSBackend::mumps;
           else if(s.compare_no_case("superlu") == 0)
             b = b | DSSBackend::superlu;
           else if(s.compare_no_case("umfpack") == 0)
@@ -623,6 +677,8 @@ namespace FEAT
           return DSSBackend::superlu;
         if(this->_core_mkldss)
           return DSSBackend::mkldss;
+        if(this->_core_mumps)
+          return DSSBackend::mumps;
         if(this->_core_cudss)
           return DSSBackend::cudss;
         return DSSBackend::none;
@@ -684,6 +740,10 @@ namespace FEAT
           if(single_process && _create_core_umfpack())
             return;
 
+          // Let's try MUMPS next
+          if(_create_core_mumps())
+            return;
+
           // Let's try SuperLU last
           if(_create_core_superlu())
             return;
@@ -705,6 +765,10 @@ namespace FEAT
 
           // Let's try UMFPACK if we're in a single-process case next (if allowed)
           if(*(ab & DSSBackend::umfpack) && single_process && _create_core_umfpack())
+            return;
+
+          // Let's try MUMPS next (if allowed)
+          if(*(ab & DSSBackend::mkldss) && _create_core_mumps())
             return;
 
           // Let's try SuperLU last (if allowed)
@@ -735,6 +799,13 @@ namespace FEAT
           this->_core_mkldss = nullptr;
         }
 #endif // FEAT_HAVE_MKL
+#ifdef FEAT_HAVE_MUMPS
+        if(this->_core_mumps)
+        {
+          DSS::destroy_mumps_core(this->_core_mumps);
+          this->_core_mumps = nullptr;
+        }
+#endif // FEAT_HAVE_MUMPS
 #ifdef FEAT_HAVE_SUPERLU_DIST
         if(this->_core_superlu)
         {
@@ -782,6 +853,17 @@ namespace FEAT
           DSS::init_mkldss_numeric(this->_core_mkldss);
         }
 #endif // FEAT_HAVE_MKL
+#ifdef FEAT_HAVE_MUMPS
+        if(this->_core_mumps)
+        {
+          this->_upload_numeric(
+            DSS::get_mumps_mat_val(this->_core_mumps),
+            DSS::get_mumps_row_ptr(this->_core_mumps),
+            DSS::get_mumps_col_idx(this->_core_mumps));
+
+          DSS::init_mumps_numeric(this->_core_mumps);
+        }
+#endif // FEAT_HAVE_MUMPS
 #ifdef FEAT_HAVE_SUPERLU_DIST
         if(this->_core_superlu)
         {
@@ -894,6 +976,32 @@ namespace FEAT
           return Status::success;
         }
 #endif // FEAT_HAVE_MKL
+#ifdef FEAT_HAVE_MUMPS
+        if(this->_core_mumps)
+        {
+          // upload defect vector
+          this->_upload_vector(DSS::get_mumps_vector(this->_core_mumps), vec_def);
+
+          // solve system via MUMPS
+          try
+          {
+            DSS::solve_mumps(this->_core_mumps);
+          }
+          catch(const DirectSparseSolverException&)
+          {
+            return Status::aborted;
+          }
+          catch(...)
+          {
+            throw;
+          }
+
+          // download correction vector
+          this->_download_vector(vec_cor, DSS::get_mumps_vector(this->_core_mumps));
+
+          return Status::success;
+        }
+#endif // FEAT_HAVE_MUMPS
 #ifdef FEAT_HAVE_SUPERLU_DIST
         if(this->_core_superlu)
         {
@@ -1003,6 +1111,33 @@ namespace FEAT
 #else
         return false;
 #endif // FEAT_HAVE_MKL
+      }
+
+      /// Tries to create a MUMPS backend core and returns true, if it succeeded
+      bool _create_core_mumps()
+      {
+#ifdef FEAT_HAVE_MUMPS
+        // create MUMPS core
+        this->_core_mumps = DSS::create_mumps_core(
+          this->_get_comm(),
+          this->_get_num_global_dofs(),
+          this->_get_global_dof_offset(),
+          this->_get_num_owned_dofs(),
+          this->_get_adp_matrix_num_nzes(),
+          this->_get_num_global_nonzeros());
+
+        // upload matrix structure to MUMPS core
+        BaseClass::_upload_symbolic(
+          DSS::get_mumps_row_ptr(this->_core_mumps),
+          DSS::get_mumps_col_idx(this->_core_mumps));
+
+        // perform symbolic factorization of MUMPS core
+        DSS::init_mumps_symbolic(this->_core_mumps);
+
+        return true;
+#else
+        return false;
+#endif // FEAT_HAVE_MUMPS
       }
 
       /// Tries to create a SuperLU backend core and returns true, if it succeeded
