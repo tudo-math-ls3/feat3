@@ -1,6 +1,6 @@
 if(NOT TARGET CGAL::CGAL)
   FetchContent_GetProperties(cgal)
-  find_package(Boost 1.81 REQUIRED)
+  find_package(Boost 1.81 REQUIRED COMPONENTS graph heap logic)
 
   add_library(feat-cgal-extern INTERFACE)
   target_include_directories(feat-cgal-extern INTERFACE "${cgal_SOURCE_DIR}/include")
