@@ -23,7 +23,6 @@
 #include <kernel/solver/direct_stokes_solver.hpp>
 #include <kernel/solver/frosch.hpp>
 #include <control/scalar_basic.hpp>
-#include "scalexa_gendie_scalarize_helper.hpp"
 #include "format_helper.hpp"
 #include "template_helper.hpp"
 #include <kernel/adjacency/graph.hpp>
@@ -390,11 +389,7 @@ namespace Gendie
     std::shared_ptr<FEAT::Solver::SolverBase<DefectVectorType>> coarse_solver;
     std::shared_ptr<FEAT::Solver::MultiGrid<SystemMatrix, SystemFilter, SystemTransfer>> multigrid;
     #ifdef FEAT_HAVE_TRILINOS
-    // define our scalarized solver level for the coarse grid solver
-    typedef FEAT::Control::ScalarUnitFilterSystemLevel<double, typename LocalSystemMatrix::IndexType> ScalarizedSystemLevelType;
-    // create scalarize helper
-    std::shared_ptr<Gendie::GendieScalarizeHelper<SystemLevelType, ScalarizedSystemLevelType>> scalarize_helper;
-    std::shared_ptr<FEAT::Solver::StokesFROSchPreconditioner<typename ScalarizedSystemLevelType::GlobalSystemMatrix, typename ScalarizedSystemLevelType::GlobalSystemFilter>> frosch_precond;
+    std::shared_ptr<FEAT::Solver::StokesFROSchPreconditioner<SystemMatrix, SystemFilter>> frosch_precond;
     std::shared_ptr<FEAT::Solver::Trilinos::FROSchParameterList> frosch_params;
     std::vector<int> _frosch_subregions;
     FEAT::Index _frosch_gmres_dim;
@@ -752,7 +747,7 @@ namespace Gendie
       // if we have an xml file. we always only parse this
       if(!_frosch_xml.empty())
       {
-        if(_logger) _logger->print("Use frosch xml file");
+        //if(_logger) _logger->print("Use frosch xml file");
         this->frosch_params->read_from_xml_file(_frosch_xml);
         return true;
       }
@@ -785,7 +780,6 @@ namespace Gendie
       #ifdef FEAT_HAVE_TRILINOS
       this->frosch_precond.reset();
       this->frosch_params.reset();
-      this->scalarize_helper.reset();
       #endif
       this->base_solver.reset();
       this->iter_solver.reset();
@@ -812,8 +806,6 @@ namespace Gendie
       #ifdef FEAT_HAVE_TRILINOS
       if(coarse_frosch && (system_levels.size() == domain_virtual_size))
       {
-        scalarize_helper = std::make_shared<Gendie::GendieScalarizeHelper<System_, ScalarizedSystemLevelType>>();
-        scalarize_helper->create(*system_levels.back());
         // create on same communicater our coarse level uses
         frosch_params = std::make_shared<FEAT::Solver::Trilinos::FROSchParameterList>(domain.back().layer().comm(), 3, FEAT::Solver::Trilinos::FROSchParameterList::SADDLEPOINT);
         // if(_logger) _logger->print("Parsing from " + frosch_xml, info);
@@ -844,24 +836,22 @@ namespace Gendie
         if(coarse_frosch)
 #endif
         {
-          Index num_owned_pres_dofs = this->system_levels.front()->gate_pres.get_num_local_dofs();
-          this->frosch_precond = FEAT::Solver::new_stokes_frosch(scalarize_helper->scalarized_level.matrix_sys,
-            scalarize_helper->scalarized_level.filter_sys, num_owned_pres_dofs, *frosch_params);
+          this->frosch_precond = FEAT::Solver::new_stokes_frosch(matrix_sys, fi lter_sys, *frosch_params);
 
-          std::shared_ptr<FEAT::Solver::IterativeSolver<typename ScalarizedSystemLevelType::GlobalSystemVector>> solver_iterative;
+          std::shared_ptr<FEAT::Solver::IterativeSolver<DefectVectorType>> solver_iterative;
 
           if(_frosch_gmres_dim > 0)
           {
-            solver_iterative = Solver::new_fgmres(scalarize_helper->scalarized_level.matrix_sys,
-              scalarize_helper->scalarized_level.filter_sys, _frosch_gmres_dim, _frosch_inner_rescale, this->frosch_precond);
+            solver_iterative = Solver::new_fgmres(matrix_sys, filter_sys, _frosch_gmres_dim, _frosch_inner_rescale, this->frosch_precond);
             solver_iterative->set_tol_rel(_frosch_tol_rel);
             // solver_iterative->set_tol_abs(tol_abs);
             solver_iterative->set_tol_abs_low(1e-14);
             solver_iterative->set_min_iter(_frosch_miniter);
             solver_iterative->set_max_iter(_frosch_maxiter);
-          } else {
-            solver_iterative = Solver::new_richardson(scalarize_helper->scalarized_level.matrix_sys,
-              scalarize_helper->scalarized_level.filter_sys, DataType(1), this->frosch_precond);
+          }
+          else
+          {
+            solver_iterative = Solver::new_richardson(matrix_sys, filter_sys, DataType(1), this->frosch_precond);
             solver_iterative->set_tol_rel(mg_tol_rel);
             // solver_iterative->set_tol_abs(tol_abs);
             solver_iterative->set_tol_abs_low(1e-14);
@@ -871,7 +861,7 @@ namespace Gendie
           // solver_iterative->set_plot_mode(FEAT::Solver::PlotMode::summary);
           solver_iterative->set_plot_mode(coarse_solver_info ? FEAT::Solver::PlotMode::summary : FEAT::Solver::PlotMode::none);
 
-          this->base_solver = std::make_shared<Gendie::GendieScalarizeWrapper<System_, ScalarizedSystemLevelType>>(*scalarize_helper, solver_iterative);
+          this->base_solver = solver_iterative;
         }
         else
 #endif // FEAT_HAVE_TRILINOS
@@ -958,25 +948,22 @@ namespace Gendie
 #ifdef FEAT_HAVE_TRILINOS
         else if(coarse_frosch)
         {
-          Index num_owned_pres_dofs = lvl.gate_pres.get_num_local_dofs();
-          this->frosch_precond = Solver::new_stokes_frosch(scalarize_helper->scalarized_level.matrix_sys,
-            scalarize_helper->scalarized_level.filter_sys, num_owned_pres_dofs, *frosch_params);
+          this->frosch_precond = Solver::new_stokes_frosch(lvl.matrix_sys, lvl.filter_sys, *frosch_params);
 
-          std::shared_ptr<FEAT::Solver::IterativeSolver<typename ScalarizedSystemLevelType::GlobalSystemVector>> solver_iterative;
+          std::shared_ptr<FEAT::Solver::IterativeSolver<DefectVectorType>> solver_iterative;
 
           if(_frosch_gmres_dim > 0)
           {
-            solver_iterative = Solver::new_fgmres(scalarize_helper->scalarized_level.matrix_sys,
-              scalarize_helper->scalarized_level.filter_sys, _frosch_gmres_dim, _frosch_inner_rescale, this->frosch_precond);
+            solver_iterative = Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, _frosch_gmres_dim, _frosch_inner_rescale, this->frosch_precond);
             solver_iterative->set_tol_rel(_frosch_tol_rel);
             // solver_iterative->set_tol_abs(tol_abs);
             solver_iterative->set_tol_abs_low(1e-14);
             solver_iterative->set_min_iter(_frosch_miniter);
             solver_iterative->set_max_iter(_frosch_maxiter);
-          } else
+          }
+          else
           {
-            solver_iterative = Solver::new_richardson(scalarize_helper->scalarized_level.matrix_sys,
-              scalarize_helper->scalarized_level.filter_sys, DataType(1), this->frosch_precond);
+            solver_iterative = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, DataType(1), this->frosch_precond);
 
             solver_iterative->set_tol_rel(coarse_tol_rel);
             // solver_iterative->set_tol_abs(tol_abs);
@@ -987,7 +974,7 @@ namespace Gendie
           // solver_iterative->set_plot_mode(FEAT::Solver::PlotMode::summary);
           solver_iterative->set_plot_mode(coarse_solver_info ? FEAT::Solver::PlotMode::summary : FEAT::Solver::PlotMode::none);
 
-          this->coarse_solver = std::make_shared<Gendie::GendieScalarizeWrapper<System_, ScalarizedSystemLevelType>>(*scalarize_helper, solver_iterative);
+          this->coarse_solver = solver_iterative;
           this->multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, this->coarse_solver);
         }
 #endif
@@ -1150,7 +1137,8 @@ namespace Gendie
         _frosch_parti(FEAT::Solver::Trilinos::FROSchParameterList::PartitionType::PARMETIS),
         _frosch_approach(FEAT::Solver::Trilinos::FROSchParameterList::PartitionApproach::REPARTITION),
         _frosch_combine_overlap(FEAT::Solver::Trilinos::FROSchParameterList::CombineOverlap::RESTRICTED),
-        _frosch_ipou_velo(dim == 3 ? FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSWSTAR : FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSW),
+        //_frosch_ipou_velo(dim == 3 ? FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSWSTAR : FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSW),
+        _frosch_ipou_velo(FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSWSTAR),
         _frosch_ipou_pres(FEAT::Solver::Trilinos::FROSchParameterList::IPOU::RGDSW),
         _frosch_exclude_velocity_pressure(false),
         _frosch_exclude_pressure_velocity(false),
@@ -1207,7 +1195,8 @@ namespace Gendie
         _frosch_parti(FEAT::Solver::Trilinos::FROSchParameterList::PartitionType::PARMETIS),
         _frosch_approach(FEAT::Solver::Trilinos::FROSchParameterList::PartitionApproach::REPARTITION),
         _frosch_combine_overlap(FEAT::Solver::Trilinos::FROSchParameterList::CombineOverlap::RESTRICTED),
-        _frosch_ipou_velo(dim == 3 ? FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSWSTAR : FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSW),
+        //_frosch_ipou_velo(dim == 3 ? FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSWSTAR : FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSW),
+        _frosch_ipou_velo(FEAT::Solver::Trilinos::FROSchParameterList::IPOU::GDSWSTAR),
         _frosch_ipou_pres(FEAT::Solver::Trilinos::FROSchParameterList::IPOU::RGDSW),
         _frosch_exclude_velocity_pressure(false),
         _frosch_exclude_pressure_velocity(false),
