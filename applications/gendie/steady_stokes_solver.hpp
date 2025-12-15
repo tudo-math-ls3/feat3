@@ -836,7 +836,7 @@ namespace Gendie
         if(coarse_frosch)
 #endif
         {
-          this->frosch_precond = FEAT::Solver::new_stokes_frosch(matrix_sys, fi lter_sys, *frosch_params);
+          this->frosch_precond = FEAT::Solver::new_stokes_frosch(matrix_sys, filter_sys, *frosch_params);
 
           std::shared_ptr<FEAT::Solver::IterativeSolver<DefectVectorType>> solver_iterative;
 
