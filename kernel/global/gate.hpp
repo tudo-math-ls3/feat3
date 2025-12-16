@@ -431,9 +431,6 @@ namespace FEAT
        */
       VectorTicketType sync_0_async(LocalVector_& vector) const
       {
-        if(_ranks.empty())
-          return SynchVectorTicket<LocalVector_, Mirror_>(); // empty ticket
-
         return SynchVectorTicket<LocalVector_, Mirror_>(vector, *_comm, _ranks, _mirrors);
       }
 
@@ -484,9 +481,6 @@ namespace FEAT
        */
       VectorTicketType sync_1_async(LocalVector_& vector) const
       {
-        if(_ranks.empty())
-          return SynchVectorTicket<LocalVector_, Mirror_>(); // empty ticket
-
         from_1_to_0(vector);
         return SynchVectorTicket<LocalVector_, Mirror_>(vector, *_comm, _ranks, _mirrors);
       }
