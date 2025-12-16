@@ -784,7 +784,7 @@ namespace FEAT
      * \brief Returns the machine precision constant for a floating-point data type.
      */
     template<typename T_>
-    inline T_ eps()
+    constexpr T_ eps()
     {
       static_assert(Type::Traits<T_>::is_float, "eps can only be applied to floating point types");
 
@@ -801,24 +801,24 @@ namespace FEAT
 
     /// \cond internal
     template<>
-    inline float eps<float>()
+    constexpr float eps<float>()
     {
       return std::numeric_limits<float>::epsilon();
     }
     template<>
-    inline double eps<double>()
+    constexpr double eps<double>()
     {
       return std::numeric_limits<double>::epsilon();
     }
     template<>
-    inline long double eps<long double>()
+    constexpr long double eps<long double>()
     {
       return std::numeric_limits<long double>::epsilon();
     }
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
     template<>
-    inline __float128 eps<__float128>()
+    constexpr __float128 eps<__float128>()
     {
       return FLT128_EPSILON;
     }
@@ -826,7 +826,7 @@ namespace FEAT
 
     #ifdef FEAT_HAVE_HALFMATH
     template<>
-    inline Half eps<Half>()
+    constexpr Half eps<Half>()
     {
       return CUDART_ONE_FP16 - Half(0.99951171);
     }

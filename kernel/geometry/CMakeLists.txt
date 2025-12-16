@@ -80,6 +80,7 @@ set(test_list
   mesh_node-test-conf-quad
   mesh_part_ops-test
   mesh_part-test
+  raycast-test
   shape_convert-test
   standard_refinery-test-conf-quad
   standard_refinery-test-conf-hexa
