@@ -21,6 +21,11 @@
 #include <functional>
 #include <vector>
 
+#ifdef FEAT_HAVE_CGAL
+#include <kernel/geometry/cgal.hpp>
+#endif
+
+
 namespace FEAT
 {
   namespace Geometry
@@ -235,6 +240,39 @@ namespace FEAT
         }
       }
 
+#if defined(FEAT_HAVE_CGAL) || defined(DOXYGEN)
+      /**
+       * \brief Constructor
+       *
+       * \param[in] cw
+       * A \resident reference to the cgal surface mesh.
+       * Must remain unchanged for the lifetime of this exporter.
+       *
+       * \param[in] var_prec
+       * Specifies the precision of the variable entries. If set to 0, the runtime's default precision is used.
+       * See the \p precision parameter of the #stringify_fp_sci() function for details.
+       */
+      template<typename DT_>
+      explicit ExportVTK(const Geometry::CGALWrapper<DT_>& cw, int var_prec = 0) :
+        _num_verts(cw.get_num_entities(0)),
+        _num_cells(cw.get_num_entities(cell_dim_)),
+        _var_prec(Math::max(0, var_prec))
+      {
+        XASSERTM(cell_dim_ == 2, "CGAL Export only possible with surface mesh");
+
+        _vertices = [&](Index i, int j) { return cw.point(i)[j]; };
+        // TODO: probably pretty inefficient...
+        _cells = [&](Index i, int j) {
+          auto face_iter = cw.vertices_around_face().image_begin(i);
+          while(j > 0)
+          {
+            --j;
+            ++face_iter;
+          }
+          return *face_iter;};
+      }
+#endif
+
       /// destructor
       virtual ~ExportVTK() = default;
 
@@ -391,6 +429,46 @@ namespace FEAT
       }
 
       /**
+       * \brief Adds a vector-field vertex variable given by a std::vector of Tiny::Vector to the exporter.
+       *
+       * This functions adds a 1D, 2D or 3D vector-field variable to the exporter.
+       *
+       * \tparam VectorType_
+       * Type of the input. Only DenseVectorBlocked and SparseVectorBlocked have the right interface at the moment.
+       *
+       * \param[in] name
+       * The name of the variable to be exported.
+       *
+       * \param[in] v
+       * A \transient reference to the vector containing the field values in the mesh vertices.
+       *
+       * \param[in] scaling_factor
+       * A scaling factor applied to each datapoint.
+       *
+       * \note
+       * This function creates a (deep) copy of the vector data.
+       */
+      template<typename DT_, int dim_>
+      void add_vertex_vector(const String& name, const std::vector<Tiny::Vector<DT_, dim_>>& v, double scaling_factor = 1.0)
+      {
+        std::vector<double> d(3 * _num_verts);
+
+        for(Index i(0); i < _num_verts; ++i)
+        {
+          for(Index j(0); j < 3; ++j)
+          {
+            d[(Index(3) * i) + j] = double(0);
+          }
+
+          for(int j(0); j < dim_; ++j)
+          {
+            d[(Index(3) * i) + Index(j)] = scaling_factor * double(v[i][j]);
+          }
+        }
+        _vertex_vectors.emplace_back(name, std::move(d));
+      }
+
+      /**
        * \brief Adds a scalar cell variable to the exporter.
        *
        * \param[in] name
@@ -514,6 +592,46 @@ namespace FEAT
           for(int j(0); j < v.BlockSize; ++j)
           {
             d[(Index(3) * i) + Index(j)] = scaling_factor * double(v(i)[j]);
+          }
+        }
+        _cell_vectors.emplace_back(name, std::move(d));
+      }
+
+      /**
+       * \brief Adds a vector-field cell variable given by a std::vector of Tiny::Vector to the exporter.
+       *
+       * This functions adds a 1D, 2D or 3D vector-field variable to the exporter.
+       *
+       * \tparam VectorType_
+       * Type of the input. Only DenseVectorBlocked and SparseVectorBlocked have the right interface at the moment.
+       *
+       * \param[in] name
+       * The name of the variable to be exported.
+       *
+       * \param[in] v
+       * A \transient reference to the vector containing the field values in the mesh cell.
+       *
+       * \param[in] scaling_factor
+       * A scaling factor applied to each datapoint.
+       *
+       * \note
+       * This function creates a (deep) copy of the vector data.
+       */
+      template<typename DT_, int dim_>
+      void add_cell_vector(const String& name, const std::vector<Tiny::Vector<DT_, dim_>>& v, double scaling_factor = 1.0)
+      {
+        std::vector<double> d(3 * _num_cells);
+
+        for(Index i(0); i < _num_cells; ++i)
+        {
+          for(Index j(0); j < 3; ++j)
+          {
+            d[(Index(3) * i) + j] = double(0);
+          }
+
+          for(int j(0); j < dim_; ++j)
+          {
+            d[(Index(3) * i) + Index(j)] = scaling_factor * double(v[i][j]);
           }
         }
         _cell_vectors.emplace_back(name, std::move(d));
