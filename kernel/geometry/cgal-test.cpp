@@ -131,6 +131,7 @@ public:
     test_displacement(tol);
     test_vertices_around_face();
     test_point_accessors(tol);
+    test_face_normals(tol);
   }
 
   void test_move_constructor() const
@@ -485,6 +486,43 @@ public:
     for(std::uint32_t i(0); i < points.size(); i++)
     {
       TEST_CHECK_EQUAL_WITHIN_EPS((points[i] - cw.point(i)).norm_euclid(), 0, tol);
+    }
+  }
+
+  void test_face_normals(DT_ tol) const
+  {
+    std::stringstream mts = tetrahedron_mesh();
+    CGALWrapper<DT_> cw(mts, CGALFileMode::fm_off);
+
+    auto points = cw.points();
+    auto normals = cw.outer_normals_at_faces();
+
+    auto ref_normals = normals;
+
+    auto cgal_face_adjactor = cw.vertices_around_face();
+
+    for(Index f = 0u; f < cgal_face_adjactor.get_num_nodes_domain(); ++f)
+    {
+      Tiny::Matrix<DT_, 2, 3> loc_face_mat;
+      Index l = 0;
+      auto iter = cgal_face_adjactor.image_begin(f);
+      auto ref_p = points[*iter];
+      ++iter;
+      for(; iter != cgal_face_adjactor.image_end(f); ++iter, ++l)
+      {
+        loc_face_mat[l] = points[*iter] - ref_p;
+      }
+      Tiny::Matrix<DT_, 3, 2> loc_t;
+      loc_t.set_transpose(loc_face_mat);
+      Tiny::orthogonal_3x2(ref_normals[f], loc_t);
+      ref_normals[f] = ref_normals[f].normalize();
+    }
+
+    TEST_CHECK_EQUAL(normals.size(), cw.get_num_entities(2));
+
+    for(std::uint32_t i(0); i < normals.size(); i++)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS((normals[i] - ref_normals[i]).norm_euclid(), 0, tol);
     }
   }
 };

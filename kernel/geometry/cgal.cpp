@@ -583,6 +583,24 @@ namespace FEAT::Geometry
   }
 
   template<typename DT_>
+  std::vector<typename CGALWrapper<DT_>::PointType> CGALWrapper<DT_>::outer_normals_at_faces() const
+  {
+    using PolyhedronType = typename CGALTypeWrapper<DT_>::Polyhedron_;
+
+    CGALWrapperData<DT_>* cd = (CGALWrapperData<DT_>*)_cgal_data;
+    PolyhedronType* poly = cd->_polyhedron;
+
+    std::vector<PointType> normals(this->get_num_entities(2));
+    for(const auto facet : poly->faces())
+    {
+      auto outer_normal = CGAL::Polygon_mesh_processing::compute_face_normal(facet, *poly);
+      normals.at(facet) = PointType{outer_normal.x(), outer_normal.y(), outer_normal.z()};
+    }
+
+    return normals;
+  }
+
+  template<typename DT_>
   Index CGALVerticesAroundFaceAdjactor<DT_>::get_num_nodes_domain() const
   {
     return Index(_wrapper->get_num_entities(2));

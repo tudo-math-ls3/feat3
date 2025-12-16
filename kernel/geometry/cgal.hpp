@@ -273,6 +273,9 @@ namespace FEAT
       /// Returns an adjactor for vertices around faces of the mesh
       CGALVerticesAroundFaceAdjactor<DT_> vertices_around_face() const;
 
+      /// Returns an adjactor for vertices around faces of the mesh
+      std::vector<PointType> outer_normals_at_faces() const;
+
     private:
       /// Delete tree, which also requires to delete the inside tester
       void _delete_tree();
