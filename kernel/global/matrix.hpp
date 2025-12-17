@@ -73,9 +73,9 @@ namespace FEAT
 
     protected:
       /// a pointer to the row gate responsible for synchronization
-      GateRowType* _row_gate;
+      const GateRowType* _row_gate;
       /// a pointer to the column gate responsible for synchronization
-      GateColType* _col_gate;
+      const GateColType* _col_gate;
       /// the internal local matrix object
       LocalMatrix_ _matrix;
 
@@ -106,7 +106,7 @@ namespace FEAT
        * always must use the same internal communicator!
        */
       template<typename... Args_>
-      explicit Matrix(GateRowType* row_gate, GateColType* col_gate, Args_&&... args) :
+      explicit Matrix(const GateRowType* row_gate, const GateColType* col_gate, Args_&&... args) :
         _row_gate(row_gate),
         _col_gate(col_gate),
         _matrix(std::forward<Args_>(args)...)
