@@ -22,6 +22,7 @@
 #include <fstream>
 #include <vector>
 #include <string>
+#include <array>
 
 namespace FEAT
 {
@@ -41,20 +42,41 @@ namespace FEAT
    */
   class MemoryUsage
   {
+  public:
+    enum memory_type : std::uint8_t
+    {
+      peak_physical = 0,
+      cur_physical = 1,
+      peak_virtual = 2,
+      cur_virtual = 3,
+      cur_swap = 4,
+      size = 5
+    };
+
+    static const char* format(memory_type type)
+    {
+      switch (type) {
+        case peak_physical:
+          return "Peak Physical";
+        case cur_physical:
+          return "Current Physical";
+        case peak_virtual:
+          return "Peak Virtual";
+        case cur_virtual:
+          return "Current Virtual";
+        case cur_swap:
+          return "Current Swap";
+        default:
+          return "Unkown";
+      }
+    }
+
   private:
-    std::size_t _current_physical;
-    std::size_t _peak_physical;
-    std::size_t _current_virtual;
-    std::size_t _peak_virtual;
-    std::size_t _current_swap;
+    std::array<std::size_t, memory_type::size> _memory;
 
   public:
     MemoryUsage() :
-      _current_physical(0),
-      _peak_physical(0),
-      _current_virtual(0),
-      _peak_virtual(0),
-      _current_swap(0)
+     _memory()
     {
       stamp();
     }
@@ -98,6 +120,7 @@ namespace FEAT
       {
         if (line.starts_with("VmRSS"))
         {
+          std::size_t& _current_physical = _memory[memory_type::cur_physical];
           std::deque<String> v = line.split_by_whitespaces();
           XASSERTM(v.back() == "kB", "get_memory_usage: unit mismatch!");
           v.at(v.size() - 2).parse(_current_physical);
@@ -107,6 +130,7 @@ namespace FEAT
 
         if (line.starts_with("VmHWM"))
         {
+          std::size_t& _peak_physical = _memory[memory_type::peak_physical];
           std::deque<String> v = line.split_by_whitespaces();
           XASSERTM(v.back() == "kB", "get_memory_usage: unit mismatch!");
           v.at(v.size() - 2).parse(_peak_physical);
@@ -116,6 +140,7 @@ namespace FEAT
 
         if (line.starts_with("VmSize"))
         {
+          std::size_t& _current_virtual = _memory[memory_type::cur_virtual];
           std::deque<String> v = line.split_by_whitespaces();
           XASSERTM(v.back() == "kB", "get_memory_usage: unit mismatch!");
           v.at(v.size() - 2).parse(_current_virtual);
@@ -125,6 +150,7 @@ namespace FEAT
 
         if (line.starts_with("VmPeak"))
         {
+          std::size_t& _peak_virtual = _memory[memory_type::peak_virtual];
           std::deque<String> v = line.split_by_whitespaces();
           XASSERTM(v.back() == "kB", "get_memory_usage: unit mismatch!");
           v.at(v.size() - 2).parse(_peak_virtual);
@@ -134,6 +160,7 @@ namespace FEAT
 
         if (line.starts_with("VmSwap"))
         {
+          std::size_t& _current_swap = _memory[memory_type::cur_swap];
           std::deque<String> v = line.split_by_whitespaces();
           XASSERTM(v.back() == "kB", "get_memory_usage: unit mismatch!");
           v.at(v.size() - 2).parse(_current_swap);
@@ -149,11 +176,11 @@ namespace FEAT
 
       Windows::query_memory_usage(work_set_size, work_set_size_peak, page_file_usage, page_file_usage_peak);
 
-      _current_physical = std::size_t(work_set_size);
-      _current_virtual = std::size_t(page_file_usage);
-      _peak_physical = std::size_t(work_set_size_peak);
-      _peak_virtual = std::size_t(page_file_usage_peak);
-      _current_swap = std::size_t(0);
+      _memory[memory_type::cur_physical]  = std::size_t(work_set_size);
+      _memory[memory_type::cur_virtual]   = std::size_t(page_file_usage);
+      _memory[memory_type::peak_physical] = std::size_t(work_set_size_peak);
+      _memory[memory_type::peak_virtual]  = std::size_t(page_file_usage_peak);
+      _memory[memory_type::cur_swap]      = std::size_t(0);
 
 #elif defined(__unix__)
       // see:
@@ -162,60 +189,66 @@ namespace FEAT
       struct rusage r_usage;
       if (0 != getrusage(RUSAGE_SELF, &r_usage))
         XABORTM("Error in getrusage call!");
-      _peak_physical = (std::size_t)r_usage.ru_maxrss;
-      _peak_virtual = (std::size_t)r_usage.ru_maxrss;
-      _current_physical = (std::size_t)r_usage.ru_maxrss;
-      _current_virtual = (std::size_t)r_usage.ru_maxrss;
-      _current_swap = std::size_t(0);
       // 'ru_maxrss' is given in kilobytes
-      _peak_physical *= 1024u;
-      _peak_virtual *= 1024u;
-      _current_physical *= 1024u;
-      _current_virtual *= 1024u;
+      _memory[memory_type::cur_physical]  = std::size_t(r_usage.ru_maxrss) * 1024u;
+      _memory[memory_type::cur_virtual]   = std::size_t(r_usage.ru_maxrss) * 1024u;
+      _memory[memory_type::peak_physical] = std::size_t(r_usage.ru_maxrss) * 1024u;
+      _memory[memory_type::peak_virtual]  = std::size_t(r_usage.ru_maxrss) * 1024u;
+      _memory[memory_type::cur_swap]      = std::size_t(0);
 #endif
     }
 
     /// Returns current (last stamp call) physical memory
     std::size_t get_current_physical() const
     {
-      return _current_physical;
+      return _memory[memory_type::cur_physical];
     }
 
     /// Returns peak physical memory
     std::size_t get_peak_physical() const
     {
-      return _peak_physical;
+      return _memory[memory_type::peak_physical];
     }
 
     /// Returns current (last stamp call) virtual memory
     std::size_t get_current_virtual() const
     {
-      return _current_virtual;
+      return _memory[memory_type::cur_virtual];
     }
 
     /// Returns peak virtual memory
     std::size_t get_peak_virtual() const
     {
-      return _peak_virtual;
+      return _memory[memory_type::peak_virtual];
     }
 
     /// Returns current (last stamp call) swap memory
     std::size_t get_current_swap() const
     {
-      return _current_swap;
+      return _memory[memory_type::cur_swap];
     }
 
     /// Retrieve formatted memory usage string
     String get_formatted_memory_usage() const
     {
       String r;
-      r += String("Current real:").pad_back(20) + stringify(_current_physical / 1024 / 1024) + " MByte\n";
-      r += String("Peak real:").pad_back(20) + stringify(_peak_physical / 1024 / 1024) + " MByte\n";
-      r += String("Current virtual:").pad_back(20) + stringify(_current_virtual / 1024 / 1024) + " MByte\n";
-      r += String("Peak virtual:").pad_back(20) + stringify(_peak_virtual / 1024 / 1024) + " MByte\n";
-      r += String("Current swap:").pad_back(20) + stringify(_current_swap / 1024 / 1024) + " MByte\n";
+      for(std::size_t k = 0u; k < memory_type::size; ++k)
+      {
+        memory_type type = memory_type(k);
+        r += (String(format(type)) + String(":")).pad_back(20) + stringify(_memory[type] / 1024 / 1024) + " MByte\n";
+      }
 
       return r;
+    }
+
+    String get_formatted_memory_usage(const Dist::Comm& comm, memory_type mem_type) const
+    {
+      std::uint64_t min_p, max_p, sum_p;
+      min_p = max_p = sum_p = _memory[mem_type];
+      comm.allreduce(&min_p, &min_p, 1u, Dist::op_min);
+      comm.allreduce(&max_p, &max_p, 1u, Dist::op_max);
+      comm.allreduce(&sum_p, &sum_p, 1u, Dist::op_sum);
+      return String(format(mem_type)).pad_back(20u, '.') + ":   " + stringify_bytes(sum_p, 3, 0) + " [ Max: " + stringify_bytes(max_p, 3, 0) + " / Min: " + stringify_bytes(min_p, 3, 0) + " ]";
     }
 
     /**
@@ -227,12 +260,7 @@ namespace FEAT
     static String format_peak_physical_usage(const Dist::Comm& comm)
     {
       MemoryUsage mu;
-      std::uint64_t min_p, max_p, sum_p;
-      min_p = max_p = sum_p = mu.get_peak_physical();
-      comm.allreduce(&min_p, &min_p, 1u, Dist::op_min);
-      comm.allreduce(&max_p, &min_p, 1u, Dist::op_max);
-      comm.allreduce(&sum_p, &sum_p, 1u, Dist::op_sum);
-      return stringify_bytes(sum_p, 3, 0) + " [ Max: " + stringify_bytes(max_p, 3, 0) + " / Min: " + stringify_bytes(min_p, 3, 0) + " ]";
+      return mu.get_formatted_memory_usage(comm, memory_type::peak_physical);
     }
   }; //class MemoryUsage
 } // namespace FEAT
