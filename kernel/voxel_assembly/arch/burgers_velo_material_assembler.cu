@@ -1170,12 +1170,6 @@ template void Arch::assemble_burgers_velo_material_csr(const Q2StandardQuad&, co
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, int, int, int, bool);
 template void Arch::assemble_burgers_velo_material_csr(const Q2StandardQuad&, const CSRMatrixData<float, std::uint64_t>&, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, int, int, int, bool);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_burgers_velo_material_csr(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint32_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, const AssemblyMaterialData<Half>&, MaterialType, int, int, int, bool);
-template void Arch::assemble_burgers_velo_material_csr(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint64_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, const AssemblyMaterialData<Half>&, MaterialType, int, int, int, bool);
-#endif
 
 template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardQuad&, const CSRMatrixData<double, std::uint32_t>&, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType);
@@ -1185,12 +1179,6 @@ template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardQuad
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType);
 template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardQuad&, const CSRMatrixData<float, std::uint64_t>&, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint32_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, const AssemblyMaterialData<Half>&, MaterialType);
-template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint64_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, const AssemblyMaterialData<Half>&, MaterialType);
-#endif
 
 template void Arch::assemble_burgers_velo_material_defect(const Q2StandardQuad&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, int, int, int, bool);
@@ -1200,12 +1188,6 @@ template void Arch::assemble_burgers_velo_material_defect(const Q2StandardQuad&,
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, int, int, int, bool);
 template void Arch::assemble_burgers_velo_material_defect(const Q2StandardQuad&, float*, const float*, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, int, int, int, bool);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_burgers_velo_material_defect(const Q2StandardQuad&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, const AssemblyMaterialData<Half>&, MaterialType, int, int, int, bool);
-template void Arch::assemble_burgers_velo_material_defect(const Q2StandardQuad&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, const AssemblyMaterialData<Half>&, MaterialType, int, int, int, bool);
-#endif
 
 template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardQuad&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType);
@@ -1215,12 +1197,6 @@ template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardQ
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType);
 template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardQuad&, float*, const float*, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardQuad&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, const AssemblyMaterialData<Half>&, MaterialType);
-template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardQuad&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, const AssemblyMaterialData<Half>&, MaterialType);
-#endif
 
 /*********************************************************3D implementations**************************************************************************************/
 
@@ -1232,12 +1208,6 @@ template void Arch::assemble_burgers_velo_material_csr(const Q2StandardHexa&, co
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, int, int, int, bool);
 template void Arch::assemble_burgers_velo_material_csr(const Q2StandardHexa&, const CSRMatrixData<float, std::uint64_t>&, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, int, int, int, bool);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_burgers_velo_material_csr(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint32_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, const AssemblyMaterialData<Half>&, MaterialType, int, int, int, bool);
-template void Arch::assemble_burgers_velo_material_csr(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint64_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, const AssemblyMaterialData<Half>&, MaterialType, int, int, int, bool);
-#endif
 
 template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardHexa&, const CSRMatrixData<double, std::uint32_t>&, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType);
@@ -1247,12 +1217,6 @@ template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardHexa
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType);
 template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardHexa&, const CSRMatrixData<float, std::uint64_t>&, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint32_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, const AssemblyMaterialData<Half>&, MaterialType);
-template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint64_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, const AssemblyMaterialData<Half>&, MaterialType);
-#endif
 
 template void Arch::assemble_burgers_velo_material_defect(const Q2StandardHexa&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, int, int, int, bool);
@@ -1262,12 +1226,6 @@ template void Arch::assemble_burgers_velo_material_defect(const Q2StandardHexa&,
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, int, int, int, bool);
 template void Arch::assemble_burgers_velo_material_defect(const Q2StandardHexa&, float*, const float*, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, int, int, int, bool);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_burgers_velo_material_defect(const Q2StandardHexa&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, const AssemblyMaterialData<Half>&, MaterialType, int, int, int, bool);
-template void Arch::assemble_burgers_velo_material_defect(const Q2StandardHexa&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, const AssemblyMaterialData<Half>&, MaterialType, int, int, int, bool);
-#endif
 
 template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardHexa&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType);
@@ -1277,9 +1235,3 @@ template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardH
                                           const std::vector<int*>&, const std::vector<Index>&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType);
 template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardHexa&, float*, const float*, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
                                           const std::vector<int*>&, const std::vector<Index>&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType);
-#ifdef FEAT_HAVE_HALFMATH
-template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardHexa&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, const AssemblyMaterialData<Half>&, MaterialType);
-template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardHexa&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, Half, const AssemblyBurgersData<Half>&, const AssemblyMaterialData<Half>&, MaterialType);
-#endif

@@ -339,10 +339,10 @@ namespace FEAT
         {
         #ifdef __CUDACC__
           return a_T * mu_inf + a_T * (mu_0 - mu_inf) *
-                  CudaMath::cuda_pow(DT_(1) + CudaMath::cuda_pow(lambda * a_T * gamma_dot, yasuda_a), (exp - 1) / yasuda_a);
+                  CudaMath::cuda_pow(DT_(1) + CudaMath::cuda_pow(lambda * a_T * gamma_dot, yasuda_a), (exp - DT_(1)) / yasuda_a);
         #else
           return a_T * mu_inf + a_T * (mu_0 - mu_inf) *
-                  Math::pow(DT_(1) + Math::pow(lambda * a_T * gamma_dot, yasuda_a), (exp - 1) / yasuda_a);
+                  Math::pow(DT_(1) + Math::pow(lambda * a_T * gamma_dot, yasuda_a), (exp - DT_(1)) / yasuda_a);
         #endif
         }
       };

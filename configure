@@ -855,15 +855,8 @@ for token in buildid:
     config.cache_entry("FEAT_HAVE_QUADMATH", "ON", "BOOL")
     config.cache_entry("FEAT_OVERRIDE_MPI_OPS", "ON", "BOOL")
   elif token == "half":
-    invalid_cuda_architectures = [arch for arch in config.cuda_architectures_int if arch < 60]
-    if invalid_cuda_architectures:
-      if len(invalid_cuda_architectures) == 1:
-        error("cuda architecture " + str(invalid_cuda_architectures[0]) + " is too low for half, which needs at least sm_60")
-      else:
-        error("cuda architectures " + ", ".join(map(str, invalid_cuda_architectures)) + " are too low for half, which needs at least sm_60")
-    else:
-      config.cache_entry("FEAT_HAVE_HALFMATH", "ON", "BOOL")
-      config.cache_entry("FEAT_OVERRIDE_MPI_OPS", "ON", "BOOL")
+    config.cache_entry("FEAT_HAVE_HALFMATH", "ON", "BOOL")
+    config.cache_entry("FEAT_OVERRIDE_MPI_OPS", "ON", "BOOL")
   elif token == "cotire":
     config.cache_entry("FEAT_COTIRE", "ON", "BOOL")
   elif token == "trilinos":
@@ -908,8 +901,14 @@ for token in buildid:
   else:
     warning("Unknown build-id token", token)
 
-if "half" in buildid and (config.cuda_arch != "native") and (config.cuda_arch_int < 60):
-  error("cuda arch " + config.cuda_arch + " is too low for half, which needs at least sm_60")
+# check for cuda architectures without half-precision support
+invalid_architectures = ["sm_" + str(arch) for arch in config.cuda_architectures_int if arch < 60]
+if "half" in buildid and invalid_architectures:
+  if len(invalid_architectures) == 1:
+    error("Cuda architecture", str(invalid_architectures[0]), "does not support half-precision. Half-precision requires at least sm_60")
+  else:
+    error("Cuda architectures", ", ".join(map(str, invalid_architectures)), "do not support half-precision. Half-precision requires at least sm_60")
+
 
 # always set build flags offline
 config.env["CMAKE_CXX_FLAGS_DEBUG"] = ""

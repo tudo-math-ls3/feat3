@@ -45,7 +45,17 @@ void Scale::value_cuda(DT_ * r, const DT_ * const x, const DT_ s, const Index si
 
   cublasStatus_t status;
 
-  status = cublasScalEx(Util::Intern::cublas_handle, int(size), &s, et, r, dt, 1, et);
+  if(et == CUDA_R_32F)
+  {
+    // NOTE(mmuegge): cublasAxpyEx expects a to be a floating point value, but DT_ might be Half.
+    // Cast to float to ensure the type matches
+    const float s_tmp = float(s);
+    status = cublasScalEx(Util::Intern::cublas_handle, int(size), &s_tmp, et, r, dt, 1, et);
+  }
+  else
+  {
+    status = cublasScalEx(Util::Intern::cublas_handle, int(size), &s, et, r, dt, 1, et);
+  }
   if (status != CUBLAS_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
 

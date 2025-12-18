@@ -41,7 +41,18 @@ void Axpy::value_cuda(DT_ * r, const DT_ a, const DT_ * const x, const Index siz
     throw InternalError(__func__, __FILE__, __LINE__, "unsupported data type!");
 
   cublasStatus_t status;
-  status = cublasAxpyEx(Util::Intern::cublas_handle, int(size), &a, et, x, dt, 1, r, dt, 1, et);
+
+  if(et == CUDA_R_32F)
+  {
+    // NOTE(mmuegge): cublasAxpyEx expects a to be a floating point value, but DT_ might be Half.
+    // Cast to float to ensure the type matches
+    float a_tmp = float(a);
+    status = cublasAxpyEx(Util::Intern::cublas_handle, int(size), &a_tmp, et, x, dt, 1, r, dt, 1, et);
+  }
+  else
+  {
+    status = cublasAxpyEx(Util::Intern::cublas_handle, int(size), &a, et, x, dt, 1, r, dt, 1, et);
+  }
 
   if (status != CUBLAS_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "cuda error: " + stringify(cublasGetStatusString(status)));
