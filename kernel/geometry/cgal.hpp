@@ -10,6 +10,7 @@
 #include <kernel/shape.hpp>
 #include <kernel/util/string.hpp>
 #include <kernel/util/tiny_algebra.hpp>
+#include <fstream>
 
 #if defined(FEAT_HAVE_CGAL) || defined(DOXYGEN)
 
@@ -253,6 +254,25 @@ namespace FEAT
       /// Returns the size in bytes
       std::size_t bytes() const;
 
+      /// Write the surface file to an ostream object
+      void write_off(std::ostream& stream) const;
+
+      /// Writes the surface to a off file
+      /// Warning: Only call this from one process...
+      void write_off(const String& filename) const
+      {
+        // try to open our output file
+        const String name(filename + ".off");
+        std::ofstream ofs(name.c_str());
+        if(!(ofs.is_open() && ofs.good()))
+        {
+          throw FileError("Failed to create '" + name + "'");
+        }
+
+        write_off(ofs);
+        ofs.close();
+      }
+
       /**
        * \brief Displace each vertex of the mesh by its given offset
        *
@@ -273,7 +293,7 @@ namespace FEAT
       /// Returns an adjactor for vertices around faces of the mesh
       CGALVerticesAroundFaceAdjactor<DT_> vertices_around_face() const;
 
-      /// Returns an adjactor for vertices around faces of the mesh
+      /// Returns the outer normals at each surface element
       std::vector<PointType> outer_normals_at_faces() const;
 
     private:

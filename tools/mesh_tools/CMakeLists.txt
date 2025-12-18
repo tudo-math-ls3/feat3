@@ -25,6 +25,11 @@ target_link_libraries(mesh-validator feat)
 add_executable(mesh2eps mesh_to_eps.cpp)
 target_link_libraries(mesh2eps feat)
 
+if (FEAT_HAVE_CGAL)
+add_executable(mesh2off mesh_to_surface.cpp)
+target_link_libraries(mesh2off feat)
+endif (FEAT_HAVE_CGAL)
+
 add_executable(mesh2svg mesh_to_svg.cpp)
 target_link_libraries(mesh2svg feat)
 

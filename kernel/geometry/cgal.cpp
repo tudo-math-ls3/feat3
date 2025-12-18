@@ -693,6 +693,17 @@ namespace FEAT::Geometry
   }
 
   template<typename DT_>
+  void CGALWrapper<DT_>::write_off(std::ostream& stream) const
+  {
+    CGALWrapperData<DT_> * cd = (CGALWrapperData<DT_>*)_cgal_data;
+
+    bool status(false);
+    status = CGAL::IO::write_OFF(stream, *(cd->_polyhedron));
+    if(!status)
+      throw FileError("Failed to write off file to stream");
+  }
+
+  template<typename DT_>
   void CGALWrapper<DT_>::_delete_tree()
   {
     CGALWrapperData<DT_> * cd = (CGALWrapperData<DT_>*)_cgal_data;
