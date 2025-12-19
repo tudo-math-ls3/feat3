@@ -316,7 +316,7 @@ namespace FEAT::Geometry
      *  \param[in] mesh Reference to foundation mesh. The reference is stored and must be valid for the lifetime of the
      * AdaptiveMesh \param[in] behaviour The import behaviour to use during adaptions
      */
-    explicit AdaptiveMesh(const FoundationMeshType& mesh) : _foundation_mesh(mesh) {};
+    explicit AdaptiveMesh(const FoundationMeshType& mesh) : _foundation_mesh(mesh) {}
 
     AdaptiveMesh(AdaptiveMesh& other) = delete;
     AdaptiveMesh(AdaptiveMesh&& other) = delete;

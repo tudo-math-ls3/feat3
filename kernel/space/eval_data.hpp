@@ -116,7 +116,7 @@ namespace FEAT
       // our space config
       static constexpr SpaceTags config = cfg_tags_;
 
-      BasisDataReduced() : grad(), value() {};
+      BasisDataReduced() : grad(), value() {}
 
     }; // class BasisData<...>
 

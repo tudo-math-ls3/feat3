@@ -19,7 +19,7 @@ def configure_gcc(cpu, buildid, compiler, restrict_errors):
     print ("Error: GNU Compiler version less then 7 is not supported, please update your compiler or choose another one!")
     sys.exit(1)
 
-  cxxflags = "-std=c++17 -ggdb -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -Wuninitialized -Wvla -Wdouble-promotion -Wformat=2"
+  cxxflags = "-std=c++17 -ggdb -Wall -Wextra -Wundef -Wshadow -Woverloaded-virtual -Wuninitialized -Wvla -Wdouble-promotion -Wformat=2 -Wconversion"
 
   cxxflags += " -pthread"
 

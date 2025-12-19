@@ -1507,7 +1507,7 @@ public:
         {
           for(int j = 0; j < width; ++j)
           {
-            TEST_CHECK_EQUAL_WITHIN_EPS(crs(r*height+i, c*width+j), bcrs(r, c)[i][j], tol);
+            TEST_CHECK_EQUAL_WITHIN_EPS(crs(r*height+Index(i), c*width+Index(j)), bcrs(r, c)[i][j], tol);
           }
         }
       }

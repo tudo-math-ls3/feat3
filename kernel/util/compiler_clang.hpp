@@ -23,7 +23,7 @@
 
 #if(__clang_major__ >= 15)
 #define FEAT_DISABLE_WARNINGS _Pragma("clang diagnostic push") \
-  _Pragma("clang diagnostic ignored \"-Wall\"")
+  _Pragma("clang diagnostic ignored \"-Wall\"") \
   _Pragma("clang diagnostic ignored \"-Wunused-variable\"") \
   _Pragma("clang diagnostic ignored \"-Wunused-parameter\"") \
   _Pragma("clang diagnostic ignored \"-Wsign-compare\"") \

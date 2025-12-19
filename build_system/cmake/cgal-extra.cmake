@@ -3,6 +3,7 @@ if(NOT TARGET CGAL::CGAL)
   find_package(Boost 1.81 REQUIRED COMPONENTS graph heap logic)
 
   add_library(feat-cgal-extern INTERFACE)
+  set_target_properties(feat-cgal-extern PROPERTIES SYSTEM ON)
   target_include_directories(feat-cgal-extern INTERFACE "${cgal_SOURCE_DIR}/include")
   # target_link_libraries(feat-cgal-extern INTERFACE Boost::boost)
   target_link_libraries(feat-cgal-extern INTERFACE Boost::graph Boost::heap Boost::logic)

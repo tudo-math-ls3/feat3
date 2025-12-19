@@ -622,6 +622,11 @@ namespace FEAT::Geometry
 
     auto* cd = static_cast<CGALWrapperData<DT_>*>(_wrapper->_cgal_data);
 
+    // Index a = ~Index(0);
+    // std::uint32_t b = a;
+    double b = 1E+301;
+    float c = b;
+
     auto range = cd->_polyhedron->vertices_around_face(cd->_polyhedron->halfedge(FaceIndex(face)));
     return CGALValueIteratorWrapper<Index>([it = range.begin(), end = range.end()]() mutable {
       if(it != end)

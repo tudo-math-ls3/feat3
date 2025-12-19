@@ -42,7 +42,7 @@ namespace FEAT::Geometry
 
       for(int i(0); i < num_verts; ++i)
       {
-        result.coords.at(i) = coords[Mapping::map(idx, i)];
+        result.coords.at(std::size_t(i)) = coords[std::size_t(Mapping::map(idx, i))];
       }
 
       return result;
@@ -108,17 +108,17 @@ namespace FEAT::Geometry
       std::array<VertexType, num_verts> vertices;
       for(int i(0); i < num_verts; ++i)
       {
-        auto& c = coeffs[i];
+        auto& c = coeffs[std::size_t(i)];
         VertexType v = a;
         for(int j(0); j < Shape_::dimension; ++j)
         {
-          v[j] += c[j] * diff[j];
+          v[j] += c[std::size_t(j)] * diff[j];
         }
         for (int j(0); j < v.n; ++j)
         {
           ASSERTM(v[j] >= 0.0 && v[j] <= 1.0, "Invalid vertex in axis_aligned");
         }
-        vertices[i] = v;
+        vertices[std::size_t(i)] = v;
       }
       add_entity(vertices);
 
@@ -140,8 +140,9 @@ namespace FEAT::Geometry
      */
     RawTemplate& recurse(Index face, const RawTemplate& tmplt)
     {
+      typedef typename std::vector<RawEntity<Shape_>>::difference_type DiffType;
       const EntityType parent = entities[face];
-      entities.erase(entities.begin() + face);
+      entities.erase(entities.begin() + DiffType(face));
 
       for(const EntityType& entity : tmplt.entities)
       {
@@ -170,15 +171,15 @@ namespace FEAT::Geometry
           VertexType v;
           for (int i = 0; i < Shape_::dimension; ++i)
           {
-            v[i] = coords[i] * stepsize[i];
+            v[i] = typename VertexType::ValueType(coords[std::size_t(i)]) * stepsize[i];
           }
           axis_aligned(v, v + stepsize);
         }
         else
         {
-          for(Index i(0); i < size[dim]; i++)
+          for(Index i(0); i < size[std::size_t(dim)]; i++)
           {
-            coords[dim] = i;
+            coords[std::size_t(dim)] = i;
             _grid(size, stepsize, dim + 1, coords);
           }
         }
@@ -195,7 +196,7 @@ namespace FEAT::Geometry
     {
       RawEntity<Shape_> new_entity;
 
-      for(int i(0); i < entity.num_vertices; ++i)
+      for(std::size_t i(0); i < std::size_t(entity.num_vertices); ++i)
       {
         new_entity.coords.at(i) = vertex_transform(entity.coords.at(i));
       }
@@ -331,7 +332,7 @@ namespace FEAT::Geometry
   template<typename TemplateMap, typename RefinementType_>
   int create_3dtemplate_rotations(TemplateMap& map, const RefinementType_& base_type)
   {
-    enum class Rotation
+    enum class Rotation : std::uint8_t
     {
       None,
       X,
@@ -353,7 +354,7 @@ namespace FEAT::Geometry
     RefinementType_ outer_type = base_type;
     auto outer_template = map[outer_type];
 
-    for(int outer_rotation(0); outer_rotation < 6; outer_rotation++)
+    for(std::size_t outer_rotation(0); outer_rotation < 6u; outer_rotation++)
     {
       const Rotation next_outer_rotation = rotations[outer_rotation];
       if (next_outer_rotation == Rotation::X)

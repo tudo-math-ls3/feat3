@@ -97,7 +97,7 @@ namespace FEAT::Geometry
   IntersectionData<DT_> merge(const IntersectionData<DT_>& a, const IntersectionData<DT_>& b)
   {
     return {Math::min(a.t_entry, b.t_entry), Math::max(a.t_exit, b.t_exit)};
-  };
+  }
 
   /// Normal merge function lifted to optionals
   template<typename DT_>
@@ -120,7 +120,7 @@ namespace FEAT::Geometry
     {
       return std::make_optional(merge(a.value(), b.value()));
     }
-  };
+  }
 
   /**
    * \brief Intersection tests between Rays and primitives.
@@ -376,14 +376,14 @@ namespace FEAT::Geometry
     static DataType cross(const Vector2D& a, const Vector2D& b)
     {
       return (a[0] * b[1]) - (a[1] * b[0]);
-    };
+    }
 
     static Vector3D cross(const Vector3D& a, const Vector3D& b)
     {
       Vector3D result;
       Tiny::cross(result, a, b);
       return result;
-    };
+    }
   };
 
   template<typename MeshType_>

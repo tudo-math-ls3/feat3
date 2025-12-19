@@ -72,7 +72,7 @@ namespace FEAT::Assembly
       _normal = ImagePointType::convert_new(normal);
       _face_volume = DataType(face_volume);
       _cell_helper.resize(cell_offsets.at(surface_ind+1)-cell_offsets.at(surface_ind));
-      std::copy(cells.begin()+cell_offsets.at(surface_ind), cells.begin()+cell_offsets.at(surface_ind+1), _cell_helper.begin());
+      std::copy(cells.begin()+long(cell_offsets.at(surface_ind)), cells.begin()+long(cell_offsets.at(surface_ind+1)), _cell_helper.begin());
       _cur_surface_index = surface_ind;
       _cell_bb.resize(_cell_helper.size());
 

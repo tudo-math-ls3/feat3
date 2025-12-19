@@ -1796,7 +1796,7 @@ namespace FBMTest
       // construct our vertices for the local face
       // get our mapping face to vertices
       const auto& vertex_set = domain.front()->get_mesh().get_vertex_set();
-      part_vertices = FEAT::LAFEM::DenseVectorBlocked<DataType, IndexType, dim>(target_set.get_num_entities()*face_to_vert.get_num_indices());
+      part_vertices = FEAT::LAFEM::DenseVectorBlocked<DataType, IndexType, dim>(target_set.get_num_entities()*Index(face_to_vert.get_num_indices()));
       for(Index k = 0; k < target_set.get_num_entities(); ++k)
       {
         const Index cur_face = target_set[k];
@@ -1838,7 +1838,7 @@ namespace FBMTest
     }
 
     // communicate overall number of faces to export
-    std::vector<Index> num_faces_per_rank(comm.size());
+    std::vector<Index> num_faces_per_rank(Index(comm.size()));
     {
       Index num_faces = vec_face.size();
       comm.gather(&num_faces, 1, num_faces_per_rank.data(), 1, 0);
@@ -1847,24 +1847,24 @@ namespace FBMTest
     Index num_faces_global = comm.rank() == 0 ? std::accumulate(num_faces_per_rank.begin(), num_faces_per_rank.end(), Index(0)) : Index(0);
     // will be filled on rank 0
     FEAT::LAFEM::DenseVectorBlocked<DataType, IndexType, dim> global_vec_face(num_faces_global);
-    FEAT::LAFEM::DenseVectorBlocked<DataType, IndexType, dim> global_part_vertices(num_faces_global*face_to_vert.get_num_indices());
+    FEAT::LAFEM::DenseVectorBlocked<DataType, IndexType, dim> global_part_vertices(num_faces_global*Index(face_to_vert.get_num_indices()));
 
 
-    std::vector<Index> num_faces_offsets(comm.size());
+    std::vector<Index> num_faces_offsets(Index(comm.size()));
     std::exclusive_scan(num_faces_per_rank.begin(), num_faces_per_rank.end(), num_faces_offsets.begin(), Index(0));
 
     // now create gather and sendbuffer and get our values
     {
-      std::vector<std::vector<DataType>> recv_buffer(comm.rank() == 0 ? comm.size() : 0);
+      std::vector<std::vector<DataType>> recv_buffer(comm.rank() == 0 ? Index(comm.size()) : 0u);
       if(comm.rank() == 0)
       {
         for(Index k = 0; k < num_faces_per_rank.size(); ++k)
         {
-          recv_buffer.at(k).resize(num_faces_per_rank[k]*dim*(1+face_to_vert.get_num_indices()));
+          recv_buffer.at(k).resize(num_faces_per_rank[k]*Index(dim*(1+face_to_vert.get_num_indices())));
         }
       }
       // reserve enough space for face values and face vertices
-      std::vector<DataType> vtx_send_buffer(vec_face.size()*dim*(1+face_to_vert.get_num_indices()));
+      std::vector<DataType> vtx_send_buffer(vec_face.size()*Index(dim*(1+face_to_vert.get_num_indices())));
 
       // fill our buffer array, first face_values, then our vertices
       const DataType* vtx_val = part_vertices.template elements<LAFEM::Perspective::pod>();
@@ -1875,7 +1875,7 @@ namespace FBMTest
       {
         vtx_send_buffer[k] = face_val[k];
       }
-      for(Index k = 0; k < vec_face.size()*dim*(face_to_vert.get_num_indices()); ++k)
+      for(Index k = 0; k < vec_face.size()*Index(dim*(face_to_vert.get_num_indices())); ++k)
       {
         vtx_send_buffer[k+vec_face.size()*dim] = vtx_val[k];
       }
@@ -1887,18 +1887,18 @@ namespace FBMTest
         {
           if(num_faces_per_rank[k] > 0)
           {
-            requests.push_back(comm.irecv(recv_buffer.at(k).data(), num_faces_per_rank[k]*dim*(1+face_to_vert.get_num_indices()), int(k)));
+            requests.push_back(comm.irecv(recv_buffer.at(k).data(), num_faces_per_rank[k]*Index(dim*(1+face_to_vert.get_num_indices())), int(k)));
           }
         }
 
         // copy this rank
         {
           auto rcomm_rank = 0;
-          for(Index k = 0; k < num_faces_per_rank.at(rcomm_rank)*dim; ++k)
+          for(Index k = 0; k < num_faces_per_rank.at(Index(rcomm_rank))*Index(dim); ++k)
           {
             gface_val[k] = face_val[k];
           }
-          for(Index k = 0; k < num_faces_per_rank.at(rcomm_rank)*dim*(face_to_vert.get_num_indices()); ++k)
+          for(Index k = 0; k < num_faces_per_rank.at(Index(rcomm_rank))*Index(dim*(face_to_vert.get_num_indices())); ++k)
           {
             gvtx_val[k] = vtx_val[k];
           }
@@ -1917,9 +1917,9 @@ namespace FBMTest
           {
             gface_val[cur_offset + k] = recv_buffer.at(rcomm_rank)[k];
           }
-          cur_offset = num_faces_offsets[rcomm_rank]*dim*(face_to_vert.get_num_indices());
+          cur_offset = num_faces_offsets[rcomm_rank]*Index(dim*(face_to_vert.get_num_indices()));
           Index buffer_offset = num_faces_per_rank.at(rcomm_rank)*dim;
-          for(Index k = 0; k < num_faces_per_rank.at(rcomm_rank)*dim*(face_to_vert.get_num_indices()); ++k)
+          for(Index k = 0; k < num_faces_per_rank.at(rcomm_rank)*Index(dim*(face_to_vert.get_num_indices())); ++k)
           {
             gvtx_val[cur_offset+k] = recv_buffer.at(rcomm_rank)[k+buffer_offset];
           }

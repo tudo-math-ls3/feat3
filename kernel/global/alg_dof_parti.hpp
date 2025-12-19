@@ -565,13 +565,13 @@ namespace FEAT
             // this neighbor has a lower rank than our process, so update the dof owners vector and
             // update the ownership of these dofs by setting this neighbor as  their owner -- unless
             // another neighbor with an even lower rank is already a candidate for ownership
-            ADPAuxType::update_owners(neighbor_ranks.at(i), dof_owners, gate.get_mirrors().at(i));
+            ADPAuxType::update_owners(IndexType(neighbor_ranks.at(i)), dof_owners, gate.get_mirrors().at(i));
           }
         }
 
         // Okay, at this point we (and all other processes) know the owners of each of our local DOFs.
         // Now, we have to generate the mirror of all local DOF indices of the DOFs that we own:
-        this->_owned_dof_count = ADPAuxType::build_owned_mirror(my_rank, this->_owned_mirror, dof_owners);
+        this->_owned_dof_count = ADPAuxType::build_owned_mirror(IndexType(my_rank), this->_owned_mirror, dof_owners);
 
         // Save current owned DOF count as extra DOF offset
         this->_extra_dof_offset = this->_owned_dof_count;
@@ -599,7 +599,7 @@ namespace FEAT
         // own this particular DOF or ~Index(0) if this particular DOF is owned by another process:
         IndexVectorType own_dof_idx;
         ADPAuxType::alloc_idx_vector(own_dof_idx, vec_tmpl, ~IndexType(0));
-        ADPAuxType::build_owned_dofs(my_rank, own_dof_idx, dof_owners, 0u);
+        ADPAuxType::build_owned_dofs(IndexType(my_rank), own_dof_idx, dof_owners, 0u);
 
         // Now we also have to create the mirrors for each of our neighbor processes:
         for(std::size_t i(0); i < neighbor_ranks.size(); ++i)
@@ -622,7 +622,7 @@ namespace FEAT
             // that particular neighbor, are owned by some *other* neighbor process(es) and not by
             // the particular neighbor that we are currently considering.
             OwnerMirrorType owner_mirror;
-            if(ADPAuxType::build_owner_mirror(neighbor_rank, owner_mirror, halo_mirror, dof_owners) > Index(0))
+            if(ADPAuxType::build_owner_mirror(IndexType(neighbor_rank), owner_mirror, halo_mirror, dof_owners) > Index(0))
             {
               // That neighbor owns at least one of our local DOFs, so create a mirror from the
               // index-vector and push it into our list of "owner-neighbors".

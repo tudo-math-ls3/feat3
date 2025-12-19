@@ -116,7 +116,7 @@ namespace FEAT::Geometry::Intern
 
       for(int i(0); i < n_; ++i)
       {
-        result[i] = _markings[indices[i]];
+        result[std::size_t(i)] = _markings[indices[i]];
       }
       return result;
     }

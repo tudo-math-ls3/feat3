@@ -300,16 +300,16 @@ namespace FEAT::Assembly
     template<typename Vtxs_>
     void add_face_vertices(const Vtxs_& face_vertices)
     {
-      for(int i = 0; i < verts_per_face; ++i)
+      for(std::size_t i = 0; i < std::size_t(verts_per_face); ++i)
       {
         _shape_vertices.push_back(face_vertices[i]);
       }
 
       const IndexType num_indx = _shape_index_tmp.size();
       _shape_index_tmp.emplace_back();
-      for(int i = 0; i < verts_per_face; ++i)
+      for(IndexType i = 0; i < IndexType(verts_per_face); ++i)
       {
-        _shape_index_tmp.back()[i] = num_indx*IndexType(verts_per_face) + IndexType(i);
+        _shape_index_tmp.back()[int(i)] = num_indx*verts_per_face + IndexType(i);
       }
     }
 
@@ -322,7 +322,7 @@ namespace FEAT::Assembly
       _shape_index_tmp.emplace_back();
       for(int i = 0; i < verts_per_face; ++i)
       {
-        _shape_index_tmp.back()[i] = IndexType(vert_idx[i]);
+        _shape_index_tmp.back()[i] = IndexType(vert_idx[std::size_t(i)]);
       }
     }
 
@@ -396,9 +396,9 @@ namespace FEAT::Assembly
           DataType face_volume = EvalHelper::volume(coefficients);
 
           // our cubature points
-          std::vector<CoordVecType> points(_cubature_rule.get_num_points());
+          std::vector<CoordVecType> points(std::size_t(_cubature_rule.get_num_points()));
           // our weights
-          std::vector<DataType> weights(_cubature_rule.get_num_points());
+          std::vector<DataType> weights(std::size_t(_cubature_rule.get_num_points()));
           // averaged normal (we assume we have planar normals, in theory this should also be a vector)
           NormalVecType normal(DataType(0));
 

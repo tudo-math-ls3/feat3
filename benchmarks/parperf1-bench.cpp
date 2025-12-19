@@ -293,8 +293,8 @@ LAFEM::DenseVector<DT_, IT_> create_vector_init(int rank, Index mx, Index my, In
 
   DT_* val = vector.elements();
 
-  const Index jy = rank / mx;
-  const Index jx = rank % mx;
+  const Index jy = Index(rank) / mx;
+  const Index jx = Index(rank) % mx;
   const DT_ imnx = DT_(1) / DT_(mx*lx+1);
   const DT_ imny = DT_(1) / DT_(my*ly+1);
 

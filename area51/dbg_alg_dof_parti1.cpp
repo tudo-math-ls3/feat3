@@ -302,7 +302,7 @@ int main(int argc, char* argv[])
   Assembly::SymbolicAssembler::assemble_matrix_std2(matrix.local().at<0,1>(), space_1, space_2);
   Assembly::SymbolicAssembler::assemble_matrix_std2(matrix.local().at<1,0>(), space_2, space_1);
 
-  Random rng(17 + 7*comm.rank());
+  Random rng(std::size_t(17 + 7*comm.rank()));
   matrix.local().format(rng, 1.0, 9.0);
 
   //matrix.local().at<0,0>().format(0.11);

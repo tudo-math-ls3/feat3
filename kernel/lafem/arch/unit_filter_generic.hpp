@@ -66,7 +66,7 @@ namespace FEAT
           for(IT_ j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
           {
             for(int l(0); l < block_width; ++l)
-              mat[j*block_width + l] = DT_(0);
+              mat[Index(int(j)*block_width + l)] = DT_(0);
           }
         }
       }

@@ -163,7 +163,7 @@ namespace FEAT::Geometry
       {
         centroid += vertex;
       }
-      return is_internal_vertex((1.0 / entity.coords.size()) * centroid);
+      return is_internal_vertex((1.0 / Real(entity.coords.size())) * centroid);
     }
 
     /// Deduplicates the given vector, using Comp for comparisons.
@@ -428,7 +428,7 @@ namespace FEAT::Geometry
         {
           vertex[j] = 0.5 * (Shape::ReferenceCell<Shape_>::template vertex<Real>(i, j) + 1.0);
         }
-        vertices[i] = vertex;
+        vertices[std::size_t(i)] = vertex;
       }
 
       return vertices;
@@ -832,7 +832,7 @@ namespace FEAT::Geometry
         mappings_n[type] = {};
       }
 
-      return mappings_n.at(type)[orientation];
+      return mappings_n.at(type)[std::size_t(orientation)];
     }
 
     template<int n_>
@@ -1098,7 +1098,7 @@ namespace FEAT::Geometry
         {
           RawEntity<DimShape, num_coords> embedded;
 
-          for(int i(0); i < num_vertices; i++)
+          for(std::size_t i(0); i < std::size_t(num_vertices); i++)
           {
             embedded.coords[i] = Embedder::embed(parent_index, entity.coords[i]);
           }
@@ -1136,11 +1136,11 @@ namespace FEAT::Geometry
 
         auto& entries = this->template entries<0>();
 
-        for(int vertex(0); vertex < num_vertices; vertex++)
+        for(std::size_t vertex(0); vertex < std::size_t(num_vertices); vertex++)
         {
           RawEntity<Shape::Vertex, num_coords> entity;
           entity.coords[0] = vertices[vertex];
-          entries.emplace_back(entity, EntityReference{EntitySource::ParentTopology, static_cast<Index>(vertex), 0, 0});
+          entries.emplace_back(entity, EntityReference{EntitySource::ParentTopology, Index(vertex), 0, 0});
         }
       }
       else
@@ -1158,7 +1158,7 @@ namespace FEAT::Geometry
 
           for(int vertex(0); vertex < num_vertices; vertex++)
           {
-            entity.coords[vertex] = vertices[FaceMapping::map(face, vertex)];
+            entity.coords[std::size_t(vertex)] = vertices[std::size_t(FaceMapping::map(face, vertex))];
           }
           entries.emplace_back(entity, EntityReference{EntitySource::ParentTopology, static_cast<Index>(face), 0, 0});
         }
@@ -1544,7 +1544,7 @@ namespace FEAT::Geometry
     Index _find_vertex(const std::vector<Tiny::Vector<Real, n_>>& vertices, const Tiny::Vector<Real, n_>& vertex)
     {
       auto pred = [&](auto v) { return Intern::is_same_vertex(vertex, v); };
-      return std::distance(vertices.begin(), std::find_if(vertices.begin(), vertices.end(), pred));
+      return Index(std::distance(vertices.begin(), std::find_if(vertices.begin(), vertices.end(), pred)));
     }
 
     /// dim-based accessor for type adjustment arrays
@@ -1589,7 +1589,7 @@ namespace FEAT::Geometry
         auto& vertex_refs = topo.template get_references<0>();
         for(int i(0); i < num_entities; i++)
         {
-          vertex_refs[i] = search_space.search_vertex(raw_entity.coords[i]);
+          vertex_refs[std::size_t(i)] = search_space.search_vertex(raw_entity.coords[i]);
         }
       }
       else
@@ -1597,7 +1597,7 @@ namespace FEAT::Geometry
         auto& refs = topo.template get_references<dim_>();
         for(int i(0); i < num_entities; i++)
         {
-          refs[i] = search_space.search(raw_entity.template face<dim_>(i));
+          refs[std::size_t(i)] = search_space.search(raw_entity.template face<dim_>(i));
         }
 
         _build_topology<TemplateShape_, TopologyShape_, dim_ - 1>(raw_entity, search_space, topo);
@@ -1739,7 +1739,7 @@ namespace FEAT::Geometry
           std::array<VertexType, num_vertices> local = {};
 
           const auto& local_refs = local_topo.template get_references<0>();
-          for(int i(0); i < num_vertices; i++)
+          for(std::size_t i(0); i < std::size_t(num_vertices); i++)
           {
             local[i] =
               Intern::orient_vertex<TemplateShape_>(local_search_space.vertex_by_reference(local_refs[i]), orientation);
@@ -1752,7 +1752,7 @@ namespace FEAT::Geometry
             std::array<VertexType, num_vertices> oriented = {};
 
             const auto& oriented_refs = oriented_topo.template get_references<0>();
-            for(int i(0); i < num_vertices; i++)
+            for(std::size_t i(0); i < std::size_t(num_vertices); i++)
             {
               oriented[i] = oriented_search_space.vertex_by_reference(oriented_refs[i]);
             }
@@ -1949,7 +1949,7 @@ namespace FEAT::Geometry
         {
           if(closest_marking.is_vertex_marked(i) && !type_marking.is_vertex_marked(i))
           {
-            adjustment[i] = 1;
+            adjustment[std::size_t(i)] = 1;
           }
         }
       }

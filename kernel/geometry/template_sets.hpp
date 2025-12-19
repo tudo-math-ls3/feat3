@@ -64,7 +64,7 @@ namespace FEAT::Geometry
           break;
         }
 
-        Index cell = std::distance(worklist.begin(), it);
+        Index cell = Index(std::distance(worklist.begin(), it));
 
         RefinementFieldTuple<std::uint64_t, num_vertices> levels =
           result.get_tuple(v_at_c[cell]);
@@ -93,7 +93,7 @@ namespace FEAT::Geometry
 
           // Invalid type found. Adjust levels
           auto& adjustment = templates.template type_adjustment<dim>(type.to_number());
-          for(int i(0); i < num_vertices; i++)
+          for(std::size_t i(0); i < std::size_t(num_vertices); i++)
           {
             result[v_at_c[cell][i]] += adjustment[i];
             levels[i] += adjustment[i];
@@ -196,7 +196,7 @@ namespace FEAT::Geometry
           break;
         }
 
-        Index cell = std::distance(worklist.begin(), it);
+        Index cell = Index(std::distance(worklist.begin(), it));
 
         RefinementFieldTuple<IsolatedPointVertexMarking, num_vertices> levels =
           result.get_tuple(v_at_c[cell]);

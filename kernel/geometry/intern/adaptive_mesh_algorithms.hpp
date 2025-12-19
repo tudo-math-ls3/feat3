@@ -188,27 +188,30 @@ namespace FEAT::Geometry::Intern
         vertices.push_back(key);
       }
     }
+
     void operator()(Intern::EdgeKey key)
     {
       if(storage[key].layer == layer || storage[key].type.is_zero_refinement())
       {
         edges.push_back(key);
       }
-    };
+    }
+
     void operator()(Intern::FaceKey key)
     {
       if(storage[key].layer == layer || storage[key].type.is_zero_refinement())
       {
         faces.push_back(key);
       }
-    };
+    }
+
     void operator()(Intern::CellKey key)
     {
       if(storage[key].layer == layer || storage[key].type.is_zero_refinement())
       {
         cells.push_back(key);
       }
-    };
+    }
 
     const MeshStorage_& storage;
     Layer layer;

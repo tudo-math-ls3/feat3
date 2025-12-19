@@ -520,7 +520,7 @@ namespace DFG95
 
       // append memory info
       s += String("\nMemory Statistics:").pad_back(padlen+15) + String("Sum").pad_back(29)
-        + String("Min").pad_back(29) + String("Max").pad_back(22) + "Balance\n";;
+        + String("Min").pad_back(29) + String("Max").pad_back(22) + "Balance\n";
       s += format_memuse("Peak Physical Memory", Bytes::peak_p);
       s += format_memuse("Peak Virtual Memory", Bytes::peak_v);
       s += format_memuse("Mesh-Node Size", Bytes::mesh);
@@ -1011,7 +1011,7 @@ int main(int argc, char* argv[])
   comm.print(String("Maximum OpenMP Threads").pad_back(padlen, '.') + ": " + stringify(omp_get_max_threads()));
 #endif
 
-  comm.print(String("Total CPU Cores").pad_back(padlen, '.') + ": " + stringify(std::size_t(num_threads) * comm.size()));
+  comm.print(String("Total CPU Cores").pad_back(padlen, '.') + ": " + stringify(std::size_t(num_threads * comm.size())));
 
   if(args.check("backend") > 0)
   {
@@ -1311,7 +1311,7 @@ int main(int argc, char* argv[])
     if(num_threads > 1)
     {
       domain.at(i)->domain_asm.set_threading_strategy(Assembly::ThreadingStrategy::layered);
-      domain.at(i)->domain_asm.set_max_worker_threads(num_threads);
+      domain.at(i)->domain_asm.set_max_worker_threads(std::size_t(num_threads));
     }
     domain.at(i)->domain_asm.compile_all_elements();
   }

@@ -29,9 +29,9 @@ namespace FEAT::Geometry
 
       for(int current_bit = 0; current_bit < num_bits; current_bit++)
       {
-        if(bits[current_bit])
+        if(bits[std::size_t(current_bit)])
         {
-          int mapped_bit = CongruencyMapping::map(orientation, current_bit);
+          std::size_t mapped_bit = std::size_t(CongruencyMapping::map(orientation, current_bit));
           result[mapped_bit] = true;
         }
       }
@@ -145,7 +145,7 @@ namespace FEAT::Geometry
     {
       for(int i = 0; i < num_vertices; i++)
       {
-        _type[i] = (markings[i] > 0);
+        _type[std::size_t(i)] = (markings[i] > 0);
       }
     }
 
@@ -171,7 +171,7 @@ namespace FEAT::Geometry
       for(int i(0); i < num_verts; i++)
       {
         auto vertex = static_cast<Index>(Mapping::map(face, i));
-        result[i] = _type[vertex];
+        result[std::size_t(i)] = _type[vertex];
       }
 
       return StandardRefinementType<FaceShape>(result);

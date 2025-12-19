@@ -258,7 +258,7 @@ int main(int argc, char* argv[])
   Assembly::SymbolicAssembler::assemble_matrix_std1(matrix.local(), space_1);
 
 
-  Random rng(17 + 7*comm.rank());
+  Random rng(std::size_t(17 + 7*comm.rank()));
   matrix.local().format(rng, 1.0, 9.0);
   /*{
     auto* val = matrix.local().val();

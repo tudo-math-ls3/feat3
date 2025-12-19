@@ -348,7 +348,7 @@ namespace FEAT
       {
         for(int i(0); i < n_; ++i)
         {
-          v[i] = ValueType(x[i]);
+          v[i] = ValueType(x[std::size_t(i)]);
         }
         return *this;
       }

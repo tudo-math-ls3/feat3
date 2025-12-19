@@ -255,7 +255,7 @@ int main(int argc, char* argv[])
   viargs.pop_front();
   viargs.pop_front();
 
-  Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);
+  Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory((Index(level)));
 
   MeshType mesh(mesh_factory);
 
@@ -328,10 +328,10 @@ int main(int argc, char* argv[])
     std::cout << stringify_fp_fix(time_5.value, 6, 12);
     std::cout << stringify_fp_fix(time_6.value, 6, 12);
     std::cout << "   " << std::hex << crc_dom_ptr;
-    std::cout << "   " << std::hex << crc_img_idx;;
+    std::cout << "   " << std::hex << crc_img_idx;
     std::cout << "   " << std::hex << crc_row_ptr;
-    std::cout << "   " << std::hex << crc_col_idx;;
-    std::cout << std::endl;
+    std::cout << "   " << std::hex << crc_col_idx;
+    std::cout << "\n";
 
     time_1.clear();
     time_2.clear();
@@ -342,7 +342,7 @@ int main(int argc, char* argv[])
   }
 
   MemoryUsage mem_use;
-  std::cout /*<< "Peak Physical Memory: "*/ << "\n" << mem_use.get_formatted_memory_usage() << std::endl;
+  std::cout /*<< "Peak Physical Memory: "*/ << "\n" << mem_use.get_formatted_memory_usage() << "\n";
 
   return 0;
 }

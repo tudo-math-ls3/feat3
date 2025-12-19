@@ -28,10 +28,10 @@ namespace FEAT
           FEAT_PRAGMA_OMP(parallel for)
           for(Index i = 0; i < ue; ++i)
           {
-            for(int j = 0 ; j < block_size ; ++j)
+            for(Index j = 0 ; j < Index(block_size) ; ++j)
             {
-              if(!Math::isnan(sv_elements[block_size * i + Index(j)]))
-                v[block_size * sv_indices[i] + j] = sv_elements[block_size * i + Index(j)];
+              if(!Math::isnan(sv_elements[Index(block_size) * i + j]))
+                v[Index(block_size) * sv_indices[i] + j] = sv_elements[Index(block_size) * i + Index(j)];
             }
           }
         }
@@ -40,9 +40,9 @@ namespace FEAT
           FEAT_PRAGMA_OMP(parallel for)
           for(Index i = 0; i < ue; ++i)
           {
-            for(int j = 0 ; j < block_size ; ++j)
+            for(Index j = 0 ; j < Index(block_size) ; ++j)
             {
-              v[block_size * sv_indices[i] + j] = sv_elements[block_size * i + Index(j)];
+              v[Index(block_size) * sv_indices[i] + j] = sv_elements[Index(block_size) * i + j];
             }
           }
         }
@@ -56,10 +56,10 @@ namespace FEAT
           FEAT_PRAGMA_OMP(parallel for)
           for(Index i = 0; i < ue; ++i)
           {
-            for(int j = 0 ; j < block_size ; ++j)
+            for(Index j = 0 ; j < Index(block_size) ; ++j)
             {
-              if(!Math::isnan(sv_elements[block_size * i + Index(j)]))
-                v[block_size * sv_indices[i] + j] = DT_(0);
+              if(!Math::isnan(sv_elements[Index(block_size) * i + j]))
+                v[Index(block_size) * sv_indices[i] + j] = DT_(0);
             }
           }
         }
@@ -68,8 +68,8 @@ namespace FEAT
           FEAT_PRAGMA_OMP(parallel for)
           for(Index i = 0; i < ue; ++i)
           {
-            for(int j = 0 ; j < block_size ; ++j)
-              v[block_size * sv_indices[i] + j] = DT_(0);
+            for(Index j = 0 ; j < Index(block_size) ; ++j)
+              v[Index(block_size) * sv_indices[i] + j] = DT_(0);
           }
         }
       }
@@ -82,7 +82,7 @@ namespace FEAT
         for(Index i = 0; i < ue; ++i)
         {
           const IT_ ix(sv_indices[i]);
-          const DT_* const vx(&sv_elements[i*block_height]);
+          const DT_* const vx(&sv_elements[i*Index(block_height)]);
 
           // replace by unit row
           for(IT_ j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
@@ -94,9 +94,9 @@ namespace FEAT
               if(ign_nans && Math::isnan(vx[k]))
                 continue;
               for(int l(0); l < block_width; ++l)
-                mat[j*block_height*block_width + k*block_width + l] = DT_(0);
+                mat[Index(j)*Index(block_height*block_width) + Index(k*block_width) + Index(l)] = DT_(0);
               if((col_idx[j] == ix) && (k < block_width))
-                mat[j*block_height*block_width + k*block_width + k] = DT_(1);
+                mat[Index(j)*Index(block_height*block_width) + Index(k*block_width + k)] = DT_(1);
             }
           }
         }
@@ -110,7 +110,7 @@ namespace FEAT
         for(Index i = 0; i < ue; ++i)
         {
           const IT_ ix(sv_indices[i]);
-          const DT_* const vx(&sv_elements[i*block_height]);
+          const DT_* const vx(&sv_elements[i*Index(block_height)]);
 
           // replace by unit row
           for(IT_ j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
@@ -122,7 +122,7 @@ namespace FEAT
               if(ign_nans && Math::isnan(vx[k]))
                 continue;
               for(int l(0); l < block_width; ++l)
-                mat[j*block_height*block_width + k*block_width + l] = DT_(0);
+                mat[Index(j)*Index(block_height*block_width) + Index(k*block_width + l)] = DT_(0);
             }
           }
         }
@@ -136,7 +136,7 @@ namespace FEAT
         for(Index i = 0; i < ue; ++i)
         {
           const IT_ ix(sv_indices[i]);
-          const DT_* const vx(&sv_elements[i*block_height]);
+          const DT_* const vx(&sv_elements[i*Index(block_height)]);
 
           // replace by unit row
           for(IT_ j(row_ptr[ix]); j < row_ptr[ix + 1]; ++j)
@@ -146,7 +146,7 @@ namespace FEAT
             {
               for(int l(0); l < block_width; ++l)
               {
-                mat_a[j*block_height*block_width + k*block_width + l] = vx[k] * mat_m[j*block_height*block_width + k*block_width + l];
+                mat_a[Index(j)*Index(block_height*block_width) + Index(k*block_width + l)] = vx[Index(k)] * mat_m[Index(j)*Index(block_height*block_width) + Index(k*block_width + l)];
               }
             }
           }
