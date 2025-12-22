@@ -168,7 +168,7 @@ namespace FEAT::Assembly
       for(int k = 0; k < domain_dim; ++k)
       {
         mesh_bb[0][k] = Math::Limits<DataType>::max();
-        mesh_bb[1][k] = Math::Limits<DataType>::min();
+        mesh_bb[1][k] = Math::Limits<DataType>::lowest();
       }
       {
         for(const auto* verts = vtx_set.begin(); verts != vtx_set.end(); ++verts)
