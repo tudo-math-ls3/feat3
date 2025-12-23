@@ -182,7 +182,7 @@ namespace Gendie
         {
           gamma_dot = Math::clamp(gamma_dot, min_shear, max_shear);
           return aT * a * visco_scale * ((c-DT2_(1.0)) / d) *
-                  Math::pow( DT2_(1.0) + Math::pow(b * gamma_dot, d), ((c - DT2_(1.0) - d) / d)) *
+                  Math::pow( DT2_(1.0) + Math::pow(b * gamma_dot * aT, d), ((c - DT2_(1.0) - d) / d)) *
                   d * b * aT * Math::pow(b * gamma_dot * aT, d-DT2_(1.0));
         };
       }
@@ -191,7 +191,7 @@ namespace Gendie
         return [a=DT2_(this->data[0]), b=DT2_(this->data[1]), c=DT2_(this->data[2]), d=DT2_(this->data[3]), visco_scale=DT2_(visco_scaling_factor)](DT2_ gamma_dot, DT2_ aT) -> DT2_
         {
           return aT * a * visco_scale * ((c-DT2_(1.0)) / d) *
-                  Math::pow( DT2_(1.0) + Math::pow(b * gamma_dot, d), ((c - DT2_(1.0) - d) / d)) *
+                  Math::pow( DT2_(1.0) + Math::pow(b * gamma_dot * aT, d), ((c - DT2_(1.0) - d) / d)) *
                   d * b * aT * Math::pow(b * gamma_dot * aT, d-DT2_(1.0));
         };
       }
