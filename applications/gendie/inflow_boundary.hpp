@@ -177,6 +177,7 @@ namespace Gendie
     InflowGeometry inflow_geometry;
     InflowType inflow_type;
     int flow_id;
+    bool projection_warning;
     // typedef std::function<bool(const VecType&)> HitTestFunc;
     typedef Analytic::SimplifiedLambdaVectorFunction3D<std::function<VecType(VecType)>> DirichletBoundaryFunc;
     // typedef std::function<VecType(const VecType&)> DirichletBoundaryFunc;
@@ -220,7 +221,7 @@ namespace Gendie
     }
   public:
 
-    InflowGeometryHandler(const FEAT::PropertyMap* prop, const VecType& bb_min, const VecType& bb_max, int id, InflowType inflow_type_ = InflowType::best, InflowGeometry in_geo = InflowGeometry::unkown) : inflow_geometry(in_geo), inflow_type(inflow_type_), flow_id(id)
+    InflowGeometryHandler(const FEAT::PropertyMap* prop, const VecType& bb_min, const VecType& bb_max, int id, InflowType inflow_type_ = InflowType::best, InflowGeometry in_geo = InflowGeometry::unkown) : inflow_geometry(in_geo), inflow_type(inflow_type_), flow_id(id), projection_warning(false)
     {
       {
         auto [val, success] = prop->query("center");
@@ -237,6 +238,9 @@ namespace Gendie
         XASSERTM(success, "Could not parse flow normal");
         flow_normal = _parse_vector(val);
         flow_normal.normalize();
+      }
+      {
+        projection_warning = Gendie::check_for_config_option(prop->query("projection_warning"), false);
       }
       {
         // by which factor we shift our center into normal direction
@@ -269,7 +273,7 @@ namespace Gendie
 
         }
         // print warning if the linear_factor is larger than 1%
-        if(Math::abs(linear_factor) >= DataType(0.01))
+        if(this->projection_warning && Math::abs(linear_factor) >= DataType(0.01))
           std::printf("WARNING: Projection factor %f larger than 0.01\n", double(linear_factor));
         // and now project
         center = center + linear_factor * flow_normal;
@@ -484,11 +488,13 @@ namespace Gendie
         auto [val, success] = prop->query("midpoint_a"); //placeholder for boundary name
         XASSERTM(success, "Could not parse midpoint_a: ");
         a = this->_parse_vector(val);
+        a = Intern::project_vector(a, this->flow_normal, this->d_plane);
       }
       {
         auto [val, success] = prop->query("midpoint_b"); //placeholder for boundary name
         XASSERTM(success, "Could not parse midpoint_b: ");
         b = this->_parse_vector(val);
+        b = Intern::project_vector(b, this->flow_normal, this->d_plane);
       }
     }
 
@@ -536,12 +542,10 @@ namespace Gendie
           {
             const VecType proj = Intern::project_vector(point, _flow_normal, d_p);
             const VecType dC = proj - _center;
-            const DataType aux1 = Math::sqr(aC.norm_euclid_sqr()) - Math::sqr(Tiny::dot(dC, aC));
-            const DataType aux2 = Math::sqr(bC.norm_euclid_sqr()) - Math::sqr(Tiny::dot(dC, bC));
+            const DataType aux1 = Math::max(DataType(0), Math::sqr(aC.norm_euclid_sqr()) - Math::sqr(Tiny::dot(dC, aC)));
+            const DataType aux2 = Math::max(DataType(0), Math::sqr(bC.norm_euclid_sqr()) - Math::sqr(Tiny::dot(dC, bC)));
             const DataType daux = aux1 * aux2;
-            return (((Math::sqr(aC.norm_euclid_sqr()) - Math::sqr(Tiny::dot(dC, aC)) > DataType(0))
-                && (Math::sqr(bC.norm_euclid_sqr()) - Math::sqr(Tiny::dot(dC, bC)) > DataType(0))) ?
-                  daux * scale : DataType(0)) * _flow_normal ;
+            return (daux * scale) * _flow_normal ;
           });
         }
         default:
@@ -627,15 +631,16 @@ namespace Gendie
           DataType scale = (DataType(8) / DataType(3)) * aC.norm_euclid() * bC.norm_euclid()
                                   + DataType(2) * Math::pi<DataType>() * Math::sqr(radius);
           scale = vol_flow / scale;
-          return DirichletBoundaryFunc([scale, _center=this->center, _flow_normal=this->flow_normal, d_p=this->d_plane, _a=this->a, radi=DataType(1)/this->radius, bC]
+          return DirichletBoundaryFunc([scale, _center=this->center, _flow_normal=this->flow_normal, d_p=this->d_plane, _a=this->a, radi=DataType(1)/this->radius, aC, bC]
                   (const VecType& point) -> VecType
           {
             const VecType proj = Intern::project_vector(point, _flow_normal, d_p);
             const VecType dC = proj - _center;
-            const DataType aux =  DataType(1) - Math::sqr(Tiny::dot(dC, bC))/Math::sqr(bC.norm_euclid_sqr());
+            const DataType aux =  Math::max(DataType(0), DataType(1) - Math::sqr(Tiny::dot(dC, bC))/Math::sqr(bC.norm_euclid_sqr()));
             const DataType aux2 = Math::max(DataType(0), DataType(1) - (proj-_a).norm_euclid_sqr()*Math::sqr(radi))
                                   + Math::max(DataType(0), DataType(1) - (proj-DataType(2)*_center+_a).norm_euclid_sqr() * Math::sqr(radi));
-            return (Math::max(aux, aux2) *scale) * _flow_normal;
+            const bool outside_rec = (Math::sqr(aC.norm_euclid_sqr()) - Math::sqr(Tiny::dot(dC, aC))) <= DataType(0);
+            return ((outside_rec ? aux2 : aux) *scale) * _flow_normal;
           });
         }
         default:
