@@ -620,12 +620,12 @@ namespace FEAT
     bool VoxelMap::_check_point(i64 xidx, i64 yidx, i64 zidx) const
     {
       if((xidx < i64(0)) || (i64(_num_points[0]) <= xidx))
-        return Real(_out_of_bounds_value);
+        return _out_of_bounds_value;
       if((yidx < i64(0)) || (i64(_num_points[1]) <= yidx))
-        return Real(_out_of_bounds_value);
+        return _out_of_bounds_value;
       if((zidx < i64(0)) || (i64(_num_points[2]) <= zidx))
-        return Real(_out_of_bounds_value);
-      return ((this->_voxel_map[zidx*this->_stride_plane + yidx*this->_stride_line + (xidx>>3)] >> (xidx & 7)) & 1u) != 0u;
+        return _out_of_bounds_value;
+      return ((this->_voxel_map[u64(zidx)*this->_stride_plane + u64(yidx)*this->_stride_line + u64(xidx>>3)] >> (xidx & 7)) & 1) != 0;
     }
 
     bool VoxelMap::_check_point_nearest(const std::array<i64, 1>& p) const
@@ -698,22 +698,22 @@ namespace FEAT
 
     Real VoxelMap::_sample_point_1d_x(i64 px, i64 xidx, i64 yidx, i64 zidx) const
     {
-      Real v0 = Real(check_point(xidx, yidx, zidx));
-      Real v1 = Real(check_point(xidx+1, yidx, zidx));
+      Real v0 = Real(_check_point(xidx, yidx, zidx));
+      Real v1 = Real(_check_point(xidx+1, yidx, zidx));
       return  v0 + (v1 - v0) * _calc_sample_rate(px, xidx, 0u);
     }
 
     Real VoxelMap::_sample_point_1d_y(i64 py, i64 xidx, i64 yidx, i64 zidx) const
     {
-      Real v0 = Real(check_point(xidx, yidx, zidx));
-      Real v1 = Real(check_point(xidx, yidx+1, zidx));
+      Real v0 = Real(_check_point(xidx, yidx, zidx));
+      Real v1 = Real(_check_point(xidx, yidx+1, zidx));
       return  v0 + (v1 - v0) * _calc_sample_rate(py, yidx, 1u);
     }
 
     Real VoxelMap::_sample_point_1d_z(i64 pz, i64 xidx, i64 yidx, i64 zidx) const
     {
-      Real v0 = Real(check_point(xidx, yidx, zidx));
-      Real v1 = Real(check_point(xidx, yidx, zidx+1));
+      Real v0 = Real(_check_point(xidx, yidx, zidx));
+      Real v1 = Real(_check_point(xidx, yidx, zidx+1));
       return  v0 + (v1 - v0) * _calc_sample_rate(pz, zidx, 2u);
     }
 
@@ -1163,15 +1163,18 @@ namespace FEAT
       box_min[2u] = box_min_z;
       box_max[2u] = box_max_z;
 
+      const i64 ih = i64(height);
+      const i64 jw = i64(width);
+
       // okay, let's loop over all domain nodes
-      for(Index i(0); i < height; ++i)
+      for(i64 i(0); i < ih; ++i)
       {
-        box_min[1u] = i64(_bbox_min[1] + (i * (_bbox_max[1] - _bbox_min[1])) / height);
-        box_max[1u] = i64(_bbox_min[1] + ((i+1) * (_bbox_max[1] - _bbox_min[1])) / height);
-        for(Index j(0); j < width; ++j)
+        box_min[1u] = i64(_bbox_min[1] + (i * (_bbox_max[1] - _bbox_min[1])) / ih);
+        box_max[1u] = i64(_bbox_min[1] + ((i+1) * (_bbox_max[1] - _bbox_min[1])) / ih);
+        for(i64 j(0); j < jw; ++j)
         {
-          box_min[0u] = i64(_bbox_min[0] + (j * (_bbox_max[0] - _bbox_min[0])) / width);
-          box_max[0u] = i64(_bbox_min[0] + ((j+1) * (_bbox_max[0] - _bbox_min[0])) / width);
+          box_min[0u] = i64(_bbox_min[0] + (j * (_bbox_max[0] - _bbox_min[0])) / jw);
+          box_max[0u] = i64(_bbox_min[0] + ((j+1) * (_bbox_max[0] - _bbox_min[0])) / jw);
           Real w = _sample_box(box_min, box_max) * 255.0;
           oline[j] = (w <= 0.0 ? 0 : (w >= 255.0 ? 255 : u8(w)));
         }
