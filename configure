@@ -43,6 +43,8 @@ class FeatConfig:
     self.buildid = []
     # Set of cmake cache variables
     self.cmake_cache = {}
+    # List of CMake flags in addition to cache values
+    self.additional_cmake_flags = []
     # List of C compiler flags
     self.c_flags = []
     # List of C++ compiler flags
@@ -119,6 +121,14 @@ class FeatConfig:
       else:
         self.c_flags.append(flag)
 
+  def add_cmake_flags(self, *args):
+    """Add CMake flags. Warns on duplicate flags"""
+    for flag in args:
+      if flag in self.additional_cmake_flags:
+        warning("CMake flag", flag, "is set twice")
+      else:
+        self.additional_cmake_flags.append(flag)
+
   def add_cxx_flags(self, *args):
     """Add CXX compiler flags. Warns on duplicate flags"""
     for flag in args:
@@ -153,7 +163,7 @@ class FeatConfig:
       else:
         flags.append(f"-D{var}={entry['value']}")
 
-    return flags
+    return flags + self.additional_cmake_flags
 
 
   def cmake_flags_str(self):
@@ -359,6 +369,9 @@ parser.add_argument("--cuda-verbose", "--cuda_verbose", action="store_true", hel
 
 parser.add_argument("--cxx", help=
 "override default C++ compiler binary with absolute path to binary. This option does not replace the compiler tag in the build-id")
+
+parser.add_argument("--debug-find-package", action="store_true", help=
+"Print detailed information about paths considered by find_package during configuring")
 
 parser.add_argument("--eickt", action="store_true", help=
 "explicitely instantiate common kernel templates")
@@ -572,6 +585,9 @@ if args.cxx:
   if not os.path.exists(args.compiler_cxx):
     error("Could not find specified C++ compiler", args.compiler_cxx)
   config.set_compiler_cxx(args.compiler_cxx)
+
+if args.debug_find_package:
+  config.add_cmake_flags("--debug-find")
 
 if args.eickt:
   config.cache_entry("FEAT_EICKT", "ON", "BOOL")
