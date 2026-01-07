@@ -141,7 +141,7 @@ public:
 
   void run_test_parallel() const
   {
-    static const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    static const DT_ tol = TestSystem::tol<DT_>();
 
     const Dist::Comm comm = Dist::Comm::world();
 
@@ -285,7 +285,7 @@ public:
 
   void run_test_serial() const
   {
-    const DataType tol = Math::pow(Math::eps<DataType>(), 0.6);
+    const DataType tol = TestSystem::tol<DataType>();
 
     // create a pointstar factory
     LAFEM::PointstarFactoryFD<DataType, IndexType> psf(17);

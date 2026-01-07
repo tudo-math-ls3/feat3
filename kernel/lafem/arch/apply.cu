@@ -235,14 +235,21 @@ void Apply::csr_cuda(DT_ * r, const DT_ a, const DT_ * const x, const DT_ b, con
     MemoryPool::copy(r, y, (transposed?columns:rows));
   }
 
+  float alpha_tmp = a;
+  float beta_tmp = b;
+
+  // Due to cuda requirements alpha and beta need to be float if this function is called with Half
+  void* const alpha_ptr = dt == CUDA_R_16F ? (void*)&alpha_tmp : (void*)&a;
+  void* const beta_ptr = dt == CUDA_R_16F ? (void*)&beta_tmp : (void*)&b;
+
   size_t buffer_size(0);
-  status = cusparseSpMV_bufferSize(Util::Intern::cusparse_handle, trans, &a, descr, dx, &b, dr, ct, CUSPARSE_SPMV_CSR_ALG1, &buffer_size);
+  status = cusparseSpMV_bufferSize(Util::Intern::cusparse_handle, trans, alpha_ptr, descr, dx, beta_ptr, dr, ct, CUSPARSE_SPMV_CSR_ALG1, &buffer_size);
   if (status != CUSPARSE_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "cusparseSpMV_bufferSize failed with status code: " + stringify(cusparseGetErrorString(status)));
 
   void* buffer = Util::cuda_get_static_memory(buffer_size);
 
-  status = cusparseSpMV(Util::Intern::cusparse_handle, trans, &a, descr, dx, &b, dr, ct, CUSPARSE_SPMV_CSR_ALG1, buffer);
+  status = cusparseSpMV(Util::Intern::cusparse_handle, trans, alpha_ptr, descr, dx, beta_ptr, dr, ct, CUSPARSE_SPMV_CSR_ALG1, buffer);
   if (status != CUSPARSE_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "cusparseSpMV failed with status code: " + stringify(cusparseGetErrorString(status)));
 

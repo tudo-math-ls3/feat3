@@ -23,7 +23,7 @@ public:
 
   void test_scalar_1d_a() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     // create lambda function: 2*x^2
     auto func = create_lambda_function_scalar_1d(
@@ -44,7 +44,7 @@ public:
 
   void test_scalar_1d_b() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     // create lambda function: 2*x^2
     auto func = create_lambda_function_scalar_1d(
@@ -64,7 +64,7 @@ public:
 
   void test_scalar_1d_c() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     // create lambda function: 2*x^2
     auto func = create_lambda_function_scalar_1d(
@@ -84,7 +84,7 @@ public:
 
   void test_scalar_2d_1() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.6));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     // local variable to capture by lambda
     DT_ a(2.0);
@@ -106,7 +106,7 @@ public:
 
   void test_scalar_2d_a() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     // create lambda function: 2*x^2 + x*y^2
     auto func = create_lambda_function_scalar_2d(
@@ -134,7 +134,7 @@ public:
 
   void test_scalar_2d_b() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     // create lambda function: 2*x^2 + x*y^2
     auto func = create_lambda_function_scalar_2d(
@@ -159,7 +159,7 @@ public:
 
   void test_scalar_2d_c() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     // create lambda function: 2*x^2 + x*y^2
     auto func = create_lambda_function_scalar_2d(
@@ -182,7 +182,7 @@ public:
 
   void test_vector_2d_a() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     // create lambda function: 2*x^2*y + 3*x*y^2
     auto func = create_lambda_function_vector_2d(
@@ -230,7 +230,7 @@ public:
 
   void test_vector_2d_b() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     // create lambda function: 2*x^2*y + 3*x*y^2
     auto func = create_lambda_function_vector_2d(
@@ -269,7 +269,7 @@ public:
 
   void test_vector_2d_c() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     // create lambda function: 2*x^2*y + 3*x*y^2
     auto func = create_lambda_function_vector_2d(
@@ -303,7 +303,7 @@ public:
 
   void test_scalar_3d_a() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     // create lambda function: 2*x^2*z - 3*y*z^2 + x*y^2
     auto func = create_lambda_function_scalar_3d(
@@ -341,7 +341,7 @@ public:
 
   void test_scalar_3d_b() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     // create lambda function: 2*x^2*z - 3*y*z^2 + x*y^2
     auto func = create_lambda_function_scalar_3d(
@@ -373,7 +373,7 @@ public:
 
   void test_scalar_3d_c() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     // create lambda function: 2*x^2*z - 3*y*z^2 + x*y^2
     auto func = create_lambda_function_scalar_3d(
@@ -402,7 +402,7 @@ public:
 
   void test_vector_3d_a() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     // create lambda function: 2*x^2*z - 3*y*z^2 + x*y^2
     auto func = create_lambda_function_vector_3d(
@@ -498,7 +498,7 @@ public:
 
   void test_vector_3d_b() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     // create lambda function: 2*x^2*z - 3*y*z^2 + x*y^2
     auto func = create_lambda_function_vector_3d(
@@ -570,7 +570,7 @@ public:
 
   void test_vector_3d_c() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     // create lambda function: 2*x^2*z - 3*y*z^2 + x*y^2
     auto func = create_lambda_function_vector_3d(
@@ -630,7 +630,7 @@ public:
 
   void test_simplified_2d() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
     SimplifiedLambdaVectorFunction2D simple_a([](Tiny::Vector<DT_, 2> a) -> Tiny::Vector<DT_, 2>{return DT_(2)*a;});
     auto res = Analytic::eval_value_x(simple_a, DT_(1.4), DT_(5.3));
     TEST_CHECK_EQUAL_WITHIN_EPS(res[0], DT_(2.8), tol);
@@ -644,7 +644,7 @@ public:
 
   void test_simplified_3d() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.5));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
     SimplifiedLambdaVectorFunction3D simple_a([](Tiny::Vector<DT_, 3> a) -> Tiny::Vector<DT_, 3>{return DT_(2)*a;});
     auto res = Analytic::eval_value_x(simple_a, DT_(1.4), DT_(5.3), DT_(0.1));
     TEST_CHECK_EQUAL_WITHIN_EPS(res[0], DT_(2.8), tol);

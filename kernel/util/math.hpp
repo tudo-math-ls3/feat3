@@ -1133,7 +1133,7 @@ namespace FEAT
 #ifdef FEAT_HAVE_HALFMATH
     inline bool isnormal(Half x)
     {
-      return ((__hisinf(x) || __hisnan(x)) && (__habs(x) >= CUDART_MIN_DENORM_FP16));
+      return !__hisinf(x) && !__hisnan(x) && (__habs(x) >= CUDART_MIN_DENORM_FP16);
     }
 #endif
 

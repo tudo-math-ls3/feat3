@@ -177,7 +177,7 @@ public:
 
   virtual void run() const override
   {
-    static const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    static const DT_ tol = TestSystem::tol<DT_>();
 
     const Dist::Comm comm = Dist::Comm::world();
 

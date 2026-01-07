@@ -193,13 +193,20 @@ void ProductMatMat::dsd_cuda(DT_ * r, const DT_ alpha, const DT_ beta, const DT_
 
   cusparseOperation_t trans = CUSPARSE_OPERATION_NON_TRANSPOSE;
   size_t buffer_size(0);
-  status = cusparseSpMM_bufferSize(Util::Intern::cusparse_handle, trans, trans, &alpha, descr_x, descr_y, &beta, descr_r, ct, CUSPARSE_SPMM_CSR_ALG2, &buffer_size);
+
+  float alpha_tmp = float(alpha);
+  float beta_tmp = float(beta);
+
+  void* const alpha_ptr = dt == CUDA_R_16F ? (void*)&alpha_tmp : (void*)&alpha;
+  void* const beta_ptr = dt == CUDA_R_16F ? (void*)&beta_tmp : (void*)&beta;
+
+  status = cusparseSpMM_bufferSize(Util::Intern::cusparse_handle, trans, trans, alpha_ptr, descr_x, descr_y, beta_ptr, descr_r, ct, CUSPARSE_SPMM_CSR_ALG2, &buffer_size);
   if (status != CUSPARSE_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "cusparsecsrmvex_buffersize failed with status code: " + stringify(cusparseGetErrorString(status)));
 
   void* buffer = Util::cuda_get_static_memory(buffer_size);
 
-  status = cusparseSpMM(Util::Intern::cusparse_handle, trans, trans, &alpha, descr_x, descr_y, &beta, descr_r, ct, CUSPARSE_SPMM_CSR_ALG2, buffer);
+  status = cusparseSpMM(Util::Intern::cusparse_handle, trans, trans, alpha_ptr, descr_x, descr_y, beta_ptr, descr_r, ct, CUSPARSE_SPMM_CSR_ALG2, buffer);
   if (status != CUSPARSE_STATUS_SUCCESS)
     throw InternalError(__func__, __FILE__, __LINE__, "cusparseSpMM failed with status code: " + stringify(cusparseGetErrorString(status)));
 

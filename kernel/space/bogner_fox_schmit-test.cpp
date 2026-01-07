@@ -46,7 +46,7 @@ public:
     typedef Cubature::Rule<ShapeType, DataType_, DataType_, Tiny::Vector<DataType_, 1> > CubatureRule;
 
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create a single line mesh over [-1,1]
     Geometry::UnitCubeFactory<MeshType> mesh_factory;

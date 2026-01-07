@@ -101,6 +101,7 @@ int main(int argc, char** argv)
       result = EXIT_FAILURE;
       ++tests_failed;
     }
+    /*
     catch(std::exception& e)
     {
       std::cout << "CRASHED: " << (*i)->id() << "\n" << stringify(e.what()) << "\n";
@@ -113,6 +114,7 @@ int main(int argc, char** argv)
       result = EXIT_FAILURE;
       ++tests_failed;
     }
+    */
 
     i = TestList::instance()->erase(i);
     iterator_index++;

@@ -143,7 +143,7 @@ public:
 
   void test_vector(const GateType& gate) const
   {
-    const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.8));
+    const DataType tol = TestSystem::tol<DataType>();
     Random rng;
     std::cout << "test_vector RNG Seed: " << rng.get_seed() << "\n";
 
@@ -204,7 +204,7 @@ public:
 
   void test_matrix(/*const*/ GateType& gate, const IT_ m) const
   {
-    const DataType tol = Math::pow(Math::eps<DataType>(), DataType(0.8));
+    const DataType tol = TestSystem::tol<DataType>();
     Random rng;
     std::cout << "test_matrix RNG Seed: " << rng.get_seed() << "\n";
 

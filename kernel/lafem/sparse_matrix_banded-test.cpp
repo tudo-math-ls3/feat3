@@ -48,7 +48,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
@@ -203,7 +203,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
@@ -249,7 +249,7 @@ public:
     {
       for(Index j(0) ; j < c.columns() ; ++j)
       {
-        TEST_CHECK_EQUAL_WITHIN_EPS(c(i,j), zfp(i,j), Math::pow(Math::eps<DT_>(), DT_(0.7)));
+        TEST_CHECK_EQUAL_WITHIN_EPS(c(i,j), zfp(i,j), TestSystem::tol<DT_>());
       }
     }
 #endif
@@ -305,7 +305,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.8)));
+    const DT_ eps = TestSystem::tol<DT_>();
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
@@ -450,7 +450,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
@@ -539,7 +539,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.9)));
+    const DT_ eps = TestSystem::tol<DT_>();
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
@@ -647,7 +647,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ eps = TestSystem::tol<DT_>();
     const DT_ delta = DT_(123.5);
     const DT_ initial_value = DT_(10.0);
 

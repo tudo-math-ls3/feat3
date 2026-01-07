@@ -322,7 +322,7 @@ public:
   template<int BlockHeight_, int BlockWidth_>
   void check_symmetric(const SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& matrix) const
   {
-    const DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.8)));
+    const DT_ eps = TestSystem::tol<DT_>();
     const Index nrows = matrix.rows();
     const Index ncols = matrix.columns();
     const IT_* row_ptr = matrix.row_ptr();

@@ -108,7 +108,7 @@ public:
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute tolerance
-    const DataType_ tol = Math::pow(Math::eps<DataType_>(), DataType_(0.5));
+    const DataType_ tol = TestSystem::tol<DataType_>();
 
     // create a quad mesh
     Geometry::RefinedUnitCubeFactory<MeshType> mesh_factory(level);

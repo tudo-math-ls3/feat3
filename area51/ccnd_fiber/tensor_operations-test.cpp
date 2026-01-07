@@ -37,7 +37,7 @@ public:
   void test_symmetric_tensor_contraction_2D() const
   {
     // Set tolerance
-    const DT_ tol(Math::pow(_eps, DT_(0.75))*DT_(10));
+    const DT_ tol = TestSystem::tol<DT_>();
 
     //initialize the symmetric tensor as vector
     Vector<DT_, 16> t(DT_(0));

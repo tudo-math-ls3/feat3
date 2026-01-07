@@ -61,7 +61,7 @@ public:
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create a quad mesh
     Geometry::UnitCubeFactory<MeshType> mesh_factory;
@@ -122,7 +122,7 @@ public:
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create a quad mesh
     Geometry::UnitCubeFactory<MeshType> mesh_factory;
@@ -184,7 +184,7 @@ public:
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create a cube mesh
     Geometry::UnitCubeFactory<MeshType> mesh_factory;
@@ -252,7 +252,7 @@ public:
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create a cube mesh
     Geometry::UnitCubeFactory<MeshType> mesh_factory;
@@ -343,7 +343,7 @@ public:
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create a quad mesh
     Geometry::UnitCubeFactory<QuadMeshType> quad_mesh_factory;
@@ -410,7 +410,7 @@ public:
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create a quad mesh
     Geometry::UnitCubeFactory<QuadMeshType> quad_mesh_factory;
@@ -480,7 +480,7 @@ public:
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create a cube mesh
     Geometry::UnitCubeFactory<QuadMeshType> quad_mesh_factory;
@@ -554,7 +554,7 @@ public:
     typedef Trafo::Standard::Mapping<MeshType> TrafoType;
 
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create a cube mesh
     Geometry::UnitCubeFactory<QuadMeshType> quad_mesh_factory;
@@ -666,7 +666,7 @@ class InverseMappingTest
 
       static constexpr int dim = 1;
       // Tolerance
-      DT_ tol(Math::pow(Math::eps<DT_>(), DT_(0.9)));
+      const DT_ tol = TestSystem::tol<DT_>();
 
       // 2d test
       Tiny::Vector<DT_, dim> coeffs(DT_(0));
@@ -706,7 +706,7 @@ class InverseMappingTest
 
       static constexpr int dim = 2;
       // Tolerance
-      DT_ tol(Math::pow(Math::eps<DT_>(), DT_(0.9)));
+      const DT_ tol = TestSystem::tol<DT_>();
 
       // 2d test
       Tiny::Vector<DT_, dim> coeffs(DT_(0));
@@ -752,7 +752,7 @@ class InverseMappingTest
       static constexpr int num_points = 5;
       static constexpr int dim = 3;
       // Tolerance
-      DT_ tol(Math::pow(Math::eps<DT_>(), DT_(0.75)));
+      const DT_ tol = TestSystem::tol<DT_>();
 
       // 2d test
       Tiny::Vector<DT_, dim> coeffs(DT_(0));
@@ -807,7 +807,7 @@ class InverseMappingTest
       static constexpr int world_dim = 2;
 
       // Tolerance
-      DT_ tol(Math::pow(Math::eps<DT_>(), DT_(0.8)));
+      const DT_ tol = TestSystem::tol<DT_>();
 
       Tiny::Vector<DT_, world_dim> coeffs(DT_(0));
       // The last column of coords will contain the orthogonal to the edge immersed in 2d
@@ -864,7 +864,7 @@ class InverseMappingTest
       static constexpr int world_dim = 3;
       static constexpr int shape_dim = 1;
       // Tolerance
-      DT_ tol(Math::pow(Math::eps<DT_>(), DT_(0.5)));
+      const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
       Tiny::Vector<DT_, shape_dim+1> coeffs(DT_(0));
       Tiny::Matrix<DT_, shape_dim+1, world_dim > coords;
@@ -932,7 +932,7 @@ class InverseMappingTest
       static constexpr int world_dim = 3;
       static constexpr int shape_dim = 2;
       // Tolerance
-      DT_ tol(Math::pow(Math::eps<DT_>(), DT_(0.8)));
+      const DT_ tol = TestSystem::tol<DT_>();
 
       Tiny::Vector<DT_, world_dim> coeffs(DT_(0));
       // The last column of coords will contain the orthogonal to the triangle immersed in 3d
@@ -1030,7 +1030,7 @@ class StandardTrafoVolumeTest
     }
     void test_1d_quad() const
     {
-      const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.4));
+      const DataType_ eps = TestSystem::tol<DataType_>();
 
       typedef Shape::Hypercube<1> ShapeType;
       typedef Geometry::ConformalMesh<ShapeType> MeshType;
@@ -1051,7 +1051,7 @@ class StandardTrafoVolumeTest
 
     void test_1d_simplex() const
     {
-      const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.4));
+      const DataType_ eps = TestSystem::tol<DataType_>();
 
       typedef Shape::Simplex<1> ShapeType;
       typedef Geometry::ConformalMesh<ShapeType> MeshType;
@@ -1072,7 +1072,7 @@ class StandardTrafoVolumeTest
 
     void test_2d_simplex() const
     {
-      const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.4));
+      const DataType_ eps = TestSystem::tol<DataType_>();
 
       typedef Shape::Simplex<2> ShapeType;
       typedef Geometry::ConformalMesh<ShapeType> MeshType;
@@ -1105,7 +1105,7 @@ class StandardTrafoVolumeTest
 
     void test_2d_quad() const
     {
-      const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.4));
+      const DataType_ eps = TestSystem::relaxed_tol<DataType_>();
 
       typedef Shape::Hypercube<2> ShapeType;
       typedef Geometry::ConformalMesh<ShapeType> MeshType;
@@ -1143,7 +1143,7 @@ class StandardTrafoVolumeTest
 
     void test_3d_quad() const
     {
-      const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.4));
+      const DataType_ eps = TestSystem::tol<DataType_>();
 
       typedef Shape::Hypercube<3> ShapeType;
       typedef Geometry::ConformalMesh<ShapeType> MeshType;
@@ -1201,7 +1201,7 @@ class StandardTrafoVolumeTest
 
     void test_3d_simplex() const
     {
-      const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.4));
+      const DataType_ eps = TestSystem::tol<DataType_>();
       typedef Shape::Simplex<3> ShapeType;
       typedef Geometry::ConformalMesh<ShapeType> MeshType;
       typedef Trafo::Standard::Mapping<MeshType> TrafoType;

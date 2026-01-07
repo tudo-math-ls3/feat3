@@ -96,7 +96,7 @@ public:
 
   JumpStabilTest(PreferredBackend backend) :
     UnitTest("JumpStabilTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
-    tol(Math::pow(Math::eps<DataType>(), DataType(0.8)))
+    tol(TestSystem::tol<DT_>())
   {
   }
 

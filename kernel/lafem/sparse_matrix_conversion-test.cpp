@@ -51,7 +51,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     SparseMatrixFactory<DT_, IT_> a(4, 4);
     for (Index row(0) ; row < a.rows() ; ++row)
     {

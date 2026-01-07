@@ -15,6 +15,7 @@
 
 #include <map>
 #include <cstring>
+#include <memory>
 #include <typeinfo>
 #include <cstdio>
 #include <cstddef>
@@ -100,6 +101,8 @@ namespace FEAT
           mi.counter = 1;
           mi.size = count * sizeof(DT_);
           _pool.insert(std::pair<void*, Util::Intern::MemoryInfo>(memory, mi));
+
+          std::uninitialized_fill(memory, memory + count, DT_(42));
 
           return memory;
         }

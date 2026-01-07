@@ -46,7 +46,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     DenseMatrix<DT_, IT_> zero;
     TEST_CHECK(zero.empty());
 
@@ -143,7 +143,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     DenseMatrix<DT_, IT_> test_mat(40, 40);
     for (Index i(0); i < test_mat.rows(); ++i)
     {
@@ -285,7 +285,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    DT_ eps = TestSystem::tol<DT_>();
     DT_ s(DT_(0.123));
     for (Index size(16); size < 100; size *= 2)
     {
@@ -406,7 +406,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    DT_ eps = TestSystem::tol<DT_>();
     DT_ s(DT_(0.123));
     for (Index size(16); size < 100; size *= 2)
     {
@@ -527,7 +527,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
 
     for (Index size(1); size < 65; size *= 2)
     {
@@ -572,8 +572,8 @@ public:
       }
 
 #ifdef FEAT_HAVE_HALFMATH
-      if (typeid(DT_) == typeid(Half))
-        eps *= 4.;
+      if constexpr(std::is_same_v<DT_, Half>)
+        eps *= Half(4);
 #endif
     }
   }
@@ -627,7 +627,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
 
     for (Index size(1); size < 32; size *= 2)
     {
@@ -666,8 +666,8 @@ public:
           TEST_CHECK_RELATIVE(result(i, j), ref(i, j), eps);
       }
 #ifdef FEAT_HAVE_HALFMATH
-      if (typeid(DT_) == typeid(Half))
-        eps *= 4.;
+      if constexpr(std::is_same_v<DT_, Half>)
+        eps *= Half(4);
 #endif
     }
   }
@@ -721,7 +721,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
 
     for (Index size(1); size < 32; size *= 2)
     {
@@ -760,8 +760,8 @@ public:
           TEST_CHECK_RELATIVE(result(i, j), ref(i, j), eps);
       }
 #ifdef FEAT_HAVE_HALFMATH
-      if (typeid(DT_) == typeid(Half))
-        eps *= 4.;
+      if constexpr(std::is_same_v<DT_, Half>)
+        eps *= Half(4);
 #endif
     }
   }
@@ -815,7 +815,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
 
     for (Index size(1); size < 65; size *= 2)
     {
@@ -862,8 +862,8 @@ public:
           TEST_CHECK_RELATIVE(z(i, j), ref(i, j), eps);
       }
 #ifdef FEAT_HAVE_HALFMATH
-      if (typeid(DT_) == typeid(Half))
-        eps *= 4.;
+      if constexpr(std::is_same_v<DT_, Half>)
+        eps *= Half(4);
 #endif
     }
   }
@@ -917,7 +917,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
 
     for (Index size(1); size < 65; size *= 2)
     {
@@ -977,8 +977,8 @@ public:
           TEST_CHECK_EQUAL_WITHIN_EPS(z(i, j), ref(i, j), eps);
       }
 #ifdef FEAT_HAVE_HALFMATH
-      if (typeid(DT_) == typeid(Half))
-        eps *= 4.;
+      if constexpr(std::is_same_v<DT_, Half>)
+        eps *= Half(4);
 #endif
     }
   }
@@ -1109,7 +1109,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ eps = TestSystem::tol<DT_>();
     const DT_ delta = DT_(123.5);
 
     for (Index size(1); size < 100; size *= 2)

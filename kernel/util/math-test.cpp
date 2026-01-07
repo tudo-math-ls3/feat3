@@ -349,7 +349,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ tol = TestSystem::tol<DT_>();
 
     // create an RNG with a fixed seed; if we used a true random seed then we will
     // get test failures due to singular input matrices every now and then...

@@ -39,7 +39,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
+    const DT_ tol = TestSystem::tol<DT_>();
 
     const Index n = 7;
     VectorType a1(n, DT_(1));
@@ -142,7 +142,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
+    const DT_ tol = TestSystem::tol<DT_>();
 
     typedef SparseMatrixCSR<DT_, IT_> MatrixType;
     IVectorType row_ptr(IT_(8));

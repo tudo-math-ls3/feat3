@@ -68,7 +68,7 @@ public:
   void test_unit_2d_q1(QuadMesh& mesh_f, QuadMesh& mesh_c) const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create trafos
     QuadTrafo trafo_f(mesh_f);
@@ -147,7 +147,7 @@ public:
   void test_unit_2d_q1t(QuadMesh& mesh_f, QuadMesh& mesh_c) const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create trafos
     QuadTrafo trafo_f(mesh_f);
@@ -229,7 +229,7 @@ public:
   void test_unit_2d_q1_vec(QuadMesh& mesh_f, QuadMesh& mesh_c) const
   {
     // compute tolerance
-    const DataType_ tol = Math::pow(Math::eps<DataType_>(), DataType_(0.9));
+    const DataType_ tol = TestSystem::tol<DataType_>();
 
     // create trafos
     QuadTrafo trafo_f(mesh_f);
@@ -314,7 +314,7 @@ public:
   template<typename SpaceType_>
   void run_space() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ tol = TestSystem::tol<DT_>();
 
     // create coarse mesh
     Geometry::RefinedUnitCubeFactory<MeshType> coarse_factory(2);

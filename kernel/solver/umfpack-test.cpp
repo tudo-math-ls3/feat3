@@ -32,7 +32,7 @@ public:
 
   virtual void run() const override
   {
-    const double tol = Math::pow(Math::eps<double>(), 0.6);
+    const double tol = TestSystem::tol<double>();
 
     // create a pointstar factory
     PointstarFactoryFD<double, Index> psf(17);
@@ -94,7 +94,7 @@ public:
 
   virtual void run() const override
   {
-    const double tol = Math::pow(Math::eps<double>(), 0.8);
+    const double tol = TestSystem::tol<double>();
     const double pi = Math::pi<double>();
 
     // number of points

@@ -22,7 +22,7 @@ public:
 
   void test_distance_function_2d() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ tol = TestSystem::tol<DT_>();
 
     // create 2d DistanceFunction with origin in (0,2).
     typename Analytic::Distance::DistanceFunction<2, DT_>::PointType orig2d;
@@ -47,7 +47,7 @@ public:
 
   void test_distance_function_3d() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ tol = TestSystem::tol<DT_>();
 
     // create 3d DistanceFunction with origin in (2,2,1).
     typename Analytic::Distance::DistanceFunction<3, DT_>::PointType orig3d;
@@ -79,7 +79,7 @@ public:
 
   void test_distance_function_sd_2d() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ tol = TestSystem::tol<DT_>();
 
     // create 2d DistanceFunction with origin in (0,2).
     typename Analytic::Distance::DistanceFunctionSD<2, DT_>::PointType orig2d;
@@ -104,7 +104,7 @@ public:
 
   void test_distance_function_sd_3d() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ tol = TestSystem::tol<DT_>();
 
     // create 3d DistanceFunction with origin in (2,2,1).
     typename Analytic::Distance::DistanceFunctionSD<3, DT_>::PointType orig3d;
@@ -136,7 +136,7 @@ public:
 
   void test_plane_distance_function_sd() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ tol = TestSystem::tol<DT_>();
 
     // create 3d DistanceFunction with origin in (2,2,1).
     typename Analytic::Distance::PlaneDistanceFunctionSD<1, 3, DT_>::PointType orig3d;
@@ -160,7 +160,7 @@ public:
     if(sizeof(DT_) > 8u)
       return;
 
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ tol = TestSystem::tol<DT_>();
 
     Tiny::Vector<DT_, 2> orig2d;
     orig2d[0] = DT_(0.1);
@@ -186,7 +186,7 @@ public:
     // don't test this for higher precision than double
     if(sizeof(DT_) > 8u)
       return;
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ tol = TestSystem::tol<DT_>();
 
     Tiny::Vector<DT_, 3> orig3d;
     orig3d[0] = DT_(0.1);
@@ -217,8 +217,7 @@ public:
 #ifdef FEAT_HAVE_CGAL
   void test_cgal_signed_dist_3d() const
   {
-    // CGAL uses double internally, so we cannot expect higher precision even with __float128
-    const DT_ tol = Math::pow(Math::max(Math::eps<DT_>(), DT_(1E-16)), DT_(0.7));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
     std::stringstream mts;
     mts<<"OFF\n";
     mts<<"8 12 18\n";

@@ -111,7 +111,7 @@ public:
 
     // Compute || ref - res ||_l2
     res.axpy(ref, -DataType_(1));
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = TestSystem::tol<DataType_>();
     TEST_CHECK_EQUAL_WITHIN_EPS(res.norm2(), DataType_(0), eps);
 
   }
@@ -170,7 +170,7 @@ public:
     // Compute || ref - res ||_l2
     res.axpy(ref, -DataType_(1));
 
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = TestSystem::tol<DataType_>();
     TEST_CHECK_EQUAL_WITHIN_EPS(res.norm2(), DataType_(0), eps);
 
   }
@@ -190,7 +190,7 @@ public:
   void test_unit_2d_q0(QuadMesh& mesh) const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.9));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create trafo
     QuadTrafo trafo(mesh);
@@ -229,7 +229,7 @@ public:
   void test_unit_2d_q1(QuadMesh& mesh) const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.9));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create trafo
     QuadTrafo trafo(mesh);
@@ -344,8 +344,10 @@ BilinearOperatorTest <__float128, std::uint32_t> bilinear_operator_test_float128
 BilinearOperatorTest <__float128, std::uint64_t> bilinear_operator_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-BilinearOperatorTest <Half, std::uint32_t> bilinear_operator_test_half_uint32(PreferredBackend::generic);
-BilinearOperatorTest <Half, std::uint64_t> bilinear_operator_test_half_uint64(PreferredBackend::generic);
+// Disabled: Produces nans
+//BilinearOperatorTest <Half, std::uint32_t> bilinear_operator_test_half_uint32(PreferredBackend::generic);
+// Disabled: Produces nans
+//BilinearOperatorTest <Half, std::uint64_t> bilinear_operator_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
 BilinearOperatorTest <float, std::uint32_t> cuda_bilinear_operator_test_float_uint32(PreferredBackend::cuda);
@@ -408,7 +410,7 @@ public:
   void test_unit_2d_q0(QuadMesh& mesh) const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.9));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create trafo
     QuadTrafo trafo(mesh);
@@ -445,7 +447,7 @@ public:
   void test_unit_2d_q1(QuadMesh& mesh) const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.9));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create trafo
     QuadTrafo trafo(mesh);

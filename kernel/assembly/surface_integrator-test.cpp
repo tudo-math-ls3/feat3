@@ -75,7 +75,7 @@ public:
 
   void test_unit_3d() const
   {
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = TestSystem::tol<DataType_>();
     constexpr int dim = 3;
     typedef Shape::Hypercube<dim> ShapeType;
     typedef Geometry::ConformalMesh<ShapeType> MeshType;

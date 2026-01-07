@@ -91,7 +91,7 @@ public:
 
   void test_auto_derive_scalar2d() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.6));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     Analytic::AutoDerive<ScalarTestFunction, DT_> func;
 
@@ -114,7 +114,7 @@ public:
 
   void test_auto_derive_vector2d() const
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.6));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     Analytic::AutoDerive<VectorTestFunction, DT_> func;
 

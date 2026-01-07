@@ -40,7 +40,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     SparseVector<DT_, IT_> zero;
     TEST_CHECK(zero.empty());
 
@@ -145,7 +145,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     SparseVector<DT_, IT_> a(10);
     a(3, DT_(7));
     a(3, DT_(3));
@@ -223,7 +223,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ eps = TestSystem::tol<DT_>();
     const DT_ delta = DT_(123.5);
     const DT_ initial_value = DT_(10.0);
 

@@ -54,7 +54,7 @@ class SlipFilterVectorTest
 
   virtual void run() const override
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.75));
+    const DT_ tol = TestSystem::tol<DT_>();
 
     const IT_ nn(100);
     FilterType my_filter(nn, nn);
@@ -328,7 +328,7 @@ class SlipFilterAssemblyTest
       my_filter.filter_sol(vec);
 
       // Check results
-      const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
+      const DT_ tol = TestSystem::tol<DT_>();
 
       // First check all filtered entries if they are really orthogonal to the normal vector saved in the filter
       for(Index i(0); i < my_filter.used_elements(); ++i)
@@ -426,7 +426,7 @@ class SlipFilterAssemblyTest
       my_filter.filter_sol(vec);
 
       // Check results
-      const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
+      const DT_ tol = TestSystem::tol<DT_>();
 
       // First check all filtered entries if they are really orthogonal to the normal vector saved in the filter
       for(Index i(0); i < my_filter.used_elements(); ++i)

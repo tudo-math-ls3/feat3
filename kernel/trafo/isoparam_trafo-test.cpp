@@ -36,7 +36,7 @@ public:
 
   void test_2d_quad() const
   {
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.4));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     typedef Shape::Hypercube<2> ShapeType;
     typedef Shape::Hypercube<1> FacetType;

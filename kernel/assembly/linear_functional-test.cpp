@@ -59,7 +59,7 @@ public:
   void test_unit_2d_q1(QuadMesh& mesh) const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create trafo
     QuadTrafo trafo(mesh);
@@ -109,7 +109,7 @@ public:
   void test_unit_2d_q0(QuadMesh& mesh) const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.7));
+    const DataType_ eps = TestSystem::relaxed_tol<DataType_>();
 
     // create trafo
     QuadTrafo trafo(mesh);

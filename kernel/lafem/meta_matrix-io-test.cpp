@@ -46,7 +46,7 @@ public:
 
   virtual void run() const override
   {
-    DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    DataType_ eps = TestSystem::tol<DataType_>();
     // String directory("meta_matrix-io-test.directory/");
     String directory ("./");
 

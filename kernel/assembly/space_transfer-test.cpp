@@ -52,7 +52,7 @@ public:
   void test_unit_2d_q2q1() const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.75));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     String cubature = "gauss-legendre:3";
 
@@ -92,10 +92,10 @@ public:
 
     // compare vectors
     vec_q2t_1.axpy(vec_q2, -DataType_(1));
-    TEST_CHECK(vec_q2t_1.norm2() < eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_q2t_1.norm2(), DataType_(0.0), eps);
 
     vec_q2t_2.axpy(vec_q2, -DataType_(1));
-    TEST_CHECK(vec_q2t_2.norm2() < eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_q2t_2.norm2(), DataType_(0.0), eps);
 
     // project Q2 vector into Q1 space with matrix
     VectorType vec_q1t_1 = matrix_q2_to_q1.create_vector_l();
@@ -108,10 +108,10 @@ public:
 
     // compare vectors
     vec_q1t_1.axpy(vec_q1, -DataType_(1));
-    TEST_CHECK(vec_q1t_1.norm2() < eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_q1t_1.norm2(), DataType_(0.0), eps);
 
     vec_q1t_2.axpy(vec_q1, -DataType_(1));
-    TEST_CHECK(vec_q1t_2.norm2() < eps);
+    TEST_CHECK_EQUAL_WITHIN_EPS(vec_q1t_2.norm2(), DataType_(0.0), eps);
   }
 };
 

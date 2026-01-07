@@ -41,7 +41,8 @@ public:
 
   virtual void run() const override
   {
-    test_fe_error(IT_(3), Math::pow(Math::eps<DT_>(), DT_(0.7)), Math::pow(Math::eps<DT_>(), DT_(0.7)), Math::pow(Math::eps<DT_>(), DT_(0.7)));
+    const DT_ tol = TestSystem::tol<DT_>();
+    test_fe_error(IT_(3), tol, tol, tol);
   }
 
   void test_fe_error(Index level, DataType val_tol, DataType grad_tol, DataType hess_tol) const

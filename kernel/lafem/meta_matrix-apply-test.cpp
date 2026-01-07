@@ -53,7 +53,7 @@ public:
 
   void test_diag() const
   {
-    const DataType tol(Math::pow(Math::eps<DataType>(), DataType(0.7)));
+    const DataType tol = TestSystem::tol<DataType>();
 
     // generate a test system: A,x,b
     typename BaseClass::SystemDiagMatrix mat_sys;
@@ -90,7 +90,7 @@ public:
 
   void test_full() const
   {
-    const DataType tol(Math::pow(Math::eps<DataType>(), DataType(0.7)));
+    const DataType tol = TestSystem::tol<DataType>();
 
     // generate a test system: A,x,b
     typename BaseClass::SystemFullMatrix mat_sys;

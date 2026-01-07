@@ -59,7 +59,7 @@ public:
 
     //simple test
     {
-      DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+      DT_ eps = TestSystem::tol<DT_>();
       auto comm = Dist::Comm::world();
       Control::CheckpointControl cp(comm);
       LAFEM::SerialConfig config(false, false);
@@ -139,7 +139,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     LAFEM::PowerRowMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, 2> powrow;
     LAFEM::PointstarFactoryFD<DT_, IT_> five_star(40,2);
     LAFEM::PointstarFactoryFD<DT_, IT_> nine_star(40,3);
@@ -185,7 +185,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     LAFEM::PowerColMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, 2> powcol;
     LAFEM::PointstarFactoryFD<DT_, IT_> five_star(40,2);
     LAFEM::PointstarFactoryFD<DT_, IT_> nine_star(40,3);
@@ -231,7 +231,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     LAFEM::PowerFullMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, 2,2> powful;
     LAFEM::PointstarFactoryFD<DT_, IT_> five_star(40,2);
     LAFEM::PointstarFactoryFD<DT_, IT_> nine_star(40,3);
@@ -285,7 +285,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     LAFEM::DenseVector<DT_, IT_> dv1(1234);
     for (Index i(0) ; i < dv1.size() ; ++i)
       dv1(i, DT_(i) / DT_(12));
@@ -334,7 +334,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     LAFEM::SaddlePointMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, LAFEM::SparseMatrixCSCR<DT_, IT_>> saddle;
     LAFEM::PointstarFactoryFD<DT_, IT_> five_star(40,2);
     LAFEM::SparseMatrixCSR<DT_, IT_> star1 = five_star.matrix_csr();
@@ -382,7 +382,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     LAFEM::TupleDiagMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, LAFEM::SparseMatrixCSCR<DT_, IT_>> tuple1;
     LAFEM::PointstarFactoryFD<DT_, IT_> five_star(40,2);
     LAFEM::SparseMatrixCSR<DT_, IT_> star1 = five_star.matrix_csr();
@@ -430,7 +430,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     typedef LAFEM::TupleMatrixRow<LAFEM::SparseMatrixCSR<DT_, IT_>,LAFEM::SparseMatrixCSCR<DT_, IT_>> tuprow;
     LAFEM::TupleMatrix<tuprow, tuprow> tuple1;
     LAFEM::PointstarFactoryFD<DT_, IT_> five_star(40,2);
@@ -488,7 +488,7 @@ public:
   virtual void run() const override
   {
     //Does not function with sparse_vector, as Containertype is missing <-- should we add that?
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     LAFEM::TupleVector<LAFEM::DenseVector<DT_, IT_>, LAFEM::DenseVector<DT_, IT_>> tuple1;
     LAFEM::DenseVector<DT_, IT_> dv1(1234);
     for (Index i(0) ; i < dv1.size() ; ++i)

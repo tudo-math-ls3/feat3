@@ -32,7 +32,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ tol(Math::pow(Math::eps<DT_>(), DT_(0.7)));
+    const DT_ tol = TestSystem::tol<DT_>();
 
     // Test FD poinstars
     // dimension loop: d=1,2,3,4
@@ -133,7 +133,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ tol(Math::pow(Math::eps<DT_>(), DT_(0.8)));
+    const DT_ tol = TestSystem::tol<DT_>();
 
 
     std::vector<IT_> num_of_subintervalls;

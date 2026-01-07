@@ -57,7 +57,7 @@ public:
 
   virtual void run() const override
   {
-    const DataType tol(Math::pow(Math::eps<DataType>(), DataType(0.7)));
+    const DataType tol = TestSystem::tol<DataType>();
 
     // generate a test system: A,x,b
     SystemMatrix mat_sys;
@@ -200,7 +200,7 @@ public:
 
   virtual void run() const override
   {
-    const DataType tol(Math::pow(Math::eps<DataType>(), DataType(0.7)));
+    const DataType tol = TestSystem::tol<DataType>();
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
@@ -329,7 +329,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ eps(Math::pow(Math::eps<DT_>(), DT_(0.8)));
+    const DT_ eps = TestSystem::tol<DT_>();
 
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";

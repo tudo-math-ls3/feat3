@@ -69,7 +69,7 @@ public:
   void asm_unit_quad() const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create a quad mesh
     Geometry::UnitCubeFactory<QuadMesh> mesh_factory;
@@ -174,7 +174,7 @@ public:
   void asm_tetris_quad() const
   {
     // compute eps
-    const DataType_ eps = Math::pow(Math::eps<DataType_>(), DataType_(0.8));
+    const DataType_ eps = TestSystem::tol<DataType_>();
 
     // create a quad mesh
     QuadMesh *mesh = Geometry::TestAux::create_tetris_mesh_2d();

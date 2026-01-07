@@ -45,7 +45,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
+    const DT_ tol = TestSystem::tol<DT_>();
 
     const int n = 7;
     VectorType a1(n, DT_(1));
@@ -184,7 +184,7 @@ public:
   {
     typedef Tiny::Vector<DT_, BlockHeight> VectorValueType;
 
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
+    const DT_ tol = TestSystem::tol<DT_>();
 
     IVectorType row_ptr(IT_(8));
     IVectorType col_idx(IT_(18));
@@ -378,7 +378,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.9));
+    const DT_ tol = TestSystem::tol<DT_>();
     const DT_ nan = Math::nan<DT_>();
 
     const Index n = 7;

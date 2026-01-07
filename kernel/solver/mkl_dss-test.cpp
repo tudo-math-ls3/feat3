@@ -32,7 +32,7 @@ public:
 
   virtual void run() const override
   {
-    const double tol = Math::pow(Math::eps<double>(), 0.6);
+    const double tol = TestSystem::tol<double>();
 
     // set backend to MKL
     Backend::set_preferred_backend(PreferredBackend::mkl);

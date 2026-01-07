@@ -65,7 +65,7 @@ public:
 
   virtual void run() const override
   {
-    const DataType tol(Math::pow(Math::eps<DataType>(), DataType(0.7)));
+    const DataType tol = TestSystem::tol<DataType>();
 
     const Index m = 3;
     const Index n = m*m;

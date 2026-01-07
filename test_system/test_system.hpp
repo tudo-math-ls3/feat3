@@ -300,6 +300,74 @@ namespace FEAT
       }
     }; // class UnitTest
 
+    template<typename DT_>
+    DT_ tol()
+    {
+      return Math::pow(Math::eps<DT_>(), DT_(0.7));
+    }
+
+    template<>
+    inline double tol<double>()
+    {
+      return Math::pow(Math::eps<double>(), 0.7);
+    }
+
+    template<>
+    inline float tol<float>()
+    {
+      return Math::pow(Math::eps<float>(), 0.7F);
+    }
+
+#ifdef FEAT_HAVE_QUADMATH
+    template<>
+    inline __float128 tol<__float128>()
+    {
+      return Math::pow(Math::eps<__float128>(), __float128(0.7));
+    }
+#endif
+
+#ifdef FEAT_HAVE_HALFMATH
+    template<>
+    inline Half tol<Half>()
+    {
+      return Math::pow(Math::eps<Half>(), Half(0.35));
+    }
+#endif
+
+    template<typename DT_>
+    DT_ relaxed_tol()
+    {
+      return Math::pow(Math::eps<DT_>(), DT_(0.4));
+    }
+
+    template<>
+    inline double relaxed_tol<double>()
+    {
+      return Math::pow(Math::eps<double>(), 0.4);
+    }
+
+    template<>
+    inline float relaxed_tol<float>()
+    {
+      return Math::pow(Math::eps<float>(), 0.3F);
+    }
+
+#ifdef FEAT_HAVE_QUADMATH
+    template<>
+    inline __float128 relaxed_tol<__float128>()
+    {
+      return Math::pow(Math::eps<__float128>(), __float128(0.4));
+    }
+#endif
+
+#ifdef FEAT_HAVE_HALFMATH
+    template<>
+    inline Half relaxed_tol<Half>()
+    {
+      return Math::pow(Math::eps<Half>(), Half(0.2));
+    }
+#endif
+
   } // namespace TestSystem
 } // namespace FEAT
 /// checks if a == b

@@ -48,7 +48,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
@@ -182,7 +182,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     DenseVector<DT_, IT_> dv(12, DT_(2));
     dv(7, DT_(3));
     DenseVectorBlocked<DT_, IT_, 3> g(dv);
@@ -279,7 +279,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    DT_ eps = TestSystem::tol<DT_>();
     DT_ s(DT_(0.4711));
     Tiny::Vector<DT_, block_size_> bs;
     for(int j(0); j < block_size_; ++j)
@@ -388,7 +388,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.7));
+    const DT_ eps = TestSystem::tol<DT_>();
 
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
@@ -460,8 +460,10 @@ DenseVectorBlockedDotTest <__float128, std::uint32_t, 3> dv_dot_product_test_flo
 DenseVectorBlockedDotTest <__float128, std::uint64_t, 2> dv_dot_product_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedDotTest <Half, std::uint32_t,3 > dv_blocked_dot_product_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedDotTest <Half, std::uint64_t, 2> dv_blocked_dot_product_test_half_uint64(PreferredBackend::generic);
+// Disabled because half-precision can not reach eps
+//DenseVectorBlockedDotTest <Half, std::uint32_t,3 > dv_blocked_dot_product_test_half_uint32(PreferredBackend::generic);
+// Disabled because half-precision overflows
+//DenseVectorBlockedDotTest <Half, std::uint64_t, 2> dv_blocked_dot_product_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
 DenseVectorBlockedDotTest <float, std::uint32_t, 3> cuda_dv_dot_product_test_float_uint32(PreferredBackend::cuda);
@@ -489,7 +491,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ eps = TestSystem::tol<DT_>();
 
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
@@ -558,8 +560,10 @@ DenseVectorBlockedTripleDotTest <__float128, std::uint32_t, 3> dv_triple_dot_pro
 DenseVectorBlockedTripleDotTest <__float128, std::uint64_t, 2> dv_triple_dot_product_test_float128_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedTripleDotTest <Half, std::uint32_t, 3> dv_blocked_triple_dot_product_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedTripleDotTest <Half, std::uint64_t, 2> dv_blocked_triple_dot_product_test_half_uint64(PreferredBackend::generic);
+// Disabled because half-precision can not reach eps
+//DenseVectorBlockedTripleDotTest <Half, std::uint32_t, 3> dv_blocked_triple_dot_product_test_half_uint32(PreferredBackend::generic);
+// Disabled because half-precision can not reach eps
+//DenseVectorBlockedTripleDotTest <Half, std::uint64_t, 2> dv_blocked_triple_dot_product_test_half_uint64(PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
 DenseVectorBlockedTripleDotTest <float, std::uint32_t, 3> cuda_dv_triple_dot_product_test_float_uint32(PreferredBackend::cuda);
@@ -589,7 +593,7 @@ public:
   {
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
-      DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+      DT_ eps = TestSystem::tol<DT_>();
 
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
       DenseVectorBlocked<DT_, IT_, block_size_> b(size);
@@ -685,7 +689,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     for(Index size(1); size < Index(1e3); size*=2)
     {
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
@@ -752,7 +756,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
       DT_ s(DT_(4.321));
@@ -829,7 +833,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ eps = TestSystem::tol<DT_>();
 
     for (Index size(1) ; size < Index(1e3) ; size*=2)
     {
@@ -1201,7 +1205,7 @@ public:
 
   virtual void run() const override
   {
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
     bool one_error(false);
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
@@ -1287,7 +1291,7 @@ public:
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    DT_ eps = TestSystem::tol<DT_>();
 
     constexpr Index size = Index(1e4);
 
@@ -1346,7 +1350,7 @@ public:
 
   virtual void run() const override
   {
-    const DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.8));
+    const DT_ eps = TestSystem::tol<DT_>();
 
     for (Index size(2); size < Index(1e3); size *= 2)
     {

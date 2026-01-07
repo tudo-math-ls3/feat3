@@ -160,14 +160,14 @@ template
 
       solver->init();
       solver->set_plot_mode(Solver::PlotMode::all);
-      solver->set_tol_rel(Math::pow(Math::eps<DataType>(), DataType(0.9)));
+      solver->set_tol_rel(TestSystem::tol<DataType>());
       solver->correct(new_coords, rhs);
       solver->done();
       // Compute functional value post optimization
       DataType fval_post(0);
       rumpflpumpfl.eval_fval_cellwise(fval_post, &func_norm, &func_cof, &func_det);
 
-      const DataType eps = Math::pow(Math::eps<DataType>(),DataType(0.5));
+      const DataType eps = TestSystem::tol<DataType>();
 
       // Check functional value contributions
       TEST_CHECK(fval_pre > fval_post);

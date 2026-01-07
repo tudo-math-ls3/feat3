@@ -661,7 +661,7 @@ public:
     TEST_CHECK_EQUAL((builder.template get_template<1>(EdgeType(2)).get_vertex_coefficients().size()), 1);
     TEST_CHECK_EQUAL((builder.template get_template<1>(EdgeType(3)).get_vertex_coefficients().size()), 2);
 
-    const Real tol = Math::pow(Math::eps<Real>(), Real(0.7));
+    const Real tol = TestSystem::tol<Real>();
     TEST_CHECK_EQUAL_WITHIN_EPS((builder.template get_template<1>(EdgeType(1)).get_vertex_coefficients()[0][0]), 2.0 / 3.0, tol);
     TEST_CHECK_EQUAL_WITHIN_EPS((builder.template get_template<1>(EdgeType(1)).get_vertex_coefficients()[0][1]), 1.0 / 3.0, tol);
 

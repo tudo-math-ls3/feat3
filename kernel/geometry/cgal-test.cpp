@@ -115,8 +115,7 @@ public:
 #endif
   virtual void run() const override
   {
-    // choose tolerance, but not tighter than double precision
-    const DT_ tol = DT_(2) * Math::max(Math::eps<DT_>(), DT_(Math::eps<double>()));
+    const DT_ tol = TestSystem::relaxed_tol<DT_>();
 
     test_move_constructor();
     test_thread_safety();

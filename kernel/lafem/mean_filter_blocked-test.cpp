@@ -42,7 +42,7 @@ public:
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
-    DT_ eps = Math::pow(Math::eps<DT_>(), DT_(0.75));
+    DT_ eps = TestSystem::tol<DT_>();
     for(Index size(1); size < Index(1e3); size*=2)
     {
       DT_ tol = eps * DT_(size);
