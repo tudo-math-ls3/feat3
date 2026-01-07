@@ -659,7 +659,7 @@ namespace FEAT::Geometry::Intern
 
     for(int i = 0; i < face_verts; i++)
     {
-      local[i] = v_at_cell[cell][IndexMapping::map(face, i)];
+      local[std::size_t(i)] = v_at_cell[cell][IndexMapping::map(face, i)];
     }
     //return Sampler::compare(v_at_face[face_at_cell[cell][face]], local);
     return Sampler::compare(local, v_at_face[face_at_cell(cell, face)]);
@@ -716,7 +716,7 @@ namespace FEAT::Geometry::Intern
       for(int vert = 0; vert < num_vertices; vert++)
       {
         Index vertex_index = foundation_entity_vertices(entity, vert);
-        topology_vertices[vert] = Intern::OrientedElement<0>(0, root_vertices.at(vertex_index));
+        topology_vertices[std::size_t(vert)] = Intern::OrientedElement<0>(0, root_vertices.at(vertex_index));
       }
     }
   };
@@ -756,8 +756,8 @@ namespace FEAT::Geometry::Intern
       for(int edge = 0; edge < num_edges; edge++)
       {
         int orientation = congruency<FoundationMeshType, topology_dim_, 1>(a_mesh._foundation_mesh, entity, edge);
-        Index edge_index = foundation_entity_edges(entity, (int)edge);
-        topology_edges[edge] = Intern::OrientedEdge(orientation, root_edges.at(edge_index));
+        Index edge_index = foundation_entity_edges(entity, edge);
+        topology_edges[std::size_t(edge)] = Intern::OrientedEdge(orientation, root_edges.at(edge_index));
       }
     }
   };
@@ -798,7 +798,7 @@ namespace FEAT::Geometry::Intern
       {
         int orientation = congruency<FoundationMeshType, topology_dim_, 2>(a_mesh._foundation_mesh, entity, face);
         Index face_index = foundation_entity_faces(entity, face);
-        topology_faces[face] = Intern::OrientedFace(orientation, root_faces.at(face_index));
+        topology_faces[std::size_t(face)] = Intern::OrientedFace(orientation, root_faces.at(face_index));
       }
     }
   };

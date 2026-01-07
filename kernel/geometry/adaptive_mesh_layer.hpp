@@ -987,10 +987,10 @@ namespace FEAT::Geometry
         return _mesh->get_neighbor(
           _layer,
           _permutation.value().map(i),
-          _inverse_face_permutation.value().map(j)
+          Index(_inverse_face_permutation.value().map(j))
         );
       }
-      return _mesh->get_neighbor(_layer, i, j);
+      return _mesh->get_neighbor(_layer, i, Index(j));
     }
 
     /// access operator
@@ -1001,10 +1001,10 @@ namespace FEAT::Geometry
         return _mesh->get_neighbor(
           _layer,
           _permutation.value().map(i),
-          _inverse_face_permutation.value().map(j)
+          Index(_inverse_face_permutation.value().map(j))
         );
       }
-      return _mesh->get_neighbor(_layer, i, j);
+      return _mesh->get_neighbor(_layer, i, Index(j));
     }
 
     IndexTuple<num_indices> operator[](Index i) const

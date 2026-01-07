@@ -407,7 +407,7 @@ namespace FEAT::Geometry
 
       for(Index i(0); i < num_vertices; ++i)
       {
-        sdls[i] = marker(i);
+        sdls[i] = std::uint64_t(marker(i));
       }
 
       // Create mesh
@@ -528,7 +528,7 @@ namespace FEAT::Geometry
      * \param[in] face_idx Index of the sub-entity
      */
     template<int dim_, int codim_>
-    Index get_face_index(Layer layer, Index entity_idx, Index face_idx) const
+    Index get_face_index(Layer layer, Index entity_idx, int face_idx) const
     {
       auto& entity = _storage.template get_by_index<dim_>(layer, entity_idx);
 
@@ -913,9 +913,9 @@ namespace FEAT::Geometry
       // Retrieve vertex coordinates of topology for following vertex interpolation
       std::array<VertexType, num_vertices> vertex_coordinates;
 
-      for(int i{0}; i < num_vertices; i++)
+      for(int i(0); i < num_vertices; i++)
       {
-        vertex_coordinates[i] = _storage[topology.template key_by_dim<0>(i)].vertex;
+        vertex_coordinates[std::size_t(i)] = _storage[topology.template key_by_dim<0>(i)].vertex;
       }
 
       // Produce child vertices by linear interpolation
@@ -1274,9 +1274,9 @@ namespace FEAT::Geometry
 
       LevelTuple<entity_dim_> result;
 
-      for(Index i(0); i < result.size; ++i)
+      for(int i(0); i < result.size; ++i)
       {
-        result[i] = TemplateSet::template spread_refinement_field<ParentShape>(vertex_refs[i], lvls);
+        result[i] = TemplateSet::template spread_refinement_field<ParentShape>(vertex_refs[std::size_t(i)], lvls);
       }
 
       return result;
@@ -1314,7 +1314,7 @@ namespace FEAT::Geometry
         for(int i(0); i < num_entities; i++)
         {
           EntityReference ref = tmplt.template get_reference<dim_>(i);
-          target[i] = _resolve_entity_reference<parent_dim_, dim_>(parent_topo, siblings, ref);
+          target[std::size_t(i)] = _resolve_entity_reference<parent_dim_, dim_>(parent_topo, siblings, ref);
 
           if constexpr(dim_ >= 1)
           {
@@ -1329,15 +1329,15 @@ namespace FEAT::Geometry
               std::array<ElementRef<0>, num_vertices> local_keys;
               std::array<ElementRef<0>, num_vertices> foreign_keys;
 
-              const auto& entity = _storage[target[i]];
+              const auto& entity = _storage[target[std::size_t(i)]];
               for(int vertex(0); vertex < num_vertices; vertex++)
               {
-                Index local_vertex = FaceMapping::map(i, vertex);
-                local_keys[vertex] = topo.template key_by_dim<0>(local_vertex).key;
-                foreign_keys[vertex] = entity.topology.template key_by_dim<0>(vertex).key;
+                int local_vertex = FaceMapping::map(i, vertex);
+                local_keys[std::size_t(vertex)] = topo.template key_by_dim<0>(local_vertex).key;
+                foreign_keys[std::size_t(vertex)] = entity.topology.template key_by_dim<0>(vertex).key;
               }
 
-              target[i].orientation = CongruencySampler::compare(local_keys.data(), foreign_keys.data());
+              target[std::size_t(i)].orientation = CongruencySampler::compare(local_keys.data(), foreign_keys.data());
             }
           }
         }
@@ -1365,12 +1365,16 @@ namespace FEAT::Geometry
         case EntitySource::ParentTopology:
           return topo.template key_by_dim<result_dim_>(ref.index);
         case EntitySource::Sibling:
-          return OrientedElementRef<result_dim_>(ref.orientation, siblings.template by_dim<result_dim_>()[ref.index]);
+          return OrientedElementRef<result_dim_>(ref.orientation, siblings.template by_dim<result_dim_>()[std::size_t(ref.index)]);
         case EntitySource::BoundaryEdge:
         {
           if constexpr (entity_dim_ >= 2 && result_dim_ <= 1)
           {
             return _resolve_boundary_entity_reference<entity_dim_, result_dim_, 1>(topo, ref);
+          }
+          else
+          {
+            XABORTM("_resolve_entity_reference failed: EntitySource::BoundaryEdge: Either source or target has invalid dimension");
           }
         }
         case EntitySource::BoundaryFace:
@@ -1379,9 +1383,13 @@ namespace FEAT::Geometry
           {
             return _resolve_boundary_entity_reference<entity_dim_, result_dim_, 2>(topo, ref);
           }
+          else
+          {
+            XABORTM("_resolve_entity_reference failed: EntitySource::BoundaryFace: Either source or target has invalid dimension");
+          }
         }
         default:
-          XABORTM("select failed");
+          XABORTM("_resolve_entitiy_reference failed: Unkown EntitySource");
       }
     }
 
@@ -1471,7 +1479,7 @@ namespace FEAT::Geometry
         {
           for(int j(0); j < num_entities; j++)
           {
-            all_unique = all_unique && (i == j || (entities[i] != entities[j]));
+            all_unique = all_unique && (i == j || (entities[std::size_t(i)] != entities[std::size_t(j)]));
           }
         }
 
@@ -1507,7 +1515,7 @@ namespace FEAT::Geometry
 
         for(int entity_idx(0); entity_idx < num_entities; entity_idx++)
         {
-          const Intern::OrientedElement<dim_> o_ref = entities[entity_idx];
+          const Intern::OrientedElement<dim_> o_ref = entities[std::size_t(entity_idx)];
           const auto& entity = _storage[o_ref];
 
           std::array<ElementRef<0>, num_vertices> local_keys;
@@ -1515,9 +1523,9 @@ namespace FEAT::Geometry
 
           for(int vertex(0); vertex < num_vertices; vertex++)
           {
-            Index local_vertex = FaceMapping::map(entity_idx, vertex);
-            local_keys[vertex] = topology.template key_by_dim<0>(local_vertex).key;
-            foreign_keys[vertex] = entity.topology.template key_by_dim<0>(vertex).key;
+            const int local_vertex = int(FaceMapping::map(entity_idx, vertex));
+            local_keys[std::size_t(vertex)] = topology.template key_by_dim<0>(local_vertex).key;
+            foreign_keys[std::size_t(vertex)] = entity.topology.template key_by_dim<0>(vertex).key;
           }
 
           is_oriented = is_oriented && (CongruencySampler::compare(local_keys.data(), foreign_keys.data()) == o_ref.orientation);
@@ -1550,13 +1558,13 @@ namespace FEAT::Geometry
         const auto& entities = topology.template by_dim<dim_>();
         for(int entity_idx(0); entity_idx < num_entities; entity_idx++)
         {
-          const auto& entity = _storage[entities[entity_idx]];
+          const auto& entity = _storage[entities[std::size_t(entity_idx)]];
 
           for(int vertex(0); vertex < num_vertices; vertex++)
           {
-            ElementRef<0> v_topo = topology.template by_dim<0>()[FaceMapping::map(entity_idx, vertex)].key;
-            int orientation = entities[entity_idx].orientation;
-            Index mapped = CongruencyMapping::map(orientation, vertex);
+            ElementRef<0> v_topo = topology.template by_dim<0>()[std::size_t(FaceMapping::map(entity_idx, vertex))].key;
+            const int orientation = entities[std::size_t(entity_idx)].orientation;
+            const Index mapped = Index(CongruencyMapping::map(orientation, vertex));
             ElementRef<0> v_entity = entity.topology.template by_dim<0>()[mapped].key;
             is_consistent = is_consistent && (v_topo == v_entity);
 

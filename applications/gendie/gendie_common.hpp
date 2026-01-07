@@ -284,14 +284,14 @@ namespace Gendie
               loc_unit_asm_inflow.add_mesh_part(*mesh_part);
               if constexpr(system_is_solver_level)
               {
-                loc_unit_asm_inflow.assemble(filter_v_inflow, domain.at(i)->space_velo, inflow_bounds.at(id).get_diri_inflow_function(materials, mesh_unit_scale));
+                loc_unit_asm_inflow.assemble(filter_v_inflow, domain.at(i)->space_velo, inflow_bounds.at(std::size_t(id)).get_diri_inflow_function(materials, mesh_unit_scale));
               }
               else
               {
                 // create temporary filter (of correct datatype)
                 typename SystemLevel_::LocalVeloUnitFilter fil_loc_v;
                 // directly assembly onto the inflow filter
-                loc_unit_asm_inflow.assemble(fil_loc_v, domain.at(i)->space_velo, inflow_bounds.at(id).get_diri_inflow_function(materials, mesh_unit_scale));
+                loc_unit_asm_inflow.assemble(fil_loc_v, domain.at(i)->space_velo, inflow_bounds.at(std::size_t(id)).get_diri_inflow_function(materials, mesh_unit_scale));
                 //and now convert
                 if(filter_v_inflow.size() == Index(0))
                   filter_v_inflow.convert(fil_loc_v);

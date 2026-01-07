@@ -61,27 +61,27 @@ namespace DbgAdaptiveMesh
       vertex_set[indices[6]] = {2.0 * (Real)type, 1.0, 1.0};
       vertex_set[indices[7]] = {2.0 * (Real)type + 1.0, 1.0, 1.0};
 
-      for(int i = 0; i < 12; i++)
+      for(std::size_t i = 0; i < 12u; i++)
       {
-        e_at_c[type][i] = 12 * type + i;
+        e_at_c[type][int(i)] = 12 * type + i;
 
-        v_at_e[12 * type + i][0] = indices[CellEdgeMap::map(i, 0)];
-        v_at_e[12 * type + i][1] = indices[CellEdgeMap::map(i, 1)];
+        v_at_e[12 * type + i][0] = indices[CellEdgeMap::map(int(i), 0)];
+        v_at_e[12 * type + i][1] = indices[CellEdgeMap::map(int(i), 1)];
       }
 
-      for(int i = 0; i < 6; i++)
+      for(std::size_t i = 0; i < 6u; i++)
       {
-        f_at_c[type][i] = 6 * type + i;
+        f_at_c[type][int(i)] = 6u * type + i;
 
-        v_at_f[6 * type + i][0] = indices[CellFaceMap::map(i, 0)];
-        v_at_f[6 * type + i][1] = indices[CellFaceMap::map(i, 1)];
-        v_at_f[6 * type + i][2] = indices[CellFaceMap::map(i, 2)];
-        v_at_f[6 * type + i][3] = indices[CellFaceMap::map(i, 3)];
+        v_at_f[6 * type + i][0] = indices[CellFaceMap::map(int(i), 0)];
+        v_at_f[6 * type + i][1] = indices[CellFaceMap::map(int(i), 1)];
+        v_at_f[6 * type + i][2] = indices[CellFaceMap::map(int(i), 2)];
+        v_at_f[6 * type + i][3] = indices[CellFaceMap::map(int(i), 3)];
 
-        e_at_f[6 * type + i][0] = 12 * type + FaceEdgeMap::map(i, 0);
-        e_at_f[6 * type + i][1] = 12 * type + FaceEdgeMap::map(i, 1);
-        e_at_f[6 * type + i][2] = 12 * type + FaceEdgeMap::map(i, 2);
-        e_at_f[6 * type + i][3] = 12 * type + FaceEdgeMap::map(i, 3);
+        e_at_f[6 * type + i][0] = 12u * type + Index(FaceEdgeMap::map(int(i), 0));
+        e_at_f[6 * type + i][1] = 12u * type + Index(FaceEdgeMap::map(int(i), 1));
+        e_at_f[6 * type + i][2] = 12u * type + Index(FaceEdgeMap::map(int(i), 2));
+        e_at_f[6 * type + i][3] = 12u * type + Index(FaceEdgeMap::map(int(i), 3));
       }
 
       for(int i = 0; i < 8; i++)
@@ -137,10 +137,10 @@ namespace DbgAdaptiveMesh
       for(int i = 0; i < 4; i++)
       {
         v_at_f[type][i] = indices[i];
-        v_at_e[4 * type + i][0] = indices[EdgeMap::map(i, 0)];
-        v_at_e[4 * type + i][1] = indices[EdgeMap::map(i, 1)];
-        e_at_f[type][i] = 4 * type + i;
-        levels[indices[i]] = (type & (1ULL << (std:: uint64_t)i)) > 0 ? 1 : 0;
+        v_at_e[4 * type + std::size_t(i)][0] = indices[EdgeMap::map(i, 0)];
+        v_at_e[4 * type + std::size_t(i)][1] = indices[EdgeMap::map(i, 1)];
+        e_at_f[type][i] = 4 * type + Index(i);
+        levels[indices[i]] = (type & (1ULL << std:: uint64_t(i))) > 0 ? 1 : 0;
       }
     }
 

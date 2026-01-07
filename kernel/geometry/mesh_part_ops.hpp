@@ -444,7 +444,7 @@ namespace FEAT::Geometry
       std::array<Index, ShapeType::dimension + 1> size{};
       for(int i(0); i < ShapeType::dimension + 1; i++)
       {
-        size[i] = tsh.get_num_entities(i);
+        size[std::size_t(i)] = tsh.get_num_entities(i);
       }
 
 

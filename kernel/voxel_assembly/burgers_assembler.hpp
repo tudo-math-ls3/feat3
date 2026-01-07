@@ -1669,7 +1669,7 @@ namespace FEAT
         Util::cuda_copy_host_to_device(cub_pt_device, (void*)cub_pt, Index(num_cubs) * sizeof(CubPointType));
 
         void* cub_wg_device = Util::cuda_malloc(Index(num_cubs) * sizeof(DataType));
-        Util::cuda_copy_host_to_device(cub_wg_device, (void*)cub_wg, Index(num_cubs) * sizeof(DataType));
+        Util::cuda_copy_host_to_device(cub_wg_device, (const void*)cub_wg, Index(num_cubs) * sizeof(DataType));
 
         VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_assembly_field();
@@ -1697,7 +1697,7 @@ namespace FEAT
         Util::cuda_copy_host_to_device(cub_pt_device, (void*)cub_pt, Index(num_cubs) * sizeof(CubPointType));
 
         void* cub_wg_device = Util::cuda_malloc(Index(num_cubs) * sizeof(DataType));
-        Util::cuda_copy_host_to_device(cub_wg_device, (void*)cub_wg, Index(num_cubs) * sizeof(DataType));
+        Util::cuda_copy_host_to_device(cub_wg_device, (const void*)cub_wg, Index(num_cubs) * sizeof(DataType));
 
         VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_assembly_field();

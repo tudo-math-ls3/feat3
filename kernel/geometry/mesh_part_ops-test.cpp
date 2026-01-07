@@ -125,7 +125,7 @@ public:
       const auto& vertex_target_set = intersection_part.get_target_set<0>();
       const Index* begin = vertex_target_set.get_indices();
       const Index* end = begin + vertex_target_set.get_num_entities();
-      for(Index i : {0, 1, 4, 5, 8, 9, 12, 13})
+      for(Index i : {0ULL, 1ULL, 4ULL, 5ULL, 8ULL, 9ULL, 12ULL, 13ULL})
       {
         TEST_CHECK(std::find(begin, end, i) != end);
       }

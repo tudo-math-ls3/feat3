@@ -279,12 +279,12 @@ namespace FEAT::Geometry::Intern
     std::array<OrientedElement<dim_>, num_entities> entities;
 
     template<int key_dim_>
-    OrientedElement<key_dim_> key_by_dim(Index idx) const
+    OrientedElement<key_dim_> key_by_dim(int idx) const
     {
       static_assert(key_dim_ < Shape_::dimension);
       ASSERT(idx < (ElementTopology<Shape_, key_dim_>::num_entities));
 
-      return ElementTopology<Shape_, key_dim_>::entities[idx];
+      return ElementTopology<Shape_, key_dim_>::entities[std::size_t(idx)];
     }
 
     template<int query_dim_>
@@ -322,12 +322,12 @@ namespace FEAT::Geometry::Intern
     std::array<OrientedElement<0>, num_entities> entities;
 
     template<int key_dim_>
-    OrientedElement<key_dim_> key_by_dim(Index idx) const
+    OrientedElement<key_dim_> key_by_dim(int idx) const
     {
       static_assert(key_dim_ == 0);
       ASSERT(idx < num_entities);
 
-      return entities[idx];
+      return entities[std::size_t(idx)];
     }
 
     template<int query_dim_>
@@ -1244,11 +1244,11 @@ namespace FEAT::Geometry::Intern
           auto& candidates = key.is_permanent ? permanent_facet_neighbors[layer.idx][key.layer.idx][key] : transient_facet_neighbors[layer.idx][key.layer.idx][key];
           if(candidates[0] == element_key)
           {
-            element.neighbors[facet_idx] = candidates[1];
+            element.neighbors[std::size_t(facet_idx)] = candidates[1];
           }
           else if(candidates[1] == element_key)
           {
-            element.neighbors[facet_idx] = candidates[0];
+            element.neighbors[std::size_t(facet_idx)] = candidates[0];
           }
         }
       };

@@ -339,7 +339,7 @@ namespace FEAT
           _watch_create_base_mesh.start();
           _base_mesh_node = std::move(mesh_node);
 
-          for(int k = 0; k < shape_dim; ++k)
+          for(std::size_t k = 0; k < std::size_t(shape_dim); ++k)
           {
             _base_slices[k] = Math::Limits<Index>::max();
           }

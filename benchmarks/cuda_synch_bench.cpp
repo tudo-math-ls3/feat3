@@ -32,7 +32,7 @@ void run([[maybe_unused]] SimpleArgParser& args)
   typedef DT_ DataType;
   typedef IT_ IndexType;
 
-  Index node_size = 10 << lvl;
+  Index node_size = 10u << lvl;
 
   std::vector<IT_> num_of_nodes;
   num_of_nodes.push_back(node_size);
@@ -58,14 +58,14 @@ void run([[maybe_unused]] SimpleArgParser& args)
 
   double flops(double(mat.used_elements()));
   flops *= 2;
-  flops *= num_inner_loop;
+  flops *= double(num_inner_loop);
 
   double bytes(double(mat.used_elements()));
   bytes *= double(sizeof(DT_));
   bytes += double(mat.used_elements() * sizeof(IT_));
   bytes += double(rhs.size() * sizeof(DT_));
 
-  bytes *= num_inner_loop;
+  bytes *= double(num_inner_loop);
 
   if constexpr (synch_)
   {

@@ -95,7 +95,7 @@ namespace FEAT
           (void)comm; // suppress unused parameter warnings
 #endif
           // set up HYPRE dof indices vector
-          _hypre_dof_idx.resize((std::size_t)_num_owned_dofs);
+          _hypre_dof_idx.resize(std::size_t(_num_owned_dofs));
           for(HYPRE_Int i(0); i < _num_owned_dofs; ++i)
             _hypre_dof_idx[std::size_t(i)] = _dof_offset + i;
 
@@ -117,12 +117,12 @@ namespace FEAT
           HYPRE_IJVectorInitialize(_hypre_vec_cor);
 
           // create HYPRE index vectors
-          _hypre_num_nze.resize((std::size_t)_num_owned_dofs);
-          _hypre_row_ptr.resize((std::size_t)(_num_owned_dofs+1u));
-          _hypre_col_idx.resize((std::size_t)_num_nonzeros);
-          _hypre_mat_val.resize((std::size_t)_num_nonzeros);
-          _hypre_def_val.resize((std::size_t)_num_owned_dofs);
-          _hypre_cor_val.resize((std::size_t)_num_owned_dofs);
+          _hypre_num_nze.resize(std::size_t(_num_owned_dofs));
+          _hypre_row_ptr.resize(std::size_t(_num_owned_dofs+1));
+          _hypre_col_idx.resize(std::size_t(_num_nonzeros));
+          _hypre_mat_val.resize(std::size_t(_num_nonzeros));
+          _hypre_def_val.resize(std::size_t(_num_owned_dofs));
+          _hypre_cor_val.resize(std::size_t(_num_owned_dofs));
         }
 
         ~Core()

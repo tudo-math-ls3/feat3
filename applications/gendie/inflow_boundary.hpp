@@ -214,7 +214,7 @@ namespace Gendie
       XASSERTM(vals.size() == 3, "Entry " + entry + " does not contain 3 coordinates");
       for(int i = 0; i < 3; i++)
       {
-        XASSERTM(vals[i].parse(tmp[i]), "Could not parse entry");
+        XASSERTM(vals[std::size_t(i)].parse(tmp[i]), "Could not parse entry");
       }
       return tmp;
     }
@@ -688,7 +688,7 @@ namespace Gendie
         const Tiny::Vector<DataType, 3> dC = in - cent;
 
         // TODO: not enough information to describe ellipse
-        return (Math::abs(orth_dist) < tolerance) && (Math::sqr(dC[0]));
+        return (Math::abs(orth_dist) < tolerance) && bool(Math::sqr(dC[0]));
       };
     }
 

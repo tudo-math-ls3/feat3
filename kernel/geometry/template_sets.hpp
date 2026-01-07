@@ -77,7 +77,7 @@ namespace FEAT::Geometry
           while(!type.is_zero_refinement() && templates.template has_template<dim>(type))
           {
             // Type is valid. Decrement markings to check next type.
-            for(Index i(0); i < num_vertices; i++)
+            for(int i(0); i < num_vertices; i++)
             {
               levels[i] = levels[i] > 0 ? levels[i] - 1 : 0;
             }
@@ -93,10 +93,10 @@ namespace FEAT::Geometry
 
           // Invalid type found. Adjust levels
           auto& adjustment = templates.template type_adjustment<dim>(type.to_number());
-          for(std::size_t i(0); i < std::size_t(num_vertices); i++)
+          for(int i(0); i < num_vertices; i++)
           {
-            result[v_at_c[cell][i]] += adjustment[i];
-            levels[i] += adjustment[i];
+            result[v_at_c[cell][i]] += adjustment[std::size_t(i)];
+            levels[i] += adjustment[std::size_t(i)];
           }
           type = StandardRefinementType<ShapeType>(levels);
 
@@ -209,7 +209,7 @@ namespace FEAT::Geometry
           while(!type.is_zero_refinement() && templates.template has_template<dim>(type))
           {
             // Type is valid. Decrement markings to check next type.
-            for(Index i(0); i < num_vertices; i++)
+            for(int i(0); i < num_vertices; i++)
             {
               levels[i].level = levels[i].level > 0 ? levels[i].level - 1 : 0;
             }
@@ -238,8 +238,8 @@ namespace FEAT::Geometry
           auto& adjustment = templates.template type_adjustment<dim>(type.to_number());
           for(int i(0); i < num_vertices; i++)
           {
-            result[v_at_c[cell][i]].level += adjustment[i];
-            levels[i].level += adjustment[i];
+            result[v_at_c[cell][i]].level += adjustment[std::size_t(i)];
+            levels[i].level += adjustment[std::size_t(i)];
           }
           type = IsolatedPointRefinementType<ShapeType>(levels);
 
@@ -274,7 +274,7 @@ namespace FEAT::Geometry
         case EntitySource::Sibling:
         {
           std::uint64_t min = markings[0];
-          for(Index i(1); i < markings.size; ++i)
+          for(int i(1); i < markings.size; ++i)
           {
             min = std::min(min, markings[i]);
           }
@@ -334,7 +334,7 @@ namespace FEAT::Geometry
         case EntitySource::Sibling:
         {
           std::uint64_t min = markings[0].level;
-          for(Index i(1); i < markings.size; ++i)
+          for(int i(1); i < markings.size; ++i)
           {
             min = std::min(min, markings[i].level);
           }
@@ -470,7 +470,7 @@ namespace FEAT::Geometry
     }
 
     template<typename Shape_, int dim_>
-    static std::pair<Index, int> correct_for_orientation(StandardRefinementType<Shape_> type, int orientation, Index idx)
+    static std::pair<Index, int> correct_for_orientation(StandardRefinementType<Shape_> type, int orientation, int idx)
     {
       return _templates.template correct_for_orientation<Shape_::dimension, dim_>(type, orientation, idx);
     }
@@ -583,7 +583,7 @@ namespace FEAT::Geometry
     }
 
     template<typename Shape_, int dim_>
-    static std::pair<Index, int> correct_for_orientation(IsolatedPointRefinementType<Shape_> type, int orientation, Index idx)
+    static std::pair<Index, int> correct_for_orientation(IsolatedPointRefinementType<Shape_> type, int orientation, int idx)
     {
       return _templates().template correct_for_orientation<Shape_::dimension, dim_>(type, orientation, idx);
     }

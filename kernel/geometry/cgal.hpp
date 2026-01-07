@@ -90,14 +90,14 @@ namespace FEAT
 
       CGALValueIteratorWrapper& operator++()
       {
-        ASSERT(current.has_value());
+        ASSERT(_current.has_value());
         _current = _generator();
         return *this;
       }
 
       CGALValueIteratorWrapper operator++(int)
       {
-        ASSERT(current.has_value());
+        ASSERT(_current.has_value());
         CGALValueIteratorWrapper tmp = *this;
         ++(*this);
         return tmp;
@@ -359,7 +359,7 @@ namespace FEAT
           {
             if(vts[k] == v)
             {
-              vs[j] = k;
+              vs[std::size_t(j)] = k;
               break;
             }
           }

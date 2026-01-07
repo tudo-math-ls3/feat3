@@ -67,11 +67,11 @@ namespace FEAT
 #endif
 
           // allocate matrix and vector arrays
-          row_ptr.resize(num_owned_dofs+1u, 0u);
-          col_idx.resize(num_owned_nzes, 0u);
-          mat_val.resize(num_owned_nzes, 0.0);
-          rhs_val.resize(num_owned_dofs, 0.0);
-          sol_val.resize(num_owned_dofs, 0.0);
+          row_ptr.resize(std::size_t(num_owned_dofs+1), 0u);
+          col_idx.resize(std::size_t(num_owned_nzes), 0u);
+          mat_val.resize(std::size_t(num_owned_nzes), 0.0);
+          rhs_val.resize(std::size_t(num_owned_dofs), 0.0);
+          sol_val.resize(std::size_t(num_owned_dofs), 0.0);
 
 #ifdef FEAT_DSS_UMFPACK_I64
           ::umfpack_dl_defaults(control);

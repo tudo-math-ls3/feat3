@@ -24,23 +24,23 @@ namespace FEAT::Geometry::Intern
     using VertexMarkingType = VertexMarking_;
 
     /// Tuple size
-    static constexpr std::size_t size = size_;
+    static constexpr int size = size_;
 
     /// Tuple values
-    std::array<VertexMarkingType, size_> levels;
+    std::array<VertexMarkingType, std::size_t(size_)> levels;
 
     /// access operator
-    VertexMarkingType& operator[](Index idx)
+    VertexMarkingType& operator[](int idx)
     {
       ASSERT(idx < size);
-      return levels[idx];
+      return levels[std::size_t(idx)];
     }
 
     /// access operator
-    const VertexMarkingType& operator[](Index idx) const
+    const VertexMarkingType& operator[](int idx) const
     {
       ASSERT(idx < size);
-      return levels[idx];
+      return levels[std::size_t(idx)];
     }
   };
 
@@ -116,7 +116,7 @@ namespace FEAT::Geometry::Intern
 
       for(int i(0); i < n_; ++i)
       {
-        result[std::size_t(i)] = _markings[indices[i]];
+        result[i] = _markings[indices[i]];
       }
       return result;
     }

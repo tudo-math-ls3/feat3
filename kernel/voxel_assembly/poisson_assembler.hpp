@@ -207,11 +207,11 @@ namespace FEAT
 
         typedef typename Cubature::Rule<ShapeType, DataType, DataType>::PointType CubPointType;
         //initialize all necessary pointer arrays and values //maybe more sense to specify cubature rule and set this to a const mem location?
-        void* cub_pt_device = Util::cuda_malloc(num_cubs * sizeof(CubPointType));
-        Util::cuda_copy_host_to_device(cub_pt_device, (void*)cub_pt, num_cubs * sizeof(CubPointType));
+        void* cub_pt_device = Util::cuda_malloc(std::size_t(num_cubs) * sizeof(CubPointType));
+        Util::cuda_copy_host_to_device(cub_pt_device, (void*)cub_pt, std::size_t(num_cubs) * sizeof(CubPointType));
 
-        void* cub_wg_device = Util::cuda_malloc(num_cubs * sizeof(DataType));
-        Util::cuda_copy_host_to_device(cub_wg_device, (void*)cub_wg, num_cubs * sizeof(DataType));
+        void* cub_wg_device = Util::cuda_malloc(std::size_t(num_cubs) * sizeof(DataType));
+        Util::cuda_copy_host_to_device(cub_wg_device, (const void*)cub_wg, std::size_t(num_cubs) * sizeof(DataType));
 
         VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_assembly_field();

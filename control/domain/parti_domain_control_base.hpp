@@ -1407,7 +1407,7 @@ namespace FEAT
           const auto& vertex_set =  base_mesh_node.get_mesh()->get_vertex_set();
 
           // call the partitioner
-          if(!partitioner.execute(faces_at_elem, verts_at_elem, vertex_set, ancestor.num_parts, weights))
+          if(!partitioner.execute(faces_at_elem, verts_at_elem, vertex_set, Index(ancestor.num_parts), weights))
             return false;
 
           // create partition graph

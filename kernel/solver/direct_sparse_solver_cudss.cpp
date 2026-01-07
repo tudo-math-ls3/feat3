@@ -104,18 +104,18 @@ namespace FEAT
           memset(memory_estimates, 0, sizeof(memory_estimates));
 
           // allocate matrix and vector arrays in host memory
-          row_ptr_host.resize(num_owned_dofs+1u, 0u);
-          col_idx_host.resize(num_owned_nzes, 0u);
-          mat_val_host.resize(num_owned_nzes, 0.0);
-          rhs_val_host.resize(num_owned_dofs * num_rhs, 0.0);
-          sol_val_host.resize(num_owned_dofs * num_rhs, 0.0);
+          row_ptr_host.resize(std::size_t(num_owned_dofs+1), 0u);
+          col_idx_host.resize(std::size_t(num_owned_nzes), 0u);
+          mat_val_host.resize(std::size_t(num_owned_nzes), 0.0);
+          rhs_val_host.resize(std::size_t(num_owned_dofs * num_rhs), 0.0);
+          sol_val_host.resize(std::size_t(num_owned_dofs * num_rhs), 0.0);
 
           // allocate matrix and vector arrays in device memory
-          row_ptr_dev = Util::cuda_malloc(sizeof(CUDSS_IT) * (num_owned_dofs+1u));
-          col_idx_dev = Util::cuda_malloc(sizeof(CUDSS_IT) * num_owned_nzes);
-          mat_val_dev = Util::cuda_malloc(sizeof(CUDSS_DT) * num_owned_nzes);
-          rhs_val_dev = Util::cuda_malloc(sizeof(CUDSS_DT) * num_owned_dofs * num_rhs);
-          sol_val_dev = Util::cuda_malloc(sizeof(CUDSS_DT) * num_owned_dofs * num_rhs);
+          row_ptr_dev = Util::cuda_malloc(sizeof(CUDSS_IT) * std::size_t(num_owned_dofs+1));
+          col_idx_dev = Util::cuda_malloc(sizeof(CUDSS_IT) * std::size_t(num_owned_nzes));
+          mat_val_dev = Util::cuda_malloc(sizeof(CUDSS_DT) * std::size_t(num_owned_nzes));
+          rhs_val_dev = Util::cuda_malloc(sizeof(CUDSS_DT) * std::size_t(num_owned_dofs * num_rhs));
+          sol_val_dev = Util::cuda_malloc(sizeof(CUDSS_DT) * std::size_t(num_owned_dofs * num_rhs));
         }
 
         ~CUDSS_Core()
@@ -154,8 +154,8 @@ namespace FEAT
           const std::int64_t last_owned_dof  = dof_offset + num_owned_dofs - 1;
 
           // copy structure host arrays to device
-          Util::cuda_copy_host_to_device(row_ptr_dev, row_ptr_host.data(), sizeof(CUDSS_IT) * (num_owned_dofs+1u));
-          Util::cuda_copy_host_to_device(col_idx_dev, col_idx_host.data(), sizeof(CUDSS_IT) * num_owned_nzes);
+          Util::cuda_copy_host_to_device(row_ptr_dev, row_ptr_host.data(), sizeof(CUDSS_IT) * std::size_t(num_owned_dofs+1));
+          Util::cuda_copy_host_to_device(col_idx_dev, col_idx_host.data(), sizeof(CUDSS_IT) * std::size_t(num_owned_nzes));
 
           // set the basic configuration
           //cudssAlgType_t alg_type = CUDSS_ALG_DEFAULT;//CUDSS_ALG_1; // COLAMD based ordering
@@ -251,7 +251,7 @@ namespace FEAT
         void init_numeric()
         {
           // copy value host arrays to device
-          Util::cuda_copy_host_to_device(mat_val_dev, mat_val_host.data(), sizeof(CUDSS_DT) * num_owned_nzes);
+          Util::cuda_copy_host_to_device(mat_val_dev, mat_val_host.data(), sizeof(CUDSS_DT) * std::size_t(num_owned_nzes));
 
           // perform numeric factorization
           cudssStatus_t ret = cudssExecute(
@@ -274,7 +274,7 @@ namespace FEAT
           cudssStatus_t ret = CUDSS_STATUS_INTERNAL_ERROR;
 
           // copy RHS value array to device
-          Util::cuda_copy_host_to_device(rhs_val_dev, rhs_val_host.data(), sizeof(CUDSS_DT) * num_owned_dofs * num_rhs);
+          Util::cuda_copy_host_to_device(rhs_val_dev, rhs_val_host.data(), sizeof(CUDSS_DT) * std::size_t(num_owned_dofs * num_rhs));
 
           // set solution vector data array
           ret = cudssMatrixSetValues(vec_sol, sol_val_dev);
@@ -299,7 +299,7 @@ namespace FEAT
             throw DirectSparseSolverException("cuDSS", "cudssExecute() for phase 'CUDSS_PHASE_SOLVE' failed!");
 
           // copy sol values array to host
-          Util::cuda_copy_device_to_host(sol_val_host.data(), sol_val_dev, sizeof(CUDSS_DT) * num_owned_dofs * num_rhs);
+          Util::cuda_copy_device_to_host(sol_val_host.data(), sol_val_dev, sizeof(CUDSS_DT) * std::size_t(num_owned_dofs * num_rhs));
 
           // wait until CUDA is done
           Util::cuda_synchronize();

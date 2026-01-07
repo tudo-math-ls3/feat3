@@ -356,7 +356,7 @@ namespace FEAT
       #ifdef FEAT_HAVE_CUDA
         _d_macro_dofs.resize(this->_macro_dofs.size());
         _d_dof_macros.resize(this->_dof_macros.size());
-        for(int i = 0; i < int(this->_macro_dofs.size()); ++i)
+        for(std::size_t i = 0; i < this->_macro_dofs.size(); ++i)
         {
           Index malloc_size;
           if constexpr(macro_type_ == FEAT::Intern::VankaMacroPolicy::uniformMacros)
@@ -369,7 +369,7 @@ namespace FEAT
             Index* tmp_alias = _d_macro_dofs[i];
             const Index* dom_ptr = this->_macro_dofs[i].get_domain_ptr();
             const Index* img_ptr = this->_macro_dofs[i].get_image_idx();
-            for(int k = 0; k < int(this->_macro_dofs[i].get_num_nodes_domain()); ++k)
+            for(Index k = 0; k < this->_macro_dofs[i].get_num_nodes_domain(); ++k)
             {
               if constexpr(macro_type_ == FEAT::Intern::VankaMacroPolicy::uniformMacros)
               {
@@ -390,7 +390,7 @@ namespace FEAT
             Index* tmp_alias = _d_dof_macros[i];
             const Index* dom_ptr = this->_dof_macros[i].get_domain_ptr();
             const Index* img_ptr = this->_dof_macros[i].get_image_idx();
-            for(int k = 0; k < int(this->_dof_macros[i].get_num_nodes_domain()); ++k)
+            for(Index k = 0; k < this->_dof_macros[i].get_num_nodes_domain(); ++k)
             {
               const Index loc_size = dom_ptr[k+1] - dom_ptr[k];
               tmp_alias[k*(_max_degree_macros[i]+1)] = loc_size;
@@ -415,7 +415,7 @@ namespace FEAT
       #ifdef FEAT_HAVE_CUDA
         Util::cuda_free(_d_macro_mask);
         _d_macro_mask = nullptr;
-        for(int i = 0; i < int(_d_macro_dofs.size()); ++i)
+        for(std::size_t i = 0; i < _d_macro_dofs.size(); ++i)
         {
           Util::cuda_free((void*)(_d_macro_dofs[i]));
           Util::cuda_free((void*)(_d_dof_macros[i]));

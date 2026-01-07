@@ -512,7 +512,7 @@ namespace FEAT::Geometry
      */
     IntersectionResultType cast(const Index vertex, const Vector& direction) const
     {
-      const DataType eps = 1e-8;
+      const DataType eps = DataType(1e-8);
       const Ray<Vector> r{_mesh.get_vertex_set()[vertex], direction};
 
       const auto& f_at_c = _mesh.template get_index_set<shape_dim, facet_dim>();

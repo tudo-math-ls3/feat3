@@ -96,9 +96,9 @@ namespace FEAT
       // set matrix data
       ret = cudssMatrixCreateCsr(
         &core.matrix,
-        neq,
-        neq,
-        nze,
+        std::int64_t(neq),
+        std::int64_t(neq),
+        std::int64_t(nze),
         row_ptr,
         nullptr,
         col_idx,
@@ -114,9 +114,9 @@ namespace FEAT
       // allocate solution vector
       ret = cudssMatrixCreateDn(
         &core.vec_sol,
-        neq,
+        std::int64_t(neq),
         1,
-        neq,
+        std::int64_t(neq),
         nullptr,
         CUDA_R_64F,
         CUDSS_LAYOUT_COL_MAJOR);
@@ -127,9 +127,9 @@ namespace FEAT
       // allocate rhs vector
       ret = cudssMatrixCreateDn(
         &core.vec_rhs,
-        neq,
+        std::int64_t(neq),
         1,
-        neq,
+        std::int64_t(neq),
         nullptr,
         CUDA_R_64F,
         CUDSS_LAYOUT_COL_MAJOR);

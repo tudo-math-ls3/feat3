@@ -135,7 +135,7 @@ namespace Gendie
           //first parse the min parameters
           for(int i = 0; i < dim; ++i)
           {
-            if(!tmp_msh_string.at(i).parse(mesh_bb_min[i]))
+            if(!tmp_msh_string.at(std::size_t(i)).parse(mesh_bb_min[i]))
             {
               logger->print("Could not parse " + stringify(i) + "th Parameter of BB min parameter!", error);
               Runtime::abort();
@@ -143,7 +143,7 @@ namespace Gendie
           }
           for(int i = 0; i < dim; ++i)
           {
-            if(!tmp_msh_string.at(i+dim).parse(mesh_bb_max[i]))
+            if(!tmp_msh_string.at(std::size_t(i+dim)).parse(mesh_bb_max[i]))
             {
               logger->print("Could not parse " + stringify(i) + "th Parameter of BB max parameter!", error);
               Runtime::abort();
@@ -151,7 +151,7 @@ namespace Gendie
           }
           for(int i = 0; i < dim; ++i)
           {
-            if(!tmp_msh_string.at(i+2*dim).parse(mesh_bb_num_cells[i]))
+            if(!tmp_msh_string.at(std::size_t(i+2*dim)).parse(mesh_bb_num_cells[i]))
             {
               logger->print("Could not parse " + stringify(i) + "th Parameter of BB num cells parameter!", error);
               Runtime::abort();
@@ -503,7 +503,7 @@ namespace Gendie
           // inflow
           loc_unit_asm_inflow.add_mesh_part(*mesh_part);
           // directly assembly onto the inflow filter
-          loc_unit_asm_inflow.assemble(filter_v_inflow, cur_dom.space_velo, inflow_boundaries.at(id).get_diri_inflow_function(materials, param_holder.mesh_unit_scale));
+          loc_unit_asm_inflow.assemble(filter_v_inflow, cur_dom.space_velo, inflow_boundaries.at(std::size_t(id)).get_diri_inflow_function(materials, param_holder.mesh_unit_scale));
         }
         else if((name != "bnd:n") && (!name.starts_with("bnd:out")) && ((name_lower.replace_all(String("outflow"), String("")) == 0u)))
         {
@@ -870,7 +870,7 @@ namespace Gendie
         const String& mesh_hirarchy_vtk = config->query("postproc-params/mesh-hirarchy-vtk").first;
         logger.print("Writing Mesh hirarchy output to '" + mesh_hirarchy_vtk + "_<LEVEL>.pvtu'", info);
         //todo: write out refinement hirarchy with mesh parts
-        for(int i = 0; i < int(domain.size_physical()); ++i)
+        for(std::size_t i = 0; i < std::size_t(domain.size_physical()); ++i)
         {
           String cur_vtk_name = mesh_hirarchy_vtk + "_" + stringify(i).pad_front(2, '0');
           // get the mesh for the VTK output

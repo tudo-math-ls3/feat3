@@ -1297,7 +1297,7 @@ public:
     Tiny::Vector<DT_, block_size_> tmp_tiny(DT_(0));
     tmp_tiny[0] = DT_(1);
 
-    for(int i = 0; i < int(normal.size()); ++i)
+    for(Index i = 0; i < normal.size(); ++i)
     {
       normal(i, tmp_tiny);
     }
@@ -1306,7 +1306,7 @@ public:
 
     vec.project_onto(projected_vec, normal);
 
-    for(int i = 0; i < int(vec.size()); ++i)
+    for(Index i = 0; i < vec.size(); ++i)
     {
       TEST_CHECK_EQUAL_WITHIN_EPS(projected_vec(i)[0], vec(i)[0],  eps);
     }
@@ -1357,7 +1357,7 @@ public:
       {
         Tiny::Vector<DT_, block_size_> tv;
         for (int j = 0; j < block_size_; ++j)
-          tv[j] = DT_(i * block_size_ + j);
+          tv[j] = DT_(i * block_size_ + Index(j));
         a(i, tv);
         b(i, tv);
       }
@@ -1435,7 +1435,7 @@ public:
       {
         Tiny::Vector<DT_, block_size_> tv;
         for (int j = 0; j < block_size_; ++j)
-          tv[j] = DT_(i * block_size_ + j);
+          tv[j] = DT_(i * block_size_ + Index(j));
         a(i, tv);
       }
 

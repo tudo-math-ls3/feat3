@@ -451,20 +451,20 @@ public:
       TEST_CHECK_EQUAL(vertices.size(), 4);
       TEST_CHECK_EQUAL(edges.size(), 4);
 
-      for(int i(0); i < 4; i++)
+      for(std::size_t i(0); i < 4u; i++)
       {
         TEST_CHECK(is_same_vertex(vertices[i].raw_entity.coords[0], expected_vertices[i]));
-        TEST_CHECK_EQUAL(vertices[i].reference.index, Index(i));
+        TEST_CHECK_EQUAL(vertices[i].reference.index, int(i));
         TEST_CHECK_EQUAL(vertices[i].reference.source, EntitySource::ParentTopology);
       }
 
-      for(int i(0); i < 4; i++)
+      for(std::size_t i(0); i < 4u; i++)
       {
         using FaceMapping = Geometry::Intern::FaceIndexMapping<Shape::Quadrilateral, 1, 0>;
-        TEST_CHECK(is_same_vertex(edges[i].raw_entity.coords[0], expected_vertices[FaceMapping::map(i, 0)]));
-        TEST_CHECK(is_same_vertex(edges[i].raw_entity.coords[1], expected_vertices[FaceMapping::map(i, 1)]));
+        TEST_CHECK(is_same_vertex(edges[i].raw_entity.coords[0], expected_vertices[std::size_t(FaceMapping::map(int(i), 0))]));
+        TEST_CHECK(is_same_vertex(edges[i].raw_entity.coords[1], expected_vertices[std::size_t(FaceMapping::map(int(i), 1))]));
 
-        TEST_CHECK_EQUAL(edges[i].reference.index, Index(i));
+        TEST_CHECK_EQUAL(edges[i].reference.index, int(i));
         TEST_CHECK_EQUAL(edges[i].reference.source, EntitySource::ParentTopology);
       }
     }
@@ -493,33 +493,33 @@ public:
       TEST_CHECK_EQUAL(edges.size(), 12);
       TEST_CHECK_EQUAL(faces.size(), 6);
 
-      for(int i(0); i < 8; i++)
+      for(std::size_t i(0); i < 8u; i++)
       {
         TEST_CHECK(is_same_vertex(vertices[i].raw_entity.coords[0], expected_vertices[i]));
-        TEST_CHECK_EQUAL(vertices[i].reference.index, Index(i));
+        TEST_CHECK_EQUAL(vertices[i].reference.index, int(i));
         TEST_CHECK_EQUAL(vertices[i].reference.source, EntitySource::ParentTopology);
       }
 
-      for(int i(0); i < 12; i++)
+      for(std::size_t i(0); i < 12u; i++)
       {
         using FaceMapping = Geometry::Intern::FaceIndexMapping<Shape::Hexahedron, 1, 0>;
-        TEST_CHECK(is_same_vertex(edges[i].raw_entity.coords[0], expected_vertices[FaceMapping::map(i, 0)]));
-        TEST_CHECK(is_same_vertex(edges[i].raw_entity.coords[1], expected_vertices[FaceMapping::map(i, 1)]));
+        TEST_CHECK(is_same_vertex(edges[i].raw_entity.coords[0], expected_vertices[std::size_t(FaceMapping::map(int(i), 0))]));
+        TEST_CHECK(is_same_vertex(edges[i].raw_entity.coords[1], expected_vertices[std::size_t(FaceMapping::map(int(i), 1))]));
 
-        TEST_CHECK_EQUAL(edges[i].reference.index, Index(i));
+        TEST_CHECK_EQUAL(edges[i].reference.index, int(i));
         TEST_CHECK_EQUAL(edges[i].reference.source, EntitySource::ParentTopology);
       }
 
-      for(int i(0); i < 6; i++)
+      for(std::size_t i(0); i < 6; i++)
       {
         using FaceMapping = Geometry::Intern::FaceIndexMapping<Shape::Hexahedron, 2, 0>;
 
-        TEST_CHECK(is_same_vertex(faces[i].raw_entity.coords[0], expected_vertices[FaceMapping::map(i, 0)]));
-        TEST_CHECK(is_same_vertex(faces[i].raw_entity.coords[1], expected_vertices[FaceMapping::map(i, 1)]));
-        TEST_CHECK(is_same_vertex(faces[i].raw_entity.coords[2], expected_vertices[FaceMapping::map(i, 2)]));
-        TEST_CHECK(is_same_vertex(faces[i].raw_entity.coords[3], expected_vertices[FaceMapping::map(i, 3)]));
+        TEST_CHECK(is_same_vertex(faces[i].raw_entity.coords[0], expected_vertices[std::size_t(FaceMapping::map(int(i), 0))]));
+        TEST_CHECK(is_same_vertex(faces[i].raw_entity.coords[1], expected_vertices[std::size_t(FaceMapping::map(int(i), 1))]));
+        TEST_CHECK(is_same_vertex(faces[i].raw_entity.coords[2], expected_vertices[std::size_t(FaceMapping::map(int(i), 2))]));
+        TEST_CHECK(is_same_vertex(faces[i].raw_entity.coords[3], expected_vertices[std::size_t(FaceMapping::map(int(i), 3))]));
 
-        TEST_CHECK_EQUAL(faces[i].reference.index, Index(i));
+        TEST_CHECK_EQUAL(faces[i].reference.index, int(i));
         TEST_CHECK_EQUAL(faces[i].reference.source, EntitySource::ParentTopology);
       }
     }
@@ -555,8 +555,8 @@ public:
         TEST_CHECK_EQUAL(entry.source, EntitySource::BoundaryFace);
         TEST_CHECK_EQUAL(entry.entity, 0);
 
-        TEST_CHECK_EQUAL(seen_edges[entry.index], false);
-        seen_edges[entry.index] = true;
+        TEST_CHECK_EQUAL(seen_edges[std::size_t(entry.index)], false);
+        seen_edges[std::size_t(entry.index)] = true;
       }
 
       {
@@ -566,8 +566,8 @@ public:
 
         TEST_CHECK_EQUAL(entry.source, EntitySource::BoundaryFace);
         TEST_CHECK_EQUAL(entry.entity, 0);
-        TEST_CHECK_EQUAL(seen_edges[entry.index], false);
-        seen_edges[entry.index] = true;
+        TEST_CHECK_EQUAL(seen_edges[std::size_t(entry.index)], false);
+        seen_edges[std::size_t(entry.index)] = true;
       }
 
       {
@@ -577,8 +577,8 @@ public:
 
         TEST_CHECK_EQUAL(entry.source, EntitySource::BoundaryFace);
         TEST_CHECK_EQUAL(entry.entity, 0);
-        TEST_CHECK_EQUAL(seen_edges[entry.index], false);
-        seen_edges[entry.index] = true;
+        TEST_CHECK_EQUAL(seen_edges[std::size_t(entry.index)], false);
+        seen_edges[std::size_t(entry.index)] = true;
       }
 
       {
@@ -588,8 +588,8 @@ public:
 
         TEST_CHECK_EQUAL(entry.source, EntitySource::BoundaryFace);
         TEST_CHECK_EQUAL(entry.entity, 0);
-        TEST_CHECK_EQUAL(seen_edges[entry.index], false);
-        seen_edges[entry.index] = true;
+        TEST_CHECK_EQUAL(seen_edges[std::size_t(entry.index)], false);
+        seen_edges[std::size_t(entry.index)] = true;
       }
 
       std::vector<bool> seen_faces(4, false);
@@ -603,8 +603,8 @@ public:
         TEST_CHECK_EQUAL(entry.source, EntitySource::BoundaryFace);
         TEST_CHECK_EQUAL(entry.entity, 0);
 
-        TEST_CHECK_EQUAL(seen_faces[entry.index], false);
-        seen_edges[entry.index] = true;
+        TEST_CHECK_EQUAL(seen_faces[std::size_t(entry.index)], false);
+        seen_edges[std::size_t(entry.index)] = true;
       }
 
       {
@@ -617,8 +617,8 @@ public:
         TEST_CHECK_EQUAL(entry.source, EntitySource::BoundaryFace);
         TEST_CHECK_EQUAL(entry.entity, 0);
 
-        TEST_CHECK_EQUAL(seen_faces[entry.index], false);
-        seen_edges[entry.index] = true;
+        TEST_CHECK_EQUAL(seen_faces[std::size_t(entry.index)], false);
+        seen_edges[std::size_t(entry.index)] = true;
       }
 
       {
@@ -631,8 +631,8 @@ public:
         TEST_CHECK_EQUAL(entry.source, EntitySource::BoundaryFace);
         TEST_CHECK_EQUAL(entry.entity, 0);
 
-        TEST_CHECK_EQUAL(seen_faces[entry.index], false);
-        seen_edges[entry.index] = true;
+        TEST_CHECK_EQUAL(seen_faces[std::size_t(entry.index)], false);
+        seen_edges[std::size_t(entry.index)] = true;
       }
 
       {
@@ -645,8 +645,8 @@ public:
         TEST_CHECK_EQUAL(entry.source, EntitySource::BoundaryFace);
         TEST_CHECK_EQUAL(entry.entity, 0);
 
-        TEST_CHECK_EQUAL(seen_faces[entry.index], false);
-        seen_edges[entry.index] = true;
+        TEST_CHECK_EQUAL(seen_faces[std::size_t(entry.index)], false);
+        seen_edges[std::size_t(entry.index)] = true;
       }
     }
   }
@@ -740,7 +740,7 @@ public:
         // Check no element is mapped to twice
         for(Index i(0); i < size; ++i)
         {
-          Index mapped = builder.template correct_for_orientation<dim_, codim_>(type, orientation, i).first;
+          Index mapped = builder.template correct_for_orientation<dim_, codim_>(type, orientation, int(i)).first;
           TEST_CHECK_MSG(
             seen[mapped] == 0,
             "test_orientation_mapping<" + stringify(dim_) + ", " + stringify(codim_) + ">: Element " +

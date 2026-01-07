@@ -526,7 +526,7 @@ namespace Gendie
             if(Math::abs(DataType(1) - space_data.phi[i].value) < 1e-5)
             {
               XASSERTM(dof_k == ~Index(0), "ERROR: Already found an index");
-              dof_k = i;
+              dof_k = Index(i);
             }
             for(int bi(0); bi < dim_; ++bi)
             {
@@ -828,7 +828,7 @@ namespace Gendie
             if(Math::abs(DataType(1) - space_data.phi[i].value) < 1e-5)
             {
               XASSERTM(dof_k == ~Index(0), "ERROR: Already found an index");
-              dof_k = i;
+              dof_k = Index(i);
             }
             // val.axpy(space_data.phi[i].value, basis_val[i]);
             // J_ij = d/d_j f_i  <==> J = (f_1,...,f_n)^T * (d/d_1, ..., d/d_n)

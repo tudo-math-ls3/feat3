@@ -82,7 +82,7 @@ namespace FEAT::Geometry
     bool is_vertex_marked(int vertex) const
     {
       ASSERT(vertex < num_vertices);
-      return bits[vertex];
+      return bits[std::size_t(vertex)];
     }
 
     std::size_t distance(const VertexMarking& other) const
@@ -299,9 +299,9 @@ namespace FEAT::Geometry
       _type(0),
       _isolated(false)
     {
-      for(Index i = 0; i < num_vertices; i++)
+      for(int i = 0; i < num_vertices; i++)
       {
-        _type[i] = (markings[i].level > 0);
+        _type[std::size_t(i)] = (markings[i].level > 0);
         _isolated = _isolated || markings[i].is_isolated;
       }
     }
@@ -329,7 +329,7 @@ namespace FEAT::Geometry
       for(int i(0); i < num_verts; i++)
       {
         auto vertex = static_cast<Index>(Mapping::map(face, i));
-        result_bits[i] = _type[vertex];
+        result_bits[std::size_t(i)] = _type[vertex];
       }
 
       // Result type has same isolation as us, as long as we picked any marked vertices

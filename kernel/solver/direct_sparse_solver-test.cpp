@@ -227,14 +227,14 @@ public:
 
     // initialize reference solution vector
     {
-      const IT_ ii = IT_(comm.rank()) / np;
-      const IT_ jj = IT_(comm.rank()) % np;
+      const IT_ ii = IT_(comm.rank()) / IT_(np);
+      const IT_ jj = IT_(comm.rank()) % IT_(np);
 
       const IT_ n = IT_(isqrt(vec_ref.local().size()));
       DataType* v = vec_ref.local().elements();
 
       // global size in one dimension; remember 1 DOF overlap
-      const IT_ gn = np * (n - IT_(1)) + IT_(1);
+      const IT_ gn = IT_(np) * (n - IT_(1)) + IT_(1);
 
       // scaling factor for sine bubble = sin(pi*x)*sin(pi*y)
       const DT_ sc = Math::pi<DT_>() / DT_(gn - IT_(1));

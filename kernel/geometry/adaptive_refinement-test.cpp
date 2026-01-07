@@ -449,7 +449,7 @@ public:
     // Test layer 1 edges
     {
       // Ensure keys and indices are consistent
-      for(Index i : {0, 3, 4, 5})
+      for(Index i : {Index(0), Index(3), Index(4), Index(5)})
       {
         AdaptiveEdge key_edge = storage[edge_keys[i]];
         AdaptiveEdge idx_edge = storage.template get_by_index<1>(Layer{1}, storage.get_index(edge_keys[i]));

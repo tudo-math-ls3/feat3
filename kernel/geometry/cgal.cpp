@@ -399,6 +399,7 @@ namespace FEAT::Geometry
   template<typename DT_>
   CGALFeatureNetwork CGALWrapper<DT_>::detect_features(DT_ critical_angle)
   {
+    using CGALDT = typename CGALTypeWrapper<DT_>::CGALDT_;
     using PolyhedronType = typename CGALTypeWrapper<DT_>::Polyhedron_;
     using VertexIndex = typename PolyhedronType::Vertex_index;
     using EdgeIndex = typename PolyhedronType::Edge_index;
@@ -419,7 +420,7 @@ namespace FEAT::Geometry
     if(map.second)
     {
       // Property was newly created. Fill it with proper data.
-      CGAL::Polygon_mesh_processing::detect_sharp_edges(*poly, critical_angle, map.first);
+      CGAL::Polygon_mesh_processing::detect_sharp_edges(*poly, CGALDT(critical_angle), map.first);
     }
 
     /////////////////////////////////
@@ -543,12 +544,12 @@ namespace FEAT::Geometry
     using Point = typename CGALTypeWrapper<DT_>::Point_;
     using Vector = typename CGALTypeWrapper<DT_>::Vector_;
 
-    ASSERT(get_num_vertices() == offset.size());
+    ASSERT(get_num_vertices() == offsets.size());
 
     auto* cd = static_cast<CGALWrapperData<DT_>*>(_cgal_data);
 
     _delete_tree();
-    int i(0);
+    std::size_t i(0);
     for(auto vertex_idx : cd->_polyhedron->vertices())
     {
       Point& vertex = cd->_polyhedron->point(vertex_idx);
@@ -622,12 +623,7 @@ namespace FEAT::Geometry
 
     auto* cd = static_cast<CGALWrapperData<DT_>*>(_wrapper->_cgal_data);
 
-    // Index a = ~Index(0);
-    // std::uint32_t b = a;
-    double b = 1E+301;
-    float c = b;
-
-    auto range = cd->_polyhedron->vertices_around_face(cd->_polyhedron->halfedge(FaceIndex(face)));
+    auto range = cd->_polyhedron->vertices_around_face(cd->_polyhedron->halfedge(FaceIndex(typename PolyhedronType::size_type(face))));
     return CGALValueIteratorWrapper<Index>([it = range.begin(), end = range.end()]() mutable {
       if(it != end)
       {

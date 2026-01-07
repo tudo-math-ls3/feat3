@@ -144,7 +144,7 @@ namespace FEAT
       const int z_size = this->_sub_comm.size();
       std::vector<idx_t> vtxdist;
       for(int i(0); i <= z_size; ++i)
-        vtxdist.push_back(idx_t(_num_elems*i) / idx_t(z_size));
+        vtxdist.push_back((idx_t(_num_elems)*idx_t(i)) / idx_t(z_size));
 
       // create adjacency arrays from our sub-graph without the self-adjacency
       std::vector<idx_t> xadj, adjncy;

@@ -1089,7 +1089,7 @@ namespace FEAT
           {
             if(this->_out_of_bounds_value)
               return true;
-            ibox_max[i] = i64(this->_num_points[i]) - 1;
+            ibox_max[i] = u64(this->_num_points[i]) - 1;
           }
           else
             ibox_max[i] = u64(imax);

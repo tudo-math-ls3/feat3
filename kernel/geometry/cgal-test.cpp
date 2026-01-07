@@ -346,7 +346,7 @@ public:
 
     // Quad feature should be circular around the quad
     auto it = quad_network[0].begin();
-    for(Index i : {1, 0, 2, 3, 1})
+    for(Index i : {Index(1), Index(0), Index(2), Index(3), Index(1)})
     {
       TEST_CHECK_EQUAL(*(it++), i);
     }
@@ -424,7 +424,7 @@ public:
 
     cw.displace_vertices(offsets);
 
-    for(Index i(0); i < 4; i++)
+    for(std::uint32_t i(0); i < 4; i++)
     {
       TEST_CHECK_EQUAL_WITHIN_EPS((cw.point(i) - (points[i] + offsets[i])).norm_euclid(), 0, tol);
     }
@@ -504,7 +504,7 @@ public:
     for(Index f = 0u; f < cgal_face_adjactor.get_num_nodes_domain(); ++f)
     {
       Tiny::Matrix<DT_, 2, 3> loc_face_mat;
-      Index l = 0;
+      int l = 0;
       auto iter = cgal_face_adjactor.image_begin(f);
       auto ref_p = points[*iter];
       ++iter;

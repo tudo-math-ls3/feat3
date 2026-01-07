@@ -1001,7 +1001,7 @@ namespace FEAT
       const u64 off = line * this->_stride_line;
       for(u64 i(0); i < n; ++i)
       {
-        _voxel_map[off + (i >> 3)] |= char(mask[i] != 0) << (i & 0x7);
+        _voxel_map[off + (i >> 3)] |= char(char(mask[i] != 0) << char(i & 0x7));
       }
     }
 

@@ -478,14 +478,14 @@ namespace FEAT::Geometry
     EntitySource source;
     /// Index of the entity in the target location. Might need to be mapped to
     /// account for template types and orientations.
-    Index index;
+    int index;
     /// Orientation of the retrieved entity relative to the retrieving entity. Only set for sibling entities.
     int orientation;
     /// Index of boundary entity to retrieve entity from. Only set for boundary entities.
     int entity;
 
     EntityReference() = default;
-    EntityReference(EntitySource s, Index i, int o, int e) : source(s), index(i), orientation(o), entity(e)
+    EntityReference(EntitySource s, int i, int o, int e) : source(s), index(i), orientation(o), entity(e)
     {
     }
 
@@ -556,7 +556,7 @@ namespace FEAT::Geometry
     template<int dim_>
     EntityReference get_reference(int idx) const
     {
-      return TopologyTemplate<Shape_, dim_>::references[idx];
+      return TopologyTemplate<Shape_, dim_>::references[std::size_t(idx)];
     }
   };
 
@@ -605,9 +605,9 @@ namespace FEAT::Geometry
     }
 
     template<int dim_>
-    EntityReference get_reference(Index idx) const
+    EntityReference get_reference(int idx) const
     {
-      return TopologyTemplate<Shape_, dim_>::references[idx];
+      return TopologyTemplate<Shape_, dim_>::references[std::size_t(idx)];
     }
   };
 
@@ -786,9 +786,9 @@ namespace FEAT::Geometry
 
   public:
     /// Apply operator
-    std::pair<Index, int> operator()(Index idx) const
+    std::pair<Index, int> operator()(int idx) const
     {
-      return _mapping.at(idx);
+      return _mapping.at(std::size_t(idx));
     }
 
     /// Accessor for full orientation mapping
@@ -1050,7 +1050,7 @@ namespace FEAT::Geometry
      * search space.
      */
     template<typename Shape__>
-    void add_sibling(const RawEntity<Shape__, num_coords_>& entity, Index idx)
+    void add_sibling(const RawEntity<Shape__, num_coords_>& entity, int idx)
     {
       return TemplateSearchSpace<Shape__, num_coords>::_add_sibling(entity, idx);
     }
@@ -1079,7 +1079,7 @@ namespace FEAT::Geometry
       if constexpr(dim_ == 0)
       {
         auto& vertices = this->template entries<0>();
-        Index vertex_index = 0;
+        int vertex_index = 0;
         for(const auto& vertex : Intern::internal_vertices(tmplt))
         {
           RawEntity<Shape::Vertex, num_coords> entity(Embedder::embed(parent_index, vertex));
@@ -1093,7 +1093,7 @@ namespace FEAT::Geometry
         auto& entries = this->template entries<dim_>();
 
         // Add internal elements of dimension dim_ to search space
-        Index idx = 0;
+        int idx = 0;
         for(const auto& entity : Intern::internal_entities<EntityShape_, dim_>(tmplt.entities))
         {
           RawEntity<DimShape, num_coords> embedded;
@@ -1136,11 +1136,11 @@ namespace FEAT::Geometry
 
         auto& entries = this->template entries<0>();
 
-        for(std::size_t vertex(0); vertex < std::size_t(num_vertices); vertex++)
+        for(int vertex(0); vertex < num_vertices; vertex++)
         {
           RawEntity<Shape::Vertex, num_coords> entity;
-          entity.coords[0] = vertices[vertex];
-          entries.emplace_back(entity, EntityReference{EntitySource::ParentTopology, Index(vertex), 0, 0});
+          entity.coords[0] = vertices[std::size_t(vertex)];
+          entries.emplace_back(entity, EntityReference{EntitySource::ParentTopology, vertex, 0, 0});
         }
       }
       else
@@ -1160,7 +1160,7 @@ namespace FEAT::Geometry
           {
             entity.coords[std::size_t(vertex)] = vertices[std::size_t(FaceMapping::map(face, vertex))];
           }
-          entries.emplace_back(entity, EntityReference{EntitySource::ParentTopology, static_cast<Index>(face), 0, 0});
+          entries.emplace_back(entity, EntityReference{EntitySource::ParentTopology, face, 0, 0});
         }
 
         _add_topology_rec<dim_ - 1>(vertices);
@@ -1199,7 +1199,7 @@ namespace FEAT::Geometry
     }
 
     /// Inner add_sibling logic for the current shape.
-    void _add_sibling(const RawEntity<Shape_, num_coords_>& entity, Index idx)
+    void _add_sibling(const RawEntity<Shape_, num_coords_>& entity, int idx)
     {
       _entries.push_back({entity, EntityReference{EntitySource::Sibling, idx, 0, 0}});
     }
@@ -1278,7 +1278,7 @@ namespace FEAT::Geometry
      * template construction. We hence present a way to easily add these to the
      * search space.
      */
-    void add_sibling_vertex(const Tiny::Vector<Real, num_coords>& vertex, Index idx)
+    void add_sibling_vertex(const Tiny::Vector<Real, num_coords>& vertex, int idx)
     {
       _entries.push_back(
         {RawEntity<Shape::Vertex, num_coords>(vertex), EntityReference{EntitySource::Sibling, idx, 0, 0}});
@@ -1445,7 +1445,7 @@ namespace FEAT::Geometry
      * \brief Correct an index for orientation
      */
     template<int dim_, int codim_>
-    std::pair<Index, int> correct_for_orientation(RefinementTypeByDim<dim_> type, int orientation, Index idx)
+    std::pair<Index, int> correct_for_orientation(RefinementTypeByDim<dim_> type, int orientation, int idx)
     {
       return _orientation_mappings.template get_mapping<dim_, codim_>(type, orientation)(idx);
     }
@@ -1587,9 +1587,9 @@ namespace FEAT::Geometry
       if constexpr(dim_ == 0)
       {
         auto& vertex_refs = topo.template get_references<0>();
-        for(int i(0); i < num_entities; i++)
+        for(Index i(0); i < Index(num_entities); i++)
         {
-          vertex_refs[std::size_t(i)] = search_space.search_vertex(raw_entity.coords[i]);
+          vertex_refs[i] = search_space.search_vertex(raw_entity.coords[i]);
         }
       }
       else
@@ -1629,7 +1629,7 @@ namespace FEAT::Geometry
           tmplt.get_vertex_coefficients().push_back(Intern::vertex_coefficients<TemplateShape_>(vertex));
 
           // Add entry to search space for building topologies later
-          search_space.add_sibling_vertex(vertex, tmplt.get_vertices().size() - 1);
+          search_space.add_sibling_vertex(vertex, int(tmplt.get_vertices().size() - 1));
         }
       }
       else
@@ -1645,7 +1645,7 @@ namespace FEAT::Geometry
           _build_topology<TemplateShape_, TopologyShape>(entity, search_space, topology);
           topologies.push_back(topology);
 
-          search_space.add_sibling(entity, topologies.size() - 1);
+          search_space.add_sibling(entity, int(topologies.size() - 1));
         }
       }
     }

@@ -78,7 +78,7 @@ NOINLINE void read_mem(u64* x, u64 num_entries, u64 repeat_count)
 // prints nicely padded output
 void print_time(const Dist::Comm& comm, const String& name, const StopWatch& watch, u64 total_size)
 {
-  comm.print(name.pad_back(pad_len, '.') + ": " + stringify_bytes((1000000ull*total_size) / watch.elapsed_micros()) + "/sec");
+  comm.print(name.pad_back(pad_len, '.') + ": " + stringify_bytes((1000000ULL*total_size) / u64(watch.elapsed_micros())) + "/sec");
 }
 
 int main(int argc, char** argv)
