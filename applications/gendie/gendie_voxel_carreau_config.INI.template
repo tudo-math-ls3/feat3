@@ -66,6 +66,7 @@ center=FLOAT,FLOAT,FLOAT
 flow_normal=FLOAT,FLOAT,FLOAT
 face_normal=FLOAT,FLOAT,FLOAT # will be ignored
 radius=FLOAT # other specific inflow variables
+profile = STRING # best, parabolic, constant, etc...
 
 # Define the problem to be solved
 [special-problem-definition]

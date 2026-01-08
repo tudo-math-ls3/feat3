@@ -103,7 +103,7 @@ namespace Gendie
 
     bool parse_inflow_option(const std::pair<String, bool>& option, InflowType& in_type)
     {
-      if((!option.second) || option.first.empty() || option.first.compare_no_case("best") || option.first.compare_no_case("default"))
+      if((!option.second) || option.first.empty() || (option.first.compare_no_case("best") == 0) || (option.first.compare_no_case("default") == 0))
       {
         in_type = InflowType::best;
         return true;
@@ -934,6 +934,7 @@ namespace Gendie
       XASSERTM(sub_prop, "Could not find inflow params section");
 
       XASSERTM(Intern::parse_inflow_geometry(sub_prop->query("type"), _inflow_geometry), "Could not parse inflow option");
+      XASSERTM(Intern::parse_inflow_option(sub_prop->query("profile"), _inflow_type), "Could not parse inflow profile option");
       _geo_handler = create_geo_handler<MeshType, DataType>(sub_prop, bb_min, bb_max, id, _inflow_type);
     }
 
