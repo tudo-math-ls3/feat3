@@ -304,7 +304,8 @@ description = (
   "  - 'fparser':      enable fparser TPL\n"
   "  - 'floatx':       enable floatx TPL\n"
   "  - 'hypre':        enable HYPRE TPL\n"
-  "  - 'metis':        enable METIS and ParMETIS TPLs (requires MPI)\n"
+  "  - 'meshhexer':    enable MeshHexer TPL\n"
+  "  - 'metis':        enable METIS and ParMETIS TPLs\n"
   "  - 'mumps'         enable MUMPS TPL\n"
   "  - 'pmp':          enable PMP TPL\n"
   "  - 'superlu':      enable SuperLU_Dist TPL (requires MPI)\n"
@@ -880,6 +881,8 @@ for token in buildid:
     config.cache_entry("FEAT_HAVE_FPARSER", "ON", "BOOL")
   elif token == "hypre":
     config.cache_entry("FEAT_HAVE_HYPRE", "ON", "BOOL")
+  elif token == "meshhexer":
+    config.cache_entry("FEAT_HAVE_MESHHEXER", "ON", "BOOL")
   elif token == "metis":
     config.cache_entry("FEAT_HAVE_PARMETIS", "ON", "BOOL")
   elif token == "mumps":

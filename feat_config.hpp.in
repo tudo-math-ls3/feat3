@@ -59,6 +59,9 @@
 /// Do we have HYPRE support enabled?
 #cmakedefine FEAT_HAVE_HYPRE
 
+/// Do we have MeshHexer support enabled?
+#cmakedefine FEAT_HAVE_MESHHEXER
+
 /// Do we have MKL support enabled?
 #cmakedefine FEAT_HAVE_MKL
 

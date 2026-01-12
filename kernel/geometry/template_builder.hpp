@@ -1475,6 +1475,7 @@ namespace FEAT::Geometry
         if(!_type_adjustment_initialized[1])
         {
           _create_type_adjustments<Shape::Hypercube<dim_>>(edges());
+          _type_adjustment_initialized[1] = true;
         }
         return _edge_type_adjustments.at(type);
       }
@@ -1483,6 +1484,7 @@ namespace FEAT::Geometry
         if(!_type_adjustment_initialized[2])
         {
           _create_type_adjustments<Shape::Hypercube<dim_>>(faces());
+          _type_adjustment_initialized[2] = true;
         }
         return _face_type_adjustments.at(type);
       }
@@ -1491,6 +1493,7 @@ namespace FEAT::Geometry
         if(!_type_adjustment_initialized[3])
         {
           _create_type_adjustments<Shape::Hypercube<dim_>>(cells());
+          _type_adjustment_initialized[3] = true;
         }
         return _cell_type_adjustments.at(type);
       }

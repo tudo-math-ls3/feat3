@@ -278,6 +278,11 @@ void Runtime::initialize(int& argc, char**& argv)
 #else
         std::cout << "FEAT_HAVE_HYPRE...............: no\n";
 #endif
+#ifdef FEAT_HAVE_MESHHEXER
+        std::cout << "FEAT_HAVE_MESHHEXER...........: yes\n";
+#else
+        std::cout << "FEAT_HAVE_MESHHEXER...........: no\n";
+#endif
 #ifdef FEAT_HAVE_METIS
         std::cout << "FEAT_HAVE_METIS...............: yes\n";
 #else

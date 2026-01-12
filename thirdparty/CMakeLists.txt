@@ -18,7 +18,8 @@
 # | floatx         | FEAT_HAVE_FLOATX        | FloatX::FloatX             |
 # | fparser        | FEAT_HAVE_FPARSER       | fparser::fparser           |
 # | Hypre          | FEAT_HAVE_HYPRE         | HYPRE::HYPRE               |
-# | MUMPS          | FEAT_HAVE_MUMPS         | mumps::mumps
+# | MeshHexer      | FEAT_HAVE_MESHHExer     | MeshHexer::MeshHexer       |
+# | MUMPS          | FEAT_HAVE_MUMPS         | mumps::mumps               |
 # | ParMETIS       | FEAT_HAVE_PARMETIS      | ParMETIS::ParMETIS         |
 # | pmp            | FEAT_HAVE_PMP           | pmp::pmp                   |
 # | SuperLU (dist) | FEAT_HAVE_SUPERLU_DIST  | SuperLU::SuperLU           |
@@ -207,6 +208,23 @@ if(FEAT_HAVE_HYPRE)
     # Enable Hypre OpenMP support if FEAT is build with OpenMP support
     set(HYPRE_WITH_OPENMP ${FEAT_HAVE_OMP} CACHE BOOL "Build Hypre with OMP support" FORCE)
   endif()
+endif()
+
+option(FEAT_HAVE_MESHHEXER "Enable MeshHexer?" OFF)
+if(FEAT_HAVE_MESHHEXER)
+  feat_get_tpl(
+    PACKAGE_NAME meshhexer
+    VERSION 0.1
+    URL https://github.com/tudo-math-ls3/MeshHexer/archive/refs/heads/main.zip
+    URL_HASH MD5=efced399c2716ef7d55c1bf073d0f9e9
+    CONFIG
+    SYSTEM
+  )
+  set(MESHHEXER_BUILD_APPLICATIONS OFF)
+  set(MESHHEXER_DOCUMENTATION OFF)
+  set(MESHHEXER_HAVE_OMP ${FEAT_HAVE_OMP})
+  set(MESHHEXER_INSTALL OFF)
+  set(MESHHEXER_TESTING OFF)
 endif()
 
 option(FEAT_HAVE_MUMPS "Enable MUMPS" OFF)

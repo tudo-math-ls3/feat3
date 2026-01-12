@@ -6,6 +6,7 @@ add_subdirectory( test_aux )
 
 # list of geometry source files and depenencies
 set(kernel-geometry-list
+  meshhexer.cpp
   parti_parmetis.cpp
   parti_zoltan.cpp
   voxel_map.cpp
@@ -58,6 +59,11 @@ if(FEAT_HAVE_CGAL)
     feat-dependency feat-kernel-util)
 
   target_link_libraries(feat-kernel-geometry PRIVATE feat-kernel-geometry-cgal)
+endif()
+
+if(FEAT_HAVE_MESHHEXER)
+  find_package(meshhexer 0.1 REQUIRED)
+  target_link_libraries(feat-kernel-geometry PRIVATE MeshHexer::MeshHexer)
 endif()
 
 if (FEAT_VALGRIND)

@@ -117,9 +117,9 @@ namespace FEAT::Geometry
     }
 
     /// deleted copy-constructor
-    SubdivisionLevels(SubdivisionLevels& other) = delete;
+    SubdivisionLevels(const SubdivisionLevels& other) = delete;
     /// deleted copy-assign operator
-    SubdivisionLevels& operator=(SubdivisionLevels& other) = delete;
+    SubdivisionLevels& operator=(const SubdivisionLevels& other) = delete;
 
     /// destructor
     ~SubdivisionLevels() = default;
