@@ -123,10 +123,11 @@ namespace Gendie
     virtual ViscoDerFuncT<half> get_visc_der_func(half mesh_scale) const = 0;
   #endif
 
-    static DataType get_visco_scaling_factor(DataType mesh_scale)
+    template<typename DT2_>
+    static DT2_ get_visco_scaling_factor(DT2_ mesh_scale)
     {
       // mesh_scale -> 1000 for mm, 100 for cm, ...
-      return DataType(1E3)/mesh_scale;
+      return DT2_(1E3)/mesh_scale;
     }
 
     MaterialType get_type() const {return type;}
