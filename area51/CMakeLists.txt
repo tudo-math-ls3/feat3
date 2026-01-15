@@ -142,6 +142,9 @@ add_executable(dbg-fbm-reconstruction-test-3d dbg_fbm_reconst_test.cpp)
 target_link_libraries(dbg-fbm-reconstruction-test-3d PRIVATE feat)
 target_compile_definitions(dbg-fbm-reconstruction-test-3d PRIVATE FEAT_APP_DIM=3)
 
+add_executable(dbg-adaptive-parti-domain-control dbg_adaptive_parti_domain_control.cpp)
+target_link_libraries(dbg-adaptive-parti-domain-control PRIVATE feat)
+
 if (FEAT_HAVE_UMFPACK)
    add_executable(feti-seq-usquare feti_seq_usquare.cpp)
    target_link_libraries(feti-seq-usquare feat)

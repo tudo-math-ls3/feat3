@@ -435,6 +435,12 @@ namespace FEAT::Geometry
       return RawData_::template max_children<template_dim_, child_dim_>();
     }
 
+    template<int template_dim_>
+    static Real average_elements_per_marking()
+    {
+      return _templates().template average_elements_per_marking<template_dim_>();
+    }
+
     /**
      * \brief Adjusts SubdivisionLevels to match TemplateSet requirements
      *
@@ -546,6 +552,12 @@ namespace FEAT::Geometry
     static constexpr int max_children()
     {
       return RawData_::template max_children<template_dim_, child_dim_>();
+    }
+
+    template<int template_dim_>
+    static Real average_elements_per_marking()
+    {
+      return _templates().template average_elements_per_marking<template_dim_>();
     }
 
     /**

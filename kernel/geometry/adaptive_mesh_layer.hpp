@@ -5,9 +5,11 @@
 
 #pragma once
 
+#include "kernel/geometry/common_factories.hpp"
 #include "kernel/geometry/mesh_permutation.hpp"
 #include "kernel/shape.hpp"
 #include "kernel/util/string.hpp"
+#include <iterator>
 #include <kernel/adjacency/permutation.hpp>
 #include <kernel/base_header.hpp>
 #include <kernel/geometry/adaptive_mesh.hpp>
@@ -1531,7 +1533,7 @@ namespace FEAT::Geometry
      * children, the requested child's index, if the parent has at least \c
      * child children, std::nullopt else.
      */
-    std::optional<Index> get_child(Index elem, Index child)
+    std::optional<Index> get_child(Index elem, Index child) const
     {
       return _mesh->template get_child<ShapeType::dimension>(_layer, elem, child);
     }
@@ -1541,7 +1543,7 @@ namespace FEAT::Geometry
      *
      * \param[in] elem Element to return number of children of
      */
-    Index get_num_children(Index elem)
+    Index get_num_children(Index elem) const
     {
       return _mesh->template get_num_children<ShapeType::dimension>(_layer, elem);
     }
@@ -1567,10 +1569,28 @@ namespace FEAT::Geometry
       return _mesh->foundation_mesh();
     }
 
+    /// accessor for foundation mesh
+    const typename AdaptiveMeshType::FoundationMeshType& foundation_mesh() const
+    {
+      return _mesh->foundation_mesh();
+    }
+
     /// accessor for adaptive mesh
     AdaptiveMeshType& adaptive_mesh()
     {
       return *_mesh;
+    }
+
+    /// accessor for adaptive mesh
+    const AdaptiveMeshType& adaptive_mesh() const
+    {
+      return *_mesh;
+    }
+
+    /// accessor for adaptive mesh
+    std::shared_ptr<AdaptiveMeshType> adaptive_mesh_ptr() const
+    {
+      return _mesh;
     }
   };
 
@@ -1586,16 +1606,26 @@ namespace FEAT::Geometry
     class ChildCellIterator
     {
     public:
-      ChildCellIterator(AdaptiveMeshLayerType& coarse, Index cell, Index child) :
+      ChildCellIterator(const AdaptiveMeshLayerType* coarse, Index cell, Index child) :
         _coarse(coarse),
         _cell(cell),
         _child(child)
       {
       }
 
+      ChildCellIterator() = default;
+
+      ChildCellIterator(const ChildCellIterator& other) = default;
+      ChildCellIterator(ChildCellIterator&& other) = default;
+
+      ChildCellIterator& operator=(const ChildCellIterator& other) = default;
+      ChildCellIterator& operator=(ChildCellIterator&& other) = default;
+
+      ~ChildCellIterator() = default;
+
       Index operator*() const
       {
-        return _coarse.get_child(_cell, _child).value_or(0);
+        return _coarse->get_child(_cell, _child).value_or(0);
       }
 
       ChildCellIterator& operator++()
@@ -1612,7 +1642,7 @@ namespace FEAT::Geometry
     private:
       static constexpr int dim = AdaptiveMeshLayerType::ShapeType::dimension;
 
-      AdaptiveMeshLayerType& _coarse;
+      const AdaptiveMeshLayerType* _coarse;
       Index _cell;
       Index _child;
     };
@@ -1621,11 +1651,11 @@ namespace FEAT::Geometry
 
   private:
     // TODO: Should these be std::shared_ptrs?
-    AdaptiveMeshLayerType& _coarse;
-    AdaptiveMeshLayerType& _fine;
+    const AdaptiveMeshLayerType& _coarse;
+    const AdaptiveMeshLayerType& _fine;
 
   public:
-    AdaptiveChildMapping(AdaptiveMeshLayerType& coarse, AdaptiveMeshLayerType& fine) : _coarse(coarse), _fine(fine)
+    AdaptiveChildMapping(const AdaptiveMeshLayerType& coarse, const AdaptiveMeshLayerType& fine) : _coarse(coarse), _fine(fine)
     {
     }
 
@@ -1641,13 +1671,119 @@ namespace FEAT::Geometry
 
     ChildCellIterator image_begin(Index domain_node) const
     {
-      return ChildCellIterator(_coarse, domain_node, 0);
+      return ChildCellIterator(&_coarse, domain_node, 0);
     }
 
     ChildCellIterator image_end(Index domain_node) const
     {
       Index num_children = _coarse.get_num_children(domain_node);
-      return ChildCellIterator(_coarse, domain_node, num_children);
+      return ChildCellIterator(&_coarse, domain_node, num_children);
+    }
+  };
+
+  /**
+   * \brief Adjactor from elements of the foundation mesh to layer 0 of an adaptive mesh
+   */
+  template<typename AdaptiveMeshType_, int dim_ = AdaptiveMeshType_::ShapeType::dimension>
+  class FoundationAdaptiveAdjactor
+  {
+    const AdaptiveMeshType_& _amesh;
+  public:
+    class OnceIterator
+    {
+      Index _idx;
+      bool _done;
+
+    public:
+
+      using iterator_category = std::input_iterator_tag;
+      using difference_type = std::size_t;
+      using value_type = Index;
+      using pointer = Index*;
+      using reference = Index&;
+
+      OnceIterator() : _idx(0), _done(true)
+      {
+      }
+
+      explicit OnceIterator(Index i) : _idx(i), _done(false)
+      {
+      }
+
+      OnceIterator(const OnceIterator& other) = default;
+      OnceIterator(OnceIterator&& other) = default;
+
+      OnceIterator& operator=(const OnceIterator& other) = default;
+      OnceIterator& operator=(OnceIterator&& other) = default;
+
+      ~OnceIterator() = default;
+
+
+      Index operator*()
+      {
+        return _idx;
+      }
+
+      Index operator->()
+      {
+        return _idx;
+      }
+
+      OnceIterator& operator++()
+      {
+        _done = true;
+        return *this;
+      }
+
+      OnceIterator& operator++(int)
+      {
+        OnceIterator tmp = *this;
+        ++(*this);
+        return tmp;
+      }
+
+      friend bool operator==(const OnceIterator& a, const OnceIterator& b)
+      {
+        return (a._done && b._done);
+      }
+
+      friend bool operator!=(const OnceIterator& a, const OnceIterator& b)
+      {
+        return !(a == b);
+      }
+    };
+
+    using ImageIterator = OnceIterator;
+
+    explicit FoundationAdaptiveAdjactor(const AdaptiveMeshType_& amesh) : _amesh(amesh)
+    {
+    }
+
+    Index get_num_nodes_domain() const
+    {
+      return _amesh.foundation_mesh().get_num_entities(dim_);
+    }
+
+    Index get_num_nodes_image() const
+    {
+      return _amesh.get_num_entities(Geometry::Layer{0}, dim_);
+    }
+
+    ImageIterator image_begin(Index domain_idx) const
+    {
+      if(auto mapping = _amesh.template get_overlap_cell<dim_>(domain_idx))
+      {
+        return OnceIterator(*mapping);
+      }
+      else
+      {
+        return OnceIterator{};
+      }
+    }
+
+    ImageIterator image_end(Index /*domain_idx*/) const
+    {
+      return OnceIterator{};
     }
   };
 } // namespace FEAT::Geometry

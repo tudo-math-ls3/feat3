@@ -561,7 +561,7 @@ namespace FEAT::Geometry
      * child children, std::nullopt else.
      */
     template<int dim_>
-    std::optional<Index> get_child(Layer layer, Index parent_idx, Index child)
+    std::optional<Index> get_child(Layer layer, Index parent_idx, Index child) const
     {
       auto& element = _storage.template get_by_index<dim_>(layer, parent_idx);
 
@@ -637,14 +637,23 @@ namespace FEAT::Geometry
     }
 
     /**
+     * \brief Accessor for foundation mesh
+     */
+    const FoundationMeshType& foundation_mesh() const
+    {
+      return _foundation_mesh;
+    }
+
+    /**
      * \brief Mapping of elements of the foundation mesh to elements of the AdaptiveMesh
      *
      * \returns Index of element corresponding to given foundation mesh
      * element, if one exists. Index belongs to layer 0.
      */
-    std::optional<Index> get_overlap_cell(Index foundation_index)
+    template<int dim_>
+    std::optional<Index> get_overlap_cell(Index foundation_index) const
     {
-      std::unordered_map<Index, ElementRef<shape_dim>>& root_map = _roots.template by_dim<ShapeType::dimension>();
+      const std::unordered_map<Index, ElementRef<dim_>>& root_map = _roots.template by_dim<dim_>();
 
       auto iter = root_map.find(foundation_index);
       if(iter != root_map.end())

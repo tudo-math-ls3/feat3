@@ -40,9 +40,11 @@
 #include <kernel/voxel_assembly/poisson_assembler.hpp>
 
 #include <control/domain/domain_control.hpp>
+#include <control/domain/adaptive_parti_domain_control.hpp>
 #include <control/asm/gate_asm.hpp>
 #include <control/asm/muxer_asm.hpp>
 #include <control/asm/splitter_asm.hpp>
+#include <control/asm/transfer_adaptive_asm.hpp>
 #include <control/asm/transfer_asm.hpp>
 #include <control/asm/transfer_voxel_asm.hpp>
 #include <control/asm/mean_filter_asm.hpp>
@@ -232,6 +234,36 @@ namespace FEAT
         XASSERT(!virt_lvl_coarse.is_parent());
 
         Asm::asm_transfer_voxel_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc, shrink,
+          [](const DomainLevel_& dl) {return &dl.space;},
+          this->transfer_sys.local(), this->coarse_muxer_sys, this->gate_sys, this->gate_sys);
+
+        this->transfer_sys.compile();
+      }
+
+      template<typename DomainLevel_, typename TemplateSet_>
+      void assemble_transfer_adaptive(
+        const ScalarBasicSystemLevel& sys_lvl_coarse,
+        const Domain::VirtualLevel<Domain::AdaptiveLevelWrapper<DomainLevel_, TemplateSet_>>& virt_lvl_fine,
+        const Domain::VirtualLevel<Domain::AdaptiveLevelWrapper<DomainLevel_, TemplateSet_>>& virt_lvl_coarse,
+        const String& cubature, bool trunc = false, bool shrink = true)
+      {
+        Asm::asm_transfer_adaptive_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc, shrink,
+          [](const DomainLevel_& dl) {return &dl.space;},
+          this->transfer_sys.local(), this->coarse_muxer_sys, this->gate_sys, sys_lvl_coarse.gate_sys);
+
+        this->transfer_sys.compile();
+      }
+
+      template<typename DomainLevel_, typename TemplateSet_>
+      void assemble_transfer_adaptive(
+        const Domain::VirtualLevel<Domain::AdaptiveLevelWrapper<DomainLevel_, TemplateSet_>>& virt_lvl_fine,
+        const Domain::VirtualLevel<Domain::AdaptiveLevelWrapper<DomainLevel_, TemplateSet_>>& virt_lvl_coarse,
+        const String& cubature, bool trunc = false, bool shrink = true)
+      {
+        // if the coarse level is a parent, then we need the coarse system level
+        XASSERT(!virt_lvl_coarse.is_parent());
+
+        Asm::asm_transfer_adaptive_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc, shrink,
           [](const DomainLevel_& dl) {return &dl.space;},
           this->transfer_sys.local(), this->coarse_muxer_sys, this->gate_sys, this->gate_sys);
 

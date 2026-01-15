@@ -160,6 +160,12 @@ namespace FEAT::Util
       _slots.emplace_back(Slot());
     }
 
+    SlotMap(const SlotMap& other) = default;
+    SlotMap(SlotMap&& other) = default;
+
+    SlotMap& operator=(const SlotMap& other) = default;
+    SlotMap& operator=(SlotMap&& other) = default;
+
     /**
      * \brief Insert \c value into the \c SlotMap
      *

@@ -211,6 +211,11 @@ namespace FEAT::Geometry
     {
       return _type.to_ulong();
     }
+
+    Index num_marked() const
+    {
+      return _type.count();
+    }
   };
 
   template<typename Shape_>
@@ -369,6 +374,11 @@ namespace FEAT::Geometry
     Index to_number() const
     {
       return _type.to_ulong();
+    }
+
+    Index num_marked() const
+    {
+      return _type.count();
     }
   };
 

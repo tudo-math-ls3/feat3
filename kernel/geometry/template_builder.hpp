@@ -1497,6 +1497,39 @@ namespace FEAT::Geometry
       XABORTM("Unsupported template dimension!");
     }
 
+    template<int dim_>
+    Real average_elements_per_marking()
+    {
+      RawTemplateMapByDim<dim_>* templates = nullptr;
+
+      if constexpr(dim_ == 1)
+      {
+        templates = &RawData_::raw_edges();
+      }
+      else if constexpr(dim_ == 2)
+      {
+        templates = &RawData_::raw_faces();
+      }
+      else if constexpr(dim_ == 3)
+      {
+        templates = &RawData_::raw_cells();
+      }
+      else
+      {
+        XABORTM("Unsupported dimension!");
+      }
+
+      Index markings(0);
+      std::size_t elements(0);
+      for(const auto& [type, tmplt] : *templates)
+      {
+        markings += type.num_marked();
+        elements += tmplt.entities.size();
+      }
+
+      return Real(elements) / Real(markings);
+    }
+
     /// print some stats about maximum children in the raw data
     void stats()
     {

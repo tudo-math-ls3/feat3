@@ -1499,7 +1499,8 @@ namespace FEAT
           Index* idx = ancestor.parti_graph.get_image_idx();
 
           // weighted partitioning?
-          if(!weights.empty())
+          // If num_elems == num_parts, we have to assign one element to each part, independent of weight.
+          if(!weights.empty() && num_elems > num_parts)
           {
             // compute total number of non-zero weight elements
             WeightType weight_sum(0.0);
@@ -1513,8 +1514,10 @@ namespace FEAT
             for(Index i(1), last(0); i < num_parts; ++i)
             {
               // add as many elements as we need to achieve the target weight for this partition
-              WeightType target_weight = weight_sum * WeightType(i) / WeightType(num_parts);
-              for(; (weight_count < target_weight) && (last < num_elems); ++last)
+              // Set target_weight to at least weight_count. Otherwise we might produce an empty block
+              // because a previous block already surpassed the new target_weight.
+              WeightType target_weight = Math::max(weight_count, weight_sum * WeightType(i) / WeightType(num_parts));
+              for(; (weight_count <= target_weight) && (last < num_elems); ++last)
                 weight_count += weights[last];
 
               ptr[i] = last;
