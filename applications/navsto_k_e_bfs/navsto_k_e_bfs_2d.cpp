@@ -59,6 +59,7 @@
 #include <kernel/solver/direct_sparse_solver.hpp>
 #include <kernel/solver/schwarz_precond.hpp>
 #include <kernel/solver/richardson.hpp>
+#include <control/transport_solvers/afc_limiter.hpp>
 
 /**
  * \brief Runs the k-epsilon turbulence model simulation for a given mesh configuration.
@@ -215,12 +216,44 @@ void run_k_epsilon_model(
   typedef LAFEM::DenseVector<DataType, IndexType> VectorTypeTurb;
 
   // Initialize Matrices
-  GlobalTurbMatrix matrix_k = the_turb_level.matrix_sys.clone(LAFEM::CloneMode::Shallow);
+  GlobalTurbMatrix matrix_k = the_turb_level.matrix_sys.clone(LAFEM::CloneMode::Layout);
   GlobalTurbMatrix matrix_e = the_turb_level.matrix_sys.clone(LAFEM::CloneMode::Layout);
-  GlobalTurbMatrix matrix_left_k = the_turb_level.matrix_sys.clone(LAFEM::CloneMode::Layout);
-  GlobalTurbMatrix matrix_left_e = the_turb_level.matrix_sys.clone(LAFEM::CloneMode::Layout);
-  GlobalTurbMatrix matrix_mass_k = the_turb_level.matrix_sys.clone(LAFEM::CloneMode::Layout);
-  GlobalTurbMatrix matrix_mass_e = the_turb_level.matrix_sys.clone(LAFEM::CloneMode::Layout);
+
+  // create limiter
+  Control::AFCTransportSolver<GlobalTurbMatrix> limiter_k;
+  Control::AFCTransportSolver<GlobalTurbMatrix> limiter_e;
+
+  // limit diffusion
+  limiter_k.limit_stiff_matrix(true);
+  limiter_e.limit_stiff_matrix(true);
+
+  // initialize mass matrices
+  GlobalTurbMatrix& matrix_mass_k = limiter_k.get_mass_matrix();
+  matrix_mass_k = the_turb_level.matrix_sys.clone(LAFEM::CloneMode::Layout);
+
+  GlobalTurbMatrix& matrix_mass_e = limiter_e.get_mass_matrix();
+  matrix_mass_e = the_turb_level.matrix_sys.clone(LAFEM::CloneMode::Layout);
+
+  // initialize convection matrices
+  GlobalTurbMatrix& matrix_conv_k = limiter_k.get_conv_matrix();
+  matrix_conv_k = the_turb_level.matrix_sys.clone(LAFEM::CloneMode::Layout);
+
+  GlobalTurbMatrix& matrix_conv_e = limiter_e.get_conv_matrix();
+  matrix_conv_e = the_turb_level.matrix_sys.clone(LAFEM::CloneMode::Layout);
+
+  // inizialize diffusion matrices
+  GlobalTurbMatrix& matrix_diff_k = limiter_k.get_stiff_matrix();
+  matrix_diff_k = the_turb_level.matrix_sys.clone(LAFEM::CloneMode::Layout);
+
+  GlobalTurbMatrix& matrix_diff_e = limiter_e.get_stiff_matrix();
+  matrix_diff_e = the_turb_level.matrix_sys.clone(LAFEM::CloneMode::Layout);
+
+  // initialize reaction matrices
+  GlobalTurbMatrix& matrix_reac_k = limiter_k.get_react_matrix();
+  matrix_reac_k = the_turb_level.matrix_sys.clone(LAFEM::CloneMode::Layout);
+
+  GlobalTurbMatrix& matrix_reac_e = limiter_e.get_react_matrix();
+  matrix_reac_e = the_turb_level.matrix_sys.clone(LAFEM::CloneMode::Layout);
 
   // Initialize Vectors
   GlobalScalarVectorType vec_rhs_k = matrix_k.create_vector_r();
@@ -274,12 +307,18 @@ void run_k_epsilon_model(
     vtk_writer.register_scalar_vector("p_k_neumann", vec_p_k_neumann);
     vtk_writer.register_stokes_vector("surface_int_23", surface_int_23);
     vtk_writer.register_scalar_vector("surface_int_27", surface_int_27);
-    vtk_writer.register_scalar_vector("ref", reference_vec_0);
+    vtk_writer.register_scalar_vector("vec_f_e", vec_f_e);
   }
 
   // Format matrices and vectors
   matrix_k.local().format();
+  matrix_diff_k.local().format();
+  matrix_reac_k.local().format();
+  matrix_conv_k.local().format();
   matrix_e.local().format();
+  matrix_diff_e.local().format();
+  matrix_reac_e.local().format();
+  matrix_conv_e.local().format();
   vec_rhs_k.format();
   vec_f_k.format();
   vec_rhs_e.format();
@@ -311,7 +350,13 @@ void run_k_epsilon_model(
   // Create TurbAssemblyJob
   TurbSystemAssemblyJob<MatrixTypeTurb, VectorTypeTurb, LocalVeloVector, SpaceTurbType, SpaceVeloType> turb_asm_job;
   turb_asm_job.matrix_k = &matrix_k.local();
+  turb_asm_job.matrix_diff_k = &matrix_diff_k.local();
+  turb_asm_job.matrix_reac_k = &matrix_reac_k.local();
+  turb_asm_job.matrix_conv_k = &matrix_conv_k.local();
   turb_asm_job.matrix_e = &matrix_e.local();
+  turb_asm_job.matrix_diff_e = &matrix_diff_e.local();
+  turb_asm_job.matrix_reac_e = &matrix_reac_e.local();
+  turb_asm_job.matrix_conv_e = &matrix_conv_e.local();
   turb_asm_job.vec_rhs_k = &vec_f_k.local();
   turb_asm_job.vec_rhs_e = &vec_f_e.local();
   turb_asm_job.vec_sol_k = &vec_sol_k.local();
@@ -490,13 +535,11 @@ void run_k_epsilon_model(
 
   comm.print("Assembling system matrix...\n");
 
-  // Symbolic Assembly matrix_left_* and matrix_mass_*
-  Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_left_k.local(), domain_control.front()->space_turb);
-  Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_left_e.local(), domain_control.front()->space_turb);
-  matrix_left_k.local().format();
-  matrix_left_e.local().format();
-  matrix_mass_k = matrix_left_k.clone(LAFEM::CloneMode::Weak);
-  matrix_mass_e = matrix_left_e.clone(LAFEM::CloneMode::Weak);
+  // Symbolic Assembly matrix_mass_*
+  Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_mass_k.local(), domain_control.front()->space_turb);
+  Assembly::SymbolicAssembler::assemble_matrix_std1(matrix_mass_e.local(), domain_control.front()->space_turb);
+  matrix_mass_k.local().format();
+  matrix_mass_e.local().format();
 
   // Assemble mass matrices
   Assembly::Common::IdentityOperator identity_operator;
@@ -519,6 +562,13 @@ void run_k_epsilon_model(
   // assemble TurbAssemblyJob
   domain_control.front()->domain_asm.assemble(turb_asm_job);
 
+  // synchronize vectors
+  vec_f_k.sync_0();
+  vec_f_e.sync_0();
+  vec_p_k.sync_0();
+  vec_p_k_bnd.sync_0();
+  vec_p_k_neumann.sync_0();
+
   // Create vec_mass_l for Computation of primal vector P_k
   auto vec_mass_l = matrix_mass_k.lump_rows();
   vec_mass_l.component_invert(vec_mass_l, 1.0);
@@ -532,8 +582,6 @@ void run_k_epsilon_model(
   vec_sol_e.format(params.e_0);
 
   // equation (23)
-  // convert to obtain a type-0 vector
-  surface_int_23.from_1_to_0();
   turb_trace_assembler.assemble_functional_vector_velocity(
     surface_int_23.local().first(),
     vec_sol_k.local(),
@@ -551,8 +599,6 @@ void run_k_epsilon_model(
   if(params.problem == "neumann")
   {
     // equation (27)
-    // convert to obtain a type-0 vector
-    surface_int_27.from_1_to_0();
     turb_trace_assembler.assemble_functional_vector_dissipation(
       surface_int_27.local(),
       vec_sol_k.local(),
@@ -569,31 +615,35 @@ void run_k_epsilon_model(
   }
 
   // ================================================================================================
-  // Preconditioner and Solver
+  // Limiter
   // ------------------------------------------------------------------------------------------------
 
-  // Create Preconditioner and Solver
+  // Filter
   auto& solver_filter_k = (params.problem == "neumann" ? filter_k_neumann : filter_k_wall);
   auto& solver_filter_e = (params.problem == "neumann" ? filter_e_neumann : filter_e_wall);
 
-  // these solvers require a suitable third-party direct solver (UMFPACK, SuperLU, MKL-DSS or cuDSS)
-  auto sparse_sol_k = Solver::new_direct_sparse_solver(matrix_left_k, solver_filter_k);
-  auto sparse_sol_e = Solver::new_direct_sparse_solver(matrix_left_e, solver_filter_e);
-  auto solver_k = Solver::new_richardson(matrix_left_k, solver_filter_k, 1, sparse_sol_k);
-  auto solver_e = Solver::new_richardson(matrix_left_e, solver_filter_e, 1, sparse_sol_e);
+  // we already set all matrices with refences so there is nothing to do here
 
-  // Enable convergence plot
-  solver_k->set_plot_mode(Solver::PlotMode::summary);
-  solver_k->set_max_iter(10000);
-  solver_k->set_tol_rel(1e-10);
+  // set filter
+  limiter_k.set_filter(solver_filter_k.local());
+  limiter_e.set_filter(solver_filter_e.local());
 
-  solver_e->set_plot_mode(Solver::PlotMode::summary);
-  solver_e->set_max_iter(10000);
-  solver_e->set_tol_rel(1e-10);
+  // set theta = 1 for implicit Euler
+  limiter_k.set_theta(1.0);
+  limiter_e.set_theta(1.0);
 
-  // Initialize the solver
-  solver_k->init_symbolic();
-  solver_e->init_symbolic();
+  // set limiter to FCT
+  limiter_k.set_limiter(1);
+  limiter_e.set_limiter(1);
+
+  // set step size
+  limiter_k.init_symbolic();
+  limiter_k.init_stepsize();
+  limiter_k.init_time_stepping(time_stepping.delta_t);
+
+  limiter_e.init_symbolic();
+  limiter_e.init_stepsize();
+  limiter_e.init_time_stepping(time_stepping.delta_t);
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -771,6 +821,14 @@ void run_k_epsilon_model(
   DataType defect_old_e = 0.0;
   DataType defect_new_e = 0.0;
 
+  // Counter for setting k, e
+  IndexType count_e = 0;
+  IndexType count_k = 0;
+  IndexType count_nu = 0;
+  IndexType global_count_e = 0;
+  IndexType global_count_k = 0;
+  IndexType global_count_nu = 0;
+
   // for Neumann we need to start with a smaller Re and then increase it after solving
   // for Dirichlet it is not necessary
   IndexType num_inc = 1;
@@ -791,11 +849,6 @@ void run_k_epsilon_model(
     while(time_stepping.advance_step())
     {
       comm.print(String("\n") + String(100u, '=') + "\n");
-
-      // Counter for setting k, e
-      IndexType count_e = 0;
-      IndexType count_k = 0;
-      IndexType count_nu = 0;
 
       vec_sol_k_old.copy(vec_sol_k);
       vec_sol_e_old.copy(vec_sol_e);
@@ -875,6 +928,10 @@ void run_k_epsilon_model(
               filter_e_wall.local().add(vertices_bnd_l[i], left_wall_val_e.local()(vertices_bnd_l[i]));
             }
           }
+
+          // update filter for limiter
+          limiter_k.set_filter(filter_k_wall.local());
+          limiter_e.set_filter(filter_e_wall.local());
         }
 
         if(params.problem == "neumann")
@@ -886,6 +943,10 @@ void run_k_epsilon_model(
           // assemble inflow filter
           unit_asm.assemble(filter_k_neumann.local(), domain_control.front()->space_turb, bnd_info.k_sol_func());
           unit_asm.assemble(filter_e_neumann.local(), domain_control.front()->space_turb, bnd_info.e_sol_func());
+
+          // update filter for limiter
+          limiter_k.set_filter(filter_k_neumann.local());
+          limiter_e.set_filter(filter_e_neumann.local());
         }
 
         // ============================================================================================
@@ -977,9 +1038,15 @@ void run_k_epsilon_model(
         vec_rhs_k.local().format();
         vec_f_k.format();
         matrix_k.local().format();
+        matrix_diff_k.local().format();
+        matrix_reac_k.local().format();
+        matrix_conv_k.local().format();
         vec_rhs_e.format();
-        vec_f_e.local().format();
+        vec_f_e.format();
         matrix_e.local().format();
+        matrix_diff_e.local().format();
+        matrix_reac_e.local().format();
+        matrix_conv_e.local().format();
         vec_p_k.format(0.0);
         vec_p_k_bnd.format(0.0);
         vec_p_k_neumann.format(0.0);
@@ -990,28 +1057,37 @@ void run_k_epsilon_model(
         // Update matrix_k, vec_f_k
         domain_control.front()->domain_asm.assemble(turb_asm_job);
 
+        // synchronize vectors
+        vec_p_k.sync_0();
+        vec_p_k_bnd.sync_0();
+        vec_p_k_neumann.sync_0();
+
+        // initialize limiter step size
+        limiter_k.init_stepsize();
+        limiter_k.init_time_stepping(time_stepping.delta_t);
+
+        limiter_e.init_stepsize();
+        limiter_e.init_time_stepping(time_stepping.delta_t);
+
         // Compute: vec_rhs_k = M * k_{t-1} + delta_t * f_k_{t}
         vec_rhs_k.axpy(vec_f_k, time_stepping.delta_t);
 
         // synchronize to obtain a type-1 vector
         vec_rhs_k.sync_0();
-
-        // Compute: matrix_left_k = M + delta_t*matrix_k
-        matrix_left_k.local().copy(matrix_mass_k.local());
-
-        // add to RHS
-        matrix_left_k.local().axpy(matrix_k.local(), time_stepping.delta_t);
+        vec_f_k.sync_0();
 
         // apply filter
         if(params.problem == "dirichlet")
         {
           filter_k_wall.filter_sol(vec_sol_k);
           filter_k_wall.filter_rhs(vec_rhs_k);
+          filter_k_wall.filter_rhs(vec_f_k);
         }
         if(params.problem == "neumann")
         {
           filter_k_neumann.filter_sol(vec_sol_k);
           filter_k_neumann.filter_rhs(vec_rhs_k);
+          filter_k_neumann.filter_rhs(vec_f_k);
         }
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -1020,29 +1096,15 @@ void run_k_epsilon_model(
         turb_k_solve.start();
 
         // Solve the system for k
-        solver_k->init_numeric();
-        if(params.problem == "dirichlet")
+        //auto status_k = Solver::solve(*solver_k, vec_sol_k, vec_rhs_k, matrix_left_k, filter_k_wall);
+        auto status_k = limiter_k.apply(vec_sol_k, vec_f_k);
+        if(!Solver::status_success(status_k))
         {
-          auto status_k = Solver::solve(*solver_k, vec_sol_k, vec_rhs_k, matrix_left_k, filter_k_wall);
-          if(!Solver::status_success(status_k))
-          {
-            comm.print("Solver k didn't succeed!\n");
-            break;
-          }
-        }
-        if(params.problem == "neumann")
-        {
-          auto status_k = Solver::solve(*solver_k, vec_sol_k, vec_rhs_k, matrix_left_k, filter_k_neumann);
-          if(!Solver::status_success(status_k))
-          {
-            comm.print("Solver k didn't succeed!\n");
+          comm.print("Solver k didn't succeed!\n");
+          if(params.problem == "neumann")
             comm.print("Final Reynoldsnumber " + stringify(params.Re_turbulent) + "\n");
-            break;
-          }
+          break;
         }
-
-        // release the solver
-        solver_k->done_numeric();
 
         // stop watch
         turb_k_solve.stop();
@@ -1056,10 +1118,7 @@ void run_k_epsilon_model(
         // All matrices and vectors have already been assembled
 
         // Compute: vec_rhs_e = M * e_{t-1}
-        matrix_mass_e.apply(vec_rhs_e, vec_sol_e_old);
-
-        // synchronize to obtain a type-0 vector
-        vec_rhs_e.from_1_to_0();
+        matrix_mass_e.local().apply(vec_rhs_e.local(), vec_sol_e_old.local());
 
         // Compute: vec_rhs_e = M * e_{t-1} + delta_t * f_e_{t}
         vec_rhs_e.axpy(vec_f_e, time_stepping.delta_t);
@@ -1069,8 +1128,6 @@ void run_k_epsilon_model(
           // Compute: vec_rhs_e = M * e_{t-1} + delta_t * f_e_{t} + delta_t * eq (27)
           vec_rhs_e_neumann.format();
 
-          // synchronize to obtain a type-0 vector
-          vec_rhs_e_neumann.from_1_to_0();
           turb_trace_assembler.assemble_functional_vector_dissipation(
             vec_rhs_e_neumann.local(),
             vec_sol_k.local(),
@@ -1079,33 +1136,31 @@ void run_k_epsilon_model(
             domain_control.front()->space_turb,
             domain_control.front()->space_velo,
             params.cubature_name,
-            DataType(time_stepping.delta_t)
+            DataType(1.0)
           );
 
-          // synchronize to obtain a type-1 vector
-          vec_rhs_e_neumann.sync_0();
-
           // add to RHS
-          vec_rhs_e.axpy(vec_rhs_e_neumann);
+          vec_rhs_e.axpy(vec_rhs_e_neumann, time_stepping.delta_t);
+
+          vec_f_e.axpy(vec_rhs_e_neumann);
         }
 
         // synchronize to obtain a type-1 vector
         vec_rhs_e.sync_0();
-
-        // Compute: matrix_left_e = M + delta_t * matrix_e
-        matrix_left_e.local().copy(matrix_mass_e.local());
-        matrix_left_e.local().axpy(matrix_e.local(), time_stepping.delta_t);
+        vec_f_e.sync_0();
 
         // apply filter
         if(params.problem =="dirichlet")
         {
           filter_e_wall.filter_sol(vec_sol_e);
           filter_e_wall.filter_rhs(vec_rhs_e);
+          filter_e_wall.filter_rhs(vec_f_e);
         }
         if(params.problem =="neumann")
         {
           filter_e_neumann.filter_sol(vec_sol_e);
           filter_e_neumann.filter_rhs(vec_rhs_e);
+          filter_e_neumann.filter_rhs(vec_f_e);
         }
 
         // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -1114,29 +1169,15 @@ void run_k_epsilon_model(
         turb_e_solve.start();
 
         // solve for e
-        solver_e->init_numeric();
-        if(params.problem == "dirichlet")
+        //auto status_e = Solver::solve(*solver_e, vec_sol_e, vec_rhs_e, matrix_left_e, filter_e_wall);
+        auto status_e = limiter_e.apply(vec_sol_e, vec_f_e);
+        if(!Solver::status_success(status_e))
         {
-          auto status_e = Solver::solve(*solver_e, vec_sol_e, vec_rhs_e, matrix_left_e, filter_e_wall);
-          if(!Solver::status_success(status_e))
-          {
-            comm.print("Solver e didn't succeed!\n");
-            break;
-          }
-        }
-        if(params.problem == "neumann")
-        {
-          auto status_e = Solver::solve(*solver_e, vec_sol_e, vec_rhs_e, matrix_left_e, filter_e_neumann);
-          if(!Solver::status_success(status_e))
-          {
-            comm.print("Solver e didn't succeed!\n");
+          comm.print("Solver e didn't succeed!\n");
+          if(params.problem == "neumann")
             comm.print("Final Reynoldsnumber " + stringify(params.Re_turbulent) + "\n");
-            break;
-          }
+          break;
         }
-
-        // release the solver
-        solver_e->done_numeric();
 
         // stop watch
         turb_e_solve.stop();
@@ -1184,8 +1225,18 @@ void run_k_epsilon_model(
           data_ptr_nu[i] = Math::max(params.nu_min, l_star * Math::sqrt(data_ptr_k[i]));
 
           // Compute gamma according to eq (9)
-          data_ptr_gamma[i] = params.C_mu * data_ptr_k[i] / data_ptr_nu[i];
+          data_ptr_gamma[i] = (params.C_mu * data_ptr_k[i] / data_ptr_nu[i]);
         }
+
+        global_count_e = 0;
+        global_count_k = 0;
+        global_count_nu = 0;
+
+        // sum of local counts over all processes
+        comm.reduce(&count_e, &global_count_e, 1, FEAT::Dist::op_sum, 0);
+        comm.reduce(&count_k, &global_count_k, 1, FEAT::Dist::op_sum, 0);
+        comm.reduce(&count_nu, &global_count_nu, 1, FEAT::Dist::op_sum, 0);
+
 
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Calculate defect
@@ -1199,17 +1250,9 @@ void run_k_epsilon_model(
         matrix_e.apply(res_defect_e, vec_sol_e);
 
         // res_defect_k -= vec_rhs_k
-        // synchronize to obtain a type-0 vector
-        res_defect_k.from_1_to_0();
-        res_defect_e.from_1_to_0();
-
         // subtract from res_defect_*
         res_defect_k.axpy(vec_f_k, DataType(-1));
         res_defect_e.axpy(vec_f_e, DataType(-1));
-
-        // synchronize to obtain a type-1 vector
-        res_defect_k.sync_0();
-        res_defect_e.sync_0();
 
         //filter defect
         if(params.problem == "dirichlet")
@@ -1302,7 +1345,6 @@ void run_k_epsilon_model(
         stringify(time_stepping.time_step).pad_front(5)
         + stringify("k").pad_front(10)
         + stringify_fp_fix(time, 5).pad_front(10)
-        + stringify(solver_k->get_num_iter()).pad_front(5)
       );
 
       // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -1311,16 +1353,15 @@ void run_k_epsilon_model(
         stringify(time_stepping.time_step).pad_front(5)
         + stringify("e").pad_front(10)
         + stringify_fp_fix(time, 5).pad_front(10)
-        + stringify(solver_e->get_num_iter()).pad_front(5)
       );
 
       // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
 
       // Print out counter
       comm.print(
-        "\n  k was set to a positive value " + stringify(count_k) + " times.\n"
-        + "  e was set to a positive value " + stringify(count_e) + " times.\n"
-        + "  l_* was set to l_max = " + stringify(bnd_info.get_l_max()) + " : " + stringify(count_nu) + " times.\n"
+        "\n  k was set to a positive value " + stringify(global_count_k) + " times.\n"
+        + "  e was set to a positive value " + stringify(global_count_e) + " times.\n"
+        + "  l_* was set to l_max = " + stringify(bnd_info.get_l_max()) + " : " + stringify(global_count_nu) + " times.\n"
       );
 
       // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
@@ -1355,8 +1396,6 @@ void run_k_epsilon_model(
       // equation (23)
       surface_int_23.format();
 
-      // synchronize to obtain a type-0 vector
-      surface_int_23.from_1_to_0();
       turb_trace_assembler.assemble_functional_vector_velocity(
         surface_int_23.local().first(),
         vec_sol_k.local(),
@@ -1376,8 +1415,6 @@ void run_k_epsilon_model(
         // equation (27)
         surface_int_27.format();
 
-        // synchronize to obtain a type-0 vector
-        surface_int_27.from_1_to_0();
         turb_trace_assembler.assemble_functional_vector_dissipation(
           surface_int_27.local(),
           vec_sol_k.local(),
@@ -1451,8 +1488,8 @@ void run_k_epsilon_model(
   time_stepping.finish_loop();
 
   // And release the solver
-  solver_k->done_symbolic();
-  solver_e->done_symbolic();
+  limiter_k.done_symbolic();
+  limiter_e.done_symbolic();
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

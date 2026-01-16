@@ -32,9 +32,15 @@ namespace Turb
 
     /// inout: pointer to k system matrix to be assembled
     TurbMatrixType* matrix_k = nullptr;
+    TurbMatrixType* matrix_diff_k = nullptr;
+    TurbMatrixType* matrix_reac_k = nullptr;
+    TurbMatrixType* matrix_conv_k = nullptr;
 
     /// inout: pointer to e system matrix to be assembled
     TurbMatrixType* matrix_e = nullptr;
+    TurbMatrixType* matrix_diff_e = nullptr;
+    TurbMatrixType* matrix_reac_e = nullptr;
+    TurbMatrixType* matrix_conv_e = nullptr;
 
     /// inout: pointer to k rhs vector to be assembled
     TurbVectorType* vec_rhs_k = nullptr;
@@ -139,7 +145,13 @@ namespace Turb
 
       /// matrix scatter objects
       typename TurbMatrixType::ScatterAxpy scatter_matrix_k;
+      typename TurbMatrixType::ScatterAxpy scatter_matrix_diff_k;
+      typename TurbMatrixType::ScatterAxpy scatter_matrix_reac_k;
+      typename TurbMatrixType::ScatterAxpy scatter_matrix_conv_k;
       typename TurbMatrixType::ScatterAxpy scatter_matrix_e;
+      typename TurbMatrixType::ScatterAxpy scatter_matrix_diff_e;
+      typename TurbMatrixType::ScatterAxpy scatter_matrix_reac_e;
+      typename TurbMatrixType::ScatterAxpy scatter_matrix_conv_e;
 
       /// vector scatter objects
       typename TurbVectorType::ScatterAxpy scatter_vec_rhs_k;
@@ -171,7 +183,8 @@ namespace Turb
       DataType value_k, value_e, velo_norm;
 
       /// the local k and e matrices to be assembled
-      Tiny::Matrix<DataType, max_local_dofs_turb, max_local_dofs_turb> local_matrix_k, local_matrix_e;
+      Tiny::Matrix<DataType, max_local_dofs_turb, max_local_dofs_turb> local_matrix_k, local_matrix_diff_k, local_matrix_reac_k, local_matrix_conv_k;
+      Tiny::Matrix<DataType, max_local_dofs_turb, max_local_dofs_turb> local_matrix_e, local_matrix_diff_e, local_matrix_reac_e, local_matrix_conv_e;
 
       /// the local k and e rhs vectors to be assembled
       Tiny::Vector<DataType, max_local_dofs_turb> local_vec_rhs_k, local_vec_rhs_e, local_ref;
@@ -202,7 +215,13 @@ namespace Turb
         gather_vec_p_k_bnd(*job.p_k_bnd),
         gather_vec_p_k_neumann(*job.p_k_neumann),
         scatter_matrix_k(*job.matrix_k),
+        scatter_matrix_diff_k(*job.matrix_diff_k),
+        scatter_matrix_reac_k(*job.matrix_reac_k),
+        scatter_matrix_conv_k(*job.matrix_conv_k),
         scatter_matrix_e(*job.matrix_e),
+        scatter_matrix_diff_e(*job.matrix_diff_e),
+        scatter_matrix_reac_e(*job.matrix_reac_e),
+        scatter_matrix_conv_e(*job.matrix_conv_e),
         scatter_vec_rhs_k(*job.vec_rhs_k),
         scatter_vec_rhs_e(*job.vec_rhs_e),
         scatter_vec_rhs_ref(*job.ref),
@@ -298,9 +317,9 @@ namespace Turb
           value_e += local_dofs_e[i] * space_data_turb.phi[i].value;
           if(this->job.problem == "neumann")
           {
-            local_p_k[i] = local_dofs_p_k[i] * space_data_turb.phi[i].value;
-            local_p_k_bnd[i] = local_dofs_p_k_bnd[i] * space_data_turb.phi[i].value;
-            local_p_k_neumann[i] = local_dofs_p_k_neumann[i] * space_data_turb.phi[i].value;
+            local_p_k[i] += local_dofs_p_k[i] * space_data_turb.phi[i].value;
+            local_p_k_bnd[i] += local_dofs_p_k_bnd[i] * space_data_turb.phi[i].value;
+            local_p_k_neumann[i] += local_dofs_p_k_neumann[i] * space_data_turb.phi[i].value;
           }
         }
       }
@@ -329,7 +348,13 @@ namespace Turb
 
         // format local matrices and vectors
         local_matrix_k.format();
+        local_matrix_diff_k.format();
+        local_matrix_reac_k.format();
+        local_matrix_conv_k.format();
         local_matrix_e.format();
+        local_matrix_diff_e.format();
+        local_matrix_reac_e.format();
+        local_matrix_conv_e.format();
         local_vec_rhs_k.format();
         local_vec_rhs_e.format();
         local_p_k.format();
@@ -381,11 +406,17 @@ namespace Turb
               local_matrix_k[i][j] += weight * (scale_diff * value_nu / sig_k * laplace_op
                                               + scale_reac * theta_mat_k * value_gamma * mass_op
                                               + scale_conv * conv_op);
+              local_matrix_diff_k[i][j] += weight * (scale_diff * value_nu / sig_k * laplace_op);
+              local_matrix_reac_k[i][j] += weight * (scale_reac * theta_mat_k * value_gamma * mass_op);
+              local_matrix_conv_k[i][j] += weight * (scale_conv * conv_op);
 
               // update local matrix e
               local_matrix_e[i][j] += weight * (scale_diff * value_nu / sig_e * laplace_op
                                               + scale_reac * theta_mat_e * value_gamma * mass_op
                                               + scale_conv * conv_op);
+              local_matrix_diff_e[i][j] += weight * (scale_diff * value_nu / sig_e * laplace_op);
+              local_matrix_reac_e[i][j] += weight * (scale_reac * theta_mat_e * value_gamma * mass_op);
+              local_matrix_conv_e[i][j] += weight * (scale_conv * conv_op);
             } // next trial function
 
             // compute P_k
@@ -437,7 +468,13 @@ namespace Turb
       void scatter()
       {
         this->scatter_matrix_k(this->local_matrix_k, this->dof_mapping_turb, this->dof_mapping_turb);
+        this->scatter_matrix_diff_k(this->local_matrix_diff_k, this->dof_mapping_turb, this->dof_mapping_turb);
+        this->scatter_matrix_reac_k(this->local_matrix_reac_k, this->dof_mapping_turb, this->dof_mapping_turb);
+        this->scatter_matrix_conv_k(this->local_matrix_conv_k, this->dof_mapping_turb, this->dof_mapping_turb);
         this->scatter_matrix_e(this->local_matrix_e, this->dof_mapping_turb, this->dof_mapping_turb);
+        this->scatter_matrix_diff_e(this->local_matrix_diff_e, this->dof_mapping_turb, this->dof_mapping_turb);
+        this->scatter_matrix_reac_e(this->local_matrix_reac_e, this->dof_mapping_turb, this->dof_mapping_turb);
+        this->scatter_matrix_conv_e(this->local_matrix_conv_e, this->dof_mapping_turb, this->dof_mapping_turb);
         this->scatter_vec_rhs_k(this->local_vec_rhs_k, this->dof_mapping_turb);
         this->scatter_vec_rhs_e(this->local_vec_rhs_e, this->dof_mapping_turb);
         this->scatter_vec_rhs_ref(this->local_ref, this->dof_mapping_turb);
