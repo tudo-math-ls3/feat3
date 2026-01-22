@@ -77,8 +77,30 @@ namespace FEAT
           /// the desired minimum and maximum refinement levels for this layer
           int desired_level_max, desired_level_min;
 
-          int progeny_group, progeny_child;
-          int progeny_first, progeny_count;
+          /// Progeny group of this process.
+          int progeny_group;
+
+          /**
+           * \brief Which direct child this process belongs to in its progeny group.
+           *
+           * This integer groups the children of the current process by their sibling communicators.
+           * Two processes with identical values of \c progeny_child belong to the same set of
+           * siblings on the previous (i.e. next finest) layer
+           */
+          int progeny_child;
+
+          /// Size of the progeny group of this process.
+          int progeny_count;
+          /// First process of the progeny group of this process. Numbered w.r.t. the DomainControllers communicator
+          int progeny_first;
+
+          /**
+           * \brief Progeny communicator
+           *
+           * Contains all processes that are children of the current process somewhere in the process hierarchy.
+           * Can be viewed as a transitive inverse of the sibling communicators, as each sibling communicator
+           * contains all processes that get reduced to a single parent in the process hierarchy.
+           */
           Dist::Comm progeny_comm;
 
           /// specifies whether a partitioning was found

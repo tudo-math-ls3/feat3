@@ -1,0 +1,147 @@
+/**
+\page domain_controllers FEAT Domain Controllers
+
+The various domain controller in the control/domain subdirectory are powerful
+building blocks for MPI-parallel applications. They deal with the minutiae of
+managing MPI processes and mesh partitioning and produce neighbor ranks and
+mesh-halos from which other MPI-abstractions in FEAT can be constructed.
+
+This document serves as an overview over various concepts used by the domain
+control classes.
+
+\section Concepts
+
+\subsection domain_controllers_concept_levels Levels
+
+A level refers to a mesh (or a mesh-patch), potentially together with system
+matrices, vectors, transfer operators, etc.  The term is used here in the same
+way as in the context of multigrid solvers.
+
+\subsection domain_controllers_concept_desired_levels Desired Levels
+
+Desired levels indicate to the domain controllers how many processes should be
+active on which level of the mesh hierarchy.
+
+For single layered process hierarchies (see the subsection below) desired
+levels can be given in a simplified form as "n m" where n is the highest level
+and m the lowest level.  The domain control will refine its given mesh m times,
+store that mesh as the first level, and then refine up to level n, performing a
+partitioning somewhere in between.
+
+For multi layered process hierarchies desired levels are given in the form
+"n_1:p_1 (n_i:p_i)* n_k", which tells the domain control that on level n_i the
+mesh should be split across p_i processes. p_1 must be the same as the size of
+the world communicator, a single process for n_k is implied.
+
+For example the level string "4:16 2:4 1" tells the domain controller that we
+want 16 processes active on level 4, 4 processes active on level 2, and we want
+the mesh-hierarchy to start on level 1.
+
+As the name desired level implies, the domain controllers have some freedom in
+choosing levels. The number of processes per layer of the hierarchy will
+always be kept, but the controllers can increase the levels at which processes
+become active if required for mesh partitioning.
+
+\subsection domain_controllers_concept_domain_layers Domain Layers
+
+\ref FEAT::Control::Domain::DomainLayer%s are objects that represent a
+partitioning of some set of MPI processes. They always store the following
+information:
+- A \ref Dist::Comm communicator which represents the set of all processes that
+  currently participate in the decomposition
+- A set of ranks that represent the neighbors of this process within the
+  communicator
+
+In a simple parallel application, there exists just a single domain layer,
+whose communicator is the world communicator (i.e. the set of all available
+processes). In more complex scenarios, an application may contain a list of
+domain layers, where each domain layer represents a subset of the processes
+contained in the previous domain layer, thus forming a "process hierarchy".
+
+In such a process hierarchy, a whole group of "siblings" in a particular domain
+layer is reduced onto a single parent process in the next domain layer.
+
+In case of multiple domain layers forming a hierarchy, each layer (except
+for the last one) also contains two additional objects:
+- A Dist::Comm communicator which represents the set of all sibling processes
+  which are reduced to a single parent in the next layer.
+- The rank of parent process within the sibling communicator.
+
+As an aside, in a process hierarchy each process stores a list of domain
+layers. This can be rather unintuitive at first, because the recursive
+partitioning induces a tree structure and one might expect that to be reflected
+in the definition of the domain layers. That tree structure does implicitly
+exist, it is just distributed among all processes. Each process stores the the
+list of nodes from its leaf of the process hierarchy up to the root node.
+Together they store the whole tree, but each process stores only nodes it
+itself participates in, for which a simple list suffices.
+
+The following figures shows how the domain layers are constructed recursively.
+
+\image html images/domain_layers.svg
+
+Layer 0 is the world communicator consisting of processes 0 to 7.  The
+communicator gets partitioned into first 4, then 2, and finally just a single
+root process.
+
+During each partitioning we determine how many processes need to be reduced
+onto a single process in the next layer to achieve the desired number of active
+processes in the next layer. For this example we need to reduce two processes
+to a single process in the next layer for each partitioning. The processes
+getting "merged" are grouped together in sibling communicators, shown as green
+boxes.
+
+From each group of siblings a parent process is selected, i.e. the lowest rank
+in the sibling communicator.  Parent processes are shown with blue outlines in
+the figure above.  All these parent processes form the "parent communicator"
+for this layer, which is really just the normal communicator of the next layer.
+
+\subsection domain_controllers_concept_ancestors Ancestors
+
+Specific to the \ref FEAT::Control::Domain::PartiDomainControl and its
+subclasses, the \ref FEAT::Control::Domain::PartiDomainControlBase::Ancestor%s
+expand upon the data stored in domain layers.  Domain layers are purely
+concerned with the (recursive) partitioning of processes.  Ancestors store
+additional data about:
+- desired refinement levels for meshes at this layer of the domain,
+- information about mesh partitioning, such as the minimum mesh-level for
+  partitioning, the used mesh-partitioner, and the actual partitioning of the
+mesh,
+- progeny groups, an additional type of communicator besides the domain layers
+  communicators and sibling communicators.
+
+Progeny groups are a third kind of communicator. The layers communicators
+include all processes that are active at some layer of the process hierarchy.
+The layers sibling communicators include all processes that get reduced to a
+single process during process partitioning. The progeny group communicators
+include all processes that stem from the current process, i.e. all processes
+that have the current process as a father process at some point. They are a
+transitive inverse of the sibling communicators. The progeny communicators are
+required when communicating split halos during mesh partitioning.
+
+Note that in a hierarchy with two layers, the sibling communicators and the
+progeny group communicators coincide. It is only after an additional layer is
+introduced that they start to differ.
+
+Besides the actual progeny group communicator four more pieces of information are stored:
+- The progreny group, a integer indicating which group the current process belongs to
+- The progeny child, a integer indicating which child the current process is
+- The progeny count, a integer indicating how large the progeny group is
+- The progeny first, a integer indicating the rank of the first child of the group
+
+The following figure shows the values of these integers for the progeny groups
+created by the partitioning that was already used to illustrate domain layers.
+The progeny communicators are indicated with red outlines.
+
+\image html images/ancestors.svg
+
+Some things to note:
+- The child indices refer to progeny groups, i.e. all processes that belong to
+  the same progeny group on some layer are treated as one child on the next
+layer.
+- As expected from the name, there is no ancestor for the last layer (layer
+  three in this case)
+- The progeny groups are not numbered consectutively. This is intended. The
+  progeny groups are used during level creation to rename halos after
+  patch-extraction.
+**/

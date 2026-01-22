@@ -51,6 +51,8 @@ namespace FEAT
        *
        * \todo document this
        *
+       * See \ref domain_controllers for an overview over domain controller concepts.
+       *
        * For more details on meshes, see the related doxygen page \ref mesh_file_format.
        *
        * \author Peter Zajac
