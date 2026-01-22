@@ -89,10 +89,10 @@ namespace FEAT
            */
           int progeny_child;
 
-          /// Size of the progeny group of this process.
-          int progeny_count;
           /// First process of the progeny group of this process. Numbered w.r.t. the DomainControllers communicator
           int progeny_first;
+          /// Size of the progeny group of this process.
+          int progeny_count;
 
           /**
            * \brief Progeny communicator
