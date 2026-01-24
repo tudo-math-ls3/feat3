@@ -15,13 +15,13 @@ namespace FEAT
 
   void Backend::set_preferred_backend(PreferredBackend preferred_backend)
   {
-    _preferred_backend = preferred_backend;
-    if (preferred_backend != PreferredBackend::cuda)
+    if (preferred_backend != PreferredBackend::cuda && _preferred_backend != preferred_backend)
     {
 #ifdef FEAT_HAVE_CUDA
       FEAT::Util::cuda_synchronize();
 #endif
     }
+    _preferred_backend = preferred_backend;
   }
 
   PreferredBackend Backend::get_preferred_backend()
