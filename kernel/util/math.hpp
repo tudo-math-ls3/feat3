@@ -746,26 +746,26 @@ namespace FEAT
 
     /// \cond internal
     template<>
-    inline float pi<float>()
+    inline constexpr float pi<float>()
     {
       return 3.141592654f;
     }
 
     template<>
-    inline double pi<double>()
+    inline constexpr double pi<double>()
     {
       return 3.1415926535897932385;
     }
 
     template<>
-    inline long double pi<long double>()
+    inline constexpr long double pi<long double>()
     {
       return 3.141592653589793238462643383279502884197l;
     }
 
 #ifdef FEAT_HAVE_QUADMATH
     template<>
-    inline __float128 pi<__float128>()
+    inline constexpr __float128 pi<__float128>()
     {
       return 3.141592653589793238462643383279502884197q;
     }
@@ -784,7 +784,7 @@ namespace FEAT
      * \brief Returns the machine precision constant for a floating-point data type.
      */
     template<typename T_>
-    constexpr T_ eps()
+    inline T_ eps()
     {
       static_assert(Type::Traits<T_>::is_float, "eps can only be applied to floating point types");
 
@@ -801,24 +801,24 @@ namespace FEAT
 
     /// \cond internal
     template<>
-    constexpr float eps<float>()
+    inline constexpr float eps<float>()
     {
       return std::numeric_limits<float>::epsilon();
     }
     template<>
-    constexpr double eps<double>()
+    inline constexpr double eps<double>()
     {
       return std::numeric_limits<double>::epsilon();
     }
     template<>
-    constexpr long double eps<long double>()
+    inline constexpr long double eps<long double>()
     {
       return std::numeric_limits<long double>::epsilon();
     }
 
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
     template<>
-    constexpr __float128 eps<__float128>()
+    inline constexpr __float128 eps<__float128>()
     {
       return FLT128_EPSILON;
     }
@@ -826,7 +826,7 @@ namespace FEAT
 
     #ifdef FEAT_HAVE_HALFMATH
     template<>
-    constexpr Half eps<Half>()
+    inline Half eps<Half>()
     {
       return CUDART_ONE_FP16 - Half(0.99951171);
     }
@@ -839,7 +839,7 @@ namespace FEAT
      * The return value of this function coincides with <c>std::numeric_limits<T_>::max()</c>.
      */
     template<typename T_>
-    inline T_ huge()
+    constexpr T_ huge()
     {
       return std::numeric_limits<T_>::max();
     }
@@ -850,7 +850,7 @@ namespace FEAT
      * The return value of this function coincides with <c>std::numeric_limits<T_>::min()</c>.
      */
     template<typename T_>
-    inline T_ tiny()
+    constexpr T_ tiny()
     {
       return std::numeric_limits<T_>::min();
     }
@@ -858,13 +858,13 @@ namespace FEAT
     /// \cond internal
 #if defined(FEAT_HAVE_QUADMATH) && !defined(__CUDACC__)
     template<>
-    inline __float128 huge<__float128>()
+    inline constexpr __float128 huge<__float128>()
     {
       return FLT128_MAX;
     }
 
     template<>
-    inline __float128 tiny<__float128>()
+    inline constexpr __float128 tiny<__float128>()
     {
       return FLT128_MIN;
     }
