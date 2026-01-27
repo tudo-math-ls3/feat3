@@ -2794,6 +2794,11 @@ namespace FEAT
           Index nb = ADPMatAuxB::calc_mat_buf_row_nze(buf_row_nze, local_matrix.block_b(), row_mirror.template at<0>());
           XASSERT(na == nb);
           Index nd = ADPMatAuxD::calc_mat_buf_row_nze(&buf_row_nze[na], local_matrix.block_d(), row_mirror.template at<1>());
+
+          // \todo invent main diagonal for pressure block
+          //for(Index i = 0u; i < nd; ++i)
+            //++buf_row_nze[na + i];
+
           return na + nd;
         }
 
@@ -2811,6 +2816,12 @@ namespace FEAT
           Index nb = ADPMatAuxB::gather_mat_buf_col_idx(aux_row_ptr, buf_col_idx, local_matrix.block_b(), row_mirror.template at<0>(), global_dof_idx.template at<1>());
           XASSERT(na == nb);
           Index nd = ADPMatAuxD::gather_mat_buf_col_idx(&aux_row_ptr[na], buf_col_idx, local_matrix.block_d(), row_mirror.template at<1>(), global_dof_idx.template at<0>());
+
+          // \todo invent main diagonal for pressure block
+          //const auto* p_dof_idx = global_dof_idx.template at<1>().elements();
+          //for(Index i = 0u; i < nd; ++i)
+            //buf_col_idx[aux_row_ptr[na + i]] = p_dof_idx[i];
+
           return na + nd;
         }
 
@@ -2828,6 +2839,14 @@ namespace FEAT
           Index nb = ADPMatAuxB::gather_owned_struct(graph, local_matrix.block_b(), row_mirror.template at<0>(), global_dof_idx.template at<1>(), row_offset);
           XASSERT(na == nb);
           Index nd = ADPMatAuxD::gather_owned_struct(graph, local_matrix.block_d(), row_mirror.template at<1>(), global_dof_idx.template at<0>(), row_offset + na);
+
+          // invent main diagonal for pressure block
+          {
+            const auto* p_dof_idx = global_dof_idx.template at<1>().elements();
+            for(Index i = 0u; i < nd; ++i)
+              graph.insert(na + i, p_dof_idx[i]);
+          }
+
           return na + nd;
         }
       }; // class ADPMatAux<LAFEM::SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_>>
@@ -2840,6 +2859,11 @@ namespace FEAT
       class ADPFilAux<LAFEM::NoneFilter<DT_, IT_>>
       {
       public:
+        static Index row_count(const LAFEM::VectorMirror<DT_, IT_>& row_mirror)
+        {
+          return row_mirror.num_indices();
+        }
+
         static Index upload_filter(
           LAFEM::UnitFilter<DT_, IT_>& DOXY(unit_rows),
           const LAFEM::NoneFilter<DT_, IT_>& DOXY(filter),
@@ -2847,7 +2871,7 @@ namespace FEAT
           Index DOXY(row_offset))
         {
           // nothing to do here
-          return row_mirror.num_indices();
+          return row_count(row_mirror);
         }
       }; // class ADPFilAux<LAFEM::NoneFilter<DT_, IT_>>
 
@@ -2857,6 +2881,11 @@ namespace FEAT
       class ADPFilAux<LAFEM::NoneFilterBlocked<DT_, IT_, bs_>>
       {
       public:
+        static Index row_count(const LAFEM::VectorMirror<DT_, IT_>& row_mirror)
+        {
+          return row_mirror.num_indices() * Index(bs_);
+        }
+
         static Index upload_filter(
           LAFEM::UnitFilter<DT_, IT_>& DOXY(unit_rows),
           const LAFEM::NoneFilterBlocked<DT_, IT_, bs_>& DOXY(filter),
@@ -2864,7 +2893,7 @@ namespace FEAT
           Index DOXY(row_offset))
         {
           // nothing to do here
-          return row_mirror.num_indices() * Index(bs_);
+          return row_count(row_mirror);
         }
       }; // class ADPFilAux<LAFEM::NoneFilterBlocked<DT_, IT_, bs_>>
 
@@ -2874,6 +2903,11 @@ namespace FEAT
       class ADPFilAux<LAFEM::UnitFilter<DT_, IT_>>
       {
       public:
+        static Index row_count(const LAFEM::VectorMirror<DT_, IT_>& row_mirror)
+        {
+          return row_mirror.num_indices();
+        }
+
         static Index upload_filter(
           LAFEM::UnitFilter<DT_, IT_>& unit_rows,
           const LAFEM::UnitFilter<DT_, IT_>& filter,
@@ -2881,7 +2915,7 @@ namespace FEAT
           Index row_offset)
         {
           if(filter.used_elements() <= Index(0))
-            return row_mirror.num_indices();
+            return row_count(row_mirror);
 
           const IT_* fil_idx = filter.get_indices();
           const IT_* mir_idx = row_mirror.indices();
@@ -2903,7 +2937,7 @@ namespace FEAT
             }
           }
 
-          return row_mirror.num_indices();
+          return row_count(row_mirror);
         }
       }; // class ADPFilAux<LAFEM::UnitFilter<DT_, IT_>>
 
@@ -2913,6 +2947,11 @@ namespace FEAT
       class ADPFilAux<LAFEM::UnitFilterBlocked<DT_, IT_, bs_>>
       {
       public:
+        static Index row_count(const LAFEM::VectorMirror<DT_, IT_>& row_mirror)
+        {
+          return row_mirror.num_indices() * Index(bs_);
+        }
+
         static Index upload_filter(
           LAFEM::UnitFilter<DT_, IT_>& unit_rows,
           const LAFEM::UnitFilterBlocked<DT_, IT_, bs_>& filter,
@@ -2920,7 +2959,7 @@ namespace FEAT
           Index row_offset)
         {
           if(filter.used_elements() <= Index(0))
-            return row_mirror.num_indices() * Index(bs_);
+            return row_count(row_mirror);
 
           const bool ignore_nans = filter.get_ignore_nans();
           const auto* fil_val = filter.get_values();
@@ -2948,7 +2987,7 @@ namespace FEAT
             }
           }
 
-          return row_mirror.num_indices() * Index(bs_);
+          return row_count(row_mirror);
         }
       }; // class ADPFilAux<LAFEM::UnitFilterBlocked<DT_, IT_, bs_>>
 
@@ -2958,6 +2997,11 @@ namespace FEAT
       class ADPFilAux<LAFEM::MeanFilter<DT_, IT_>>
       {
       public:
+        static Index row_count(const LAFEM::VectorMirror<DT_, IT_>& row_mirror)
+        {
+          return row_mirror.num_indices();
+        }
+
         static Index upload_filter(
           LAFEM::UnitFilter<DT_, IT_>& DOXY(unit_rows),
           const LAFEM::MeanFilter<DT_, IT_>& filter,
@@ -2965,7 +3009,7 @@ namespace FEAT
           Index DOXY(row_offset))
         {
           XASSERTM(filter.empty(), "AlgDofParti does not support LAFEM::MeanFilter yet!");
-          return row_mirror.num_indices();
+          return row_count(row_mirror);
         }
       }; // class ADPFilAux<LAFEM::MeanFilter<DT_, IT_>>
 
@@ -2975,6 +3019,11 @@ namespace FEAT
       class ADPFilAux<LAFEM::MeanFilterBlocked<DT_, IT_, bs_>>
       {
       public:
+        static Index row_count(const LAFEM::VectorMirror<DT_, IT_>& row_mirror)
+        {
+          return row_mirror.num_indices() * Index(bs_);
+        }
+
         static Index upload_filter(
           LAFEM::UnitFilter<DT_, IT_>& DOXY(unit_rows),
           const LAFEM::MeanFilterBlocked<DT_, IT_, bs_>& filter,
@@ -2982,7 +3031,7 @@ namespace FEAT
           Index DOXY(row_offset))
         {
           XASSERTM(filter.empty(), "AlgDofParti does not support LAFEM::MeanFilterBlocked yet!");
-          return row_mirror.num_indices() * Index(bs_);
+          return row_count(row_mirror);
         }
       }; // class ADPFilAux<LAFEM::MeanFilterBlocked<DT_, IT_, bs_>>
 
@@ -2992,6 +3041,11 @@ namespace FEAT
       class ADPFilAux<Global::MeanFilter<DT_, IT_>>
       {
       public:
+        static Index row_count(const LAFEM::VectorMirror<DT_, IT_>& row_mirror)
+        {
+          return row_mirror.num_indices();
+        }
+
         static Index upload_filter(
           LAFEM::UnitFilter<DT_, IT_>& DOXY(unit_rows),
           const Global::MeanFilter<DT_, IT_>& filter,
@@ -2999,7 +3053,7 @@ namespace FEAT
           Index DOXY(row_offset))
         {
           XASSERTM(filter.empty(), "AlgDofParti does not support Global::MeanFilter yet!");
-          return row_mirror.num_indices();
+          return row_count(row_mirror);
         }
       }; // class ADPFilAux<Global::MeanFilter<DT_, IT_>>
 
@@ -3009,6 +3063,11 @@ namespace FEAT
       class ADPFilAux<LAFEM::SlipFilter<DT_, IT_, bs_>>
       {
       public:
+        static Index row_count(const LAFEM::VectorMirror<DT_, IT_>& row_mirror)
+        {
+          return row_mirror.num_indices() * Index(bs_);
+        }
+
         static Index upload_filter(
           LAFEM::UnitFilter<DT_, IT_>& DOXY(unit_rows),
           const LAFEM::SlipFilter<DT_, IT_, bs_>& filter,
@@ -3016,7 +3075,7 @@ namespace FEAT
           Index DOXY(row_offset))
         {
           XASSERTM(filter.empty(), "AlgDofParti does not support LAFEM::SlipFilter yet!");
-          return row_mirror.num_indices() * Index(bs_);
+          return row_count(row_mirror);
         }
       }; // class ADPFilAux<LAFEM::SlipFilter<DT_, IT_, bs_>>
 
@@ -3030,6 +3089,14 @@ namespace FEAT
         typedef typename FirstFilter_::IndexType IT_;
         typedef ADPFilAux<FirstFilter_> ADPFilAuxFirst;
         typedef ADPFilAux<LAFEM::FilterChain<RestFilter_...>> ADPFilAuxRest;
+
+        static Index row_count(const LAFEM::VectorMirror<DT_, IT_>& row_mirror)
+        {
+          Index n1 = ADPFilAuxFirst::row_count(row_mirror);
+          Index n2 = ADPFilAuxRest::row_count(row_mirror);
+          XASSERT(n1 == n2);
+          return n1;
+        }
 
         template<typename RowMirror_>
         static Index upload_filter(
@@ -3055,6 +3122,11 @@ namespace FEAT
         typedef typename FirstFilter_::IndexType IT_;
         typedef ADPFilAux<FirstFilter_> ADPFilAuxFirst;
 
+        static Index row_count(const LAFEM::VectorMirror<DT_, IT_>& row_mirror)
+        {
+          return ADPFilAuxFirst::row_count(row_mirror);
+        }
+
         template<typename RowMirror_>
         static Index upload_filter(
           LAFEM::UnitFilter<DT_, IT_>& unit_rows,
@@ -3076,6 +3148,11 @@ namespace FEAT
         typedef typename SubFilter_::IndexType IT_;
         typedef ADPFilAux<SubFilter_> ADPFilAuxSub;
 
+        static Index row_count(const LAFEM::VectorMirror<DT_, IT_>& row_mirror)
+        {
+          return ADPFilAuxSub::row_count(row_mirror);
+        }
+
         template<typename RowMirror_>
         static Index upload_filter(
           LAFEM::UnitFilter<DT_, IT_>& unit_rows,
@@ -3087,7 +3164,7 @@ namespace FEAT
           {
             ADPFilAuxSub::upload_filter(unit_rows, x.second, row_mirror, row_offset);
           }
-          return row_mirror.num_indices();
+          return row_count(row_mirror);
         }
       }; // class ADPFilAux<LAFEM::FilterSequence<SubFilter_>>
 
@@ -3101,6 +3178,13 @@ namespace FEAT
         typedef typename FirstFilter_::IndexType IT_;
         typedef ADPFilAux<FirstFilter_> ADPFilAuxFirst;
         typedef ADPFilAux<LAFEM::TupleFilter<RestFilter_...>> ADPFilAuxRest;
+
+        static Index row_count(const LAFEM::VectorMirror<DT_, IT_>& row_mirror)
+        {
+          Index n1 = ADPFilAuxFirst::row_count(row_mirror);
+          Index n2 = ADPFilAuxRest::row_count(row_mirror);
+          return n1 + n2;
+        }
 
         template<typename FirstMirror_, typename... RestMirror_>
         static Index upload_filter(
@@ -3124,6 +3208,11 @@ namespace FEAT
         typedef typename FirstFilter_::DataType DT_;
         typedef typename FirstFilter_::IndexType IT_;
         typedef ADPFilAux<FirstFilter_> ADPFilAuxFirst;
+
+        static Index row_count(const LAFEM::VectorMirror<DT_, IT_>& row_mirror)
+        {
+          return ADPFilAuxFirst::row_count(row_mirror);
+        }
 
         template<typename FirstMirror_>
         static Index upload_filter(
