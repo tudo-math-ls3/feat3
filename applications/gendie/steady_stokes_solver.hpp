@@ -20,9 +20,11 @@
 #include <kernel/util/stop_watch.hpp>
 #include <kernel/util/string.hpp>
 
-#include <kernel/solver/direct_stokes_solver.hpp>
-#include <kernel/solver/frosch.hpp>
+// #include <kernel/solver/direct_stokes_solver.hpp>
+#include <kernel/solver/direct_sparse_solver.hpp>
+// #include <kernel/solver/frosch.hpp>
 #include <control/scalar_basic.hpp>
+// #include "scalexa_gendie_scalarize_helper.hpp"
 #include "format_helper.hpp"
 #include "template_helper.hpp"
 #include <kernel/adjacency/graph.hpp>
@@ -822,24 +824,19 @@ namespace Gendie
 
       #endif
 
+      // case only one level
       if(domain_virtual_size == std::size_t(1))
       {
         // create direct solver or FMGRES?
-#if defined(FEAT_HAVE_UMFPACK) || defined(FEAT_HAVE_CUDSS)
-        if(!coarse_frosch && !coarse_gmres)
+        if(!coarse_frosch && !coarse_gmres && FEAT::Solver::have_direct_sparse_solver(matrix_sys, filter_sys))
         {
           auto backendt = FEAT::Backend::get_preferred_backend();
           FEAT::Backend::set_preferred_backend(solver_backend);
-          this->base_solver = FEAT::Solver::new_direct_stokes_solver(matrix_sys, filter_sys);
+          this->base_solver = FEAT::Solver::new_direct_sparse_solver(matrix_sys, filter_sys);
           FEAT::Backend::set_preferred_backend(backendt);
         }
-#endif //FEAT_HAVE_UMFPACK
 #ifdef FEAT_HAVE_TRILINOS
-#if defined(FEAT_HAVE_UMFPACK) || defined(FEAT_HAVE_CUDSS)
         else if(coarse_frosch)
-#else
-        if(coarse_frosch)
-#endif
         {
           this->frosch_precond = FEAT::Solver::new_stokes_frosch(matrix_sys, filter_sys, *frosch_params);
 
@@ -868,8 +865,8 @@ namespace Gendie
 
           this->base_solver = solver_iterative;
         }
-        else
 #endif // FEAT_HAVE_TRILINOS
+        else
         {
           if(voxel_vanka)
           {
@@ -939,17 +936,15 @@ namespace Gendie
           this->smoother.push_back(std::move(smoother_l));
           this->vanka_solver.push_back(std::move(vanka));
         }
-#if defined(FEAT_HAVE_UMFPACK) || defined(FEAT_HAVE_CUDSS)
-        else if(!coarse_frosch && !coarse_gmres && (domain.at(i).layer().comm().size() == 1))
+        else if(!coarse_frosch && !coarse_gmres && FEAT::Solver::have_direct_sparse_solver(lvl.matrix_sys, lvl.filter_sys))
         {
           auto backendt = FEAT::Backend::get_preferred_backend();
           FEAT::Backend::set_preferred_backend(solver_backend);
           // create UMFPACK coarse grid solver
-          this->coarse_solver = FEAT::Solver::new_direct_stokes_solver(lvl.matrix_sys, lvl.filter_sys);
+          this->coarse_solver = FEAT::Solver::new_direct_sparse_solver(lvl.matrix_sys, lvl.filter_sys);
           this->multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, this->coarse_solver);
           FEAT::Backend::set_preferred_backend(backendt);
         }
-#endif //  FEAT_HAVE_UMFPACK
 #ifdef FEAT_HAVE_TRILINOS
         else if(coarse_frosch)
         {
