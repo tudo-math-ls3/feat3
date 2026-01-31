@@ -893,6 +893,107 @@ namespace FEAT
     }; // class BurgersVeloMaterialBlockedMatrixAssemblyJob
 
     /**
+     * \brief Burgers material assembly job for diagonal of block matrix
+     *
+     * This assembly job implements the blocked (i.e. vector-valued) Burgers operator assembly,
+     * which is assembled into a vector.
+     *
+     * See the documentation of the BurgersVeloMaterialAssemblyJobBase class template (which is a base class
+     * of this class) for details about the terms and coefficients offered by this assembly job.
+     *
+     * \tparam DiagonalVector_
+     * The vector type the diagonal values should end in
+     *
+     * \tparam Space_
+     * The finite element space to be used for assembly
+     *
+     * \tparam ViscoFunc_
+     *
+     * \tparam ViscoDerFunc_
+     *
+     * \tparam ConvVector_
+     * The type of the convection (velocity) vector field
+     *
+     * \author Maximilian Esser
+     */
+    template<typename DiagonalVector_, typename Space_, typename ViscoFunc_, typename ViscoDerFunc_, typename ConvVector_ = DiagonalVector_>
+    class BurgersVeloMaterialBlockedDiagonalAssemblyJob :
+      public BurgersVeloMaterialAssemblyJobBase<typename DiagonalVector_::DataType, Space_, ViscoFunc_, ViscoDerFunc_, ConvVector_>
+    {
+    public:
+      /// the matrix type
+      typedef DiagonalVector_ VectorType;
+      /// the data type
+      typedef typename VectorType::DataType DataType;
+
+      /// our base class
+      typedef BurgersVeloMaterialAssemblyJobBase<DataType, Space_, ViscoFunc_, ViscoDerFunc_, ConvVector_> BaseClass;
+
+      /// the block size
+      static constexpr int block_size = VectorType::BlockSize;
+
+      /// the matrix to be assembled
+      VectorType& vector;
+
+    public:
+      /**
+       * \brief Constructor
+       *
+       * \param[in,out] vector_
+       * A \resident reference to the matrix that is to be assembled.
+       *
+       * \param[in] conv_vector
+       * A \resident reference to the convection field vector.
+       *
+       * \param[in] space_
+       * A \resident reference to the space that is be used for assembly.
+       *
+       * \param[in] cubature_name
+       * The name of the cubature rule to be used for assembly.
+       */
+      explicit BurgersVeloMaterialBlockedDiagonalAssemblyJob(DiagonalVector_& vector_, const ConvVector_& conv_vector,
+        const Space_& space_, const String& cubature_name, ViscoFunc_ visc_fun, ViscoDerFunc_ visc_der_func) :
+        BaseClass(conv_vector, space_, cubature_name, visc_fun, visc_der_func),
+        vector(vector_)
+      {
+      }
+
+    public:
+      /// the actual assembly task
+      class Task :
+        public BurgersVeloMaterialBlockedAssemblyTaskBase<BurgersVeloMaterialBlockedDiagonalAssemblyJob, DataType, block_size, ViscoFunc_, ViscoDerFunc_>
+      {
+      public:
+        typedef BurgersVeloMaterialBlockedAssemblyTaskBase<BurgersVeloMaterialBlockedDiagonalAssemblyJob, DataType, block_size, ViscoFunc_, ViscoDerFunc_> BaseClass;
+
+      protected:
+        DiagonalVector_& vector;
+
+      public:
+        /// constructor
+        explicit Task(const BurgersVeloMaterialBlockedDiagonalAssemblyJob& job_) :
+          BaseClass(job_),
+          vector(job_.vector)
+        {
+        }
+
+        // prepare, assemble and finish are already implemented in the base classes
+
+        /// scatters the local matrix
+        void scatter()
+        {
+          auto* val_vec = vector.elements();
+          for(int loc_i = 0; loc_i < this->dof_mapping.get_num_local_dofs(); ++loc_i)
+          {
+            const Index cur_i = this->dof_mapping.get_index(loc_i);
+            for(int k = 0; k < block_size; ++k)
+              val_vec[cur_i][k] += this->local_matrix[loc_i][loc_i][k][k] * this->alpha;
+          }
+        }
+      }; // class BurgersVeloMaterialBlockedMatrixAssemblyJob::Task
+    }; // class BurgersVeloMaterialBlockedMatrixAssemblyJob
+
+    /**
      * \brief Burgers Material assembly job for block right-hand-side vector
      *
      * This assembly job implements the blocked (i.e. vector-valued) Burgers operator assembly,

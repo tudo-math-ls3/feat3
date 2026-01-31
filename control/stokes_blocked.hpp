@@ -393,6 +393,15 @@ namespace FEAT
         this->compile_scalar_transfer();
       }
 
+      void clear_transfers()
+      {
+        this->transfer_velo.local() = LocalVeloTransfer();
+        this->transfer_pres.local() = LocalPresTransfer();
+        this->transfer_scalar_velo.local() = LocalScalarTransfer();
+        this->compile_system_transfer();
+        this->compile_scalar_transfer();
+      }
+
       template<typename SpaceVelo_, typename SpacePres_, typename Cubature_>
       void assemble_grad_div_matrices(const SpaceVelo_& space_velo, const SpacePres_& space_pres, const Cubature_& cubature)
       {

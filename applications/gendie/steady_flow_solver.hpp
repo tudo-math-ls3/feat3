@@ -242,6 +242,7 @@ namespace Gendie
         success &= prop->parse_entry("fixed-ls-tol", _fixed_ls_tol);
         success &= prop->parse_entry("max-stagnations", _max_stagnations);
         _solve_stokes = Gendie::check_for_config_option(prop->query("init-with-stokes"));
+        _recalc_interface_scaling = Gendie::check_for_config_option(prop->query("reinit-fbm-interface-filter"));
       }
 
       return success;
@@ -259,6 +260,7 @@ namespace Gendie
       s += FEAT::String("Nonlin Tol Low Abs ").pad_back(padlen, pc) + ": " + FEAT::stringify_fp_sci(_tol_low_abs, 2, 4) + "\n";
       s += FEAT::String("Nonlin Stagrate ").pad_back(padlen, pc) + ": " + FEAT::stringify_fp_sci(_stag_rate, 2, 4) + "\n";
       s += FEAT::String("Max Stagnations ").pad_back(padlen, pc) + ": " + FEAT::stringify(_max_stagnations) + "\n";
+      s += FEAT::String("Reinit FBM interface filter ").pad_back(padlen, pc) + ": " + (_recalc_interface_scaling ? FEAT::String("yes") : FEAT::String("No")) + "\n";
       s += FEAT::String("Fixed Linear Solver tolerance ").pad_back(padlen, pc) + ": " +
            ((_fixed_ls_tol < DefectDataType(0)) ? FEAT::String("adaptive") : FEAT::stringify_fp_sci(_fixed_ls_tol, 2, 4)) + "\n";
 
@@ -350,6 +352,32 @@ namespace Gendie
       _defects.clear();
     }
 
+    void _prepare_system_filter()
+    {
+      if constexpr(Intern::supports_fbm<typename DefectAssembler::LevelType>)
+      {
+        if(_recalc_interface_scaling || (this->_cur_iter == 0u))
+        {
+          for(auto& sys : this->flow_solver->get_systems())
+          {
+            auto diag_a = sys->matrix_a.create_vector_l();
+            auto diag_m = sys->velo_mass_matrix.create_vector_l();
+            sys->matrix_a.extract_diag(diag_a, true);
+            sys->velo_mass_matrix.extract_diag(diag_m, true);
+            auto sc_factor = diag_a.max_abs_element() / diag_m.max_abs_element();
+            this->_logger->print("Interface factor " + FEAT::stringify(sc_factor), debug);
+            auto& fbm_int_filter = sys->filter_interface_fbm;
+            // get prev value
+            auto& _internal_vec = fbm_int_filter.get_filter_vector();
+            if(_internal_vec.size() > 0u)
+            {
+              _internal_vec.format(sc_factor);
+            }
+          }
+        }
+      }
+    }
+
     bool _init_sol(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs)
     {
       // in any case, format vec_sol
@@ -365,6 +393,7 @@ namespace Gendie
         this->system_asm->set_backend();
         // we solve "stokes" by simply assembling with a zero convection vector field
         this->system_asm->assemble_matrices_isotrop(this->flow_solver->get_systems());
+        this->_prepare_system_filter();
 
         // // we use a homogenous rhs
         this->_vec_cor.local().template at<0>().scale(vec_rhs.local().template at<0>(), DefectDataType(1)/this->_scaling_factor);
@@ -472,8 +501,14 @@ namespace Gendie
       return true;
     }
 
+    FEAT::Solver::Status _apply_solver(SolverVectorType& vec_cor, const SolverVectorType& vec_def)
+    {
+      return this->flow_solver->apply(vec_cor, vec_def);
+    }
+
     bool _apply_iteration(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs)
     {
+      this->cast()._prepare_defect_filter(vec_sol);
       this->cast()._assemble_defect(vec_sol, vec_rhs);
 
       if constexpr(!no_convert)
@@ -558,6 +593,7 @@ namespace Gendie
 
       /// setup system matrices
       this->cast()._setup_system_matrices(vec_sol, vec_rhs);
+      this->cast()._prepare_system_filter();
 
       //todo: init_numeric sets its own backend??
       this->flow_solver->init_numeric();
@@ -569,7 +605,7 @@ namespace Gendie
       {
         this->_vec_solver_def.local().convert(this->_vec_def.local());
       }
-      FEAT::Solver::Status status = this->flow_solver->apply(this->_vec_solver_cor, this->_vec_solver_def);
+      FEAT::Solver::Status status = this->cast()._apply_solver(this->_vec_solver_cor, this->_vec_solver_def);
       if constexpr(!no_convert)
       {
         this->_vec_cor.local().convert(this->_vec_solver_cor.local());
@@ -631,7 +667,7 @@ namespace Gendie
         this->_logger->print(  "----------------------------------------------------+---------------------------------------------", info);
       }
 
-      for(this->_cur_iter = 0; this->_cur_iter < this->_max_nonlin_iter; ++this->_cur_iter)
+      for(this->_cur_iter = 0; this->_cur_iter < this->_max_nonlin_iter+1; ++this->_cur_iter)
       {
         if(!this->cast()._apply_iteration(vec_sol, vec_rhs))
           break;
@@ -660,6 +696,7 @@ namespace Gendie
     DefectDataType _fixed_ls_tol;
     DefectDataType _scaling_factor;
     Index _min_nonlin_iter, _max_nonlin_iter, _cur_iter, _max_stokes_iter, _max_stagnations, _stagnation_counter;
+    bool _recalc_interface_scaling;
 
   protected:
 
@@ -716,6 +753,7 @@ namespace Gendie
        _max_stokes_iter(Index(8)),
        _max_stagnations(Index(4)),
        _stagnation_counter(Index(0)),
+       _recalc_interface_scaling(false),
        _defects(),
        _cur_status(Gendie::NonLinearStatus::undefined),
        _inner_status(FEAT::Solver::Status::undefined),
@@ -937,6 +975,32 @@ namespace Gendie
       return (this->_cur_iter >= min_picard_steps) && (this->_stag_rate < cur_improve);
     }
 
+    void _prepare_defect_filter(const DefectVectorType& vec_sol)
+    {
+      if constexpr(Intern::supports_fbm<typename DefectAssembler::LevelType>)
+      {
+        if(this->_recalc_interface_scaling || (this->_cur_iter == 0u))
+        {
+          this->system_asm->set_jacobian(double(this->_cur_iter%2u & (this->_cur_iter>min_picard_steps)));
+          // assemble
+          auto diag_a = this->defect_asm->system_level->create_global_vector_velo();
+          auto diag_m = this->defect_asm->system_level->create_global_vector_velo();
+          this->defect_asm->system_level->velo_mass_matrix.extract_diag(diag_m, true);
+          diag_a.format();
+          this->system_asm->assemble_diagonal(diag_a.local(), vec_sol.local().template at<0>());
+          diag_a.sync_0();
+          auto sc_factor = diag_a.max_abs_element() / diag_m.max_abs_element();
+          auto& fbm_int_filter = this->defect_asm->system_level->filter_interface_fbm;
+          // get prev value
+          auto& _internal_vec = fbm_int_filter.get_filter_vector();
+          if(_internal_vec.size() > 0)
+          {
+            _internal_vec.format(sc_factor);
+          }
+        }
+      }
+    }
+
     void _setup_system_matrices(const DefectVectorType& vec_sol, const DefectVectorType&)
     {
       // set newton or picard step
@@ -946,16 +1010,6 @@ namespace Gendie
       // also assembles matrix for adjusted system (u, \tilde(p)),  \tilde(p) = p/scaling_factor
       this->system_asm->assemble_matrices(this->flow_solver->get_systems(), vec_sol);
 
-      // #ifdef FEAT_DEBUG_MODE  //careful, requires assembled velo_mass_matrix
-      // {
-      //   auto diag_a = this->flow_solver->get_systems().front()->matrix_a.create_vector_l();
-      //   auto diag_m = this->flow_solver->get_systems().front()->velo_mass_matrix.create_vector_l();
-      //   this->flow_solver->get_systems().front()->matrix_a.extract_diag(diag_a, true);
-      //   this->flow_solver->get_systems().front()->velo_mass_matrix.extract_diag(diag_m, true);
-      //   auto sc_factor = diag_a.max_abs_element() / diag_m.max_abs_element();
-      //   if(this->_logger) this->_logger->print("Max abs ele " + FEAT::stringify(sc_factor), info);
-      // }
-      // #endif
     }
 
     void _update_solution(DefectVectorType& vec_sol) const
@@ -1064,6 +1118,7 @@ namespace Gendie
     {
       BaseClass::_init();
       stagnation_counter = Index(0);
+      this->flow_solver->get_systems().front()->filter_sys.filter_sol(this->_vec_solver_cor);
     }
 
     void _reset()
@@ -1159,6 +1214,33 @@ namespace Gendie
       }
     }
 
+    void _prepare_defect_filter(const DefectVectorType& vec_sol)
+    {
+      if constexpr(Intern::supports_fbm<typename DefectAssembler::LevelType>)
+      {
+        if(this->_recalc_interface_scaling || (this->_cur_iter == 0u))
+        {
+          this->system_asm->set_theta(SolverDataType(1)/SolverDataType(time_step_size));
+          this->system_asm->set_jacobian(double(0));
+          // assemble
+          auto diag_a = this->defect_asm->system_level->create_global_vector_velo();
+          auto diag_m = this->defect_asm->system_level->create_global_vector_velo();
+          this->defect_asm->system_level->velo_mass_matrix.extract_diag(diag_m, true);
+          diag_a.format();
+          this->system_asm->assemble_diagonal(diag_a.local(), vec_sol.local().template at<0>());
+          diag_a.sync_0();
+          auto sc_factor = diag_a.max_abs_element() / diag_m.max_abs_element();
+          auto& fbm_int_filter = this->defect_asm->system_level->filter_interface_fbm;
+          // get prev value
+          auto& _internal_vec = fbm_int_filter.get_filter_vector();
+          if(_internal_vec.size() > 0)
+          {
+            _internal_vec.format(sc_factor);
+          }
+        }
+      }
+    }
+
     void _setup_system_matrices(const DefectVectorType& vec_sol, const DefectVectorType& vec_rhs)
     {
       // assembly of actual rhs (implicit euler)
@@ -1180,10 +1262,10 @@ namespace Gendie
         {
           this->defect_asm->system_level->apply_fbm_filter_to_rhs(loc_def.local());
         }
-        // and filter
+        // and then filter
         this->filter.filter_rhs(this->_vec_def);
 
-        // scale rhs
+        // and now scale rhs
         this->_vec_def.local().template at<0>().scale(this->_vec_def.local().template at<0>(), DefectDataType(1)/this->_scaling_factor);
       }
 
@@ -1199,7 +1281,11 @@ namespace Gendie
       this->system_asm->assemble_matrices(this->flow_solver->get_systems(), vec_sol);
     }
 
-    // finally, copy over solution from our internal vector
+    FEAT::Solver::Status _apply_solver(SolverVectorType& vec_cor, const SolverVectorType& vec_def)
+    {
+      return this->flow_solver->solve(vec_cor, vec_def);
+    }
+
     void _update_solution(DefectVectorType& vec_sol) const
     {
       vec_sol.local().copy(this->_vec_cor.local());
@@ -1319,6 +1405,32 @@ namespace Gendie
           // backtrace solution
           vec_sol_.axpy(this->_vec_cor, -bt_omega);
           // TODO: do we need to filter?? I think not
+        }
+      }
+    }
+
+    void _prepare_defect_filter(const DefectVectorType& vec_sol)
+    {
+      if constexpr(Intern::supports_fbm<typename DefectAssembler::LevelType>)
+      {
+        if(this->_recalc_interface_scaling || (this->_cur_iter == 0u))
+        {
+          this->system_asm->set_jacobian(double(this->_cur_iter>min_picard_steps));
+          // assemble
+          auto diag_a = this->defect_asm->system_level->create_global_vector_velo();
+          auto diag_m = this->defect_asm->system_level->create_global_vector_velo();
+          this->defect_asm->system_level->velo_mass_matrix.extract_diag(diag_m, true);
+          diag_a.format();
+          this->system_asm->assemble_diagonal(diag_a.local(), vec_sol.local().template at<0>());
+          diag_a.sync_0();
+          auto sc_factor = diag_a.max_abs_element() / diag_m.max_abs_element();
+          auto& fbm_int_filter = this->defect_asm->system_level->filter_interface_fbm;
+          // get prev value
+          auto& _internal_vec = fbm_int_filter.get_filter_vector();
+          if(_internal_vec.size() > 0)
+          {
+            _internal_vec.format(sc_factor);
+          }
         }
       }
     }

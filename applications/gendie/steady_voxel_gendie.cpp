@@ -992,20 +992,14 @@ namespace Gendie
     watch_create_filter.start();
     assemble_filters(*system_level, domain.front()->get_mesh_node()->get_mesh_part_names(true), *domain.front(), inflow_boundaries, materials, param_holder, true);
     watch_create_filter.stop();
-    // clear laplace matrix, since this will not be needed anymore
-    // todo: unnessearry to save whole mass matrix for this
-    // if(use_q2_fbm)
-    // {
-    //   system_level->clear_velocity_laplace_matrix();
-    // }
 
     logger.print("Create Solver", info);
     // now we can construct our solver
     watch_create_solver.start();
-    std::unique_ptr<NonlinearSteadyFlowSolverBase<SystemLevel<SystemDataType, SystemIndexType>::GlobalSystemVector>> flow_solver
-        = Gendie::new_flow_solver(domain, system_level, inflow_boundaries, materials, config.get(), &logger,true, param_holder);
+    SteadyFlowSolverFactory flow_solver_factory(domain, system_level, inflow_boundaries, materials, config->query_section("solver-params"), true, param_holder);
+    auto solver_type = flow_solver_factory.parse_solver_type(config->query("solver-params/nl-solver", String("alpine")));
+    auto flow_solver = flow_solver_factory.create(solver_type, &logger);
     watch_create_solver.stop();
-
 
     //print solver info
     logger.print(flow_solver->format_string(), info);
@@ -1038,7 +1032,26 @@ namespace Gendie
 
     if(status != NonLinearStatus::success)
     {
-      logger.print("Solver did not converge with status code" + stringify(status), error);
+      logger.print("Solver did not converge with status code" + stringify(status), warning);
+      if(solver_type != decltype(solver_type)::pseudo_ts)
+      {
+        logger.print("Printing previous solver timings", debug);
+        logger.print(flow_solver->format_timings(), debug);
+        logger.print("\n----------------------------------------------------------------------\n", info);
+        logger.print("Retrying with pseudo timestepping", info);
+        logger.flush_print();
+        flow_solver->done();
+        flow_solver.reset();
+        // always create ts solver with double solver precision in case we did not converge
+        flow_solver = flow_solver_factory.create(decltype(solver_type)::pseudo_ts, SystemDataType(1), &logger);
+        logger.print(flow_solver->format_string(), info);
+        flow_solver->init();
+        status = flow_solver->apply(vec_sol, vec_rhs);
+        if(status != NonLinearStatus::success)
+        {
+          logger.print("Pseudo ts solver did not converge with status code" + stringify(status), error);
+        }
+      }
     }
 
     logger.print("\n----------------------------------------------------------------------\n", info);
@@ -1053,6 +1066,8 @@ namespace Gendie
 
     // reset solver to free memory
     flow_solver.reset();
+    // also free solver factory
+    flow_solver_factory.reset();
 
     FEAT::Global::Vector<FEAT::LAFEM::DenseVector<SystemDataType, SystemIndexType>, FEAT::LAFEM::VectorMirror<SystemDataType, SystemIndexType>> vec_shearrate{&system_level->gate_scalar_velo}, vec_viscosity{&system_level->gate_scalar_velo};
     // and now, postprocessing, todo: refactor velo analyzer
