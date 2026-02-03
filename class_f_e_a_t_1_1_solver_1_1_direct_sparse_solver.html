@@ -228,6 +228,9 @@ Static Public Attributes</h2></td></tr>
 <tr class="memitem:a4bf1d219791748bae1b2d2aaaec2f499"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a4bf1d219791748bae1b2d2aaaec2f499">have_backend_mkldss</a> = DSS::have_mkldss</td></tr>
 <tr class="memdesc:a4bf1d219791748bae1b2d2aaaec2f499"><td class="mdescLeft">&#160;</td><td class="mdescRight">specifies whether the MKL-DSS solver backend is available  <a href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a4bf1d219791748bae1b2d2aaaec2f499">More...</a><br /></td></tr>
 <tr class="separator:a4bf1d219791748bae1b2d2aaaec2f499"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5a672f612b995238e07720b10f953343"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a5a672f612b995238e07720b10f953343">have_backend_mumps</a> = DSS::have_mumps</td></tr>
+<tr class="memdesc:a5a672f612b995238e07720b10f953343"><td class="mdescLeft">&#160;</td><td class="mdescRight">specifies whether the MUMPS solver backend is available  <a href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a5a672f612b995238e07720b10f953343">More...</a><br /></td></tr>
+<tr class="separator:a5a672f612b995238e07720b10f953343"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abc72cb34b50b703d7dd37204da7c0aa4"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#abc72cb34b50b703d7dd37204da7c0aa4">have_backend_superlu</a> = DSS::have_superlu</td></tr>
 <tr class="memdesc:abc72cb34b50b703d7dd37204da7c0aa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">specifies whether the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_super_l_u.html" title="(distributed) SuperLU direct sparse solver">SuperLU</a> solver backend is available  <a href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#abc72cb34b50b703d7dd37204da7c0aa4">More...</a><br /></td></tr>
 <tr class="separator:abc72cb34b50b703d7dd37204da7c0aa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -354,6 +357,9 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:a70a26c7be7b0462d0effb1ec50038020"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a70a26c7be7b0462d0effb1ec50038020">_create_core_mkldss</a> ()</td></tr>
 <tr class="memdesc:a70a26c7be7b0462d0effb1ec50038020"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tries to create a MKL-DSS backend core and returns true, if it succeeded.  <a href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a70a26c7be7b0462d0effb1ec50038020">More...</a><br /></td></tr>
 <tr class="separator:a70a26c7be7b0462d0effb1ec50038020"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af5172ae89aa9148913abeb9df4f5ca11"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#af5172ae89aa9148913abeb9df4f5ca11">_create_core_mumps</a> ()</td></tr>
+<tr class="memdesc:af5172ae89aa9148913abeb9df4f5ca11"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tries to create a MUMPS backend core and returns true, if it succeeded.  <a href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#af5172ae89aa9148913abeb9df4f5ca11">More...</a><br /></td></tr>
+<tr class="separator:af5172ae89aa9148913abeb9df4f5ca11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79553109a033824954b3c6dd86555b67"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a79553109a033824954b3c6dd86555b67">_create_core_superlu</a> ()</td></tr>
 <tr class="memdesc:a79553109a033824954b3c6dd86555b67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Tries to create a <a class="el" href="class_f_e_a_t_1_1_solver_1_1_super_l_u.html" title="(distributed) SuperLU direct sparse solver">SuperLU</a> backend core and returns true, if it succeeded.  <a href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a79553109a033824954b3c6dd86555b67">More...</a><br /></td></tr>
 <tr class="separator:a79553109a033824954b3c6dd86555b67"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -372,6 +378,9 @@ Private Attributes</h2></td></tr>
 <tr class="memitem:a9382c90b74675e859a96ba029111e77a"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a9382c90b74675e859a96ba029111e77a">_core_mkldss</a></td></tr>
 <tr class="memdesc:a9382c90b74675e859a96ba029111e77a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Intel <a class="el" href="class_f_e_a_t_1_1_solver_1_1_m_k_l_d_s_s.html" title="Intel MKL Direct Sparse Solver wrapper.">MKLDSS</a> core.  <a href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a9382c90b74675e859a96ba029111e77a">More...</a><br /></td></tr>
 <tr class="separator:a9382c90b74675e859a96ba029111e77a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ae6fe9ed04cffc33aa9c706a96bde09"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a4ae6fe9ed04cffc33aa9c706a96bde09">_core_mumps</a></td></tr>
+<tr class="memdesc:a4ae6fe9ed04cffc33aa9c706a96bde09"><td class="mdescLeft">&#160;</td><td class="mdescRight">MUMPS core.  <a href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a4ae6fe9ed04cffc33aa9c706a96bde09">More...</a><br /></td></tr>
+<tr class="separator:a4ae6fe9ed04cffc33aa9c706a96bde09"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a12f5142bae88b96eed8fdfea372c9342"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a12f5142bae88b96eed8fdfea372c9342">_core_superlu</a></td></tr>
 <tr class="memdesc:a12f5142bae88b96eed8fdfea372c9342"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_super_l_u.html" title="(distributed) SuperLU direct sparse solver">SuperLU</a> core.  <a href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a12f5142bae88b96eed8fdfea372c9342">More...</a><br /></td></tr>
 <tr class="separator:a12f5142bae88b96eed8fdfea372c9342"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -389,6 +398,7 @@ class FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;</div><p >Front-
 <p >In particular, this class currently offers the following backends:</p><ul>
 <li>cuDSS: A MPI-parallel direct solver for CUDA, which utilizes the GPU to solve the system. Obviously requires CUDA and the cuDSS library and can only utilize a single GPU per MPI process.</li>
 <li>MKL-DSS: A MPI-parallel direct solver, which is part of the Intel oneAPI MKL libraries, which is typically the best choice if the solver is applied on multiple processes.</li>
+<li>MUMPS: A MPI-parallel direct solver written in Fortran.</li>
 <li><a class="el" href="class_f_e_a_t_1_1_solver_1_1_super_l_u.html" title="(distributed) SuperLU direct sparse solver">SuperLU</a>: A MPI-parallel direct solver implemented in the SuperLU_Dist library. This solver is usually slower that UMFPACK in the single-process case and slower that MKL-DSS in the multi-process case, so it serves as a fallback if the other ones are not available or not suitable.</li>
 <li>UMFPACK: A sequential direct solver, which is typically the best choice if the solver is applied only on a single MPI process or in sequential builds.</li>
 </ul>
@@ -404,6 +414,7 @@ The actual backend selection process is performed during the execution of the <a
 <p ><b>Scenario A:</b> If the user specified a list of allowed backend (combinations) by calling one of the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a2dec12bec613d0ffe7f7a62afc2934f9" title="Pushes a list of allowed backends into the backend queue.">push_allowed_backend_list()</a> or push_allowed_backends() functions, then the algorithm will start with the first allowed backend (combination) from the list and it will check if any of the allowed backends in the combination is available and, if so, it will select that backend. If the backend combination contains more than a single allowed backend, the algorithm will check them in the following order:</p><ol type="1">
 <li>cuDSS</li>
 <li>MKL-DSS</li>
+<li>MUMPS</li>
 <li>UMFPACK</li>
 <li><a class="el" href="class_f_e_a_t_1_1_solver_1_1_super_l_u.html" title="(distributed) SuperLU direct sparse solver">SuperLU</a></li>
 </ol>
@@ -415,6 +426,7 @@ The actual backend selection process is performed during the execution of the <a
 <li>If the preferred backend is any other than the ones listed above, then the algorithm will try to select a suitable backend by trying out all available backends in the following order:<ol type="a">
 <li>cuDSS</li>
 <li>MKL-DSS</li>
+<li>MUMPS</li>
 <li>UMFPACK</li>
 <li><a class="el" href="class_f_e_a_t_1_1_solver_1_1_super_l_u.html" title="(distributed) SuperLU direct sparse solver">SuperLU</a></li>
 </ol>
@@ -425,7 +437,7 @@ The actual backend selection process is performed during the execution of the <a
 <dl class="todo"><dt><b><a class="el" href="todo.html#_todo000046">Todo:</a></b></dt><dd>check for unsupported filters in <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#adfc74221f40ab77f89ccb293046b74e4" title="Checks whether a suitable backend for the given matrix and filter.">is_available()</a></dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00404">404</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00448">448</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a413cc56fd31134a99f7d0803294c568b" name="a413cc56fd31134a99f7d0803294c568b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a413cc56fd31134a99f7d0803294c568b">&#9670;&#160;</a></span>BaseClass</h2>
@@ -443,7 +455,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>our base class </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00409">409</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00453">453</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -491,7 +503,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>our (global or local) system filter type </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00415">415</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00459">459</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -539,7 +551,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>our (global or local) system matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00411">411</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00455">455</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -559,7 +571,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>our (global or local) system vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00413">413</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00457">457</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -610,7 +622,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This constructor queries the result of <a class="el" href="class_f_e_a_t_1_1_backend.html#aacfb7dadbfabd2d5415c438652304e06" title="get current preferred backend">Backend::get_preferred_backend()</a>, which is used during the symbolic initialization phase to determine which of the available solver backends to choose if the user did not manually specify a set of allowed backends. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00458">458</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00506">506</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -641,7 +653,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>virtual destructor </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00470">470</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00519">519</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -673,11 +685,11 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Tries to create a cuDSS backend core and returns true, if it succeeded. </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00955">955</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l01063">1063</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ad87c27c7d905efdeafb574306117ddb9">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_matrix_num_nzes()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a010e5439714453aa3faf23b0b6d27a48">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_comm()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a6a58807855dce338b8e5fb950b223e61">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_global_dof_offset()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ab934585a0eb28b50149e32ff156685bc">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_dofs()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a99b7d0d16e851aa0d96b916e8d50bca4">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_nonzeros()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_owned_dofs()</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5b254d7be485ba5d3fd6667ff7c115c6">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_symbolic()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00640">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00696">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -708,11 +720,46 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Tries to create a MKL-DSS backend core and returns true, if it succeeded. </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00982">982</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l01090">1090</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ad87c27c7d905efdeafb574306117ddb9">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_matrix_num_nzes()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a010e5439714453aa3faf23b0b6d27a48">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_comm()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a6a58807855dce338b8e5fb950b223e61">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_global_dof_offset()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ab934585a0eb28b50149e32ff156685bc">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_dofs()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a99b7d0d16e851aa0d96b916e8d50bca4">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_nonzeros()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_owned_dofs()</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5b254d7be485ba5d3fd6667ff7c115c6">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_symbolic()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00640">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00696">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+
+</div>
+</div>
+<a id="af5172ae89aa9148913abeb9df4f5ca11" name="af5172ae89aa9148913abeb9df4f5ca11"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af5172ae89aa9148913abeb9df4f5ca11">&#9670;&#160;</a></span>_create_core_mumps()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html">FEAT::Solver::DirectSparseSolver</a>&lt; Matrix_, Filter_ &gt;::_create_core_mumps </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Tries to create a MUMPS backend core and returns true, if it succeeded. </p>
+
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l01117">1117</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ad87c27c7d905efdeafb574306117ddb9">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_matrix_num_nzes()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a010e5439714453aa3faf23b0b6d27a48">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_comm()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a6a58807855dce338b8e5fb950b223e61">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_global_dof_offset()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ab934585a0eb28b50149e32ff156685bc">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_dofs()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a99b7d0d16e851aa0d96b916e8d50bca4">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_nonzeros()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_owned_dofs()</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5b254d7be485ba5d3fd6667ff7c115c6">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_symbolic()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00696">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -743,11 +790,11 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Tries to create a <a class="el" href="class_f_e_a_t_1_1_solver_1_1_super_l_u.html" title="(distributed) SuperLU direct sparse solver">SuperLU</a> backend core and returns true, if it succeeded. </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l01009">1009</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l01144">1144</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ad87c27c7d905efdeafb574306117ddb9">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_matrix_num_nzes()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a010e5439714453aa3faf23b0b6d27a48">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_comm()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a6a58807855dce338b8e5fb950b223e61">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_global_dof_offset()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ab934585a0eb28b50149e32ff156685bc">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_dofs()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a99b7d0d16e851aa0d96b916e8d50bca4">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_nonzeros()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_owned_dofs()</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5b254d7be485ba5d3fd6667ff7c115c6">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_symbolic()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00640">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00696">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -778,11 +825,11 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Tries to create an UMFPACK backend core and returns true, if it succeeded. </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l01036">1036</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l01171">1171</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ad87c27c7d905efdeafb574306117ddb9">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_matrix_num_nzes()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a010e5439714453aa3faf23b0b6d27a48">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_comm()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a6a58807855dce338b8e5fb950b223e61">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_global_dof_offset()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ab934585a0eb28b50149e32ff156685bc">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_dofs()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a99b7d0d16e851aa0d96b916e8d50bca4">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_nonzeros()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_owned_dofs()</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a5b254d7be485ba5d3fd6667ff7c115c6">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_symbolic()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00640">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00696">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -833,7 +880,7 @@ template&lt;typename DTV_ &gt; </div>
   </dd>
 </dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00148">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_download_cor()</a>, and <a class="el" href="direct__sparse__solver_8hpp_source.html#l00839">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::apply()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00148">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_download_cor()</a>, and <a class="el" href="direct__sparse__solver_8hpp_source.html#l00921">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::apply()</a>.</p>
 
 </div>
 </div>
@@ -1378,7 +1425,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of nonzero entries of the local ADP matrix </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00955">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00982">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01009">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01036">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l01063">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01090">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01117">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mumps()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01144">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01171">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -1562,7 +1609,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the underlying communicator </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00955">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00982">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01009">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01036">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00640">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>, <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l01063">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01090">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01117">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mumps()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01144">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01171">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00696">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>, <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -1624,7 +1671,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The index of the first global DOF owned by this process </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00955">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00982">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01009">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01036">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l01063">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01090">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01117">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mumps()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01144">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01171">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -1684,7 +1731,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The total number of global DOFs on all processes </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00955">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00982">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01009">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01036">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00543">FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_adp_matrix_num_cols()</a>, <a class="el" href="superlu_8hpp_source.html#l00159">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l01063">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01090">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01117">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mumps()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01144">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01171">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00543">FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_adp_matrix_num_cols()</a>, <a class="el" href="superlu_8hpp_source.html#l00159">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -1746,7 +1793,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The total number of nonzero entries of the global ADP matrix </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00955">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00982">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01009">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, and <a class="el" href="direct__sparse__solver_8hpp_source.html#l01036">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l01063">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01090">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01117">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mumps()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01144">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, and <a class="el" href="direct__sparse__solver_8hpp_source.html#l01171">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>.</p>
 
 </div>
 </div>
@@ -1808,7 +1855,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename SolverBase_  = Solver
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of global DOFs owned by this process </dd></dl>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00955">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00982">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01009">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01036">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00537">FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_adp_matrix_num_rows()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00531">FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_adp_vector_size()</a>, <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l01063">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01090">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01117">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mumps()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01144">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01171">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00537">FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_adp_matrix_num_rows()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00531">FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_adp_vector_size()</a>, <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -1898,7 +1945,7 @@ template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00760">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, <a class="el" href="hypre_8hpp_source.html#l00202">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_numeric()</a>, and <a class="el" href="superlu_8hpp_source.html#l00159">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00831">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_numeric()</a>, <a class="el" href="hypre_8hpp_source.html#l00202">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_numeric()</a>, and <a class="el" href="superlu_8hpp_source.html#l00159">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_numeric()</a>.</p>
 
 </div>
 </div>
@@ -2009,7 +2056,7 @@ template&lt;typename RPT_ , typename CIT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00955">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00982">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01009">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01036">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l01063">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01090">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01117">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mumps()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01144">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01171">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="hypre_8hpp_source.html#l00173">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::init_symbolic()</a>, and <a class="el" href="superlu_8hpp_source.html#l00125">FEAT::Solver::SuperLU&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -2113,7 +2160,7 @@ template&lt;typename DTV_ &gt; </div>
   </dd>
 </dl>
 
-<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00133">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_def()</a>, and <a class="el" href="direct__sparse__solver_8hpp_source.html#l00839">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::apply()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="hypre_8hpp_source.html#l00133">FEAT::Solver::HypreSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_def()</a>, and <a class="el" href="direct__sparse__solver_8hpp_source.html#l00921">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::apply()</a>.</p>
 
 </div>
 </div>
@@ -2268,7 +2315,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00839">839</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00921">921</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a789568423271ce99012675fb81019e9b">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_download_vector()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a8719d02f608f9e0d17f7f06415c1d9be">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_vector()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edadfb7069bfc6e0064a6c667626eca07b4">FEAT::Solver::aborted</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda260ca9dd8a4577fc00b7bd5810298076">FEAT::Solver::success</a>.</p>
 
@@ -2301,9 +2348,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Clears the deque of allowed backends. </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00599">599</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00653">653</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00432">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_allowed_backends</a>.</p>
+<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00478">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_allowed_backends</a>.</p>
 
 </div>
 </div>
@@ -2371,7 +2418,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#af2ea6e8c96de45c8408f3dcc59b8f186">FEAT::Solver::SolverBase&lt; Vector_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00812">812</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00894">894</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00246">FEAT::Solver::SolverBase&lt; Vector_ &gt;::done_numeric()</a>.</p>
 
@@ -2406,7 +2453,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#a70018a5e4ca2cd3dfc0cac9db3df051e">FEAT::Solver::SolverBase&lt; Vector_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00722">722</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00786">786</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00255">FEAT::Solver::SolverBase&lt; Vector_ &gt;::done_symbolic()</a>.</p>
 
@@ -2439,9 +2486,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns a reference to the deque of allowed backends. </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00605">605</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00659">659</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00432">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_allowed_backends</a>.</p>
+<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00478">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_allowed_backends</a>.</p>
 
 </div>
 </div>
@@ -2473,9 +2520,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 <p>Returns the selected backend. </p>
 <p >Note that the backend is selected during the execution of <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a987d04e694298e26ed1d0ba8650beffd" title="Performs the symbolic initialization of the solver.">init_symbolic()</a> and therefore this function only returns the actually selected backend after <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a987d04e694298e26ed1d0ba8650beffd" title="Performs the symbolic initialization of the solver.">init_symbolic()</a> was called. This function always returns <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a334c4a4c42fdb79d7ebc3e73b517e6f8" title="no backend allowed">DSSBackend::none</a> before the call to <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a987d04e694298e26ed1d0ba8650beffd" title="Performs the symbolic initialization of the solver.">init_symbolic()</a> and after the call to <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a4058490cc40d32e9ea90a3f0ec0486c8" title="Releases the symbolic factorization data and frees the backend.">done_symbolic()</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00618">618</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00672">672</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ae3aa5b6b7b1ea1afbbc3134b7af923fe">FEAT::Solver::cudss</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa7e50eecfc88a2f0d1939637ef836a3d">FEAT::Solver::mkldss</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a334c4a4c42fdb79d7ebc3e73b517e6f8">FEAT::Solver::none</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aef31a9bc50c89d729abd9684bc1893b2">FEAT::Solver::superlu</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a091e9008b7557a06bb0ace6e8284b598">FEAT::Solver::umfpack</a>.</p>
+<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ae3aa5b6b7b1ea1afbbc3134b7af923fe">FEAT::Solver::cudss</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa7e50eecfc88a2f0d1939637ef836a3d">FEAT::Solver::mkldss</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ab27173dfce996604c695b9ada179db68">FEAT::Solver::mumps</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a334c4a4c42fdb79d7ebc3e73b517e6f8">FEAT::Solver::none</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aef31a9bc50c89d729abd9684bc1893b2">FEAT::Solver::superlu</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a091e9008b7557a06bb0ace6e8284b598">FEAT::Solver::umfpack</a>.</p>
 
 </div>
 </div>
@@ -2544,7 +2591,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#a3d2a6e135e4af6af6be0c0aaf3330b3a">FEAT::Solver::SolverBase&lt; Vector_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00760">760</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00831">831</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#afdc8520e21ad255c8c577b9ec7893c6a">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_upload_numeric()</a>, and <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00237">FEAT::Solver::SolverBase&lt; Vector_ &gt;::init_numeric()</a>.</p>
 
@@ -2581,9 +2628,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#a394e71e99c87e99a5eda16c302df725e">FEAT::Solver::SolverBase&lt; Vector_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00640">640</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00696">696</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00432">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_allowed_backends</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00955">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00982">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01009">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01036">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a010e5439714453aa3faf23b0b6d27a48">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_comm()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00434">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_preferred_backend</a>, <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a39466fe22b062a34cfe09f3cc8c24868">FEAT::cuda</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ae3aa5b6b7b1ea1afbbc3134b7af923fe">FEAT::Solver::cudss</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00227">FEAT::Solver::SolverBase&lt; Vector_ &gt;::init_symbolic()</a>, <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a324ddb5e2f605b34cce9110cbf390f6b">FEAT::mkl</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa7e50eecfc88a2f0d1939637ef836a3d">FEAT::Solver::mkldss</a>, <a class="el" href="dist_8hpp_source.html#l01506">FEAT::Dist::Comm::size()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aef31a9bc50c89d729abd9684bc1893b2">FEAT::Solver::superlu</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a091e9008b7557a06bb0ace6e8284b598">FEAT::Solver::umfpack</a>.</p>
+<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00478">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_allowed_backends</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01063">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_cudss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01090">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mkldss()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01117">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_mumps()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01144">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_superlu()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l01171">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_create_core_umfpack()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a010e5439714453aa3faf23b0b6d27a48">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_comm()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00480">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_preferred_backend</a>, <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a39466fe22b062a34cfe09f3cc8c24868">FEAT::cuda</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ae3aa5b6b7b1ea1afbbc3134b7af923fe">FEAT::Solver::cudss</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00227">FEAT::Solver::SolverBase&lt; Vector_ &gt;::init_symbolic()</a>, <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a324ddb5e2f605b34cce9110cbf390f6b">FEAT::mkl</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa7e50eecfc88a2f0d1939637ef836a3d">FEAT::Solver::mkldss</a>, <a class="el" href="dist_8hpp_source.html#l01506">FEAT::Dist::Comm::size()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aef31a9bc50c89d729abd9684bc1893b2">FEAT::Solver::superlu</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a091e9008b7557a06bb0ace6e8284b598">FEAT::Solver::umfpack</a>.</p>
 
 </div>
 </div>
@@ -2633,11 +2680,11 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code> if at least one direct sparse solver backend is available for this system, otherwise <code>false</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00501">501</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00552">552</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00428">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::have_backend_global</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00426">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::have_backend_local</a>, <a class="el" href="dist_8hpp_source.html#l01506">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
+<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00474">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::have_backend_global</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00472">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::have_backend_local</a>, <a class="el" href="dist_8hpp_source.html#l01506">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l01094">FEAT::Solver::have_direct_sparse_solver()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l01229">FEAT::Solver::have_direct_sparse_solver()</a>.</p>
 
 </div>
 </div>
@@ -2670,9 +2717,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Implements <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ab7e792923921c7dbe2a1fefafd73ef0a">FEAT::Solver::SolverBase&lt; Vector_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00475">475</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00524">524</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00436">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_core_cudss</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00438">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_core_mkldss</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00440">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_core_superlu</a>, and <a class="el" href="direct__sparse__solver_8hpp_source.html#l00442">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_core_umfpack</a>.</p>
+<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00482">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_core_cudss</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00484">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_core_mkldss</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00486">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_core_mumps</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00488">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_core_superlu</a>, and <a class="el" href="direct__sparse__solver_8hpp_source.html#l00490">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_core_umfpack</a>.</p>
 
 </div>
 </div>
@@ -2714,15 +2761,16 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 <li><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa181a603769c1f98ad927e7367c7aa51" title="all backends allowed">DSSBackend::all</a>: "all"</li>
 <li><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ae3aa5b6b7b1ea1afbbc3134b7af923fe" title="cuDSS backend">DSSBackend::cudss</a>: "cudss"</li>
 <li><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa7e50eecfc88a2f0d1939637ef836a3d" title="MKL-DSS backend.">DSSBackend::mkldss</a>: "mkldss" or "mkl-dss"</li>
+<li><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ab27173dfce996604c695b9ada179db68" title="MUMPS backend.">DSSBackend::mumps</a>: "mumps"</li>
 <li><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aef31a9bc50c89d729abd9684bc1893b2" title="SuperLU backend.">DSSBackend::superlu</a>: "superlu"</li>
 <li><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a091e9008b7557a06bb0ace6e8284b598" title="UMFPACK backend.">DSSBackend::umfpack</a>: "umfpack" </li>
 </ul>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00561">561</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00613">613</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa181a603769c1f98ad927e7367c7aa51">FEAT::Solver::all</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ae3aa5b6b7b1ea1afbbc3134b7af923fe">FEAT::Solver::cudss</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa7e50eecfc88a2f0d1939637ef836a3d">FEAT::Solver::mkldss</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a334c4a4c42fdb79d7ebc3e73b517e6f8">FEAT::Solver::none</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00561">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::push_allowed_backend()</a>, <a class="el" href="string_8hpp_source.html#l00467">FEAT::String::split_by_charset()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aef31a9bc50c89d729abd9684bc1893b2">FEAT::Solver::superlu</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a091e9008b7557a06bb0ace6e8284b598">FEAT::Solver::umfpack</a>.</p>
+<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa181a603769c1f98ad927e7367c7aa51">FEAT::Solver::all</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ae3aa5b6b7b1ea1afbbc3134b7af923fe">FEAT::Solver::cudss</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa7e50eecfc88a2f0d1939637ef836a3d">FEAT::Solver::mkldss</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ab27173dfce996604c695b9ada179db68">FEAT::Solver::mumps</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a334c4a4c42fdb79d7ebc3e73b517e6f8">FEAT::Solver::none</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00613">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::push_allowed_backend()</a>, <a class="el" href="string_8hpp_source.html#l00467">FEAT::String::split_by_charset()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aef31a9bc50c89d729abd9684bc1893b2">FEAT::Solver::superlu</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a091e9008b7557a06bb0ace6e8284b598">FEAT::Solver::umfpack</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00561">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::push_allowed_backend()</a>, and <a class="el" href="direct__sparse__solver_8hpp_source.html#l00541">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::push_allowed_backend_list()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00613">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::push_allowed_backend()</a>, and <a class="el" href="direct__sparse__solver_8hpp_source.html#l00592">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::push_allowed_backend_list()</a>.</p>
 
 </div>
 </div>
@@ -2760,9 +2808,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00593">593</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00647">647</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00432">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_allowed_backends</a>.</p>
+<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00478">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::_allowed_backends</a>.</p>
 
 </div>
 </div>
@@ -2800,9 +2848,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00541">541</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00592">592</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00561">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::push_allowed_backend()</a>.</p>
+<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00613">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::push_allowed_backend()</a>.</p>
 
 </div>
 </div>
@@ -2840,11 +2888,11 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00529">529</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00580">580</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00529">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::push_allowed_backend_list()</a>, and <a class="el" href="string_8hpp_source.html#l00518">FEAT::String::split_by_whitespaces()</a>.</p>
+<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00580">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::push_allowed_backend_list()</a>, and <a class="el" href="string_8hpp_source.html#l00518">FEAT::String::split_by_whitespaces()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00529">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::push_allowed_backend_list()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00580">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::push_allowed_backend_list()</a>.</p>
 
 </div>
 </div>
@@ -2873,9 +2921,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>backends that the user allowed us to use </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00432">432</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00478">478</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00599">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::clear_allowed_backends()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00605">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::get_allowed_backends()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00640">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>, and <a class="el" href="direct__sparse__solver_8hpp_source.html#l00593">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::push_allowed_backend()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00653">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::clear_allowed_backends()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00659">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::get_allowed_backends()</a>, <a class="el" href="direct__sparse__solver_8hpp_source.html#l00696">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>, and <a class="el" href="direct__sparse__solver_8hpp_source.html#l00647">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::push_allowed_backend()</a>.</p>
 
 </div>
 </div>
@@ -2934,9 +2982,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Nvidia cuDSS core. </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00436">436</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00482">482</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00475">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::name()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00524">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::name()</a>.</p>
 
 </div>
 </div>
@@ -2964,9 +3012,39 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Intel <a class="el" href="class_f_e_a_t_1_1_solver_1_1_m_k_l_d_s_s.html" title="Intel MKL Direct Sparse Solver wrapper.">MKLDSS</a> core. </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00438">438</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00484">484</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00475">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::name()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00524">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::name()</a>.</p>
+
+</div>
+</div>
+<a id="a4ae6fe9ed04cffc33aa9c706a96bde09" name="a4ae6fe9ed04cffc33aa9c706a96bde09"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ae6fe9ed04cffc33aa9c706a96bde09">&#9670;&#160;</a></span>_core_mumps</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void* <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html">FEAT::Solver::DirectSparseSolver</a>&lt; Matrix_, Filter_ &gt;::_core_mumps</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>MUMPS core. </p>
+
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00486">486</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00524">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::name()</a>.</p>
 
 </div>
 </div>
@@ -2994,9 +3072,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p><a class="el" href="class_f_e_a_t_1_1_solver_1_1_super_l_u.html" title="(distributed) SuperLU direct sparse solver">SuperLU</a> core. </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00440">440</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00488">488</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00475">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::name()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00524">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::name()</a>.</p>
 
 </div>
 </div>
@@ -3024,9 +3102,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>UMFPACK core. </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00442">442</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00490">490</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00475">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::name()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00524">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::name()</a>.</p>
 
 </div>
 </div>
@@ -3054,9 +3132,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>preferred backend of runtime at time of object creation </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00434">434</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00480">480</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00640">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00696">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -3144,7 +3222,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>specifies whether the cuDSS solver backend is available </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00418">418</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00462">462</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -3172,9 +3250,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>specifies whether at least one backend for global systems is available </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00428">428</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00474">474</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00501">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::is_available()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00552">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::is_available()</a>.</p>
 
 </div>
 </div>
@@ -3202,9 +3280,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>specifies whether at least one backend for local systems is available </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00426">426</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00472">472</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00501">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::is_available()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__sparse__solver_8hpp_source.html#l00552">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::is_available()</a>.</p>
 
 </div>
 </div>
@@ -3232,7 +3310,35 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>specifies whether the MKL-DSS solver backend is available </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00420">420</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00464">464</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a5a672f612b995238e07720b10f953343" name="a5a672f612b995238e07720b10f953343"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5a672f612b995238e07720b10f953343">&#9670;&#160;</a></span>have_backend_mumps</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr bool <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html">FEAT::Solver::DirectSparseSolver</a>&lt; Matrix_, Filter_ &gt;::have_backend_mumps = DSS::have_mumps</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>specifies whether the MUMPS solver backend is available </p>
+
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00466">466</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -3260,7 +3366,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>specifies whether the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_super_l_u.html" title="(distributed) SuperLU direct sparse solver">SuperLU</a> solver backend is available </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00422">422</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00468">468</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -3288,7 +3394,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>specifies whether the UMFPACK solver backend is available </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00424">424</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00470">470</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 </div>
 </div>

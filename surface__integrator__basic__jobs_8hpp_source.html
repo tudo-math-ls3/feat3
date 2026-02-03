@@ -177,7 +177,7 @@ $(document).ready(function(){initNavTree('surface__integrator__basic__jobs_8hpp_
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>      _normal = ImagePointType::convert_new(<a class="code hl_enumvalue" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428afea087517c26fadd409bd4b9dc642555">normal</a>);</div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>      _face_volume = DataType(face_volume);</div>
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>      _cell_helper.resize(cell_offsets.at(surface_ind+1)-cell_offsets.at(surface_ind));</div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>      std::copy(cells.begin()+cell_offsets.at(surface_ind), cells.begin()+cell_offsets.at(surface_ind+1), _cell_helper.begin());</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>      std::copy(cells.begin()+<span class="keywordtype">long</span>(cell_offsets.at(surface_ind)), cells.begin()+<span class="keywordtype">long</span>(cell_offsets.at(surface_ind+1)), _cell_helper.begin());</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>      _cur_surface_index = surface_ind;</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>      _cell_bb.resize(_cell_helper.size());</div>
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>

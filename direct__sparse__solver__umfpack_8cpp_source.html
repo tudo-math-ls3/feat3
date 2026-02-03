@@ -167,11 +167,11 @@ $(document).ready(function(){initNavTree('direct__sparse__solver__umfpack_8cpp_s
 <div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span> </div>
 <div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>          <span class="comment">// allocate matrix and vector arrays</span></div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>          row_ptr.resize(num_owned_dofs+1u, 0u);</div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>          col_idx.resize(num_owned_nzes, 0u);</div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>          mat_val.resize(num_owned_nzes, 0.0);</div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>          rhs_val.resize(num_owned_dofs, 0.0);</div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>          sol_val.resize(num_owned_dofs, 0.0);</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>          row_ptr.resize(std::size_t(num_owned_dofs+1), 0u);</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>          col_idx.resize(std::size_t(num_owned_nzes), 0u);</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>          mat_val.resize(std::size_t(num_owned_nzes), 0.0);</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>          rhs_val.resize(std::size_t(num_owned_dofs), 0.0);</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span>          sol_val.resize(std::size_t(num_owned_dofs), 0.0);</div>
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span> </div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="preprocessor">#ifdef FEAT_DSS_UMFPACK_I64</span></div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>          ::umfpack_dl_defaults(control);</div>

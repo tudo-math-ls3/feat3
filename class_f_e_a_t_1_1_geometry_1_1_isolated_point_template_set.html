@@ -128,9 +128,12 @@ Public Types</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
-<tr class="memitem:a00fa6fbd2b5c6a3bde105c7176475c2e"><td class="memTemplParams" colspan="2">template&lt;typename Shape_ , int dim_&gt; </td></tr>
-<tr class="memitem:a00fa6fbd2b5c6a3bde105c7176475c2e"><td class="memTemplItemLeft" align="right" valign="top">static std::pair&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>, int &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_isolated_point_template_set.html#a00fa6fbd2b5c6a3bde105c7176475c2e">correct_for_orientation</a> (<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_isolated_point_refinement_type.html">IsolatedPointRefinementType</a>&lt; Shape_ &gt; type, int orientation, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> idx)</td></tr>
-<tr class="separator:a00fa6fbd2b5c6a3bde105c7176475c2e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d1c95344344adae2ee7ec28edefea69"><td class="memTemplParams" colspan="2">template&lt;int template_dim_&gt; </td></tr>
+<tr class="memitem:a3d1c95344344adae2ee7ec28edefea69"><td class="memTemplItemLeft" align="right" valign="top">static <a class="el" href="namespace_f_e_a_t.html#a36baa4de7876ef0ecb7c1e44cb88d7e9">Real</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_isolated_point_template_set.html#a3d1c95344344adae2ee7ec28edefea69">average_elements_per_marking</a> ()</td></tr>
+<tr class="separator:a3d1c95344344adae2ee7ec28edefea69"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afca8658b1b0a4ffa47f0ce0b5222b1d9"><td class="memTemplParams" colspan="2">template&lt;typename Shape_ , int dim_&gt; </td></tr>
+<tr class="memitem:afca8658b1b0a4ffa47f0ce0b5222b1d9"><td class="memTemplItemLeft" align="right" valign="top">static std::pair&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>, int &gt;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_isolated_point_template_set.html#afca8658b1b0a4ffa47f0ce0b5222b1d9">correct_for_orientation</a> (<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_isolated_point_refinement_type.html">IsolatedPointRefinementType</a>&lt; Shape_ &gt; type, int orientation, int idx)</td></tr>
+<tr class="separator:afca8658b1b0a4ffa47f0ce0b5222b1d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aba75121756184c5d1c61a1357e763213"><td class="memTemplParams" colspan="2">template&lt;typename Shape_ &gt; </td></tr>
 <tr class="memitem:aba75121756184c5d1c61a1357e763213"><td class="memTemplItemLeft" align="right" valign="top">static const <a class="el" href="struct_f_e_a_t_1_1_geometry_1_1_refinement_template.html">RefinementTemplate</a>&lt; Shape_ &gt; &amp;&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_isolated_point_template_set.html#aba75121756184c5d1c61a1357e763213">get_template</a> (<a class="el" href="class_f_e_a_t_1_1_geometry_1_1_isolated_point_refinement_type.html">IsolatedPointRefinementType</a>&lt; Shape_ &gt; type)</td></tr>
 <tr class="separator:aba75121756184c5d1c61a1357e763213"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -175,7 +178,7 @@ class FEAT::Geometry::IsolatedPointTemplateSet&lt; RawData_ &gt;</div><p >Schnei
 <p >This class can be used as a TemplateSet for the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh.html" title="Dynamic mesh data structure.">AdaptiveMesh</a> class. It supports Quadrilateral and Hexahedral meshes. The templates are described in R. Schneiders, Refining quadrilateral and hexahedral element meshes, 1998,</p>
 <p >This template set defines a full set of templates for refinement of quadrilateral meshes. For hexahedral meshes the templates are limited and allow only refinement of convex areas. </p>
 
-<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00509">509</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00515">515</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="aba9277d30e9c05f6a0d39e2098f2931a" name="aba9277d30e9c05f6a0d39e2098f2931a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aba9277d30e9c05f6a0d39e2098f2931a">&#9670;&#160;</a></span>MaxShape</h2>
@@ -199,7 +202,7 @@ template&lt;typename RawData_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00511">511</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00517">517</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
 
 </div>
 </div>
@@ -219,7 +222,7 @@ template&lt;int dim_&gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00516">516</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00522">522</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
 
 </div>
 </div>
@@ -239,7 +242,7 @@ template&lt;typename Shape_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00519">519</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00525">525</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
 
 </div>
 </div>
@@ -257,7 +260,7 @@ template&lt;typename RawData_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00513">513</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00519">519</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
 
 </div>
 </div>
@@ -287,12 +290,43 @@ template&lt;typename RawData_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00611">611</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00623">623</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a00fa6fbd2b5c6a3bde105c7176475c2e" name="a00fa6fbd2b5c6a3bde105c7176475c2e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a00fa6fbd2b5c6a3bde105c7176475c2e">&#9670;&#160;</a></span>correct_for_orientation()</h2>
+<a id="a3d1c95344344adae2ee7ec28edefea69" name="a3d1c95344344adae2ee7ec28edefea69"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3d1c95344344adae2ee7ec28edefea69">&#9670;&#160;</a></span>average_elements_per_marking()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename RawData_ &gt; </div>
+<div class="memtemplate">
+template&lt;int template_dim_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="namespace_f_e_a_t.html#a36baa4de7876ef0ecb7c1e44cb88d7e9">Real</a> <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_isolated_point_template_set.html">FEAT::Geometry::IsolatedPointTemplateSet</a>&lt; RawData_ &gt;::average_elements_per_marking </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00558">558</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
+
+</div>
+</div>
+<a id="afca8658b1b0a4ffa47f0ce0b5222b1d9" name="afca8658b1b0a4ffa47f0ce0b5222b1d9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afca8658b1b0a4ffa47f0ce0b5222b1d9">&#9670;&#160;</a></span>correct_for_orientation()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -319,7 +353,7 @@ template&lt;typename Shape_ , int dim_&gt; </div>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>idx</em>&#160;</td>
         </tr>
         <tr>
@@ -335,7 +369,7 @@ template&lt;typename Shape_ , int dim_&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00586">586</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00598">598</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
 
 </div>
 </div>
@@ -367,7 +401,7 @@ template&lt;typename Shape_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00574">574</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00586">586</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
 
 </div>
 </div>
@@ -399,7 +433,7 @@ template&lt;typename Shape_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00580">580</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00592">592</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
 
 </div>
 </div>
@@ -439,7 +473,7 @@ template&lt;typename Shape_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>True, if the template set is compatible with the mesh shape, false otherwise. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00529">529</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00535">535</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
 
 </div>
 </div>
@@ -490,7 +524,7 @@ template&lt;typename Mesh_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00560">560</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00572">572</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
 
 </div>
 </div>
@@ -530,7 +564,7 @@ template&lt;int template_dim_, int child_dim_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00546">546</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00552">552</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
 
 </div>
 </div>
@@ -579,7 +613,7 @@ template&lt;int template_dim_, int child_dim_&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>Number of children of dimension <code>child_dim_</code> of template with dimension <code>template_dim_</code> and type <code>type</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00605">605</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00617">617</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
 
 </div>
 </div>
@@ -621,7 +655,7 @@ template&lt;typename Shape_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00566">566</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00578">578</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
 
 </div>
 </div>
@@ -650,7 +684,7 @@ template&lt;typename RawData_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00534">534</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="template__sets_8hpp_source.html#l00540">540</a> of file <a class="el" href="template__sets_8hpp_source.html">template_sets.hpp</a>.</p>
 
 </div>
 </div>

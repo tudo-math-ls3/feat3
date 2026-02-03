@@ -391,10 +391,10 @@ $(document).ready(function(){initNavTree('voxel__assembly__common_8hpp_source.ht
 <div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span><span class="keyword">        </span>{</div>
 <div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span><span class="preprocessor">        #ifdef __CUDACC__</span></div>
 <div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>          <span class="keywordflow">return</span> a_T * mu_inf + a_T * (mu_0 - mu_inf) *</div>
-<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>                  CudaMath::cuda_pow(DT_(1) + CudaMath::cuda_pow(lambda * a_T * gamma_dot, yasuda_a), (exp - 1) / yasuda_a);</div>
+<div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span>                  CudaMath::cuda_pow(DT_(1) + CudaMath::cuda_pow(lambda * a_T * gamma_dot, yasuda_a), (exp - DT_(1)) / yasuda_a);</div>
 <div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span><span class="preprocessor">        #else</span></div>
 <div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>          <span class="keywordflow">return</span> a_T * mu_inf + a_T * (mu_0 - mu_inf) *</div>
-<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>                  <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a564d69313ee91de438926de491613096">Math::pow</a>(DT_(1) + <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a564d69313ee91de438926de491613096">Math::pow</a>(lambda * a_T * gamma_dot, yasuda_a), (exp - 1) / yasuda_a);</div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>                  <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a564d69313ee91de438926de491613096">Math::pow</a>(DT_(1) + <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a564d69313ee91de438926de491613096">Math::pow</a>(lambda * a_T * gamma_dot, yasuda_a), (exp - DT_(1)) / yasuda_a);</div>
 <div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span><span class="preprocessor">        #endif</span></div>
 <div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>        }</div>
 <div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span>      };</div>

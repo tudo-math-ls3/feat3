@@ -137,6 +137,7 @@ var namespace_f_e_a_t_1_1_solver =
     [ "DSSBackend", "namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485", [
       [ "none", "namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a334c4a4c42fdb79d7ebc3e73b517e6f8", null ],
       [ "cudss", "namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ae3aa5b6b7b1ea1afbbc3134b7af923fe", null ],
+      [ "mumps", "namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ab27173dfce996604c695b9ada179db68", null ],
       [ "mkldss", "namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa7e50eecfc88a2f0d1939637ef836a3d", null ],
       [ "superlu", "namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aef31a9bc50c89d729abd9684bc1893b2", null ],
       [ "umfpack", "namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a091e9008b7557a06bb0ace6e8284b598", null ],

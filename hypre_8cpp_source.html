@@ -186,7 +186,7 @@ $(document).ready(function(){initNavTree('hypre_8cpp_source.html',''); initResiz
 <div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>          (void)comm; <span class="comment">// suppress unused parameter warnings</span></div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>          <span class="comment">// set up HYPRE dof indices vector</span></div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>          _hypre_dof_idx.resize((std::size_t)_num_owned_dofs);</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>          _hypre_dof_idx.resize(std::size_t(_num_owned_dofs));</div>
 <div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>          <span class="keywordflow">for</span>(HYPRE_Int i(0); i &lt; _num_owned_dofs; ++i)</div>
 <div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>            _hypre_dof_idx[std::size_t(i)] = _dof_offset + i;</div>
 <div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span> </div>
@@ -208,12 +208,12 @@ $(document).ready(function(){initNavTree('hypre_8cpp_source.html',''); initResiz
 <div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>          HYPRE_IJVectorInitialize(_hypre_vec_cor);</div>
 <div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span> </div>
 <div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>          <span class="comment">// create HYPRE index vectors</span></div>
-<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>          _hypre_num_nze.resize((std::size_t)_num_owned_dofs);</div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>          _hypre_row_ptr.resize((std::size_t)(_num_owned_dofs+1u));</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>          _hypre_col_idx.resize((std::size_t)_num_nonzeros);</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>          _hypre_mat_val.resize((std::size_t)_num_nonzeros);</div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>          _hypre_def_val.resize((std::size_t)_num_owned_dofs);</div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>          _hypre_cor_val.resize((std::size_t)_num_owned_dofs);</div>
+<div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>          _hypre_num_nze.resize(std::size_t(_num_owned_dofs));</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>          _hypre_row_ptr.resize(std::size_t(_num_owned_dofs+1));</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>          _hypre_col_idx.resize(std::size_t(_num_nonzeros));</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>          _hypre_mat_val.resize(std::size_t(_num_nonzeros));</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>          _hypre_def_val.resize(std::size_t(_num_owned_dofs));</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>          _hypre_cor_val.resize(std::size_t(_num_owned_dofs));</div>
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>        }</div>
 <div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span> </div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>        ~Core()</div>

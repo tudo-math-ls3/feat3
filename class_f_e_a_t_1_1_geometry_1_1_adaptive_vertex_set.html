@@ -181,7 +181,7 @@ class FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;</div><p ><a c
 <p >This class template is a compatability layer between the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh.html" title="Dynamic mesh data structure.">AdaptiveMesh</a> class and the rest of <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a>. It presents a normal <a class="el" href="struct_f_e_a_t_1_1_geometry_1_1_vertex_set.html" title="Fixed-Sized Vertex Set class template.">VertexSet</a> interface for a single layer of an <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh.html" title="Dynamic mesh data structure.">AdaptiveMesh</a>. This allows using the <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh_layer.html" title="ConformalMesh interface for adaptive meshes.">AdaptiveMeshLayer</a> like any other mesh class.</p>
 <dl class="section author"><dt>Author</dt><dd>Markus Muegge </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00034">34</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00036">36</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a22c78a1fbb7687018c4c3c007457bcad" name="a22c78a1fbb7687018c4c3c007457bcad"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a22c78a1fbb7687018c4c3c007457bcad">&#9670;&#160;</a></span>AdaptiveMeshType</h2>
@@ -199,7 +199,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p><a class="el" href="namespace_f_e_a_t_1_1_type.html" title="Type namespace.">Type</a> of underlying adaptive mesh. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00038">38</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00040">40</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -219,7 +219,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p><a class="el" href="namespace_f_e_a_t_1_1_type.html" title="Type namespace.">Type</a> of single vertex coordinate. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00044">44</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00046">46</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -239,7 +239,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>Vertex type. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00047">47</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00049">49</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -289,7 +289,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00070">70</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00072">72</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -319,7 +319,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00086">86</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00088">88</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -351,9 +351,9 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 <p>Returns a clone of this vertex set. </p>
 <dl class="section warning"><dt>Warning</dt><dd>A <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_vertex_set.html" title="VertexSet interface for adaptive meshes.">AdaptiveVertexSet</a> is a view into a underlying <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh.html" title="Dynamic mesh data structure.">AdaptiveMesh</a>. The returned clone will thus not be independent of this <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_vertex_set.html" title="VertexSet interface for adaptive meshes.">AdaptiveVertexSet</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00081">81</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00083">83</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00051">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::_mesh</a>.</p>
+<p class="reference">References <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00053">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::_mesh</a>.</p>
 
 </div>
 </div>
@@ -384,9 +384,9 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>Returns the number of coordinates per vertex. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00095">95</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00097">97</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00041">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::num_coords</a>.</p>
+<p class="reference">References <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00043">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::num_coords</a>.</p>
 
 </div>
 </div>
@@ -417,9 +417,9 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>Returns the number of vertices in the vertex set. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00103">103</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00105">105</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00051">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::_mesh</a>.</p>
+<p class="reference">References <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00053">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::_mesh</a>.</p>
 
 </div>
 </div>
@@ -448,7 +448,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00168">168</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00170">170</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -487,9 +487,9 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the vertex. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00115">115</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00117">117</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00051">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::_mesh</a>.</p>
+<p class="reference">References <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00053">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::_mesh</a>.</p>
 
 </div>
 </div>
@@ -528,9 +528,9 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A reference to the vertex.  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00125">125</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00127">127</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00051">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::_mesh</a>.</p>
+<p class="reference">References <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00053">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::_mesh</a>.</p>
 
 </div>
 </div>
@@ -582,11 +582,11 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 <dd>
 Does not apply to any other <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_vertex_set.html" title="VertexSet interface for adaptive meshes.">AdaptiveVertexSet</a>, even if the other <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_vertex_set.html" title="VertexSet interface for adaptive meshes.">AdaptiveVertexSet</a> points to the same <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_adaptive_mesh.html" title="Dynamic mesh data structure.">AdaptiveMesh</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00149">149</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00151">151</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00114">FEAT::Adjacency::Permutation::clone()</a>, <a class="el" href="permutation_8cpp_source.html#l00152">FEAT::Adjacency::Permutation::concat()</a>, and <a class="el" href="permutation_8hpp_source.html#l00127">FEAT::Adjacency::Permutation::inverse()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01280">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::create_permutation()</a>, and <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01311">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::set_permutation()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01282">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::create_permutation()</a>, and <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l01313">FEAT::Geometry::AdaptiveMeshLayer&lt; AdaptiveMeshType_ &gt;::set_permutation()</a>.</p>
 
 </div>
 </div>
@@ -613,7 +613,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00054">54</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00056">56</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -641,9 +641,9 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>Underlying adaptive mesh. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00051">51</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00053">53</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00081">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::clone()</a>, <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00103">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::get_num_vertices()</a>, and <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00115">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::operator[]()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00083">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::clone()</a>, <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00105">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::get_num_vertices()</a>, and <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00117">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::operator[]()</a>.</p>
 
 </div>
 </div>
@@ -669,7 +669,7 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00061">61</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00063">63</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
 </div>
 </div>
@@ -697,9 +697,9 @@ template&lt;typename AdaptiveMeshType_ &gt; </div>
 
 <p>Number of coordinates per vertex. </p>
 
-<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00041">41</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00043">43</a> of file <a class="el" href="adaptive__mesh__layer_8hpp_source.html">adaptive_mesh_layer.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00095">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::get_num_coords()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00097">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::get_num_coords()</a>.</p>
 
 </div>
 </div>

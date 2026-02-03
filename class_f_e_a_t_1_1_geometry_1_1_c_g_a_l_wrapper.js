@@ -12,11 +12,19 @@ var class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper =
     [ "closest_point", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a69279547b7f6b0b6cfb5a7f9c210a21b", null ],
     [ "closest_point_on_feature", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#af2472285376bb2c0c210ee89f0fc319a", null ],
     [ "detect_features", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#ab1714bbe96f7c339c63936d5d911e3b1", null ],
+    [ "displace_vertices", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a04a194c9c0da5f581f9491ab8e98aa27", null ],
+    [ "get_num_entities", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a125741d1962654d1878cdecb3e327fe2", null ],
+    [ "get_num_vertices", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#ab608cd9471fded8957e48552e24c22f3", null ],
     [ "intersects_line", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a3faf05364a7aa31864b959a8acccfa90", null ],
+    [ "outer_normals_at_faces", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a26ff24ae978cd75d0e9bde438689923e", null ],
     [ "point", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#ad4b7844bfa49141bb03edf512a8c9cfb", null ],
     [ "point_inside", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a163a2c526c810459165515f98956857c", null ],
     [ "point_not_outside", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#acee5cc4a4fd75835ca2ca567a7864e84", null ],
+    [ "points", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a07d2cbf428eeeb57fdca66672075fe26", null ],
     [ "squared_distance", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a7f59c7a3d1e2ada0f8414c0a1060a3a7", null ],
     [ "squared_distance_to_feature", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#accd465525148caac6e5231501684ee94", null ],
-    [ "transform", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a11a9dcee8b70993d969023985d0ef3b5", null ]
+    [ "transform", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a11a9dcee8b70993d969023985d0ef3b5", null ],
+    [ "vertices_around_face", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a8c8e87608e41167749c2d4c425fe0b83", null ],
+    [ "write_off", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a429ffb12622807784f2125c11b838bfa", null ],
+    [ "write_off", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a15dd7b3875fd3b9fc4727452cbfded76", null ]
 ];

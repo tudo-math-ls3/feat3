@@ -485,11 +485,12 @@ Enumerations</h2></td></tr>
 <tr class="memitem:a9f9ec7e41e649666c38e64e308656485"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485">DSSBackend</a> : int { <br />
 &#160;&#160;<a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a334c4a4c42fdb79d7ebc3e73b517e6f8">none</a> = 0x0000
 , <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ae3aa5b6b7b1ea1afbbc3134b7af923fe">cudss</a> = 0x0001
-, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa7e50eecfc88a2f0d1939637ef836a3d">mkldss</a> = 0x0002
-, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aef31a9bc50c89d729abd9684bc1893b2">superlu</a> = 0x0004
+, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ab27173dfce996604c695b9ada179db68">mumps</a> = 0x0002
+, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa7e50eecfc88a2f0d1939637ef836a3d">mkldss</a> = 0x0003
 , <br />
-&#160;&#160;<a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a091e9008b7557a06bb0ace6e8284b598">umfpack</a> = 0x0008
-, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa181a603769c1f98ad927e7367c7aa51">all</a> = 0x000F
+&#160;&#160;<a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aef31a9bc50c89d729abd9684bc1893b2">superlu</a> = 0x0008
+, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a091e9008b7557a06bb0ace6e8284b598">umfpack</a> = 0x0010
+, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa181a603769c1f98ad927e7367c7aa51">all</a> = 0x001F
 <br />
  }</td></tr>
 <tr class="memdesc:a9f9ec7e41e649666c38e64e308656485"><td class="mdescLeft">&#160;</td><td class="mdescRight">Enumeration of allowed backends for DirectSparseSolver class.  <a href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485">More...</a><br /></td></tr>
@@ -1202,6 +1203,8 @@ Variables</h2></td></tr>
 </td></tr>
 <tr><td class="fieldname"><a id="a9f9ec7e41e649666c38e64e308656485ae3aa5b6b7b1ea1afbbc3134b7af923fe" name="a9f9ec7e41e649666c38e64e308656485ae3aa5b6b7b1ea1afbbc3134b7af923fe"></a>cudss&#160;</td><td class="fielddoc"><p >cuDSS backend </p>
 </td></tr>
+<tr><td class="fieldname"><a id="a9f9ec7e41e649666c38e64e308656485ab27173dfce996604c695b9ada179db68" name="a9f9ec7e41e649666c38e64e308656485ab27173dfce996604c695b9ada179db68"></a>mumps&#160;</td><td class="fielddoc"><p >MUMPS backend. </p>
+</td></tr>
 <tr><td class="fieldname"><a id="a9f9ec7e41e649666c38e64e308656485aa7e50eecfc88a2f0d1939637ef836a3d" name="a9f9ec7e41e649666c38e64e308656485aa7e50eecfc88a2f0d1939637ef836a3d"></a>mkldss&#160;</td><td class="fielddoc"><p >MKL-DSS backend. </p>
 </td></tr>
 <tr><td class="fieldname"><a id="a9f9ec7e41e649666c38e64e308656485aef31a9bc50c89d729abd9684bc1893b2" name="a9f9ec7e41e649666c38e64e308656485aef31a9bc50c89d729abd9684bc1893b2"></a>superlu&#160;</td><td class="fielddoc"><p ><a class="el" href="class_f_e_a_t_1_1_solver_1_1_super_l_u.html" title="(distributed) SuperLU direct sparse solver">SuperLU</a> backend. </p>
@@ -1212,7 +1215,7 @@ Variables</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00192">192</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00226">226</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -1567,9 +1570,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if at least one backend is available for the given system, otherwise <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l01094">1094</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l01229">1229</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00501">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::is_available()</a>.</p>
+<p class="reference">References <a class="el" href="direct__sparse__solver_8hpp_source.html#l00552">FEAT::Solver::DirectSparseSolver&lt; Matrix_, Filter_ &gt;::is_available()</a>.</p>
 
 </div>
 </div>
@@ -2880,7 +2883,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A shared pointer to a new <a class="el" href="class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html" title="Front-end wrapper class for (parallel) third-party direct sparse solvers.">DirectSparseSolver</a> object. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l01076">1076</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l01211">1211</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -7770,7 +7773,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename ColoringType_ , FEAT:
 
 <p>bit-wise AND operator for DSSBackend enum values </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00209">209</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00244">244</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 </div>
 </div>
@@ -7800,7 +7803,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename ColoringType_ , FEAT:
 
 <p>checks whether at least one of the bits in DSSBackend is selected </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00215">215</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00250">250</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa181a603769c1f98ad927e7367c7aa51">all</a>.</p>
 
@@ -7872,9 +7875,9 @@ template&lt;typename Matrix_ , typename Filter_ , typename ColoringType_ , FEAT:
 
 <p>output operator for DSSBackend </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00222">222</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00257">257</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ae3aa5b6b7b1ea1afbbc3134b7af923fe">cudss</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa7e50eecfc88a2f0d1939637ef836a3d">mkldss</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aef31a9bc50c89d729abd9684bc1893b2">superlu</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a091e9008b7557a06bb0ace6e8284b598">umfpack</a>.</p>
+<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ae3aa5b6b7b1ea1afbbc3134b7af923fe">cudss</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aa7e50eecfc88a2f0d1939637ef836a3d">mkldss</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485ab27173dfce996604c695b9ada179db68">mumps</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485aef31a9bc50c89d729abd9684bc1893b2">superlu</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a9f9ec7e41e649666c38e64e308656485a091e9008b7557a06bb0ace6e8284b598">umfpack</a>.</p>
 
 </div>
 </div>
@@ -7914,7 +7917,7 @@ template&lt;typename Matrix_ , typename Filter_ , typename ColoringType_ , FEAT:
 
 <p>bit-wise OR operator for DSSBackend enum values </p>
 
-<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00203">203</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="direct__sparse__solver_8hpp_source.html#l00238">238</a> of file <a class="el" href="direct__sparse__solver_8hpp_source.html">direct_sparse_solver.hpp</a>.</p>
 
 </div>
 </div>

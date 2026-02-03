@@ -18,6 +18,7 @@ var dir_58759e03702cf5d3134868f6de633189 =
     [ "direct_sparse_solver.hpp", "direct__sparse__solver_8hpp_source.html", null ],
     [ "direct_sparse_solver_cudss.cpp", "direct__sparse__solver__cudss_8cpp_source.html", null ],
     [ "direct_sparse_solver_mkl.cpp", "direct__sparse__solver__mkl_8cpp_source.html", null ],
+    [ "direct_sparse_solver_mumps.cpp", "direct__sparse__solver__mumps_8cpp_source.html", null ],
     [ "direct_sparse_solver_superlu.cpp", "direct__sparse__solver__superlu_8cpp_source.html", null ],
     [ "direct_sparse_solver_umfpack.cpp", "direct__sparse__solver__umfpack_8cpp_source.html", null ],
     [ "direct_stokes_solver.hpp", "direct__stokes__solver_8hpp_source.html", null ],

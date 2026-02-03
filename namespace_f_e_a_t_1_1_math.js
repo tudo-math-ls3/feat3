@@ -16,7 +16,7 @@ var namespace_f_e_a_t_1_1_math =
     [ "eps", "namespace_f_e_a_t_1_1_math.html#afec6f28efbe20fb1ec6ec53245ab6adf", null ],
     [ "exp", "namespace_f_e_a_t_1_1_math.html#a2accdba2efee942983ac19e72aa5b30d", null ],
     [ "factorial", "namespace_f_e_a_t_1_1_math.html#a1546f1fe9d4fc7909256b43466cec3bd", null ],
-    [ "huge", "namespace_f_e_a_t_1_1_math.html#a982e9ed1e36cccb7ab1857cb699114f4", null ],
+    [ "huge", "namespace_f_e_a_t_1_1_math.html#ad36592a1132c7e209f2ede3d7bd64427", null ],
     [ "ilog10", "namespace_f_e_a_t_1_1_math.html#ad1c11f2be50636eeeea88afb1b187e06", null ],
     [ "invert_matrix", "namespace_f_e_a_t_1_1_math.html#aa3bd97ac1936a6eefda19f005d30ddb3", null ],
     [ "isfinite", "namespace_f_e_a_t_1_1_math.html#ad714ccd9f976acf07f7ba2e4b6be3c9a", null ],
@@ -41,5 +41,5 @@ var namespace_f_e_a_t_1_1_math =
     [ "sqrt", "namespace_f_e_a_t_1_1_math.html#a00029dad195a1d46d7baa2c66595b0b5", null ],
     [ "tan", "namespace_f_e_a_t_1_1_math.html#a9c620aa12e1fae51ce83f77930822032", null ],
     [ "tanh", "namespace_f_e_a_t_1_1_math.html#a3e026735e16566f7c5e30d9faae4dd7f", null ],
-    [ "tiny", "namespace_f_e_a_t_1_1_math.html#a1244b118c18e265e79092bd3de1f8cb2", null ]
+    [ "tiny", "namespace_f_e_a_t_1_1_math.html#ad2938580bd1df532fd59d84567730b57", null ]
 ];

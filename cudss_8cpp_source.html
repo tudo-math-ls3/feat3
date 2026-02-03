@@ -201,9 +201,9 @@ $(document).ready(function(){initNavTree('cudss_8cpp_source.html',''); initResiz
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>      <span class="comment">// set matrix data</span></div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>      ret = cudssMatrixCreateCsr(</div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>        &amp;core.matrix,</div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>        neq,</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        neq,</div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        nze,</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>        std::int64_t(neq),</div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>        std::int64_t(neq),</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>        std::int64_t(nze),</div>
 <div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>        row_ptr,</div>
 <div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>        <span class="keyword">nullptr</span>,</div>
 <div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>        col_idx,</div>
@@ -219,9 +219,9 @@ $(document).ready(function(){initNavTree('cudss_8cpp_source.html',''); initResiz
 <div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>      <span class="comment">// allocate solution vector</span></div>
 <div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>      ret = cudssMatrixCreateDn(</div>
 <div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>        &amp;core.vec_sol,</div>
-<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>        neq,</div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>        std::int64_t(neq),</div>
 <div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span>        1,</div>
-<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>        neq,</div>
+<div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span>        std::int64_t(neq),</div>
 <div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>        <span class="keyword">nullptr</span>,</div>
 <div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>        CUDA_R_64F,</div>
 <div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>        CUDSS_LAYOUT_COL_MAJOR);</div>
@@ -232,9 +232,9 @@ $(document).ready(function(){initNavTree('cudss_8cpp_source.html',''); initResiz
 <div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span>      <span class="comment">// allocate rhs vector</span></div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>      ret = cudssMatrixCreateDn(</div>
 <div class="line"><a id="l00129" name="l00129"></a><span class="lineno">  129</span>        &amp;core.vec_rhs,</div>
-<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        neq,</div>
+<div class="line"><a id="l00130" name="l00130"></a><span class="lineno">  130</span>        std::int64_t(neq),</div>
 <div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>        1,</div>
-<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>        neq,</div>
+<div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>        std::int64_t(neq),</div>
 <div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>        <span class="keyword">nullptr</span>,</div>
 <div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>        CUDA_R_64F,</div>
 <div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span>        CUDSS_LAYOUT_COL_MAJOR);</div>

@@ -329,96 +329,164 @@ $(document).ready(function(){initNavTree('test__system_8hpp_source.html',''); in
 <div class="line"><a id="l00300" name="l00300"></a><span class="lineno">  300</span>      }</div>
 <div class="line"><a id="l00301" name="l00301"></a><span class="lineno">  301</span>    }; <span class="comment">// class UnitTest</span></div>
 <div class="line"><a id="l00302" name="l00302"></a><span class="lineno">  302</span> </div>
-<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>  } <span class="comment">// namespace TestSystem</span></div>
-<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>} <span class="comment">// namespace FEAT</span></div>
-<div class="line"><a id="l00306" name="l00306"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#aec703c88b9951285edb42334b5de816c">  306</a></span><span class="comment"></span><span class="preprocessor">#define TEST_CHECK_EQUAL(a, b) \</span></div>
-<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span><span class="preprocessor">  do { \</span></div>
-<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span><span class="preprocessor">    CHECK_INTERNAL((a)==(b), this-&gt;_id + &quot;\n&quot;</span> +  &quot;Expected &#39;&quot; #a &quot;&#39; to equal \n&#39;&quot; + FEAT::stringify(b) + &quot;&#39;\nbut got\n&#39;&quot; + FEAT::stringify(a) + &quot;&#39;&quot;)\</div>
-<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>  } while (false)</div>
-<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span> </div>
-<div class="line"><a id="l00312" name="l00312"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a6153fa6708f27e2294595086ead3927b">  312</a></span><span class="preprocessor">#define TEST_CHECK_NOT_EQUAL(a, b) \</span></div>
-<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span><span class="preprocessor">  do { \</span></div>
-<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span><span class="preprocessor">    CHECK_INTERNAL(!((a)==(b)), this-&gt;_id + &quot;\n&quot;</span> +  &quot;Expected &#39;&quot; #a &quot;&#39; that is&#39;&quot; + FEAT::stringify(a) + &quot;&#39; to equal not &#39;&quot; + FEAT::stringify(b) + &quot;&#39;&quot;)\</div>
-<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>  } while (false)</div>
-<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span> </div>
-<div class="line"><a id="l00318" name="l00318"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a2c23cb13a7c79e7821f4d3dad74cf550">  318</a></span><span class="preprocessor">#define TEST_CHECK_IN_RANGE(x, a, b) \</span></div>
-<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span><span class="preprocessor">  do { \</span></div>
-<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span><span class="preprocessor">    CHECK_INTERNAL(((a) &lt;= (x)) &amp;&amp; ((x) &lt;= (b)), this-&gt;_id + &quot;\n&quot;</span> +  &quot;Expected &#39;&quot; #x &quot;&#39; that is&#39;&quot; + FEAT::stringify(x) + &quot;&#39; to be in range [&quot; + FEAT::stringify(a) + &quot;,&quot; + FEAT::stringify(b) + &quot;]&quot;)\</div>
-<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span>  } while (false)</div>
-<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span> </div>
-<div class="line"><a id="l00324" name="l00324"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a84c9168a9746502205cff6a348296825">  324</a></span><span class="preprocessor">#define TEST_CHECK_STRINGIFY_EQUAL(a, b) \</span></div>
-<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span><span class="preprocessor">  do { \</span></div>
-<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span><span class="preprocessor">    String s_a(FEAT::stringify(a)); \</span></div>
-<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span><span class="preprocessor">    String s_b(FEAT::stringify(b)); \</span></div>
-<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span><span class="preprocessor">    CHECK_INTERNAL(s_a == s_b, this-&gt;_id + &quot;\n&quot;</span> +  &quot;Expected &#39;&quot; #a &quot;&#39; to equal &#39;&quot; + s_b + &quot;&#39;\nbut got\n&#39;&quot; + s_a + &quot;&#39;&quot;)\</div>
-<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span>  } while (false)</div>
-<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span> </div>
-<div class="line"><a id="l00332" name="l00332"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#aeff9e34224f1f66e6a8cdd4721ed8ce2">  332</a></span><span class="preprocessor">#define TEST_CHECK(a) \</span></div>
-<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span><span class="preprocessor">  do { \</span></div>
-<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span><span class="preprocessor">    CHECK_INTERNAL(a, this-&gt;_id + &quot;\n&quot;</span> +  &quot;Check &#39;&quot; #a &quot;&#39; failed&quot;) \</div>
-<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span>  } while (false)</div>
+<div class="line"><a id="l00303" name="l00303"></a><span class="lineno">  303</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DT_&gt;</div>
+<div class="line"><a id="l00304" name="l00304"></a><span class="lineno">  304</span>    DT_ tol()</div>
+<div class="line"><a id="l00305" name="l00305"></a><span class="lineno">  305</span>    {</div>
+<div class="line"><a id="l00306" name="l00306"></a><span class="lineno">  306</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a564d69313ee91de438926de491613096">Math::pow</a>(Math::eps&lt;DT_&gt;(), DT_(0.7));</div>
+<div class="line"><a id="l00307" name="l00307"></a><span class="lineno">  307</span>    }</div>
+<div class="line"><a id="l00308" name="l00308"></a><span class="lineno">  308</span> </div>
+<div class="line"><a id="l00309" name="l00309"></a><span class="lineno">  309</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00310" name="l00310"></a><span class="lineno">  310</span>    <span class="keyword">inline</span> <span class="keywordtype">double</span> tol&lt;double&gt;()</div>
+<div class="line"><a id="l00311" name="l00311"></a><span class="lineno">  311</span>    {</div>
+<div class="line"><a id="l00312" name="l00312"></a><span class="lineno">  312</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a564d69313ee91de438926de491613096">Math::pow</a>(Math::eps&lt;double&gt;(), 0.7);</div>
+<div class="line"><a id="l00313" name="l00313"></a><span class="lineno">  313</span>    }</div>
+<div class="line"><a id="l00314" name="l00314"></a><span class="lineno">  314</span> </div>
+<div class="line"><a id="l00315" name="l00315"></a><span class="lineno">  315</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00316" name="l00316"></a><span class="lineno">  316</span>    <span class="keyword">inline</span> <span class="keywordtype">float</span> tol&lt;float&gt;()</div>
+<div class="line"><a id="l00317" name="l00317"></a><span class="lineno">  317</span>    {</div>
+<div class="line"><a id="l00318" name="l00318"></a><span class="lineno">  318</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a564d69313ee91de438926de491613096">Math::pow</a>(Math::eps&lt;float&gt;(), 0.7F);</div>
+<div class="line"><a id="l00319" name="l00319"></a><span class="lineno">  319</span>    }</div>
+<div class="line"><a id="l00320" name="l00320"></a><span class="lineno">  320</span> </div>
+<div class="line"><a id="l00321" name="l00321"></a><span class="lineno">  321</span><span class="preprocessor">#ifdef FEAT_HAVE_QUADMATH</span></div>
+<div class="line"><a id="l00322" name="l00322"></a><span class="lineno">  322</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00323" name="l00323"></a><span class="lineno">  323</span>    <span class="keyword">inline</span> __float128 tol&lt;__float128&gt;()</div>
+<div class="line"><a id="l00324" name="l00324"></a><span class="lineno">  324</span>    {</div>
+<div class="line"><a id="l00325" name="l00325"></a><span class="lineno">  325</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a564d69313ee91de438926de491613096">Math::pow</a>(Math::eps&lt;__float128&gt;(), __float128(0.7));</div>
+<div class="line"><a id="l00326" name="l00326"></a><span class="lineno">  326</span>    }</div>
+<div class="line"><a id="l00327" name="l00327"></a><span class="lineno">  327</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00328" name="l00328"></a><span class="lineno">  328</span> </div>
+<div class="line"><a id="l00329" name="l00329"></a><span class="lineno">  329</span><span class="preprocessor">#ifdef FEAT_HAVE_HALFMATH</span></div>
+<div class="line"><a id="l00330" name="l00330"></a><span class="lineno">  330</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00331" name="l00331"></a><span class="lineno">  331</span>    <span class="keyword">inline</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> tol&lt;Half&gt;()</div>
+<div class="line"><a id="l00332" name="l00332"></a><span class="lineno">  332</span>    {</div>
+<div class="line"><a id="l00333" name="l00333"></a><span class="lineno">  333</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a564d69313ee91de438926de491613096">Math::pow</a>(Math::eps&lt;Half&gt;(), <a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a>(0.35));</div>
+<div class="line"><a id="l00334" name="l00334"></a><span class="lineno">  334</span>    }</div>
+<div class="line"><a id="l00335" name="l00335"></a><span class="lineno">  335</span><span class="preprocessor">#endif</span></div>
 <div class="line"><a id="l00336" name="l00336"></a><span class="lineno">  336</span> </div>
-<div class="line"><a id="l00338" name="l00338"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a77113b042a17bf510fec145e7eda1fd3">  338</a></span><span class="preprocessor">#define TEST_CHECK_MSG(a,msg) \</span></div>
-<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span><span class="preprocessor">  do { \</span></div>
-<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span><span class="preprocessor">    CHECK_INTERNAL(a, this-&gt;_id + &quot;\n&quot;</span> + (msg))\</div>
-<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>  } while (false)</div>
+<div class="line"><a id="l00337" name="l00337"></a><span class="lineno">  337</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> DT_&gt;</div>
+<div class="line"><a id="l00338" name="l00338"></a><span class="lineno">  338</span>    DT_ relaxed_tol()</div>
+<div class="line"><a id="l00339" name="l00339"></a><span class="lineno">  339</span>    {</div>
+<div class="line"><a id="l00340" name="l00340"></a><span class="lineno">  340</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a564d69313ee91de438926de491613096">Math::pow</a>(Math::eps&lt;DT_&gt;(), DT_(0.4));</div>
+<div class="line"><a id="l00341" name="l00341"></a><span class="lineno">  341</span>    }</div>
 <div class="line"><a id="l00342" name="l00342"></a><span class="lineno">  342</span> </div>
-<div class="line"><a id="l00344" name="l00344"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a267add74892b4d85b4644949f038d977">  344</a></span><span class="preprocessor">#define TEST_CHECK_THROWS(a, b) \</span></div>
-<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span><span class="preprocessor">  do { \</span></div>
-<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span><span class="preprocessor">    try { \</span></div>
-<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span><span class="preprocessor">      try { \</span></div>
-<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span><span class="preprocessor">        a; \</span></div>
-<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span><span class="preprocessor">        this-&gt;check(__func__, __FILE__, __LINE__, false, \</span></div>
-<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span><span class="preprocessor">            this-&gt;_id + &quot;\n&quot;</span> +  &quot;Expected exception of type &#39;&quot; #b &quot;&#39; not thrown&quot;); \</div>
-<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>      } catch (b &amp;) { \</div>
-<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>        TEST_CHECK(true); \</div>
-<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>      } \</div>
-<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span>    } catch (const FEAT::TestSystem::TestFailedException &amp;) { \</div>
-<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span>      throw; \</div>
-<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>    } catch (const std::exception &amp; test_e) { \</div>
-<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>      throw FEAT::TestSystem::TestFailedException(__func__, __FILE__, __LINE__, \</div>
-<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>          &quot;Test threw unexpected exception &quot;+ FEAT::stringify(test_e.what()) + \</div>
-<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>          &quot; inside a TEST_CHECK_THROWS block&quot;); \</div>
-<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>    } catch (...) { \</div>
-<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span>      throw FEAT::TestSystem::TestFailedException(__func__, __FILE__, __LINE__, \</div>
-<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span>          &quot;Test threw unexpected unknown exception inside a TEST_CHECK_THROWS block&quot;); \</div>
-<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span>    } \</div>
-<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>  } while (false)</div>
-<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span> </div>
-<div class="line"><a id="l00367" name="l00367"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a7585e793a391d301bd4cbdc66f024018">  367</a></span><span class="preprocessor">#define TEST_CHECK_EQUAL_WITHIN_EPS(a, b, eps) \</span></div>
-<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span><span class="preprocessor">  do { \</span></div>
-<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span><span class="preprocessor">    CHECK_INTERNAL(((a) &lt;= ((b) + (eps))) &amp;&amp; ((b) &lt;= ((a) + (eps))), \</span></div>
-<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span><span class="preprocessor">        this-&gt;_id + &quot;\n&quot;</span> + &quot;Expected &#39;|&quot; #a &quot; - &quot; #b \</div>
-<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span>        &quot;|&#39; &lt;= &#39;&quot; + FEAT::stringify(eps) + &quot;&#39; but was &#39;&quot; + \</div>
-<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span>        FEAT::stringify((a) &lt; (b) ? (b) - (a) : (a) - (b)) + &quot;&#39;&quot; \</div>
-<div class="line"><a id="l00373" name="l00373"></a><span class="lineno">  373</span>        + &quot;, with &quot; #a &quot;=&quot; + FEAT::stringify(a) + &quot; and &quot; #b &quot;=&quot; + FEAT::stringify(b))\</div>
-<div class="line"><a id="l00374" name="l00374"></a><span class="lineno">  374</span>  } while (false)</div>
-<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span> </div>
-<div class="line"><a id="l00377" name="l00377"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#ae9b1cfc8f38cdb393ed4cdfd3a90e159">  377</a></span><span class="preprocessor">#define TEST_CHECK_RELATIVE(a, b, eps) \</span></div>
-<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span><span class="preprocessor">  do { \</span></div>
-<div class="line"><a id="l00379" name="l00379"></a><span class="lineno">  379</span><span class="preprocessor">    CHECK_INTERNAL(Math::abs((a) - (b)) &lt;= (eps)*Math::abs(b), \</span></div>
-<div class="line"><a id="l00380" name="l00380"></a><span class="lineno">  380</span><span class="preprocessor">        this-&gt;_id + &quot;\n&quot;</span> + &quot;Expected &#39;|&quot; #a &quot; - &quot; #b \</div>
-<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span>        &quot;|&#39; &lt;= &#39;&quot; + FEAT::stringify(eps) + &quot;*|&quot; #b &quot;|&#39; = &#39;&quot; + \</div>
-<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span>        FEAT::stringify((eps)*Math::abs(b)) + &quot;&#39; but was &#39;&quot; + \</div>
-<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span>        FEAT::stringify(Math::abs((a) - (b))) + &quot;&#39;&quot; \</div>
-<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span>        + &quot;, with &quot; #a &quot;=&quot; + FEAT::stringify(a) + &quot; and &quot; #b &quot;=&quot; + FEAT::stringify(b))\</div>
-<div class="line"><a id="l00385" name="l00385"></a><span class="lineno">  385</span>  } while (false)</div>
-<div class="line"><a id="l00386" name="l00386"></a><span class="lineno">  386</span> </div>
-<div class="line"><a id="l00388" name="l00388"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a5ac5be32c01b54e44938fce83d4e5f51">  388</a></span><span class="preprocessor">#define TEST_CHECK_LESS_THAN(a, b) \</span></div>
-<div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span><span class="preprocessor">  do { \</span></div>
-<div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span><span class="preprocessor">    CHECK_INTERNAL((a) &lt; (b), this-&gt;_id + &quot;\n&quot;</span> +  &quot;Expected &#39;&quot; #a &quot;&#39; to be less than \n&#39;&quot; + FEAT::stringify(b) + &quot;&#39;\nbut got\n&#39;&quot; + FEAT::stringify(a) + &quot;&#39;&quot;)\</div>
-<div class="line"><a id="l00391" name="l00391"></a><span class="lineno">  391</span>  } while (false)</div>
-<div class="line"><a id="l00392" name="l00392"></a><span class="lineno">  392</span> </div>
-<div class="line"><a id="l00394" name="l00394"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a29fc8ef53f555acfd8901be6843345b1">  394</a></span><span class="preprocessor">#define TEST(pre, test, post) \</span></div>
-<div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span><span class="preprocessor">  do { \</span></div>
-<div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span><span class="preprocessor">    pre; \</span></div>
-<div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span><span class="preprocessor">    try { \</span></div>
-<div class="line"><a id="l00398" name="l00398"></a><span class="lineno">  398</span><span class="preprocessor">      test; \</span></div>
-<div class="line"><a id="l00399" name="l00399"></a><span class="lineno">  399</span><span class="preprocessor">    } catch (const FEAT::TestSystem::TestFailedException &amp; test_e) { \</span></div>
-<div class="line"><a id="l00400" name="l00400"></a><span class="lineno">  400</span><span class="preprocessor">      post; \</span></div>
-<div class="line"><a id="l00401" name="l00401"></a><span class="lineno">  401</span><span class="preprocessor">      throw; } \</span></div>
-<div class="line"><a id="l00402" name="l00402"></a><span class="lineno">  402</span><span class="preprocessor">    post; \</span></div>
-<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span><span class="preprocessor">  } while (false)</span></div>
+<div class="line"><a id="l00343" name="l00343"></a><span class="lineno">  343</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00344" name="l00344"></a><span class="lineno">  344</span>    <span class="keyword">inline</span> <span class="keywordtype">double</span> relaxed_tol&lt;double&gt;()</div>
+<div class="line"><a id="l00345" name="l00345"></a><span class="lineno">  345</span>    {</div>
+<div class="line"><a id="l00346" name="l00346"></a><span class="lineno">  346</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a564d69313ee91de438926de491613096">Math::pow</a>(Math::eps&lt;double&gt;(), 0.4);</div>
+<div class="line"><a id="l00347" name="l00347"></a><span class="lineno">  347</span>    }</div>
+<div class="line"><a id="l00348" name="l00348"></a><span class="lineno">  348</span> </div>
+<div class="line"><a id="l00349" name="l00349"></a><span class="lineno">  349</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00350" name="l00350"></a><span class="lineno">  350</span>    <span class="keyword">inline</span> <span class="keywordtype">float</span> relaxed_tol&lt;float&gt;()</div>
+<div class="line"><a id="l00351" name="l00351"></a><span class="lineno">  351</span>    {</div>
+<div class="line"><a id="l00352" name="l00352"></a><span class="lineno">  352</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a564d69313ee91de438926de491613096">Math::pow</a>(Math::eps&lt;float&gt;(), 0.3F);</div>
+<div class="line"><a id="l00353" name="l00353"></a><span class="lineno">  353</span>    }</div>
+<div class="line"><a id="l00354" name="l00354"></a><span class="lineno">  354</span> </div>
+<div class="line"><a id="l00355" name="l00355"></a><span class="lineno">  355</span><span class="preprocessor">#ifdef FEAT_HAVE_QUADMATH</span></div>
+<div class="line"><a id="l00356" name="l00356"></a><span class="lineno">  356</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00357" name="l00357"></a><span class="lineno">  357</span>    <span class="keyword">inline</span> __float128 relaxed_tol&lt;__float128&gt;()</div>
+<div class="line"><a id="l00358" name="l00358"></a><span class="lineno">  358</span>    {</div>
+<div class="line"><a id="l00359" name="l00359"></a><span class="lineno">  359</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a564d69313ee91de438926de491613096">Math::pow</a>(Math::eps&lt;__float128&gt;(), __float128(0.4));</div>
+<div class="line"><a id="l00360" name="l00360"></a><span class="lineno">  360</span>    }</div>
+<div class="line"><a id="l00361" name="l00361"></a><span class="lineno">  361</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00362" name="l00362"></a><span class="lineno">  362</span> </div>
+<div class="line"><a id="l00363" name="l00363"></a><span class="lineno">  363</span><span class="preprocessor">#ifdef FEAT_HAVE_HALFMATH</span></div>
+<div class="line"><a id="l00364" name="l00364"></a><span class="lineno">  364</span>    <span class="keyword">template</span>&lt;&gt;</div>
+<div class="line"><a id="l00365" name="l00365"></a><span class="lineno">  365</span>    <span class="keyword">inline</span> <a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a> relaxed_tol&lt;Half&gt;()</div>
+<div class="line"><a id="l00366" name="l00366"></a><span class="lineno">  366</span>    {</div>
+<div class="line"><a id="l00367" name="l00367"></a><span class="lineno">  367</span>      <span class="keywordflow">return</span> <a class="code hl_function" href="namespace_f_e_a_t_1_1_math.html#a564d69313ee91de438926de491613096">Math::pow</a>(Math::eps&lt;Half&gt;(), <a class="code hl_typedef" href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">Half</a>(0.2));</div>
+<div class="line"><a id="l00368" name="l00368"></a><span class="lineno">  368</span>    }</div>
+<div class="line"><a id="l00369" name="l00369"></a><span class="lineno">  369</span><span class="preprocessor">#endif</span></div>
+<div class="line"><a id="l00370" name="l00370"></a><span class="lineno">  370</span> </div>
+<div class="line"><a id="l00371" name="l00371"></a><span class="lineno">  371</span>  } <span class="comment">// namespace TestSystem</span></div>
+<div class="line"><a id="l00372" name="l00372"></a><span class="lineno">  372</span>} <span class="comment">// namespace FEAT</span></div>
+<div class="line"><a id="l00374" name="l00374"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#aec703c88b9951285edb42334b5de816c">  374</a></span><span class="comment"></span><span class="preprocessor">#define TEST_CHECK_EQUAL(a, b) \</span></div>
+<div class="line"><a id="l00375" name="l00375"></a><span class="lineno">  375</span><span class="preprocessor">  do { \</span></div>
+<div class="line"><a id="l00376" name="l00376"></a><span class="lineno">  376</span><span class="preprocessor">    CHECK_INTERNAL((a)==(b), this-&gt;_id + &quot;\n&quot;</span> +  &quot;Expected &#39;&quot; #a &quot;&#39; to equal \n&#39;&quot; + FEAT::stringify(b) + &quot;&#39;\nbut got\n&#39;&quot; + FEAT::stringify(a) + &quot;&#39;&quot;)\</div>
+<div class="line"><a id="l00377" name="l00377"></a><span class="lineno">  377</span>  } while (false)</div>
+<div class="line"><a id="l00378" name="l00378"></a><span class="lineno">  378</span> </div>
+<div class="line"><a id="l00380" name="l00380"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a6153fa6708f27e2294595086ead3927b">  380</a></span><span class="preprocessor">#define TEST_CHECK_NOT_EQUAL(a, b) \</span></div>
+<div class="line"><a id="l00381" name="l00381"></a><span class="lineno">  381</span><span class="preprocessor">  do { \</span></div>
+<div class="line"><a id="l00382" name="l00382"></a><span class="lineno">  382</span><span class="preprocessor">    CHECK_INTERNAL(!((a)==(b)), this-&gt;_id + &quot;\n&quot;</span> +  &quot;Expected &#39;&quot; #a &quot;&#39; that is&#39;&quot; + FEAT::stringify(a) + &quot;&#39; to equal not &#39;&quot; + FEAT::stringify(b) + &quot;&#39;&quot;)\</div>
+<div class="line"><a id="l00383" name="l00383"></a><span class="lineno">  383</span>  } while (false)</div>
+<div class="line"><a id="l00384" name="l00384"></a><span class="lineno">  384</span> </div>
+<div class="line"><a id="l00386" name="l00386"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a2c23cb13a7c79e7821f4d3dad74cf550">  386</a></span><span class="preprocessor">#define TEST_CHECK_IN_RANGE(x, a, b) \</span></div>
+<div class="line"><a id="l00387" name="l00387"></a><span class="lineno">  387</span><span class="preprocessor">  do { \</span></div>
+<div class="line"><a id="l00388" name="l00388"></a><span class="lineno">  388</span><span class="preprocessor">    CHECK_INTERNAL(((a) &lt;= (x)) &amp;&amp; ((x) &lt;= (b)), this-&gt;_id + &quot;\n&quot;</span> +  &quot;Expected &#39;&quot; #x &quot;&#39; that is&#39;&quot; + FEAT::stringify(x) + &quot;&#39; to be in range [&quot; + FEAT::stringify(a) + &quot;,&quot; + FEAT::stringify(b) + &quot;]&quot;)\</div>
+<div class="line"><a id="l00389" name="l00389"></a><span class="lineno">  389</span>  } while (false)</div>
+<div class="line"><a id="l00390" name="l00390"></a><span class="lineno">  390</span> </div>
+<div class="line"><a id="l00392" name="l00392"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a84c9168a9746502205cff6a348296825">  392</a></span><span class="preprocessor">#define TEST_CHECK_STRINGIFY_EQUAL(a, b) \</span></div>
+<div class="line"><a id="l00393" name="l00393"></a><span class="lineno">  393</span><span class="preprocessor">  do { \</span></div>
+<div class="line"><a id="l00394" name="l00394"></a><span class="lineno">  394</span><span class="preprocessor">    String s_a(FEAT::stringify(a)); \</span></div>
+<div class="line"><a id="l00395" name="l00395"></a><span class="lineno">  395</span><span class="preprocessor">    String s_b(FEAT::stringify(b)); \</span></div>
+<div class="line"><a id="l00396" name="l00396"></a><span class="lineno">  396</span><span class="preprocessor">    CHECK_INTERNAL(s_a == s_b, this-&gt;_id + &quot;\n&quot;</span> +  &quot;Expected &#39;&quot; #a &quot;&#39; to equal &#39;&quot; + s_b + &quot;&#39;\nbut got\n&#39;&quot; + s_a + &quot;&#39;&quot;)\</div>
+<div class="line"><a id="l00397" name="l00397"></a><span class="lineno">  397</span>  } while (false)</div>
+<div class="line"><a id="l00398" name="l00398"></a><span class="lineno">  398</span> </div>
+<div class="line"><a id="l00400" name="l00400"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#aeff9e34224f1f66e6a8cdd4721ed8ce2">  400</a></span><span class="preprocessor">#define TEST_CHECK(a) \</span></div>
+<div class="line"><a id="l00401" name="l00401"></a><span class="lineno">  401</span><span class="preprocessor">  do { \</span></div>
+<div class="line"><a id="l00402" name="l00402"></a><span class="lineno">  402</span><span class="preprocessor">    CHECK_INTERNAL(a, this-&gt;_id + &quot;\n&quot;</span> +  &quot;Check &#39;&quot; #a &quot;&#39; failed&quot;) \</div>
+<div class="line"><a id="l00403" name="l00403"></a><span class="lineno">  403</span>  } while (false)</div>
+<div class="line"><a id="l00404" name="l00404"></a><span class="lineno">  404</span> </div>
+<div class="line"><a id="l00406" name="l00406"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a77113b042a17bf510fec145e7eda1fd3">  406</a></span><span class="preprocessor">#define TEST_CHECK_MSG(a,msg) \</span></div>
+<div class="line"><a id="l00407" name="l00407"></a><span class="lineno">  407</span><span class="preprocessor">  do { \</span></div>
+<div class="line"><a id="l00408" name="l00408"></a><span class="lineno">  408</span><span class="preprocessor">    CHECK_INTERNAL(a, this-&gt;_id + &quot;\n&quot;</span> + (msg))\</div>
+<div class="line"><a id="l00409" name="l00409"></a><span class="lineno">  409</span>  } while (false)</div>
+<div class="line"><a id="l00410" name="l00410"></a><span class="lineno">  410</span> </div>
+<div class="line"><a id="l00412" name="l00412"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a267add74892b4d85b4644949f038d977">  412</a></span><span class="preprocessor">#define TEST_CHECK_THROWS(a, b) \</span></div>
+<div class="line"><a id="l00413" name="l00413"></a><span class="lineno">  413</span><span class="preprocessor">  do { \</span></div>
+<div class="line"><a id="l00414" name="l00414"></a><span class="lineno">  414</span><span class="preprocessor">    try { \</span></div>
+<div class="line"><a id="l00415" name="l00415"></a><span class="lineno">  415</span><span class="preprocessor">      try { \</span></div>
+<div class="line"><a id="l00416" name="l00416"></a><span class="lineno">  416</span><span class="preprocessor">        a; \</span></div>
+<div class="line"><a id="l00417" name="l00417"></a><span class="lineno">  417</span><span class="preprocessor">        this-&gt;check(__func__, __FILE__, __LINE__, false, \</span></div>
+<div class="line"><a id="l00418" name="l00418"></a><span class="lineno">  418</span><span class="preprocessor">            this-&gt;_id + &quot;\n&quot;</span> +  &quot;Expected exception of type &#39;&quot; #b &quot;&#39; not thrown&quot;); \</div>
+<div class="line"><a id="l00419" name="l00419"></a><span class="lineno">  419</span>      } catch (b &amp;) { \</div>
+<div class="line"><a id="l00420" name="l00420"></a><span class="lineno">  420</span>        TEST_CHECK(true); \</div>
+<div class="line"><a id="l00421" name="l00421"></a><span class="lineno">  421</span>      } \</div>
+<div class="line"><a id="l00422" name="l00422"></a><span class="lineno">  422</span>    } catch (const FEAT::TestSystem::TestFailedException &amp;) { \</div>
+<div class="line"><a id="l00423" name="l00423"></a><span class="lineno">  423</span>      throw; \</div>
+<div class="line"><a id="l00424" name="l00424"></a><span class="lineno">  424</span>    } catch (const std::exception &amp; test_e) { \</div>
+<div class="line"><a id="l00425" name="l00425"></a><span class="lineno">  425</span>      throw FEAT::TestSystem::TestFailedException(__func__, __FILE__, __LINE__, \</div>
+<div class="line"><a id="l00426" name="l00426"></a><span class="lineno">  426</span>          &quot;Test threw unexpected exception &quot;+ FEAT::stringify(test_e.what()) + \</div>
+<div class="line"><a id="l00427" name="l00427"></a><span class="lineno">  427</span>          &quot; inside a TEST_CHECK_THROWS block&quot;); \</div>
+<div class="line"><a id="l00428" name="l00428"></a><span class="lineno">  428</span>    } catch (...) { \</div>
+<div class="line"><a id="l00429" name="l00429"></a><span class="lineno">  429</span>      throw FEAT::TestSystem::TestFailedException(__func__, __FILE__, __LINE__, \</div>
+<div class="line"><a id="l00430" name="l00430"></a><span class="lineno">  430</span>          &quot;Test threw unexpected unknown exception inside a TEST_CHECK_THROWS block&quot;); \</div>
+<div class="line"><a id="l00431" name="l00431"></a><span class="lineno">  431</span>    } \</div>
+<div class="line"><a id="l00432" name="l00432"></a><span class="lineno">  432</span>  } while (false)</div>
+<div class="line"><a id="l00433" name="l00433"></a><span class="lineno">  433</span> </div>
+<div class="line"><a id="l00435" name="l00435"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a7585e793a391d301bd4cbdc66f024018">  435</a></span><span class="preprocessor">#define TEST_CHECK_EQUAL_WITHIN_EPS(a, b, eps) \</span></div>
+<div class="line"><a id="l00436" name="l00436"></a><span class="lineno">  436</span><span class="preprocessor">  do { \</span></div>
+<div class="line"><a id="l00437" name="l00437"></a><span class="lineno">  437</span><span class="preprocessor">    CHECK_INTERNAL(((a) &lt;= ((b) + (eps))) &amp;&amp; ((b) &lt;= ((a) + (eps))), \</span></div>
+<div class="line"><a id="l00438" name="l00438"></a><span class="lineno">  438</span><span class="preprocessor">        this-&gt;_id + &quot;\n&quot;</span> + &quot;Expected &#39;|&quot; #a &quot; - &quot; #b \</div>
+<div class="line"><a id="l00439" name="l00439"></a><span class="lineno">  439</span>        &quot;|&#39; &lt;= &#39;&quot; + FEAT::stringify(eps) + &quot;&#39; but was &#39;&quot; + \</div>
+<div class="line"><a id="l00440" name="l00440"></a><span class="lineno">  440</span>        FEAT::stringify((a) &lt; (b) ? (b) - (a) : (a) - (b)) + &quot;&#39;&quot; \</div>
+<div class="line"><a id="l00441" name="l00441"></a><span class="lineno">  441</span>        + &quot;, with &quot; #a &quot;=&quot; + FEAT::stringify(a) + &quot; and &quot; #b &quot;=&quot; + FEAT::stringify(b))\</div>
+<div class="line"><a id="l00442" name="l00442"></a><span class="lineno">  442</span>  } while (false)</div>
+<div class="line"><a id="l00443" name="l00443"></a><span class="lineno">  443</span> </div>
+<div class="line"><a id="l00445" name="l00445"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#ae9b1cfc8f38cdb393ed4cdfd3a90e159">  445</a></span><span class="preprocessor">#define TEST_CHECK_RELATIVE(a, b, eps) \</span></div>
+<div class="line"><a id="l00446" name="l00446"></a><span class="lineno">  446</span><span class="preprocessor">  do { \</span></div>
+<div class="line"><a id="l00447" name="l00447"></a><span class="lineno">  447</span><span class="preprocessor">    CHECK_INTERNAL(Math::abs((a) - (b)) &lt;= (eps)*Math::abs(b), \</span></div>
+<div class="line"><a id="l00448" name="l00448"></a><span class="lineno">  448</span><span class="preprocessor">        this-&gt;_id + &quot;\n&quot;</span> + &quot;Expected &#39;|&quot; #a &quot; - &quot; #b \</div>
+<div class="line"><a id="l00449" name="l00449"></a><span class="lineno">  449</span>        &quot;|&#39; &lt;= &#39;&quot; + FEAT::stringify(eps) + &quot;*|&quot; #b &quot;|&#39; = &#39;&quot; + \</div>
+<div class="line"><a id="l00450" name="l00450"></a><span class="lineno">  450</span>        FEAT::stringify((eps)*Math::abs(b)) + &quot;&#39; but was &#39;&quot; + \</div>
+<div class="line"><a id="l00451" name="l00451"></a><span class="lineno">  451</span>        FEAT::stringify(Math::abs((a) - (b))) + &quot;&#39;&quot; \</div>
+<div class="line"><a id="l00452" name="l00452"></a><span class="lineno">  452</span>        + &quot;, with &quot; #a &quot;=&quot; + FEAT::stringify(a) + &quot; and &quot; #b &quot;=&quot; + FEAT::stringify(b))\</div>
+<div class="line"><a id="l00453" name="l00453"></a><span class="lineno">  453</span>  } while (false)</div>
+<div class="line"><a id="l00454" name="l00454"></a><span class="lineno">  454</span> </div>
+<div class="line"><a id="l00456" name="l00456"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a5ac5be32c01b54e44938fce83d4e5f51">  456</a></span><span class="preprocessor">#define TEST_CHECK_LESS_THAN(a, b) \</span></div>
+<div class="line"><a id="l00457" name="l00457"></a><span class="lineno">  457</span><span class="preprocessor">  do { \</span></div>
+<div class="line"><a id="l00458" name="l00458"></a><span class="lineno">  458</span><span class="preprocessor">    CHECK_INTERNAL((a) &lt; (b), this-&gt;_id + &quot;\n&quot;</span> +  &quot;Expected &#39;&quot; #a &quot;&#39; to be less than \n&#39;&quot; + FEAT::stringify(b) + &quot;&#39;\nbut got\n&#39;&quot; + FEAT::stringify(a) + &quot;&#39;&quot;)\</div>
+<div class="line"><a id="l00459" name="l00459"></a><span class="lineno">  459</span>  } while (false)</div>
+<div class="line"><a id="l00460" name="l00460"></a><span class="lineno">  460</span> </div>
+<div class="line"><a id="l00462" name="l00462"></a><span class="lineno"><a class="line" href="test__system_8hpp.html#a29fc8ef53f555acfd8901be6843345b1">  462</a></span><span class="preprocessor">#define TEST(pre, test, post) \</span></div>
+<div class="line"><a id="l00463" name="l00463"></a><span class="lineno">  463</span><span class="preprocessor">  do { \</span></div>
+<div class="line"><a id="l00464" name="l00464"></a><span class="lineno">  464</span><span class="preprocessor">    pre; \</span></div>
+<div class="line"><a id="l00465" name="l00465"></a><span class="lineno">  465</span><span class="preprocessor">    try { \</span></div>
+<div class="line"><a id="l00466" name="l00466"></a><span class="lineno">  466</span><span class="preprocessor">      test; \</span></div>
+<div class="line"><a id="l00467" name="l00467"></a><span class="lineno">  467</span><span class="preprocessor">    } catch (const FEAT::TestSystem::TestFailedException &amp; test_e) { \</span></div>
+<div class="line"><a id="l00468" name="l00468"></a><span class="lineno">  468</span><span class="preprocessor">      post; \</span></div>
+<div class="line"><a id="l00469" name="l00469"></a><span class="lineno">  469</span><span class="preprocessor">      throw; } \</span></div>
+<div class="line"><a id="l00470" name="l00470"></a><span class="lineno">  470</span><span class="preprocessor">    post; \</span></div>
+<div class="line"><a id="l00471" name="l00471"></a><span class="lineno">  471</span><span class="preprocessor">  } while (false)</span></div>
 <div class="ttc" id="abase__header_8hpp_html"><div class="ttname"><a href="base__header_8hpp.html">base_header.hpp</a></div><div class="ttdoc">FEAT Kernel base header.</div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_string_html"><div class="ttname"><a href="class_f_e_a_t_1_1_string.html">FEAT::String</a></div><div class="ttdoc">String class implementation.</div><div class="ttdef"><b>Definition:</b> <a href="string_8hpp_source.html#l00044">string.hpp:46</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_test_system_1_1_test_failed_exception_html"><div class="ttname"><a href="class_f_e_a_t_1_1_test_system_1_1_test_failed_exception.html">FEAT::TestSystem::TestFailedException</a></div><div class="ttdoc">exception thrown by the check method in UnitTest</div><div class="ttdef"><b>Definition:</b> <a href="test__system_8hpp_source.html#l00043">test_system.hpp:45</a></div></div>
@@ -454,10 +522,12 @@ $(document).ready(function(){initNavTree('test__system_8hpp_source.html',''); in
 <div class="ttc" id="aclass_f_e_a_t_1_1_test_system_1_1_unit_test_html_aca7247c86c1a32944732b6e08060cb79"><div class="ttname"><a href="class_f_e_a_t_1_1_test_system_1_1_unit_test.html#aca7247c86c1a32944732b6e08060cb79">FEAT::TestSystem::UnitTest::_datatype_name</a></div><div class="ttdeci">String _datatype_name</div><div class="ttdoc">precision description String</div><div class="ttdef"><b>Definition:</b> <a href="test__system_8hpp_source.html#l00232">test_system.hpp:232</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_test_system_1_1_unit_test_html_ae3c2f906f0942c48f4e2b6b4dd181a85"><div class="ttname"><a href="class_f_e_a_t_1_1_test_system_1_1_unit_test.html#ae3c2f906f0942c48f4e2b6b4dd181a85">FEAT::TestSystem::UnitTest::_preferred_backend</a></div><div class="ttdeci">PreferredBackend _preferred_backend</div><div class="ttdoc">preferred compute intensive backend</div><div class="ttdef"><b>Definition:</b> <a href="test__system_8hpp_source.html#l00236">test_system.hpp:236</a></div></div>
 <div class="ttc" id="aexception_8hpp_html"><div class="ttname"><a href="exception_8hpp.html">exception.hpp</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_1_1_math_html_a564d69313ee91de438926de491613096"><div class="ttname"><a href="namespace_f_e_a_t_1_1_math.html#a564d69313ee91de438926de491613096">FEAT::Math::pow</a></div><div class="ttdeci">T_ pow(T_ x, T_ y)</div><div class="ttdoc">Returns x raised to the power of y.</div><div class="ttdef"><b>Definition:</b> <a href="math_8hpp_source.html#l00643">math.hpp:643</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00011">adjactor.hpp:12</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_html_a050b7378896da037a96211e8db059029"><div class="ttname"><a href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029">FEAT::PreferredBackend</a></div><div class="ttdeci">PreferredBackend</div><div class="ttdoc">The backend that shall be used in all compute heavy calculations.</div><div class="ttdef"><b>Definition:</b> <a href="backend_8hpp_source.html#l00123">backend.hpp:124</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_html_a050b7378896da037a96211e8db059029a3d517f8924ac7fd03699a29d97dc52d9"><div class="ttname"><a href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a3d517f8924ac7fd03699a29d97dc52d9">FEAT::PreferredBackend::generic</a></div><div class="ttdeci">@ generic</div></div>
 <div class="ttc" id="anamespace_f_e_a_t_html_a5eca21c2244b8e23da100b311bcda535"><div class="ttname"><a href="namespace_f_e_a_t.html#a5eca21c2244b8e23da100b311bcda535">FEAT::stringify</a></div><div class="ttdeci">String stringify(const T_ &amp;item)</div><div class="ttdoc">Converts an item into a String.</div><div class="ttdef"><b>Definition:</b> <a href="string_8hpp_source.html#l00944">string.hpp:944</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_a8c47ff8b285a0bdc256ac0d394c06c7e"><div class="ttname"><a href="namespace_f_e_a_t.html#a8c47ff8b285a0bdc256ac0d394c06c7e">FEAT::Half</a></div><div class="ttdeci">__half Half</div><div class="ttdoc">Half data type.</div><div class="ttdef"><b>Definition:</b> <a href="half_8hpp_source.html#l00025">half.hpp:25</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

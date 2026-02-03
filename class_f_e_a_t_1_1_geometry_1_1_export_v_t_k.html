@@ -136,6 +136,10 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><b>ExportVTK</b> (const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html">ExportVTK</a> &amp;<a class="el" href="namespace_f_e_a_t_1_1_geometry.html#a9a08208ef110199cc9c70de1f8b83de6a795f3202b17cb6bc3d4b771d8c6c9eaf">other</a>)=default</td></tr>
 <tr class="memdesc:a9c69f24bb0fd974a4cb9772bd051fe18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copy constructor. <br /></td></tr>
 <tr class="separator:a9c69f24bb0fd974a4cb9772bd051fe18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1e4d98ebf57b83a8a980740eb2c2dec"><td class="memTemplParams" colspan="2">template&lt;typename DT_ &gt; </td></tr>
+<tr class="memitem:ae1e4d98ebf57b83a8a980740eb2c2dec"><td class="memTemplItemLeft" align="right" valign="top">&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#ae1e4d98ebf57b83a8a980740eb2c2dec">ExportVTK</a> (const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html">Geometry::CGALWrapper</a>&lt; DT_ &gt; &amp;cw, int var_prec=0)</td></tr>
+<tr class="memdesc:ae1e4d98ebf57b83a8a980740eb2c2dec"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#ae1e4d98ebf57b83a8a980740eb2c2dec">More...</a><br /></td></tr>
+<tr class="separator:ae1e4d98ebf57b83a8a980740eb2c2dec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0d08c20ae292d5add655cec1182e6d89"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a0d08c20ae292d5add655cec1182e6d89">ExportVTK</a> (const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#ad7e21a582c82be27009565549a972a84">MeshType</a> &amp;mesh, const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_mesh_part.html">MeshPart</a>&lt; <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#ad7e21a582c82be27009565549a972a84">MeshType</a> &gt; &amp;part, int var_prec=0)</td></tr>
 <tr class="memdesc:a0d08c20ae292d5add655cec1182e6d89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a0d08c20ae292d5add655cec1182e6d89">More...</a><br /></td></tr>
 <tr class="separator:a0d08c20ae292d5add655cec1182e6d89"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -154,6 +158,10 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~ExportVTK</b> ()=
 <tr class="memitem:acb1a392316504d9ffb91efbb9c6d05fc"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#acb1a392316504d9ffb91efbb9c6d05fc">add_cell_scalar</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;name, const T_ *data, double scaling_factor=1.0)</td></tr>
 <tr class="memdesc:acb1a392316504d9ffb91efbb9c6d05fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a scalar cell variable to the exporter.  <a href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#acb1a392316504d9ffb91efbb9c6d05fc">More...</a><br /></td></tr>
 <tr class="separator:acb1a392316504d9ffb91efbb9c6d05fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23cec58129a21b81a6c30b80aeaa967c"><td class="memTemplParams" colspan="2">template&lt;typename DT_ , int dim_&gt; </td></tr>
+<tr class="memitem:a23cec58129a21b81a6c30b80aeaa967c"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a23cec58129a21b81a6c30b80aeaa967c">add_cell_vector</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;name, const std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, dim_ &gt; &gt; &amp;v, double scaling_factor=1.0)</td></tr>
+<tr class="memdesc:a23cec58129a21b81a6c30b80aeaa967c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a vector-field cell variable given by a std::vector of <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html" title="Tiny Vector class template.">Tiny::Vector</a> to the exporter.  <a href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a23cec58129a21b81a6c30b80aeaa967c">More...</a><br /></td></tr>
+<tr class="separator:a23cec58129a21b81a6c30b80aeaa967c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa2c51ebe07a5b0ec804b75dfd6743f7c"><td class="memTemplParams" colspan="2">template&lt;typename T_ &gt; </td></tr>
 <tr class="memitem:aa2c51ebe07a5b0ec804b75dfd6743f7c"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#aa2c51ebe07a5b0ec804b75dfd6743f7c">add_cell_vector</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;name, const T_ *x, const T_ *y=nullptr, const T_ *z=nullptr, double scaling_factor=1.0)</td></tr>
 <tr class="memdesc:aa2c51ebe07a5b0ec804b75dfd6743f7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a vector-field cell variable to the exporter.  <a href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#aa2c51ebe07a5b0ec804b75dfd6743f7c">More...</a><br /></td></tr>
@@ -166,6 +174,10 @@ virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~ExportVTK</b> ()=
 <tr class="memitem:adb78e451e92e0188dbd3754cdbdd0854"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#adb78e451e92e0188dbd3754cdbdd0854">add_vertex_scalar</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;name, const T_ *data, double scaling_factor=1.0)</td></tr>
 <tr class="memdesc:adb78e451e92e0188dbd3754cdbdd0854"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a scalar vertex variable to the exporter.  <a href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#adb78e451e92e0188dbd3754cdbdd0854">More...</a><br /></td></tr>
 <tr class="separator:adb78e451e92e0188dbd3754cdbdd0854"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa2f225a60d7f14f10bb1208fdad12f67"><td class="memTemplParams" colspan="2">template&lt;typename DT_ , int dim_&gt; </td></tr>
+<tr class="memitem:aa2f225a60d7f14f10bb1208fdad12f67"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#aa2f225a60d7f14f10bb1208fdad12f67">add_vertex_vector</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;name, const std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, dim_ &gt; &gt; &amp;v, double scaling_factor=1.0)</td></tr>
+<tr class="memdesc:aa2f225a60d7f14f10bb1208fdad12f67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a vector-field vertex variable given by a std::vector of <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html" title="Tiny Vector class template.">Tiny::Vector</a> to the exporter.  <a href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#aa2f225a60d7f14f10bb1208fdad12f67">More...</a><br /></td></tr>
+<tr class="separator:aa2f225a60d7f14f10bb1208fdad12f67"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a178ae94962c9c9c639d41e9922c01cbe"><td class="memTemplParams" colspan="2">template&lt;typename T_ &gt; </td></tr>
 <tr class="memitem:a178ae94962c9c9c639d41e9922c01cbe"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a178ae94962c9c9c639d41e9922c01cbe">add_vertex_vector</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;name, const T_ *x, const T_ *y=nullptr, const T_ *z=nullptr, double scaling_factor=1.0)</td></tr>
 <tr class="memdesc:a178ae94962c9c9c639d41e9922c01cbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds a vector-field vertex variable to the exporter.  <a href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a178ae94962c9c9c639d41e9922c01cbe">More...</a><br /></td></tr>
@@ -251,7 +263,7 @@ class FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;</div><p >VTK exporter 
 </dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00118">118</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00123">123</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a6be6ab3b4cc8fae9cf53e17e9bda9260" name="a6be6ab3b4cc8fae9cf53e17e9bda9260"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6be6ab3b4cc8fae9cf53e17e9bda9260">&#9670;&#160;</a></span>CellShapeType</h2>
@@ -269,7 +281,7 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
 
 <p>shape type of exported cells </p>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00126">126</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00131">131</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
 </div>
 </div>
@@ -289,7 +301,7 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
 
 <p>mesh type </p>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00122">122</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00127">127</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
 </div>
 </div>
@@ -309,7 +321,7 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
 
 <p>our shape type </p>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00124">124</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00129">129</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
 </div>
 </div>
@@ -337,7 +349,7 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
 
 <p>our variable container </p>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00132">132</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00137">137</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
 </div>
 </div>
@@ -357,13 +369,13 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
 
 <p>our VTK shape type </p>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00128">128</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00133">133</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="ac66c1e6340b5421576a3d5daff1ab090" name="ac66c1e6340b5421576a3d5daff1ab090"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac66c1e6340b5421576a3d5daff1ab090">&#9670;&#160;</a></span>ExportVTK() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ac66c1e6340b5421576a3d5daff1ab090">&#9670;&#160;</a></span>ExportVTK() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -407,14 +419,14 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00170">170</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00175">175</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00142">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cells</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00140">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertices</a>.</p>
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00147">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cells</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00145">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertices</a>.</p>
 
 </div>
 </div>
 <a id="a0d08c20ae292d5add655cec1182e6d89" name="a0d08c20ae292d5add655cec1182e6d89"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0d08c20ae292d5add655cec1182e6d89">&#9670;&#160;</a></span>ExportVTK() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a0d08c20ae292d5add655cec1182e6d89">&#9670;&#160;</a></span>ExportVTK() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -465,9 +477,62 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00197">197</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00202">202</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00142">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cells</a>, <a class="el" href="export__vtk_8hpp_source.html#l00140">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertices</a>, <a class="el" href="mesh__part_8hpp_source.html#l00297">FEAT::Geometry::MeshPart&lt; MeshType_ &gt;::has_topology()</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00147">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cells</a>, <a class="el" href="export__vtk_8hpp_source.html#l00145">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertices</a>, <a class="el" href="mesh__part_8hpp_source.html#l00297">FEAT::Geometry::MeshPart&lt; MeshType_ &gt;::has_topology()</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
+
+</div>
+</div>
+<a id="ae1e4d98ebf57b83a8a980740eb2c2dec" name="ae1e4d98ebf57b83a8a980740eb2c2dec"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1e4d98ebf57b83a8a980740eb2c2dec">&#9670;&#160;</a></span>ExportVTK() <span class="overload">[3/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </div>
+<div class="memtemplate">
+template&lt;typename DT_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html">FEAT::Geometry::ExportVTK</a>&lt; Mesh_, cell_dim_ &gt;::ExportVTK </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html">Geometry::CGALWrapper</a>&lt; DT_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>cw</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>var_prec</em> = <code>0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">explicit</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">cw</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_resident">resident</a> reference to the cgal surface mesh. Must remain unchanged for the lifetime of this exporter.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">var_prec</td><td>Specifies the precision of the variable entries. If set to 0, the runtime's default precision is used. See the <code>precision</code> parameter of the <a class="el" href="namespace_f_e_a_t.html#abb8ee3d761bb7c3710a943fe34746ad2" title="Prints a floating point value to a string in scientific notation.">stringify_fp_sci()</a> function for details. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00256">256</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00147">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cells</a>, <a class="el" href="export__vtk_8hpp_source.html#l00145">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertices</a>, <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#ad4b7844bfa49141bb03edf512a8c9cfb">FEAT::Geometry::CGALWrapper&lt; DT_ &gt;::point()</a>, <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a8c8e87608e41167749c2d4c425fe0b83">FEAT::Geometry::CGALWrapper&lt; DT_ &gt;::vertices_around_face()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -527,16 +592,84 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This function creates a (deep) copy of the data array, so the <code>data</code> array can be deleted or overwritten after the return of this function. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00411">411</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00489">489</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00152">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_scalars</a>, <a class="el" href="export__vtk_8hpp_source.html#l00146">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_cells</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00157">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_scalars</a>, <a class="el" href="export__vtk_8hpp_source.html#l00151">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_cells</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00243">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::add_to_vtk_exporter()</a>, <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00604">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::add_to_vtk_exporter()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00564">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00243">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::add_to_vtk_exporter()</a>, <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00604">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::add_to_vtk_exporter()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00682">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write()</a>.</p>
+
+</div>
+</div>
+<a id="a23cec58129a21b81a6c30b80aeaa967c" name="a23cec58129a21b81a6c30b80aeaa967c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a23cec58129a21b81a6c30b80aeaa967c">&#9670;&#160;</a></span>add_cell_vector() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </div>
+<div class="memtemplate">
+template&lt;typename DT_ , int dim_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html">FEAT::Geometry::ExportVTK</a>&lt; Mesh_, cell_dim_ &gt;::add_cell_vector </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, dim_ &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>v</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>scaling_factor</em> = <code>1.0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Adds a vector-field cell variable given by a std::vector of <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html" title="Tiny Vector class template.">Tiny::Vector</a> to the exporter. </p>
+<p >This functions adds a 1D, 2D or 3D vector-field variable to the exporter.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">VectorType_</td><td><a class="el" href="namespace_f_e_a_t_1_1_type.html" title="Type namespace.">Type</a> of the input. Only DenseVectorBlocked and SparseVectorBlocked have the right interface at the moment.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>The name of the variable to be exported.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">v</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the vector containing the field values in the mesh cell.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">scaling_factor</td><td>A scaling factor applied to each datapoint.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>This function creates a (deep) copy of the vector data. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00621">621</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00159">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_vectors</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00151">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_cells</a>.</p>
 
 </div>
 </div>
 <a id="aa2c51ebe07a5b0ec804b75dfd6743f7c" name="aa2c51ebe07a5b0ec804b75dfd6743f7c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa2c51ebe07a5b0ec804b75dfd6743f7c">&#9670;&#160;</a></span>add_cell_vector() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2c51ebe07a5b0ec804b75dfd6743f7c">&#9670;&#160;</a></span>add_cell_vector() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -603,16 +736,16 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This function creates a (deep) copy of the three data arrays, so the data arrays can be deleted or overwritten after the return of this function. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00442">442</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00520">520</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00154">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_vectors</a>, <a class="el" href="export__vtk_8hpp_source.html#l00146">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_cells</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00159">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_vectors</a>, <a class="el" href="export__vtk_8hpp_source.html#l00151">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_cells</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00604">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::add_to_vtk_exporter()</a>.</p>
 
 </div>
 </div>
 <a id="af740fc82d811cb97e5456084c9ed05a5" name="af740fc82d811cb97e5456084c9ed05a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af740fc82d811cb97e5456084c9ed05a5">&#9670;&#160;</a></span>add_cell_vector() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#af740fc82d811cb97e5456084c9ed05a5">&#9670;&#160;</a></span>add_cell_vector() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -673,9 +806,9 @@ template&lt;typename VectorType_ &gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This function creates a (deep) copy of the vector data. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00503">503</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00581">581</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00154">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_vectors</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00146">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_cells</a>.</p>
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00159">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_vectors</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00151">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_cells</a>.</p>
 
 </div>
 </div>
@@ -734,16 +867,84 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This function creates a (deep) copy of the data array, so the <code>data</code> array can be deleted or overwritten after the return of this function. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00282">282</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00320">320</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00144">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_verts</a>, <a class="el" href="export__vtk_8hpp_source.html#l00148">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_scalars</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00149">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_verts</a>, <a class="el" href="export__vtk_8hpp_source.html#l00153">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_scalars</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00604">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::add_to_vtk_exporter()</a>.</p>
 
 </div>
 </div>
+<a id="aa2f225a60d7f14f10bb1208fdad12f67" name="aa2f225a60d7f14f10bb1208fdad12f67"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa2f225a60d7f14f10bb1208fdad12f67">&#9670;&#160;</a></span>add_vertex_vector() <span class="overload">[1/3]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </div>
+<div class="memtemplate">
+template&lt;typename DT_ , int dim_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html">FEAT::Geometry::ExportVTK</a>&lt; Mesh_, cell_dim_ &gt;::add_vertex_vector </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
+          <td class="paramname"><em>name</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; DT_, dim_ &gt; &gt; &amp;&#160;</td>
+          <td class="paramname"><em>v</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">double&#160;</td>
+          <td class="paramname"><em>scaling_factor</em> = <code>1.0</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Adds a vector-field vertex variable given by a std::vector of <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html" title="Tiny Vector class template.">Tiny::Vector</a> to the exporter. </p>
+<p >This functions adds a 1D, 2D or 3D vector-field variable to the exporter.</p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">VectorType_</td><td><a class="el" href="namespace_f_e_a_t_1_1_type.html" title="Type namespace.">Type</a> of the input. Only DenseVectorBlocked and SparseVectorBlocked have the right interface at the moment.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">name</td><td>The name of the variable to be exported.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">v</td><td>A <a class="el" href="resident_vs_transient.html#res_vs_tran_transient">transient</a> reference to the vector containing the field values in the mesh vertices.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">scaling_factor</td><td>A scaling factor applied to each datapoint.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section note"><dt>Note</dt><dd>This function creates a (deep) copy of the vector data. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00452">452</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00149">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_verts</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00155">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_vectors</a>.</p>
+
+</div>
+</div>
 <a id="a178ae94962c9c9c639d41e9922c01cbe" name="a178ae94962c9c9c639d41e9922c01cbe"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a178ae94962c9c9c639d41e9922c01cbe">&#9670;&#160;</a></span>add_vertex_vector() <span class="overload">[1/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a178ae94962c9c9c639d41e9922c01cbe">&#9670;&#160;</a></span>add_vertex_vector() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -810,16 +1011,16 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This function creates a (deep) copy of the three data arrays, so the data arrays can be deleted or overwritten after the return of this function. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00313">313</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00351">351</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00144">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_verts</a>, <a class="el" href="export__vtk_8hpp_source.html#l00150">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_vectors</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00149">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_verts</a>, <a class="el" href="export__vtk_8hpp_source.html#l00155">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_vectors</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="dudv__functional__control_8hpp_source.html#l00384">FEAT::Control::Meshopt::DuDvFunctionalControl&lt; DT_, IT_, DomainControl_ &gt;::add_to_vtk_exporter()</a>, <a class="el" href="hyperelasticity__functional__control_8hpp_source.html#l00402">FEAT::Control::Meshopt::HyperelasticityFunctionalControl&lt; DT_, IT_, DomainControl_, Hyperelasticity_ &gt;::add_to_vtk_exporter()</a>, and <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00604">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::add_to_vtk_exporter()</a>.</p>
 
 </div>
 </div>
 <a id="ab416bed860b82139b16057146fd2123f" name="ab416bed860b82139b16057146fd2123f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab416bed860b82139b16057146fd2123f">&#9670;&#160;</a></span>add_vertex_vector() <span class="overload">[2/2]</span></h2>
+<h2 class="memtitle"><span class="permalink"><a href="#ab416bed860b82139b16057146fd2123f">&#9670;&#160;</a></span>add_vertex_vector() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -880,9 +1081,9 @@ template&lt;typename VectorType_ &gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This function creates a (deep) copy of the vector data. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00374">374</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00412">412</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00144">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_verts</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00150">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_vectors</a>.</p>
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00149">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_verts</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00155">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_vectors</a>.</p>
 
 </div>
 </div>
@@ -913,9 +1114,9 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
 
 <p>Clears all vertex and cell variables in the exporter. </p>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00256">256</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00294">294</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00152">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_scalars</a>, <a class="el" href="export__vtk_8hpp_source.html#l00154">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_vectors</a>, <a class="el" href="export__vtk_8hpp_source.html#l00148">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_scalars</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00150">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_vectors</a>.</p>
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00157">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_scalars</a>, <a class="el" href="export__vtk_8hpp_source.html#l00159">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_vectors</a>, <a class="el" href="export__vtk_8hpp_source.html#l00153">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_scalars</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00155">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_vectors</a>.</p>
 
 </div>
 </div>
@@ -953,11 +1154,11 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00528">528</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00646">646</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00673">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00791">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00564">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00682">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write()</a>.</p>
 
 </div>
 </div>
@@ -1007,9 +1208,9 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00623">623</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00741">741</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00146">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_cells</a>, <a class="el" href="export__vtk_8hpp_source.html#l00411">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_cell_scalar()</a>, <a class="el" href="math_8hpp_source.html#l00231">FEAT::Math::ilog10()</a>, <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, <a class="el" href="dist_8hpp_source.html#l01494">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01506">FEAT::Dist::Comm::size()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00820">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_pvtu()</a>, <a class="el" href="dist__file__io_8cpp_source.html#l00434">FEAT::DistFileIO::write_sequence()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00673">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00151">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_cells</a>, <a class="el" href="export__vtk_8hpp_source.html#l00489">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_cell_scalar()</a>, <a class="el" href="math_8hpp_source.html#l00231">FEAT::Math::ilog10()</a>, <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, <a class="el" href="dist_8hpp_source.html#l01494">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01506">FEAT::Dist::Comm::size()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00938">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_pvtu()</a>, <a class="el" href="dist__file__io_8cpp_source.html#l00434">FEAT::DistFileIO::write_sequence()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00791">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
 
 </div>
 </div>
@@ -1067,9 +1268,9 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
 </dl>
 <dl class="section note"><dt>Note</dt><dd>Specifying <code>nparts</code> &lt; 1 is equivalent to calling <code>write(filename)</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00564">564</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00682">682</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00146">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_cells</a>, <a class="el" href="export__vtk_8hpp_source.html#l00411">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_cell_scalar()</a>, <a class="el" href="math_8hpp_source.html#l00231">FEAT::Math::ilog10()</a>, <a class="el" href="string_8hpp_source.html#l00944">FEAT::stringify()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00528">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00820">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_pvtu()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00151">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_cells</a>, <a class="el" href="export__vtk_8hpp_source.html#l00489">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_cell_scalar()</a>, <a class="el" href="math_8hpp_source.html#l00231">FEAT::Math::ilog10()</a>, <a class="el" href="string_8hpp_source.html#l00944">FEAT::stringify()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00646">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00938">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_pvtu()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -1125,11 +1326,11 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00820">820</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00938">938</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00152">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_scalars</a>, <a class="el" href="export__vtk_8hpp_source.html#l00154">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_vectors</a>, <a class="el" href="export__vtk_8hpp_source.html#l00148">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_scalars</a>, <a class="el" href="export__vtk_8hpp_source.html#l00150">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_vectors</a>, <a class="el" href="math_8hpp_source.html#l00231">FEAT::Math::ilog10()</a>, <a class="el" href="string_8hpp_source.html#l00392">FEAT::String::pad_front()</a>, <a class="el" href="string_8hpp_source.html#l00944">FEAT::stringify()</a>, <a class="el" href="base__header_8hpp_source.html#l00110">FEAT::version_major</a>, <a class="el" href="base__header_8hpp_source.html#l00112">FEAT::version_minor</a>, and <a class="el" href="base__header_8hpp_source.html#l00114">FEAT::version_patch</a>.</p>
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00157">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_scalars</a>, <a class="el" href="export__vtk_8hpp_source.html#l00159">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_vectors</a>, <a class="el" href="export__vtk_8hpp_source.html#l00153">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_scalars</a>, <a class="el" href="export__vtk_8hpp_source.html#l00155">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_vectors</a>, <a class="el" href="math_8hpp_source.html#l00231">FEAT::Math::ilog10()</a>, <a class="el" href="string_8hpp_source.html#l00392">FEAT::String::pad_front()</a>, <a class="el" href="string_8hpp_source.html#l00944">FEAT::stringify()</a>, <a class="el" href="base__header_8hpp_source.html#l00110">FEAT::version_major</a>, <a class="el" href="base__header_8hpp_source.html#l00112">FEAT::version_minor</a>, and <a class="el" href="base__header_8hpp_source.html#l00114">FEAT::version_patch</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00564">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00682">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write()</a>.</p>
 
 </div>
 </div>
@@ -1167,11 +1368,11 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00673">673</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00791">791</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00152">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_scalars</a>, <a class="el" href="export__vtk_8hpp_source.html#l00154">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_vectors</a>, <a class="el" href="export__vtk_8hpp_source.html#l00142">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cells</a>, <a class="el" href="export__vtk_8hpp_source.html#l00146">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_cells</a>, <a class="el" href="export__vtk_8hpp_source.html#l00144">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_verts</a>, <a class="el" href="export__vtk_8hpp_source.html#l00156">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_var_prec</a>, <a class="el" href="export__vtk_8hpp_source.html#l00148">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_scalars</a>, <a class="el" href="export__vtk_8hpp_source.html#l00150">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_vectors</a>, <a class="el" href="export__vtk_8hpp_source.html#l00140">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertices</a>, <a class="el" href="string_8hpp_source.html#l01088">FEAT::stringify_fp_sci()</a>, <a class="el" href="base__header_8hpp_source.html#l00110">FEAT::version_major</a>, <a class="el" href="base__header_8hpp_source.html#l00112">FEAT::version_minor</a>, and <a class="el" href="base__header_8hpp_source.html#l00114">FEAT::version_patch</a>.</p>
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00157">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_scalars</a>, <a class="el" href="export__vtk_8hpp_source.html#l00159">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cell_vectors</a>, <a class="el" href="export__vtk_8hpp_source.html#l00147">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_cells</a>, <a class="el" href="export__vtk_8hpp_source.html#l00151">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_cells</a>, <a class="el" href="export__vtk_8hpp_source.html#l00149">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_num_verts</a>, <a class="el" href="export__vtk_8hpp_source.html#l00161">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_var_prec</a>, <a class="el" href="export__vtk_8hpp_source.html#l00153">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_scalars</a>, <a class="el" href="export__vtk_8hpp_source.html#l00155">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertex_vectors</a>, <a class="el" href="export__vtk_8hpp_source.html#l00145">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_vertices</a>, <a class="el" href="string_8hpp_source.html#l01088">FEAT::stringify_fp_sci()</a>, <a class="el" href="base__header_8hpp_source.html#l00110">FEAT::version_major</a>, <a class="el" href="base__header_8hpp_source.html#l00112">FEAT::version_minor</a>, and <a class="el" href="base__header_8hpp_source.html#l00114">FEAT::version_patch</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00528">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00646">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write()</a>.</p>
 
 </div>
 </div>
@@ -1200,9 +1401,9 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
 
 <p>cell variable list </p>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00152">152</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00157">157</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00411">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_cell_scalar()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00256">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::clear()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00820">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_pvtu()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00673">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00489">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_cell_scalar()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00294">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::clear()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00938">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_pvtu()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00791">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
 
 </div>
 </div>
@@ -1230,9 +1431,9 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
 
 <p>cell field list </p>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00154">154</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00159">159</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00442">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_cell_vector()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00256">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::clear()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00820">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_pvtu()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00673">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00520">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_cell_vector()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00294">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::clear()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00938">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_pvtu()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00791">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
 
 </div>
 </div>
@@ -1260,9 +1461,9 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
 
 <p>Accessor function for cells. </p>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00142">142</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00147">147</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00170">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::ExportVTK()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00673">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00175">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::ExportVTK()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00791">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
 
 </div>
 </div>
@@ -1290,9 +1491,9 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
 
 <p>number of cells in mesh </p>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00146">146</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00151">151</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00411">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_cell_scalar()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00442">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_cell_vector()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00564">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00673">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00489">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_cell_scalar()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00520">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_cell_vector()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00682">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00791">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
 
 </div>
 </div>
@@ -1320,9 +1521,9 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
 
 <p>number of vertices in mesh </p>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00144">144</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00149">149</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00282">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_vertex_scalar()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00313">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_vertex_vector()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00673">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00320">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_vertex_scalar()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00351">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_vertex_vector()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00791">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
 
 </div>
 </div>
@@ -1350,9 +1551,9 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
 
 <p>precision of variables </p>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00156">156</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00161">161</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00673">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00791">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
 
 </div>
 </div>
@@ -1380,9 +1581,9 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
 
 <p>vertex variable list </p>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00148">148</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00153">153</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00282">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_vertex_scalar()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00256">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::clear()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00820">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_pvtu()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00673">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00320">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_vertex_scalar()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00294">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::clear()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00938">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_pvtu()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00791">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
 
 </div>
 </div>
@@ -1410,9 +1611,9 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
 
 <p>vertex field list </p>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00150">150</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00155">155</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00313">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_vertex_vector()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00256">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::clear()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00820">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_pvtu()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00673">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00351">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_vertex_vector()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00294">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::clear()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00938">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_pvtu()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00791">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
 
 </div>
 </div>
@@ -1440,9 +1641,9 @@ template&lt;typename Mesh_ , int cell_dim_ = Mesh_::ShapeType::dimension&gt; </d
 
 <p>Accessor function for vertices. </p>
 
-<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00140">140</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="export__vtk_8hpp_source.html#l00145">145</a> of file <a class="el" href="export__vtk_8hpp_source.html">export_vtk.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00170">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::ExportVTK()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00673">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l00175">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::ExportVTK()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00791">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
 
 </div>
 </div>

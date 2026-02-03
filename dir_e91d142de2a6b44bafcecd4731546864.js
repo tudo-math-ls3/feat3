@@ -1,5 +1,6 @@
 var dir_e91d142de2a6b44bafcecd4731546864 =
 [
+    [ "adaptive_parti_domain_control.hpp", "adaptive__parti__domain__control_8hpp_source.html", null ],
     [ "domain_control.hpp", "domain__control_8hpp_source.html", null ],
     [ "domain_level.hpp", "domain__level_8hpp_source.html", null ],
     [ "parti_domain_control.hpp", "parti__domain__control_8hpp_source.html", null ],

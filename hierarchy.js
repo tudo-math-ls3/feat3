@@ -64,12 +64,15 @@ var hierarchy =
       [ "FEAT::Control::Domain::HierarchUnitCubeDomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_hierarch_unit_cube_domain_control.html", null ],
       [ "FEAT::Control::Domain::HierarchUnitCubeDomainControl2< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_hierarch_unit_cube_domain_control2.html", null ],
       [ "FEAT::Control::Domain::PartiDomainControlBase< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html", [
-        [ "FEAT::Control::Domain::PartiDomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html", null ],
+        [ "FEAT::Control::Domain::PartiDomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html", [
+          [ "FEAT::Control::Domain::AdaptivePartiDomainControl< DomainLevel_, TemplateSet_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_adaptive_parti_domain_control.html", null ]
+        ] ],
         [ "FEAT::Control::Domain::VoxelDomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_control.html", null ]
       ] ],
       [ "FEAT::Control::Domain::UnitCubeDomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_unit_cube_domain_control.html", null ]
     ] ],
     [ "DomainLevel_", null, [
+      [ "FEAT::Control::Domain::AdaptiveLevelWrapper< DomainLevel_, TemplateSet_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_adaptive_level_wrapper.html", null ],
       [ "FEAT::Control::Domain::VoxelDomainLevelWrapper< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_level_wrapper.html", null ]
     ] ],
     [ "FEAT::Cubature::DriverBase< Shape::Simplex< 2 > >", "class_f_e_a_t_1_1_cubature_1_1_driver_base.html", [
@@ -681,6 +684,8 @@ var hierarchy =
     [ "FEAT::Geometry::Atlas::SphereTraits", "struct_f_e_a_t_1_1_geometry_1_1_atlas_1_1_sphere_traits.html", null ],
     [ "FEAT::Geometry::Atlas::SurfaceMeshTraits", "struct_f_e_a_t_1_1_geometry_1_1_atlas_1_1_surface_mesh_traits.html", null ],
     [ "FEAT::Geometry::AttributeSet< DataType_ >", "class_f_e_a_t_1_1_geometry_1_1_attribute_set.html", null ],
+    [ "FEAT::Geometry::CGALValueIteratorWrapper< T_ >", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_value_iterator_wrapper.html", null ],
+    [ "FEAT::Geometry::CGALVerticesAroundFaceAdjactor< DT_ >", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_vertices_around_face_adjactor.html", null ],
     [ "FEAT::Geometry::CGALWrapper< DT_ >", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html", null ],
     [ "FEAT::Geometry::ChartHitTestFactory< Mesh_, Chart_ >::ChartHitFunction", "class_f_e_a_t_1_1_geometry_1_1_chart_hit_test_factory_1_1_chart_hit_function.html", null ],
     [ "FEAT::Geometry::ConformalMesh< Shape_, num_coords_, Coord_ >", "class_f_e_a_t_1_1_geometry_1_1_conformal_mesh.html", null ],
@@ -706,6 +711,9 @@ var hierarchy =
     [ "FEAT::Geometry::Factory< StructuredMesh< shape_dim_, num_coords_, Coord_ > >", "class_f_e_a_t_1_1_geometry_1_1_factory_3_01_structured_mesh_3_01shape__dim___00_01num__coords___00_01_coord___01_4_01_4.html", [
       [ "FEAT::Geometry::StandardRefinery< StructuredMesh< shape_dim_, num_coords_, Coord_ > >", "class_f_e_a_t_1_1_geometry_1_1_standard_refinery_3_01_structured_mesh_3_01shape__dim___00_01num_b4b6d554135f436a9680aeb85e74df96.html", null ]
     ] ],
+    [ "FEAT::Geometry::FoundationAdaptiveAdjactor< AdaptiveMeshType_, dim_ >", "class_f_e_a_t_1_1_geometry_1_1_foundation_adaptive_adjactor.html", null ],
+    [ "FEAT::Geometry::FoundationAdaptiveAdjactor< AdaptiveMeshType_, dim_ >::OnceIterator", "class_f_e_a_t_1_1_geometry_1_1_foundation_adaptive_adjactor_1_1_once_iterator.html", null ],
+    [ "FEAT::Geometry::Gap", "struct_f_e_a_t_1_1_geometry_1_1_gap.html", null ],
     [ "FEAT::Geometry::IndexCalculator< Shape_, face_dim_ >", "class_f_e_a_t_1_1_geometry_1_1_index_calculator.html", null ],
     [ "FEAT::Geometry::IndexSet< num_indices_ >", "class_f_e_a_t_1_1_geometry_1_1_index_set.html", null ],
     [ "FEAT::Geometry::IndexTree< Shape_ >", "class_f_e_a_t_1_1_geometry_1_1_index_tree.html", null ],
@@ -757,6 +765,7 @@ var hierarchy =
     [ "FEAT::Geometry::Intern::VertexEmbedder< Shape::Hexahedron, 1 >", "struct_f_e_a_t_1_1_geometry_1_1_intern_1_1_vertex_embedder_3_01_shape_1_1_hexahedron_00_011_01_4.html", null ],
     [ "FEAT::Geometry::Intern::VertexEmbedder< Shape::Hexahedron, 2 >", "struct_f_e_a_t_1_1_geometry_1_1_intern_1_1_vertex_embedder_3_01_shape_1_1_hexahedron_00_012_01_4.html", null ],
     [ "FEAT::Geometry::Intern::VertexEmbedder< Shape::Quadrilateral, 1 >", "struct_f_e_a_t_1_1_geometry_1_1_intern_1_1_vertex_embedder_3_01_shape_1_1_quadrilateral_00_011_01_4.html", null ],
+    [ "FEAT::Geometry::IntersectionData< DT_ >", "struct_f_e_a_t_1_1_geometry_1_1_intersection_data.html", null ],
     [ "FEAT::Geometry::IsolatedPointRefinementType< Shape_ >", "class_f_e_a_t_1_1_geometry_1_1_isolated_point_refinement_type.html", null ],
     [ "FEAT::Geometry::IsolatedPointTemplateSet< RawData_ >", "class_f_e_a_t_1_1_geometry_1_1_isolated_point_template_set.html", null ],
     [ "FEAT::Geometry::IsolatedPointVertexMarking", "struct_f_e_a_t_1_1_geometry_1_1_isolated_point_vertex_marking.html", null ],
@@ -771,6 +780,7 @@ var hierarchy =
     [ "FEAT::Geometry::MeshExtruderFactory< SourceMesh_ >", "class_f_e_a_t_1_1_geometry_1_1_mesh_extruder_factory.html", null ],
     [ "FEAT::Geometry::MeshFileReader", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html", null ],
     [ "FEAT::Geometry::MeshFileWriter", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_writer.html", null ],
+    [ "FEAT::Geometry::MeshHexerSurfaceMesh", "class_f_e_a_t_1_1_geometry_1_1_mesh_hexer_surface_mesh.html", null ],
     [ "FEAT::Geometry::MeshNode< RootMesh_, ThisMesh_ >", "class_f_e_a_t_1_1_geometry_1_1_mesh_node.html", [
       [ "FEAT::Geometry::RootMeshNode< MeshType >", "class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html", null ]
     ] ],
@@ -807,6 +817,8 @@ var hierarchy =
     [ "FEAT::Geometry::PatchPartMapHolder< Shape_, dim_ >", "class_f_e_a_t_1_1_geometry_1_1_patch_part_map_holder.html", null ],
     [ "FEAT::Geometry::RawEntity< Shape_, num_coords_ >", "struct_f_e_a_t_1_1_geometry_1_1_raw_entity.html", null ],
     [ "FEAT::Geometry::RawTemplate< Shape_ >", "struct_f_e_a_t_1_1_geometry_1_1_raw_template.html", null ],
+    [ "FEAT::Geometry::Ray< Vector_ >", "struct_f_e_a_t_1_1_geometry_1_1_ray.html", null ],
+    [ "FEAT::Geometry::RayIntersectionPrimitives< DT_ >", "class_f_e_a_t_1_1_geometry_1_1_ray_intersection_primitives.html", null ],
     [ "FEAT::Geometry::RedundantIndexSetBuilder< Shape_ >", "class_f_e_a_t_1_1_geometry_1_1_redundant_index_set_builder.html", null ],
     [ "FEAT::Geometry::RefineFactory< Mesh_, Factory_ >", "class_f_e_a_t_1_1_geometry_1_1_refine_factory.html", null ],
     [ "FEAT::Geometry::RefinementTemplate< Shape_, CoShape_ >", "struct_f_e_a_t_1_1_geometry_1_1_refinement_template.html", null ],
@@ -840,6 +852,7 @@ var hierarchy =
     [ "FEAT::Geometry::UnitSphereFactory< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_unit_sphere_factory.html", null ],
     [ "FEAT::Geometry::UnitStarCubeFactory< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_unit_star_cube_factory.html", null ],
     [ "FEAT::Geometry::VertexMarking< Shape_ >", "struct_f_e_a_t_1_1_geometry_1_1_vertex_marking.html", null ],
+    [ "FEAT::Geometry::VertexRaycaster< MeshType_ >", "class_f_e_a_t_1_1_geometry_1_1_vertex_raycaster.html", null ],
     [ "FEAT::Geometry::VertexSet< num_coords_, Coord_ >", "struct_f_e_a_t_1_1_geometry_1_1_vertex_set.html", null ],
     [ "FEAT::Geometry::VoxelMap", "class_f_e_a_t_1_1_geometry_1_1_voxel_map.html", null ],
     [ "FEAT::Geometry::VoxelMap::FileHeader", "struct_f_e_a_t_1_1_geometry_1_1_voxel_map_1_1_file_header.html", null ],

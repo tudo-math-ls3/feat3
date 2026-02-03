@@ -208,11 +208,11 @@ $(document).ready(function(){initNavTree('direct__sparse__solver__mkl_8cpp_sourc
 <div class="line"><a id="l00118" name="l00118"></a><span class="lineno">  118</span><span class="preprocessor">#endif </span><span class="comment">// FEAT_HAVE_MPI</span></div>
 <div class="line"><a id="l00119" name="l00119"></a><span class="lineno">  119</span> </div>
 <div class="line"><a id="l00120" name="l00120"></a><span class="lineno">  120</span>          <span class="comment">// allocate matrix and vector arrays</span></div>
-<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>          row_ptr.resize(num_owned_dofs+1u, 0u);</div>
-<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>          col_idx.resize(num_owned_nzes, 0u);</div>
-<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>          mat_val.resize(num_owned_nzes, 0.0);</div>
-<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>          rhs_val.resize(num_owned_dofs, 0.0);</div>
-<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>          sol_val.resize(num_owned_dofs, 0.0);</div>
+<div class="line"><a id="l00121" name="l00121"></a><span class="lineno">  121</span>          row_ptr.resize(std::size_t(num_owned_dofs+1), 0u);</div>
+<div class="line"><a id="l00122" name="l00122"></a><span class="lineno">  122</span>          col_idx.resize(std::size_t(num_owned_nzes), 0u);</div>
+<div class="line"><a id="l00123" name="l00123"></a><span class="lineno">  123</span>          mat_val.resize(std::size_t(num_owned_nzes), 0.0);</div>
+<div class="line"><a id="l00124" name="l00124"></a><span class="lineno">  124</span>          rhs_val.resize(std::size_t(num_owned_dofs), 0.0);</div>
+<div class="line"><a id="l00125" name="l00125"></a><span class="lineno">  125</span>          sol_val.resize(std::size_t(num_owned_dofs), 0.0);</div>
 <div class="line"><a id="l00126" name="l00126"></a><span class="lineno">  126</span>        }</div>
 <div class="line"><a id="l00127" name="l00127"></a><span class="lineno">  127</span> </div>
 <div class="line"><a id="l00128" name="l00128"></a><span class="lineno">  128</span>        ~MKLDSS_Core()</div>

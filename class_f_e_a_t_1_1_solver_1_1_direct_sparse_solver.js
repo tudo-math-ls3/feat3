@@ -10,6 +10,7 @@ var class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver =
     [ "~DirectSparseSolver", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a8e103a7c5fa5505931908e8472eb82f8", null ],
     [ "_create_core_cudss", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a79dfccf8e43f0a6fd3f6aecd7cbe4aa1", null ],
     [ "_create_core_mkldss", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a70a26c7be7b0462d0effb1ec50038020", null ],
+    [ "_create_core_mumps", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#af5172ae89aa9148913abeb9df4f5ca11", null ],
     [ "_create_core_superlu", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a79553109a033824954b3c6dd86555b67", null ],
     [ "_create_core_umfpack", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a06f1e4453d17a99df5583033fd3cf9d4", null ],
     [ "_download_vector", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a789568423271ce99012675fb81019e9b", null ],
@@ -66,6 +67,7 @@ var class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver =
     [ "_comm_self", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a3cd993260b72e64a99fae533594e0e70", null ],
     [ "_core_cudss", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a0dc948cf98b8a0a5715a1844b91c9528", null ],
     [ "_core_mkldss", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a9382c90b74675e859a96ba029111e77a", null ],
+    [ "_core_mumps", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a4ae6fe9ed04cffc33aa9c706a96bde09", null ],
     [ "_core_superlu", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a12f5142bae88b96eed8fdfea372c9342", null ],
     [ "_core_umfpack", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a8d87ac5474c3a926db751e959c553c5b", null ],
     [ "_preferred_backend", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a3ec4fb3d25159ff4646bd3409b955fb0", null ],
@@ -75,6 +77,7 @@ var class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver =
     [ "have_backend_global", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a2d5dede670eb3bf0526930be2dae201e", null ],
     [ "have_backend_local", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#ad4fddd69cf7f2733092712daf3e9790f", null ],
     [ "have_backend_mkldss", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a4bf1d219791748bae1b2d2aaaec2f499", null ],
+    [ "have_backend_mumps", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a5a672f612b995238e07720b10f953343", null ],
     [ "have_backend_superlu", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#abc72cb34b50b703d7dd37204da7c0aa4", null ],
     [ "have_backend_umfpack", "class_f_e_a_t_1_1_solver_1_1_direct_sparse_solver.html#a720ab18cf599651e6d960dea8f0d3f8e", null ]
 ];
