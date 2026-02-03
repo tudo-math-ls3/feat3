@@ -246,6 +246,25 @@ namespace FEAT
       /// tests whether the cgal mesh intersects with the line segment a->b
       bool intersects_line(const PointType& a, const PointType& b) const;
 
+      bool intersects_hexaedron(const std::array<FEAT::Geometry::CGALWrapper<DT_>::PointType, 8>& points) const;
+
+      template<std::size_t num_verts_>
+      bool intersects_polygon(const std::array<FEAT::Geometry::CGALWrapper<DT_>::PointType, num_verts_>& points) const
+      {
+        if constexpr(num_verts_ == 2)
+        {
+          return intersects_line(points[0], points[1]);
+        }
+        else if constexpr(num_verts_ == 8)
+        {
+          return intersects_hexaedron(points);
+        }
+
+        XABORTM("Not implemented");
+
+        return false;
+      }
+
       /// Applies an affine transformation to the underlying polyhedron and reinitializes the AABB tree
       /// see https://doc.cgal.org/5.5.3/Kernel_23/classCGAL_1_1Aff__transformation__3.html for definition
       /// of transformation matrix and translation

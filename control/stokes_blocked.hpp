@@ -351,11 +351,11 @@ namespace FEAT
         this->compile_scalar_transfer();
       }
 
-      template<typename DomainLevel_>
+      template<typename DomainLevel_, template<typename> class SlagDomainLevelWrapper_>
       void assemble_transfers_voxel(
         const StokesBlockedSystemLevel& sys_lvl_coarse,
-        const Domain::VirtualLevel<Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_fine,
-        const Domain::VirtualLevel<Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_coarse,
+        const Domain::VirtualLevel<SlagDomainLevelWrapper_<DomainLevel_>>& virt_lvl_fine,
+        const Domain::VirtualLevel<SlagDomainLevelWrapper_<DomainLevel_>>& virt_lvl_coarse,
         const String& cubature, bool trunc_v = false, bool trunc_p = false, bool shrink = true)
       {
         Asm::asm_transfer_voxel_blocked(virt_lvl_fine, virt_lvl_coarse, cubature, trunc_v, shrink,
@@ -371,10 +371,10 @@ namespace FEAT
         this->compile_scalar_transfer();
       }
 
-      template<typename DomainLevel_>
+      template<typename DomainLevel_, template<typename> class SlagDomainLevelWrapper_>
       void assemble_transfers_voxel(
-        const Domain::VirtualLevel<Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_fine,
-        const Domain::VirtualLevel<Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_coarse,
+        const Domain::VirtualLevel<SlagDomainLevelWrapper_<DomainLevel_>>& virt_lvl_fine,
+        const Domain::VirtualLevel<SlagDomainLevelWrapper_<DomainLevel_>>& virt_lvl_coarse,
         const String& cubature, bool trunc_v = false, bool trunc_p = false, bool shrink = true)
       {
         // if the coarse level is a parent, then we need the coarse system level

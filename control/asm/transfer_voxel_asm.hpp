@@ -153,10 +153,10 @@ namespace FEAT
        * otherwise \transient a reference to the same object as gate_f, thus indicating that this process does not
        * participate in the parent layer.
        */
-      template<typename DomainLevel_, typename SpaceLambda_, typename Transfer_, typename Muxer_, typename Gate_>
+      template<typename DomainLevel_, template<typename> class SlagDomainLevelWrapper_, typename SpaceLambda_, typename Transfer_, typename Muxer_, typename Gate_>
       void asm_transfer_voxel_scalar(
-        const Control::Domain::VirtualLevel<Control::Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_f,
-        const Control::Domain::VirtualLevel<Control::Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_c,
+        const Control::Domain::VirtualLevel<SlagDomainLevelWrapper_<DomainLevel_>>& virt_lvl_f,
+        const Control::Domain::VirtualLevel<SlagDomainLevelWrapper_<DomainLevel_>>& virt_lvl_c,
         const String& cubature, bool trunc, bool shrink,
         SpaceLambda_&& space_lambda, Transfer_& transfer, const Muxer_& muxer, const Gate_& gate_f, const Gate_& gate_c)
       {
@@ -340,10 +340,10 @@ namespace FEAT
        * otherwise \transient a reference to the same object as gate_f, thus indicating that this process does not
        * participate in the parent layer.
        */
-      template<typename DomainLevel_, typename SpaceLambda_, typename Transfer_, typename Muxer_, typename Gate_>
+      template<typename DomainLevel_, template<typename> class SlagDomainLevelWrapper_, typename SpaceLambda_, typename Transfer_, typename Muxer_, typename Gate_>
       static void asm_transfer_voxel_blocked(
-        const Control::Domain::VirtualLevel<Control::Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_f,
-        const Control::Domain::VirtualLevel<Control::Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_c,
+        const Control::Domain::VirtualLevel<SlagDomainLevelWrapper_<DomainLevel_>>& virt_lvl_f,
+        const Control::Domain::VirtualLevel<SlagDomainLevelWrapper_<DomainLevel_>>& virt_lvl_c,
         const String& cubature, bool trunc, bool shrink,
         SpaceLambda_&& space_lambda, Transfer_& transfer, const Muxer_& muxer, const Gate_& gate_f, const Gate_& gate_c)
       {

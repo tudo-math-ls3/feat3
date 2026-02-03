@@ -17,6 +17,8 @@
 #include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/util/omp_util.hpp>
 
+#include <control/domain/cgal_domain_control.hpp>
+
 
 
 
@@ -25,13 +27,13 @@ namespace Gendie
 
   /// our domain level
   typedef DomainLevelBase DomainLevelBackground;
-  typedef Control::Domain::VoxelDomainLevelWrapper<DomainLevelBackground> DomainLevel;
+  typedef Control::Domain::CGALDomainLevelWrapper<DomainLevelBackground> DomainLevel;
 
   template<typename DT_, typename IT_> using SystemLevel = SystemLevelBase<DT_, IT_>;
 
   /// our partidomaincontrol
   template<typename DomainLevel_>
-  using PartitionControl = Control::Domain::VoxelDomainControl<DomainLevel_>;
+  using PartitionControl = Control::Domain::CGALDomainControl<DomainLevel_>;
 
   typedef Gendie::InflowBoundary<MeshType> InflowBound;
 
@@ -48,7 +50,6 @@ namespace Gendie
     String cubature_m = "gauss-legendre:3";
     String cubature_postproc = "gauss-legendre:5";
     String level_string;
-    String voxel_map_file;
     String min_gap;
     String vtk_filename;
     String vtk_name;
@@ -64,14 +65,13 @@ namespace Gendie
 
 
     bool use_base_mesh = false;
-    bool use_voxel_map = false;
-    bool meshpart_by_cgal_wrapper = false;
     bool assemble_q2_filter = false;
     bool want_vtk = false;
     bool refine_vtk = false;
     bool use_true_vtk_name = false;
     bool vtk_debug = false;
     bool measure_cgal_size = true;
+    bool cheap_weights = true;
 
     ParameterHolder() = default;
 
@@ -164,19 +164,14 @@ namespace Gendie
             resolution = Math::min(resolution, Math::abs((mesh_bb_max[i]-mesh_bb_min[i])/ SystemDataType(mesh_bb_num_cells[i])));
           }
 
+          cheap_weights = Gendie::check_for_config_option(base_config->query("cheap-weights"), true);
         }
+
         // refine resolution parameter depending on level
         resolution *= Math::pow(SystemDataType(2), -SystemDataType(std::stoi(level_string.split_by_whitespaces().front())));
 
-        // create voxel map
-        if(Gendie::check_for_config_option(base_config->query("voxel-map")))
         {
-          use_voxel_map = true;
-          voxel_map_file = base_config->query("voxel-map").first;
-        }
-        else
-        {
-          use_voxel_map = false;
+          // use_voxel_map = false;
           // parse resolution, if available
           const auto* spec_problem_def = config->get_sub_section("special-problem-definition");
           if(!spec_problem_def)
@@ -202,8 +197,6 @@ namespace Gendie
         velo_scaling_factor = SystemDataType(1)/mesh_unit_scale;
         visc_scaling_factor = SystemDataType(1E-3)*mesh_unit_scale;
         pres_scaling_factor = SystemDataType(1E-8)*mesh_unit_scale;
-
-        meshpart_by_cgal_wrapper = Gendie::check_for_config_option(base_config->query("meshpart-by-cgal-wrapper"));
       }
 
 
@@ -261,16 +254,7 @@ namespace Gendie
       output += String("Background Mesh BB").pad_back(pad_len, pad_char) + ": " + "[" + stringify(mesh_bb_min[0]) + ", " + stringify(mesh_bb_max[0])
                       + "], [" + stringify(mesh_bb_min[1]) + ", " + stringify(mesh_bb_max[1]) + "], [" + stringify(mesh_bb_min[2]) + ", " + stringify(mesh_bb_max[2]) + "]\n";
       output += String("MinGap").pad_back(pad_len, pad_char) + ": " + min_gap + "\n";
-      output += String("Use Voxelmap").pad_back(pad_len, pad_char) + ": " + (use_voxel_map ? String("yes"):String("no")) + "\n";
-      if(use_voxel_map)
-      {
-        output += String("Voxelmap File").pad_back(pad_len, pad_char) + ": " + voxel_map_file + "\n";
-      }
-      else
-      {
-        output += String("Internal Voxel Map Resolution").pad_back(pad_len, pad_char) + ": " + stringify_fp_fix(resolution, 5) + "\n";
-      }
-      output += String("Use Voxel Map to Create Filters").pad_back(pad_len, pad_char) + ": " + (meshpart_by_cgal_wrapper ? String("no") : String("yes")) + "\n";
+      output += String("Cheap weight calculation").pad_back(pad_len, pad_char) + ": " + (cheap_weights ? String("yes") : String("no")) + "\n";
       output += String("Cubature Matrix a").pad_back(pad_len, pad_char) + ": " + cubature_a + "\n";
       output += String("Cubature Matrix b").pad_back(pad_len, pad_char) + ": " + cubature_b + "\n";
       output += String("Cubature Matrix m").pad_back(pad_len, pad_char) + ": " + cubature_m + "\n";
@@ -297,6 +281,7 @@ namespace Gendie
   void create_voxel_domain(PartitionControl<DomainLevel>& domain, const SimpleArgParser& /*args*/, const PropertyMap* config, ParamHolder_& param_holder, const Logger* logger)
   {
     logger->print("Going into create_voxel_domain", info);
+    domain.cheap_weight_calculation(param_holder.cheap_weights);
     TimeStamp create_voxel_domain;
     {
       const auto* parti_config = config->get_sub_section("partition");
@@ -343,22 +328,12 @@ namespace Gendie
     }
 
     // create slag mask
+    if(domain.cgal_wrapper_empty())
     {
-      // create voxel map
-      if(param_holder.use_voxel_map)
-      {
-        domain.read_voxel_map(param_holder.voxel_map_file);
-      }
-      else
-      {
-        domain.create_voxel_map_from_off(param_holder.surface_meshfile, false, param_holder.resolution);
-      }
+      domain.create_cgal_wrapper(param_holder.surface_meshfile, Geometry::CGALFileMode::fm_off);
     }
-
-    if(!param_holder.meshpart_by_cgal_wrapper)
-    {
-      domain.keep_voxel_map();
-    }
+    //always keep cgal wrapper
+    domain.keep_cgal_wrapper();
 
     // now we can create our hirarchy
     domain.create_hierarchy();
@@ -773,26 +748,25 @@ namespace Gendie
     // wrapper class for our parameters
     ParameterHolder param_holder(config.get(), &logger);
 
-    if(param_holder.measure_cgal_size)
-    {
-      std::unique_ptr<Geometry::CGALWrapper<SystemDataType>> cgal = Gendie::create_cgal_wrapper(param_holder.surface_meshfile, comm);
-      if(cgal)
-      {
-        std::size_t bytes_sum, bytes_min, bytes_max;
-        bytes_sum = bytes_min = bytes_max = cgal->bytes();
-        comm.allreduce(&bytes_min, &bytes_min, 1, FEAT::Dist::op_min);
-        comm.allreduce(&bytes_max, &bytes_max, 1, FEAT::Dist::op_max);
-        comm.allreduce(&bytes_sum, &bytes_sum, 1, FEAT::Dist::op_sum);
-        logger.print(format_submemory_mm_t_kb("CGAL Size", bytes_sum, bytes_min, bytes_max, pad_len), info);
-      }
-
-    }
     /*----------------------------------------------------------------------------------------------*/
     /*------------------------- Domain and System Setup --------------------------------------------*/
     /*----------------------------------------------------------------------------------------------*/
     logger.print("Setting up domain", info);
     watch_create_domain.start();
     PartitionControl<DomainLevel> domain(comm, true);
+    {
+      std::unique_ptr<Geometry::CGALWrapper<SystemDataType>> _cgal_tmp = Gendie::create_cgal_wrapper(param_holder.surface_meshfile, comm);
+      if(_cgal_tmp && param_holder.measure_cgal_size)
+      {
+        std::size_t bytes_sum, bytes_min, bytes_max;
+        bytes_sum = bytes_min = bytes_max = _cgal_tmp->bytes();
+        comm.allreduce(&bytes_min, &bytes_min, 1, FEAT::Dist::op_min);
+        comm.allreduce(&bytes_max, &bytes_max, 1, FEAT::Dist::op_max);
+        comm.allreduce(&bytes_sum, &bytes_sum, 1, FEAT::Dist::op_sum);
+        logger.print(format_submemory_mm_t_kb("CGAL Size", bytes_sum, bytes_min, bytes_max, pad_len), info);
+      }
+      domain.set_cgal_wrapper(std::move(_cgal_tmp));
+    }
     watch_create_domain.stop();
 
     // our materials
@@ -834,23 +808,20 @@ namespace Gendie
       // now we create our fine resolved mesh part based on the surface file
       logger.print("Create FBM Meshpart and Assembler", info);
       {
-        std::unique_ptr<Geometry::CGALWrapper<SystemDataType>> cgal_wrapper(nullptr);
-        if(param_holder.meshpart_by_cgal_wrapper)
-          cgal_wrapper = Gendie::create_cgal_wrapper(param_holder.surface_meshfile, comm);
+        // release here to free used memory of cgal afterwards
+        std::unique_ptr<Geometry::CGALWrapper<SystemDataType>> cgal_wrapper(domain.release_cgal_wrapper());
+        XASSERTM(cgal_wrapper.get() != nullptr, "CGAL Wrapper was not allocated");
 
         // create meshparts on all levels
         for(std::size_t i(0); i < domain.size_physical(); ++i)
         {
-
-          // TODO: refactor with voxel map
-          auto* ptr = param_holder.meshpart_by_cgal_wrapper ? Gendie::add_cgal_mesh_part(domain.at(i)->get_mesh_node(), cgal_wrapper.get(), "fbm")
-                                                            : Gendie::add_voxel_mesh_part(domain.at(i)->get_mesh_node(), domain.get_voxel_map(), "fbm");
+          auto* ptr = Gendie::add_cgal_mesh_part(domain.at(i)->get_mesh_node(), cgal_wrapper.get(), "fbm");
           if(ptr == nullptr)
           {
             logger.print("Meshpart is nullptr", error);
             Runtime::abort();
           }
-          // // create FBM assembler
+          // create FBM assembler
           domain.at(i)->create_fbm_assembler(domain.at(i).layer().comm(), "fbm");
         }
       }
@@ -859,8 +830,6 @@ namespace Gendie
       domain.add_trafo_mesh_part_charts();
       #endif
 
-      watch_create_domain.stop();
-
       // at this point, our domain is compiled, so print chosen levels
       logger.print(String("Desired levels").pad_back(pad_len, pad_char) + ": " + domain.format_desired_levels(), info);
       logger.print(String("Chosen levels").pad_back(pad_len, pad_char) + ": " + domain.format_chosen_levels(), info);
@@ -868,56 +837,58 @@ namespace Gendie
       logger.print(param_holder.format_string(), info);
       //flush output
       logger.flush_print();
+    }
 
-      watch_create_domain.stop();
-      if(Gendie::check_for_config_option(config->query("postproc-params/mesh-hirarchy-vtk")))
+    watch_create_domain.stop();
+
+    if(Gendie::check_for_config_option(config->query("postproc-params/mesh-hirarchy-vtk")))
+    {
+      const String& mesh_hirarchy_vtk = config->query("postproc-params/mesh-hirarchy-vtk").first;
+      logger.print("Writing Mesh hirarchy output to '" + mesh_hirarchy_vtk + "_<LEVEL>.pvtu'", info);
+      //todo: write out refinement hirarchy with mesh parts
+      for(std::size_t i = 0; i < std::size_t(domain.size_physical()); ++i)
       {
-        const String& mesh_hirarchy_vtk = config->query("postproc-params/mesh-hirarchy-vtk").first;
-        logger.print("Writing Mesh hirarchy output to '" + mesh_hirarchy_vtk + "_<LEVEL>.pvtu'", info);
-        //todo: write out refinement hirarchy with mesh parts
-        for(std::size_t i = 0; i < std::size_t(domain.size_physical()); ++i)
+        String cur_vtk_name = mesh_hirarchy_vtk + "_" + stringify(i).pad_front(2, '0');
+        // get the mesh for the VTK output
+        const MeshType* mesh = &domain.at(i)->get_mesh();
+        const MeshNodeType* node = domain.at(i)->get_mesh_node();
+        std::deque<String> part_names = node->get_mesh_part_names();
+
+        // Create a VTK exporter for our mesh
+        Geometry::ExportVTK<MeshType> exporter(*mesh);
+
+        std::vector<double> vtx_data(mesh->get_num_entities(0), 0.0);
+
+        // loop over all mesh parts
+        for(auto it = part_names.begin(); it != part_names.end(); ++it)
         {
-          String cur_vtk_name = mesh_hirarchy_vtk + "_" + stringify(i).pad_front(2, '0');
-          // get the mesh for the VTK output
-          const MeshType* mesh = &domain.at(i)->get_mesh();
-          const MeshNodeType* node = domain.at(i)->get_mesh_node();
-          std::deque<String> part_names = node->get_mesh_part_names();
+          // get the mesh part
+          const auto* part = node->find_mesh_part(*it);
+          if(part == nullptr)
+            continue;
 
-          // Create a VTK exporter for our mesh
-          Geometry::ExportVTK<MeshType> exporter(*mesh);
+          // get the vertex target set
+          const auto& trg = part->template get_target_set<0>();
 
-          std::vector<double> vtx_data(mesh->get_num_entities(0), 0.0);
+          // mark all indexes vertices
+          for(Index k(0); k < trg.get_num_entities(); ++k)
+            vtx_data[trg[k]] = 1.0;
 
-          // loop over all mesh parts
-          for(auto it = part_names.begin(); it != part_names.end(); ++it)
-          {
-            // get the mesh part
-            const auto* part = node->find_mesh_part(*it);
-            if(part == nullptr)
-              continue;
+          // add variable
+          exporter.add_vertex_scalar(*it, vtx_data.data());
 
-            // get the vertex target set
-            const auto& trg = part->template get_target_set<0>();
-
-            // mark all indexes vertices
-            for(Index k(0); k < trg.get_num_entities(); ++k)
-              vtx_data[trg[k]] = 1.0;
-
-            // add variable
-            exporter.add_vertex_scalar(*it, vtx_data.data());
-
-            // unmark vertices
-            for(Index k(0); k < trg.get_num_entities(); ++k)
-              vtx_data[trg[k]] = 0.0;
-          }
-          exporter.write(cur_vtk_name, domain.at(i).layer().comm());
-
+          // unmark vertices
+          for(Index k(0); k < trg.get_num_entities(); ++k)
+            vtx_data[trg[k]] = 0.0;
         }
+        exporter.write(cur_vtk_name, domain.at(i).layer().comm());
+
       }
     }
 
 
     logger.print("Compile Domain Assembler", info);
+    watch_create_domain.start();
     {
       //create domain assembler for all levels
       const Index num_levels(domain.size_physical());
@@ -925,6 +896,7 @@ namespace Gendie
       {
         DomainLevel& dom_lvl = *domain.at(i);
         // in theory, we should also set a worker stretegy here, but is not necessary, due to omp...
+        dom_lvl.domain_asm.set_max_worker_threads(std::size_t(0));
         // if(num_worker_threads > 1)
         // {
         //   dom_lvl.domain_asm.set_max_worker_threads(num_worker_threads > 1 ? std::size_t(num_worker_threads) : std::size_t(0));
@@ -1156,7 +1128,9 @@ namespace Gendie
         analyze = 6,
         time_asm = 7,
         lin_sol = 8,
-        num_entries = 9
+        create_weights = 9,
+        create_hirarch = 10,
+        num_entries = 11
       };
       FEAT::String s;
       double timings_max[num_entries], timings_min[num_entries], timings[num_entries];
@@ -1169,6 +1143,8 @@ namespace Gendie
       timings_min[_TimeID::analyze] = timings_max[_TimeID::analyze] = timings[_TimeID::analyze] = watch_analyze_sol.elapsed();
       timings_min[_TimeID::time_asm] = timings_max[_TimeID::time_asm] = timings[_TimeID::time_asm] = assembly_time_solver;
       timings_min[_TimeID::lin_sol] = timings_max[_TimeID::lin_sol] = timings[_TimeID::lin_sol] = ls_time_solver;
+      timings_min[_TimeID::create_weights] = timings_max[_TimeID::create_weights] = timings[_TimeID::create_weights] = domain.get_watch_weights().elapsed();
+      timings_min[_TimeID::create_hirarch] = timings_max[_TimeID::create_hirarch] = timings[_TimeID::create_hirarch] = domain.get_watch_hierarchy().elapsed();
       // sync our timings
       comm.allreduce(timings_max, timings_max, _TimeID::num_entries, FEAT::Dist::op_max);
       comm.allreduce(timings_min, timings_min, _TimeID::num_entries, FEAT::Dist::op_min);
@@ -1179,6 +1155,8 @@ namespace Gendie
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
 
       s += format_subtime_mm("Create Domain", timings[_TimeID::create_domain], timings[_TimeID::total], timings_min[_TimeID::create_domain], timings_max[_TimeID::create_domain], pad_len);
+      s += format_subtime_mm("Create Domain Weights", timings[_TimeID::create_weights], timings[_TimeID::total], timings_min[_TimeID::create_weights], timings_max[_TimeID::create_weights], pad_len);
+      s += format_subtime_mm("Create Domain Hirarch", timings[_TimeID::create_hirarch], timings[_TimeID::total], timings_min[_TimeID::create_hirarch], timings_max[_TimeID::create_hirarch], pad_len);
       s += format_subtime_mm("Create System", timings[_TimeID::create_system], timings[_TimeID::total], timings_min[_TimeID::create_system], timings_max[_TimeID::create_system], pad_len);
       s += format_subtime_mm("Create Filter", timings[_TimeID::create_filter], timings[_TimeID::total], timings_min[_TimeID::create_filter], timings_max[_TimeID::create_filter], pad_len);
       s += format_subtime_mm("Create Solver", timings[_TimeID::create_solver], timings[_TimeID::total], timings_min[_TimeID::create_solver], timings_max[_TimeID::create_solver], pad_len);

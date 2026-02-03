@@ -131,6 +131,7 @@ public:
     test_vertices_around_face();
     test_point_accessors(tol);
     test_face_normals(tol);
+    test_intersection();
   }
 
   void test_move_constructor() const
@@ -523,6 +524,49 @@ public:
     {
       TEST_CHECK_EQUAL_WITHIN_EPS((normals[i] - ref_normals[i]).norm_euclid(), 0, tol);
     }
+  }
+
+  void test_intersection() const
+  {
+    std::stringstream mts = tetrahedron_mesh();
+    CGALWrapper<DT_> cw(mts, CGALFileMode::fm_off);
+
+    // also construct a hexagon
+    std::array<Tiny::Vector<DT_, 3>, 8> hexa
+    {
+      Tiny::Vector<DT_, 3>{DT_(-0.5), DT_(-0.5), DT_(-0.5)}, // with this, the conversion is unique...
+      {DT_(0.5), DT_(-0.5), DT_(-0.5)},
+      {DT_(-0.5), DT_(0.5), DT_(-0.5)},
+      {DT_(0.5), DT_(0.5), DT_(-0.5)},
+      {DT_(-0.5), DT_(-0.5), DT_(0.5)},
+      {DT_(0.5), DT_(-0.5), DT_(0.5)},
+      {DT_(-0.5), DT_(0.5), DT_(0.5)},
+      {DT_(0.5), DT_(0.5), DT_(0.5)}
+    };
+
+    TEST_CHECK(cw.intersects_polygon(hexa));
+
+    //scale by factor 10 -> no intersection, but contains mesh
+    for(int k = 0; k < 8; ++k)
+    {
+      hexa[k] *= DT_(10);
+    }
+
+    TEST_CHECK(cw.intersects_polygon(hexa));
+
+    //shift, so the tipp intersects a bit with 0,0,2.0 in the right lower quadrant
+    for(int k = 0; k < 8; ++k)
+    {
+      hexa[k] += Tiny::Vector<DT_, 3>{DT_(4.8), DT_(4.89), DT_(6.98)};
+    }
+    TEST_CHECK(cw.intersects_polygon(hexa));
+
+    //shift completly outside
+    for(int k = 0; k < 8; ++k)
+    {
+      hexa[k] += Tiny::Vector<DT_, 3>{DT_(4.8), DT_(4.89), DT_(6.98)};
+    }
+    TEST_CHECK(!cw.intersects_polygon(hexa));
   }
 };
 

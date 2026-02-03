@@ -751,6 +751,132 @@ namespace FEAT::Geometry
     return static_cast<CGALWrapperData<DT_>*>(this->_cgal_data)->_tree->do_intersect(seg);
   }
 
+  namespace Intern
+  {
+    template<typename DT_>
+    static inline void split_hexaeder_surface(typename CGALTypeWrapper<DT_>::Polyhedron_& surface, const std::array<typename FEAT::Geometry::CGALWrapper<DT_>::PointType, 8>& points)
+    {
+      typename CGALTypeWrapper<DT_>::Polyhedron_::Vertex_index vtx_desc[8];
+      for(int k = 0; k < 8; ++k)
+      {
+        vtx_desc[k] = surface.add_vertex(typename FEAT::Geometry::CGALTypeWrapper<DT_>::Point_(points[k][0], points[k][1], points[k][2]));
+      }
+
+      constexpr std::size_t faces[12][3] =
+      {
+        {0, 1, 2}, {1, 3, 2}, //bottom
+        {6, 5, 4}, {7, 5, 6}, //top
+        {0, 2, 4}, {2, 6, 4}, //left
+        {3, 1, 5}, {3, 5, 7}, //right
+        {4, 1, 0}, {5, 1, 4}, //front
+        {2, 3, 6}, {3, 7, 6} //back
+      };
+
+      for(int f = 0; f < 12; ++f)
+      {
+        surface.add_face(vtx_desc[faces[f][0]], vtx_desc[faces[f][1]], vtx_desc[faces[f][2]]);
+      }
+    }
+  }
+
+  template<typename DT_>
+  bool FEAT::Geometry::CGALWrapper<DT_>::intersects_hexaedron(const std::array<FEAT::Geometry::CGALWrapper<DT_>::PointType, 8>& points) const
+  {
+    typename CGALTypeWrapper<DT_>::Polyhedron_ hexaeder;
+    typedef typename CGALTypeWrapper<DT_>::Point_ Point;
+    Intern::template split_hexaeder_surface<DT_>(hexaeder, points);
+    const auto* tree = static_cast<CGALWrapperData<DT_>*>(this->_cgal_data)->_tree;
+
+    // first of all, check if the first surface point is contained in our mesh cell, if yes, we are done
+    // if not we know, that the surface mesh is not wholly contained in our mesh cell
+    {
+      const auto* poly = static_cast<CGALWrapperData<DT_>*>(this->_cgal_data)->_polyhedron;
+      typename CGALTypeWrapper<DT_>::Point_inside_ inside(hexaeder);
+      auto res = inside(poly->point(*std::begin(poly->vertices())));
+      if(res == CGAL::ON_BOUNDED_SIDE || res == CGAL::ON_BOUNDARY)
+      {
+        return true;
+      }
+    }
+
+    // first, create boundingbox
+    auto boxA = CGAL::Bbox_3(0., 0., 0., 0., 0., 0.);
+    for(auto v : hexaeder.vertices())
+    {
+      boxA += hexaeder.point(v).bbox();
+    }
+
+    // check if we overlap with the surface bb
+    {
+      auto boxB = tree->bbox();
+      if(!CGAL::do_overlap(boxA, boxB))
+      {
+        return false;
+      }
+    }
+
+    // first a few easy tests, check if any vertex of our mesh (and the midpoint) is inside the surface mesh
+    {
+      typename FEAT::Geometry::CGALWrapper<DT_>::PointType mid_point(DT_(0));
+      for(std::size_t k = 0; k < 8u; ++k)
+      {
+        mid_point += points[k];
+      }
+      mid_point *= DT_(1)/DT_(8);
+
+      auto& inside_tester = *static_cast<CGALWrapperData<DT_>*>(this->_cgal_data)->_inside_tester;
+      if(inside_tester(Point(mid_point[0], mid_point[1], mid_point[2])) != CGAL::ON_UNBOUNDED_SIDE)
+        return true;
+
+      for(auto v : hexaeder.vertices())
+      {
+        auto p = hexaeder.point(v);
+        if(inside_tester(p) != CGAL::ON_UNBOUNDED_SIDE)
+          return true;
+      }
+    }
+
+    // we are not inside, so now check, if we intersect tree at all
+    if(!tree->do_intersect(boxA))
+      return false;
+
+    //finally, we have no better choice than doing a check against all surface elements
+    {
+      const auto* poly = static_cast<CGALWrapperData<DT_>*>(this->_cgal_data)->_polyhedron;
+
+      for(auto sf : poly->faces())
+      {
+        std::array<Point, 3> triang;
+        {
+          std::size_t k = 0;
+          for(auto v : poly->vertices_around_face(poly->halfedge(sf)))
+          {
+            triang[k++] = poly->point(v);
+          }
+        }
+        CGAL::Triangle_3<typename CGALTypeWrapper<DT_>::K> triangle_s(triang[0], triang[1], triang[2]);
+
+        for(auto f : hexaeder.faces())
+        {
+          {
+            std::size_t k = 0;
+            for(auto v : hexaeder.vertices_around_face(hexaeder.halfedge(f)))
+            {
+              triang[k++] = hexaeder.point(v);
+            }
+          }
+          CGAL::Triangle_3<typename CGALTypeWrapper<DT_>::K> triangle_a(triang[0], triang[1], triang[2]);
+
+          if(CGAL::do_intersect(triangle_s, triangle_a))
+            return true;
+        }
+      }
+    }
+
+    // no intersection
+    return false;
+  }
+
 } // namespace Geometry
 
 

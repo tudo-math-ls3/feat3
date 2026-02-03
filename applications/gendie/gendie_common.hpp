@@ -1,7 +1,7 @@
 #pragma once
 
-#include "applications/gendie/logger.hpp"
-#include "kernel/util/property_map.hpp"
+#include <applications/gendie/logger.hpp>
+#include <kernel/util/property_map.hpp>
 #include <applications/gendie/fbm_control_helper.hpp>
 #include <kernel/runtime.hpp>
 #include <kernel/backend.hpp>
