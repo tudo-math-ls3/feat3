@@ -532,18 +532,22 @@ namespace Gendie
       switch(this->inflow_type)
       {
         case InflowType::best:
+        // parabolic function with x at sides 0, i.e. f(x) = (|a-c|^2-|(x-c)_|_(a-c)|^2)* (|b-c|^2-|(x-c)_|_(b-c)|^2)
+        // additional, we have to normalize, .i.e. integrate above function across the rectangle
         case InflowType::parabolic:
         {
           const VecType aC = a - this->center;
           const VecType bC = b - this->center;
+          const DataType euc_a = aC.norm_euclid_sqr();
+          const DataType euc_b = bC.norm_euclid_sqr();
           const DataType scale = vol_flow * DataType(9)/ (DataType(16) * Math::cub(aC.norm_euclid()) * Math::cub(bC.norm_euclid()));
-          return DirichletBoundaryFunc([scale, _center=this->center, _flow_normal=this->flow_normal, d_p=this->d_plane, aC, bC]
+          return DirichletBoundaryFunc([scale, _center=this->center, _flow_normal=this->flow_normal, d_p=this->d_plane, aC, bC, euc_a, euc_b]
                   (const VecType& point) -> VecType
           {
             const VecType proj = Intern::project_vector(point, _flow_normal, d_p);
             const VecType dC = proj - _center;
-            const DataType aux1 = Math::max(DataType(0), Math::sqr(aC.norm_euclid_sqr()) - Math::sqr(Tiny::dot(dC, aC)));
-            const DataType aux2 = Math::max(DataType(0), Math::sqr(bC.norm_euclid_sqr()) - Math::sqr(Tiny::dot(dC, bC)));
+            const DataType aux1 = Math::max(DataType(0), euc_a - Math::sqr(Tiny::dot(dC, aC))/euc_a);
+            const DataType aux2 = Math::max(DataType(0), euc_b - Math::sqr(Tiny::dot(dC, bC))/euc_b);
             const DataType daux = aux1 * aux2;
             return (daux * scale) * _flow_normal ;
           });
@@ -628,15 +632,16 @@ namespace Gendie
         {
           const VecType aC = this->a - this->center;
           const VecType bC = this->b - this->center;
+          const DataType euc_b = bC.norm_euclid_sqr();
           DataType scale = (DataType(8) / DataType(3)) * aC.norm_euclid() * bC.norm_euclid()
                                   + DataType(2) * Math::pi<DataType>() * Math::sqr(radius);
           scale = vol_flow / scale;
-          return DirichletBoundaryFunc([scale, _center=this->center, _flow_normal=this->flow_normal, d_p=this->d_plane, _a=this->a, radi=DataType(1)/this->radius, aC, bC]
+          return DirichletBoundaryFunc([scale, _center=this->center, _flow_normal=this->flow_normal, d_p=this->d_plane, _a=this->a, radi=DataType(1)/this->radius, aC, bC, euc_b]
                   (const VecType& point) -> VecType
           {
             const VecType proj = Intern::project_vector(point, _flow_normal, d_p);
             const VecType dC = proj - _center;
-            const DataType aux =  Math::max(DataType(0), DataType(1) - Math::sqr(Tiny::dot(dC, bC))/Math::sqr(bC.norm_euclid_sqr()));
+            const DataType aux =  Math::max(DataType(0), DataType(1) - Math::sqr(Tiny::dot(dC, bC)/euc_b));
             const DataType aux2 = Math::max(DataType(0), DataType(1) - (proj-_a).norm_euclid_sqr()*Math::sqr(radi))
                                   + Math::max(DataType(0), DataType(1) - (proj-DataType(2)*_center+_a).norm_euclid_sqr() * Math::sqr(radi));
             const bool outside_rec = (Math::sqr(aC.norm_euclid_sqr()) - Math::sqr(Tiny::dot(dC, aC))) <= DataType(0);
