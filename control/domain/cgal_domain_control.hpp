@@ -1466,8 +1466,12 @@ namespace FEAT
 
             // the check_parti function returns the partitioning level w.r.t. the current
             // level (which may be > 0), so we have to compensate that by adding our current level:
+            // note: contrary to the standard parti domain control, we calculate our partition always to the level
+            // we split to the subdomains, i.e. on the level we actually change our layer
+            // due to this, we enforce, that we at least win 1 real level to the parent
             ancestor.parti_level += lvl;
             ancestor.parti_level = Math::max(ancestor.parti_level, ancestor.desired_level_min);
+            ancestor.parti_level = Math::max(ancestor.parti_level,parent_min_lvl + int(!is_base_layer));
 
             // Note: each progeny group within the main communicator may have chosen a different
             // partitioning level at this point. We will compensate this by adjusting the minimum
@@ -1530,10 +1534,7 @@ namespace FEAT
             std::unique_ptr<MeshNodeType> patch_mesh_node(
               parent_mesh_node->extract_patch(neighbor_ranks, ancestor.parti_graph, ancestor.progeny_child));
 
-            // extract our coloring
-            Adjacency::Coloring patch_coloring = this->_extract_patch_coloring(*parent_mesh_node, parent_coloring, ancestor.progeny_child);
-
-            // create an empty patch slag node
+            // create an empty patch slag node (which we might need, if we refine further for this partition)
             std::unique_ptr<MeshNodeType> patch_slag_node;
 
             // translate neighbor ranks by progeny group to obtain the neighbor ranks
@@ -1570,30 +1571,35 @@ namespace FEAT
 
             // refine up to desired minimum level of this layer
             XASSERTM(lvl == global_level_min, "INTERNAL ERROR");
-            /*for(; lvl < global_level_min; ++lvl)
-            {
-              // refine the base mesh node
-              std::unique_ptr<MeshNodeType> coarse_slag_node(std::move(parent_slag_node));
-              std::unique_ptr<MeshNodeType> coarse_mesh_node(std::move(parent_mesh_node));
-              parent_slag_node = coarse_mesh_node->refine_unique(this->_adapt_mode);
-              parent_mesh_node = this->_deslag_mesh_node(*parent_slag_node);
+            // for(; lvl < global_level_min; ++lvl)
+            // {
+            //   // refine the base mesh node
+            //   std::unique_ptr<MeshNodeType> coarse_slag_node(std::move(parent_slag_node));
+            //   std::unique_ptr<MeshNodeType> coarse_mesh_node(std::move(parent_mesh_node));
+            //   parent_slag_node = coarse_mesh_node->refine_unique(this->_adapt_mode);
+            //   // parent_mesh_node = this->_deslag_mesh_node(*parent_slag_node);
+            //   parent_mesh_node = this->_deslag_mesh_node(*parent_slag_node, ancestor, !is_base_layer);
 
-              // push base mesh to parent layer if desired
-              if((ancestor.layer_p >= 0) && (parent_min_lvl >= 0) && (lvl >= parent_min_lvl))
-              {
-                // clear patches before pushing this node as they are redundant here
-                //coarse_mesh_node->clear_patches();
-                this->push_level_front(ancestor.layer_p, std::make_shared<LevelType>(lvl, std::move(coarse_mesh_node), std::move(coarse_slag_node)));
-              }
+            //   // push base mesh to parent layer if desired
+            //   if((ancestor.layer_p >= 0) && (parent_min_lvl >= 0) && (lvl >= parent_min_lvl))
+            //   {
+            //     // clear patches before pushing this node as they are redundant here
+            //     coarse_mesh_node->clear_patches();
+            //     this->push_level_front(ancestor.layer_p, std::make_shared<LevelType>(lvl, std::move(coarse_mesh_node), std::move(coarse_slag_node), std::move(parent_coloring)));
+            //   }
+            //   parent_coloring = _unstructered_mesh ? this->_compute_unstructered_coloring(*parent_mesh_node) : this->_compute_refined_mesh_coloring(*parent_slag_node);
 
-              // refine the patch mesh
-              //patch_slag_node = patch_mesh_node->refine_unique(this->_adapt_mode);
-              //patch_mesh_node = this->_deslag_mesh_node(*patch_slag_node);
-              patch_mesh_node = this->_deslag_mesh_node(*patch_mesh_node->refine_unique(this->_adapt_mode));
-            }*/
+            //   // refine the patch mesh
+            //   patch_slag_node = patch_mesh_node->refine_unique(this->_adapt_mode);
+            //   patch_mesh_node = this->_deslag_mesh_node(*patch_slag_node, ancestor, !is_base_layer);
+            //   // patch_mesh_node = this->_deslag_mesh_node(*patch_slag_node);
+            //   // patch_mesh_node = this->_deslag_mesh_node(*patch_mesh_node->refine_unique(this->_adapt_mode));
+            // }
+
+            // extract our coloring
+            Adjacency::Coloring patch_coloring = this->_extract_patch_coloring(*parent_mesh_node, parent_coloring, ancestor.progeny_child);
 
             // split the halos of our base-mesh and compute the halos of our patches from that
-            //this->_split_basemesh_halos(ancestor, *parent_slag_node, *patch_slag_node, neighbor_ranks);
             this->_split_basemesh_halos(ancestor, *parent_mesh_node, *patch_mesh_node, neighbor_ranks);
 
             // does this process participate in the child layer?
@@ -1631,9 +1637,9 @@ namespace FEAT
           }
 
           // get the desired maximum level
-          // if we have more than one layer, make sure that the finest one contains at
-          // least one level, as otherwise the finest global level would be a ghost level
-          int desired_level_max = Math::max(this->_ancestry.front().desired_level_max, lvl+1);
+          // int desired_level_max = Math::max(this->_ancestry.front().desired_level_max, lvl+1);
+          int desired_level_max = this->_ancestry.front().desired_level_max;
+          XASSERTM(desired_level_max > lvl, "Trying to refine larger than provided level hirarchy");
 
           for(; lvl < desired_level_max; ++lvl)
           {
