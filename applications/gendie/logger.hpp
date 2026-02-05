@@ -50,15 +50,15 @@ namespace Gendie
     print_level std_out_lvl = print_level::info;
     print_level log_lvl = print_level::verbose;
 
-    bool print_time;
+    bool print_time, always_flush;
 
 
-    Logger(const FEAT::Dist::Comm& comm_, print_level out_lvl_ = print_level::info, print_level log_lvl_ = print_level::verbose, bool print_time_ = true) :
+    Logger(const FEAT::Dist::Comm& comm_, print_level out_lvl_ = print_level::info, print_level log_lvl_ = print_level::verbose, bool print_time_ = true, bool always_flush_ = false) :
       comm(comm_),
       std_out_lvl(out_lvl_),
       log_lvl(log_lvl_),
-
-      print_time(print_time_)
+      print_time(print_time_),
+      always_flush(always_flush_)
     {}
 
     ~Logger() = default;
@@ -102,6 +102,9 @@ namespace Gendie
           log += "\n" + pre_line + line;
         }
       }
+
+      if(always_flush)
+        this->flush_print();
     }
 
     void flush_print() const

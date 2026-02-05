@@ -72,6 +72,7 @@ namespace Gendie
     bool vtk_debug = false;
     bool measure_cgal_size = true;
     bool cheap_weights = true;
+    bool always_flush_print = false;
 
     ParameterHolder() = default;
 
@@ -165,6 +166,8 @@ namespace Gendie
           }
 
           cheap_weights = Gendie::check_for_config_option(base_config->query("cheap-weights"), true);
+          // TODO: This should not be on by default
+          always_flush_print = Gendie::check_for_config_option(base_config->query("always-flush-print"), true);
         }
 
         // refine resolution parameter depending on level
@@ -255,6 +258,7 @@ namespace Gendie
                       + "], [" + stringify(mesh_bb_min[1]) + ", " + stringify(mesh_bb_max[1]) + "], [" + stringify(mesh_bb_min[2]) + ", " + stringify(mesh_bb_max[2]) + "]\n";
       output += String("MinGap").pad_back(pad_len, pad_char) + ": " + min_gap + "\n";
       output += String("Cheap weight calculation").pad_back(pad_len, pad_char) + ": " + (cheap_weights ? String("yes") : String("no")) + "\n";
+      output += String("Flush Print").pad_back(pad_len, pad_char) + ": " + (always_flush_print ? String("yes") : String("no")) + "\n";
       output += String("Cubature Matrix a").pad_back(pad_len, pad_char) + ": " + cubature_a + "\n";
       output += String("Cubature Matrix b").pad_back(pad_len, pad_char) + ": " + cubature_b + "\n";
       output += String("Cubature Matrix m").pad_back(pad_len, pad_char) + ": " + cubature_m + "\n";
@@ -298,9 +302,6 @@ namespace Gendie
     // setup domain
     {
       domain.set_desired_levels(param_holder.level_string.split_by_whitespaces());
-
-      // TODO: somewhere at this point, we would need to set the base splitte if required
-
     }
 
     if(param_holder.use_base_mesh)
@@ -691,6 +692,7 @@ namespace Gendie
     print_level comm_out_level = print_level::info;
     Logger logger(comm, comm_out_level, print_level::off);
     logger.print("-------------------Welcome to FEAT3 Steady Gendie Simulator tool--------------------", info);
+    logger.flush_print();
 
     // create arg parser
     SimpleArgParser args(argc, argv);
@@ -745,8 +747,10 @@ namespace Gendie
     logger.print("System IndexType: " + String(ix_typename), info);
 
     logger.print("Parsing Parameters...", info);
+    logger.flush_print();
     // wrapper class for our parameters
     ParameterHolder param_holder(config.get(), &logger);
+    logger.always_flush = param_holder.always_flush_print;
 
     /*----------------------------------------------------------------------------------------------*/
     /*------------------------- Domain and System Setup --------------------------------------------*/
