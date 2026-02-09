@@ -236,7 +236,7 @@ public:
       for (Index i(0) ; i < k.size() ; ++i)
         TEST_CHECK_EQUAL_WITHIN_EPS(zlib(i), k(i), DT_(1e-5));
 #endif
-#ifdef FEAT_HAVE_ZFP
+#if defined FEAT_HAVE_ZFP && !defined FEAT_HAVE_HALFMATH
       auto zp = k.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-5)));
       DenseVector<DT_, IT_> zfp(zp);
       for (Index i(0) ; i < k.size() ; ++i)

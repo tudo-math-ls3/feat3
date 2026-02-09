@@ -532,7 +532,8 @@ CGALTest<float> cgal_test_float;
 CGALTest<__float128> cgal_test_float128;
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-CGALTest<Half> cgal_test_half;
+// Disabled, because CGALWrapper does not support half-precision
+//CGALTest<Half> cgal_test_half;
 #endif
 
 #endif //FEAT_HAVE_CGAL

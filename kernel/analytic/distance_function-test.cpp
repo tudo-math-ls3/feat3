@@ -214,7 +214,7 @@ public:
     TEST_CHECK_EQUAL_WITHIN_EPS(hess3d[2][2], DT_(0.73601352265148765414), tol);
   }
 
-#ifdef FEAT_HAVE_CGAL
+#if defined FEAT_HAVE_CGAL && !defined FEAT_HAVE_HALFMATH
   void test_cgal_signed_dist_3d() const
   {
     const DT_ tol = TestSystem::relaxed_tol<DT_>();
@@ -265,7 +265,7 @@ public:
     test_inverse_distance_function_2d();
     test_inverse_distance_function_3d();
     test_plane_distance_function_sd();
-#ifdef FEAT_HAVE_CGAL
+#if defined FEAT_HAVE_CGAL && !defined FEAT_HAVE_HALFMATH
     test_cgal_signed_dist_3d();
 #endif // FEAT_HAVE_CGAL
   }

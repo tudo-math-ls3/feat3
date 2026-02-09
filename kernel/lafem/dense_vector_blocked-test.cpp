@@ -223,7 +223,7 @@ public:
     DenseVectorBlocked<DT_, IT_, 5> zlib(zb);
     TEST_CHECK_LESS_THAN(zlib.max_rel_diff(tester_blocked), eps);
 #endif
-#ifdef FEAT_HAVE_ZFP
+#if defined FEAT_HAVE_ZFP && !defined FEAT_HAVE_HALFMATH
     auto zp = tester_blocked.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
     DenseVectorBlocked<DT_, IT_, 5> zfp(zp);
     for (Index i(0) ; i < tester_blocked.size() ; ++i)

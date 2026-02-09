@@ -174,7 +174,7 @@ public:
     for (Index i(0) ; i < a.size() ; ++i)
       TEST_CHECK_EQUAL_WITHIN_EPS(zlib(i), a(i), eps);
 #endif
-#ifdef FEAT_HAVE_ZFP
+#if defined FEAT_HAVE_ZFP && !defined FEAT_HAVE_HALFMATH
     auto zf = a.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
     SparseVector<DT_, IT_> zfp(zf);
     for (Index i(0) ; i < a.size() ; ++i)

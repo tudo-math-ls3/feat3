@@ -306,7 +306,7 @@ public:
     SparseMatrixCSR<DT_, IT_> zlib(zl);
     TEST_CHECK_LESS_THAN(zlib.max_rel_diff(f), eps);
 #endif
-#ifdef FEAT_HAVE_ZFP
+#if defined FEAT_HAVE_ZFP && !defined FEAT_HAVE_HALFMATH
     auto zf = f.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
     SparseMatrixCSR<DT_, IT_> zfp(zf);
     for (Index row(0); row < f.rows(); ++row)
@@ -1315,7 +1315,7 @@ public:
     SparseMatrixCSR<DT_, IT_> a(mat_rows, mat_cols, col_ind, val, row_ptr);
 
 #ifdef FEAT_HAVE_ZLIB
-#ifdef FEAT_HAVE_ZFP
+#if defined FEAT_HAVE_ZFP && !defined FEAT_HAVE_HALFMATH
     LAFEM::SerialConfig config(false, false);
     config.set_tolerance(FEAT::Real(1e-2));
     std::vector<char> uncompressed = a.serialize(config);

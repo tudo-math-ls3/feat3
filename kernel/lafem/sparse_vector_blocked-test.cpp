@@ -152,7 +152,7 @@ public:
     SparseVectorBlocked<DT_, IT_, 2> zlib(zl);
     TEST_CHECK_LESS_THAN(zlib.max_rel_diff(a), eps);
 #endif
-#ifdef FEAT_HAVE_ZFP
+#if defined FEAT_HAVE_ZFP && !defined FEAT_HAVE_HALFMATH
     auto zf = a.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
     SparseVectorBlocked<DT_, IT_, 2> zfp(zf);
     for (Index i(0) ; i < a.size() ; ++i)

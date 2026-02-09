@@ -763,8 +763,9 @@ template class FEAT::Geometry::CGALWrapper<float>;
 template class FEAT::Geometry::CGALVerticesAroundFaceAdjactor<float>;
 
 #ifdef FEAT_HAVE_HALFMATH
-template class FEAT::Geometry::CGALWrapper<Half>;
-template class FEAT::Geometry::CGALVerticesAroundFaceAdjactor<Half>;
+// TODO: Figure out missing operators and ambigous overloads to support this properly
+//template class FEAT::Geometry::CGALWrapper<FEAT::Half>;
+//template class FEAT::Geometry::CGALVerticesAroundFaceAdjactor<FEAT::Half>;
 #endif
 
 #ifdef FEAT_HAVE_QUADMATH

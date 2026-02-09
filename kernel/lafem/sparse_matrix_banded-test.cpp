@@ -242,7 +242,7 @@ public:
     SparseMatrixBanded<DT_, IT_> zlib(zl);
     TEST_CHECK_LESS_THAN(zlib.max_rel_diff(c), eps);
 #endif
-#ifdef FEAT_HAVE_ZFP
+#if defined FEAT_HAVE_ZFP && !defined FEAT_HAVE_HALFMATH
     auto zf = c.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
     SparseMatrixBanded<DT_, IT_> zfp(zf);
     for(Index i(0); i < c.rows() ; ++i)

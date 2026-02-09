@@ -257,7 +257,7 @@ public:
       }
     }
 #endif
-#ifdef FEAT_HAVE_ZFP
+#if defined FEAT_HAVE_ZFP && !defined FEAT_HAVE_HALFMATH
     auto zf = a.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
     SparseMatrixCSCR<DT_, IT_> zfp(zf);
     TEST_CHECK_EQUAL(zfp.rows(), a.rows());

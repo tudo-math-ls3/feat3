@@ -177,7 +177,7 @@ if(FEAT_HAVE_CUDA)
 
   option(FEAT_HAVE_HALFMATH "Support half precision floating point?" OFF)
   if(FEAT_HAVE_HALFMATH)
-    target_include_directories(feat-dependency INTERFACE "${CUDAToolkit_INCLUDE_DIRS}")
+    target_include_directories(feat-dependency SYSTEM INTERFACE "${CUDAToolkit_INCLUDE_DIRS}")
   endif (FEAT_HAVE_HALFMATH)
 
 endif(FEAT_HAVE_CUDA)
