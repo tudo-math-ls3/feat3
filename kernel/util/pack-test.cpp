@@ -222,3 +222,41 @@ public:
 #endif //FEAT_HAVE_ZFP
   }
 } pack_test;
+
+class Base64Test :
+  public TestSystem::UnitTest
+{
+public:
+  Base64Test() : TestSystem::UnitTest("Base64Test")
+  {
+  }
+
+  ~Base64Test() override = default;
+
+  void run() const override
+  {
+    // RFC 4648 Test Vectors
+    test_string("", "");
+    test_string("f", "Zg==");
+    test_string("fo", "Zm8=");
+    test_string("foo", "Zm9v");
+    test_string("foob", "Zm9vYg==");
+    test_string("fooba", "Zm9vYmE=");
+    test_string("foobar", "Zm9vYmFy");
+  }
+
+  void test_string(const String& input, const String& output) const
+  {
+    String encoded =
+      Pack::base64_encode((const Pack::u8*)input.c_str(), (const Pack::u8*)input.c_str() + input.length());
+
+    std::vector<Pack::u8> decoded_bytes = Pack::base64_decode(encoded);
+
+    std::string decoded(decoded_bytes.begin(), decoded_bytes.end());
+
+    // Output matches expected value
+    TEST_CHECK_EQUAL(encoded, output);
+    // Round trip is identity
+    TEST_CHECK_EQUAL(decoded, input);
+  }
+} base64_test;

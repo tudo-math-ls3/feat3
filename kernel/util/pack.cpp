@@ -12,6 +12,8 @@
 #include <kernel/util/type_traits.hpp>
 
 // includes, system
+#include <array>
+#include <algorithm>
 #include <cstring>
 
 // includes, thirdparty
@@ -1029,6 +1031,237 @@ namespace FEAT::Pack
     XABORTM("cannot decode compressed type; zfp not available");
     return std::size_t(0);
 #endif // FEAT_HAVE_ZFP
+  }
+
+  /////////////////////////////////////////////////////////////
+  // Base64 handling
+  /////////////////////////////////////////////////////////////
+
+  static constexpr std::string_view base64_alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+  static constexpr char base64_padding = '=';
+
+  /// Checks if the given characters is a valid Base64 character
+  static bool is_valid_base64_char(const char c)
+  {
+    return (std::isalnum(c) != 0) || c == '+' || c == '/' || c == base64_padding;
+  }
+
+  /// Encodes a group of three bytes into four Base64 characters
+  static void encode_base64_quantum(const std::array<Pack::u8, 3>& quantum, std::array<Pack::u8, 4>& chars)
+  {
+    // +--first octet--+-second octet--+--third octet--+
+    // |7 6 5 4 3 2 1 0|7 6 5 4 3 2 1 0|7 6 5 4 3 2 1 0|
+    // +-----------+---+-------+-------+---+-----------+
+    // |5 4 3 2 1 0|5 4 3 2 1 0|5 4 3 2 1 0|5 4 3 2 1 0|
+    // +--1.index--+--2.index--+--3.index--+--4.index--+
+
+    // Leftmost 6 bits of first octet
+    chars[0] = static_cast<Pack::u8>((quantum[0] & 0b11111100U) >> 2U);
+
+    // Rightmost 2 bits of first octet and leftmost 4 bits of second octet
+    chars[1] = static_cast<Pack::u8>(((quantum[0] & 0b00000011U) << 4U) | ((quantum[1] & 0b11110000U) >> 4U));
+
+    // Rightmost 4 bits of second octet and leftmost 2 bits of third octet
+    chars[2] = static_cast<Pack::u8>(((quantum[1] & 0b00001111U) << 2U) | ((quantum[2] & 0b11000000U) >> 6U));
+
+    // Rightmost 6 bits of third octet
+    chars[3] = static_cast<Pack::u8>(quantum[2] & 0b00111111U);
+  }
+
+  /// Decodes a group of four Base64 characters into a group of three bytes
+  static void decode_base64_quantum(std::array<Pack::u8, 3>& quantum, const std::array<Pack::u8, 4>& chars)
+  {
+    // +--first octet--+-second octet--+--third octet--+
+    // |7 6 5 4 3 2 1 0|7 6 5 4 3 2 1 0|7 6 5 4 3 2 1 0|
+    // +-----------+---+-------+-------+---+-----------+
+    // |5 4 3 2 1 0|5 4 3 2 1 0|5 4 3 2 1 0|5 4 3 2 1 0|
+    // +--1.index--+--2.index--+--3.index--+--4.index--+
+
+    // First char and leftmost two bits of second char
+    // NOTE: Useless mask for first operand silences warning about promotion to int
+    quantum[0] = static_cast<Pack::u8>(((chars[0] & 0b11111111U) << 2U) | ((chars[1] & 0b00110000U) >> 4U));
+
+    // Rightmost four bits of second char and leftmost four bits of third char
+    quantum[1] = static_cast<Pack::u8>(((chars[1] & 0b00001111U) << 4U) | ((chars[2] & 0b00111100U) >> 2U));
+
+    // Rightmost two bits of third char and fourth char
+    quantum[2] = static_cast<Pack::u8>(((chars[2] & 0b00000011U) << 6U) | (chars[3] & 0b00111111U));
+  }
+
+  /**
+   * \briefs Checks whether a string is valid Base64 data
+   *
+   * \param[in] s String to check
+   *
+   * \returns True, if s contains valid Base64 data
+   */
+  bool is_valid_base64_string(const String& s)
+  {
+    return std::all_of(s.begin(), s.end(), [](char c) { return is_valid_base64_char(c); });
+  }
+
+  /**
+   * \brief Encodes bytes into a Base64 string
+   *
+   * \tparam ByteIter Iterator of Pack::u8s. Must support operator* and operator++(int)
+   *
+   * \param[in] begin Start of bytes
+   * \param[in] end End of bytes
+   *
+   * \returns A string containing the given bytes as a Base64 string
+   *
+   * See RFC 4648 for details
+   */
+  String base64_encode(const Pack::u8* begin, const Pack::u8* end)
+  {
+    // Groups of three bytes are split into 6-bit groups,
+    // which are used as indices into the base64 alphabet
+
+    // We call each non-overlapping group of 3 bytes a "quantum" of data
+
+    // Depending on the input, there might be a partial quantum left
+    // after processing the final complete quantum.
+    // If there are no bits left, then encoding is done
+    // If there are 8 bits left, then the final bytes
+    // are encoded into two characters followed by two padding characters
+    // If there are 16 bits left, then the final bytes
+    // are encoded into three characters follow by a padding character
+
+    // Group of three bytes
+    std::array<Pack::u8, 3> quantum{};
+
+    // Group of four characters
+    std::array<Pack::u8, 4> chars{};
+
+    // Allocate outpuly 4 chars for at
+    // 4 chars per full quantum plus potentially 4 chars for a partial quantum
+    const auto num_bytes = static_cast<Index>(std::distance(begin, end));
+    const Index full_quantums = num_bytes / Index(3);
+    String output((full_quantums * 4) + (num_bytes % 3 == 0 ? 0 : 4), '=');
+
+    // Index into the current quantum of three bytes.
+    // Used to determine when a quantum is full and to
+    // determine the size of the partial quantum at the end
+    Index quantum_idx(0);
+
+    // Current position in output string
+    Index output_pos(0);
+
+    // Pointer to next byte of input
+    const Pack::u8* next_byte = begin;
+
+    while(next_byte != end)
+    {
+      quantum[quantum_idx++] = *next_byte++;
+
+      // Quantum is full. Encode it and write it to the output
+      if(quantum_idx == 3)
+      {
+        encode_base64_quantum(quantum, chars);
+
+        for(Pack::u8 idx : chars)
+        {
+          output[output_pos++] = base64_alphabet[idx];
+        }
+
+        // Reset quantum index
+        quantum_idx = 0;
+      }
+    }
+
+    // Check for partial quantum
+    if(quantum_idx > 0)
+    {
+      // Zero pad quantum
+      for(Index j = quantum_idx; j < 3; j++)
+      {
+        quantum[j] = 0;
+      }
+
+      encode_base64_quantum(quantum, chars);
+
+      // One byte in quantum => two chars in ouput
+      // Two bytes in quamtum => three chars in output
+      for(Index j(0); j < (quantum_idx + 1); j++)
+      {
+        output[output_pos++] = base64_alphabet[chars[j]];
+      }
+      // String is automatically padded by initialization
+    }
+
+    return output;
+  }
+
+  /**
+   * \brief Decodes a Base64 string into bytes
+   *
+   * \param[in] s String to decode
+   *
+   * \returns A vector containing the bytes encoded by \c s
+   *
+   * See RFC 4648 for details
+   */
+  std::vector<Pack::u8> base64_decode(const String& s)
+  {
+    // Groups of four characters are split into three bytes.
+    // We call each group of 3 bytes a "quantum" of data
+
+    // The input string might be padded with '=' characters.
+    // These are treated as zeros for the purposes of decoding a 3-byte
+    // quantum. Bytes that consist solely of padding bits are discarded.
+
+    // Group of three bytes
+    std::array<Pack::u8, 3> quantum{};
+    // Group of four Base64 chars
+    std::array<Pack::u8, 4> chars{};
+
+    std::vector<Pack::u8> output;
+
+    // Index into the current group of four chars.
+    // Used to determine when a group is full and to
+    // determine the size of the partial group at the end
+    Index char_idx(0);
+
+    // Pointer to next input char
+    auto next_char = s.begin();
+
+    while(next_char != s.end() && is_valid_base64_char(*next_char) && *next_char != base64_padding)
+    {
+      // Cast is safe because we know the char is a valid base64 char
+      chars[char_idx++] = static_cast<Pack::u8>(base64_alphabet.find(*next_char++));
+
+      if(char_idx == 4)
+      {
+        decode_base64_quantum(quantum, chars);
+
+        for(Pack::u8 byte : quantum)
+        {
+          output.push_back(byte);
+        }
+
+        char_idx = 0;
+      }
+    }
+
+    if(char_idx > 0)
+    {
+      // Zero pad chars
+      for(Index j = char_idx; j < 4; j++)
+      {
+        chars[j] = 0;
+      }
+
+      decode_base64_quantum(quantum, chars);
+
+      // Two chars in string => one byte in output
+      // Three chars in string => two bytes in output
+      for(Index j(0); j < (char_idx - 1); j++)
+      {
+        output.push_back(quantum[j]);
+      }
+    }
+
+    return output;
   }
 
   /////////////////////////////////////////////////////////////

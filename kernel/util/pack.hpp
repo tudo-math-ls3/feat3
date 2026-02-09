@@ -364,4 +364,40 @@ namespace FEAT::Pack
     std::size_t buf_size,
     Pack::Type pack_type,
     bool swap_bytes);
+
+  /////////////////////////////////////////////////////////////
+  // Base64 handling
+  /////////////////////////////////////////////////////////////
+
+  /**
+   * \briefs Checks whether a string is valid Base64 data
+   *
+   * \param[in] s String to check
+   *
+   * \returns True, if s contains valid Base64 data
+   */
+  bool is_valid_base64_string(const String& s);
+
+  /**
+   * \brief Encodes bytes into a Base64 string
+   *
+   * \param[in] begin Start of bytes
+   * \param[in] end End of bytes
+   *
+   * \returns A string containing the given bytes as a Base64 string
+   *
+   * See RFC 4648 for details
+   */
+  String base64_encode(const Pack::u8* begin, const Pack::u8* end);
+
+  /**
+   * \brief Decodes a Base64 string into bytes
+   *
+   * \param[in] s String to decode
+   *
+   * \returns A vector containing the bytes encoded by \c s
+   *
+   * See RFC 4648 for details
+   */
+  std::vector<Pack::u8> base64_decode(const String& s);
 } // namespace FEAT::Pack
