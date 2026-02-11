@@ -35,7 +35,16 @@ use-base-mesh = true or false # default false
 base-mesh = path/to/mesh/filename
 
 # Use cgal to determine fbm meshparts, else internal voxel map is used
-meshpart-by-cgal-wrapper = false  # or true
+meshpart-by-cgal-wrapper = true  # or false, for now should always be used
+
+# Use cheap (i.e. no) weight calculation, careful very expensive to do
+cheap-weights = false  # or true default false
+
+# Force flush print
+always-flush-print = true  # or false default true
+
+# Do exact intersection tests to cut away elements, very expensive to do
+exact-deslagging = false # or true  default false
 
 ################### problem params #######################################
 ## problem definition

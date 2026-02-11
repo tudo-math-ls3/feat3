@@ -73,6 +73,7 @@ namespace Gendie
     bool measure_cgal_size = true;
     bool cheap_weights = true;
     bool always_flush_print = false;
+    bool exact_deslagging = false;
 
     ParameterHolder() = default;
 
@@ -167,7 +168,9 @@ namespace Gendie
 
           cheap_weights = Gendie::check_for_config_option(base_config->query("cheap-weights"), true);
           // TODO: This should not be on by default
-          always_flush_print = Gendie::check_for_config_option(base_config->query("always-flush-print"), true);
+          always_flush_print = Gendie::check_for_config_option(base_config->query("always-flush-print"), false);
+
+          exact_deslagging = Gendie::check_for_config_option(base_config->query("exact-deslagging"), false);
         }
 
         // refine resolution parameter depending on level
@@ -259,6 +262,7 @@ namespace Gendie
       output += String("MinGap").pad_back(pad_len, pad_char) + ": " + min_gap + "\n";
       output += String("Cheap weight calculation").pad_back(pad_len, pad_char) + ": " + (cheap_weights ? String("yes") : String("no")) + "\n";
       output += String("Flush Print").pad_back(pad_len, pad_char) + ": " + (always_flush_print ? String("yes") : String("no")) + "\n";
+      output += String("Exact Deslagging").pad_back(pad_len, pad_char) + ": " + (exact_deslagging ? String("yes") : String("no")) + "\n";
       output += String("Cubature Matrix a").pad_back(pad_len, pad_char) + ": " + cubature_a + "\n";
       output += String("Cubature Matrix b").pad_back(pad_len, pad_char) + ": " + cubature_b + "\n";
       output += String("Cubature Matrix m").pad_back(pad_len, pad_char) + ": " + cubature_m + "\n";
@@ -304,6 +308,8 @@ namespace Gendie
       domain.set_desired_levels(param_holder.level_string.split_by_whitespaces());
     }
 
+    logger->print("Creating mesh");
+
     if(param_holder.use_base_mesh)
     {
       std::deque<String> mesh_file_names = param_holder.base_meshfile_names.split_by_whitespaces();
@@ -328,16 +334,20 @@ namespace Gendie
                                 param_holder.mesh_bb_max[0], param_holder.mesh_bb_min[1], param_holder.mesh_bb_max[1], param_holder.mesh_bb_min[2], param_holder.mesh_bb_max[2]);
     }
 
+    logger->print("Setting CGAL Wrapper");
     // create slag mask
     if(domain.cgal_wrapper_empty())
     {
       domain.create_cgal_wrapper(param_holder.surface_meshfile, Geometry::CGALFileMode::fm_off);
+      domain.get_cgal_wrapper()->set_expensive_intersection(param_holder.exact_deslagging);
     }
     //always keep cgal wrapper
     domain.keep_cgal_wrapper();
 
     // now we can create our hirarchy
+    logger->print("Creating hirarchy");
     domain.create_hierarchy();
+
     logger->print("Printing chosen parti info", info);
 
     if(domain.front_layer().comm().rank() == 0)
@@ -760,6 +770,10 @@ namespace Gendie
     PartitionControl<DomainLevel> domain(comm, true);
     {
       std::unique_ptr<Geometry::CGALWrapper<SystemDataType>> _cgal_tmp = Gendie::create_cgal_wrapper(param_holder.surface_meshfile, comm);
+      if(_cgal_tmp)
+      {
+        _cgal_tmp->set_expensive_intersection(param_holder.exact_deslagging);
+      }
       if(_cgal_tmp && param_holder.measure_cgal_size)
       {
         std::size_t bytes_sum, bytes_min, bytes_max;
