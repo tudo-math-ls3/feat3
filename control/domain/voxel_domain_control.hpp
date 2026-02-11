@@ -910,6 +910,85 @@ namespace FEAT
         }
 
         /**
+         * \brief Gather a vector of element indices that intersect the masked domain in a copperative manner
+         *
+         * \attention
+         * This has to be called by all processes in the sibling communicator
+         *
+         * \param[in] mesh
+         * A \transient reference to the mesh whose elements are to be tested against the cgal mesh
+         *
+         * \param[in] sibling_comm
+         * The communicator accross the workload is to be spread.
+         *
+         * \returns
+         * A vector containing the indices of all mesh elements that intersect the domain that is represented by
+         * the voxel map.
+         */
+        std::vector<Index> _gather_masked_elements(const MeshType& mesh, const Dist::Comm& sibling_comm) const
+        {
+          const Index num_elems = mesh.get_num_elements();
+          const Index num_procs = Index(sibling_comm.size());
+          const Index cur_rank = Index(sibling_comm.rank());
+          const Index elems_per_rank = num_elems/num_procs + Index((num_elems%num_procs)>0u);
+
+          // reserve the vector
+          std::vector<Index> masked_elems;
+          masked_elems.reserve(elems_per_rank);
+
+          // get the vertex set and the vertices-at-element index set
+          const auto& vtx = mesh.get_vertex_set();
+          const auto& verts_at_elem = mesh.template get_index_set<shape_dim, 0>();
+
+          // element bounding box coordinates
+          Tiny::Vector<CoordType, shape_dim> elbox_min, elbox_max;
+
+          // loop over all elements
+          for(Index ielem = cur_rank*elems_per_rank; ielem < Math::min((cur_rank+1u)*elems_per_rank, num_elems); ++ielem)
+          {
+            // compute bounding box of element
+            // note: actually, we should always have
+            //   elbox_min = vtx[verts_at_elem(ielem, 0)]
+            //   elbox_max = vtx[verts_at_elem(ielem, 1 << shape_dim - 1)]
+            // because of the element orientation of the base mesh, but we'll compute the bounding
+            // box for each element manually anyways, just to be sure in case that a derived class
+            // might give us a mesh object that is not directly refined from the base mesh using
+            // the standard 2-level refinement...
+            elbox_min = elbox_max = vtx[verts_at_elem(ielem, 0)];
+            for(int j(1); j < verts_at_elem.num_indices; ++j)
+            {
+              const auto& v = vtx[verts_at_elem(ielem, j)];
+              for(int k(0); k < shape_dim; ++k)
+                Math::minimax(v[k], elbox_min[k], elbox_max[k]);
+            }
+
+            // check the bounding box against the voxel map
+            if(this->_voxel_map->check_box(elbox_min, elbox_max))
+              masked_elems.push_back(ielem);
+          }
+
+          // communicate sizes of buffers
+          std::vector<int> recv_sizes(num_procs);
+          recv_sizes.at(cur_rank) = int(masked_elems.size());
+
+          sibling_comm.allgather(recv_sizes.data(), 1, recv_sizes.data(), 1);
+
+          // and now, create big buffer
+          std::vector<Index> gathered_mask(std::size_t(std::accumulate(recv_sizes.begin(), recv_sizes.end(), 0)), 0u);
+
+          // and also, we have to caclulate our displacements into our big buffer
+          std::vector<int> displacements;
+          displacements.reserve(recv_sizes.size());
+          std::exclusive_scan(recv_sizes.begin(), recv_sizes.end(), std::back_inserter(displacements), 0);
+
+          // and now gather
+          sibling_comm.allgatherv(masked_elems.data(), masked_elems.size(), gathered_mask.data(), recv_sizes.data(), displacements.data());
+
+          // return the list of all elements that we found
+          return gathered_mask;
+        }
+
+        /**
          * \brief Gathers the element slag weights for a given mesh
          *
          * The "slag weight" of an element is defined as the number of voxel map points with a value of 1,
@@ -981,7 +1060,7 @@ namespace FEAT
         virtual std::unique_ptr<MeshNodeType> _deslag_mesh_node(MeshNodeType& mesh_node)
         {
           XASSERTM(mesh_node.get_halo_map().empty(), "This function must not be used for partitioned mesh nodes!");
-          return mesh_node.extract_patch(_gather_masked_elements(*mesh_node.get_mesh()), true, false, false);
+          return mesh_node.extract_patch(_gather_masked_elements(*mesh_node.get_mesh(), this->_comm), true, false, false);
         }
 
         /**
@@ -1004,7 +1083,9 @@ namespace FEAT
          */
         virtual std::unique_ptr<MeshNodeType> _deslag_mesh_node(MeshNodeType& mesh_node, const Ancestor& ancestor, bool is_child)
         {
-          std::unique_ptr<MeshNodeType> new_node = mesh_node.extract_patch(_gather_masked_elements(*mesh_node.get_mesh()), true, false, false);
+          const auto* prod_comm = is_child ? &ancestor.progeny_comm : nullptr;
+          std::unique_ptr<MeshNodeType> new_node = prod_comm ? mesh_node.extract_patch(_gather_masked_elements(*mesh_node.get_mesh(), *prod_comm), true, false, false):
+                                                               mesh_node.extract_patch(_gather_masked_elements(*mesh_node.get_mesh()), true, false, false);
           this->_deslag_patch_halos(*new_node, mesh_node, ancestor, is_child);
           return new_node;
         }

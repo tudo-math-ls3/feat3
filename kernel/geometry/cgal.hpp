@@ -178,6 +178,7 @@ namespace FEAT
 
     private:
       void * _cgal_data;
+      bool _expensive_intersection = false;
 
       /// read in stream in prescibed file format and preprocess search tree for in/out test
       void _parse_mesh(std::istream & file, CGALFileMode file_mode);
@@ -314,6 +315,9 @@ namespace FEAT
 
       /// Returns the outer normals at each surface element
       std::vector<PointType> outer_normals_at_faces() const;
+
+      /// Sets whether we do an expensive test for the intersection test or only use boundingboxes
+      void set_expensive_intersection(bool expensive_test);
 
     private:
       /// Delete tree, which also requires to delete the inside tester

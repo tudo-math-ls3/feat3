@@ -159,20 +159,28 @@ namespace FEAT::Geometry
 
   template<typename DT_>
   CGALWrapper<DT_>::CGALWrapper(std::istream & file, CGALFileMode file_mode) :
-    _cgal_data(nullptr)
+    _cgal_data(nullptr),
+    _expensive_intersection(false)
   {
     _parse_mesh(file, file_mode);
   }
 
   template<typename DT_>
   CGALWrapper<DT_>::CGALWrapper(const String & filename, CGALFileMode file_mode) :
-    _cgal_data(nullptr)
+    _cgal_data(nullptr),
+    _expensive_intersection(false)
   {
     std::ifstream file(filename.c_str());
     XASSERTM(file.is_open(), "CGALWrapper: file read error: " + filename + " !");
     _parse_mesh(file, file_mode);
     file.close();
   }
+
+  template<typename DT_>
+  void CGALWrapper<DT_>::set_expensive_intersection(bool expensive_test)
+      {
+        this->_expensive_intersection = expensive_test;
+      }
 
   template <typename DT_>
   static CGALWrapperData<DT_> *from_topology(
@@ -210,7 +218,8 @@ namespace FEAT::Geometry
   CGALWrapper<DT_>::CGALWrapper(
     const std::vector<typename CGALWrapper<DT_>::PointType> &vertices,
     const std::vector<std::array<Index, 3>> &faces) :
-    _cgal_data(from_topology<DT_>(vertices, faces))
+    _cgal_data(from_topology<DT_>(vertices, faces)),
+    _expensive_intersection(false)
   {
     _init_wrapper();
   }
@@ -731,7 +740,8 @@ namespace FEAT::Geometry
 
   template<typename DT_>
   CGALWrapper<DT_>::CGALWrapper(CGALWrapper<DT_>&& other) noexcept
-  : _cgal_data(nullptr)
+  : _cgal_data(nullptr),
+    _expensive_intersection(other._expensive_intersection)
   {
     std::swap(this->_cgal_data, other._cgal_data);
   }
@@ -739,6 +749,7 @@ namespace FEAT::Geometry
   template<typename DT_>
   CGALWrapper<DT_>& CGALWrapper<DT_>::operator=(CGALWrapper<DT_>&& other) noexcept
   {
+    this->_expensive_intersection = other._expensive_intersection;
     std::swap(this->_cgal_data, other._cgal_data);
     return *this;
   }
@@ -800,7 +811,7 @@ namespace FEAT::Geometry
     }
 
     // first, create boundingbox
-    auto boxA = CGAL::Bbox_3(0., 0., 0., 0., 0., 0.);
+    auto boxA = hexaeder.point(*std::begin(hexaeder.vertices())).bbox();
     for(auto v : hexaeder.vertices())
     {
       boxA += hexaeder.point(v).bbox();
@@ -836,15 +847,21 @@ namespace FEAT::Geometry
       }
     }
 
-    // we are not inside, so now check, if we intersect tree at all
-    if(!tree->do_intersect(boxA))
-      return false;
-
-    //finally, we have no better choice than doing a check against all surface elements
+    if(!this->_expensive_intersection)
     {
+      return tree->do_intersect(boxA);
+    }
+    else
+    {
+      // we construct a list of all primitives (i.e. surface elements) intersected with our boundinbox
+      std::list<typename FEAT::Geometry::CGALTypeWrapper<DT_>::Tree_::Primitive_id> primitives;
+
+      // gather all intersections
+      tree->all_intersected_primitives(boxA, std::back_inserter(primitives));
       const auto* poly = static_cast<CGALWrapperData<DT_>*>(this->_cgal_data)->_polyhedron;
 
-      for(auto sf : poly->faces())
+      // iterate over all primitives (i.e. faces) that possibly intersect our boundingbox
+      for(const auto& sf: primitives)
       {
         std::array<Point, 3> triang;
         {
@@ -854,8 +871,10 @@ namespace FEAT::Geometry
             triang[k++] = poly->point(v);
           }
         }
-        CGAL::Triangle_3<typename CGALTypeWrapper<DT_>::K> triangle_s(triang[0], triang[1], triang[2]);
+        CGAL::Triangle_3<typename CGALTypeWrapper<DT_>::K> triangle_s{triang[0], triang[1], triang[2]};
 
+        // now test if we actually intersect, testing only intersection is enough, since we know the geometries do not
+        // contain each other
         for(auto f : hexaeder.faces())
         {
           {
@@ -872,6 +891,7 @@ namespace FEAT::Geometry
         }
       }
     }
+
 
     // no intersection
     return false;
