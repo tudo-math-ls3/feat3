@@ -420,8 +420,9 @@ namespace Gendie
     LevelDeque<SolverDataType_>& _get_level(bool system_assembled = false)
     {
       if(_level_deques.template get_level<SolverDataType_>().empty())
+      {
         return _set_level<SolverDataType_>(system_assembled);
-
+      }
       return _level_deques.template get_level<SolverDataType_>();
     }
 

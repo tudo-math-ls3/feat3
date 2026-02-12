@@ -65,7 +65,44 @@ if (FEAT_HAVE_SUPERLU_DIST)
 endif (FEAT_HAVE_SUPERLU_DIST)
 
 if (FEAT_HAVE_TRILINOS)
-  target_link_libraries(feat-kernel-solver PUBLIC TRILINOS_TPL)
+  find_package(Trilinos
+      REQUIRED
+      PATHS "${FEAT_TRILINOS_PATH}/"
+      COMPONENTS
+      # Amesos
+      # AztecOO
+      Belos
+      # Epetra
+      # Ifpack
+      # MueLu
+      Teuchos
+      Tpetra
+      Thyra
+      # ShyLU
+      ShyLU_DD
+      Xpetra
+      Zoltan
+      Zoltan2)
+  target_link_libraries(feat-kernel-solver PRIVATE Trilinos::all_selected_libs)
+
+  #target_compile_options(feat-kernel-solver PRIVATE ${Trilinos_CXX_COMPILER_FLAGS})
+
+  ## if trilinos has mumps available, we have to link against the fortran headers, which requires fortran to be an activated language of the project
+  if(TARGET MUMPS::all_libs)
+    set(CMAKE_Fortran_COMPILER "mpifort" CACHE STRING "" FORCE)
+    enable_language(Fortran)
+    find_package(MPI COMPONENTS Fortran C CXX)
+    # target_link_libraries(feat-kernel-solver PRIVATE MUMPS::all_libs MPI::MPI_CXX MPI::MPI_Fortran mpi_mpifh gfortran)
+    target_link_libraries(feat-kernel-solver PRIVATE MUMPS::all_libs MPI::MPI_CXX MPI::MPI_Fortran)
+    target_link_libraries(feat-kernel-solver PRIVATE ${Trilinos_Fortran_IMPLICIT_LINK_LIBRARIES})
+  endif()
+  target_link_libraries(feat-kernel-solver PRIVATE $<TARGET_NAME_IF_EXISTS:UMFPACK::all_libs>)
+  target_link_libraries(feat-kernel-solver PRIVATE $<TARGET_NAME_IF_EXISTS:Scotch::all_libs>)
+  target_link_libraries(feat-kernel-solver PRIVATE $<TARGET_NAME_IF_EXISTS:SCALAPACK::all_libs>)
+  target_link_libraries(feat-kernel-solver PRIVATE $<TARGET_NAME_IF_EXISTS:LAPACK::all_libs>)
+  target_link_libraries(feat-kernel-solver PRIVATE $<TARGET_NAME_IF_EXISTS:BLAS::all_libs>)
+  # target_link_libraries(TRILINOS_TPL INTERFACE $<TARGET_NAME_IF_EXISTS:METIS::all_libs>)
+  # target_link_libraries(feat-kernel-solver PUBLIC TRILINOS_TPL)
 endif (FEAT_HAVE_TRILINOS)
 
 if (FEAT_HAVE_UMFPACK)

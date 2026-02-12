@@ -40,6 +40,7 @@
   _Pragma("GCC diagnostic ignored \"-Wpedantic\"") \
   _Pragma("GCC diagnostic ignored \"-Wignored-qualifiers\"") \
   _Pragma("GCC diagnostic ignored \"-Wduplicated-branches\"")
+  _Pragma("GCC diagnostic ignored \"-Walloc-size-larger-than=\"")
 #else
 #define FEAT_DISABLE_WARNINGS _Pragma("GCC diagnostic push") \
   _Pragma("GCC diagnostic ignored \"-Wunused-variable\"") \

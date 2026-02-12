@@ -1412,7 +1412,7 @@ namespace FEAT
           {
             FROSchParameterList::PartitionType parti_type;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("parmetis"))
             {
@@ -1442,7 +1442,7 @@ namespace FEAT
             for(const auto& t : it->second)
             {
               std::string type = t;
-              std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+              std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
               if(!type.compare("parmetis"))
               {
@@ -1484,7 +1484,7 @@ namespace FEAT
           {
             FROSchParameterList::PartitionApproach parti_app;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("partition"))
             {
@@ -1505,7 +1505,7 @@ namespace FEAT
             for(const auto& t : it->second)
             {
               std::string type = t;
-              std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+              std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
               if(!type.compare("partition"))
               {
@@ -1578,7 +1578,7 @@ namespace FEAT
           {
             FROSchParameterList::IPOU ipou;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("gdsw"))
             {
@@ -1602,7 +1602,7 @@ namespace FEAT
             for(const auto& t : it->second)
             {
               std::string type = t;
-              std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+              std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
               if(!type.compare("gdsw"))
               {
@@ -1638,7 +1638,7 @@ namespace FEAT
           {
             FROSchParameterList::IPOU ipou;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("gdsw"))
             {
@@ -1662,7 +1662,7 @@ namespace FEAT
             for(const auto& t : it->second)
             {
               std::string type = t;
-              std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+              std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
               if(!type.compare("gdsw"))
               {
@@ -1698,7 +1698,7 @@ namespace FEAT
           {
             FROSchParameterList::DirectSolver solver;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("klu"))
             {
@@ -1722,7 +1722,7 @@ namespace FEAT
             for(const auto& t : it->second)
             {
               std::string type = t;
-              std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+              std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
               if(!type.compare("klu"))
               {
@@ -1758,7 +1758,7 @@ namespace FEAT
           {
             FROSchParameterList::DirectSolver solver;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("klu"))
             {
@@ -1782,7 +1782,7 @@ namespace FEAT
             for(const auto& t : it->second)
             {
               std::string type = t;
-              std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+              std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
               if(!type.compare("klu"))
               {
@@ -1818,7 +1818,7 @@ namespace FEAT
           {
             FROSchParameterList::DirectSolver solver;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("klu"))
             {
@@ -1853,7 +1853,7 @@ namespace FEAT
           {
             FROSchParameterList::Preconditioner precond;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("twolevel"))
             {
@@ -1888,7 +1888,7 @@ namespace FEAT
           {
             bool cspace;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("true"))
             {
@@ -1909,7 +1909,7 @@ namespace FEAT
             for(const auto& t : it->second)
             {
               std::string type = t;
-              std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+              std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
               if(!type.compare("true"))
               {
@@ -1942,7 +1942,7 @@ namespace FEAT
           {
             bool cspace;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("true"))
             {
@@ -1963,7 +1963,7 @@ namespace FEAT
             for(const auto& t : it->second)
             {
               std::string type = t;
-              std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+              std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
               if(!type.compare("true"))
               {
@@ -1996,7 +1996,7 @@ namespace FEAT
           {
             bool excl;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("true"))
             {
@@ -2017,7 +2017,7 @@ namespace FEAT
             for(const auto& t : it->second)
             {
               std::string type = t;
-              std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+              std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
               if(!type.compare("true"))
               {
@@ -2050,7 +2050,7 @@ namespace FEAT
           {
             bool excl;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("true"))
             {
@@ -2071,7 +2071,7 @@ namespace FEAT
             for(const auto& t : it->second)
             {
               std::string type = t;
-              std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+              std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
               if(!type.compare("true"))
               {
@@ -2104,7 +2104,7 @@ namespace FEAT
           {
             bool print;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
             if(!type.compare("true"))
             {
               print = true;
@@ -2135,7 +2135,7 @@ namespace FEAT
           {
             bool verbose;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
             if(!type.compare("true"))
             {
               verbose = true;
@@ -2166,7 +2166,7 @@ namespace FEAT
           {
             bool timer;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("true"))
             {
@@ -2198,7 +2198,7 @@ namespace FEAT
           {
             FROSchParameterList::CombineOverlap mode;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("full"))
             {
@@ -2222,7 +2222,7 @@ namespace FEAT
             for(const auto& t : it->second)
             {
               std::string type = t;
-              std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+              std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
               if(!type.compare("full"))
               {
@@ -2258,7 +2258,7 @@ namespace FEAT
           {
             FROSchParameterList::CombineLevel mode;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("additive"))
             {
@@ -2279,7 +2279,7 @@ namespace FEAT
             for(const auto& t : it->second)
             {
               std::string type = t;
-              std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+              std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
               if(!type.compare("additive"))
               {
@@ -2312,7 +2312,7 @@ namespace FEAT
           {
             bool rsf_ao;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("true"))
             {
@@ -2333,7 +2333,7 @@ namespace FEAT
             for(const auto& t : it->second)
             {
               std::string type = t;
-              std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+              std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
               if(!type.compare("true"))
               {
@@ -2366,7 +2366,7 @@ namespace FEAT
           {
             bool rsf_cm;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("true"))
             {
@@ -2387,7 +2387,7 @@ namespace FEAT
             for(const auto& t : it->second)
             {
               std::string type = t;
-              std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+              std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
               if(!type.compare("true"))
               {
@@ -2420,7 +2420,7 @@ namespace FEAT
           {
             bool reuse_cm;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("true"))
             {
@@ -2441,7 +2441,7 @@ namespace FEAT
             for(const auto& t : it->second)
             {
               std::string type = t;
-              std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+              std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
               if(!type.compare("true"))
               {
@@ -2474,7 +2474,7 @@ namespace FEAT
           {
             bool reuse_cb;
             std::string type = it->second.front();
-            std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+            std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
             if(!type.compare("true"))
             {
@@ -2495,7 +2495,7 @@ namespace FEAT
             for(const auto& t : it->second)
             {
               std::string type = t;
-              std::for_each(type.begin(), type.end(), [](char& c) { c = std::tolower(c); });
+              std::transform(type.begin(), type.end(), type.begin(), [](unsigned char c){return std::tolower(c);});
 
               if(!type.compare("true"))
               {
@@ -2966,7 +2966,7 @@ namespace FEAT
             for(Teuchos::Array<GO>::size_type j = 0; j < num_entries; ++j)
               col_buffer[j] = static_cast<GO>(this->_col_idx[entries_start + j]);
 
-            crsgraph->insertGlobalIndices(static_cast<GO>(_my_dof_offset + i), num_entries, col_buffer.data());
+            crsgraph->insertGlobalIndices(static_cast<GO>(_my_dof_offset + i), int(num_entries), col_buffer.data());
             entries_start += num_entries;
           }
           crsgraph->fillComplete();
@@ -3210,8 +3210,8 @@ namespace FEAT
           for (int rank = 0; rank < _comm->getSize(); ++rank)
           {
             rank_start[rank] = _all_global_dof_offset[rank];
-            rank_velo_end[rank] = _all_global_dof_offset[rank] + _all_num_owned_velo_dofs[rank];
-            rank_total_end[rank] = _all_global_dof_offset[rank] + _all_num_owned_velo_dofs[rank] + _all_num_owned_pres_dofs[rank];
+            rank_velo_end[rank] = _all_global_dof_offset[rank] + GO(_all_num_owned_velo_dofs[rank]);
+            rank_total_end[rank] = _all_global_dof_offset[rank] + GO(_all_num_owned_velo_dofs[rank]) + GO(_all_num_owned_pres_dofs[rank]);
           }
 
           /// build repeated maps and set
@@ -3256,7 +3256,7 @@ namespace FEAT
                   if(col < rank_velo_end[current_rank])
                   {
                     // Velocity DOF
-                    GO mapped_dof = _all_first_owned_velo_dof[current_rank] + (col - rank_start[current_rank]);
+                    GO mapped_dof = GO(_all_first_owned_velo_dof[current_rank]) + GO(col - rank_start[current_rank]);
                     cols[counter++] = mapped_dof;
                   }
                 }
@@ -3315,7 +3315,7 @@ namespace FEAT
               for (unsigned j = i; j < XRepeatedMaps[0]->getLocalNumElements(); j += dofsPerNodeVector[0]) {
                 nullSpaceBasis[0]->getDataNonConst(i)[XRepeatedMaps[0]->getLocalElement(XRepeatedMaps[0]->getGlobalElement(j))] = Teuchos::ScalarTraits<SC>::one();
               }
-            LO offset = XRepeatedMaps[0]->getLocalNumElements();
+            LO offset = LO(XRepeatedMaps[0]->getLocalNumElements());
             for (unsigned j = 0; j < XRepeatedMaps[1]->getLocalNumElements(); j += dofsPerNodeVector[1]) {
               nullSpaceBasis[1]->getDataNonConst(0)[offset + XRepeatedMaps[1]->getLocalElement(XRepeatedMaps[1]->getGlobalElement(j))] = Teuchos::ScalarTraits<SC>::one();
             }
@@ -3359,7 +3359,7 @@ namespace FEAT
                 if(col < rank_velo_end[current_rank])
                 {
                   // Velocity DOF
-                  GO mapped_dof = _all_first_owned_velo_dof[current_rank] + (col - rank_start[current_rank]);
+                  GO mapped_dof = GO(_all_first_owned_velo_dof[current_rank]) + GO(col - rank_start[current_rank]);
                   cols[counter++] = mapped_dof;
                   this->_col_idx_mapped[counter_col_idx++] = mapped_dof;
                 }
@@ -3367,7 +3367,7 @@ namespace FEAT
                 {
                   // Pressure DOF
                   GO pres_offset = col - rank_velo_end[current_rank];
-                  GO mapped_dof = _num_global_velo_dofs + _all_first_owned_pres_dof[current_rank] + pres_offset;
+                  GO mapped_dof = GO(_num_global_velo_dofs) + GO(_all_first_owned_pres_dof[current_rank]) + GO(pres_offset);
                   cols[counter++] = mapped_dof;
                   this->_col_idx_mapped[counter_col_idx++] = mapped_dof;
                 }
@@ -3403,7 +3403,7 @@ namespace FEAT
                 if(col < rank_velo_end[current_rank])
                 {
                   // Velocity DOF
-                  GO mapped_dof = _all_first_owned_velo_dof[current_rank] + (col - rank_start[current_rank]);
+                  GO mapped_dof = GO(_all_first_owned_velo_dof[current_rank]) + GO(col - rank_start[current_rank]);
                   cols[counter++] = mapped_dof;
                   this->_col_idx_mapped[counter_col_idx++] = mapped_dof;
                 }
@@ -3411,7 +3411,7 @@ namespace FEAT
                 {
                   // Pressure DOF
                   GO pres_offset = col - rank_velo_end[current_rank];
-                  GO mapped_dof = _num_global_velo_dofs + _all_first_owned_pres_dof[current_rank] + pres_offset;
+                  GO mapped_dof = GO(_num_global_velo_dofs) + GO(_all_first_owned_pres_dof[current_rank]) + GO(pres_offset);
                   cols[counter++] = mapped_dof;
                   this->_col_idx_mapped[counter_col_idx++] = mapped_dof;
                 }
@@ -3622,6 +3622,7 @@ namespace FEAT
     } // namespace Trilinos
   } // namespace Solver
 } // namespace FEAT
+
 #else
 // insert dummy function to suppress linker warnings
 void dummy_frosch_function() {}
