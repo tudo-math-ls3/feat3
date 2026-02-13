@@ -109,6 +109,7 @@ if(FEAT_HAVE_BOOST)
     VERSION 1.88
     URL https://github.com/boostorg/boost/releases/download/boost-1.88.0/boost-1.88.0-cmake.zip
     URL_HASH MD5=419f6a9273cb90d4f3f65ca0ae02cd00
+    COMPONENTS graph heap logic
     CONFIG
     SYSTEM
   )

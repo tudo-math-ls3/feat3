@@ -46,7 +46,7 @@ function(feat_get_tpl)
     TPL
     "CONFIG;EXLUDE_FROM_ALL;SYSTEM" # Options
     "PACKAGE_NAME;VERSION;URL;URL_HASH;SOURCE_SUBDIR" # Single value keywords
-    "PATCH_COMMAND_WINDOWS;PATCH_COMMAND_LINUX" # Multi value keywords
+    "PATCH_COMMAND_WINDOWS;PATCH_COMMAND_LINUX;COMPONENTS" # Multi value keywords
   )
   message(STATUS "------------------------------------------------------")
   message(STATUS "- Getting TPL: ${TPL_PACKAGE_NAME} (Version: ${TPL_VERSION})")
@@ -61,6 +61,11 @@ function(feat_get_tpl)
 
     if(FEAT_NO_EXTERNAL_DOWNLOAD)
         list(APPEND FIND_PACKAGE_ARGS REQUIRED)
+    endif()
+
+    if(TPL_COMPONENTS)
+      list(APPEND FIND_PACKAGE_ARGS COMPONENTS)
+      list(APPEND FIND_PACKAGE_ARGS ${TPL_COMPONENTS})
     endif()
 
     message(STATUS "Trying to find ${TPL_PACKAGE_NAME}")
