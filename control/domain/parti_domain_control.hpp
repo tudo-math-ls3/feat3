@@ -10,6 +10,7 @@
 #include <kernel/geometry/mesh_file_reader.hpp>
 #include <kernel/geometry/boundary_factory.hpp>
 #include <kernel/geometry/common_factories.hpp>
+#include <kernel/geometry/hit_test_factory.hpp>
 
 #include <control/domain/parti_domain_control_base.hpp>
 
@@ -80,6 +81,12 @@ namespace FEAT
         using typename BaseClass::Ancestor;
         /// our weight type
         using typename BaseClass::WeightType;
+
+        /// shape dimension
+        static constexpr int shape_dim = MeshType::shape_dim;
+
+        /// coordinate type
+        typedef typename MeshType::CoordType CoordType;
 
       protected:
         /// the extern partition sets
@@ -248,7 +255,7 @@ namespace FEAT
          * \param[in] num_elems_x, num_elems_y, num_elems_z
          * The number of elements in each dimension for the base-mesh
          */
-        virtual void create_rectilinear(Index num_elems_x, Index num_elems_y = 0u, Index num_elems_z = 0u)
+        virtual void create_unit_hypercube(Index num_elems_x, Index num_elems_y = 0u, Index num_elems_z = 0u)
         {
           // ensure that the domain control is still empty
           XASSERTM(!this->_was_created, "domain has already been created");
@@ -265,6 +272,101 @@ namespace FEAT
           {
             Geometry::BoundaryFactory<MeshType> bnd_factory(*base_mesh_node->get_mesh());
             base_mesh_node->add_mesh_part("bnd", bnd_factory.make_unique());
+          }
+
+          // create control
+          this->create(std::move(base_mesh_node));
+
+          // collect partition statistics
+          FEAT::Statistics::toe_partition = stamp_create.elapsed_now();
+        }
+
+        /**
+         * \brief Creates a domain control from a structured rectilinear base mesh for specific size and add standard
+         *        boundary names
+         *
+         * \note This function also creates mesh-parts "bnd:l, bnd:r" and so on.
+         *
+         * \param[in] num_elems_x, num_elems_y, num_elems_z
+         * The number of elements in each dimension for the base-mesh
+         *
+         * \param[in] min_x, min_y, min_z
+         * The lower boundaries of the rectangle
+         *
+         * \param[in] max_x, max_y, max_z
+         * The upper boundaries of the rectangle
+         */
+        virtual void create_rectilinear(Index num_elems_x, CoordType x_min, CoordType x_max,
+          Index num_elems_y = 0u, CoordType y_min = CoordType(0), CoordType y_max = CoordType(0),
+          Index num_elems_z = 0u, CoordType z_min = CoordType(0), CoordType z_max = CoordType(0))
+        {
+          // ensure that the domain control is still empty
+          XASSERTM(!this->_was_created, "domain has already been created");
+          XASSERT(this->size_physical() == std::size_t(0));
+          XASSERT(this->size_virtual() == std::size_t(0));
+
+          TimeStamp stamp_create;
+
+          // allocate a base-mesh node and create mesh
+          std::unique_ptr<MeshNodeType> base_mesh_node = MeshNodeType::make_unique(
+            Geometry::StructUnitCubeFactory<MeshType>::make_unique_from(num_elems_x, num_elems_y, num_elems_z));
+
+          {
+            const CoordType tol = FEAT::Math::pow(FEAT::Math::Limits<CoordType>::epsilon(), CoordType(0.6));
+            // add meshparts for left
+            {
+              auto hit = [tol](auto p){return p[0] < tol;};
+              FEAT::Geometry::HitTestFactory<decltype(hit), MeshType> factory(hit, *base_mesh_node->get_mesh());
+              base_mesh_node->add_mesh_part("bnd:l", factory.make_unique());
+            }
+            // add meshparts for right
+            {
+              auto hit = [tol](auto p){return p[0] > (CoordType(1)-tol);};
+              FEAT::Geometry::HitTestFactory<decltype(hit), MeshType> factory(hit, *base_mesh_node->get_mesh());
+              base_mesh_node->add_mesh_part("bnd:r", factory.make_unique());
+            }
+            // add meshparts for bottom
+            if constexpr(shape_dim >= 2)
+            {
+              {
+                auto hit = [tol](auto p){return p[1] < tol;};
+                FEAT::Geometry::HitTestFactory<decltype(hit), MeshType> factory(hit, *base_mesh_node->get_mesh());
+                base_mesh_node->add_mesh_part("bnd:b", factory.make_unique());
+              }
+              // add meshparts for top
+              {
+                auto hit = [tol](auto p){return p[1] > (CoordType(1)-tol);};
+                FEAT::Geometry::HitTestFactory<decltype(hit), MeshType> factory(hit, *base_mesh_node->get_mesh());
+                base_mesh_node->add_mesh_part("bnd:t", factory.make_unique());
+              }
+            }
+            if constexpr(shape_dim >= 3)
+            {
+              // add meshparts for far
+              {
+                auto hit = [tol](auto p){return p[2] < tol;};
+                FEAT::Geometry::HitTestFactory<decltype(hit), MeshType> factory(hit, *base_mesh_node->get_mesh());
+                base_mesh_node->add_mesh_part("bnd:f", factory.make_unique());
+              }
+              // add meshparts for top
+              {
+                auto hit = [tol](auto p){return p[2] > (CoordType(1)-tol);};
+                FEAT::Geometry::HitTestFactory<decltype(hit), MeshType> factory(hit, *base_mesh_node->get_mesh());
+                base_mesh_node->add_mesh_part("bnd:n", factory.make_unique());
+              }
+            }
+          }
+
+          // get the node's vertex set
+          auto& vtx = base_mesh_node->get_mesh()->get_vertex_set();
+          Index n = vtx.get_num_vertices();
+          for(Index i(0); i < n; ++i)
+          {
+            vtx[i][0] = x_min + (x_max - x_min) * vtx[i][0];
+            if constexpr(shape_dim >= 2)
+              vtx[i][1] = y_min + (y_max - y_min) * vtx[i][1];
+            if constexpr(shape_dim >= 3)
+              vtx[i][2] = z_min + (z_max - z_min) * vtx[i][2];
           }
 
           // create control

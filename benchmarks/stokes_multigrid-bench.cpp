@@ -498,7 +498,7 @@ namespace StokesMultigridBench
     args.parse("slices", base_mesh_num_slices);
 
     // create domain from a rectilinear base mesh
-    domain.create_rectilinear(base_mesh_num_slices, base_mesh_num_slices);
+    domain.create_unit_hypercube(base_mesh_num_slices, base_mesh_num_slices);
 
     // get the number of slices on the fine mesh
     Index fine_mesh_num_slices = base_mesh_num_slices << (domain.get_chosen_levels().front().first);
