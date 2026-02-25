@@ -141,9 +141,9 @@ endif(FEAT_HAVE_MKL)
 option(FEAT_HAVE_CUDA "Enable cuda language and cuda backend?" OFF)
 if(FEAT_HAVE_CUDA)
   # since we call this before enable_language, this should be set as long as the user does not provide them
-  set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "-g -O3" CACHE STRING "Cuda rel with deb")
-  set(CMAKE_CUDA_FLAGS_RELEASE "-O3" CACHE STRING "Cuda rel with deb")
-  set(CMAKE_CUDA_FLAGS_DEBUG "-g -O1" CACHE STRING "Cuda rel with deb")
+  set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "-g -O3" CACHE STRING "Cuda release with deb")
+  set(CMAKE_CUDA_FLAGS_RELEASE "-O3" CACHE STRING "Cuda release")
+  set(CMAKE_CUDA_FLAGS_DEBUG "-g -O1" CACHE STRING "Cuda debug")
 
   option(FEAT_CUDA_VERBOSE "Enable verbose cuda compiler?" OFF)
   if(FEAT_CUDA_VERBOSE)
@@ -227,6 +227,7 @@ option(FEAT_HAVE_OMP "FEAT OpenMP support available" OFF)
 if(FEAT_HAVE_OMP)
   find_package(OpenMP REQUIRED)
   target_link_libraries(feat-dependency INTERFACE OpenMP::OpenMP_CXX)
+  target_compile_options(feat-dependency INTERFACE $<$<COMPILE_LANGUAGE:CUDA>: -Xcompiler=${OpenMP_CXX_FLAGS}>)
 endif(FEAT_HAVE_OMP)
 
 option(FEAT_VALGRIND "Enable valgrind ctest support" OFF) #this should be done thorugh internal methods...

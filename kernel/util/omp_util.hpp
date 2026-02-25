@@ -75,7 +75,7 @@ namespace FEAT
       y[i] = (k += x[i]);
 #else
     // don't parallelize unless we have at least 10 elements per thread
-    const std::size_t max_threads(omp_get_max_threads());
+    const std::size_t max_threads = std::size_t(omp_get_max_threads());
     if(n < 10u*max_threads)
     {
       // sequential inclusive scan
@@ -91,8 +91,8 @@ namespace FEAT
     // parallel OpenMP region
     FEAT_PRAGMA_OMP(parallel shared(vo))
     {
-      const std::size_t num_threads(omp_get_num_threads());
-      const std::size_t thread_id(omp_get_thread_num());
+      const std::size_t num_threads =  std::size_t(omp_get_num_threads());
+      const std::size_t thread_id = std::size_t(omp_get_thread_num());
 
       // chunk begin and end for each threads
       const std::size_t i0 = (n * thread_id) / num_threads;
@@ -169,7 +169,7 @@ namespace FEAT
     }
 #else
     // don't parallelize unless we have at least 10 elements per thread
-    const std::size_t max_threads(omp_get_max_threads());
+    const std::size_t max_threads = std::size_t(omp_get_max_threads());
     if(n < 10u*max_threads)
     {
       // sequential exclusive scan
@@ -189,8 +189,8 @@ namespace FEAT
     // parallel OpenMP region
     FEAT_PRAGMA_OMP(parallel shared(vo))
     {
-      const std::size_t num_threads(omp_get_num_threads());
-      const std::size_t thread_id(omp_get_thread_num());
+      const std::size_t num_threads = std::size_t(omp_get_num_threads());
+      const std::size_t thread_id = std::size_t(omp_get_thread_num());
 
       // chunk begin and end for each threads
       const std::size_t i0 = (n * thread_id) / num_threads;
