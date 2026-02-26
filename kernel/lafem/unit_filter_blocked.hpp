@@ -110,8 +110,9 @@ namespace FEAT
        */
       explicit UnitFilterBlocked(Index size_in,
                                  DenseVectorBlocked<DT_, IT_, BlockSize_> & values,
-                                 DenseVector<IT_, IT_> & indices) :
-        _sv(size_in, values, indices)
+                                 DenseVector<IT_, IT_> & indices, bool ignore_nans = false) :
+        _sv(size_in, values, indices),
+        _ignore_nans(ignore_nans)
       {
         XASSERTM(values.size() == indices.size(), "Vector size mismatch!");
       }
