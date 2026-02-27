@@ -99,17 +99,17 @@ After starting <c>VScode</c> it will prompt you to select a compiler kit. Select
 
 
  \section vscode_configuration_setup Configuration Setup
- The CMake Toolse extension uses CMake <a href="https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html">presets</a> to determine how to configure and build FEAT. Whenever you execute the configure script
- the generated configuration gets appended to the CMakeUserPresets.json file in the root of your FEAT repository.
+ The CMake Toolse extension uses CMake <a href="https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html">presets</a> to determine how to configure and build FEAT.
+ Whenever you execute the configure script wit the --preset flag the generated configuration gets appended to the CMakeUserPresets.json file in the root of your FEAT repository.
  If a configuration with the same build-id already exists, it will be overwritten.
- Whenever you run the configure script, <c>VScode</c> should automatically pick up any new or changed presets.
+ <c>VScode</c> should automatically pick up any new or changed presets.
  You can select the preset you want to use in the CMake tab of the sidebar or via
 
  \verbatim
  CTRL + Shift + P   -> CMake: Select Configure Preset
  \endverbatim
 
- <c>VScode</c> will then create its own independent build directory in <c>out/${presetName}</c> and configure FEAT.
+ <c>VScode</c> will then create its own independent build directory in <c>${FEAT_REPO}/build</c> and configure FEAT.
 
  \note
  If you do not want your own build directory and only want to use the one managed by <c>VScode</c> you can run the configure script with the <c>--preset-only</c> flag.

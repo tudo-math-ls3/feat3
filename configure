@@ -329,16 +329,15 @@ description = (
   "\n"
   "============= CMake Presets =================\n"
   "To properly integrate with other tooling (for example the CMake Tools Visual Studio Code extension)\n"
-  "this configure script will add a CMake preset to the CMakeUserPresets.json file in the repository this\n"
+  "this configure script can add a CMake preset to the CMakeUserPresets.json file in the repository this\n"
   "this script is located in. This allows other tooling to easily build FEAT with the same configuration\n"
   "you use for your own build directory. In a module-based environment, make sure you load the same modules\n"
   "when running VSCode as you did when running the configure script for your preset.\n"
   "\n"
   "The presets are named by their build-id. If a preset for a build-id already exists, it will be overwritten.\n"
   "\n"
+  "If you want to generate a preset, pass the --preset flag.\n"
   "If you only want to generate a preset, without configuring a build directory, you can use the --preset-only flag.\n"
-  "If you do not want to generate a preset, for example because you do not have write-access to the repository, use\n"
-  "the --no-preset flag."
 )
 
 epilog = (
@@ -391,14 +390,7 @@ parser.add_argument("--initial-cache-file", "--initial_cache_file", help=
 parser.add_argument("--in-source", "--in_source", action="store_true", help=
 "allow in-source builds. Not recommended")
 
-# TODO: Do what the help says
-parser.add_argument("--likwid-explicit-path", "--likwid_explicit_path", help=(
-"turns off the internal find_package mechanism of CMake and instead uses "
-"the provided prefix path to the install directory of likwid, i.e. .../prefix/include/likwid.h "
-"and .../prefix/lib/liblikwid.so must exist and in turn are guranteed to be used. "
-"This option will probably be removed in a future release with an internal find script."))
-
-parser.add_argument("--likwid-markers" "--likwid_markers", action="extend", nargs="+", choices = ["kernel", "app", "special", "cuda"], help=
+parser.add_argument("--likwid-marker" "--likwid_marker", action="append", choices = ["kernel", "app", "special", "cuda"], dest="likwid_markers", help=
 "list of performance markers to activate. Defaults to 'app'")
 
 parser.add_argument("--mkl-legacy-spmv", action="store_true", help=
@@ -419,8 +411,8 @@ parser.add_argument("--no-external-downloads", "--no_external_download", action=
 parser.add_argument("--no-external-libs", "--no_external_libs", action="store_true", default=False, help =
 "always download thirdparty dependencies in the configure step (default: %(default)s)")
 
-parser.add_argument("--no-preset", action="store_true", default=False, help=
-"do not write a CMake preset to the repositories CMakeUserPresets.json")
+parser.add_argument("--preset", action="store_true", default=False, help=
+"write a CMake preset to the repositories CMakeUserPresets.json")
 
 parser.add_argument("--no-thirdparty-cache", "--no_thirdparty_cache", action="store_true", default=False, help=
 "disable caching for thirdparty dependencies (default: %(default)s)")
@@ -564,6 +556,7 @@ if (("half" in buildid) or ("quadmath" in buildid)) and ("mpi" in buildid) and n
 
 # Defaults we always want to set
 config.buildid = buildid
+config.cache_entry("CMAKE_BUILD_TYPE", "None", "STRING")
 config.cache_entry("BUILD_ID", "-".join(buildid), "STRING")
 config.cache_entry("CMAKE_EXPORT_COMPILE_COMMANDS", "ON", "BOOL")
 config.cputype = args.cpu or detect_cpu()
@@ -597,11 +590,6 @@ if args.eickt:
 
 if args.finalize_resets_device:
   config.cache_entry("FEAT_FINALIZE_RESETS_DEVICE", "ON", "BOOL")
-
-if args.likwid_explicit_path:
-  if not os.path.exists(args.likwid_explicit_path):
-    error("Likwid path", args.likwid_explicit_path, "does not exist")
-  config.cache_entry("FEAT_EXPLICIT_LIKWID_PATH", args.likwid_explicit_path, "FILEPATH")
 
 if args.mkl_legacy_spmv:
   config.cache_entry("FEAT_USE_MKL_LEGACY_SPMV", "OFF", "BOOL")
@@ -675,13 +663,10 @@ for token in buildid:
     config.generator = "Visual Studio 17 2022"
   elif token == "debug":
     config.cache_entry("FEAT_DEBUG_MODE", "ON", "BOOL")
-    config.cache_entry("CMAKE_BUILD_TYPE", "Debug", "STRING")
   elif token == "nopt":
     config.cache_entry("FEAT_DEBUG_MODE", "ON", "BOOL")
-    config.cache_entry("CMAKE_BUILD_TYPE", "RelWithDebInfo", "STRING")
   elif token == "opt":
     config.cache_entry("FEAT_DEBUG_MODE", "OFF", "BOOL")
-    config.cache_entry("CMAKE_BUILD_TYPE", "Release", "STRING")
   elif token == "gcc" or token == "gnu" or token == "g++":
     config.set_compiler_cxx("g++")
     config.set_compiler_cc("gcc")
@@ -806,6 +791,7 @@ for token in buildid:
   elif token == "likwid":
     config.cache_entry("FEAT_USE_LIKWID", "ON", "BOOL")
     config.cache_entry("LIKWID_PERFMON", "ON", "BOOL")
+    print(args)
     if args.likwid_markers:
       if "app" in args.likwid_markers:
         config.cache_entry("FEAT_APPLICATION_MARKER_ACTIVATED", "ON", "BOOL")
@@ -912,17 +898,6 @@ if "half" in buildid and invalid_architectures:
   else:
     error("Cuda architectures", ", ".join(map(str, invalid_architectures)), "do not support half-precision. Half-precision requires at least sm_60")
 
-
-# always set build flags offline
-config.env["CMAKE_CXX_FLAGS_DEBUG"] = ""
-config.env["CMAKE_CXX_FLAGS_RELEASE"] = ""
-config.env["CMAKE_CXX_FLAGS_MINSIZEREL"] = ""
-config.env["CMAKE_CXX_FLAGS_RELWITHDEBINFO"] = ""
-config.env["CMAKE_C_FLAGS_DEBUG"] = ""
-config.env["CMAKE_C_FLAGS_RELEASE"] = ""
-config.env["CMAKE_C_FLAGS_MINSIZEREL"] = ""
-config.env["CMAKE_C_FLAGS_RELWITHDEBINFO"] = ""
-
 # give cmake on macOS a hint to the openmp lib
 if (platform.system() == "Darwin") and ("omp" in buildid):
   config.add_ld_flags("-L/usr/opt/local/opt/libomp/lib")
@@ -957,7 +932,7 @@ if config.cuda_architectures:
   print("")
 print("Generator: " + config.generator)
 
-if not args.no_preset:
+if args.preset:
   print("")
   print("Adding CMake preset to", trunk_dirname + "/CMakeUserPresets.json")
   try:
