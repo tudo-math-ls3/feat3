@@ -11,6 +11,7 @@
 
 // includes, system
 #include <locale>
+#include <stdexcept>
 #include <string>
 #include <sstream>
 #include <vector>
@@ -868,6 +869,54 @@ namespace FEAT
     bool parse(String& s) const
     {
       s.assign(*this);
+      return true;
+    }
+
+    // Overload for std::uint8_t. Required because the generic parsing via
+    // input stream treats this type as a char and reads only a single character
+    bool parse(std::uint8_t& var) const
+    {
+      try
+      {
+        std::uint64_t tmp = std::stoull(this->c_str());
+        if(tmp <= 255)
+        {
+          var = std::uint8_t(tmp);
+        }
+        else
+        {
+          return false;
+        }
+      }
+      catch(std::invalid_argument& /*e*/)
+      {
+        return false;
+      }
+
+      return true;
+    }
+
+    // Overload for std::int8_t. Required because the generic parsing via
+    // input stream treats this type as a char and reads only a single character
+    bool parse(std::int8_t& var) const
+    {
+      try
+      {
+        std::int64_t tmp = std::stoll(this->c_str());
+        if(-128 <= tmp && tmp <= 127)
+        {
+          var = std::int8_t(tmp);
+        }
+        else
+        {
+          return false;
+        }
+      }
+      catch(std::invalid_argument& /*e*/)
+      {
+        return false;
+      }
+
       return true;
     }
 

@@ -5,8 +5,12 @@
 
 #pragma once
 
+#include <iostream>
+
+#include <ios>
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
+#include <limits>
 #ifndef __CUDA_ARCH__
 #include <kernel/util/math.hpp>
 #endif
@@ -1226,9 +1230,25 @@ namespace FEAT
         {
           lhs << "  " << stringify(b(i));
         }
-        lhs << "]";
+        lhs << "  ]";
 
         return lhs;
+      }
+
+      CUDA_HOST friend std::istream& operator>>(std::istream& in, Vector& vector)
+      {
+        // Ignore all input until opening bracket
+        in.ignore(std::numeric_limits<std::streamsize>::max(), '[');
+
+        for(int i(0); i < Vector::n; ++i)
+        {
+          in >> vector(i);
+        }
+
+        // Ignore all input until closing bracket is consumed
+        in.ignore(std::numeric_limits<std::streamsize>::max(), ']');
+
+        return in;
       }
     }; // class Vector
 
@@ -2362,6 +2382,22 @@ namespace FEAT
         lhs << A[m-1];
 
         return lhs;
+      }
+
+      /**
+       * \brief Tiny::Matrix streaming operator
+       *
+       * \param[in] in The input stream.
+       * \param[in] A The matrix to fill.
+       */
+      CUDA_HOST friend std::istream& operator>>(std::istream & in, Matrix& A)
+      {
+        for (int i(0) ; i < m; ++i)
+        {
+          in >> A[i];
+        }
+
+        return in;
       }
     }; // class Matrix
 

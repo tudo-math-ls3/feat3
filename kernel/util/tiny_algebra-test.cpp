@@ -4,6 +4,7 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/util/tiny_algebra.hpp>
+#include <sstream>
 #include <test_system/test_system.hpp>
 
 using namespace FEAT;
@@ -220,10 +221,52 @@ public:
     TEST_CHECK_EQUAL(t(1,1,1), nin);
   }
 
+  void test_streaming() const
+  {
+    {
+      Tiny::Vector<DataType_, 3> vec{1.0, 2.0, 3.0};
+      std::stringstream s;
+      s << vec;
+
+      std::istringstream input(s.str());
+
+      Tiny::Vector<DataType_, 3> result;
+      input >> result;
+
+      TEST_CHECK_EQUAL(vec(0), result(0));
+      TEST_CHECK_EQUAL(vec(1), result(1));
+      TEST_CHECK_EQUAL(vec(2), result(2));
+    }
+
+    {
+      Tiny::Vector<DataType_, 2> a{1.0, 2.0};
+      Tiny::Vector<DataType_, 2> b{3.0, 4.0};
+      Tiny::Matrix<DataType_, 2, 2> matrix{a, b};
+      std::stringstream s;
+      s << matrix;
+
+      std::istringstream input(s.str());
+
+      Tiny::Matrix<DataType_, 2, 2> result;
+      input >> result;
+
+      std::cout << "matrix " << matrix << "\n";
+      std::cout << "inter " << s.str() << "\n";
+      std::cout << "result " << result << "\n";
+      TEST_CHECK_EQUAL(matrix(0, 0), result(0, 0));
+      TEST_CHECK_EQUAL(matrix(0, 1), result(0, 1));
+      TEST_CHECK_EQUAL(matrix(1, 0), result(1, 0));
+      TEST_CHECK_EQUAL(matrix(1, 1), result(1, 1));
+    }
+  }
+
   virtual void run() const override
   {
     // test initializer list constructor/operators
     test_initializer_list();
+
+    // test streaming operators
+    test_streaming();
 
     // test matrix inversion
     test_mat_inv_lehmer<1>(); // specialized

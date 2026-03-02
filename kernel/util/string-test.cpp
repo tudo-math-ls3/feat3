@@ -3,6 +3,8 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
+#include <math.h>
+
 #include <test_system/test_system.hpp>
 #include <kernel/util/string.hpp>
 
@@ -96,6 +98,68 @@ public:
     TEST_CHECK(i == 42);
     TEST_CHECK(stringify(i = -7).parse(i));
     TEST_CHECK(i == -7);
+
+    // test parse
+    {
+      std::uint8_t v(0);
+      TEST_CHECK(String("20").parse(v));
+      TEST_CHECK_EQUAL(v, 20);
+    }
+
+    {
+      std::uint16_t v(0);
+      TEST_CHECK(String("20").parse(v));
+      TEST_CHECK_EQUAL(v, 20);
+    }
+
+    {
+      std::uint32_t v(0);
+      TEST_CHECK(String("20").parse(v));
+      TEST_CHECK_EQUAL(v, 20);
+    }
+
+    {
+      std::uint64_t v(0);
+      TEST_CHECK(String("20").parse(v));
+      TEST_CHECK_EQUAL(v, 20);
+    }
+
+    {
+      std::int8_t v(0);
+      TEST_CHECK(String("20").parse(v));
+      TEST_CHECK_EQUAL(v, 20);
+    }
+
+    {
+      std::int16_t v(0);
+      TEST_CHECK(String("20").parse(v));
+      TEST_CHECK_EQUAL(v, 20);
+    }
+
+    {
+      std::int32_t v(0);
+      TEST_CHECK(String("20").parse(v));
+      TEST_CHECK_EQUAL(v, 20);
+    }
+
+    {
+      std::int64_t v(0);
+      TEST_CHECK(String("20").parse(v));
+      TEST_CHECK_EQUAL(v, 20);
+    }
+
+    {
+      float v(0.0);
+      TEST_CHECK(String("1.234").parse(v));
+      TEST_CHECK_EQUAL(v, 1.234F);
+    }
+
+    {
+      double v(0.0);
+      TEST_CHECK(String("1.234").parse(v));
+      TEST_CHECK_EQUAL(v, 1.234);
+    }
+
 
     // should not parse
     TEST_CHECK(!stringify(27).parse(b));

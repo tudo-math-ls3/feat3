@@ -2,6 +2,7 @@
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(KERNEL_LIBRARY_FILES
+  arg_parser.cpp
   dist.cpp
   dist_file_io.cpp
   hash.cpp
@@ -98,6 +99,7 @@ endif (FEAT_HAVE_CUDA)
 
 # list of util tests
 set(test_list
+  arg_parser-test
   binary_stream-test
   math-test
   memory_usage-test
