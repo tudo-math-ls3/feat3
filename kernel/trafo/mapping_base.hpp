@@ -63,13 +63,13 @@ namespace FEAT
 
     private:
       /// deleted copy-constructor
-      MappingBase(const MappingBase&);
+      MappingBase(const MappingBase&) = delete;
       /// deleted assignment-operator
-      MappingBase& operator=(const MappingBase&);
+      MappingBase& operator=(const MappingBase&) = delete;
 
     protected:
       /// mesh reference
-      MeshType& _mesh;
+      std::reference_wrapper<MeshType> _mesh;
 
       /**
        * \brief Constructor
@@ -85,6 +85,9 @@ namespace FEAT
       }
 
     public:
+      MappingBase(MappingBase&& other) = default;
+      MappingBase& operator=(MappingBase&&) = default;
+
       /**
        * \brief Returns a reference to the underlying mesh.
        * \returns

@@ -78,6 +78,9 @@ namespace FEAT
         {
         }
 
+        Mapping(Mapping&& other) = default;
+        Mapping& operator=(Mapping&&) = default;
+
         /**
          * \brief Computes the volume of one cell
          *

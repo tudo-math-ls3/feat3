@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <functional>
 #include <kernel/trafo/mapping_base.hpp>
 #include <kernel/util/exception.hpp>
 
@@ -221,9 +222,25 @@ namespace FEAT
           init_bounding_boxes(bbox_tol);
       }
 
+      /// Copy constructor
+      InverseMapping(const InverseMapping& other) = delete;
+
+      /// Copy-assignment operator
+      InverseMapping& operator=(const InverseMapping& other) = delete;
+
+      /// Move constructor
+      InverseMapping(InverseMapping&& other) = default;
+
+      /// Move-assignment operator
+      InverseMapping& operator=(InverseMapping&& other) = default;
+
       /// virtual destructor
-      virtual ~InverseMapping()
+      virtual ~InverseMapping() = default;
+
+      /// Return a reference to the underlying trafo
+      const TrafoType& get_trafo() const
       {
+        return _trafo;
       }
 
       /**
@@ -468,25 +485,30 @@ namespace FEAT
         // loop over all cells/bounding boxes
         for(std::size_t cell(0); cell < _bboxes.size(); ++cell)
         {
-          const BBox& bbox = _bboxes.at(cell);
-
-          // check whether the point is in the bounding box
-          bool is_in = true;
-          for(int j(0); j < shape_dim; ++j)
-          {
-            if((img_point[j] < bbox[0][j]) || (img_point[j] > bbox[1][j]))
-            {
-              is_in = false;
-              break;
-            }
-          }
-
           // point inside bounding box?
-          if(is_in)
+          if(is_in_bounding_box(cell, img_point))
+          {
             cells.push_back(Index(cell));
+          }
         }
 
         return !cells.empty();
+      }
+
+      bool is_in_bounding_box(Index cell, const ImagePointType& img_point) const
+      {
+        const BBox& bbox = _bboxes.at(cell);
+
+        // check whether the point is in the bounding box
+        for(int j(0); j < shape_dim; ++j)
+        {
+          if((img_point[j] < bbox[0][j]) || (img_point[j] > bbox[1][j]))
+          {
+            return false;
+          }
+        }
+
+        return true;
       }
 
       /**
@@ -571,6 +593,241 @@ namespace FEAT
         return Intern::InverseMappingHelper<ShapeType>::is_on_ref(dom_point, _domain_tol);
       }
     }; // class InverseMapping
+
+    /**
+     * \brief Accelerated inverse mapping for multigrid hierarchies
+     *
+     * This class provides an accelerated inverse mapping for situations
+     * in which a multigrid hierarchy is available. This accelerated mapping
+     * works by first unmapping the given point on the coarse mesh and then
+     * successively checking child-cells to determine all cells on the finest
+     * mesh that contain the given point.
+     */
+    template<typename InverseMappingType_, typename CFMappingType_>
+    class HierarchicalInverseMapping
+    {
+    public:
+      /// the type of the inverse mapping on each level
+      using InverseMappingType = InverseMappingType_;
+      /// the underlying trafo type
+      using TrafoType = typename InverseMappingType::TrafoType;
+      /// the datatype to be used
+      using DataType = typename InverseMappingType::DataType;
+      /// the shape type
+      using ShapeType = typename InverseMappingType::ShapeType;
+      /// the shape dimension
+      static constexpr int shape_dim = ShapeType::dimension;
+      /// the world dimension
+      static constexpr int world_dim = TrafoType::world_dim;
+
+      /// the inverse mapping data type
+      using InvMapDataType = typename InverseMappingType::InvMapDataType;
+      /// the image point type
+      using ImagePointType = typename InvMapDataType::ImagePointType;
+      /// the domain point type
+      using DomainPointType = typename InvMapDataType::DomainPointType;
+      /// the type of mapping between mesh levels
+      using CFMappingType = CFMappingType_;
+
+    protected:
+      /// deque of inverse mapping for each level
+      std::deque<std::reference_wrapper<const InverseMappingType>> _mappings;
+      /// deque of mapping between levels
+      std::deque<CFMappingType_> _coarse_fine_mappings;
+
+    public:
+      /// Constructor
+      HierarchicalInverseMapping() = default;
+
+      /// Copy constructor
+      HierarchicalInverseMapping(const HierarchicalInverseMapping& other) = delete;
+
+      /// Copy-assignment operator
+      HierarchicalInverseMapping& operator=(const HierarchicalInverseMapping& other) = delete;
+
+      /// Move constructor
+      HierarchicalInverseMapping(HierarchicalInverseMapping&& other) = default;
+
+      /// Move-assignment operator
+      HierarchicalInverseMapping& operator=(HierarchicalInverseMapping&& other) = default;
+
+      /// virtual destructor
+      virtual ~HierarchicalInverseMapping() = default;
+
+      /**
+       * \brief Push the coarse level into the hierarchy
+       *
+       * \param[in] imapping Inverse mapping on coarse level
+       *
+       * Must be called before any other levels are pushed into the hierarchy.
+       *
+       * \warning
+       * The references to the inverse mapping and the coarse-fine mapping are stored
+       * and must outlive the HierarchicalInverseMapping
+       */
+      void push_level(const InverseMappingType& imapping)
+      {
+        XASSERT(_mappings.empty());
+
+        _mappings.push_back(imapping);
+      }
+
+      /**
+       * \brief Push a fine level into the hierarchy
+       *
+       * Must be called after the coarse level was pushed into the hierarchy.
+       *
+       * \param[in] imapping Inverse mapping for new level
+       * \param[in] cf_mapping Mapping from previously finest level to this new level
+       *
+       * \warning
+       * The references to the inverse mapping and the coarse-fine mapping are stored
+       * and must outlive the HierarchicalInverseMapping
+       */
+      void push_level(const InverseMappingType& imapping, const CFMappingType_& cf_mapping)
+      {
+        XASSERT(!_mappings.empty());
+        XASSERT(_mappings.back().get().get_trafo().get_mesh().get_num_elements() < imapping.get_trafo().get_mesh().get_num_elements());
+        XASSERT(cf_mapping.get_num_nodes_domain() == _mappings.back().get().get_trafo().get_mesh().get_num_elements());
+        XASSERT(cf_mapping.get_num_nodes_image() == imapping.get_trafo().get_mesh().get_num_elements());
+
+        _mappings.push_back(imapping);
+        _coarse_fine_mappings.push_back(cf_mapping);
+      }
+
+      /// Return a reference to the underlying trafo on the finest level
+      const TrafoType& get_trafo() const
+      {
+        return _mappings.back().get().get_trafo();
+      }
+
+      /**
+       * \brief Unmaps a given image point.
+       *
+       * This function "unmaps" a point given in real world coordinates, i.e. this
+       * function determines the set of cells that intersect with the given point
+       * and also computes the corresponding domain points for each of these cells.
+       *
+       * \attention
+       * This function may throw an InverseMappingError if the given input point
+       * \p img_point could not be unmapped for a candidate cell, unless
+       * \p ignore_failures was set to \c true. This usually indicates that
+       * the mesh has quite ill-formed cell shapes, which cause the Newton
+       * iteration to diverge -- especially, if the point to be tested is
+       * not on the candidate cell, but outside of it.
+       *
+       * \Note You should be sure that at least on cell in the given Cell array does indeed contain
+       *       the inquired point. Else you the more costly overload function above
+       *
+       * \param[in] img_point
+       * The image point that is to be unmapped.
+       *
+       * \param[in] ignore_failures
+       * Specifies whether to ignore cells on which the Newton iteration broke down.
+       * If set to \c false, an InverseMappingError will be thrown if Newton fails
+       * to converge, otherwise the corresponding cell will be skipped.
+       *
+       * \returns
+       * An InvMapDataType object that contains the set of cells and
+       * domain points, which are mapped onto the given \p img_point.
+       */
+      InvMapDataType unmap_point(const ImagePointType& img_point, bool ignore_failures = false) const
+      {
+        const Index num_layers = _mappings.size();
+
+        XASSERT(num_layers > 0);
+        XASSERT(_mappings.size() == _coarse_fine_mappings.size() + 1);
+
+        // Double buffered cells and domain points for transferring between layers
+        InvMapDataType current;
+        InvMapDataType next;
+
+        current.img_point = img_point;
+        next.img_point = img_point;
+
+        // Regular inverse mapping on coarsest mesh
+        current = _mappings.front().get().unmap_point(img_point, ignore_failures);
+
+        if(num_layers == 1)
+        {
+          // There is no hierarchy to check. We are done
+          return current;
+        }
+
+        // First layer is coarse layer. Skip it
+        for(Index level(1); level < num_layers; level++)
+        {
+          const CFMappingType& coarse_to_fine = _coarse_fine_mappings[level - 1];
+          const InverseMappingType& fine_inv_mapping = _mappings[level];
+          for(Index cell : current.cells)
+          {
+            const auto fbegin = coarse_to_fine.image_begin(cell);
+            const auto fend = coarse_to_fine.image_end(cell);
+
+            for(auto it = fbegin; it != fend; ++it)
+            {
+              DomainPointType domain_point{};
+              if(try_unmap(fine_inv_mapping, domain_point, img_point, *it, ignore_failures))
+              {
+                next.cells.push_back(*it);
+                next.dom_points.push_back(domain_point);
+              }
+            }
+          }
+
+          // Switch mappings for next layer
+          std::swap(current, next);
+
+          // Empty new fine mappings
+          next.cells.clear();
+          next.dom_points.clear();
+        }
+
+        // current contains result of last iteration
+        return current;
+      }
+    private:
+      /**
+       * \brief Try to unmap a point
+       *
+       * \param[in] mapping Inverse mapping to unmap with
+       * \param[out] domain_point Unmapped point
+       * \param[in] img_point Point on mesh to unmap
+       * \param[in] cell Cell to try to unmap on
+       * \param[in] ignore_failures
+       * Specifies whether to ignore cells on which the Newton iteration broke down.
+       * If set to \c false, an InverseMappingError will be thrown if Newton fails
+       * to converge, otherwise the corresponding cell will be skipped.
+       *
+       * \returns False if the point could not be unmapped, true otherwise
+       */
+      static bool try_unmap(
+        const InverseMappingType& mapping,
+        DomainPointType& domain_point,
+        const ImagePointType& img_point,
+        const Index cell,
+        const bool ignore_failures = false)
+      {
+        if(!mapping.is_in_bounding_box(cell, img_point))
+        {
+          return false;
+        }
+
+        if(!mapping.unmap_point_by_newton(domain_point, img_point, cell))
+        {
+          if(!ignore_failures)
+          {
+            throw InverseMappingError(domain_point, cell);
+          }
+          else
+          {
+            return false;
+          }
+        }
+
+        return mapping.test_domain_point(domain_point);
+      }
+    }; // class HierarchicalInverseMapping
 
     /// \cond internal
     namespace Intern

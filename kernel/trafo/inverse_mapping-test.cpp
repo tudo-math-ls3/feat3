@@ -3,12 +3,17 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
-#include <test_system/test_system.hpp>
 #include <kernel/geometry/common_factories.hpp>
-#include <kernel/trafo/standard/mapping.hpp>
+#include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/factory.hpp>
+#include <kernel/geometry/intern/coarse_fine_cell_mapping.hpp>
+#include <kernel/shape.hpp>
 #include <kernel/trafo/inverse_mapping.hpp>
+#include <kernel/trafo/standard/mapping.hpp>
+#include <kernel/util/dist.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/util/random.hpp>
+#include <test_system/test_system.hpp>
 
 using namespace FEAT;
 using namespace FEAT::TestSystem;
@@ -173,3 +178,184 @@ public:
 }; // class InverseMappingTest
 
 InverseMappingTest<double> inverse_mapping_test_double;
+
+class HierarchicalInverseMappingTest : public UnitTest
+{
+  using ShapeType = Shape::Quadrilateral;
+
+  using MeshType = Geometry::ConformalMesh<ShapeType>;
+
+  using DataType = typename MeshType::CoordType;
+
+  using TrafoType = Trafo::Standard::Mapping<MeshType>;
+
+  using VertexType = typename MeshType::VertexType;
+
+  using InverseMappingType = Trafo::InverseMapping<TrafoType, DataType>;
+
+  using HierarchicalInverseMappingType = Trafo::HierarchicalInverseMapping<InverseMappingType, Geometry::Intern::CoarseFineCellMapping<MeshType>>;
+
+  using InverseMappingDataType = typename HierarchicalInverseMappingType::InvMapDataType;
+public:
+
+  HierarchicalInverseMappingTest() : UnitTest("HierarchicalInverseMappingTest")
+  {
+
+  }
+
+  void run() const override
+  {
+    test_single_mesh();
+    test_mg();
+  }
+
+  void test_single_mesh() const
+  {
+    Geometry::RefinedUnitCubeFactory<MeshType> factory(1);
+
+    MeshType mesh(factory);
+    TrafoType trafo(mesh);
+    Trafo::InverseMapping<TrafoType, DataType> inverse_mapping(trafo);
+
+    HierarchicalInverseMappingType hi_mapping;
+    hi_mapping.push_level(inverse_mapping);
+
+    {
+      VertexType point{0.25, 0.25};
+      InverseMappingDataType locator_result = hi_mapping.unmap_point(point);
+      InverseMappingDataType im_result = inverse_mapping.unmap_point(point);
+
+      TEST_CHECK(compare(locator_result, im_result));
+    }
+
+    {
+      VertexType point{0.5, 0.25};
+      InverseMappingDataType locator_result = hi_mapping.unmap_point(point);
+      InverseMappingDataType im_result = inverse_mapping.unmap_point(point);
+
+      TEST_CHECK(compare(locator_result, im_result));
+    }
+
+    {
+      VertexType point{0.5, 0.25};
+      InverseMappingDataType locator_result = hi_mapping.unmap_point(point);
+      InverseMappingDataType im_result = inverse_mapping.unmap_point(point);
+
+      TEST_CHECK(compare(locator_result, im_result));
+    }
+
+    {
+      VertexType point{0.5, 0.5};
+      InverseMappingDataType locator_result = hi_mapping.unmap_point(point);
+      InverseMappingDataType im_result = inverse_mapping.unmap_point(point);
+
+      TEST_CHECK(compare(locator_result, im_result));
+    }
+  }
+
+  void test_mg() const
+  {
+    std::vector<MeshType> meshes;
+    meshes.reserve(2);
+    std::vector<TrafoType> trafos;
+    trafos.reserve(2);
+    std::vector<InverseMappingType> mappings;
+    mappings.reserve(2);
+
+    Geometry::UnitCubeFactory<MeshType> factory;
+    meshes.emplace_back(factory);
+    meshes.emplace_back(Geometry::StandardRefinery<MeshType>(meshes.back()).make());
+
+    trafos.emplace_back(meshes.front());
+    trafos.emplace_back(meshes.back());
+
+    mappings.emplace_back(trafos.front());
+    mappings.emplace_back(trafos.back());
+
+    Geometry::Intern::CoarseFineCellMapping<MeshType> cf(meshes.back(), meshes.front());
+
+    HierarchicalInverseMappingType hi_mapping;
+    // Push coarse level
+    hi_mapping.push_level(mappings.front());
+    // Push fine level
+    hi_mapping.push_level(mappings.back(), cf);
+
+    InverseMappingType& inverse_mapping = mappings.back();
+
+    {
+      VertexType point{0.25, 0.25};
+      InverseMappingDataType locator_result = hi_mapping.unmap_point(point);
+      InverseMappingDataType im_result = inverse_mapping.unmap_point(point);
+
+      TEST_CHECK(compare(locator_result, im_result));
+    }
+
+    {
+      VertexType point{0.5, 0.25};
+      InverseMappingDataType locator_result = hi_mapping.unmap_point(point);
+      InverseMappingDataType im_result = inverse_mapping.unmap_point(point);
+
+      TEST_CHECK(compare(locator_result, im_result));
+    }
+
+    {
+      VertexType point{0.5, 0.25};
+      InverseMappingDataType locator_result = hi_mapping.unmap_point(point);
+      InverseMappingDataType im_result = inverse_mapping.unmap_point(point);
+
+      TEST_CHECK(compare(locator_result, im_result));
+    }
+
+    {
+      VertexType point{0.5, 0.5};
+      InverseMappingDataType locator_result = hi_mapping.unmap_point(point);
+      InverseMappingDataType im_result = inverse_mapping.unmap_point(point);
+
+      TEST_CHECK(compare(locator_result, im_result));
+    }
+  }
+
+  static bool compare(const InverseMappingDataType& a, const InverseMappingDataType& b)
+  {
+    std::set<Index> cells_a;
+    std::set<Index> cells_b;
+
+    for(Index cell : a.cells)
+    {
+      cells_a.insert(cell);
+    }
+
+    for(Index cell : b.cells)
+    {
+      cells_b.insert(cell);
+    }
+
+    if(cells_a != cells_b)
+    {
+      return false;
+    }
+
+    if(a.dom_points.size() != b.dom_points.size())
+    {
+      return false;
+    }
+
+    for(const VertexType& p : a.dom_points)
+    {
+      bool found_match = false;
+      for(const VertexType& other : b.dom_points)
+      {
+        found_match |= (p - other).norm_euclid() < 1E-12;
+      }
+
+      if(!found_match)
+      {
+        return false;
+      }
+    }
+
+    return true;
+  }
+};
+
+static const HierarchicalInverseMappingTest hierarchical_inverse_mapping_test;
