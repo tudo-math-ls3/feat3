@@ -36,5 +36,5 @@ if(NOT TARGET pmp::pmp)
     endif()
   endif()
 
-  add_library(pmp::pmp ALIAS feat-extern-pmp)
+  add_library(pmp ALIAS feat-extern-pmp)
 endif()

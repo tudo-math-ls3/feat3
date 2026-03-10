@@ -31,7 +31,7 @@ add_library(feat-kernel-geometry STATIC ${kernel-geometry-list})
 
 if(FEAT_HAVE_PARMETIS)
   find_package(parmetis 4.0.3 REQUIRED)
-  target_link_libraries(feat-kernel-geometry PRIVATE ParMETIS::ParMETIS)
+  target_link_libraries(feat-kernel-geometry PRIVATE ParMETIS::parmetis)
 endif(FEAT_HAVE_PARMETIS)
 
 if(FEAT_HAVE_ZOLTAN)

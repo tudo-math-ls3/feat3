@@ -41,7 +41,7 @@ endif (FEAT_HAVE_CUDA)
 
 
 if(FEAT_HAVE_ALGLIB)
-  find_package(alglib 3.16.0 REQUIRED)
+  find_package(Alglib 3.16.0 REQUIRED)
   target_link_libraries(feat-kernel-solver PUBLIC Alglib::Alglib)
 endif()
 
@@ -65,7 +65,7 @@ if (FEAT_HAVE_SUPERLU_DIST)
 endif (FEAT_HAVE_SUPERLU_DIST)
 
 if (FEAT_HAVE_TRILINOS)
-  target_link_libraries(kernel-solver PUBLIC TRILINOS_TPL)
+  target_link_libraries(feat-kernel-solver PUBLIC TRILINOS_TPL)
 endif (FEAT_HAVE_TRILINOS)
 
 if (FEAT_HAVE_UMFPACK)

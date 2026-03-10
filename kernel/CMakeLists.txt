@@ -86,8 +86,10 @@ if (FEAT_HAVE_QUADMATH)
 endif (FEAT_HAVE_QUADMATH)
 
 if(FEAT_HAVE_PMP)
+  # PMP requires OpenMP, but does not search for the package in its config file
+  find_package(OpenMP)
   find_package(pmp 3.0.0 REQUIRED)
-  target_link_libraries(feat-kernel-root PUBLIC pmp::pmp)
+  target_link_libraries(feat-kernel-root PUBLIC pmp)
 endif()
 
 # list of kernel tests

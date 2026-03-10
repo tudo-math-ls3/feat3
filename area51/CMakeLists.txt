@@ -163,5 +163,6 @@ if (FEAT_HAVE_UMFPACK)
     add_test(NAME feti-multigrid-mpi-16
       COMMAND ${MPIEXEC} ${FEAT_MPI_MAPPING_FLAG} ${MPIEXEC_NUMPROC_FLAG} 16 ${MPIEXEC_PREFLAGS} $<TARGET_FILE:feti-multigrid-usquare> --test ${MPIEXEC_POSTFLAGS})
     set_tests_properties(feti-multigrid-mpi-16 PROPERTIES LABELS "mpi" FAILED_REGULAR_EXPRESSION "FAILED")
+    add_dependencies(tests feti-multigrid-usquare)
   endif (FEAT_HAVE_MPI)
 endif (FEAT_HAVE_UMFPACK)

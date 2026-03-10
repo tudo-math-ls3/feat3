@@ -15,6 +15,8 @@ import shutil
 import subprocess
 import sys
 
+from pathlib import Path
+
 sys.dont_write_bytecode = True
 from build_system.detect_cpu import detect_cpu
 from build_system.detect_cuda_arch import detect_cuda_arch
@@ -387,11 +389,17 @@ parser.add_argument("--in-home", "--in_home", action="store_true", help=
 parser.add_argument("--initial-cache-file", "--initial_cache_file", help=
 "Provide a CMake script to populate the cache. Options set by the script override options set here. Options set by the script are not included in any CMake presets")
 
+parser.add_argument("--install-tpls", action="store_true", help=
+"Build and install requested TPLs before building FEAT3. TPLS are built in the thirdparty/builds/ subdirectory of the build directory. TPLS are installed to the _deps/installed/ subdirectory of the build directory. $OMP_NUM_THREADS is used to determine parellelism of builds. Linux only.")
+
 parser.add_argument("--in-source", "--in_source", action="store_true", help=
 "allow in-source builds. Not recommended")
 
 parser.add_argument("--likwid-marker" "--likwid_marker", action="append", choices = ["kernel", "app", "special", "cuda"], dest="likwid_markers", help=
 "list of performance markers to activate. Defaults to 'app'")
+
+parser.add_argument("-j", type=int, default=1, help=
+"parallelism level. Used when building TPLs.")
 
 parser.add_argument("--mkl-legacy-spmv", action="store_true", help=
 "use the deprecated Intel MKL Sparse Matrix-Vector kernels based on legacy SparseBLAS")
@@ -932,6 +940,32 @@ if config.cuda_architectures:
   print("")
 print("Generator: " + config.generator)
 
+# Build and install TPLs if required
+if sys.platform == "linux" and args.install_tpls:
+  install_script = os.path.dirname(os.path.abspath(__file__)) + "/build_system/install_tpls.sh"
+  install_dir = os.path.abspath("./_deps/install")
+  install_tpls_args = [install_script]
+
+  Path(install_dir).mkdir(parents=True, exist_ok=True)
+  Path("thirdparty/build").mkdir(parents=True, exist_ok=True)
+
+  install_tpls_args += ["-w", "./thirdparty/build", "-i", "./_deps/install", "-j", str(args.j)]
+
+  if args.trilinos_path:
+    install_tpls_args += ["-t", args.trilinos_path]
+
+  install_tpls_args += [args.buildid]
+
+  print("")
+  print(" ".join(map(shlex.quote, install_tpls_args)))
+  print("")
+  header("============== TPLS =====================")
+  sys.stdout.flush()
+  sys.stderr.flush()
+  subprocess.run(install_tpls_args)
+
+  config.append_entry("CMAKE_PREFIX_PATH", install_dir, "FILEPATH")
+
 if args.preset:
   print("")
   print("Adding CMake preset to", trunk_dirname + "/CMakeUserPresets.json")
@@ -1023,6 +1057,8 @@ os.environ["CC"] = config.get_compiler_c()
 os.environ["LDFLAGS"] = config.ld_flags_str()
 os.environ["CFLAGS"] = config.c_flags_str()
 os.environ["CUDAFLAGS"] = config.cuda_flags_str()
+
+
 
 # Construct cmake call
 cmake_args = ["cmake", "--log-level=VERBOSE"]
