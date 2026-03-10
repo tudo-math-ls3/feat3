@@ -273,8 +273,11 @@ namespace FEAT::Geometry
       // [-r.direction, b - a, c - a] [t, u, v]' = ray.origin - a
       // The below code solves the system using Cramer's rule
 
-      const Vector3D e1 = b - a;
-      const Vector3D e2 = c - a;
+      // If true, r.direction and (c - a) are parallel. Reorder triangle so that determinant calculation does not fail
+      bool reorder = Math::abs(Tiny::dot(r.direction, (c - a)) / (r.direction.norm_euclid() * (c - a).norm_euclid())) > (DataType(1.0) - eps);
+
+      const Vector3D e1 = reorder ? c - b : b - a;
+      const Vector3D e2 = reorder ? a - b : c - a;
 
       Vector3D normal;
       Tiny::cross(normal, r.direction, e2);

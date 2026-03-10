@@ -3,12 +3,12 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
-#include "kernel/geometry/common_factories.hpp"
-#include "kernel/geometry/conformal_mesh.hpp"
-#include "kernel/geometry/reference_cell_factory.hpp"
-#include "kernel/shape.hpp"
-#include "kernel/util/tiny_algebra.hpp"
+#include <kernel/geometry/common_factories.hpp>
+#include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/geometry/raycast.hpp>
+#include <kernel/geometry/reference_cell_factory.hpp>
+#include <kernel/shape.hpp>
+#include <kernel/util/tiny_algebra.hpp>
 #include <test_system/test_system.hpp>
 
 using namespace FEAT;
@@ -297,8 +297,22 @@ public:
     i = raycaster.cast(0, {-1.0, -1.0, -1.0});
     TEST_CHECK(!i);
 
-    // Cast along face
+    // Cast along face in z-direction
     i = raycaster.cast(0, {0.0, 0.0, 1.0});
+    // Should hit
+    TEST_CHECK(i);
+    // Should hit face half a unit above
+    TEST_CHECK_EQUAL_WITHIN_EPS(i.value().t_exit, DT_(0.5), DT_(1e-4));
+
+    // Cast along face in y-direction
+    i = raycaster.cast(0, {0.0, 1.0, 0.0});
+    // Should hit
+    TEST_CHECK(i);
+    // Should hit face half a unit above
+    TEST_CHECK_EQUAL_WITHIN_EPS(i.value().t_exit, DT_(0.5), DT_(1e-4));
+
+    // Cast along face in x-direction
+    i = raycaster.cast(0, {1.0, 0.0, 0.0});
     // Should hit
     TEST_CHECK(i);
     // Should hit face half a unit above
