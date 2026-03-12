@@ -13,6 +13,7 @@
 #include <kernel/solver/amavanka.hpp>
 #include <kernel/solver/voxel_amavanka.hpp>
 #include <kernel/solver/schwarz_precond.hpp>
+#include <kernel/solver/gmres.hpp>
 #include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/richardson.hpp>
 #include "logger.hpp"
@@ -421,12 +422,19 @@ namespace Gendie
     bool _frosch_use_timers;
     bool _frosch_print_internal;
     #endif
-    FEAT::Index _coarse_gmres_dim;
-    FEAT::Index _coarse_miniter;
-    FEAT::Index _coarse_maxiter;
-    DataType _coarse_tol_rel;
-    DataType _coarse_tol_abs;
-    DataType _coarse_inner_rescale;
+    struct CoarseParams
+    {
+      FEAT::Index _gmres_dim = FEAT::Index(200);
+      FEAT::Index _miniter = FEAT::Index(1);
+      FEAT::Index _maxiter = FEAT::Index(500);
+      DataType _tol_rel = DataType(1E-2);
+      DataType _tol_abs = DataType(1E+10);
+      DataType _inner_rescale = DataType(1E+1);
+    };
+    CoarseParams coarse_gmres_params;
+  #ifdef FEAT_HAVE_TRILINOS
+    CoarseParams frosch_gmres_params;
+  #endif
 
     std::size_t domain_virtual_size;
     DataType smoother_damp;
@@ -464,9 +472,10 @@ namespace Gendie
       coarse_frosch |=  Gendie::check_for_config_option(prop->query("coarse-frosch"));
       coarse_solver_info |=  Gendie::check_for_config_option(prop->query("coarse-info"));
 
-      success &= this->_parse_coarse_params(prop->get_sub_section("coarse-parameters"));
+      success &= this->_parse_coarse_params(coarse_gmres_params, prop->get_sub_section("coarse-gmres-parameters"));
 
     #ifdef FEAT_HAVE_TRILINOS
+      success &= this->_parse_coarse_params(frosch_gmres_params, prop->get_sub_section("frosch-gmres-parameters"));
       success &= this->_parse_frosch_params(prop->get_sub_section("frosch-parameters"));
     #else
       coarse_frosch = false;
@@ -799,19 +808,19 @@ namespace Gendie
     }
     #endif
 
-    bool _parse_coarse_params(const FEAT::PropertyMap* prop)
+    bool _parse_coarse_params(CoarseParams& params, const FEAT::PropertyMap* prop)
     {
       bool success = true;
       if(prop == nullptr)
         return success;
 
       // _frosch_subregions(1, 1),
-      success &= prop->parse_entry("gmres-dim", _coarse_gmres_dim);
-      success &= prop->parse_entry("min-iter", _coarse_miniter);
-      success &= prop->parse_entry("max-iter", _coarse_maxiter);
-      success &= prop->parse_entry("tol-rel", _coarse_tol_rel);
-      success &= prop->parse_entry("tol-abs", _coarse_tol_abs);
-      success &= prop->parse_entry("inner-rescale", _coarse_inner_rescale);
+      success &= prop->parse_entry("gmres-dim", params._gmres_dim);
+      success &= prop->parse_entry("min-iter", params._miniter);
+      success &= prop->parse_entry("max-iter", params._maxiter);
+      success &= prop->parse_entry("tol-rel", params._tol_rel);
+      success &= prop->parse_entry("tol-abs", params._tol_abs);
+      success &= prop->parse_entry("inner-rescale", params._inner_rescale);
 
       return success;
     }
@@ -876,9 +885,9 @@ namespace Gendie
 
           std::shared_ptr<FEAT::Solver::IterativeSolver<DefectVectorType>> solver_iterative;
 
-          if(_coarse_gmres_dim > 0)
+          if(frosch_gmres_params._gmres_dim > 0)
           {
-            solver_iterative = Solver::new_fgmres(matrix_sys, filter_sys, solve_gmres_dim, _coarse_inner_rescale, this->frosch_precond);
+            solver_iterative = Solver::new_fgmres(matrix_sys, filter_sys, frosch_gmres_params._gmres_dim, frosch_gmres_params._inner_rescale, this->frosch_precond);
           }
           else
           {
@@ -911,9 +920,9 @@ namespace Gendie
           this->vanka_solver.front()->set_skip_singular(true);
           auto schwarz = FEAT::Solver::new_schwarz_precond(this->vanka_solver.front(), filter_sys);
           if(solve_gmres_dim > FEAT::Index(0)) // todo: is this smart?
-            this->base_solver = this->iter_solver = FEAT::Solver::new_fgmres(matrix_sys, filter_sys, solve_gmres_dim, _coarse_inner_rescale, schwarz);
+            this->base_solver = this->iter_solver = FEAT::Solver::new_gmres(matrix_sys, filter_sys, solve_gmres_dim, coarse_gmres_params._inner_rescale, schwarz);
           else
-            this->base_solver = this->iter_solver = FEAT::Solver::new_fgmres(matrix_sys, filter_sys, 16, _coarse_inner_rescale, schwarz);
+            this->base_solver = this->iter_solver = FEAT::Solver::new_gmres(matrix_sys, filter_sys, 16, coarse_gmres_params._inner_rescale, schwarz);
 
           // configure solver
           this->iter_solver->set_plot_name("FGMRES-AmaVanka");
@@ -954,7 +963,7 @@ namespace Gendie
           // create smoother: either GMRES or Richardson
           std::shared_ptr<FEAT::Solver::IterativeSolver<DefectVectorType>> smoother_l;
           if(smooth_gmres_dim > FEAT::Index(0))
-            smoother_l = FEAT::Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, smooth_gmres_dim, 0.0, schwarz);
+            smoother_l = FEAT::Solver::new_gmres(lvl.matrix_sys, lvl.filter_sys, smooth_gmres_dim, 0.0, schwarz);
           else
             smoother_l = FEAT::Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, smoother_damp, schwarz);
           smoother_l->set_min_iter(smooth_steps);
@@ -981,19 +990,19 @@ namespace Gendie
 
           std::shared_ptr<FEAT::Solver::IterativeSolver<DefectVectorType>> solver_iterative;
 
-          if(_coarse_gmres_dim > 0)
+          if(_frosch_gmres_dim > 0)
           {
-            solver_iterative = Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, _coarse_gmres_dim, _coarse_inner_rescale, this->frosch_precond);
+            solver_iterative = Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, frosch_gmres_params._gmres_dim, frosch_gmres_params._inner_rescale, this->frosch_precond);
           }
           else
           {
             solver_iterative = Solver::new_richardson(lvl.matrix_sys, lvl.filter_sys, DataType(1), this->frosch_precond);
           }
-          solver_iterative->set_tol_rel(_coarse_tol_rel);
-          // solver_iterative->set_tol_abs(tol_abs);
+          solver_iterative->set_tol_rel(frosch_gmres_params._tol_rel);
+          solver_iterative->set_tol_abs(frosch_gmres_params._tol_abs);
           solver_iterative->set_tol_abs_low(DataType(1e-14));
-          solver_iterative->set_min_iter(_coarse_miniter);
-          solver_iterative->set_max_iter(_coarse_maxiter);
+          solver_iterative->set_min_iter(frosch_gmres_params._miniter);
+          solver_iterative->set_max_iter(frosch_gmres_params._maxiter);
           // solver_iterative->set_plot_mode(FEAT::Solver::PlotMode::summary);
           solver_iterative->set_plot_mode(coarse_solver_info ? FEAT::Solver::PlotMode::summary : FEAT::Solver::PlotMode::none);
 
@@ -1019,12 +1028,12 @@ namespace Gendie
           auto schwarz = FEAT::Solver::new_schwarz_precond(vanka, lvl.filter_sys);
           schwarz->set_ignore_status(true);
           //auto coarse_solver = FEAT::Solver::new_bicgstab(lvl.matrix_sys, lvl.filter_sys, schwarz);
-          auto coarse_solver_t = FEAT::Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, _coarse_gmres_dim, _coarse_inner_rescale, schwarz);
-          coarse_solver_t->set_tol_rel(_coarse_tol_rel);
-          coarse_solver_t->set_tol_abs(_coarse_tol_abs);
+          auto coarse_solver_t = FEAT::Solver::new_gmres(lvl.matrix_sys, lvl.filter_sys, coarse_gmres_params._gmres_dim, coarse_gmres_params._inner_rescale, schwarz);
+          coarse_solver_t->set_tol_rel(coarse_gmres_params._tol_rel);
+          coarse_solver_t->set_tol_abs(coarse_gmres_params._tol_abs);
           coarse_solver_t->set_tol_abs_low(DataType(1e-14));
-          coarse_solver_t->set_min_iter(_coarse_miniter);
-          coarse_solver_t->set_max_iter(_coarse_maxiter);
+          coarse_solver_t->set_min_iter(coarse_gmres_params._miniter);
+          coarse_solver_t->set_max_iter(coarse_gmres_params._maxiter);
           coarse_solver_t->set_plot_mode(coarse_solver_info ? FEAT::Solver::PlotMode::summary : FEAT::Solver::PlotMode::none);
 
           this->multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, coarse_solver_t);
@@ -1172,12 +1181,6 @@ namespace Gendie
         _frosch_use_timers(false),
         _frosch_print_internal(false),
 #endif
-        _coarse_gmres_dim(FEAT::Index(16)),
-        _coarse_miniter(FEAT::Index(1)),
-        _coarse_maxiter(FEAT::Index(500)),
-        _coarse_tol_rel(DataType(1e-3)),
-        _coarse_tol_abs(DataType(1) / FEAT::Math::sqr(FEAT::Math::eps<DataType>())),
-        _coarse_inner_rescale(DataType(0.)),
         domain_virtual_size(std::size_t(0)),
         smoother_damp(DataType(0.5)),
         mg_tol_rel(DataType(0)),
@@ -1229,12 +1232,6 @@ namespace Gendie
         _frosch_use_timers(false),
         _frosch_print_internal(false),
 #endif
-        _coarse_gmres_dim(FEAT::Index(16)),
-        _coarse_miniter(FEAT::Index(1)),
-        _coarse_maxiter(FEAT::Index(500)),
-        _coarse_tol_rel(DataType(1e-3)),
-        _coarse_tol_abs(DataType(1) / FEAT::Math::sqr(FEAT::Math::eps<DataType>())),
-        _coarse_inner_rescale(DataType(0.)),
         domain_virtual_size(domain.size_virtual()),
         smoother_damp(DataType(0.5)),
         mg_tol_rel(DataType(0)),
