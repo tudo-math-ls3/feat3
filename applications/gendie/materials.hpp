@@ -974,4 +974,22 @@ namespace Gendie
 
     }
   }; //class Material<DT_>
+
+  template<typename DT_>
+  inline void parse_materials(std::vector<Material<DT_>>& materials, const PropertyMap* mat_config)
+  {
+    XASSERTM(mat_config, "No material config list found");
+    std::size_t i = 0u;
+    while(true)
+    {
+      const auto* cur_mat = mat_config->query_section(stringify(i));
+      if(cur_mat == nullptr)
+      {
+        XASSERTM(i > 0u, "Did not querry any materials!");
+        break;
+      }
+      materials.emplace_back(cur_mat);
+      ++i;
+    }
+  }
 }
