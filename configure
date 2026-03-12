@@ -454,6 +454,9 @@ parser.add_argument("--trilinos-path", "--trilinos_path", help=
 parser.add_argument("--unroll-banded", "--unroll_banded", action="store_true", help=
 "unroll SparseMatrixBanded kernels")
 
+parser.add_argument("--ignore-deps-install", "--ignore_deps_install", action="store_true", help=
+f"Ignore installed packages inside of {build_dirname}/_deps/install/")
+
 args = parser.parse_args()
 
 # Emit warnings for deprecated flags
@@ -632,6 +635,11 @@ if args.package_install_dir:
     if not os.path.exists(path):
       error("Package install directory", path, "does not exist")
   config.append_entry("CMAKE_PREFIX_PATH", args.package_install_dir, "FILEPATH")
+
+if not args.ignore_deps_install:
+  ## add _deps/install as install directory
+  config.append_entry("CMAKE_PREFIX_PATH", build_dirname + "/_deps/install", "FILEPATH")
+
 
 if args.set_testing_vc:
   config.cache_entry("FEAT_TESTING_VC", "ON", "BOOL")
