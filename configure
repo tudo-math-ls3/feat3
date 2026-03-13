@@ -972,8 +972,6 @@ if sys.platform == "linux" and args.install_tpls:
   sys.stderr.flush()
   subprocess.run(install_tpls_args)
 
-  config.append_entry("CMAKE_PREFIX_PATH", install_dir, "FILEPATH")
-
 if args.preset:
   print("")
   print("Adding CMake preset to", trunk_dirname + "/CMakeUserPresets.json")

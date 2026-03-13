@@ -1724,7 +1724,7 @@ namespace FEAT
           for(; lvl <= ancestor.desired_level_max; ++lvl)
           {
             // can we apply a partitioner?
-            bool enough_elems = (base_mesh_node->get_mesh()->get_num_elements() >= this->_required_elems_per_rank * Index(ancestor.num_procs));
+            bool enough_elems = (base_mesh_node->get_mesh()->get_num_elements() >= Index(this->_required_elems_per_rank) * Index(ancestor.num_procs));
             if((lvl >= ancestor.parti_level) && enough_elems && this->_apply_parti(ancestor, *base_mesh_node))
               break;
 

@@ -58,7 +58,7 @@
                     <ParameterList name="Gathering Communication">
                         <Parameter name="Send type"                             type="string"   value="Send"/>
                     </ParameterList>
-		    <ParameterList name="Zoltan2 Parameter">
+                <ParameterList name="Zoltan2 Parameter">
                       <Parameter name="algorithm"                          type="string"   value="parmetis"/>
                       <Parameter name="imbalance_tolerance"                type="double"   value="1.1"/>
                       <Parameter name="partitioning_approach"              type="string"   value="partition"/>

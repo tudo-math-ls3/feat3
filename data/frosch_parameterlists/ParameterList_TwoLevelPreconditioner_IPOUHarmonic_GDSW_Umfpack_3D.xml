@@ -26,7 +26,7 @@
     <ParameterList name="Preconditioner Types">
         <ParameterList name="FROSch">
           <Parameter name="FROSch Preconditioner Type"                        type="string"   value="TwoLevelPreconditioner"/>
-	  <Parameter name="Dimension"                                         type="int"      value="3"/>
+          <Parameter name="Dimension"                                         type="int"      value="3"/>
             <Parameter name="OverlappingOperator Type"                          type="string"   value="AlgebraicOverlappingOperator"/>
             <Parameter name="CoarseOperator Type"                               type="string"   value="IPOUHarmonicCoarseOperator"/>
             <Parameter name="Null Space Type"                                   type="string"   value="Laplace"/>

@@ -990,7 +990,7 @@ namespace Gendie
 
           std::shared_ptr<FEAT::Solver::IterativeSolver<DefectVectorType>> solver_iterative;
 
-          if(_frosch_gmres_dim > 0)
+          if(frosch_gmres_params._gmres_dim > 0)
           {
             solver_iterative = Solver::new_fgmres(lvl.matrix_sys, lvl.filter_sys, frosch_gmres_params._gmres_dim, frosch_gmres_params._inner_rescale, this->frosch_precond);
           }
