@@ -657,6 +657,11 @@ namespace Gendie
         in_type = TemperatureModelType::tbts;
         return true;
       }
+      else if(option.first.compare_no_case("etb") == 0)
+      {
+        in_type = TemperatureModelType::etb;
+        return true;
+      }
       XABORTM("No known temperature type " + option.first);
       return false;
     }
@@ -819,6 +824,24 @@ namespace Gendie
           }
           return;
         }
+        case Gendie::TemperatureModelType::etb:
+        {
+          // arr[0] = TB (reference temperature), arr[1] = E (activation energy)
+          // R is the universal gas constant
+          {
+            DataType TB(DataType(0));
+            PARSE_PROP_OPTION(prop, "reference_temperature", TB, false);
+            XASSERTM(TB > DataType(-273.15), "Reference temperature must be greater than absolute zero");
+            arr[0]=TB;
+          }
+          {
+            DataType E(DataType(0));
+            PARSE_PROP_OPTION(prop, "value_a", E, false);
+            XASSERTM(E > DataType(0), "Activation energy E must be positive");
+            arr[1]=E;
+          }
+          return;
+        }
         default:
         {
           XABORTM("Not implemented " + prop->get_entry("model").first + " yet");
@@ -849,7 +872,6 @@ namespace Gendie
 
         }
         case Gendie::TemperatureModelType::tbts:
-        default:
         {
           auto lambda = [TB=_temp_mat_data[0], TS=_temp_mat_data[1], C1=_temp_mat_data[2], C2=_temp_mat_data[3]](DataType target_temp)
                         {
@@ -857,6 +879,25 @@ namespace Gendie
                                 C1*(TB-TS)/(C2+TB-TS) - C1*(target_temp - TS)/(C2+target_temp-TS));
                         };
           return lambda(temp);
+        }
+        case Gendie::TemperatureModelType::etb:
+        {
+          // ETB model: aT = exp(aux), aux = (E/R) * (1/(T+273.15) - 1/(T_B+273.15))
+          // arr[0] = TB, arr[1] = E
+          auto lambda = [TB=_temp_mat_data[0], E=_temp_mat_data[1]](DataType target_temp)
+                        {
+                          const DataType R = DataType(8.314462618); // Universal gas constant in J/(mol·K)
+                          const DataType T_kelvin = target_temp + DataType(273.15);
+                          const DataType TB_kelvin = TB + DataType(273.15);
+                          const DataType aux = (E / R) * (DataType(1.0) / T_kelvin - DataType(1.0) / TB_kelvin);
+                          return Math::exp(aux);
+                        };
+          return lambda(temp);
+        }
+        default:
+        {
+          XABORTM("Not implemented temperature model for _get_pseudo_at");
+          return DataType(0);
         }
       }
 
