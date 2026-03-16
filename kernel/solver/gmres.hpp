@@ -387,7 +387,7 @@ namespace FEAT
             }
           }
 
-          if(1)
+          if(this->_plot_iter())
           {
             /* DEBUG  */
             String msg = this->_plot_name
@@ -433,14 +433,6 @@ namespace FEAT
           // set the current defect
           status = this->_set_new_defect(this->_vec_v.at(0), vec_sol);
 
-          if(1)
-          {
-            /* DEBUG  */
-            String msg = this->_plot_name
-              +  "* " + stringify(this->_num_iter).pad_front(this->_iter_digits)
-              + " : this->_set_new_defect = " + stringify_fp_sci(this->_def_cur);
-            this->_print_line(msg);
-          }
         }
 
         // finished
