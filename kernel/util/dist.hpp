@@ -168,6 +168,8 @@ namespace FEAT
     extern const Datatype dt_unsigned_int32;
     /// Datatype wrapper for \c MPI_UINT64_T
     extern const Datatype dt_unsigned_int64;
+    /// Datatype wrapper for \c MPI_PACKED
+    extern const Datatype dt_packed;
 
 #if defined(FEAT_HAVE_QUADMATH) || defined(DOXYGEN)
     /// custom Datatype for __float128
@@ -383,6 +385,14 @@ namespace FEAT
       Status() :
         status(0)
       {
+      }
+
+      /**
+       * \returns The source rank, as stored in <c>status.MPI_SOURCE</c>
+       */
+      int source() const
+      {
+        return 0;
       }
 #endif // FEAT_HAVE_MPI
     }; // class Status
@@ -3046,6 +3056,157 @@ namespace FEAT
       }*/
 
       // end of reductions group
+      ///@}
+
+      /**
+       * \name Datatypes
+       */
+      ///@{
+
+      /**
+       * \brief Pack message
+       *
+       * \param[in] inbuf
+       * A \transient reference to the input buffer for the operation
+       *
+       * \param[in] incount
+       * The size of the input buffer in datatype objects
+       *
+       * \param[in] datatype
+       * A reference to the Datatype object representing the input buffer contents
+       *
+       * \param[out] outbuf
+       * A \transient reference to the output buffer for the operation
+       *
+       * \param[in] outsize
+       * The size of the output buffer in bytes
+       *
+       * \param[inout] position
+       * The current position in the output buffer
+       *
+       * \see \cite MPI31 Section 4.2, page 132
+       */
+      void pack(const void* inbuf, std::size_t incount, const Datatype& datatype, void* outbuf, std::size_t outsize, int* position) const;
+
+      /**
+       * \brief Pack message
+       *
+       * This function automatically deduces the datatype of the send buffer (if possible).
+       *
+       * \param[in] inbuf
+       * A \transient reference to the input buffer for the operation
+       *
+       * \param[in] incount
+       * The size of the input buffer in datatype objects
+       *
+       * \param[out] outbuf
+       * A \transient reference to the output buffer for the operation
+       *
+       * \param[in] outsize
+       * The size of the output buffer in bytes
+       *
+       * \param[inout] position
+       * The current position in the output buffer
+       *
+       * \see \cite MPI31 Section 4.2, page 132
+       */
+      template<typename T_>
+      void pack(const T_* inbuf, std::size_t incount, void* outbuf, std::size_t outsize, int* position) const
+      {
+        pack(inbuf, incount, autotype<T_>(), outbuf, outsize, position);
+      }
+
+      /**
+       * \brief Unpack message
+       *
+       * \param[in] inbuf
+       * A \transient reference to the input buffer for the operation
+       *
+       * \param[in] insize
+       * The size of the input buffer in bytes
+       *
+       * \param[inout] position
+       * The current position in bytes
+       *
+       * \param[out] outbuf
+       * A \transient reference to the output buffer
+       *
+       * \param[in] outcount
+       * The number of items to be unpacked
+       *
+       * \param[in] datatype
+       * A reference to the Datatype object representing each object read from the input buffer
+       *
+       * \see \cite MPI31 Section 4.2, page 133
+       */
+      void unpack(const void* inbuf, std::size_t insize, int* position, void* outbuf, std::size_t outcount, const Datatype& datatype) const;
+
+      /**
+       * \brief Unpack message
+       *
+       * This function automatically deduces the datatype of the output buffer (if possible).
+       *
+       * \param[in] inbuf
+       * A \transient reference to the input buffer for the operation
+       *
+       * \param[in] insize
+       * The size of the input buffer in bytes
+       *
+       * \param[inout] position
+       * The current position in bytes
+       *
+       * \param[out] outbuf
+       * A \transient reference to the output buffer
+       *
+       * \param[in] outcount
+       * The number of items to be unpacked
+       *
+       * \param[in] datatype
+       * A reference to the Datatype object representing each object read from the input buffer
+       *
+       * \see \cite MPI31 Section 4.2, page 133
+       */
+      template<typename T_>
+      void unpack(const void* inbuf, std::size_t insize, int* position, T_* outbuf, std::size_t outcount) const
+      {
+        unpack(inbuf, insize, position, outbuf, outcount, autotype<T_>());
+      }
+
+      /**
+       * \brief Determine upper bound on increment of position by call to pack/unpack
+       *
+       * \param[in] incount
+       * Count argument to packing call
+       *
+       * \param[in] datatype
+       * A reference to the Datatype object representing the type to pack
+       *
+       * \param[out] size
+       * Upper bound on size of packed message in bytes
+       */
+      void pack_size(std::size_t incount, const Datatype& datatype, int* size) const;
+
+      /**
+       * \brief Determine upper bound on increment of position by call to pack/unpack
+       *
+       * This function automatically deduces the datatype of to-be-packed data
+       *
+       * \param[in] incount
+       * Count argument to packing call
+       *
+       * \param[in] datatype
+       * A reference to the Datatype object representing the type to pack
+       *
+       * \param[out] size
+       * Upper bound on size of packed message in bytes
+       */
+      template<typename T_>
+      void pack_size(std::size_t incount, int* size) const
+      {
+        pack_size(incount, autotype<T_>(), size);
+      }
+
+      // end of datatypes group
       ///@}
 
       /**

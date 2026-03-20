@@ -195,6 +195,7 @@ namespace FEAT
     const Datatype dt_unsigned_int16     (MPI_UINT16_T,           sizeof(std::uint16_t));
     const Datatype dt_unsigned_int32     (MPI_UINT32_T,           sizeof(std::uint32_t));
     const Datatype dt_unsigned_int64     (MPI_UINT64_T,           sizeof(std::uint64_t));
+    const Datatype dt_packed             (MPI_PACKED,             sizeof(char));
 #ifdef FEAT_HAVE_QUADMATH
     // This needs to initialized by Dist::initialize() !
     const Datatype dt__float128          (0,                      sizeof(__float128));
@@ -720,6 +721,21 @@ namespace FEAT
       return Request(req);
     }
 
+    void Comm::pack(const void* inbuf, std::size_t incount, const Datatype& datatype, void* outbuf, std::size_t outsize, int* position) const
+    {
+      MPI_Pack(inbuf, (int)incount, datatype.dt, outbuf, (int)outsize, position, comm);
+    }
+
+    void Comm::unpack(const void* inbuf, std::size_t insize, int* position, void* outbuf, std::size_t outcount, const Datatype& datatype) const
+    {
+      MPI_Unpack(inbuf, (int)insize, position, outbuf, (int)outcount, datatype.dt, comm);
+    }
+
+    void Comm::pack_size(std::size_t incount, const Datatype& datatype, int* size) const
+    {
+      MPI_Pack_size((int)incount, datatype.dt, comm, size);
+    }
+
     void Comm::bcast_stringstream(std::stringstream& stream, int root) const
     {
       std::string str;
@@ -903,6 +919,7 @@ namespace FEAT
     const Datatype dt_unsigned_int16     (52, sizeof(std::uint16_t));
     const Datatype dt_unsigned_int32     (53, sizeof(std::uint32_t));
     const Datatype dt_unsigned_int64     (54, sizeof(std::uint64_t));
+    const Datatype dt_packed             (55, sizeof(char));
 
     // operations
     const Operation op_sum(1);
@@ -1270,6 +1287,33 @@ namespace FEAT
     {
       // nothing to do
       return Request();
+    }
+
+    void Comm::pack(const void* inbuf, std::size_t incount, const Datatype& datatype, void* outbuf, std::size_t /*outsize*/, int* position) const
+    {
+      if(inbuf != outbuf && outbuf != nullptr)
+      {
+        void* out_ptr = static_cast<char*>(outbuf) + *position;
+        auto length = datatype.size() * incount;
+        memcpy(out_ptr, inbuf, length);
+        *position += (int)length;
+      }
+    }
+
+    void Comm::unpack(const void* inbuf, std::size_t /*insize*/, int* position, void* outbuf, std::size_t outcount, const Datatype& datatype) const
+    {
+      if(inbuf != outbuf && outbuf != nullptr)
+      {
+        void* out_ptr = static_cast<char*>(outbuf) + *position;
+        auto length = datatype.size() * outcount;
+        memcpy(out_ptr, inbuf, length);
+        *position += (int)length;
+      }
+    }
+
+    void Comm::pack_size(std::size_t incount, const Datatype& datatype, int* size) const
+    {
+      *size = (int)(datatype.size() * incount);
     }
 
     void Comm::bcast_stringstream(std::stringstream&, int) const
