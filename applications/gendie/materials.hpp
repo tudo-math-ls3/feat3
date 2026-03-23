@@ -662,6 +662,11 @@ namespace Gendie
         in_type = TemperatureModelType::etb;
         return true;
       }
+      else if(option.first.compare_no_case("c1c2") == 0)
+      {
+        in_type = TemperatureModelType::c1c2;
+        return true;
+      }
       XABORTM("No known temperature type " + option.first);
       return false;
     }
@@ -675,7 +680,7 @@ namespace Gendie
         in_type = MaterialType::carreau;
         return true;
       }
-      else if (option.first.compare_no_case("carreau_yasuda") == 0)
+      else if ((option.first.compare_no_case("carreau_yasuda") == 0) || (option.first.compare_no_case("yasuda") == 0))
       {
         in_type = MaterialType::carreau_yasuda;
         return true;

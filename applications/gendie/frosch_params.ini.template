@@ -16,6 +16,9 @@ frosch-xml = false
 # todo: allow for parsing of more than one level
 frosch-nlevels = 1
 
+## subregions, string of subregions for the nlevels, last one has to be 1
+subregions = 1
+
 # overlap, some int value larger 0
 frosch-overlap = 1
 
