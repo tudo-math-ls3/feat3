@@ -120,6 +120,8 @@ public:
     Cubature::DynamicFactory cubature("auto-degree:5");
     String cubature_name = "auto-degree:5";
 
+    TimeStamp stamp0;
+
     // assemble A, B and D
     Assembly::SymbolicAssembler::assemble_matrix_std1(mat_a, space_v);
     mat_a.format();
@@ -204,6 +206,7 @@ public:
     std::cout << "Testing solver pair: " << "rich/rich" << "\n";
 
     TimeStamp stamp1, stamp2;
+    Index niter = 0;
     {
       // create smoother and solver
       auto bfbt = Solver::new_bfbt(mat_a, mat_b, mat_d, filter.template at<0>(), filter.template at<1>(), solver_L_p_left, solver_L_p_right, lumped_velo_mass_vec);
@@ -211,10 +214,12 @@ public:
       auto richardson = Solver::new_richardson(matrix, filter, 0.5, uzawa);
 
       // initialize and solve
+      richardson->set_tol_rel(DT_(0.1));
       richardson->init();
       stamp1.stamp();
-      Solver::solve(*richardson, vec_sol, vec_rhs, matrix, filter);
+      richardson->correct(vec_sol, vec_rhs);
       stamp2.stamp();
+      niter = richardson->get_num_iter();
     }
 
     // compute final defect
@@ -225,12 +230,13 @@ public:
     std::cout << name << " ";
     std::cout << stringify_fp_sci(def0) << " > " << stringify_fp_sci(def1);
     std::cout << " : " << stringify_fp_fix(def1 / def0, 5);
+    std::cout << "  " << niter;
     std::cout << " | " << stamp2.elapsed_string(stamp1, TimeFormat::s_m);
+    std::cout << " / " << stamp0.elapsed_string_now(TimeFormat::s_m);
     std::cout << '\n';
 
     // ensure that the defect decreased
-    TEST_CHECK_IN_RANGE(def1 / def0, DT_(0), DT_(0.5));
-
+    TEST_CHECK_LESS_THAN(def1 / def0, DT_(0.2));
   }
 
   virtual void run() const override
