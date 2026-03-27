@@ -101,9 +101,12 @@ void Runtime::initialize(int& argc, char**& argv)
     std::cerr.flush();
     Runtime::abort();
   }
-  // set communcation layer to nullptr, so cuDSS will read its path from $CUDSS_COMM_LIB
+#ifdef FEAT_HAVE_MPI
+  // set communication layer to nullptr, so cuDSS will read its path from $CUDSS_COMM_LIB; this
+  // must *not* be called in non-MPI mode, because cuDSS would try to call MPI routines otherwise
   cudssSetCommLayer(feat_cudss_handle, nullptr);
-#endif
+#endif // FEAT_HAVE_MPI
+#endif // FEAT_HAVE_CUDSS
 
   // check whether '---debug [<ranks...>]' option is given
   // if so, then trigger a breakpoint for the specified ranks
