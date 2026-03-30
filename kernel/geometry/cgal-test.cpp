@@ -547,7 +547,7 @@ public:
     TEST_CHECK(cw.intersects_polygon(hexa));
 
     //scale by factor 10 -> no intersection, but contains mesh
-    for(int k = 0; k < 8; ++k)
+    for(std::size_t k = 0; k < 8u; ++k)
     {
       hexa[k] *= DT_(10);
     }
@@ -555,14 +555,14 @@ public:
     TEST_CHECK(cw.intersects_polygon(hexa));
 
     //shift, so the tipp intersects a bit with 0,0,2.0 in the right lower quadrant
-    for(int k = 0; k < 8; ++k)
+    for(std::size_t k = 0; k < 8u; ++k)
     {
       hexa[k] += Tiny::Vector<DT_, 3>{DT_(4.8), DT_(4.89), DT_(6.98)};
     }
     TEST_CHECK(cw.intersects_polygon(hexa));
 
     //shift completly outside
-    for(int k = 0; k < 8; ++k)
+    for(std::size_t k = 0; k < 8u; ++k)
     {
       hexa[k] += Tiny::Vector<DT_, 3>{DT_(4.8), DT_(4.89), DT_(6.98)};
     }

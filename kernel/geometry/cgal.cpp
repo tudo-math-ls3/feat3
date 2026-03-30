@@ -768,7 +768,7 @@ namespace FEAT::Geometry
     static inline void split_hexaeder_surface(typename CGALTypeWrapper<DT_>::Polyhedron_& surface, const std::array<typename FEAT::Geometry::CGALWrapper<DT_>::PointType, 8>& points)
     {
       typename CGALTypeWrapper<DT_>::Polyhedron_::Vertex_index vtx_desc[8];
-      for(int k = 0; k < 8; ++k)
+      for(std::size_t k = 0; k < std::size_t (8); ++k)
       {
         vtx_desc[k] = surface.add_vertex(typename FEAT::Geometry::CGALTypeWrapper<DT_>::Point_(points[k][0], points[k][1], points[k][2]));
       }
@@ -783,7 +783,7 @@ namespace FEAT::Geometry
         {2, 3, 6}, {3, 7, 6} //back
       };
 
-      for(int f = 0; f < 12; ++f)
+      for(std::size_t f = 0; f < std::size_t(12); ++f)
       {
         surface.add_face(vtx_desc[faces[f][0]], vtx_desc[faces[f][1]], vtx_desc[faces[f][2]]);
       }
