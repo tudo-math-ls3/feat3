@@ -228,7 +228,7 @@ namespace FEAT
       none     = 0x0000, ///< no backend allowed
       cudss    = 0x0001, ///< cuDSS backend
       mumps    = 0x0002, ///< MUMPS backend
-      mkldss   = 0x0003, ///< MKL-DSS backend
+      mkldss   = 0x0004, ///< MKL-DSS backend
       superlu  = 0x0008, ///< SuperLU backend
       umfpack  = 0x0010, ///< UMFPACK backend
       all      = 0x001F  ///< all backends allowed
