@@ -590,9 +590,9 @@ namespace FEAT
           for(Index ielem = 0; ielem < num_elems; ++ielem)
           {
             std::array<Tiny::Vector<CoordType, shape_dim>, std::decay_t<decltype(verts_at_elem)>::num_indices> verts;
-            for(int k = 0; k < int(verts.size()); ++k)
+            for(std::size_t k = 0; k < verts.size(); ++k)
             {
-              verts[k] = vtx[verts_at_elem(ielem, k)];
+              verts[k] = vtx[verts_at_elem(ielem, int(k))];
             }
 
             if(this->_cgal_wrapper->intersects_polygon(verts))
@@ -638,9 +638,9 @@ namespace FEAT
           for(Index ielem = cur_rank*elems_per_rank; ielem < Math::min((cur_rank+1u)*elems_per_rank, num_elems); ++ielem)
           {
             std::array<Tiny::Vector<CoordType, shape_dim>, std::decay_t<decltype(verts_at_elem)>::num_indices> verts;
-            for(int k = 0; k < int(verts.size()); ++k)
+            for(std::size_t k = 0; k < verts.size(); ++k)
             {
-              verts[k] = vtx[verts_at_elem(ielem, k)];
+              verts[k] = vtx[verts_at_elem(ielem, int(k))];
             }
 
             if(this->_cgal_wrapper->intersects_polygon(verts))
