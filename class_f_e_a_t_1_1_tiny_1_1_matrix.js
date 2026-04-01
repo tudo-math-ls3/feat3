@@ -50,6 +50,7 @@ var class_f_e_a_t_1_1_tiny_1_1_matrix =
     [ "trace", "class_f_e_a_t_1_1_tiny_1_1_matrix.html#a90c43d2c2af4e1b5c20dd405c0f79341", null ],
     [ "vol", "class_f_e_a_t_1_1_tiny_1_1_matrix.html#ad04359bbcfe9d6d435d63b0dea5b7a10", null ],
     [ "operator<<", "class_f_e_a_t_1_1_tiny_1_1_matrix.html#acf2b59da682b693df07f9e9583ac774b", null ],
+    [ "operator>>", "class_f_e_a_t_1_1_tiny_1_1_matrix.html#a3b1936668687776630975c04f042506b", null ],
     [ "m", "class_f_e_a_t_1_1_tiny_1_1_matrix.html#a7b46a2a9de3f0e48e65df78217c70736", null ],
     [ "n", "class_f_e_a_t_1_1_tiny_1_1_matrix.html#a77be731e3acbd28bdd83306c47846f40", null ],
     [ "sm", "class_f_e_a_t_1_1_tiny_1_1_matrix.html#a0d869085110b7b48ad1de52dc1957ee5", null ],

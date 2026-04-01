@@ -32,6 +32,7 @@ var namespace_f_e_a_t =
       [ "query_performance_frequency", "namespace_f_e_a_t_1_1_windows.html#a979dd3ce025f8f019b417774393d2905", null ]
     ] ],
     [ "Xml", "namespace_f_e_a_t_1_1_xml.html", "namespace_f_e_a_t_1_1_xml" ],
+    [ "ArgParser", "class_f_e_a_t_1_1_arg_parser.html", "class_f_e_a_t_1_1_arg_parser" ],
     [ "Backend", "class_f_e_a_t_1_1_backend.html", "class_f_e_a_t_1_1_backend" ],
     [ "BinaryStream", "class_f_e_a_t_1_1_binary_stream.html", "class_f_e_a_t_1_1_binary_stream" ],
     [ "DistFileIO", "class_f_e_a_t_1_1_dist_file_i_o.html", "class_f_e_a_t_1_1_dist_file_i_o" ],
@@ -45,6 +46,8 @@ var namespace_f_e_a_t =
     [ "MemoryPool", "class_f_e_a_t_1_1_memory_pool.html", "class_f_e_a_t_1_1_memory_pool" ],
     [ "MemoryUsage", "class_f_e_a_t_1_1_memory_usage.html", "class_f_e_a_t_1_1_memory_usage" ],
     [ "mutable_priority_queue", "class_f_e_a_t_1_1mutable__priority__queue.html", null ],
+    [ "Parameter", "class_f_e_a_t_1_1_parameter.html", "class_f_e_a_t_1_1_parameter" ],
+    [ "ParameterBuilder", "class_f_e_a_t_1_1_parameter_builder.html", "class_f_e_a_t_1_1_parameter_builder" ],
     [ "ParseError", "class_f_e_a_t_1_1_parse_error.html", "class_f_e_a_t_1_1_parse_error" ],
     [ "PropertyMap", "class_f_e_a_t_1_1_property_map.html", "class_f_e_a_t_1_1_property_map" ],
     [ "Random", "class_f_e_a_t_1_1_random.html", "class_f_e_a_t_1_1_random" ],

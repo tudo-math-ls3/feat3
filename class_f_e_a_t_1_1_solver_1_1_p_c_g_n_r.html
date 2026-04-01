@@ -148,10 +148,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af33d382743ac35d8eadac33994d0d3a7"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#af33d382743ac35d8eadac33994d0d3a7">PCGNR</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;section_name, const <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *section, const MatrixType &amp;matrix, const FilterType &amp;filter, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">PrecondType</a> &gt; precond_l=nullptr, std::shared_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">PrecondType</a> &gt; precond_r=nullptr)</td></tr>
 <tr class="memdesc:af33d382743ac35d8eadac33994d0d3a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor using a <a class="el" href="class_f_e_a_t_1_1_property_map.html" title="A class organizing a tree of key-value pairs.">PropertyMap</a>.  <a href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#af33d382743ac35d8eadac33994d0d3a7">More...</a><br /></td></tr>
 <tr class="separator:af33d382743ac35d8eadac33994d0d3a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae162070c491d897ae6f91d263200af40"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ae162070c491d897ae6f91d263200af40">apply</a> (Vector_ &amp;vec_cor, const Vector_ &amp;vec_def)=0</td></tr>
+<tr class="memitem:ae162070c491d897ae6f91d263200af40"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ae162070c491d897ae6f91d263200af40">apply</a> (Vector_ &amp;vec_cor, const Vector_ &amp;vec_def)=0</td></tr>
 <tr class="memdesc:ae162070c491d897ae6f91d263200af40"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t_1_1_solver.html" title="Solver namespace.">Solver</a> application method.  <a href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ae162070c491d897ae6f91d263200af40">More...</a><br /></td></tr>
 <tr class="separator:ae162070c491d897ae6f91d263200af40"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac219120ec3c0c47e263173a13a4b0fbb"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#ac219120ec3c0c47e263173a13a4b0fbb">apply</a> (VectorType &amp;vec_cor, const VectorType &amp;vec_def) override</td></tr>
+<tr class="memitem:ac219120ec3c0c47e263173a13a4b0fbb"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#ac219120ec3c0c47e263173a13a4b0fbb">apply</a> (VectorType &amp;vec_cor, const VectorType &amp;vec_def) override</td></tr>
 <tr class="separator:ac219120ec3c0c47e263173a13a4b0fbb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad586a1b68477198d76f4e794eaa83b5d"><td class="memItemLeft" align="right" valign="top">DataType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ad586a1b68477198d76f4e794eaa83b5d">calc_convergence_rate</a> () const</td></tr>
 <tr class="memdesc:ad586a1b68477198d76f4e794eaa83b5d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the overall convergence rate: (defect_final / defect_initial) ^ (1 / number of iterations)  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ad586a1b68477198d76f4e794eaa83b5d">More...</a><br /></td></tr>
@@ -159,9 +159,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad0e0aa027e766929e7e741f6384f887a"><td class="memItemLeft" align="right" valign="top">DataType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ad0e0aa027e766929e7e741f6384f887a">calc_defect_reduction</a> () const</td></tr>
 <tr class="memdesc:ad0e0aa027e766929e7e741f6384f887a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the overall defect reduction factor: (defect_final / defect_inital)  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ad0e0aa027e766929e7e741f6384f887a">More...</a><br /></td></tr>
 <tr class="separator:ad0e0aa027e766929e7e741f6384f887a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2f3c31f9cfa51070b2fe4a3cda6b4a2d"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#a2f3c31f9cfa51070b2fe4a3cda6b4a2d">correct</a> (VectorType &amp;vec_sol, const VectorType &amp;vec_rhs) override</td></tr>
+<tr class="memitem:a2f3c31f9cfa51070b2fe4a3cda6b4a2d"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#a2f3c31f9cfa51070b2fe4a3cda6b4a2d">correct</a> (VectorType &amp;vec_sol, const VectorType &amp;vec_rhs) override</td></tr>
 <tr class="separator:a2f3c31f9cfa51070b2fe4a3cda6b4a2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1feb792955098cf117423f18dfd0db8f"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a1feb792955098cf117423f18dfd0db8f">correct</a> (VectorType &amp;vec_sol, const VectorType &amp;vec_rhs)=0</td></tr>
+<tr class="memitem:a1feb792955098cf117423f18dfd0db8f"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a1feb792955098cf117423f18dfd0db8f">correct</a> (VectorType &amp;vec_sol, const VectorType &amp;vec_rhs)=0</td></tr>
 <tr class="memdesc:a1feb792955098cf117423f18dfd0db8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Solver correction method.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a1feb792955098cf117423f18dfd0db8f">More...</a><br /></td></tr>
 <tr class="separator:a1feb792955098cf117423f18dfd0db8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acacbcaccbf7ec307778128928a901d59"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#acacbcaccbf7ec307778128928a901d59">done</a> ()</td></tr>
@@ -206,7 +206,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af415e6a1a3687fef310f8b2012a6b040"><td class="memItemLeft" align="right" valign="top">DataType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#af415e6a1a3687fef310f8b2012a6b040">get_stag_rate</a> () const</td></tr>
 <tr class="memdesc:af415e6a1a3687fef310f8b2012a6b040"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the stagnation rate.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#af415e6a1a3687fef310f8b2012a6b040">More...</a><br /></td></tr>
 <tr class="separator:af415e6a1a3687fef310f8b2012a6b040"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a25362c6f4bb0c5d1deac80d947442303"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a25362c6f4bb0c5d1deac80d947442303">get_status</a> () const</td></tr>
+<tr class="memitem:a25362c6f4bb0c5d1deac80d947442303"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a25362c6f4bb0c5d1deac80d947442303">get_status</a> () const</td></tr>
 <tr class="memdesc:a25362c6f4bb0c5d1deac80d947442303"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the status.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a25362c6f4bb0c5d1deac80d947442303">More...</a><br /></td></tr>
 <tr class="separator:a25362c6f4bb0c5d1deac80d947442303"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae314aed268f854678d35272cd5e41340"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="class_f_e_a_t_1_1_string.html">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ae314aed268f854678d35272cd5e41340">get_summary</a> () const</td></tr>
@@ -254,7 +254,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:add5c03ded9d5568e14ec60cdfb1572b8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#add5c03ded9d5568e14ec60cdfb1572b8">set_div_rel</a> (DataType div_rel)</td></tr>
 <tr class="memdesc:add5c03ded9d5568e14ec60cdfb1572b8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the relative divergence for the solver.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#add5c03ded9d5568e14ec60cdfb1572b8">More...</a><br /></td></tr>
 <tr class="separator:add5c03ded9d5568e14ec60cdfb1572b8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a43bbf72e681f56ef9a6a96af37265a76"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a43bbf72e681f56ef9a6a96af37265a76">set_max_iter</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edaa520882cd714abbd1bf9f72d23990f0e">max_iter</a>)</td></tr>
+<tr class="memitem:a43bbf72e681f56ef9a6a96af37265a76"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a43bbf72e681f56ef9a6a96af37265a76">set_max_iter</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81aa520882cd714abbd1bf9f72d23990f0e">max_iter</a>)</td></tr>
 <tr class="memdesc:a43bbf72e681f56ef9a6a96af37265a76"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the maximum iteration count for the solver.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a43bbf72e681f56ef9a6a96af37265a76">More...</a><br /></td></tr>
 <tr class="separator:a43bbf72e681f56ef9a6a96af37265a76"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6fd0f61a9458e3b6c32b4c502fcdc7f6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a6fd0f61a9458e3b6c32b4c502fcdc7f6">set_min_iter</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> min_iter)</td></tr>
@@ -287,10 +287,10 @@ Public Member Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a5b0b165b5aba580f1b68bd3c2a49933a"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a5b0b165b5aba580f1b68bd3c2a49933a">_analyze_defect</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_iter, DataType def_cur, DataType def_prev, bool check_stag)</td></tr>
+<tr class="memitem:a5b0b165b5aba580f1b68bd3c2a49933a"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a5b0b165b5aba580f1b68bd3c2a49933a">_analyze_defect</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_iter, DataType def_cur, DataType def_prev, bool check_stag)</td></tr>
 <tr class="memdesc:a5b0b165b5aba580f1b68bd3c2a49933a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Internal function: analyze the current defect.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a5b0b165b5aba580f1b68bd3c2a49933a">More...</a><br /></td></tr>
 <tr class="separator:a5b0b165b5aba580f1b68bd3c2a49933a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa7c400a10c25597f690c515d6471e94"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#afa7c400a10c25597f690c515d6471e94">_apply_intern</a> (VectorType &amp;vec_sol)</td></tr>
+<tr class="memitem:afa7c400a10c25597f690c515d6471e94"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#afa7c400a10c25597f690c515d6471e94">_apply_intern</a> (VectorType &amp;vec_sol)</td></tr>
 <tr class="separator:afa7c400a10c25597f690c515d6471e94"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa6971e18b1d0b71c11ba6d37652682e5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#aa6971e18b1d0b71c11ba6d37652682e5">_apply_precond_l</a> (VectorType &amp;vec_cor, const VectorType &amp;vec_def)</td></tr>
 <tr class="separator:aa6971e18b1d0b71c11ba6d37652682e5"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -299,7 +299,7 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a9920812266b8f49921c9b133dd1451b4"><td class="memItemLeft" align="right" valign="top">virtual DataType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a9920812266b8f49921c9b133dd1451b4">_calc_def_norm</a> (const VectorType &amp;vec_def, const VectorType &amp;vec_sol)</td></tr>
 <tr class="memdesc:a9920812266b8f49921c9b133dd1451b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the defect norm.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a9920812266b8f49921c9b133dd1451b4">More...</a><br /></td></tr>
 <tr class="separator:a9920812266b8f49921c9b133dd1451b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa7281f8e3498245d411c5829b9d0cec0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#aa7281f8e3498245d411c5829b9d0cec0">_plot_iter</a> (<a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> st=<a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda3c709b10a5d47ba33d85337dd9110917">Status::progress</a>) const</td></tr>
+<tr class="memitem:aa7281f8e3498245d411c5829b9d0cec0"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#aa7281f8e3498245d411c5829b9d0cec0">_plot_iter</a> (<a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a> st=<a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81a3c709b10a5d47ba33d85337dd9110917">Status::progress</a>) const</td></tr>
 <tr class="memdesc:aa7281f8e3498245d411c5829b9d0cec0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Plot the current iteration?  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#aa7281f8e3498245d411c5829b9d0cec0">More...</a><br /></td></tr>
 <tr class="separator:aa7281f8e3498245d411c5829b9d0cec0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a76a7e3315fcb44c2a3ac466ae1ee1337"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a76a7e3315fcb44c2a3ac466ae1ee1337">_plot_iter_line</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_iter, DataType def_cur, DataType def_prev)</td></tr>
@@ -323,13 +323,13 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:ae6fc9035510853c34e062754732c17ba"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ae6fc9035510853c34e062754732c17ba">_set_comm_by_vector</a> (const Matrix_::VectorTypeR &amp;vector)</td></tr>
 <tr class="memdesc:ae6fc9035510853c34e062754732c17ba"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the communicator for the solver from a vector.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ae6fc9035510853c34e062754732c17ba">More...</a><br /></td></tr>
 <tr class="separator:ae6fc9035510853c34e062754732c17ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad4ef2095e84619a29292a37f078a877b"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ad4ef2095e84619a29292a37f078a877b">_set_initial_defect</a> (const VectorType &amp;vec_def, const VectorType &amp;vec_sol)</td></tr>
+<tr class="memitem:ad4ef2095e84619a29292a37f078a877b"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ad4ef2095e84619a29292a37f078a877b">_set_initial_defect</a> (const VectorType &amp;vec_def, const VectorType &amp;vec_sol)</td></tr>
 <tr class="memdesc:ad4ef2095e84619a29292a37f078a877b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Internal function: sets the initial defect vector.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#ad4ef2095e84619a29292a37f078a877b">More...</a><br /></td></tr>
 <tr class="separator:ad4ef2095e84619a29292a37f078a877b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa2b2f7492bf2c6b7d9f740b95e99969f"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#aa2b2f7492bf2c6b7d9f740b95e99969f">_set_new_defect</a> (const VectorType &amp;vec_def, const VectorType &amp;vec_sol)</td></tr>
+<tr class="memitem:aa2b2f7492bf2c6b7d9f740b95e99969f"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#aa2b2f7492bf2c6b7d9f740b95e99969f">_set_new_defect</a> (const VectorType &amp;vec_def, const VectorType &amp;vec_sol)</td></tr>
 <tr class="memdesc:aa2b2f7492bf2c6b7d9f740b95e99969f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Internal function: sets the new (next) defect vector.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#aa2b2f7492bf2c6b7d9f740b95e99969f">More...</a><br /></td></tr>
 <tr class="separator:aa2b2f7492bf2c6b7d9f740b95e99969f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8fa021d1ba593ca3ac009c053192d6d4"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a8fa021d1ba593ca3ac009c053192d6d4">_update_defect</a> (const DataType def_cur_norm)</td></tr>
+<tr class="memitem:a8fa021d1ba593ca3ac009c053192d6d4"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a8fa021d1ba593ca3ac009c053192d6d4">_update_defect</a> (const DataType def_cur_norm)</td></tr>
 <tr class="memdesc:a8fa021d1ba593ca3ac009c053192d6d4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Internal function: sets the new (next) defect norm.  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a8fa021d1ba593ca3ac009c053192d6d4">More...</a><br /></td></tr>
 <tr class="separator:a8fa021d1ba593ca3ac009c053192d6d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
@@ -392,7 +392,7 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a1f17cb192fab20b3591eafdafd7c5f6e"><td class="memItemLeft" align="right" valign="top">DataType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a1f17cb192fab20b3591eafdafd7c5f6e">_stag_rate</a></td></tr>
 <tr class="memdesc:a1f17cb192fab20b3591eafdafd7c5f6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">stagnation rate  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a1f17cb192fab20b3591eafdafd7c5f6e">More...</a><br /></td></tr>
 <tr class="separator:a1f17cb192fab20b3591eafdafd7c5f6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a575442c5edf8721e18db2a49717f45a5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a575442c5edf8721e18db2a49717f45a5">_status</a></td></tr>
+<tr class="memitem:a575442c5edf8721e18db2a49717f45a5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a575442c5edf8721e18db2a49717f45a5">_status</a></td></tr>
 <tr class="memdesc:a575442c5edf8721e18db2a49717f45a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">current status of the solver  <a href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a575442c5edf8721e18db2a49717f45a5">More...</a><br /></td></tr>
 <tr class="separator:a575442c5edf8721e18db2a49717f45a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c8249831e10132efd914b4cfe033ca5"><td class="memItemLeft" align="right" valign="top">const FilterType &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html#a7c8249831e10132efd914b4cfe033ca5">_system_filter</a></td></tr>
@@ -711,7 +711,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::_analyze_defect </td>
+          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::_analyze_defect </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
           <td class="paramname"><em>num_iter</em>, </td>
@@ -776,7 +776,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html">FEAT::Solver::PCGNR</a>&lt; Matrix_, Filter_ &gt;::_apply_intern </td>
+          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html">FEAT::Solver::PCGNR</a>&lt; Matrix_, Filter_ &gt;::_apply_intern </td>
           <td>(</td>
           <td class="paramtype">VectorType &amp;&#160;</td>
           <td class="paramname"><em>vec_sol</em></td><td>)</td>
@@ -789,11 +789,11 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000058">Todo:</a></b></dt><dd>use axpby here </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000062">Todo:</a></b></dt><dd>use axpby here </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="pcgnr_8hpp_source.html#l00261">261</a> of file <a class="el" href="pcgnr_8hpp_source.html">pcgnr.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="iterative_8hpp_source.html#l00802">FEAT::Solver::IterativeSolver&lt; Matrix_::VectorTypeR &gt;::_set_initial_defect()</a>, <a class="el" href="iterative_8hpp_source.html#l00924">FEAT::Solver::IterativeSolver&lt; Matrix_::VectorTypeR &gt;::_set_new_defect()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35edadfb7069bfc6e0064a6c667626eca07b4">FEAT::Solver::aborted</a>, <a class="el" href="iterative_8hpp_source.html#l00462">FEAT::Solver::IterativeSolver&lt; Matrix_::VectorTypeR &gt;::get_num_iter()</a>, <a class="el" href="pcgnr_8hpp_source.html#l00134">FEAT::Solver::PCGNR&lt; Matrix_, Filter_ &gt;::name()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda3c709b10a5d47ba33d85337dd9110917">FEAT::Solver::progress</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35eda5e543256c480ac577d30f76f9120eb74">FEAT::Solver::undefined</a>.</p>
+<p class="reference">References <a class="el" href="iterative_8hpp_source.html#l00802">FEAT::Solver::IterativeSolver&lt; Matrix_::VectorTypeR &gt;::_set_initial_defect()</a>, <a class="el" href="iterative_8hpp_source.html#l00924">FEAT::Solver::IterativeSolver&lt; Matrix_::VectorTypeR &gt;::_set_new_defect()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81adfb7069bfc6e0064a6c667626eca07b4">FEAT::Solver::aborted</a>, <a class="el" href="iterative_8hpp_source.html#l00462">FEAT::Solver::IterativeSolver&lt; Matrix_::VectorTypeR &gt;::get_num_iter()</a>, <a class="el" href="pcgnr_8hpp_source.html#l00134">FEAT::Solver::PCGNR&lt; Matrix_, Filter_ &gt;::name()</a>, <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81a3c709b10a5d47ba33d85337dd9110917">FEAT::Solver::progress</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81a5e543256c480ac577d30f76f9120eb74">FEAT::Solver::undefined</a>.</p>
 
 </div>
 </div>
@@ -936,7 +936,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
         <tr>
           <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::_plot_iter </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a>&#160;</td>
           <td class="paramname"><em>st</em> = <code>Status::progress</code></td><td>)</td>
           <td> const</td>
         </tr>
@@ -1229,7 +1229,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::_set_initial_defect </td>
+          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::_set_initial_defect </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a7b7d9563a388dba3a9cd2d284879aefc">VectorType</a> &amp;&#160;</td>
           <td class="paramname"><em>vec_def</em>, </td>
@@ -1277,7 +1277,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::_set_new_defect </td>
+          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::_set_new_defect </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a7b7d9563a388dba3a9cd2d284879aefc">VectorType</a> &amp;&#160;</td>
           <td class="paramname"><em>vec_def</em>, </td>
@@ -1326,7 +1326,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::_update_defect </td>
+          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::_update_defect </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a4435bf86ccac68b54c06b2e476dd097d">DataType</a>&#160;</td>
           <td class="paramname"><em>def_cur_norm</em></td><td>)</td>
@@ -1367,7 +1367,7 @@ template&lt;typename Vector_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">FEAT::Solver::SolverBase</a>&lt; Vector_ &gt;::apply </td>
+          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html">FEAT::Solver::SolverBase</a>&lt; Vector_ &gt;::apply </td>
           <td>(</td>
           <td class="paramtype">Vector_ &amp;&#160;</td>
           <td class="paramname"><em>vec_cor</em>, </td>
@@ -1422,7 +1422,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html">FEAT::Solver::PCGNR</a>&lt; Matrix_, Filter_ &gt;::apply </td>
+          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html">FEAT::Solver::PCGNR</a>&lt; Matrix_, Filter_ &gt;::apply </td>
           <td>(</td>
           <td class="paramtype">VectorType &amp;&#160;</td>
           <td class="paramname"><em>vec_cor</em>, </td>
@@ -1520,7 +1520,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html">FEAT::Solver::PCGNR</a>&lt; Matrix_, Filter_ &gt;::correct </td>
+          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html">FEAT::Solver::PCGNR</a>&lt; Matrix_, Filter_ &gt;::correct </td>
           <td>(</td>
           <td class="paramtype">VectorType &amp;&#160;</td>
           <td class="paramname"><em>vec_sol</em>, </td>
@@ -1558,7 +1558,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::correct </td>
+          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::correct </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html#a7b7d9563a388dba3a9cd2d284879aefc">VectorType</a> &amp;&#160;</td>
           <td class="paramname"><em>vec_sol</em>, </td>
@@ -2041,7 +2041,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::get_status </td>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::get_status </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -3360,7 +3360,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::_status</td>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_iterative_solver.html">FEAT::Solver::IterativeSolver</a>&lt; Matrix_::VectorTypeR  &gt;::_status</td>
         </tr>
       </table>
   </td>

@@ -14,6 +14,7 @@ var namespace_f_e_a_t_1_1_assembly =
     [ "BurgersAssemblyJobBase", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base" ],
     [ "BurgersAssemblyTaskBase", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_task_base.html", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_task_base" ],
     [ "BurgersBlockedAssemblyTaskBase", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_assembly_task_base.html", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_assembly_task_base" ],
+    [ "BurgersBlockedDiagonalAssemblyJob", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_diagonal_assembly_job.html", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_diagonal_assembly_job" ],
     [ "BurgersBlockedMatrixAssemblyJob", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_matrix_assembly_job.html", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_matrix_assembly_job" ],
     [ "BurgersBlockedVectorAssemblyJob", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_vector_assembly_job.html", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_vector_assembly_job" ],
     [ "BurgersCarreauAssemblyJobBase", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_assembly_job_base.html", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_assembly_job_base" ],

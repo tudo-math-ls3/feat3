@@ -2,6 +2,8 @@ var namespace_f_e_a_t_1_1_control_1_1_domain =
 [
     [ "AdaptiveLevelWrapper", "class_f_e_a_t_1_1_control_1_1_domain_1_1_adaptive_level_wrapper.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_adaptive_level_wrapper" ],
     [ "AdaptivePartiDomainControl", "class_f_e_a_t_1_1_control_1_1_domain_1_1_adaptive_parti_domain_control.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_adaptive_parti_domain_control" ],
+    [ "CGALDomainControl", "class_f_e_a_t_1_1_control_1_1_domain_1_1_c_g_a_l_domain_control.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_c_g_a_l_domain_control" ],
+    [ "CGALDomainLevelWrapper", "class_f_e_a_t_1_1_control_1_1_domain_1_1_c_g_a_l_domain_level_wrapper.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_c_g_a_l_domain_level_wrapper" ],
     [ "DomainControl", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_control.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_control" ],
     [ "DomainLayer", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_layer.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_layer" ],
     [ "DomainLevel", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_level.html", null ],

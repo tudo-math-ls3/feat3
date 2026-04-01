@@ -20,6 +20,7 @@ var class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_matrix_3_01_l
     [ "ADPSolverBase", "class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_matrix_3_01_local_matrix___00_01_0c8c0a3ae4dcde26813c945ec17077c5.html#abb4afd77999a51f13a889b0a89c3b347", null ],
     [ "_download_vector", "class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_matrix_3_01_local_matrix___00_01_0c8c0a3ae4dcde26813c945ec17077c5.html#a4f43ee13a0ebbabb058df66b388707d9", null ],
     [ "_download_vector", "class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_matrix_3_01_local_matrix___00_01_0c8c0a3ae4dcde26813c945ec17077c5.html#ae789314f668d044bee9b7cc5a89f205d", null ],
+    [ "_get_adp_block_information", "class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_matrix_3_01_local_matrix___00_01_0c8c0a3ae4dcde26813c945ec17077c5.html#a716af4f3e9d8ec68d5c678ed51b33766", null ],
     [ "_get_adp_matrix_num_cols", "class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_matrix_3_01_local_matrix___00_01_0c8c0a3ae4dcde26813c945ec17077c5.html#ac587521cfff5a6da82736802e2b034b0", null ],
     [ "_get_adp_matrix_num_nzes", "class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_matrix_3_01_local_matrix___00_01_0c8c0a3ae4dcde26813c945ec17077c5.html#ad75be7e204776d13957e5665f2c80d05", null ],
     [ "_get_adp_matrix_num_rows", "class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_matrix_3_01_local_matrix___00_01_0c8c0a3ae4dcde26813c945ec17077c5.html#a25701aeec426698a1bab949b75407477", null ],

@@ -16,6 +16,8 @@ var class_f_e_a_t_1_1_solver_1_1_hypre_solver_base =
     [ "_filter_mat", "class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#a26c01317f4519371cde4ccd73ffd3796", null ],
     [ "_filter_mat", "class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#ad7b014c44a27fb1b4e07f0b0ad520b0b", null ],
     [ "_format_cor", "class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#af5d0964b882f92756e92d3e94bd56772", null ],
+    [ "_get_adp_block_information", "class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#a6a6b5557facaabbe95e9a1d44006a6bd", null ],
+    [ "_get_adp_block_information", "class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#a6a6b5557facaabbe95e9a1d44006a6bd", null ],
     [ "_get_adp_matrix_num_cols", "class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#a49bb14b2fdf83babbaf47fc72b2835d9", null ],
     [ "_get_adp_matrix_num_cols", "class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#a49bb14b2fdf83babbaf47fc72b2835d9", null ],
     [ "_get_adp_matrix_num_nzes", "class_f_e_a_t_1_1_solver_1_1_hypre_solver_base.html#ad87c27c7d905efdeafb574306117ddb9", null ],

@@ -199,6 +199,8 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:ae789314f668d044bee9b7cc5a89f205d"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_matrix_3_01_local_matrix___00_01_0c8c0a3ae4dcde26813c945ec17077c5.html#ae789314f668d044bee9b7cc5a89f205d">_download_vector</a> (<a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_matrix_3_01_local_matrix___00_01_0c8c0a3ae4dcde26813c945ec17077c5.html#ae0fb0d2d0b14214694f8f6ab90a84c04">LocalVectorType</a> &amp;vector, const DTV_ *val)</td></tr>
 <tr class="memdesc:ae789314f668d044bee9b7cc5a89f205d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Downloads the ADP vector values from the given array.  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_matrix_3_01_local_matrix___00_01_0c8c0a3ae4dcde26813c945ec17077c5.html#ae789314f668d044bee9b7cc5a89f205d">More...</a><br /></td></tr>
 <tr class="separator:ae789314f668d044bee9b7cc5a89f205d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a716af4f3e9d8ec68d5c678ed51b33766"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_string.html">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_matrix_3_01_local_matrix___00_01_0c8c0a3ae4dcde26813c945ec17077c5.html#a716af4f3e9d8ec68d5c678ed51b33766">_get_adp_block_information</a> () const</td></tr>
+<tr class="separator:a716af4f3e9d8ec68d5c678ed51b33766"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac587521cfff5a6da82736802e2b034b0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_matrix_3_01_local_matrix___00_01_0c8c0a3ae4dcde26813c945ec17077c5.html#ac587521cfff5a6da82736802e2b034b0">_get_adp_matrix_num_cols</a> () const</td></tr>
 <tr class="separator:ac587521cfff5a6da82736802e2b034b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad75be7e204776d13957e5665f2c80d05"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_matrix_3_01_local_matrix___00_01_0c8c0a3ae4dcde26813c945ec17077c5.html#ad75be7e204776d13957e5665f2c80d05">_get_adp_matrix_num_nzes</a> () const</td></tr>
@@ -250,7 +252,7 @@ class FEAT::Solver::ADPSolverBase&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, 
 <p >This class implements the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html" title="Base-Class for solvers based on Algebraic-DOF-Partitioning.">ADPSolverBase</a> interface for <a class="el" href="class_f_e_a_t_1_1_global_1_1_matrix.html" title="Global Matrix wrapper class template.">Global::Matrix</a> instances, which derive from standard finite element discretizations. Most of the dirty work is outsourced to the <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html" title="Algebraic DOF Partitioning implementation.">Global::AlgDofParti</a> and <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti_system.html" title="Algebraic DOF partitioning linear system conversion class.">Global::AlgDofPartiSystem</a> classes.</p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00159">159</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00162">162</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a1f6bc3bfcdbb8739a61fd29341c46c56" name="a1f6bc3bfcdbb8739a61fd29341c46c56"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a1f6bc3bfcdbb8739a61fd29341c46c56">&#9670;&#160;</a></span>ADPMatrixType</h2>
@@ -268,7 +270,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>the ADP matrix type; this is always a (globally partitioned) CSR matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00200">200</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00203">203</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -288,7 +290,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>the ADP vector type; this is always a (globally partitioned) dense vector </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00202">202</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00205">205</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -308,7 +310,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>the algebraic dof partitioning system instance for this class </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00192">192</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00195">195</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -328,7 +330,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>the algebraic dof partitioning instance for this class </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00190">190</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00193">193</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -348,7 +350,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>our base class </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00180">180</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00183">183</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -368,7 +370,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>our internal data type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00195">195</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00198">198</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -388,7 +390,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>the system filter type; coincides with the global filter type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00187">187</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00190">190</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -408,7 +410,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>the global filter type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00177">177</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00180">180</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -428,7 +430,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>the global matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00173">173</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00176">176</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -448,7 +450,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>the global vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00175">175</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00178">178</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -468,7 +470,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>our internal index type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00197">197</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00200">200</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -488,7 +490,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>the local filter type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00168">168</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00171">171</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -508,7 +510,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>the local matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00164">164</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00167">167</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -528,7 +530,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>the local vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00166">166</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00169">169</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -548,7 +550,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>the system matrix type; coincides with the global matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00183">183</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00186">186</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -568,7 +570,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>the mirror type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00170">170</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00173">173</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -588,7 +590,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>the system vector type; coincides with the global vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00185">185</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00188">188</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -638,7 +640,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00221">221</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00224">224</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -690,9 +692,9 @@ template&lt;typename DTV_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00397">397</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00406">406</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00121">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00122">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>.</p>
 
 </div>
 </div>
@@ -743,7 +745,37 @@ template&lt;typename DTV_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00414">414</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00423">423</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a716af4f3e9d8ec68d5c678ed51b33766" name="a716af4f3e9d8ec68d5c678ed51b33766"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a716af4f3e9d8ec68d5c678ed51b33766">&#9670;&#160;</a></span>_get_adp_block_information()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , typename SolverBase_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_string.html">String</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_matrix.html">Global::Matrix</a>&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, <a class="el" href="class_f_e_a_t_1_1_global_1_1_filter.html">Global::Filter</a>&lt; LocalFilter_, Mirror_ &gt;, SolverBase_ &gt;::_get_adp_block_information </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The block information of the algebraic dof partitioning as an XML string. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00317">317</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -773,7 +805,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of columns of the local ADP matrix; equal to <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_matrix_3_01_local_matrix___00_01_0c8c0a3ae4dcde26813c945ec17077c5.html#a8a6932a49abef71854750844e46d97b6">_get_num_global_dofs()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00278">278</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00281">281</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -803,7 +835,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of nonzero entries of the local ADP matrix </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00284">284</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00287">287</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -833,7 +865,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of rows of the local ADP matrix; equal to <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_matrix_3_01_local_matrix___00_01_0c8c0a3ae4dcde26813c945ec17077c5.html#a3aac924d9138cacdb91bb0d4b535bb78">_get_num_owned_dofs()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00272">272</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00275">275</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -863,7 +895,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The size of the local ADP vector; equal to <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_matrix_3_01_local_matrix___00_01_0c8c0a3ae4dcde26813c945ec17077c5.html#a3aac924d9138cacdb91bb0d4b535bb78">_get_num_owned_dofs()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00266">266</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00269">269</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -893,7 +925,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the underlying communicator </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00231">231</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00234">234</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="matrix_8hpp_source.html#l00174">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::get_comm()</a>.</p>
 
@@ -925,7 +957,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The index of the first global DOF owned by this process </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00308">308</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00311">311</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -955,7 +987,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The total number of global DOFs on all processes </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00296">296</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00299">299</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -985,7 +1017,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The total number of nonzero entries of the global ADP matrix </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00290">290</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00293">293</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1015,7 +1047,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of global DOFs owned by this process </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00302">302</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00305">305</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1073,7 +1105,7 @@ template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00346">346</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00355">355</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1124,7 +1156,7 @@ template&lt;typename RPT_ , typename CIT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00325">325</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00334">334</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1175,9 +1207,9 @@ template&lt;typename DTV_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00364">364</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00373">373</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00121">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00122">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>.</p>
 
 </div>
 </div>
@@ -1228,7 +1260,7 @@ template&lt;typename DTV_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00380">380</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00389">389</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1260,7 +1292,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 <p>Symbolic finalization. </p>
 <p >This function releases all data allocated during the symbolic initialization phase. </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00257">257</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00260">260</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1292,7 +1324,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 <p>Symbolic initialization. </p>
 <p >This function performs the symbolic initialization of the algebraic DOF partitioning, which pre-computes the actual algebraic DOF partitioning. After this function call, the derived class has to call the corresponding upload functions to retrieve the ADP matrix arrays. </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00243">243</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00246">246</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1321,7 +1353,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>the algebraic DOF partitioning </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00210">210</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00213">213</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1349,7 +1381,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>the global system filter </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00208">208</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00211">211</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1377,7 +1409,7 @@ template&lt;typename LocalMatrix_ , typename Mirror_ , typename LocalFilter_ , t
 
 <p>the global system matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00206">206</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00209">209</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>

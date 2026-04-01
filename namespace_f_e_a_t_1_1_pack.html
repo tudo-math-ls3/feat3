@@ -104,7 +104,8 @@ $(document).ready(function(){initNavTree('namespace_f_e_a_t_1_1_pack.html',''); 
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
 <a href="#enum-members">Enumerations</a> &#124;
-<a href="#func-members">Functions</a>  </div>
+<a href="#func-members">Functions</a> &#124;
+<a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">FEAT::Pack Namespace Reference</div></div>
 </div><!--header-->
 <div class="contents">
@@ -223,6 +224,12 @@ Enumerations</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:af137883052dcdf2bfdd031592243b53b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="namespace_f_e_a_t_1_1_pack.html#adc350262d3998bd6880472fbd47649f0">Pack::u8</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_pack.html#af137883052dcdf2bfdd031592243b53b">base64_decode</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;s)</td></tr>
+<tr class="memdesc:af137883052dcdf2bfdd031592243b53b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decodes a Base64 string into bytes.  <a href="namespace_f_e_a_t_1_1_pack.html#af137883052dcdf2bfdd031592243b53b">More...</a><br /></td></tr>
+<tr class="separator:af137883052dcdf2bfdd031592243b53b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4390a80456db759770d31e80f7864cbe"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_string.html">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_pack.html#a4390a80456db759770d31e80f7864cbe">base64_encode</a> (const <a class="el" href="namespace_f_e_a_t_1_1_pack.html#adc350262d3998bd6880472fbd47649f0">Pack::u8</a> *begin, const <a class="el" href="namespace_f_e_a_t_1_1_pack.html#adc350262d3998bd6880472fbd47649f0">Pack::u8</a> *end)</td></tr>
+<tr class="memdesc:a4390a80456db759770d31e80f7864cbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encodes bytes into a Base64 string.  <a href="namespace_f_e_a_t_1_1_pack.html#a4390a80456db759770d31e80f7864cbe">More...</a><br /></td></tr>
+<tr class="separator:a4390a80456db759770d31e80f7864cbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adbe41b49207a2c0727166b9b0a26832c"><td class="memTemplParams" colspan="2">template&lt;typename T_ &gt; </td></tr>
 <tr class="memitem:adbe41b49207a2c0727166b9b0a26832c"><td class="memTemplItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_pack.html#adbe41b49207a2c0727166b9b0a26832c">decode</a> (T_ *dst, void *buf, std::size_t count, std::size_t buf_size, <a class="el" href="namespace_f_e_a_t_1_1_pack.html#a7c69c0366e113fd42901ba9bcea55d4d">Pack::Type</a> pack_type, bool swap_bytes)</td></tr>
 <tr class="memdesc:adbe41b49207a2c0727166b9b0a26832c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decodes an array from a packed buffer.  <a href="namespace_f_e_a_t_1_1_pack.html#adbe41b49207a2c0727166b9b0a26832c">More...</a><br /></td></tr>
@@ -260,6 +267,9 @@ template std::size_t&#160;</td><td class="memItemRight" valign="bottom"><b>decod
 <tr class="memitem:aa61da8e0d617965d1fd27fd69de9acd0"><td class="memItemLeft" align="right" valign="top"><a id="aa61da8e0d617965d1fd27fd69de9acd0" name="aa61da8e0d617965d1fd27fd69de9acd0"></a>
 template std::size_t&#160;</td><td class="memItemRight" valign="bottom"><b>decode&lt; u8 &gt;</b> (<a class="el" href="namespace_f_e_a_t_1_1_pack.html#adc350262d3998bd6880472fbd47649f0">u8</a> *, void *, std::size_t, std::size_t, <a class="el" href="namespace_f_e_a_t_1_1_pack.html#a7c69c0366e113fd42901ba9bcea55d4d">Pack::Type</a>, bool)</td></tr>
 <tr class="separator:aa61da8e0d617965d1fd27fd69de9acd0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a44c561e1508023fbeb0c0b91e40a73b6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_pack.html#a44c561e1508023fbeb0c0b91e40a73b6">decode_base64_quantum</a> (std::array&lt; <a class="el" href="namespace_f_e_a_t_1_1_pack.html#adc350262d3998bd6880472fbd47649f0">Pack::u8</a>, 3 &gt; &amp;quantum, const std::array&lt; <a class="el" href="namespace_f_e_a_t_1_1_pack.html#adc350262d3998bd6880472fbd47649f0">Pack::u8</a>, 4 &gt; &amp;chars)</td></tr>
+<tr class="memdesc:a44c561e1508023fbeb0c0b91e40a73b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decodes a group of four Base64 characters into a group of three bytes.  <a href="namespace_f_e_a_t_1_1_pack.html#a44c561e1508023fbeb0c0b91e40a73b6">More...</a><br /></td></tr>
+<tr class="separator:a44c561e1508023fbeb0c0b91e40a73b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4ce2436a27861a6ea142b82c8ffcc497"><td class="memTemplParams" colspan="2">template&lt;typename T_ &gt; </td></tr>
 <tr class="memitem:a4ce2436a27861a6ea142b82c8ffcc497"><td class="memTemplItemLeft" align="right" valign="top">static std::size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_pack.html#a4ce2436a27861a6ea142b82c8ffcc497">decode_raw</a> (T_ *dst, const void *buf, const std::size_t count, const <a class="el" href="namespace_f_e_a_t_1_1_pack.html#a7c69c0366e113fd42901ba9bcea55d4d">Pack::Type</a> pack_type, bool swap_bytes)</td></tr>
 <tr class="memdesc:a4ce2436a27861a6ea142b82c8ffcc497"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decodes an array from a packed buffer without compression support.  <a href="namespace_f_e_a_t_1_1_pack.html#a4ce2436a27861a6ea142b82c8ffcc497">More...</a><br /></td></tr>
@@ -341,6 +351,9 @@ template std::size_t&#160;</td><td class="memItemRight" valign="bottom"><b>encod
 <tr class="memitem:afca7e12a09977f2f87f7596d357d8507"><td class="memItemLeft" align="right" valign="top"><a id="afca7e12a09977f2f87f7596d357d8507" name="afca7e12a09977f2f87f7596d357d8507"></a>
 template std::size_t&#160;</td><td class="memItemRight" valign="bottom"><b>encode&lt; u8 &gt;</b> (void *, const <a class="el" href="namespace_f_e_a_t_1_1_pack.html#adc350262d3998bd6880472fbd47649f0">u8</a> *, std::size_t, std::size_t, <a class="el" href="namespace_f_e_a_t_1_1_pack.html#a7c69c0366e113fd42901ba9bcea55d4d">Pack::Type</a>, bool, double)</td></tr>
 <tr class="separator:afca7e12a09977f2f87f7596d357d8507"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89fd181240fa604bb8d43d48ffee898e"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_pack.html#a89fd181240fa604bb8d43d48ffee898e">encode_base64_quantum</a> (const std::array&lt; <a class="el" href="namespace_f_e_a_t_1_1_pack.html#adc350262d3998bd6880472fbd47649f0">Pack::u8</a>, 3 &gt; &amp;quantum, std::array&lt; <a class="el" href="namespace_f_e_a_t_1_1_pack.html#adc350262d3998bd6880472fbd47649f0">Pack::u8</a>, 4 &gt; &amp;chars)</td></tr>
+<tr class="memdesc:a89fd181240fa604bb8d43d48ffee898e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encodes a group of three bytes into four Base64 characters.  <a href="namespace_f_e_a_t_1_1_pack.html#a89fd181240fa604bb8d43d48ffee898e">More...</a><br /></td></tr>
+<tr class="separator:a89fd181240fa604bb8d43d48ffee898e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac18e0956760e971d934fa0ad06794fd7"><td class="memTemplParams" colspan="2">template&lt;typename T_ &gt; </td></tr>
 <tr class="memitem:ac18e0956760e971d934fa0ad06794fd7"><td class="memTemplItemLeft" align="right" valign="top">static std::size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_pack.html#ac18e0956760e971d934fa0ad06794fd7">encode_raw</a> (void *buf, const T_ *src, const std::size_t count, const <a class="el" href="namespace_f_e_a_t_1_1_pack.html#a7c69c0366e113fd42901ba9bcea55d4d">Pack::Type</a> pack_type, bool swap_bytes)</td></tr>
 <tr class="memdesc:ac18e0956760e971d934fa0ad06794fd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Encodes an array into a packed buffer without compression support.  <a href="namespace_f_e_a_t_1_1_pack.html#ac18e0956760e971d934fa0ad06794fd7">More...</a><br /></td></tr>
@@ -348,6 +361,11 @@ template std::size_t&#160;</td><td class="memItemRight" valign="bottom"><b>encod
 <tr class="memitem:a3749a647ec11d6cf8d2b38467a07aaff"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_pack.html#a3749a647ec11d6cf8d2b38467a07aaff">estimate_size</a> (std::size_t count, <a class="el" href="namespace_f_e_a_t_1_1_pack.html#a7c69c0366e113fd42901ba9bcea55d4d">Pack::Type</a> type, double tolerance=1e-16)</td></tr>
 <tr class="memdesc:a3749a647ec11d6cf8d2b38467a07aaff"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the estimated (upper bound) pack buffer size for an array.  <a href="namespace_f_e_a_t_1_1_pack.html#a3749a647ec11d6cf8d2b38467a07aaff">More...</a><br /></td></tr>
 <tr class="separator:a3749a647ec11d6cf8d2b38467a07aaff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5eddcb3a0202a4f4621b2378b46290a2"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_pack.html#a5eddcb3a0202a4f4621b2378b46290a2">is_valid_base64_char</a> (const char c)</td></tr>
+<tr class="memdesc:a5eddcb3a0202a4f4621b2378b46290a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks if the given characters is a valid Base64 character.  <a href="namespace_f_e_a_t_1_1_pack.html#a5eddcb3a0202a4f4621b2378b46290a2">More...</a><br /></td></tr>
+<tr class="separator:a5eddcb3a0202a4f4621b2378b46290a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aebaf23e617750921c8de66c8e906648a"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_pack.html#aebaf23e617750921c8de66c8e906648a">is_valid_base64_string</a> (const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;s)</td></tr>
+<tr class="separator:aebaf23e617750921c8de66c8e906648a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a422a077b3ced78b7b524168b89825943"><td class="memTemplParams" colspan="2">template&lt;typename T_ &gt; </td></tr>
 <tr class="memitem:a422a077b3ced78b7b524168b89825943"><td class="memTemplItemLeft" align="right" valign="top">static std::size_t&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_pack.html#a422a077b3ced78b7b524168b89825943">lossless_decode</a> (T_ *dst, const void *buf, const std::size_t count, const std::size_t buf_size, const <a class="el" href="namespace_f_e_a_t_1_1_pack.html#a7c69c0366e113fd42901ba9bcea55d4d">Pack::Type</a> pack_type, bool swap_bytes)</td></tr>
 <tr class="memdesc:a422a077b3ced78b7b524168b89825943"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decodes an array from a packed buffer.  <a href="namespace_f_e_a_t_1_1_pack.html#a422a077b3ced78b7b524168b89825943">More...</a><br /></td></tr>
@@ -391,6 +409,13 @@ template std::size_t&#160;</td><td class="memItemRight" valign="bottom"><b>encod
 <tr class="memitem:af89b200b1b541f2b0c59da1c35b30aef"><td class="memTemplItemLeft" align="right" valign="top">X_&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_pack.html#af89b200b1b541f2b0c59da1c35b30aef">xswap</a> (X_ x)</td></tr>
 <tr class="memdesc:af89b200b1b541f2b0c59da1c35b30aef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Swaps the bytes of an object.  <a href="namespace_f_e_a_t_1_1_pack.html#af89b200b1b541f2b0c59da1c35b30aef">More...</a><br /></td></tr>
 <tr class="separator:af89b200b1b541f2b0c59da1c35b30aef"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
+Variables</h2></td></tr>
+<tr class="memitem:aedaef1b77b7bf7effcc1aef2b832904e"><td class="memItemLeft" align="right" valign="top">static constexpr std::string_view&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_pack.html#aedaef1b77b7bf7effcc1aef2b832904e">base64_alphabet</a> = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&quot;</td></tr>
+<tr class="separator:aedaef1b77b7bf7effcc1aef2b832904e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:add7ba4a7c2eba981c09c58b65f0a19d2"><td class="memItemLeft" align="right" valign="top">static constexpr char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_pack.html#add7ba4a7c2eba981c09c58b65f0a19d2">base64_padding</a> = '='</td></tr>
+<tr class="separator:add7ba4a7c2eba981c09c58b65f0a19d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p >Data Array <a class="el" href="namespace_f_e_a_t_1_1_pack.html" title="Data Array Pack namespace.">Pack</a> namespace. </p>
@@ -622,6 +647,106 @@ template std::size_t&#160;</td><td class="memItemRight" valign="bottom"><b>encod
 </div>
 </div>
 <h2 class="groupheader">Function Documentation</h2>
+<a id="af137883052dcdf2bfdd031592243b53b" name="af137883052dcdf2bfdd031592243b53b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af137883052dcdf2bfdd031592243b53b">&#9670;&#160;</a></span>base64_decode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt; <a class="el" href="namespace_f_e_a_t_1_1_pack.html#adc350262d3998bd6880472fbd47649f0">Pack::u8</a> &gt; FEAT::Pack::base64_decode </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
+          <td class="paramname"><em>s</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Decodes a Base64 string into bytes. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td><a class="el" href="class_f_e_a_t_1_1_string.html" title="String class implementation.">String</a> to decode</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A vector containing the bytes encoded by <code>s</code> </dd></dl>
+<p>See RFC 4648 for details</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td><a class="el" href="class_f_e_a_t_1_1_string.html" title="String class implementation.">String</a> to decode</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A vector containing the bytes encoded by <code>s</code> </dd></dl>
+<p>See RFC 4648 for details </p>
+
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l01204">1204</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="pack_8cpp_source.html#l01072">decode_base64_quantum()</a>, and <a class="el" href="pack_8cpp_source.html#l01044">is_valid_base64_char()</a>.</p>
+
+</div>
+</div>
+<a id="a4390a80456db759770d31e80f7864cbe" name="a4390a80456db759770d31e80f7864cbe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4390a80456db759770d31e80f7864cbe">&#9670;&#160;</a></span>base64_encode()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_string.html">String</a> FEAT::Pack::base64_encode </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="namespace_f_e_a_t_1_1_pack.html#adc350262d3998bd6880472fbd47649f0">Pack::u8</a> *&#160;</td>
+          <td class="paramname"><em>begin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="namespace_f_e_a_t_1_1_pack.html#adc350262d3998bd6880472fbd47649f0">Pack::u8</a> *&#160;</td>
+          <td class="paramname"><em>end</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Encodes bytes into a Base64 string. </p>
+<dl class="tparams"><dt>Template Parameters</dt><dd>
+  <table class="tparams">
+    <tr><td class="paramname">ByteIter</td><td>Iterator of Pack::u8s. Must support operator* and operator++(int)</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">begin</td><td>Start of bytes </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">end</td><td>End of bytes</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A string containing the given bytes as a Base64 string</dd></dl>
+<p>See RFC 4648 for details</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">begin</td><td>Start of bytes </td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">end</td><td>End of bytes</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A string containing the given bytes as a Base64 string</dd></dl>
+<p>See RFC 4648 for details </p>
+
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l01115">1115</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="pack_8cpp_source.html#l01050">encode_base64_quantum()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l01262">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_write_data_array()</a>.</p>
+
+</div>
+</div>
 <a id="adbe41b49207a2c0727166b9b0a26832c" name="adbe41b49207a2c0727166b9b0a26832c"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adbe41b49207a2c0727166b9b0a26832c">&#9670;&#160;</a></span>decode()</h2>
 
@@ -689,11 +814,53 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The total number of bytes consumed from the input buffer. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00692">692</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00694">694</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="pack_8cpp_source.html#l00455">decode_raw()</a>, <a class="el" href="pack_8cpp_source.html#l00757">lossless_decode()</a>, <a class="el" href="pack_8cpp_source.html#l00949">lossy_decode()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="pack_8cpp_source.html#l00457">decode_raw()</a>, <a class="el" href="pack_8cpp_source.html#l00759">lossless_decode()</a>, <a class="el" href="pack_8cpp_source.html#l00951">lossy_decode()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="container_8hpp_source.html#l00626">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_deserialize()</a>.</p>
+
+</div>
+</div>
+<a id="a44c561e1508023fbeb0c0b91e40a73b6" name="a44c561e1508023fbeb0c0b91e40a73b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a44c561e1508023fbeb0c0b91e40a73b6">&#9670;&#160;</a></span>decode_base64_quantum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void FEAT::Pack::decode_base64_quantum </td>
+          <td>(</td>
+          <td class="paramtype">std::array&lt; <a class="el" href="namespace_f_e_a_t_1_1_pack.html#adc350262d3998bd6880472fbd47649f0">Pack::u8</a>, 3 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>quantum</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::array&lt; <a class="el" href="namespace_f_e_a_t_1_1_pack.html#adc350262d3998bd6880472fbd47649f0">Pack::u8</a>, 4 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>chars</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Decodes a group of four Base64 characters into a group of three bytes. </p>
+
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l01072">1072</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l01204">base64_decode()</a>.</p>
 
 </div>
 </div>
@@ -765,11 +932,11 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The total number of bytes consumed from the input buffer. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00455">455</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00457">457</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00692">decode()</a>, <a class="el" href="pack_8cpp_source.html#l00757">lossless_decode()</a>, and <a class="el" href="pack_8cpp_source.html#l00949">lossy_decode()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00694">decode()</a>, <a class="el" href="pack_8cpp_source.html#l00759">lossless_decode()</a>, and <a class="el" href="pack_8cpp_source.html#l00951">lossy_decode()</a>.</p>
 
 </div>
 </div>
@@ -800,7 +967,7 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The (raw) <a class="el" href="namespace_f_e_a_t_1_1_pack.html#a7c69c0366e113fd42901ba9bcea55d4d" title="Type enumeration.">Pack::Type</a> value for the given type <code>T_</code> or Pack::Type::None, if <code>T_</code> does not represent a type from the <a class="el" href="namespace_f_e_a_t_1_1_pack.html#a7c69c0366e113fd42901ba9bcea55d4d" title="Type enumeration.">Pack::Type</a> enum. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00374">374</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00376">376</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
 
 </div>
 </div>
@@ -839,7 +1006,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="pack_8hpp_source.html#l00256">256</a> of file <a class="el" href="pack_8hpp_source.html">pack.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00555">estimate_size()</a>, <a class="el" href="pack_8cpp_source.html#l00757">lossless_decode()</a>, <a class="el" href="pack_8cpp_source.html#l00645">lossless_encode()</a>, <a class="el" href="pack_8cpp_source.html#l00949">lossy_decode()</a>, and <a class="el" href="pack_8cpp_source.html#l00837">lossy_encode()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00557">estimate_size()</a>, <a class="el" href="pack_8cpp_source.html#l00759">lossless_decode()</a>, <a class="el" href="pack_8cpp_source.html#l00647">lossless_encode()</a>, <a class="el" href="pack_8cpp_source.html#l00951">lossy_decode()</a>, and <a class="el" href="pack_8cpp_source.html#l00839">lossy_encode()</a>.</p>
 
 </div>
 </div>
@@ -917,9 +1084,53 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The total number of bytes written into the output buffer. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00578">578</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00580">580</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="pack_8cpp_source.html#l00406">encode_raw()</a>, <a class="el" href="pack_8cpp_source.html#l00645">lossless_encode()</a>, <a class="el" href="pack_8cpp_source.html#l00837">lossy_encode()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="pack_8cpp_source.html#l00408">encode_raw()</a>, <a class="el" href="pack_8cpp_source.html#l00647">lossless_encode()</a>, <a class="el" href="pack_8cpp_source.html#l00839">lossy_encode()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="export__vtk_8hpp_source.html#l01262">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_write_data_array()</a>.</p>
+
+</div>
+</div>
+<a id="a89fd181240fa604bb8d43d48ffee898e" name="a89fd181240fa604bb8d43d48ffee898e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89fd181240fa604bb8d43d48ffee898e">&#9670;&#160;</a></span>encode_base64_quantum()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void FEAT::Pack::encode_base64_quantum </td>
+          <td>(</td>
+          <td class="paramtype">const std::array&lt; <a class="el" href="namespace_f_e_a_t_1_1_pack.html#adc350262d3998bd6880472fbd47649f0">Pack::u8</a>, 3 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>quantum</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">std::array&lt; <a class="el" href="namespace_f_e_a_t_1_1_pack.html#adc350262d3998bd6880472fbd47649f0">Pack::u8</a>, 4 &gt; &amp;&#160;</td>
+          <td class="paramname"><em>chars</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Encodes a group of three bytes into four Base64 characters. </p>
+
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l01050">1050</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l01115">base64_encode()</a>.</p>
 
 </div>
 </div>
@@ -991,11 +1202,11 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The total number of bytes written into the output buffer. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00406">406</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00408">408</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00578">encode()</a>, <a class="el" href="pack_8cpp_source.html#l00645">lossless_encode()</a>, and <a class="el" href="pack_8cpp_source.html#l00837">lossy_encode()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00580">encode()</a>, <a class="el" href="pack_8cpp_source.html#l00647">lossless_encode()</a>, and <a class="el" href="pack_8cpp_source.html#l00839">lossy_encode()</a>.</p>
 
 </div>
 </div>
@@ -1041,11 +1252,71 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An estimated (upper bound) array buffer size. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00555">555</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00557">557</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="pack_8hpp_source.html#l00256">element_size()</a>, <a class="el" href="pack_8cpp_source.html#l00498">lossy_estimate_size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="pack_8hpp_source.html#l00256">element_size()</a>, <a class="el" href="pack_8cpp_source.html#l00500">lossy_estimate_size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="container_8hpp_source.html#l00444">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialize()</a>, and <a class="el" href="container_8hpp_source.html#l00361">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialized_size()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="container_8hpp_source.html#l00444">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialize()</a>, <a class="el" href="container_8hpp_source.html#l00361">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialized_size()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l01262">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::_write_data_array()</a>.</p>
+
+</div>
+</div>
+<a id="a5eddcb3a0202a4f4621b2378b46290a2" name="a5eddcb3a0202a4f4621b2378b46290a2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5eddcb3a0202a4f4621b2378b46290a2">&#9670;&#160;</a></span>is_valid_base64_char()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static bool FEAT::Pack::is_valid_base64_char </td>
+          <td>(</td>
+          <td class="paramtype">const char&#160;</td>
+          <td class="paramname"><em>c</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Checks if the given characters is a valid Base64 character. </p>
+
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l01044">1044</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l01204">base64_decode()</a>.</p>
+
+</div>
+</div>
+<a id="aebaf23e617750921c8de66c8e906648a" name="aebaf23e617750921c8de66c8e906648a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aebaf23e617750921c8de66c8e906648a">&#9670;&#160;</a></span>is_valid_base64_string()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool FEAT::Pack::is_valid_base64_string </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;&#160;</td>
+          <td class="paramname"><em>s</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p >\briefs Checks whether a string is valid Base64 data</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">s</td><td><a class="el" href="class_f_e_a_t_1_1_string.html" title="String class implementation.">String</a> to check</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>True, if s contains valid Base64 data </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l01098">1098</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
 
 </div>
 </div>
@@ -1123,11 +1394,11 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The total number of bytes consumed from the input buffer. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00757">757</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00759">759</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="pack_8cpp_source.html#l00455">decode_raw()</a>, <a class="el" href="pack_8hpp_source.html#l00256">element_size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
+<p class="reference">References <a class="el" href="pack_8cpp_source.html#l00457">decode_raw()</a>, <a class="el" href="pack_8hpp_source.html#l00256">element_size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00692">decode()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00694">decode()</a>.</p>
 
 </div>
 </div>
@@ -1205,11 +1476,11 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The total number of bytes written into the output buffer. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00645">645</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00647">647</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="pack_8hpp_source.html#l00256">element_size()</a>, <a class="el" href="pack_8cpp_source.html#l00406">encode_raw()</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
+<p class="reference">References <a class="el" href="pack_8hpp_source.html#l00256">element_size()</a>, <a class="el" href="pack_8cpp_source.html#l00408">encode_raw()</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00578">encode()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00580">encode()</a>.</p>
 
 </div>
 </div>
@@ -1287,11 +1558,11 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The total number of bytes consumed from the input buffer. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00949">949</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00951">951</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="pack_8cpp_source.html#l00455">decode_raw()</a>, <a class="el" href="pack_8hpp_source.html#l00256">element_size()</a>, <a class="el" href="string_8hpp_source.html#l00944">FEAT::stringify()</a>, <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>, <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="pack_8cpp_source.html#l00457">decode_raw()</a>, <a class="el" href="pack_8hpp_source.html#l00256">element_size()</a>, <a class="el" href="string_8hpp_source.html#l00993">FEAT::stringify()</a>, <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>, <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00692">decode()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00694">decode()</a>.</p>
 
 </div>
 </div>
@@ -1377,11 +1648,11 @@ template&lt;typename T_ &gt; </div>
 <dl class="section warning"><dt>Warning</dt><dd>Tolerance can be exceeded in fringe cases. If data set is highly uncontinuous, error testing is recommended.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The total number of bytes written into the output buffer. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00837">837</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00839">839</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="pack_8hpp_source.html#l00256">element_size()</a>, <a class="el" href="pack_8cpp_source.html#l00406">encode_raw()</a>, <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="pack_8hpp_source.html#l00256">element_size()</a>, <a class="el" href="pack_8cpp_source.html#l00408">encode_raw()</a>, <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00578">encode()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00580">encode()</a>.</p>
 
 </div>
 </div>
@@ -1437,11 +1708,11 @@ template&lt;typename T_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>An estimated (upper bound) array buffer size. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00498">498</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00500">500</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00555">estimate_size()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00557">estimate_size()</a>.</p>
 
 </div>
 </div>
@@ -1563,7 +1834,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="pack_8hpp_source.html#l00178">178</a> of file <a class="el" href="pack_8hpp_source.html">pack.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="string_8hpp_source.html#l00679">FEAT::String::compare_no_case()</a>.</p>
+<p class="reference">References <a class="el" href="string_8hpp_source.html#l00680">FEAT::String::compare_no_case()</a>.</p>
 
 </div>
 </div>
@@ -1675,9 +1946,9 @@ template&lt;typename X_ , typename T_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number bytes read from the source buffer, i.e. <code>sizeof(X_)*count</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00196">196</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00198">198</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="pack_8cpp_source.html#l00096">xswap()</a>.</p>
+<p class="reference">References <a class="el" href="pack_8cpp_source.html#l00098">xswap()</a>.</p>
 
 </div>
 </div>
@@ -1751,9 +2022,9 @@ template&lt;typename X_ , typename T_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The number bytes written to the destination buffer, i.e. <code>sizeof(X_)*count</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00145">145</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00147">147</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="pack_8cpp_source.html#l00096">xswap()</a>.</p>
+<p class="reference">References <a class="el" href="pack_8cpp_source.html#l00098">xswap()</a>.</p>
 
 </div>
 </div>
@@ -1785,9 +2056,58 @@ template&lt;typename X_ &gt; </div>
 
 <p>Swaps the bytes of an object. </p>
 
-<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00096">96</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l00098">98</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00196">xdecode()</a>, and <a class="el" href="pack_8cpp_source.html#l00145">xencode()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="pack_8cpp_source.html#l00198">xdecode()</a>, and <a class="el" href="pack_8cpp_source.html#l00147">xencode()</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Variable Documentation</h2>
+<a id="aedaef1b77b7bf7effcc1aef2b832904e" name="aedaef1b77b7bf7effcc1aef2b832904e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aedaef1b77b7bf7effcc1aef2b832904e">&#9670;&#160;</a></span>base64_alphabet</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr std::string_view FEAT::Pack::base64_alphabet = &quot;ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/&quot;</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l01040">1040</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
+
+</div>
+</div>
+<a id="add7ba4a7c2eba981c09c58b65f0a19d2" name="add7ba4a7c2eba981c09c58b65f0a19d2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#add7ba4a7c2eba981c09c58b65f0a19d2">&#9670;&#160;</a></span>base64_padding</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr char FEAT::Pack::base64_padding = '='</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="pack_8cpp_source.html#l01041">1041</a> of file <a class="el" href="pack_8cpp_source.html">pack.cpp</a>.</p>
 
 </div>
 </div>

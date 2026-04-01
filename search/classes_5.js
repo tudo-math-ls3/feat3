@@ -60,7 +60,8 @@ var searchData=
   ['foundationtopologycollector_3c_20adaptivemeshtype_5f_2c_20topology_5fdim_5f_2c_202_20_3e_57',['FoundationTopologyCollector&lt; AdaptiveMeshType_, topology_dim_, 2 &gt;',['../struct_f_e_a_t_1_1_geometry_1_1_intern_1_1_foundation_topology_collector_3_01_adaptive_mesh_type99390dd1ccaa79ff00b64d8b0b2f4c4a.html',1,'FEAT::Geometry::Intern']]],
   ['frankes3dvariantfunction_58',['Frankes3DVariantFunction',['../class_f_e_a_t_1_1_analytic_1_1_common_1_1_frankes3_d_variant_function.html',1,'FEAT::Analytic::Common']]],
   ['frankesfunction_59',['FrankesFunction',['../class_f_e_a_t_1_1_analytic_1_1_common_1_1_frankes_function.html',1,'FEAT::Analytic::Common']]],
-  ['function_60',['Function',['../class_f_e_a_t_1_1_analytic_1_1_function.html',1,'FEAT::Analytic']]],
-  ['functioncellintegralinfo_61',['FunctionCellIntegralInfo',['../class_f_e_a_t_1_1_assembly_1_1_function_cell_integral_info.html',1,'FEAT::Assembly']]],
-  ['functionintegralinfo_62',['FunctionIntegralInfo',['../class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html',1,'FEAT::Assembly']]]
+  ['froschpreconditioner_60',['FROSchPreconditioner',['../class_f_e_a_t_1_1_solver_1_1_f_r_o_sch_preconditioner.html',1,'FEAT::Solver']]],
+  ['function_61',['Function',['../class_f_e_a_t_1_1_analytic_1_1_function.html',1,'FEAT::Analytic']]],
+  ['functioncellintegralinfo_62',['FunctionCellIntegralInfo',['../class_f_e_a_t_1_1_assembly_1_1_function_cell_integral_info.html',1,'FEAT::Assembly']]],
+  ['functionintegralinfo_63',['FunctionIntegralInfo',['../class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html',1,'FEAT::Assembly']]]
 ];

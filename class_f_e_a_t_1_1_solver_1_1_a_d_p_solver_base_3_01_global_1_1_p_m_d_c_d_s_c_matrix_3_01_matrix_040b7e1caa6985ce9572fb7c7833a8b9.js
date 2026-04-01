@@ -18,6 +18,7 @@ var class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c
     [ "_filter_mat", "class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#abbe1392a88c229e6cd29cc1ab535067e", null ],
     [ "_filter_mat", "class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#aec0041516d808fe023d5abad27ba0031", null ],
     [ "_filter_mat", "class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a72f23823ec0f9e055c6717ddffe1a50f", null ],
+    [ "_get_adp_block_information", "class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ae16ec284e0b5913b661020fd3e7d3615", null ],
     [ "_get_adp_matrix_num_cols", "class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a3f50781e8fa2e850ab926a3a46f7e293", null ],
     [ "_get_adp_matrix_num_nzes", "class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0f3af28980691b4bebc702c96dec6152", null ],
     [ "_get_adp_matrix_num_rows", "class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a13c0a1f73d87b48c672f45fb60883ac1", null ],

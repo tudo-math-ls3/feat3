@@ -139,7 +139,7 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af328eca1862a8da62eb0c952e9565d0f"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#af328eca1862a8da62eb0c952e9565d0f">~NLOptPrecond</a> ()</td></tr>
 <tr class="memdesc:af328eca1862a8da62eb0c952e9565d0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Empty virtual destructor.  <a href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#af328eca1862a8da62eb0c952e9565d0f">More...</a><br /></td></tr>
 <tr class="separator:af328eca1862a8da62eb0c952e9565d0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad1cec9e45d8eade586876bba21c749af"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#ad1cec9e45d8eade586876bba21c749af">apply</a> (<a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#ac687f31fa9389b4c0c0ec211bc262e0c">VectorType</a> &amp;vec_cor, const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#ac687f31fa9389b4c0c0ec211bc262e0c">VectorType</a> &amp;vec_def) override=0</td></tr>
+<tr class="memitem:ad1cec9e45d8eade586876bba21c749af"><td class="memItemLeft" align="right" valign="top">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#ad1cec9e45d8eade586876bba21c749af">apply</a> (<a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#ac687f31fa9389b4c0c0ec211bc262e0c">VectorType</a> &amp;vec_cor, const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#ac687f31fa9389b4c0c0ec211bc262e0c">VectorType</a> &amp;vec_def) override=0</td></tr>
 <tr class="memdesc:ad1cec9e45d8eade586876bba21c749af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the preconditioner.  <a href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#ad1cec9e45d8eade586876bba21c749af">More...</a><br /></td></tr>
 <tr class="separator:ad1cec9e45d8eade586876bba21c749af"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:acacbcaccbf7ec307778128928a901d59"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#acacbcaccbf7ec307778128928a901d59">done</a> ()</td></tr>
@@ -301,7 +301,7 @@ template&lt;typename VectorType_ , typename FilterType_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html">FEAT::Solver::NLOptPrecond</a>&lt; VectorType_, FilterType_ &gt;::apply </td>
+          <td class="memname">virtual <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81">Status</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html">FEAT::Solver::NLOptPrecond</a>&lt; VectorType_, FilterType_ &gt;::apply </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_n_l_opt_precond.html#ac687f31fa9389b4c0c0ec211bc262e0c">VectorType</a> &amp;&#160;</td>
           <td class="paramname"><em>vec_cor</em>, </td>
@@ -334,7 +334,7 @@ template&lt;typename VectorType_ , typename FilterType_ &gt; </div>
   </dd>
 </dl>
 <p>Usually this will apply some kind of solver.</p>
-<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespace_f_e_a_t_1_1_solver.html#ab1c941bc4fb3a678ef08e84cd3fa35ed" title="Solver status return codes enumeration.">Solver::Status</a> of the application of the preconditioner. </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81" title="Solver status return codes enumeration.">Solver::Status</a> of the application of the preconditioner. </dd></dl>
 
 <p>Implements <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ae162070c491d897ae6f91d263200af40">FEAT::Solver::SolverBase&lt; VectorType_ &gt;</a>.</p>
 

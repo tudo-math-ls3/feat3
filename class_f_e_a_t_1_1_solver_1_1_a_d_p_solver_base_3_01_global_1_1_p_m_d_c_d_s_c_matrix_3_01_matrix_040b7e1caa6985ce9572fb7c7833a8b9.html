@@ -197,6 +197,8 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a72f23823ec0f9e055c6717ddffe1a50f"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a72f23823ec0f9e055c6717ddffe1a50f">_filter_mat</a> (DTV_ *val, const RPT_ *row_ptr, const CIT_ *col_idx, const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html">LAFEM::UnitFilter</a>&lt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a7e8931869979d9a49c7fb78919cf4b35">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0ad2c4a41a889eef8f58ffe1cfdf5307">IndexType</a> &gt; &amp;filter)</td></tr>
 <tr class="memdesc:a72f23823ec0f9e055c6717ddffe1a50f"><td class="mdescLeft">&#160;</td><td class="mdescRight">auxiliary function: filters the local ADP matrix  <a href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a72f23823ec0f9e055c6717ddffe1a50f">More...</a><br /></td></tr>
 <tr class="separator:a72f23823ec0f9e055c6717ddffe1a50f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae16ec284e0b5913b661020fd3e7d3615"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_string.html">String</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#ae16ec284e0b5913b661020fd3e7d3615">_get_adp_block_information</a> () const</td></tr>
+<tr class="separator:ae16ec284e0b5913b661020fd3e7d3615"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f50781e8fa2e850ab926a3a46f7e293"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a3f50781e8fa2e850ab926a3a46f7e293">_get_adp_matrix_num_cols</a> () const</td></tr>
 <tr class="separator:a3f50781e8fa2e850ab926a3a46f7e293"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0f3af28980691b4bebc702c96dec6152"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a0f3af28980691b4bebc702c96dec6152">_get_adp_matrix_num_nzes</a> () const</td></tr>
@@ -260,7 +262,7 @@ class FEAT::Solver::ADPSolverBase&lt; Global::PMDCDSCMatrix&lt; MatrixB_, Matrix
 <p >Most of the dirty work is outsourced to the <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html" title="Pre-Multiplied Discontinuous Diagonal Schur-Complement Matrix.">Global::PMDCDSCMatrix</a> class, most notably to its three member functions Global::PMDCDSCMatrix::adp_compute_counts(), Global::PMDCDSCMatrix::adp_upload_symbolic() and Global::PMDCDSCMatrix::adp_upload_numeric().</p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00441">441</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00450">450</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="abb812b3c1f79e6480ec0e0e9ea10c3b6" name="abb812b3c1f79e6480ec0e0e9ea10c3b6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#abb812b3c1f79e6480ec0e0e9ea10c3b6">&#9670;&#160;</a></span>BaseClass</h2>
@@ -278,7 +280,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>our base class </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00458">458</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00467">467</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -298,7 +300,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>our internal data type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00464">464</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00473">473</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -318,7 +320,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>the global filter type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00450">450</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00459">459</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -338,7 +340,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>the global matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00446">446</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00455">455</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -358,7 +360,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>the global vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00448">448</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00457">457</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -378,7 +380,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>our internal index type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00466">466</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00475">475</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -398,7 +400,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>the local Schur-complement matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00453">453</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00462">462</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -418,7 +420,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>our internal local vector type; always a <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector&lt;DataType, IndexType&gt;</a> </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00455">455</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00464">464</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -438,7 +440,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>the system vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00461">461</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00470">470</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -488,7 +490,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00496">496</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00505">505</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -540,7 +542,7 @@ template&lt;typename DTV_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00652">652</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00668">668</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#aae0dbe1f8aa005dd40e12d0cb37f4cd6">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_vector_size()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00737">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="container_8hpp_source.html#l01136">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
@@ -598,7 +600,7 @@ template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
 
 <p>auxiliary function: filters the local ADP matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00697">697</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00713">713</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
@@ -656,7 +658,7 @@ template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
 
 <p>auxiliary function: filters the local ADP matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00689">689</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00705">705</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
@@ -714,7 +716,7 @@ template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
 
 <p>auxiliary function: filters the local ADP matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00666">666</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00682">682</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -770,9 +772,9 @@ template&lt;typename DTV_ , typename RPT_ , typename CIT_ , typename First_ &gt;
 
 <p>auxiliary function: filters the local ADP matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00723">723</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00739">739</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00940">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat()</a>.</p>
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00963">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat()</a>.</p>
 
 </div>
 </div>
@@ -828,9 +830,9 @@ template&lt;typename DTV_ , typename RPT_ , typename CIT_ , typename First_ , ty
 
 <p>auxiliary function: filters the local ADP matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00714">714</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00730">730</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00940">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat()</a>.</p>
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00963">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat()</a>.</p>
 
 </div>
 </div>
@@ -886,9 +888,9 @@ template&lt;typename DTV_ , typename RPT_ , typename CIT_ , typename SubFilter_ 
 
 <p>auxiliary function: filters the local ADP matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00705">705</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00721">721</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00940">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat()</a>.</p>
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00963">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat()</a>.</p>
 
 </div>
 </div>
@@ -944,7 +946,39 @@ template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
 
 <p>auxiliary function: filters the local ADP matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00674">674</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00690">690</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ae16ec284e0b5913b661020fd3e7d3615" name="ae16ec284e0b5913b661020fd3e7d3615"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae16ec284e0b5913b661020fd3e7d3615">&#9670;&#160;</a></span>_get_adp_block_information()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typename SolverBase_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_string.html">String</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html">FEAT::Solver::ADPSolverBase</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_p_m_d_c_d_s_c_matrix.html">Global::PMDCDSCMatrix</a>&lt; MatrixB_, MatrixD_ &gt;, GlobalFilter_, SolverBase_ &gt;::_get_adp_block_information </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<dl class="section return"><dt>Returns</dt><dd>The block information of the algebraic dof partitioning as an XML string. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00588">588</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
 
 </div>
 </div>
@@ -974,7 +1008,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of columns of the local ADP matrix; equal to <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#af2e2fe610ff0c3b63fe23b73ed0316b7">_get_num_global_dofs()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00543">543</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00552">552</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#ab934585a0eb28b50149e32ff156685bc">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_global_dofs()</a>.</p>
 
@@ -1006,7 +1040,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of nonzero entries of the local ADP matrix </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00549">549</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00558">558</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1036,7 +1070,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of rows of the local ADP matrix; equal to <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a4da3d5390745d8a5a1746d831e58ef70">_get_num_owned_dofs()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00537">537</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00546">546</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_owned_dofs()</a>.</p>
 
@@ -1068,7 +1102,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The size of the local ADP vector; equal to <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base_3_01_global_1_1_p_m_d_c_d_s_c_matrix_3_01_matrix_040b7e1caa6985ce9572fb7c7833a8b9.html#a4da3d5390745d8a5a1746d831e58ef70">_get_num_owned_dofs()</a> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00531">531</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00540">540</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#a61697a335687bd2b7f1c3df5563f342d">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_num_owned_dofs()</a>.</p>
 
@@ -1100,7 +1134,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the underlying communicator </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00510">510</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00519">519</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1130,7 +1164,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The index of the first global DOF owned by this process </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00573">573</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00582">582</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1160,7 +1194,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The total number of global DOFs on all processes </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00561">561</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00570">570</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1190,7 +1224,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The total number of nonzero entries of the global ADP matrix </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00555">555</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00564">564</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1220,7 +1254,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of global DOFs owned by this process </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00567">567</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00576">576</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1278,9 +1312,9 @@ template&lt;typename DTV_ , typename RPT_ , typename CIT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00611">611</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00627">627</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00940">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat()</a>, and <a class="el" href="adp__solver__base_8hpp_source.html#l00781">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00963">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_filter_mat()</a>, and <a class="el" href="adp__solver__base_8hpp_source.html#l00797">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
 
 </div>
 </div>
@@ -1331,9 +1365,9 @@ template&lt;typename RPT_ , typename CIT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00590">590</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00606">606</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00781">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00797">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
 
 </div>
 </div>
@@ -1384,7 +1418,7 @@ template&lt;typename DTV_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00628">628</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00644">644</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="class_f_e_a_t_1_1_solver_1_1_a_d_p_solver_base.html#aae0dbe1f8aa005dd40e12d0cb37f4cd6">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_get_adp_vector_size()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00737">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="container_8hpp_source.html#l01136">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
@@ -1418,9 +1452,9 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 <p>Symbolic initialization. </p>
 <p >This function performs the symbolic initialization of the algebraic DOF partitioning, which boils down to computing the ADP matrix dimensions for this specialization. </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00521">521</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00530">530</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00781">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
+<p class="reference">References <a class="el" href="adp__solver__base_8hpp_source.html#l00797">FEAT::Solver::ADPSolverBase&lt; Matrix_, Filter_, SolverBase_ &gt;::_system_matrix</a>.</p>
 
 </div>
 </div>
@@ -1449,7 +1483,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>the total global DOF count </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00476">476</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00485">485</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1477,7 +1511,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>our global DOF offset </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00478">478</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00487">487</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1505,7 +1539,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>the number of global non-zero entries </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00484">484</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00493">493</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1533,7 +1567,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>the owned DOF count </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00480">480</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00489">489</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1561,7 +1595,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>the number of owned non-zero entries </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00482">482</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00491">491</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1589,7 +1623,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>the global system filter </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00472">472</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00481">481</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -1617,7 +1651,7 @@ template&lt;typename MatrixB_ , typename MatrixD_ , typename GlobalFilter_ , typ
 
 <p>the global system matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00470">470</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="adp__solver__base_8hpp_source.html#l00479">479</a> of file <a class="el" href="adp__solver__base_8hpp_source.html">adp_solver_base.hpp</a>.</p>
 
 </div>
 </div>

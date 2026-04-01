@@ -1,5 +1,7 @@
 var class_f_e_a_t_1_1_geometry_1_1_export_v_t_k =
 [
+    [ "CompressedHeader", "struct_f_e_a_t_1_1_geometry_1_1_export_v_t_k_1_1_compressed_header.html", null ],
+    [ "UncompressedHeader", "struct_f_e_a_t_1_1_geometry_1_1_export_v_t_k_1_1_uncompressed_header.html", null ],
     [ "CellShapeType", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a6be6ab3b4cc8fae9cf53e17e9bda9260", null ],
     [ "MeshType", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#ad7e21a582c82be27009565549a972a84", null ],
     [ "ShapeType", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a5c0c3a40a3665b33c0f909d9f44da33b", null ],
@@ -11,6 +13,7 @@ var class_f_e_a_t_1_1_geometry_1_1_export_v_t_k =
     [ "~ExportVTK", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a0f77fd7a1ec3cef4ee2c6e024647b40f", null ],
     [ "ExportVTK", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a9c69f24bb0fd974a4cb9772bd051fe18", null ],
     [ "ExportVTK", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#aa80d5f85f0a9cf912771e576f3aecb5b", null ],
+    [ "_write_data_array", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#ae41b4fa8f09b80dfb812492e2cc35f64", null ],
     [ "add_cell_scalar", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#acb1a392316504d9ffb91efbb9c6d05fc", null ],
     [ "add_cell_vector", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a23cec58129a21b81a6c30b80aeaa967c", null ],
     [ "add_cell_vector", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#aa2c51ebe07a5b0ec804b75dfd6743f7c", null ],
@@ -20,6 +23,8 @@ var class_f_e_a_t_1_1_geometry_1_1_export_v_t_k =
     [ "add_vertex_vector", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a178ae94962c9c9c639d41e9922c01cbe", null ],
     [ "add_vertex_vector", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#ab416bed860b82139b16057146fd2123f", null ],
     [ "clear", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a443cacb7decb6ea6dbfe2b5c9453aaae", null ],
+    [ "enable_ascii_output", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a4204bc46899debc41a599cfce6670093", null ],
+    [ "enable_compression", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#ac814322501afc0baf9c991b8cf057f93", null ],
     [ "operator=", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#ab8d8e959d60f6513a3483f1db307e076", null ],
     [ "operator=", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a296aebe7a717c96bc35d2ad56a492214", null ],
     [ "write", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a4714c9f8cbfca1aed3c3d02a07322f8e", null ],
@@ -27,13 +32,17 @@ var class_f_e_a_t_1_1_geometry_1_1_export_v_t_k =
     [ "write", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a4101b61ce93c8ad7ab4df8efa66642bc", null ],
     [ "write_pvtu", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a9b685380ed87f58090c104172b4045bb", null ],
     [ "write_vtu", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a6baa54836836b317fd2e48fdaae69f25", null ],
+    [ "_ascii_output", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#adafd879d60f24591141319bb82230f8b", null ],
     [ "_cell_scalars", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#aaef9cb017d4c754996b241f2f8f1cf0f", null ],
     [ "_cell_vectors", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#ad46a2f5821ccae239b4d4aaf877506aa", null ],
-    [ "_cells", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#ade20988799601dc30e190c84213b5396", null ],
+    [ "_cells", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a945e9ea00c1d4d00f336607a2ecb6a33", null ],
     [ "_num_cells", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#aa297072eb731990ea8e06a9db3d177bb", null ],
     [ "_num_verts", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a1e07e5c1be1028b597a2766191be7eae", null ],
+    [ "_use_compression", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a27a4a2eb5be753d6d41c2580982f2e35", null ],
     [ "_var_prec", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a2cec53a30d0aeb8ea005a142c6bdcf1e", null ],
     [ "_vertex_scalars", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a1450bfd5c17ebb1d4f188fbebfa22071", null ],
     [ "_vertex_vectors", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a972543c68a70c1759a527cb0407f2862", null ],
-    [ "_vertices", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a316d3d549d5337fb647bf505143819e6", null ]
+    [ "_vertices", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a257981c49dd66941945f59fcaf27ce08", null ],
+    [ "num_coords", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#a2930e8a8584d4504d3d47a20d3bd5c71", null ],
+    [ "verts_per_cell", "class_f_e_a_t_1_1_geometry_1_1_export_v_t_k.html#af6fe3c98e5ade4a511e86a7fa4fd5696", null ]
 ];

@@ -21,6 +21,7 @@ var class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper =
     [ "point_inside", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a163a2c526c810459165515f98956857c", null ],
     [ "point_not_outside", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#acee5cc4a4fd75835ca2ca567a7864e84", null ],
     [ "points", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a07d2cbf428eeeb57fdca66672075fe26", null ],
+    [ "set_expensive_intersection", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a823106fb407c49eaba1433394a503289", null ],
     [ "squared_distance", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a7f59c7a3d1e2ada0f8414c0a1060a3a7", null ],
     [ "squared_distance_to_feature", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#accd465525148caac6e5231501684ee94", null ],
     [ "transform", "class_f_e_a_t_1_1_geometry_1_1_c_g_a_l_wrapper.html#a11a9dcee8b70993d969023985d0ef3b5", null ],

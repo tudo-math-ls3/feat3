@@ -31,6 +31,7 @@ var class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_control =
     [ "_extract_patch_layering", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_control.html#acd2a5e9e81927295bd6a66c0470618ad", null ],
     [ "_gather_element_weights", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_control.html#a929b80246dcd57ebd003ec7dd12bf579", null ],
     [ "_gather_masked_elements", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_control.html#a32dff09052ab0072a6d3d4ae86fdc2fd", null ],
+    [ "_gather_masked_elements", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_control.html#aebce620972a75299693da7eb4c0fa306", null ],
     [ "_parse_parti_type", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_control.html#a6e40e6fa212eb8a5329729dc703791f6", null ],
     [ "_precreate_voxel_map", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_control.html#a4f0bc837e20dae4c13b70e496b9a0f41", null ],
     [ "_reset_parti_types", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_control.html#a15cc7a2e6b02166ba9a38a3a897ff008", null ],

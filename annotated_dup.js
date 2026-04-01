@@ -131,6 +131,7 @@ var annotated_dup =
         [ "BurgersAssemblyJobBase", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base.html", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_job_base" ],
         [ "BurgersAssemblyTaskBase", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_task_base.html", "class_f_e_a_t_1_1_assembly_1_1_burgers_assembly_task_base" ],
         [ "BurgersBlockedAssemblyTaskBase", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_assembly_task_base.html", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_assembly_task_base" ],
+        [ "BurgersBlockedDiagonalAssemblyJob", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_diagonal_assembly_job.html", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_diagonal_assembly_job" ],
         [ "BurgersBlockedMatrixAssemblyJob", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_matrix_assembly_job.html", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_matrix_assembly_job" ],
         [ "BurgersBlockedVectorAssemblyJob", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_vector_assembly_job.html", "class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_vector_assembly_job" ],
         [ "BurgersCarreauAssemblyJobBase", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_assembly_job_base.html", "class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_assembly_job_base" ],
@@ -227,6 +228,8 @@ var annotated_dup =
         [ "Domain", "namespace_f_e_a_t_1_1_control_1_1_domain.html", [
           [ "AdaptiveLevelWrapper", "class_f_e_a_t_1_1_control_1_1_domain_1_1_adaptive_level_wrapper.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_adaptive_level_wrapper" ],
           [ "AdaptivePartiDomainControl", "class_f_e_a_t_1_1_control_1_1_domain_1_1_adaptive_parti_domain_control.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_adaptive_parti_domain_control" ],
+          [ "CGALDomainControl", "class_f_e_a_t_1_1_control_1_1_domain_1_1_c_g_a_l_domain_control.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_c_g_a_l_domain_control" ],
+          [ "CGALDomainLevelWrapper", "class_f_e_a_t_1_1_control_1_1_domain_1_1_c_g_a_l_domain_level_wrapper.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_c_g_a_l_domain_level_wrapper" ],
           [ "DomainControl", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_control.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_control" ],
           [ "DomainLayer", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_layer.html", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_layer" ],
           [ "DomainLevel", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_level.html", null ],
@@ -606,6 +609,13 @@ var annotated_dup =
         [ "Transfer", "class_f_e_a_t_1_1_global_1_1_transfer.html", "class_f_e_a_t_1_1_global_1_1_transfer" ],
         [ "Vector", "class_f_e_a_t_1_1_global_1_1_vector.html", "class_f_e_a_t_1_1_global_1_1_vector" ]
       ] ],
+      [ "Intern", null, [
+        [ "has_input_operator", "struct_f_e_a_t_1_1_intern_1_1has__input__operator.html", null ],
+        [ "has_input_operator< T, std::void_t< decltype((std::declval< std::istringstream & >() > > std::declval< T & >()))> >", "struct_f_e_a_t_1_1_intern_1_1has__input__operator_3_01_t_00_01std_1_1void__t_3_01decltype_07_07s80f520ffb6c16b6d0972ef20f18ff7ca.html", null ],
+        [ "is_std_deque", "struct_f_e_a_t_1_1_intern_1_1is__std__deque.html", null ],
+        [ "is_std_deque< std::deque< T, A > >", "struct_f_e_a_t_1_1_intern_1_1is__std__deque_3_01std_1_1deque_3_01_t_00_01_a_01_4_01_4.html", null ],
+        [ "ParameterCore", "class_f_e_a_t_1_1_intern_1_1_parameter_core.html", "class_f_e_a_t_1_1_intern_1_1_parameter_core" ]
+      ] ],
       [ "LAFEM", "namespace_f_e_a_t_1_1_l_a_f_e_m.html", [
         [ "Arch", null, [
           [ "Intern", null, [
@@ -790,6 +800,7 @@ var annotated_dup =
         [ "ExpressionTimings", "class_f_e_a_t_1_1_solver_1_1_expression_timings.html", null ],
         [ "FGMRES", "class_f_e_a_t_1_1_solver_1_1_f_g_m_r_e_s.html", "class_f_e_a_t_1_1_solver_1_1_f_g_m_r_e_s" ],
         [ "FixedStepLinesearch", "class_f_e_a_t_1_1_solver_1_1_fixed_step_linesearch.html", "class_f_e_a_t_1_1_solver_1_1_fixed_step_linesearch" ],
+        [ "FROSchPreconditioner", "class_f_e_a_t_1_1_solver_1_1_f_r_o_sch_preconditioner.html", "class_f_e_a_t_1_1_solver_1_1_f_r_o_sch_preconditioner" ],
         [ "GenericUmfpack", "class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html", "class_f_e_a_t_1_1_solver_1_1_generic_umfpack" ],
         [ "GMRES", "class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html", "class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s" ],
         [ "GroppPCG", "class_f_e_a_t_1_1_solver_1_1_gropp_p_c_g.html", "class_f_e_a_t_1_1_solver_1_1_gropp_p_c_g" ],
@@ -853,7 +864,9 @@ var annotated_dup =
         [ "SSORPrecondWithBackend", "class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond_with_backend.html", null ],
         [ "SSORPrecondWithBackend< PreferredBackend::generic, LAFEM::SparseMatrixBCSR< DT_, IT_, BlockHeight_, BlockWidth_ >, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_03cc9221468c00ec17113383d091b5dfc.html", "class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_03cc9221468c00ec17113383d091b5dfc" ],
         [ "SSORPrecondWithBackend< PreferredBackend::generic, LAFEM::SparseMatrixCSR< DT_, IT_ >, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_09cdd27baeeaa7c4869529b76c2c5d109.html", "class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_09cdd27baeeaa7c4869529b76c2c5d109" ],
+        [ "StokesFROSchPreconditioner", "class_f_e_a_t_1_1_solver_1_1_stokes_f_r_o_sch_preconditioner.html", "class_f_e_a_t_1_1_solver_1_1_stokes_f_r_o_sch_preconditioner" ],
         [ "SuperLU", "class_f_e_a_t_1_1_solver_1_1_super_l_u.html", "class_f_e_a_t_1_1_solver_1_1_super_l_u" ],
+        [ "TpetraSolverBase", "class_f_e_a_t_1_1_solver_1_1_tpetra_solver_base.html", "class_f_e_a_t_1_1_solver_1_1_tpetra_solver_base" ],
         [ "Umfpack", "class_f_e_a_t_1_1_solver_1_1_umfpack.html", "class_f_e_a_t_1_1_solver_1_1_umfpack" ],
         [ "UmfpackMean", "class_f_e_a_t_1_1_solver_1_1_umfpack_mean.html", "class_f_e_a_t_1_1_solver_1_1_umfpack_mean" ],
         [ "UzawaPrecond", "class_f_e_a_t_1_1_solver_1_1_uzawa_precond.html", "class_f_e_a_t_1_1_solver_1_1_uzawa_precond" ],
@@ -1197,6 +1210,7 @@ var annotated_dup =
         [ "Scanner", "class_f_e_a_t_1_1_xml_1_1_scanner.html", "class_f_e_a_t_1_1_xml_1_1_scanner" ],
         [ "SyntaxError", "class_f_e_a_t_1_1_xml_1_1_syntax_error.html", "class_f_e_a_t_1_1_xml_1_1_syntax_error" ]
       ] ],
+      [ "ArgParser", "class_f_e_a_t_1_1_arg_parser.html", "class_f_e_a_t_1_1_arg_parser" ],
       [ "Backend", "class_f_e_a_t_1_1_backend.html", "class_f_e_a_t_1_1_backend" ],
       [ "BinaryStream", "class_f_e_a_t_1_1_binary_stream.html", "class_f_e_a_t_1_1_binary_stream" ],
       [ "DistFileIO", "class_f_e_a_t_1_1_dist_file_i_o.html", "class_f_e_a_t_1_1_dist_file_i_o" ],
@@ -1210,6 +1224,8 @@ var annotated_dup =
       [ "MemoryPool", "class_f_e_a_t_1_1_memory_pool.html", "class_f_e_a_t_1_1_memory_pool" ],
       [ "MemoryUsage", "class_f_e_a_t_1_1_memory_usage.html", "class_f_e_a_t_1_1_memory_usage" ],
       [ "mutable_priority_queue", "class_f_e_a_t_1_1mutable__priority__queue.html", null ],
+      [ "Parameter", "class_f_e_a_t_1_1_parameter.html", "class_f_e_a_t_1_1_parameter" ],
+      [ "ParameterBuilder", "class_f_e_a_t_1_1_parameter_builder.html", "class_f_e_a_t_1_1_parameter_builder" ],
       [ "ParseError", "class_f_e_a_t_1_1_parse_error.html", "class_f_e_a_t_1_1_parse_error" ],
       [ "PropertyMap", "class_f_e_a_t_1_1_property_map.html", "class_f_e_a_t_1_1_property_map" ],
       [ "Random", "class_f_e_a_t_1_1_random.html", "class_f_e_a_t_1_1_random" ],
