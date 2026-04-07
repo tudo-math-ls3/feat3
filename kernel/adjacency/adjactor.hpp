@@ -487,5 +487,57 @@ namespace FEAT
         return _adj2;
       }
     }; // class CompositeAdjactor
+
+    /**
+     * \brief Wrapper for using range-based for loops with adjactors
+     *
+     * \tparam Adjactor_ Adjactor type wrapped by this wrapper
+     *
+     * This wrapper allows you to replace
+     *
+     * \code
+     * for(auto it = adj.image_begin(n); it != adj.image_end(n); ++it)
+     * {
+     *   const auto i = *it;
+     *   ...
+     * }
+     * \endcode
+     *
+     * with
+     *
+     * \code
+     * for(const auto i : Adjacency::ImageRange(adj, n))
+     * {
+     *   ...
+     * }
+     * \endcode
+     */
+    template<typename Adjactor_>
+    class ImageRange
+    {
+    public:
+      using Adjactor = Adjactor_;
+
+      using ImageIterator = typename Adjactor::ImageIterator;
+    private:
+      const Adjactor_& _adj;
+      Index _domain_node;
+
+    public:
+      /// Constructor
+      ImageRange(Adjactor& adjactor, Index domain_node) : _adj(adjactor), _domain_node(domain_node)
+      {
+      }
+
+      ImageIterator begin()
+      {
+        return _adj.image_begin(_domain_node);
+      }
+
+      ImageIterator end()
+      {
+        return _adj.image_end(_domain_node);
+      }
+    };
   } // namespace Adjacency
 } // namespace FEAT
