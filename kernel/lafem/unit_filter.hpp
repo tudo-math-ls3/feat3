@@ -11,7 +11,9 @@
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_vector.hpp>
-#include <kernel/lafem/arch/unit_filter.hpp>
+#include <kernel/lafem/arch/unit_filter_dense_vec.hpp>
+#include <kernel/lafem/arch/unit_filter_dense_csr.hpp>
+#include <kernel/lafem/arch/unit_filter_dense_weak_csr.hpp>
 
 namespace FEAT
 {
@@ -64,8 +66,8 @@ namespace FEAT
        * \param[in] size_in
        * The total size of the unit filter.
        */
-      explicit UnitFilter(Index size_in) :
-        _sv(size_in)
+      explicit UnitFilter(Index size_in, Index num_nzes_in) :
+        _sv(size_in, num_nzes_in)
       {
       }
 
@@ -79,12 +81,22 @@ namespace FEAT
       explicit UnitFilter(Index size_in, DenseVector<DT_, IT_> & values, DenseVector<IT_, IT_> & indices) :
         _sv(size_in, values, indices)
       {
-        XASSERTM(values.size() == indices.size(), "Vector size mismatch!");
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] sv
+       * The sparse vector containing the filter entries
+       */
+      explicit UnitFilter(SparseVector<DT_, IT_> && sv) :
+        _sv(std::forward<SparseVector<DT_, IT_>>(sv))
+      {
       }
 
       /// move-ctor
       UnitFilter(UnitFilter && other) :
-        _sv(std::move(other._sv))
+        _sv(std::forward<SparseVector<DT_, IT_>>(other._sv))
       {
       }
 
@@ -93,7 +105,7 @@ namespace FEAT
       {
         if(this != &other)
         {
-          _sv = std::forward<decltype(other._sv)>(other._sv);
+          _sv = std::forward<SparseVector<DT_, IT_>>(other._sv);
         }
         return *this;
       }
@@ -148,55 +160,131 @@ namespace FEAT
       }
       /// \endcond
 
-      /**
-       * \brief Adds one element to the filter
-       *
-       * \param[in] idx Index where to add
-       * \param[in] val Value to add
-       *
-       **/
-      void add(IndexType idx, DataType val)
-      {
-        _sv(idx, val);
-      }
-
-      /// \returns The total size of the filter.
+      /// Returns the total native size of the filter
       Index size() const
       {
         return _sv.size();
       }
 
-      /// \returns The number of entries in the filter.
-      Index used_elements() const
+      /// Returns the total raw size of the filter
+      Index size_raw() const
       {
-        return _sv.used_elements();
+        return _sv.size_raw();
       }
 
-      /// \returns The index array.
-      IT_* get_indices()
+      /// Returns the number of non-zero entries in the filter
+      Index num_nzes() const
       {
-        return _sv.indices();
+        return _sv.num_nzes();
       }
 
-      /// \returns The index array.
-      const IT_* get_indices() const
+      /// Returns the raw number of non-zero entries in the filter
+      Index num_nzes_raw() const
       {
-        return _sv.indices();
+        return _sv.num_nzes_raw();
       }
 
-      /// \returns The value array.
-      DT_* get_values()
+      /// Checks whether the size of the filter is zero
+      bool empty() const
       {
-        return _sv.elements();
+        return _sv.empty();
       }
 
-      /// \returns The value array.
-      const DT_* get_values() const
+      /// Checks whether the filter does not contain any non-zero elements
+      bool hollow() const
       {
-        return _sv.elements();
+        return _sv.hollow();
       }
 
-      /// Permutate internal vector according to the given Permutation
+      /// Returns a reference to the elements memory arbiter
+      Memory::Arbiter& elements_arbiter()
+      {
+        return _sv.elements_arbiter();
+      }
+
+      /// Returns a const reference to the elements memory arbiter
+      const Memory::Arbiter& elements_arbiter() const
+      {
+        return _sv.elements_arbiter();
+      }
+
+      /// Creates a read-only memory view for the elements array for a given memory location
+      Memory::TypedView<DT_> elements_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        return _sv.elements_view_r(loc);
+      }
+
+      /// Creates a write-only memory view for the elements array for a given memory location
+      Memory::TypedView<DT_> elements_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        return _sv.elements_view_w(loc);
+      }
+
+      /// Creates a read-write memory view for the elements array for a given memory location
+      Memory::TypedView<DT_> elements_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        return _sv.elements_view_rw(loc);
+      }
+
+      /**
+       * \brief Creates a memory view for the elements array
+       *
+       * \param[in] loc
+       * The memory location for which the view is to be created
+       *
+       * \param[in] acc
+       * A combination of access rights to grant for the view
+       */
+      Memory::TypedView<DT_> elements_view(Memory::Location loc, Memory::Access acc)
+      {
+        return _sv.elements_view(loc, acc);
+      }
+
+      /// Returns a reference to the indices memory arbiter
+      Memory::Arbiter& indices_arbiter()
+      {
+        return _sv.indices_arbiter();
+      }
+
+      /// Returns a const reference to the indices memory arbiter
+      const Memory::Arbiter& indices_arbiter() const
+      {
+        return _sv.indices_arbiter();
+      }
+
+      /// Creates a read-only memory view for the indices array for a given memory location
+      Memory::TypedView<IT_> indices_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        return _sv.indices_view_r(loc);
+      }
+
+      /// Creates a write-only memory view for the indices array for a given memory location
+      Memory::TypedView<IT_> indices_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        return _sv.indices_view_w(loc);
+      }
+
+      /// Creates a read-write memory view for the indices array for a given memory location
+      Memory::TypedView<IT_> indices_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        return _sv.indices_view_rw(loc);
+      }
+
+      /**
+       * \brief Creates a memory view for the indices array
+       *
+       * \param[in] loc
+       * The memory location for which the view is to be created
+       *
+       * \param[in] acc
+       * A combination of access rights to grant for the view
+       */
+      Memory::TypedView<IT_> indices_view(Memory::Location loc, Memory::Access acc)
+      {
+        return _sv.indices_view(loc, acc);
+      }
+
+      /// Permute internal vector according to the given Permutation
       void permute(Adjacency::Permutation & perm)
       {
         _sv.permute(perm);
@@ -243,25 +331,24 @@ namespace FEAT
       ///\cond internal
       void filter_mat(SparseMatrixCSR<DT_, IT_> & matrix) const
       {
-        if(_sv.used_elements() == Index(0))
+        if(_sv.hollow())
           return;
 
-        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix.num_rows(), "Matrix size does not match!");
 
-        const IndexType* row_ptr(matrix.row_ptr());
-        const IndexType* col_idx(matrix.col_ind());
-        Arch::UnitFilter::filter_unit_mat(matrix.val(), row_ptr, col_idx, _sv.indices(), _sv.used_elements());
+        Arch::UnitFilterDenseCSR::template exec<DT_, IT_>(matrix.val_arbiter(), matrix.row_ptr_arbiter(), matrix.col_idx_arbiter(),
+          _sv.indices_arbiter(), _sv.num_nzes(), true, 1);
       }
 
       void filter_offdiag_row_mat(SparseMatrixCSR<DT_, IT_> & matrix) const
       {
-        if(_sv.used_elements() == Index(0))
+        if(_sv.hollow())
           return;
 
-        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix.num_rows(), "Matrix size does not match!");
 
-        const IndexType* row_ptr(matrix.row_ptr());
-        Arch::UnitFilter::filter_offdiag_row_mat(matrix.val(), row_ptr, 1, _sv.indices(), _sv.used_elements());
+        Arch::UnitFilterDenseCSR::template exec<DT_, IT_>(matrix.val_arbiter(), matrix.row_ptr_arbiter(), matrix.col_idx_arbiter(),
+          _sv.indices_arbiter(), _sv.num_nzes(), false, 1);
       }
 
       void filter_offdiag_col_mat(SparseMatrixCSR<DT_, IT_> &) const
@@ -272,13 +359,13 @@ namespace FEAT
       template<int block_width_>
       void filter_offdiag_row_mat(SparseMatrixBCSR<DT_, IT_, 1, block_width_> & matrix) const
       {
-        if(_sv.used_elements() == Index(0))
+        if(_sv.hollow())
           return;
 
-        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix.num_rows(), "Matrix size does not match!");
 
-        const IndexType* row_ptr(matrix.row_ptr());
-        Arch::UnitFilter::filter_offdiag_row_mat(matrix.template val<Perspective::pod>(), row_ptr, block_width_, _sv.indices(), _sv.used_elements());
+        Arch::UnitFilterDenseCSR::template exec<DT_, IT_>(matrix.val_arbiter(), matrix.row_ptr_arbiter(), matrix.col_idx_arbiter(),
+          _sv.indices_arbiter(), _sv.num_nzes(), false, block_width_);
       }
 
       template<int block_height_>
@@ -305,21 +392,17 @@ namespace FEAT
        */
       void filter_weak_matrix_rows(SparseMatrixCSR<DT_, IT_> & matrix_a, const SparseMatrixCSR<DT_, IT_>& matrix_m) const
       {
-        if(_sv.used_elements() == Index(0))
+        if(_sv.hollow())
           return;
 
-        XASSERTM(_sv.size() == matrix_a.rows(), "Matrix size does not match!");
-        XASSERTM(_sv.size() == matrix_m.rows(), "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix_a.num_rows(), "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix_m.num_rows(), "Matrix size does not match!");
+        XASSERTM(matrix_a.num_cols() == matrix_m.num_cols(), "matrix A and M must share their layout");
+        XASSERTM(matrix_a.num_nzes() == matrix_m.num_nzes(), "matrix A and M must share their layout");
 
-        const IndexType* row_ptr(matrix_a.row_ptr());
-        const IndexType* col_idx(matrix_m.col_ind());
-        XASSERTM(row_ptr == matrix_m.row_ptr(), "matrix A and M must share their layout");
-        XASSERTM(col_idx == matrix_m.col_ind(), "matrix A and M must share their layout");
-
-        DT_* val_a(matrix_a.val());
-        const DT_* val_m(matrix_m.val());
-
-        Arch::UnitFilter::filter_weak_matrix_rows(val_a, val_m, row_ptr, get_values(), get_indices(), _sv.used_elements());
+        Arch::UnitFilterDenseWeakCSR::template exec<DT_, IT_>(
+          matrix_a.val_arbiter(), matrix_m.val_arbiter(), matrix_a.row_ptr_arbiter(),
+          _sv.elements_arbiter(), _sv.indices_arbiter(), _sv.num_nzes());
       }
 
 
@@ -331,10 +414,13 @@ namespace FEAT
        */
       void filter_rhs(DenseVector<DT_, IT_> & vector) const
       {
-        if(_sv.used_elements() == Index(0))
+        if(_sv.hollow())
           return;
+
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
-        Arch::UnitFilter::filter_rhs(vector.elements(), _sv.elements(), _sv.indices(), _sv.used_elements());
+
+        Arch::UnitFilterDenseVec::template exec<DT_, IT_>(vector.elements_arbiter(),
+          _sv.elements_arbiter(), _sv.indices_arbiter(), _sv.num_nzes(), false);
       }
 
       /**
@@ -357,10 +443,13 @@ namespace FEAT
        */
       void filter_def(DenseVector<DT_, IT_> & vector) const
       {
-        if(_sv.used_elements() == Index(0))
+        if(_sv.hollow())
           return;
+
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
-        Arch::UnitFilter::filter_def(vector.elements(), _sv.indices(), _sv.used_elements());
+
+        Arch::UnitFilterDenseVec::template exec<DT_, IT_>(vector.elements_arbiter(),
+          _sv.elements_arbiter(), _sv.indices_arbiter(), _sv.num_nzes(), true);
       }
 
       /**

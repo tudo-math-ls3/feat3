@@ -299,17 +299,22 @@ namespace FEAT
       }
       /// \endcond
 
+      /// Returns the total size of this tuple-vector.
+      Index size() const
+      {
+        return _first.size() + _rest.size();
+      }
+
+      /// Returns the total size of this tuple-vector.
+      Index size_raw() const
+      {
+        return _first.size_raw() + _rest.size_raw();
+      }
+
       /// Returns the number of blocks in this power-vector.
       int blocks() const
       {
         return num_blocks;
-      }
-
-      /// Returns the total number of scalar entries of this power-vector.
-      template <Perspective perspective_ = Perspective::native>
-      Index size() const
-      {
-        return first().template size<perspective_>() + rest().template size<perspective_>();
       }
 
       /**
@@ -523,60 +528,19 @@ namespace FEAT
         return (first().same_layout(x.first())) && (rest().same_layout(x.rest()));
       }
 
-      /**
-       * \brief Retrieve specific PowerVector element.
-       *
-       * \param[in] index The index of the vector element.
-       *
-       * \returns Specific vector element.
-       */
-      const DataType operator()(Index index) const
-      {
-        ASSERT(index < size());
-
-        if (index < first().size())
-        {
-          return first()(index);
-        }
-        else
-        {
-          return rest()(index - first().size());
-        }
-      }
-
-      /**
-       * \brief Set specific PowerVector element.
-       *
-       * \param[in] index The index of the vector element.
-       * \param[in] value The value to be set.
-       */
-      void operator()(Index index, DataType value)
-      {
-        ASSERT(index < size());
-
-        if (index < first().size())
-        {
-          first()(index, value);
-        }
-        else
-        {
-          rest()(index - first().size(), value);
-        }
-      }
-
       /// \cond internal
-      /// Writes the vector-entries in an allocated array
-      void set_vec(DataType * const pval_set) const
+      /// Extracts the values of this vector
+      Index get_values(DataType * const pval_set) const
       {
-        this->first().set_vec(pval_set);
-        this->rest().set_vec(pval_set + this->first().template size<Perspective::pod>());
+        Index n = this->first().get_values(pval_set);
+        return this->rest().get_values(pval_set + n) + n;
       }
 
-      /// Writes data of an array in the vector
-      void set_vec_inv(const DataType * const pval_set)
+      /// Overwrites the values of this vector
+      Index set_values(const DataType * const pval_set)
       {
-        this->first().set_vec_inv(pval_set);
-        this->rest().set_vec_inv(pval_set + this->first().template size<Perspective::pod>());
+        Index n = this->first().set_values(pval_set);
+        return this->rest().set_values(pval_set + n) + n;
       }
       /// \endcond
 
@@ -866,15 +830,21 @@ namespace FEAT
         return _first.set_checkpoint_data(data, config);
       }
 
+      /// Returns the total size of this tuple-vector.
+      Index size() const
+      {
+        return _first.size();
+      }
+
+      /// Returns the total size of this tuple-vector.
+      Index size_raw() const
+      {
+        return _first.size_raw();
+      }
+
       int blocks() const
       {
         return 1;
-      }
-
-      template <Perspective perspective_ = Perspective::native>
-      Index size() const
-      {
-        return _first.template size<perspective_>();
       }
 
       void format(DataType value = DataType(0))
@@ -968,28 +938,19 @@ namespace FEAT
         return first().min_element();
       }
 
-      const DataType operator()(Index index) const
+      DataType max_rel_diff(const PowerVector & x) const
       {
-        ASSERT(index < size());
-
-        return first()(index);
+        return first().max_rel_diff(x.first());
       }
 
-      void operator()(Index index, DataType value)
+      Index get_values(DataType * const pval_set) const
       {
-        ASSERT(index < size());
-
-        first()(index, value);
+        return this->first().get_values(pval_set);
       }
 
-      void set_vec(DataType * const pval_set) const
+      Index set_values(const DataType * const pval_set)
       {
-        this->first().set_vec(pval_set);
-      }
-
-      void set_vec_inv(const DataType * const pval_set)
-      {
-        this->first().set_vec_inv(pval_set);
+        return this->first().set_values(pval_set);
       }
 
       /**

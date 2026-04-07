@@ -9,6 +9,7 @@
 #if defined(FEAT_HAVE_SUPERLU_DIST) && defined(FEAT_HAVE_MPI)
 
 #include <kernel/lafem/pointstar_factory.hpp>
+#include <kernel/lafem/sparse_vector_factory.hpp>
 #include <kernel/global/gate.hpp>
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/vector.hpp>
@@ -56,14 +57,14 @@ public:
   static MirrorType create_mirror_0(const int n, const int k)
   {
     MirrorType mirror((Index)n, 1);
-    mirror.indices()[0] = Index(k);
+    mirror.indices_view_w()[0] = Index(k);
     return mirror;
   }
 
   static MirrorType create_mirror_1(const int n, const int m, const int o, const int p)
   {
     MirrorType mirror((Index)n, (Index)m);
-    IndexType* idx = mirror.indices();
+    Memory::TypedView<IndexType> idx = mirror.indices_view_w();
     for(int i(0); i < m; ++i)
       idx[Index(i)] = Index(o + i * p);
     return mirror;
@@ -135,16 +136,15 @@ public:
 
   static LocalFilterType create_filter(const int m, const std::vector<MirrorType>& bnds)
   {
-    LocalFilterType filter((Index)(m*m));
-
+    LAFEM::SparseVectorFactory<DataType, IndexType> factory((Index)(m*m));
     for(const auto& mir : bnds)
     {
       const Index n = mir.num_indices();
-      const IndexType* idx = mir.indices();
+      const Memory::TypedView<IndexType> idx = mir.indices_view_r();
       for(Index i(0); i < n; ++i)
-        filter.add(idx[i], DT_(0));
+        factory.add(idx[i], DT_(0));
     }
-    return filter;
+    return LocalFilterType(factory.make_sv());
   }
 
   static void init_sol_vector(GlobalVectorType& vec_sol)
@@ -156,7 +156,7 @@ public:
     const IT_ jj = IT_(comm.rank()) % np;
 
     const IT_ n = IT_(Math::sqrt(double(vec_sol.local().size())));
-    DataType* v = vec_sol.local().elements();
+    Memory::TypedView<DataType> v = vec_sol.local().elements_view_w();
 
     // global size in one dimension; remember 1 DOF overlap
     const IT_ gn = np * (n - IT_(1)) + IT_(1);
@@ -257,9 +257,7 @@ public:
     solver->done();
 
     // check solution
-    vec_sol.axpy(vec_ref, -DT_(1));
-    const DT_ norm = vec_sol.norm2();
-    TEST_CHECK_EQUAL_WITHIN_EPS(norm, DT_(0), tol);
+    TEST_CHECK_LESS_THAN(vec_sol.max_rel_diff(vec_ref), tol);
   }
 }; // class SuperLUTest<...>
 

@@ -256,22 +256,6 @@ namespace FEAT
         return num_col_blocks;
       }
 
-      Index get_length_of_line(const Index row) const
-      {
-        return _container.get_length_of_line(row);
-      }
-
-      void set_line(const Index row, DataType * const pval_set, IndexType * const pcol_set,
-                    const Index col_start, const Index stride = 1) const
-      {
-        _container.set_line(row, pval_set, pcol_set, col_start, stride);
-      }
-
-      void set_line_reverse(const Index row, DataType * const pval_set, const Index stride = 1)
-      {
-        _container.set_line_reverse(row, pval_set, stride);
-      }
-
       Index row_degree(const Index row) const
       {
         return _container.row_degree(row);
@@ -322,10 +306,14 @@ namespace FEAT
        * \returns Matrix row count if perspective_ = false.
        * \returns Raw matrix row count if perspective_ = true.
        */
-      template <Perspective perspective_ = Perspective::native>
-      Index rows() const
+      Index num_rows() const
       {
-        return _container.template rows<perspective_>();
+        return _container.num_rows();
+      }
+
+      Index num_rows_raw() const
+      {
+        return _container.num_rows_raw();
       }
 
       /**
@@ -334,10 +322,14 @@ namespace FEAT
        * \returns Matrix column count if raw = false.
        * \returns Raw matrix column count if raw = true.
        */
-      template <Perspective perspective_ = Perspective::native>
-      Index columns() const
+      Index num_cols() const
       {
-        return _container.template columns<perspective_>();
+        return _container.num_cols();
+      }
+
+      Index num_cols_raw() const
+      {
+        return _container.num_cols_raw();
       }
 
       /**
@@ -346,10 +338,14 @@ namespace FEAT
        * \returns Matrix non zero element count if raw = false.
        * \returns Raw matrix non zero element count if raw = true.
        */
-      template <Perspective perspective_ = Perspective::native>
-      Index used_elements() const
+      Index num_nzes() const
       {
-        return _container.template used_elements<perspective_>();
+        return _container.num_nzes();
+      }
+
+      Index num_nzes_raw() const
+      {
+        return _container.num_nzes_raw();
       }
 
       /// Returns a descriptive string for this container.
@@ -358,11 +354,6 @@ namespace FEAT
         return String("PowerFullMatrix<") + SubMatrixType::name() + "," + stringify(width_) + "," + stringify(height_) + ">";
       }
 
-      template <Perspective perspective_ = Perspective::native>
-      Index size() const
-      {
-        return rows<perspective_>() * columns<perspective_>();
-      }
 
       void format(DataType value = DataType(0))
       {
@@ -443,15 +434,21 @@ namespace FEAT
       }
 
       template <typename SubType2_>
-      void convert(const PowerFullMatrix<SubType2_, width_, height_> & other)
+      void convert(const PowerFullMatrix<SubType2_, width_, height_> & source)
       {
-        _container.convert(other._container);
+        _container.convert(source._container);
       }
 
       template <typename SubType2_>
-      void convert_reverse(PowerFullMatrix<SubType2_, width_, height_> & other) const
+      void copy(const PowerFullMatrix<SubType2_, width_, height_> & source)
       {
-        _container.convert_reverse(other._container);
+        _container.copy(source._container);
+      }
+
+      template <typename SubType2_>
+      void copy_to(PowerFullMatrix<SubType2_, width_, height_> & target) const
+      {
+        _container.copy_to(target._container);
       }
 
       /// \copydoc FEAT::Control::Checkpointable::get_checkpoint_size()

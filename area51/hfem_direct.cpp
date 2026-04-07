@@ -32,11 +32,15 @@ namespace HFEM_direct
   template <typename DT_, typename IT_, typename DT2_, typename IT2_>
   void populate(LAFEM::DenseMatrix<DT_, IT_> & target, const LAFEM::DenseVector<DT2_, IT2_> & source)
   {
-    XASSERT(target.rows() == source.size());
+    XASSERT(target.num_rows() == source.size());
 
-    for (Index row(0) ; row < target.rows() ; ++row)
+    Memory::TypedView<DT_> mat_view  = target.elements_view_w();
+    const Memory::TypedView<DT2_> vec_view  = source.elements_view_r();
+
+    for (Index row(0) ; row < target.num_rows() ; ++row)
     {
-      MemoryPool::set_memory(target.elements() + row * target.columns() , DT_(source(row)), target.columns());
+      for(Index col(0); col < target.num_cols(); ++col)
+        mat_view[row*target.num_cols() + col] = DT_(vec_view(row));
     }
   }
 
@@ -84,14 +88,14 @@ namespace HFEM_direct
     LAFEM::DenseMatrix<DT_, IT_> h(h_orig.size(), nrhs);
     populate(h, h_orig);
 
-    LAFEM::DenseMatrix<DT_, IT_> u(f.rows(), nrhs);
+    LAFEM::DenseMatrix<DT_, IT_> u(f.num_rows(), nrhs);
     u.copy(f);
-    LAFEM::DenseMatrix<DT_, IT_> v(g.rows(), nrhs);
-    LAFEM::DenseMatrix<DT_, IT_> w(h.rows(), nrhs);
-    LAFEM::DenseMatrix<DT_, IT_> tmpvec(w.rows(), w.columns());
-    LAFEM::DenseMatrix<DT_, IT_> htmp(h.rows(), h.columns());
+    LAFEM::DenseMatrix<DT_, IT_> v(g.num_rows(), nrhs);
+    LAFEM::DenseMatrix<DT_, IT_> w(h.num_rows(), nrhs);
+    LAFEM::DenseMatrix<DT_, IT_> tmpvec(w.num_rows(), w.num_cols());
+    LAFEM::DenseMatrix<DT_, IT_> htmp(h.num_rows(), h.num_cols());
     htmp.copy(h);
-    LAFEM::DenseMatrix<DT_, IT_> vtmp(v.rows(), h.columns());
+    LAFEM::DenseMatrix<DT_, IT_> vtmp(v.num_rows(), h.num_cols());
 
     TimeStamp at;
     Index iters(25);
@@ -101,39 +105,43 @@ namespace HFEM_direct
       // STEP 1: v = Attt^-1 * (g - B^t * f - D * C^-1 * h)
 
       //axpy_diag(T(1.f), Csubinv, h, T(0.f), tmpvec); // tmpvec = C^-1 * h
-      //Index nblocks = h.rows() / Csubinvd.columns();
+      //Index nblocks = h.num_rows() / Csubinvd.num_cols();
       Index coffset(0);
       Index roffset(0);
       for (Index submatrix(0); submatrix < distrib.size(); ++submatrix)
       {
-        for (Index block(0) ; block < distrib(submatrix) ; ++block)
+        Index ndist = distrib.elements_view_r()(submatrix);
+        for (Index block(0) ; block < ndist ; ++block)
         {
-          //LAFEM::Arch::ProductMatMat::dense(tmpvec.elements() + block * Csubinvd.rows(), DT_(1.0), DT_(0.0), Csubinvd.elements(), h.elements() + block * Csubinvd.columns(), tmpvec.elements() + block * Csubinvd.rows(), Csubinvd.rows(), nrhs, Csubinvd.columns());
-          LAFEM::Arch::ProductMatMat::dense(tmpvec.elements() + roffset, DT_(1.0), DT_(0.0), vCsubinvd.at(submatrix)->elements(), h.elements() + coffset, tmpvec.elements() + roffset, vCsubinvd.at(submatrix)->rows(), h.columns(), vCsubinvd.at(submatrix)->columns());
-          coffset += vCsubinvd.at(submatrix)->columns();
-          roffset += vCsubinvd.at(submatrix)->rows();
+          Memory::Arbiter tmp_arbiter(tmpvec.elements_arbiter().attach(roffset));
+          Memory::Arbiter h_arbiter(h.elements_arbiter().attach(coffset));
+          //LAFEM::Arch::ProductMatMat::dense(tmpvec.elements() + block * Csubinvd.num_rows(), DT_(1.0), DT_(0.0), Csubinvd.elements(), h.elements() + block * Csubinvd.num_cols(), tmpvec.elements() + block * Csubinvd.num_rows(), Csubinvd.num_rows(), nrhs, Csubinvd.num_cols());
+          //LAFEM::Arch::ProductMatMat::dense(tmpvec.elements() + roffset, DT_(1.0), DT_(0.0), vCsubinvd.at(submatrix)->elements(), h.elements() + coffset, tmpvec.elements() + roffset, vCsubinvd.at(submatrix)->rows(), h.num_cols(), vCsubinvd.at(submatrix)->columns());
+          LAFEM::Arch::MatMatMultDenseDense::exec(tmp_arbiter, DT_(1.0), vCsubinvd.at(submatrix)->elements_arbiter(), h_arbiter, Memory::Arbiter(), vCsubinvd.at(submatrix)->num_rows(), h.num_cols(), vCsubinvd.at(submatrix)->num_cols());
+          coffset += vCsubinvd.at(submatrix)->num_cols();
+          roffset += vCsubinvd.at(submatrix)->num_rows();
         }
       }
 
       //axpy(T(1.f), D, tmpvec, T(0.f), v);            // v = D * tmpvec
-      v.multiply(D, tmpvec);
+      v.set_product(D, tmpvec);
 
       //axpy(T(-1.0), Bt, f, T(-1.0), v);              // v = -B^t * f - v
       //LAFEM::Arch::Apply::dense(v.elements(), DT_(-1.), DT_(-1.), v.elements(), Btd.elements(),
-      //                           f.elements(), Btd.rows(), Btd.columns());
-      //LAFEM::Arch::ProductMatMat::dense(v.elements(), DT_(-1.), DT_(-1.), Btd.elements(), f.elements(), v.elements(), Btd.rows(), Btd.columns(), Btd.columns());
-      v.multiply(Btd, f, DT_(-1.), DT_(-1.));
+      //                           f.elements(), Btd.num_rows(), Btd.num_cols());
+      //LAFEM::Arch::ProductMatMat::dense(v.elements(), DT_(-1.), DT_(-1.), Btd.elements(), f.elements(), v.elements(), Btd.num_rows(), Btd.num_cols(), Btd.num_cols());
+      v.add_product(Btd, f, DT_(1.));
 
-      //axpy(T(1.0), g, v);                            // v = g + v
-      v.axpy(g);
+      //axpy(T(1.0), g, v);                            // v = v - g
+      v.axpy(g, -DT_(1));
 
       //vtmp.copy_from(v);                             // vtmp = v
       vtmp.copy(v);
 
       //axpy(T(1.0), tttAinv, vtmp, T(0.0), v);        // v = Attt^-1 * vtmp*/
-      v.multiply(Atttinvd, vtmp);
+      v.set_product(Atttinvd, vtmp);
 
-      /*MemoryPool::synchronize();
+      /*Runtime::synchronize_devices();
       for (Index i(0) ; i < 25 ; ++i)
       {
         std::cout<<v(i,0) << " " << vref_orig(i)<<"\n";
@@ -145,39 +153,43 @@ namespace HFEM_direct
       // note: u is already equal to f
       //axpy(T(-1.0), B, v, T(1.0), u);                // u = -B * v + u
       //Bd.apply(u, v, u, DT_(-1.));
-      //LAFEM::Arch::ProductMatMat::dense(u.elements(), DT_(-1.), DT_(1.), Bd.elements(), v.elements(), u.elements(), Btd.rows(), Btd.columns(), Bd.columns());
-      u.multiply(Bd, v, DT_(-1));
+      //LAFEM::Arch::ProductMatMat::dense(u.elements(), DT_(-1.), DT_(1.), Bd.elements(), v.elements(), u.elements(), Btd.num_rows(), Btd.num_cols(), Bd.num_cols());
+      u.add_product(Bd, v, -DT_(1));
 
       // STEP 3: w = C^-1 * (h - D^t * v)
       // note: htmp is equal to h
       //axpy(T(-1.0), Dt, v, T(1.0), htmp);            // htmp = -D^t * v + htmp
       //Dt.apply(htmp, v, htmp, DT_(-1.));
-      htmp.multiply(Dt, v, DT_(-1.));
+      htmp.add_product(Dt, v, DT_(1.));
 
       //axpy_diag(T(1.0), Csubinv, htmp, T(0.0), w);   // w = C^-1 * htmp
       /*for (Index block(0); block < nblocks; ++block)
       {
-        LAFEM::Arch::ProductMatMat::dense(w.elements() + block * Csubinvd.rows(), DT_(1.0), DT_(0.0), Csubinvd.elements(), htmp.elements() + block * Csubinvd.columns(), w.elements() + block * Csubinvd.rows(), Csubinvd.rows(), nrhs, Csubinvd.columns());
+        LAFEM::Arch::ProductMatMat::dense(w.elements() + block * Csubinvd.num_rows(), DT_(1.0), DT_(0.0), Csubinvd.elements(), htmp.elements() + block * Csubinvd.num_cols(), w.elements() + block * Csubinvd.num_rows(), Csubinvd.num_rows(), nrhs, Csubinvd.num_cols());
       }*/
       coffset = 0;
       roffset = 0;
       for (Index submatrix(0); submatrix < distrib.size(); ++submatrix)
       {
-        for (Index block(0) ; block < distrib(submatrix) ; ++block)
+        Index ndist = distrib.elements_view_r()(submatrix);
+        for (Index block(0) ; block < ndist ; ++block)
         {
-          LAFEM::Arch::ProductMatMat::dense(w.elements() + roffset, DT_(1.0), DT_(0.0), vCsubinvd.at(submatrix)->elements(), htmp.elements() + coffset, w.elements() + roffset, vCsubinvd.at(submatrix)->rows(), htmp.columns(), vCsubinvd.at(submatrix)->columns());
-          coffset += vCsubinvd.at(submatrix)->columns();
-          roffset += vCsubinvd.at(submatrix)->rows();
+          Memory::Arbiter w_arbiter(w.elements_arbiter().attach(roffset));
+          Memory::Arbiter h_arbiter(htmp.elements_arbiter().attach(coffset));
+          //LAFEM::Arch::ProductMatMat::dense(w.elements() + roffset, DT_(1.0), DT_(0.0), vCsubinvd.at(submatrix)->elements(), htmp.elements() + coffset, w.elements() + roffset, vCsubinvd.at(submatrix)->rows(), htmp.num_cols(), vCsubinvd.at(submatrix)->columns());
+          LAFEM::Arch::MatMatMultDenseDense::exec(w_arbiter, DT_(1.0), vCsubinvd.at(submatrix)->elements_arbiter(), h_arbiter, Memory::Arbiter(), vCsubinvd.at(submatrix)->num_rows(), htmp.num_cols(), vCsubinvd.at(submatrix)->num_cols());
+          coffset += vCsubinvd.at(submatrix)->num_cols();
+          roffset += vCsubinvd.at(submatrix)->num_rows();
         }
       }
 
       if (iter == 0)
       {
-        MemoryPool::synchronize();
+        Runtime::synchronize_devices();
         at.stamp();
       }
     }
-    MemoryPool::synchronize();
+    Runtime::synchronize_devices();
 
     /*double norm(0.);
     for (Index i(0) ; i < 25 ; ++i)

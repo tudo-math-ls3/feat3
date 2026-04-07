@@ -83,8 +83,8 @@ namespace Tutorial07
     public Assembly::BilinearOperator
   {
   public:
-    static constexpr int BlockHeight = 2;
-    static constexpr int BlockWidth = 4;
+    static constexpr int block_height = 2;
+    static constexpr int block_width = 4;
 
     static constexpr TrafoTags trafo_config = TrafoTags::none;
     static constexpr SpaceTags test_config = SpaceTags::value;
@@ -98,7 +98,7 @@ namespace Tutorial07
       /// the data type to be used
       typedef typename AsmTraits_::DataType DataType;
       /// the data type for the block system
-      typedef Tiny::Matrix<DataType, BlockHeight, BlockWidth> ValueType;
+      typedef Tiny::Matrix<DataType, block_height, block_width> ValueType;
       /// the assembler's trafo data type
       typedef typename AsmTraits_::TrafoData TrafoData;
       /// the assembler's test-function data type
@@ -125,8 +125,8 @@ namespace Tutorial07
     public Assembly::BilinearOperator
   {
   public:
-    static constexpr int BlockHeight = 4;
-    static constexpr int BlockWidth = 2;
+    static constexpr int block_height = 4;
+    static constexpr int block_width = 2;
 
     static constexpr TrafoTags trafo_config = TrafoTags::none;
     static constexpr SpaceTags test_config = SpaceTags::value;
@@ -140,7 +140,7 @@ namespace Tutorial07
       /// the data type to be used
       typedef typename AsmTraits_::DataType DataType;
       /// the data type for the block system
-      typedef Tiny::Matrix<DataType, BlockHeight, BlockWidth> ValueType;
+      typedef Tiny::Matrix<DataType, block_height, block_width> ValueType;
       /// the assembler's trafo data type
       typedef typename AsmTraits_::TrafoData TrafoData;
       /// the assembler's test-function data type
@@ -177,8 +177,8 @@ namespace Tutorial07
     )
   {
     // validate matrix and vector dimensions
-    XASSERTM(matrix.rows() == space_stress.get_num_dofs(), "invalid matrix dimensions");
-    XASSERTM(matrix.columns() == space_stress.get_num_dofs(), "invalid matrix dimensions");
+    XASSERTM(matrix.num_rows() == space_stress.get_num_dofs(), "invalid matrix dimensions");
+    XASSERTM(matrix.num_cols() == space_stress.get_num_dofs(), "invalid matrix dimensions");
     XASSERTM(convect.size() == space_velo.get_num_dofs(), "invalid vector size");
 
     typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, 2> VectorType;
@@ -703,7 +703,7 @@ namespace Tutorial07
       double* sigma_yx = new double[nverts];
       double* sigma_yy = new double[nverts];
 
-      const auto* sigma = vec_sol.at<2>().elements();
+      const auto sigma = vec_sol.at<2>().elements_view_r();
       for(Index i(0); i < nverts; ++i)
       {
         sigma_xx[i] = sigma[i][0];
@@ -734,7 +734,7 @@ namespace Tutorial07
     );
 
     // Now we can add the cell-projected pressure to our VTK exporter:
-    exporter.add_cell_scalar("pressure", cell_pres.elements());
+    exporter.add_cell_scalar("pressure", cell_pres);
 
     // finally, write the VTK file
     exporter.write(vtk_name);

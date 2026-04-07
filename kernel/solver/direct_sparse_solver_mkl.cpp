@@ -72,8 +72,8 @@ namespace FEAT
           peak_mem_num(0)
         {
 #ifdef FEAT_HAVE_MPI
-          memset(css_handle, 0, sizeof(void*)*64);
-          memset(css_iparm, 0, sizeof(MKL_INT)*64);
+          Memory::memset_main(css_handle, 0, sizeof(void*)*64);
+          Memory::memset_main(css_iparm, 0, sizeof(MKL_INT)*64);
 
           // set parameters; see
           // https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2025-2/cluster-sparse-solver-iparm-parameter.html

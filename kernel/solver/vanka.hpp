@@ -18,7 +18,6 @@
 #include <kernel/lafem/power_full_matrix.hpp>
 #include <kernel/lafem/power_row_matrix.hpp>
 #include <kernel/lafem/power_col_matrix.hpp>
-#include <kernel/lafem/power_full_matrix.hpp>
 #include <kernel/lafem/saddle_point_matrix.hpp>
 #include <kernel/util/stop_watch.hpp>
 
@@ -77,21 +76,26 @@ namespace FEAT
         static constexpr int dim = 1;
 
       protected:
-        DT_* _vec_cor;
+        Memory::TypedView<DT_> _vec_view;
 
       public:
+        /// correction vector constructor: read-write access
         explicit VankaVector(VectorType& vec_cor) :
-          _vec_cor(vec_cor.elements())
+          _vec_view(vec_cor.elements_view_rw())
         {
         }
 
-        IT_ gather_def(DT_* x, const VectorType& vec, const IT_* idx, const IT_ n, const IT_ off) const
+        /// defect vector constructor: read-only access
+        explicit VankaVector(const VectorType& vec_def) :
+          _vec_view(vec_def.elements_view_r())
         {
-          const DT_* vdef = vec.elements();
+        }
 
+        IT_ gather_def(DT_* x, const IT_* idx, const IT_ n, const IT_ off) const
+        {
           for(IT_ i(0); i < n; ++i)
           {
-            x[off+i] = vdef[idx[i]];
+            x[off+i] = _vec_view(idx[i]);
           }
           return off+n;
         }
@@ -100,7 +104,7 @@ namespace FEAT
         {
           for(IT_ i(0); i < n; ++i)
           {
-            _vec_cor[idx[i]] += omega * x[off+i];
+            _vec_view[idx[i]] += omega * x[off+i];
           }
           return off+n;
         }
@@ -115,21 +119,26 @@ namespace FEAT
         static constexpr int dim = dim_;
 
       protected:
-        ValueType* _vec_cor;
+        Memory::TypedView<ValueType> _vec_view;
 
       public:
+        /// correction vector constructor: read-write access
         explicit VankaVector(VectorType& vec_cor) :
-          _vec_cor(vec_cor.elements())
+          _vec_view(vec_cor.elements_view_rw())
         {
         }
 
-        IT_ gather_def(DT_* x, const VectorType& vec, const IT_* idx, const IT_ n, const IT_ off) const
+        /// defect vector constructor: read-only access
+        explicit VankaVector(const VectorType& vec_def) :
+          _vec_view(vec_def.elements_view_r())
         {
-          const ValueType* vdef = vec.elements();
+        }
 
+        IT_ gather_def(DT_* x, const IT_* idx, const IT_ n, const IT_ off) const
+        {
           for(IT_ i(0); i < n; ++i)
           {
-            const ValueType& vi = vdef[idx[i]];
+            const ValueType& vi = _vec_view(idx[i]);
             for(int j(0); j < dim; ++j)
             {
               x[off + i*IT_(dim) + IT_(j)] = vi[j];
@@ -142,7 +151,7 @@ namespace FEAT
         {
           for(IT_ i(0); i < n; ++i)
           {
-            ValueType& vi = _vec_cor[idx[i]];
+            ValueType& vi = _vec_view[idx[i]];
             for(int j(0); j < dim; ++j)
             {
               vi[j] += omega * x[off + i*IT_(dim) + IT_(j)];
@@ -173,11 +182,17 @@ namespace FEAT
         {
         }
 
-        template<typename DT_, typename IT_>
-        IT_ gather_def(DT_* x, const VectorType& vec, const IT_* idx, const IT_ n, const IT_ off) const
+        explicit VankaVector(const VectorType& vec_cor) :
+          _first(vec_cor.first()),
+          _rest(vec_cor.rest())
         {
-          IT_ noff = _first.gather_def(x, vec.first(), idx, n, off);
-          return _rest.gather_def(x, vec.rest(), idx, n, noff);
+        }
+
+        template<typename DT_, typename IT_>
+        IT_ gather_def(DT_* x, const IT_* idx, const IT_ n, const IT_ off) const
+        {
+          IT_ noff = _first.gather_def(x, idx, n, off);
+          return _rest.gather_def(x, idx, n, noff);
         }
 
         template<typename DT_, typename IT_>
@@ -206,10 +221,15 @@ namespace FEAT
         {
         }
 
-        template<typename DT_, typename IT_>
-        IT_ gather_def(DT_* x, const VectorType& vec, const IT_* idx, const IT_ n, const IT_ off) const
+        explicit VankaVector(const VectorType& vec_cor) :
+          _first(vec_cor.first())
         {
-          return _first.gather_def(x, vec.first(), idx, n, off);
+        }
+
+        template<typename DT_, typename IT_>
+        IT_ gather_def(DT_* x, const IT_* idx, const IT_ n, const IT_ off) const
+        {
+          return _first.gather_def(x, idx, n, off);
         }
 
         template<typename DT_, typename IT_>
@@ -230,15 +250,15 @@ namespace FEAT
         static constexpr int col_dim = 1;
 
       protected:
-        const IT_* _row_ptr;
-        const IT_* _col_idx;
-        const DT_* _mat_val;
+        const Memory::TypedView<IT_> _row_ptr;
+        const Memory::TypedView<IT_> _col_idx;
+        const Memory::TypedView<DT_> _mat_val;
 
       public:
         explicit VankaMatrix(const MatrixType& matrix) :
-          _row_ptr(matrix.row_ptr()),
-          _col_idx(matrix.col_ind()),
-          _mat_val(matrix.val())
+          _row_ptr(matrix.row_ptr_view_r()),
+          _col_idx(matrix.col_idx_view_r()),
+          _mat_val(matrix.val_view_r())
         {
         }
 
@@ -248,7 +268,7 @@ namespace FEAT
           const IT_ mo = IT_(0), const IT_ no = IT_(0)) const
         {
           // empty matrix?
-          if(_mat_val == nullptr)
+          if(_mat_val.is_nullptr())
             return std::make_pair(mo+m, no+n);
 
           // loop over all local rows
@@ -306,10 +326,10 @@ namespace FEAT
 
         IT_ mult_cor(DT_* x, const DT_ alpha, const VectorTypeR& vec_cor, const IT_* idx, const IT_ m, const IT_ off) const
         {
-          if(_mat_val == nullptr)
+          if(_mat_val.is_nullptr())
             return off + m;
 
-          const DT_* v = vec_cor.elements();
+          const Memory::TypedView<DT_> v = vec_cor.elements_view_r();
 
           // loop over all local rows
           for(IT_ i(0); i < m; ++i)
@@ -344,15 +364,15 @@ namespace FEAT
         static constexpr int col_dim = col_dim_;
 
       protected:
-        const IT_* _row_ptr;
-        const IT_* _col_idx;
-        const MatVal* _mat_val;
+        const Memory::TypedView<IT_> _row_ptr;
+        const Memory::TypedView<IT_> _col_idx;
+        const Memory::TypedView<MatVal> _mat_val;
 
       public:
         explicit VankaMatrix(const MatrixType& matrix) :
-          _row_ptr(matrix.row_ptr()),
-          _col_idx(matrix.col_ind()),
-          _mat_val(matrix.val())
+          _row_ptr(matrix.row_ptr_view_r()),
+          _col_idx(matrix.col_idx_view_r()),
+          _mat_val(matrix.val_view_r())
         {
         }
 
@@ -362,7 +382,7 @@ namespace FEAT
           const IT_ mo = IT_(0), const IT_ no = IT_(0)) const
         {
           // empty matrix?
-          XASSERTM(_mat_val != nullptr, "Vanka: invalid empty BCSR matrix");
+          XASSERTM(!_mat_val.is_nullptr(), "Vanka: invalid empty BCSR matrix");
 
           // loop over all local rows
           for(IT_ i(0); i < m; ++i)
@@ -439,12 +459,12 @@ namespace FEAT
         IT_ mult_cor(DT_* x, const DT_ alpha, const LAFEM::DenseVectorBlocked<DT_, IT_, col_dim_>& vec_cor,
           const IT_* idx, const IT_ m, const IT_ off) const
         {
-          if(_mat_val == nullptr)
+          if(_mat_val.is_nullptr())
             return off + m;
 
           typedef LAFEM::DenseVectorBlocked<DT_, IT_, col_dim_> VectorType;
           typedef typename VectorType::ValueType VecVal;
-          const VecVal* v = vec_cor.elements();
+          const Memory::TypedView<VecVal> v = vec_cor.elements_view_r();
 
           // loop over all local rows
           for(IT_ i(0); i < m; ++i)
@@ -477,10 +497,10 @@ namespace FEAT
         IT_ mult_cor(DT_* x, const DT_ alpha, const LAFEM::DenseVector<DT_, IT_>& vec_cor,
           const IT_* idx, const IT_ m, const IT_ off) const
         {
-          if(_mat_val == nullptr)
+          if(_mat_val.is_nullptr())
             return off + m;
 
-          const DT_* v = vec_cor.elements();
+          const Memory::TypedView<DT_> v = vec_cor.elements_view_r();
 
           // loop over all local rows
           for(IT_ i(0); i < m; ++i)
@@ -836,47 +856,87 @@ namespace FEAT
       };
 
       template<typename DT_, typename IT_>
-      std::pair<const IT_*, const IT_*> vanka_graph(const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix)
+      Memory::TypedView<IT_> vanka_row_ptr(
+        const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix)
       {
-        return std::make_pair(matrix.row_ptr(), matrix.col_ind());
+        return matrix.row_ptr_view_r();
       }
 
       template<typename DT_, typename IT_, int m_, int n_>
-      std::pair<const IT_*, const IT_*> vanka_graph(const LAFEM::SparseMatrixBCSR<DT_, IT_, m_, n_>& matrix)
+      Memory::TypedView<IT_> vanka_row_ptr(
+        const LAFEM::SparseMatrixBCSR<DT_, IT_, m_, n_>& matrix)
       {
-        return std::make_pair(matrix.row_ptr(), matrix.col_ind());
+        return matrix.row_ptr_view_r();
       }
 
       template<typename DT_, typename IT_, int dim_>
-      std::pair<const IT_*, const IT_*> vanka_graph(
+      Memory::TypedView<IT_> vanka_row_ptr(
         const LAFEM::PowerColMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, dim_>& matrix)
       {
-        const auto& m = matrix.first();
-        return std::make_pair(m.row_ptr(), m.col_ind());
+        return matrix.first().row_ptr_view_r();
       }
 
       template<typename DT_, typename IT_, int dim_>
-      std::pair<const IT_*, const IT_*> vanka_graph(
+      Memory::TypedView<IT_> vanka_row_ptr(
         const LAFEM::PowerRowMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, dim_>& matrix)
       {
-        const auto& m = matrix.first();
-        return std::make_pair(m.row_ptr(), m.col_ind());
+        return matrix.first().row_ptr_view_r();
       }
 
       template<typename DT_, typename IT_, int dim_>
-      std::pair<const IT_*, const IT_*> vanka_graph(
+      Memory::TypedView<IT_> vanka_row_ptr(
         const LAFEM::PowerDiagMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, dim_>& matrix)
       {
-        const auto& m = matrix.first();
-        return std::make_pair(m.row_ptr(), m.col_ind());
+        return matrix.first().row_ptr_view_r();
       }
 
       template<typename DT_, typename IT_, int row_dim_, int col_dim_>
-      std::pair<const IT_*, const IT_*> vanka_graph(
+      Memory::TypedView<IT_> vanka_row_ptr(
         const LAFEM::PowerFullMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, row_dim_, col_dim_>& matrix)
       {
-        const auto& m = matrix.template at<0,0>();
-        return std::make_pair(m.row_ptr(), m.col_ind());
+        return matrix.first().row_ptr_view_r();
+      }
+
+      template<typename DT_, typename IT_>
+      Memory::TypedView<IT_> vanka_col_idx(
+        const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix)
+      {
+        return matrix.col_idx_view_r();
+      }
+
+      template<typename DT_, typename IT_, int m_, int n_>
+      Memory::TypedView<IT_> vanka_col_idx(
+        const LAFEM::SparseMatrixBCSR<DT_, IT_, m_, n_>& matrix)
+      {
+        return matrix.col_idx_view_r();
+      }
+
+      template<typename DT_, typename IT_, int dim_>
+      Memory::TypedView<IT_> vanka_col_idx(
+        const LAFEM::PowerColMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, dim_>& matrix)
+      {
+        return matrix.first().col_idx_view_r();
+      }
+
+      template<typename DT_, typename IT_, int dim_>
+      Memory::TypedView<IT_> vanka_col_idx(
+        const LAFEM::PowerRowMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, dim_>& matrix)
+      {
+        return matrix.first().col_idx_view_r();
+      }
+
+      template<typename DT_, typename IT_, int dim_>
+      Memory::TypedView<IT_> vanka_col_idx(
+        const LAFEM::PowerDiagMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, dim_>& matrix)
+      {
+        return matrix.first().col_idx_view_r();
+      }
+
+      template<typename DT_, typename IT_, int row_dim_, int col_dim_>
+      Memory::TypedView<IT_> vanka_col_idx(
+        const LAFEM::PowerFullMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, row_dim_, col_dim_>& matrix)
+      {
+        return matrix.first().col_idx_view_r();
       }
 
     } // namespace Intern
@@ -1259,15 +1319,13 @@ namespace FEAT
       void _build_p_block()
       {
         // fetch matrix dimensions
-        const IndexType m = IndexType(_matrix.block_d().rows());
+        const IndexType m = IndexType(_matrix.block_d().num_rows());
 
         // fetch the matrix arrays
-        auto graph_b = Intern::vanka_graph(_matrix.block_b());
-        const IndexType* row_ptr_b = graph_b.first;
-        const IndexType* col_idx_b = graph_b.second;
-        auto graph_d = Intern::vanka_graph(_matrix.block_d());
-        const IndexType* row_ptr_d = graph_d.first;
-        const IndexType* col_idx_d = graph_d.second;
+        const Memory::TypedView<IndexType> row_ptr_b = Intern::vanka_row_ptr(_matrix.block_b());
+        const Memory::TypedView<IndexType> col_idx_b = Intern::vanka_col_idx(_matrix.block_b());
+        const Memory::TypedView<IndexType> row_ptr_d = Intern::vanka_row_ptr(_matrix.block_d());
+        const Memory::TypedView<IndexType> col_idx_d = Intern::vanka_col_idx(_matrix.block_d());
 
         // clear block arrays
         _block_p_ptr.clear();
@@ -1338,7 +1396,7 @@ namespace FEAT
        */
       void _build_p_nodal()
       {
-        const IndexType m = IndexType(_matrix.block_d().rows());
+        const IndexType m = IndexType(_matrix.block_d().num_rows());
 
         // clear block arrays
         _block_p_ptr.clear();
@@ -1357,9 +1415,8 @@ namespace FEAT
       void _build_v_block()
       {
         // fetch the matrix arrays
-        auto graph_d = Intern::vanka_graph(_matrix.block_d());
-        const IndexType* row_ptr_d = graph_d.first;
-        const IndexType* col_idx_d = graph_d.second;
+        const Memory::TypedView<IndexType> row_ptr_d = Intern::vanka_row_ptr(_matrix.block_d());
+        const Memory::TypedView<IndexType> col_idx_d = Intern::vanka_col_idx(_matrix.block_d());
 
         // fetch number of pressure blocks
         const IndexType m = IndexType(_block_p_ptr.size()-1);
@@ -1458,30 +1515,33 @@ namespace FEAT
       {
         // create a Vanka Vector
         this->_vec_scale.format();
-        Intern::VankaVector<VectorV> vanka_v(this->_vec_scale.template at<0>());
-        Intern::VankaVector<VectorP> vanka_p(this->_vec_scale.template at<1>());
 
-        // get our data arrays
-        const IndexType* vptr = _block_v_ptr.data();
-        const IndexType* vidx = _block_v_idx.data();
-        const IndexType* pptr = _block_p_ptr.data();
-        const IndexType* pidx = _block_p_idx.data();
-
-        // create a vector of ones
-        std::vector<DataType> vec_one(vanka_v.dim*_degree_v + _degree_p, DataType(1));
-        const DataType* vone = vec_one.data();
-
-        // loop over all blocks
-        const IndexType nblocks = IndexType(_block_v_ptr.size() - 1);
-        for(IndexType iblock(0); iblock < nblocks; ++iblock)
         {
-          // get number of velocity and pressure dofs
-          const IndexType nv = vptr[iblock+1] - vptr[iblock];
-          const IndexType np = pptr[iblock+1] - pptr[iblock];
+          Intern::VankaVector<VectorV> vanka_v(this->_vec_scale.template at<0>());
+          Intern::VankaVector<VectorP> vanka_p(this->_vec_scale.template at<1>());
 
-          // scatter ones
-          vanka_v.scatter_cor(DataType(1), vone, &vidx[vptr[iblock]], nv, IndexType(0));
-          vanka_p.scatter_cor(DataType(1), vone, &pidx[pptr[iblock]], np, IndexType(0));
+          // get our data arrays
+          const IndexType* vptr = _block_v_ptr.data();
+          const IndexType* vidx = _block_v_idx.data();
+          const IndexType* pptr = _block_p_ptr.data();
+          const IndexType* pidx = _block_p_idx.data();
+
+          // create a vector of ones
+          std::vector<DataType> vec_one(vanka_v.dim*_degree_v + _degree_p, DataType(1));
+          const DataType* vone = vec_one.data();
+
+          // loop over all blocks
+          const IndexType nblocks = IndexType(_block_v_ptr.size() - 1);
+          for(IndexType iblock(0); iblock < nblocks; ++iblock)
+          {
+            // get number of velocity and pressure dofs
+            const IndexType nv = vptr[iblock+1] - vptr[iblock];
+            const IndexType np = pptr[iblock+1] - pptr[iblock];
+
+            // scatter ones
+            vanka_v.scatter_cor(DataType(1), vone, &vidx[vptr[iblock]], nv, IndexType(0));
+            vanka_p.scatter_cor(DataType(1), vone, &pidx[pptr[iblock]], np, IndexType(0));
+          }
         }
 
         // invert components
@@ -1506,7 +1566,7 @@ namespace FEAT
         const IndexType* pidx = _block_p_idx.data();
 
         // format block data
-        ::memset(data, 0, sizeof(DataType) * _data.size());
+        Memory::memset_main(data, 0, sizeof(DataType) * _data.size());
 
         // allocate pivot array
         std::vector<IndexType> pivot(3*(dim*_degree_v + _degree_p));
@@ -1574,15 +1634,8 @@ namespace FEAT
         const VectorV& vec_dv = (multi ? vec_def.template at<0>() : this->_vec_tmp1.template at<0>());
         const VectorP& vec_dp = (multi ? vec_def.template at<1>() : this->_vec_tmp1.template at<1>());
 
-        // create our vanka matrix and vector objects
-        Intern::VankaMatrix<MatrixA_> vanka_a(_matrix.block_a());
-        Intern::VankaMatrix<MatrixB_> vanka_b(_matrix.block_b());
-        Intern::VankaMatrix<MatrixD_> vanka_d(_matrix.block_d());
-        Intern::VankaVector<VectorV> vanka_v(vec_cv);
-        Intern::VankaVector<VectorP> vanka_p(vec_cp);
-
         // get velocity vector dimension
-        const IndexType velo_dim = IndexType(vanka_v.dim);
+        const IndexType velo_dim = IndexType(Intern::VankaVector<VectorV>::dim);
 
         // get block count
         const IndexType num_blocks = IndexType(_block_v_ptr.size()-1);
@@ -1640,12 +1693,20 @@ namespace FEAT
             DataType* ldef_p = &ldef[velo_dim * nv];
 
             // gather local defect
-            vanka_v.gather_def(ldef_v, vec_dv, loc_vidx, nv, IndexType(0));
-            vanka_p.gather_def(ldef_p, vec_dp, loc_pidx, np, IndexType(0));
+            {
+              Intern::VankaVector<VectorV> vanka_dv(vec_dv);
+              Intern::VankaVector<VectorP> vanka_dp(vec_dp);
+              vanka_dv.gather_def(ldef_v, loc_vidx, nv, IndexType(0));
+              vanka_dp.gather_def(ldef_p, loc_pidx, np, IndexType(0));
+            }
 
             // multiplicative variants only:
             if(multi)
             {
+              Intern::VankaMatrix<MatrixA_> vanka_a(_matrix.block_a());
+              Intern::VankaMatrix<MatrixB_> vanka_b(_matrix.block_b());
+              Intern::VankaMatrix<MatrixD_> vanka_d(_matrix.block_d());
+
               // subtract A*x
               vanka_a.mult_cor(ldef_v, -DataType(1), vec_cv, loc_vidx, nv, IndexType(0));
               vanka_b.mult_cor(ldef_v, -DataType(1), vec_cp, loc_vidx, nv, IndexType(0));
@@ -1664,8 +1725,12 @@ namespace FEAT
             flops += 2*n*n;
 
             // scatter result
-            vanka_v.scatter_cor(_omega, lcor_v, loc_vidx, nv, IndexType(0));
-            vanka_p.scatter_cor(_omega, lcor_p, loc_pidx, np, IndexType(0));
+            {
+              Intern::VankaVector<VectorV> vanka_cv(vec_cv);
+              Intern::VankaVector<VectorP> vanka_cp(vec_cp);
+              vanka_cv.scatter_cor(_omega, lcor_v, loc_vidx, nv, IndexType(0));
+              vanka_cp.scatter_cor(_omega, lcor_p, loc_pidx, np, IndexType(0));
+            }
 
             // update block offset
             block_offset += n*n;
@@ -1708,7 +1773,7 @@ namespace FEAT
         const IndexType* pidx = _block_p_idx.data();
 
         // format block data
-        ::memset(data, 0, sizeof(DataType) * _data.size());
+        Memory::memset_main(data, 0, sizeof(DataType) * _data.size());
 
         // allocate pivot array (pressure only)
         std::vector<IndexType> pivot(3*_degree_p);
@@ -1817,15 +1882,8 @@ namespace FEAT
         const VectorV& vec_dv = (multi ? vec_def.template at<0>() : this->_vec_tmp1.template at<0>());
         const VectorP& vec_dp = (multi ? vec_def.template at<1>() : this->_vec_tmp1.template at<1>());
 
-        // create our vanka matrix and vector objects
-        Intern::VankaMatrix<MatrixA_> vanka_a(_matrix.block_a());
-        Intern::VankaMatrix<MatrixB_> vanka_b(_matrix.block_b());
-        Intern::VankaMatrix<MatrixD_> vanka_d(_matrix.block_d());
-        Intern::VankaVector<VectorV> vanka_v(vec_cv);
-        Intern::VankaVector<VectorP> vanka_p(vec_cp);
-
         // get velocity vector dimension
-        const IndexType velo_dim = IndexType(vanka_v.dim);
+        const IndexType velo_dim = IndexType(Intern::VankaVector<VectorV>::dim);
 
         // get block count
         const IndexType num_blocks = IndexType(_block_v_ptr.size()-1);
@@ -1890,12 +1948,19 @@ namespace FEAT
             DataType* ldef_p = &ldef[dnv];
 
             // gather local defect
-            vanka_v.gather_def(ldef_v, vec_dv, loc_vidx, nv, IndexType(0));
-            vanka_p.gather_def(ldef_p, vec_dp, loc_pidx, np, IndexType(0));
+            {
+              Intern::VankaVector<VectorV> vanka_dv(vec_dv);
+              Intern::VankaVector<VectorP> vanka_dp(vec_dp);
+              vanka_dv.gather_def(ldef_v, loc_vidx, nv, IndexType(0));
+              vanka_dp.gather_def(ldef_p, loc_pidx, np, IndexType(0));
+            }
 
             // multiplicative variants only:
             if(multi)
             {
+              Intern::VankaMatrix<MatrixA_> vanka_a(_matrix.block_a());
+              Intern::VankaMatrix<MatrixB_> vanka_b(_matrix.block_b());
+              Intern::VankaMatrix<MatrixD_> vanka_d(_matrix.block_d());
               // subtract A*x
               vanka_a.mult_cor(ldef_v, -DataType(1), vec_cv, loc_vidx, nv, IndexType(0));
               vanka_b.mult_cor(ldef_v, -DataType(1), vec_cp, loc_vidx, nv, IndexType(0));
@@ -1943,8 +2008,12 @@ namespace FEAT
             flops += dnv * (2*np + 2);
 
             // scatter result
-            vanka_v.scatter_cor(_omega, lcor_v, loc_vidx, nv, IndexType(0));
-            vanka_p.scatter_cor(_omega, lcor_p, loc_pidx, np, IndexType(0));
+            {
+              Intern::VankaVector<VectorV> vanka_cv(vec_cv);
+              Intern::VankaVector<VectorP> vanka_cp(vec_cp);
+              vanka_cv.scatter_cor(_omega, lcor_v, loc_vidx, nv, IndexType(0));
+              vanka_cp.scatter_cor(_omega, lcor_p, loc_pidx, np, IndexType(0));
+            }
 
             // update block offset
             block_offset += block_size;

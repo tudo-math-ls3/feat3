@@ -19,10 +19,10 @@ namespace FEAT
     template <typename DT_, typename IT_>
     class SparseVector;
 
-    template <typename DT_, typename IT_, int BlockSize_>
+    template <typename DT_, typename IT_, int block_size_>
     class DenseVectorBlocked;
 
-    template <typename DT_, typename IT_, int BlockSize_>
+    template <typename DT_, typename IT_, int block_size_>
     class SparseVectorBlocked;
 
     template <typename DT_, typename IT_>
@@ -31,7 +31,7 @@ namespace FEAT
     template <typename DT_, typename IT_>
     class SparseMatrixCSR;
 
-    template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
+    template <typename DT_, typename IT_, int block_height_, int block_width_>
     class SparseMatrixBCSR;
 
     template <typename DT_, typename IT_>

@@ -52,9 +52,9 @@ namespace FEAT
         typedef VectorTypeL GradientType;
 
         /// The global nonlinear functional's Blockheight ist the same as the local nonlinear functional's
-        static constexpr int BlockHeight = LocalNonlinearFunctional_::BlockHeight;
+        static constexpr int block_height = LocalNonlinearFunctional_::block_height;
         /// The global nonlinear functional's Blockwidth ist the same as the local nonlinear functional's
-        static constexpr int BlockWidth = LocalNonlinearFunctional_::BlockWidth;
+        static constexpr int block_width = LocalNonlinearFunctional_::block_width;
 
       protected:
         /// Gate for syncing row vectors
@@ -257,32 +257,37 @@ namespace FEAT
               // get the filter vector
               auto& slip_filter_vector = it.second.get_filter_vector();
 
-              if(slip_filter_vector.used_elements() > 0)
+              if(!slip_filter_vector.hollow())
               {
                 // Temporary DenseVector for syncing
                 LocalVectorTypeR tmp(slip_filter_vector.size(), DataType(0));
 
-                auto* tmp_elements = tmp.template elements<LAFEM::Perspective::native>();
-                auto* sfv_elements = slip_filter_vector.template elements<LAFEM::Perspective::native>();
-
                 // Copy sparse filter vector contents to DenseVector
-                for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
                 {
-                  Index idense(slip_filter_vector.indices()[isparse]);
-                  tmp_elements[idense] = sfv_elements[isparse];
+                  auto tmp_elements = tmp.elements_view_rw();
+                  const auto sfv_indices = slip_filter_vector.indices_view_r();
+                  const auto sfv_elements = slip_filter_vector.elements_view_r();
+
+                  for(Index isparse(0); isparse < slip_filter_vector.num_nzes(); ++isparse)
+                  {
+                    tmp_elements[sfv_indices(isparse)] = sfv_elements[isparse];
+                  }
                 }
 
                 _col_gate->sync_0(tmp);
-                // Copy sparse filter vector contents to DenseVector
-                for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
-                {
-                  Index idense(slip_filter_vector.indices()[isparse]);
-                  tmp_elements[idense].normalize();
-                  sfv_elements[isparse] = tmp_elements[idense];
 
+                // Copy sparse filter vector contents to DenseVector
+                {
+                  auto tmp_elements = tmp.elements_view_rw();
+                  const auto sfv_indices = slip_filter_vector.indices_view_r();
+                  auto sfv_elements = slip_filter_vector.elements_view_rw();
+                  for(Index isparse(0); isparse < slip_filter_vector.num_nzes(); ++isparse)
+                  {
+                    tmp_elements[sfv_indices(isparse)].normalize();
+                    sfv_elements[isparse] = tmp_elements[sfv_indices(isparse)];
+                  }
                 }
               }
-
               else
               {
                 // Temporary DenseVector for syncing
@@ -300,7 +305,7 @@ namespace FEAT
          *
          * \returns The number of colums
          */
-        Index columns()
+        Index num_cols()
         {
           // Compute total number of rows and columns
           auto vec_r = create_vector_r();
@@ -316,7 +321,7 @@ namespace FEAT
          *
          * \returns The number of colums
          */
-        Index rows()
+        Index num_rows()
         {
           // Compute total number of rows and rows
           auto vec_l = create_vector_l();

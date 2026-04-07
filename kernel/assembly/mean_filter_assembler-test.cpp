@@ -30,12 +30,8 @@ class MeanFilterAssemblerTest :
   typedef Space::Lagrange2::Element<QuadTrafo> QuadSpaceQ2;
 
 public:
-  MeanFilterAssemblerTest(PreferredBackend backend) :
+  explicit MeanFilterAssemblerTest(PreferredBackend backend) :
     UnitTest("MeanFilterAssemblerTest", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
-  {
-  }
-
-  virtual ~MeanFilterAssemblerTest()
   {
   }
 
@@ -92,27 +88,27 @@ public:
   }
 };
 
-MeanFilterAssemblerTest <float, std::uint32_t> mean_filter_asm_test_float_uint32(PreferredBackend::generic);
-MeanFilterAssemblerTest <double, std::uint32_t> mean_filter_asm_test_double_uint32(PreferredBackend::generic);
-MeanFilterAssemblerTest <float, std::uint64_t> mean_filter_asm_test_float_uint64(PreferredBackend::generic);
-MeanFilterAssemblerTest <double, std::uint64_t> mean_filter_asm_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MeanFilterAssemblerTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MeanFilterAssemblerTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MeanFilterAssemblerTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MeanFilterAssemblerTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MeanFilterAssemblerTest <float, std::uint64_t> mkl_mean_filter_asm_test_float_uint64(PreferredBackend::mkl);
-MeanFilterAssemblerTest <double, std::uint64_t> mkl_mean_filter_asm_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(MeanFilterAssemblerTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(MeanFilterAssemblerTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MeanFilterAssemblerTest <__float128, std::uint32_t> mean_filter_asm_test_float128_uint32(PreferredBackend::generic);
-MeanFilterAssemblerTest <__float128, std::uint64_t> mean_filter_asm_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MeanFilterAssemblerTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MeanFilterAssemblerTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
 // Disabled: Deviation of ~2.1 in int_rhs check
-//MeanFilterAssemblerTest <Half, std::uint32_t> mean_filter_asm_test_half_uint32(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(MeanFilterAssemblerTest, Half, std::uint32_t, PreferredBackend::generic);
 // Disabled: Deviation of ~2.1 in int_rhs check
-//MeanFilterAssemblerTest <Half, std::uint64_t> mean_filter_asm_test_half_uint64(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(MeanFilterAssemblerTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MeanFilterAssemblerTest <float, std::uint32_t> cuda_mean_filter_asm_test_float_uint32(PreferredBackend::cuda);
-MeanFilterAssemblerTest <double, std::uint32_t> cuda_mean_filter_asm_test_double_uint32(PreferredBackend::cuda);
-MeanFilterAssemblerTest <float, std::uint64_t> cuda_mean_filter_asm_test_float_uint64(PreferredBackend::cuda);
-MeanFilterAssemblerTest <double, std::uint64_t> cuda_mean_filter_asm_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MeanFilterAssemblerTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MeanFilterAssemblerTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MeanFilterAssemblerTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MeanFilterAssemblerTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif

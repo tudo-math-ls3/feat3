@@ -65,7 +65,9 @@ namespace FEAT
          * Meta col to be filled.
          */
         template<int n_>
-        static void fill_ptr_wrapper(CSRTupleMatrixWrapper<typename SystemMatrix_::DataType, typename SystemMatrix_::IndexType, n_>& wrap, const SystemMatrix_& matrix, int row, int col);
+        static void fill_ptr_wrapper(
+          CSRTupleMatrixWrapper<typename SystemMatrix_::DataType, typename SystemMatrix_::IndexType, n_>& wrap,
+          const SystemMatrix_& matrix, Memory::Location mem_loc, int row, int col);
 
         /**
          * \brief Recursive function for filling the column info part of the wrapper.
@@ -88,7 +90,9 @@ namespace FEAT
          * Meta col to be filled.
          */
         template<int n_>
-        static void fill_column_info(CSRTupleMatrixWrapper<typename SystemMatrix_::DataType, typename SystemMatrix_::IndexType, n_>& wrap, const SystemMatrix_& matrix, int row, int col);
+        static void fill_column_info(
+          CSRTupleMatrixWrapper<typename SystemMatrix_::DataType, typename SystemMatrix_::IndexType, n_>& wrap,
+          const SystemMatrix_& matrix, int row, int col);
 
         /**
          * \brief Compares two matrices by caluclating the normalized Froebnius-Norm of the difference.
@@ -119,19 +123,70 @@ namespace FEAT
         typedef DT_ DataType;
         typedef IT_ IndexType;
         static constexpr int n = n_;
-        //arrays hold pointer in an row major order, i.e. (1,1), (1,2) ...
-        DataType* data_arrays[n_*n_];
-        IndexType* col_arrays[n_*n_];
-        IndexType* row_arrays[n_*n_];
-        IndexType used_elements[n_*n_];
-        //since the layout is symmetric, we only need to save the row and colum counts of the first
-        //meta row, which is entirely determined by the rows of the first entry and the columns
-        //of the first meta row
-        //required??
-        IndexType tensor_counts[n_+1];
-        //since the overall layout has to be symmteric and quadratic, we only have to save the
-        //the block dimension of the first column
-        int blocksizes[n_+1];
+        Memory::TypedView<DataType> data_views[n_*n_];
+        Memory::TypedView<IndexType> col_views[n_*n_];
+        Memory::TypedView<IndexType> row_views[n_*n_];
+
+        // the views are non-copyable, so we keep the raw pointers in a sub struct here,
+        // because they need to be copied for the cuda kernel launches
+        struct RawData
+        {
+          //arrays hold pointer in an row major order, i.e. (1,1), (1,2) ...
+          DataType* data_arrays[n_*n_];
+          const IndexType* col_arrays[n_*n_];
+          const IndexType* row_arrays[n_*n_];
+          IndexType used_elements[n_*n_];
+          //since the layout is symmetric, we only need to save the row and colum counts of the first
+          //meta row, which is entirely determined by the rows of the first entry and the columns
+          //of the first meta row
+          //required??
+          IndexType tensor_counts[n_+1];
+          //since the overall layout has to be symmteric and quadratic, we only have to save the
+          //the block dimension of the first column
+          int blocksizes[n_+1];
+
+
+          // the mapping from the actual quadratic indices to the n_+1 sized row is simply
+          // (i,j) -> (i+min(i,1), j+1)
+          CUDA_HOST std::pair<IndexType, IndexType> get_tensor_size(Index i, Index j) const
+          {
+            return std::make_pair(tensor_counts[i+std::min(i,Index(1))], tensor_counts[j+1]);
+          }
+
+          CUDA_HOST std::pair<IndexType, IndexType> get_block_sizes(Index i, Index j) const
+          {
+            return std::make_pair(blocksizes[i+std::min(i,Index(1))], blocksizes[j+1]);
+          }
+
+          CUDA_HOST Index get_all_rows_size() const
+          {
+            Index val = tensor_counts[0];
+            for(int i = 1; i < n_; ++i)
+              val += tensor_counts[i+1];
+            return val;
+          }
+        } raw_data;
+
+        CSRTupleMatrixWrapper() = default;
+
+        CSRTupleMatrixWrapper(CSRTupleMatrixWrapper&& other)
+        {
+          for(int i = 0; i < n_*n_; ++i)
+          {
+            this->data_views[i] = std::forward<Memory::TypedView<DataType>>(other.data_views[i]);
+            this->col_views[i] = std::forward<Memory::TypedView<IndexType>>(other.col_views[i]);
+            this->row_views[i] = std::forward<Memory::TypedView<IndexType>>(other.row_views[i]);
+            this->raw_data.data_arrays[i] = other.raw_data.data_arrays[i];
+            this->raw_data.row_arrays[i] = other.raw_data.row_arrays[i];
+            this->raw_data.col_arrays[i] = other.raw_data.col_arrays[i];
+            this->raw_data.used_elements[i] = other.raw_data.used_elements[i];
+          }
+          for(int i = 0; i <= n_; ++i)
+          {
+            this->raw_data.tensor_counts[i] = other.raw_data.tensor_counts[i];
+            this->raw_data.blocksizes[i] = other.raw_data.blocksizes[i];
+          }
+        }
 
         CUDA_HOST FEAT::String print()
         {
@@ -141,34 +196,14 @@ namespace FEAT
             for(int j = 0; j < n_; ++j)
             {
               str += FEAT::String("Block (") + stringify(i) + ", " + stringify(j) + ")\n";
-              str += FEAT::String("Tensor size (") + stringify(tensor_counts[Index(i)+std::min(Index(i),Index(1))])
-                    + ", " + stringify(tensor_counts[j+1]) + "), Blocksize ("
-                    + stringify(blocksizes[Index(i)+std::min(Index(i),Index(1))]) + ", " + stringify(blocksizes[j+1])
+              str += FEAT::String("Tensor size (") + stringify(raw_data.tensor_counts[Index(i)+std::min(Index(i),Index(1))])
+                    + ", " + stringify(raw_data.tensor_counts[j+1]) + "), Blocksize ("
+                    + stringify(raw_data.blocksizes[Index(i)+std::min(Index(i),Index(1))]) + ", " + stringify(raw_data.blocksizes[j+1])
                     + ")\n";
             }
           }
           str += String("\n--------------------------\n");
           return str;
-        }
-
-        // the mapping from the actual quadratic indices to the n_+1 sized row is simply
-        // (i,j) -> (i+min(i,1), j+1)
-        CUDA_HOST std::pair<IndexType, IndexType> get_tensor_size(Index i, Index j) const
-        {
-          return std::make_pair(tensor_counts[i+std::min(i,Index(1))], tensor_counts[j+1]);
-        }
-
-        CUDA_HOST std::pair<IndexType, IndexType> get_block_sizes(Index i, Index j) const
-        {
-          return std::make_pair(blocksizes[i+std::min(i,Index(1))], blocksizes[j+1]);
-        }
-
-        CUDA_HOST Index get_all_rows_size() const
-        {
-          Index val = tensor_counts[0];
-          for(int i = 1; i < n_; ++i)
-            val += tensor_counts[i+1];
-          return val;
         }
       };
 
@@ -179,13 +214,16 @@ namespace FEAT
         static constexpr int num_blocks = 1;
 
         template<int n_>
-        static void fill_ptr_wrapper(CSRTupleMatrixWrapper<DT_, IT_, n_>& wrap, const LAFEM::NullMatrix<DT_, IT_, bh_, bw_>&, int row, int col)
+        static void fill_ptr_wrapper(CSRTupleMatrixWrapper<DT_, IT_, n_>& wrap, const LAFEM::NullMatrix<DT_, IT_, bh_, bw_>&, Memory::Location, int row, int col)
         {
           ASSERTM((n_ > row) && (n_ > col), "MatrixWrapper is too small");
-          wrap.data_arrays[n_*row + col] = nullptr;
-          wrap.col_arrays[n_*row + col] = nullptr;
-          wrap.row_arrays[n_*row + col] = nullptr;
-          wrap.used_elements[n_*row + col] = IT_(0);
+          wrap.data_views[n_*row + col].release();
+          wrap.col_views[n_*row + col].release();
+          wrap.row_views[n_*row + col].release();
+          wrap.raw_data.data_arrays[n_*row + col] = nullptr;
+          wrap.raw_data.col_arrays[n_*row + col] = nullptr;
+          wrap.raw_data.row_arrays[n_*row + col] = nullptr;
+          wrap.raw_data.used_elements[n_*row + col] = IT_(0);
         }
 
         template<int n_>
@@ -198,25 +236,25 @@ namespace FEAT
           #endif
           if(col == 0)
           {
-            wrap.tensor_counts[0] = matrix.rows();
-            wrap.blocksizes[0] = bh_;
+            wrap.raw_data.tensor_counts[0] = matrix.num_rows();
+            wrap.raw_data.blocksizes[0] = bh_;
           }
-          wrap.tensor_counts[col+1] = matrix.columns();
-          wrap.blocksizes[col+1] = bw_;
+          wrap.raw_data.tensor_counts[col+1] = matrix.num_cols();
+          wrap.raw_data.blocksizes[col+1] = bw_;
         }
 
         static void fill_row_helper(const LAFEM::NullMatrix<DT_, IT_, bh_, bw_>& matrix, Index* accum_row_idx, Index* accum_row_ctr, int row_block, int curr_row)
         {
           // fill with list from 0 to num_rows in raw perspective
-          std::generate(accum_row_idx+curr_row, accum_row_idx+curr_row + matrix.template rows<LAFEM::Perspective::pod>(), [n=0]() mutable{return n++;});
+          std::generate(accum_row_idx+curr_row, accum_row_idx+curr_row + matrix.num_rows_raw(), [n=0]() mutable{return n++;});
           // fill with constant value
-          std::fill(accum_row_ctr+curr_row, accum_row_ctr+curr_row + matrix.template rows<LAFEM::Perspective::pod>(), Index(row_block));
+          std::fill(accum_row_ctr+curr_row, accum_row_ctr+curr_row + matrix.num_rows_raw(), Index(row_block));
         }
 
-        static bool compare(const LAFEM::NullMatrix<DT_, IT_, bh_, bw_>& matrix_a, const LAFEM::NullMatrix<DT_, IT_, bh_, bw_>& matrix_b)
+        /*static bool compare(const LAFEM::NullMatrix<DT_, IT_, bh_, bw_>& matrix_a, const LAFEM::NullMatrix<DT_, IT_, bh_, bw_>& matrix_b)
         {
-          return (matrix_a.rows() == matrix_b.rows()) && (matrix_b.columns() == matrix_b.columns());
-        }
+          return (matrix_a.num_rows() == matrix_b.num_rows()) && (matrix_b.num_cols() == matrix_b.num_cols());
+        }*/
       }; // struct AmaVankaMatrixHelper<LAFEM::NullMatrix<...>>
 
       template<typename DT_, typename IT_>
@@ -226,13 +264,16 @@ namespace FEAT
         static constexpr int num_blocks = 1;
 
         template<int n_>
-        static void fill_ptr_wrapper(CSRTupleMatrixWrapper<DT_, IT_, n_>& wrap, const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix, int row, int col)
+        static void fill_ptr_wrapper(CSRTupleMatrixWrapper<DT_, IT_, n_>& wrap, const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix, Memory::Location mem_loc, int row, int col)
         {
           ASSERTM((n_ > row) && (n_ > col), "MatrixWrapper is too small");
-          wrap.data_arrays[n_*row + col] = const_cast<DT_*>(matrix.val());
-          wrap.col_arrays[n_*row + col] = const_cast<IT_*>(matrix.col_ind());
-          wrap.row_arrays[n_*row + col] = const_cast<IT_*>(matrix.row_ptr());
-          wrap.used_elements[n_*row + col] = IT_(matrix.used_elements());
+          wrap.data_views[n_*row + col] = const_cast<LAFEM::SparseMatrixCSR<DT_, IT_>&>(matrix).val_view_rw(mem_loc);
+          wrap.col_views[n_*row + col] = matrix.col_idx_view_r(mem_loc);
+          wrap.row_views[n_*row + col] = matrix.row_ptr_view_r(mem_loc);
+          wrap.raw_data.data_arrays[n_*row + col] = wrap.data_views[n_*row + col].get_w();
+          wrap.raw_data.col_arrays[n_*row + col] = wrap.col_views[n_*row + col].get_r();
+          wrap.raw_data.row_arrays[n_*row + col] = wrap.row_views[n_*row + col].get_r();
+          wrap.raw_data.used_elements[n_*row + col] = IT_(matrix.num_nzes());
         }
 
         template<int n_>
@@ -245,30 +286,30 @@ namespace FEAT
           #endif
           if(col == 0)
           {
-            wrap.tensor_counts[0] = IT_(matrix.rows());
-            wrap.blocksizes[0] = 1;
+            wrap.raw_data.tensor_counts[0] = IT_(matrix.num_rows());
+            wrap.raw_data.blocksizes[0] = 1;
           }
-          wrap.tensor_counts[col+1] = IT_(matrix.columns());
-          wrap.blocksizes[col+1] = 1;
+          wrap.raw_data.tensor_counts[col+1] = IT_(matrix.num_cols());
+          wrap.raw_data.blocksizes[col+1] = 1;
         }
 
         static void fill_row_helper(const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix, Index* accum_row_idx, Index* accum_row_ctr, int row_block, int curr_row)
         {
-          ASSERTM((accum_row_idx+curr_row + matrix.rows()) == std::find(accum_row_idx+curr_row, accum_row_idx+curr_row + matrix.rows(), ~Index(0)), "Row array was already written to");
-          ASSERTM((accum_row_ctr+curr_row + matrix.rows()) == std::find(accum_row_ctr+curr_row, accum_row_ctr+curr_row + matrix.rows(), ~Index(0)), "Row array was already written to");
+          ASSERTM((accum_row_idx+curr_row + matrix.num_rows()) == std::find(accum_row_idx+curr_row, accum_row_idx+curr_row + matrix.num_rows(), ~Index(0)), "Row array was already written to");
+          ASSERTM((accum_row_ctr+curr_row + matrix.num_rows()) == std::find(accum_row_ctr+curr_row, accum_row_ctr+curr_row + matrix.num_rows(), ~Index(0)), "Row array was already written to");
           // fill with list from 0 to num_rows in raw perspective
-          std::generate(accum_row_idx+curr_row, accum_row_idx+curr_row + matrix.rows(), [n=0]() mutable{return n++;});
+          std::generate(accum_row_idx+curr_row, accum_row_idx+curr_row + matrix.num_rows(), [n=0]() mutable{return n++;});
           // fill with constant value
-          std::fill(accum_row_ctr+curr_row, accum_row_ctr+curr_row + matrix.rows(), Index(row_block));
+          std::fill(accum_row_ctr+curr_row, accum_row_ctr+curr_row + matrix.num_rows(), Index(row_block));
         }
 
-        static bool compare(const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix_a, const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix_b)
+        /*static bool compare(const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix_a, const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix_b)
         {
           auto tmp = matrix_a.clone(LAFEM::CloneMode::Weak);
           tmp.axpy(matrix_b, DT_(-1));
           const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
           return (tmp.norm_frobenius()/(Math::sqrt(DT_(tmp.size()))) <= tol);
-        }
+        }*/
       }; // struct AmaVankaMatrixHelper<LAFEM::SparseMatrixCSR<...>>
 
       template<typename DT_, typename IT_, int bh_, int bw_>
@@ -278,13 +319,16 @@ namespace FEAT
         static constexpr int num_blocks = 1;
 
         template<int n_>
-        static void fill_ptr_wrapper(CSRTupleMatrixWrapper<DT_, IT_, n_>& wrap, const LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix, int row, int col)
+        static void fill_ptr_wrapper(CSRTupleMatrixWrapper<DT_, IT_, n_>& wrap, const LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix, Memory::Location mem_loc, int row, int col)
         {
           ASSERTM((n_ > row) && (n_ > col), "MatrixWrapper is too small");
-          wrap.data_arrays[n_*row + col] = const_cast<DT_*>(matrix.template val<LAFEM::Perspective::pod>());
-          wrap.col_arrays[n_*row + col] = const_cast<IT_*>(matrix.col_ind());
-          wrap.row_arrays[n_*row + col] = const_cast<IT_*>(matrix.row_ptr());
-          wrap.used_elements[n_*row + col] = IT_(matrix.used_elements());
+          wrap.data_views[n_*row + col] = const_cast<LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>&>(matrix).val_view_raw_rw(mem_loc);
+          wrap.col_views[n_*row + col] = matrix.col_idx_view_r(mem_loc);
+          wrap.row_views[n_*row + col] = matrix.row_ptr_view_r(mem_loc);
+          wrap.raw_data.data_arrays[n_*row + col] = wrap.data_views[n_*row + col].get_w();
+          wrap.raw_data.col_arrays[n_*row + col] = wrap.col_views[n_*row + col].get_r();
+          wrap.raw_data.row_arrays[n_*row + col] = wrap.row_views[n_*row + col].get_r();
+          wrap.raw_data.used_elements[n_*row + col] = IT_(matrix.num_nzes());
         }
 
         template<int n_>
@@ -297,30 +341,30 @@ namespace FEAT
           #endif
           if(col == 0)
           {
-            wrap.tensor_counts[0] = IT_(matrix.rows());
-            wrap.blocksizes[0] = bh_;
+            wrap.raw_data.tensor_counts[0] = IT_(matrix.num_rows());
+            wrap.raw_data.blocksizes[0] = bh_;
           }
-          wrap.tensor_counts[col+1] = IT_(matrix.columns());
-          wrap.blocksizes[col+1] = bw_;
+          wrap.raw_data.tensor_counts[col+1] = IT_(matrix.num_cols());
+          wrap.raw_data.blocksizes[col+1] = bw_;
         }
 
         static void fill_row_helper(const LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix, Index* accum_row_idx, Index* accum_row_ctr, int row_block, int curr_row)
         {
-          ASSERTM((accum_row_idx+curr_row + matrix.template rows<LAFEM::Perspective::pod>()) == std::find(accum_row_idx+curr_row, accum_row_idx+curr_row + matrix.template rows<LAFEM::Perspective::pod>(), ~Index(0)), "Row array was already written to");
-          ASSERTM((accum_row_ctr+curr_row + matrix.template rows<LAFEM::Perspective::pod>()) == std::find(accum_row_ctr+curr_row, accum_row_ctr+curr_row + matrix.template rows<LAFEM::Perspective::pod>(), ~Index(0)), "Row array was already written to");
+          ASSERTM((accum_row_idx+curr_row + matrix.num_rows_raw()) == std::find(accum_row_idx+curr_row, accum_row_idx+curr_row + matrix.num_rows_raw(), ~Index(0)), "Row array was already written to");
+          ASSERTM((accum_row_ctr+curr_row + matrix.num_rows_raw()) == std::find(accum_row_ctr+curr_row, accum_row_ctr+curr_row + matrix.num_rows_raw(), ~Index(0)), "Row array was already written to");
           // fill with list from 0 to num_rows in raw perspective
-          std::generate(accum_row_idx+curr_row, accum_row_idx+curr_row + matrix.template rows<LAFEM::Perspective::pod>(), [n=0]() mutable{return n++;});
+          std::generate(accum_row_idx+curr_row, accum_row_idx+curr_row + matrix.num_rows_raw(), [n=0]() mutable{return n++;});
           // fill with constant value
-          std::fill(accum_row_ctr+curr_row, accum_row_ctr+curr_row + matrix.template rows<LAFEM::Perspective::pod>(), Index(row_block));
+          std::fill(accum_row_ctr+curr_row, accum_row_ctr+curr_row + matrix.num_rows_raw(), Index(row_block));
         }
 
-        static bool compare(const LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix_a, const LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix_b)
+        /*static bool compare(const LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix_a, const LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& matrix_b)
         {
           auto tmp = matrix_a.clone(LAFEM::CloneMode::Weak);
           tmp.axpy(matrix_b, DT_(-1));
           const DT_ tol = Math::pow(Math::eps<DT_>(), DT_(0.7));
           return (tmp.norm_frobenius()/(Math::sqrt(DT_(tmp.size()))) <= tol);
-        }
+        }*/
       }; // struct AmaVankaMatrixHelper<LAFEM::SparseMatrixBCSR<...>>
 
       template<typename First_, typename... Rest_>
@@ -333,11 +377,11 @@ namespace FEAT
         typedef typename First_::DataType DataType;
         typedef typename First_::IndexType IndexType;
         template<int n_>
-        static void fill_ptr_wrapper(CSRTupleMatrixWrapper<DataType, IndexType, n_>& wrap, const LAFEM::TupleMatrixRow<First_, Rest_...>& matrix, int row, int col)
+        static void fill_ptr_wrapper(CSRTupleMatrixWrapper<DataType, IndexType, n_>& wrap, const LAFEM::TupleMatrixRow<First_, Rest_...>& matrix, Memory::Location mem_loc, int row, int col)
         {
           ASSERTM((n_ > row) && (n_ > col), "MatrixWrapper is too small");
-          AmaVankaMatrixHelper<First_>::fill_ptr_wrapper(wrap, matrix.first(), row, col);
-          AmaVankaMatrixHelper<LAFEM::TupleMatrixRow<Rest_...>>::fill_ptr_wrapper(wrap, matrix.rest(), row, col+1);
+          AmaVankaMatrixHelper<First_>::fill_ptr_wrapper(wrap, matrix.first(), mem_loc, row, col);
+          AmaVankaMatrixHelper<LAFEM::TupleMatrixRow<Rest_...>>::fill_ptr_wrapper(wrap, matrix.rest(), mem_loc, row, col+1);
         }
 
         template<int n_>
@@ -354,12 +398,12 @@ namespace FEAT
           AmaVankaMatrixHelper<First_>::fill_row_helper(matrix.first(), accum_row_idx, accum_row_ctr, row_block, curr_row);
         }
 
-        static bool compare(const LAFEM::TupleMatrixRow<First_, Rest_...>& matrix_a, const LAFEM::TupleMatrixRow<First_, Rest_...>& matrix_b)
+        /*static bool compare(const LAFEM::TupleMatrixRow<First_, Rest_...>& matrix_a, const LAFEM::TupleMatrixRow<First_, Rest_...>& matrix_b)
         {
           bool compare = AmaVankaMatrixHelper<First_>::compare(matrix_a.first(), matrix_b.first());
           compare &= AmaVankaMatrixHelper<LAFEM::TupleMatrixRow<Rest_...>>::compare(matrix_a.rest(), matrix_b.rest());
           return compare;
-        }
+        }*/
       }; // struct AmaVankaMatrixHelper<LAFEM::TupleMatrixRow<...>>
 
       template<typename First_>
@@ -371,10 +415,10 @@ namespace FEAT
         typedef typename First_::DataType DataType;
         typedef typename First_::IndexType IndexType;
         template<int n_>
-        static void fill_ptr_wrapper(CSRTupleMatrixWrapper<DataType, IndexType, n_>& wrap, const LAFEM::TupleMatrixRow<First_>& matrix, int row, int col)
+        static void fill_ptr_wrapper(CSRTupleMatrixWrapper<DataType, IndexType, n_>& wrap, const LAFEM::TupleMatrixRow<First_>& matrix, Memory::Location mem_loc, int row, int col)
         {
           ASSERTM((n_ > row) && (n_ > col), "MatrixWrapper is too small");
-          AmaVankaMatrixHelper<First_>::fill_ptr_wrapper(wrap, matrix.first(), row, col);
+          AmaVankaMatrixHelper<First_>::fill_ptr_wrapper(wrap, matrix.first(), mem_loc, row, col);
         }
 
         template<int n_>
@@ -390,11 +434,11 @@ namespace FEAT
           AmaVankaMatrixHelper<First_>::fill_row_helper(matrix.first(), accum_row_idx, accum_row_ctr, row_block, curr_row);
         }
 
-        static bool compare(const LAFEM::TupleMatrixRow<First_>& matrix_a, const LAFEM::TupleMatrixRow<First_>& matrix_b)
+        /*static bool compare(const LAFEM::TupleMatrixRow<First_>& matrix_a, const LAFEM::TupleMatrixRow<First_>& matrix_b)
         {
           bool compare = AmaVankaMatrixHelper<First_>::compare(matrix_a.first(), matrix_b.first());
           return compare;
-        }
+        }*/
       }; // struct AmaVankaMatrixHelper<LAFEM::TupleMatrixRow<First_>>
 
       template<typename FirstRow_, typename... RestRows_>
@@ -408,11 +452,11 @@ namespace FEAT
         typedef typename FirstRow_::DataType DataType;
         typedef typename FirstRow_::IndexType IndexType;
         template<int n_>
-        static void fill_ptr_wrapper(CSRTupleMatrixWrapper<DataType, IndexType, n_>& wrap, const LAFEM::TupleMatrix<FirstRow_, RestRows_...>& matrix, int row, int col)
+        static void fill_ptr_wrapper(CSRTupleMatrixWrapper<DataType, IndexType, n_>& wrap, const LAFEM::TupleMatrix<FirstRow_, RestRows_...>& matrix, Memory::Location mem_loc, int row, int col)
         {
           ASSERTM((n_ > row) && (n_ > col), "MatrixWrapper is too small");
-          AmaVankaMatrixHelper<FirstRow_>::fill_ptr_wrapper(wrap, matrix.first(), row, col);
-          AmaVankaMatrixHelper<LAFEM::TupleMatrix<RestRows_...>>::fill_ptr_wrapper(wrap, matrix.rest(), row+1, col);
+          AmaVankaMatrixHelper<FirstRow_>::fill_ptr_wrapper(wrap, matrix.first(), mem_loc, row, col);
+          AmaVankaMatrixHelper<LAFEM::TupleMatrix<RestRows_...>>::fill_ptr_wrapper(wrap, matrix.rest(), mem_loc, row+1, col);
         }
 
         template<int n_>
@@ -426,15 +470,15 @@ namespace FEAT
         static void fill_row_helper(const LAFEM::TupleMatrix<FirstRow_, RestRows_...>& matrix, Index* accum_row_idx, Index* accum_row_ctr, int row_block, int curr_row)
         {
           AmaVankaMatrixHelper<FirstRow_>::fill_row_helper(matrix.first(), accum_row_idx, accum_row_ctr, row_block, curr_row);
-          AmaVankaMatrixHelper<LAFEM::TupleMatrix<RestRows_...>>::fill_row_helper(matrix.rest(), accum_row_idx, accum_row_ctr, row_block+1, curr_row+matrix.first().template rows<LAFEM::Perspective::pod>());
+          AmaVankaMatrixHelper<LAFEM::TupleMatrix<RestRows_...>>::fill_row_helper(matrix.rest(), accum_row_idx, accum_row_ctr, row_block+1, curr_row+matrix.first().num_rows_raw());
         }
 
-        static bool compare(const LAFEM::TupleMatrix<FirstRow_, RestRows_...>& matrix_a, const LAFEM::TupleMatrix<FirstRow_, RestRows_...>& matrix_b)
+        /*static bool compare(const LAFEM::TupleMatrix<FirstRow_, RestRows_...>& matrix_a, const LAFEM::TupleMatrix<FirstRow_, RestRows_...>& matrix_b)
         {
           bool compare = AmaVankaMatrixHelper<FirstRow_>::compare(matrix_a.first(), matrix_b.first());
           compare &= AmaVankaMatrixHelper<LAFEM::TupleMatrix<RestRows_...>>::compare(matrix_a.rest(), matrix_b.rest());
           return compare;
-        }
+        }*/
       }; // struct AmaVankaMatrixHelper<LAFEM::TupleMatrix<...>>
 
       template<typename FirstRow_>
@@ -447,10 +491,10 @@ namespace FEAT
         typedef typename FirstRow_::DataType DataType;
         typedef typename FirstRow_::IndexType IndexType;
         template<int n_>
-        static void fill_ptr_wrapper(CSRTupleMatrixWrapper<DataType, IndexType, n_>& wrap, const LAFEM::TupleMatrix<FirstRow_>& matrix, int row, int col)
+        static void fill_ptr_wrapper(CSRTupleMatrixWrapper<DataType, IndexType, n_>& wrap, const LAFEM::TupleMatrix<FirstRow_>& matrix, Memory::Location mem_loc, int row, int col)
         {
           ASSERTM((n_ > row) && (n_ > col), "MatrixWrapper is too small");
-          AmaVankaMatrixHelper<FirstRow_>::fill_ptr_wrapper(wrap, matrix.first(), row, col);
+          AmaVankaMatrixHelper<FirstRow_>::fill_ptr_wrapper(wrap, matrix.first(), mem_loc, row, col);
         }
 
         template<int n_>
@@ -466,11 +510,11 @@ namespace FEAT
           AmaVankaMatrixHelper<FirstRow_>::fill_row_helper(matrix.first(), accum_row_idx, accum_row_ctr, row_block, curr_row);
         }
 
-        static bool compare(const LAFEM::TupleMatrix<FirstRow_>& matrix_a, const LAFEM::TupleMatrix<FirstRow_>& matrix_b)
+        /*static bool compare(const LAFEM::TupleMatrix<FirstRow_>& matrix_a, const LAFEM::TupleMatrix<FirstRow_>& matrix_b)
         {
           bool compare = AmaVankaMatrixHelper<FirstRow_>::compare(matrix_a.first(), matrix_b.first());
           return compare;
-        }
+        }*/
       }; // struct AmaVankaMatrixHelper<LAFEM::TupleMatrix<FirstRow_>>
 
       template<typename MatrixA_, typename MatrixB_, typename MatrixD_>
@@ -478,7 +522,7 @@ namespace FEAT
       {
         typedef typename MatrixA_::DataType DataType;
         typedef typename MatrixA_::IndexType IndexType;
-        static constexpr int block_size = MatrixA_::BlockWidth;
+        static constexpr int block_size = MatrixA_::block_width;
         static constexpr int num_blocks = 2;
 
         typedef LAFEM::TupleMatrix<
@@ -491,13 +535,13 @@ namespace FEAT
         > VankaMatrix;
 
         template<int n_>
-        static void fill_ptr_wrapper(CSRTupleMatrixWrapper<DataType, IndexType, n_>& wrap, const LAFEM::SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_>& matrix, int row, int col)
+        static void fill_ptr_wrapper(CSRTupleMatrixWrapper<DataType, IndexType, n_>& wrap, const LAFEM::SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_>& matrix, Memory::Location mem_loc, int row, int col)
         {
           ASSERTM((n_+1 > row) && (n_+1 > col), "MatrixWrapper is too small");
-          AmaVankaMatrixHelper<MatrixA_>::fill_ptr_wrapper(wrap, matrix.template at<0,0>(), row, col);
-          AmaVankaMatrixHelper<MatrixB_>::fill_ptr_wrapper(wrap, matrix.template at<0,1>(), row, col+1);
-          AmaVankaMatrixHelper<MatrixD_>::fill_ptr_wrapper(wrap, matrix.template at<1,0>(), row+1, col);
-          AmaVankaMatrixHelper<LAFEM::NullMatrix<DataType, IndexType>>::fill_ptr_wrapper(wrap, LAFEM::NullMatrix<DataType, IndexType>(matrix.template at<1,0>().rows(), matrix.template at<0,1>().columns()), row+1, col+1);
+          AmaVankaMatrixHelper<MatrixA_>::fill_ptr_wrapper(wrap, matrix.template at<0,0>(), mem_loc, row, col);
+          AmaVankaMatrixHelper<MatrixB_>::fill_ptr_wrapper(wrap, matrix.template at<0,1>(), mem_loc, row, col+1);
+          AmaVankaMatrixHelper<MatrixD_>::fill_ptr_wrapper(wrap, matrix.template at<1,0>(), mem_loc, row+1, col);
+          AmaVankaMatrixHelper<LAFEM::NullMatrix<DataType, IndexType>>::fill_ptr_wrapper(wrap, LAFEM::NullMatrix<DataType, IndexType>(matrix.template at<1,0>().num_rows(), matrix.template at<0,1>().num_cols()), mem_loc, row+1, col+1);
         }
 
         template<int n_>
@@ -512,27 +556,27 @@ namespace FEAT
         static void fill_row_helper(const LAFEM::SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_>& matrix, Index* accum_row_idx, Index* accum_row_ctr, int row_block, int curr_row)
         {
           AmaVankaMatrixHelper<MatrixA_>::fill_row_helper(matrix.template at<0,0>(), accum_row_idx, accum_row_ctr, row_block, curr_row);
-          AmaVankaMatrixHelper<MatrixD_>::fill_row_helper(matrix.template at<1,0>(), accum_row_idx, accum_row_ctr, row_block+1, curr_row + matrix.template at<0,0>().template rows<LAFEM::Perspective::pod>());
+          AmaVankaMatrixHelper<MatrixD_>::fill_row_helper(matrix.template at<1,0>(), accum_row_idx, accum_row_ctr, row_block+1, curr_row + matrix.template at<0,0>().num_rows_raw());
         }
 
-        static bool compare(const LAFEM::SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_>& matrix_a, const LAFEM::SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_>& matrix_b)
+        /*static bool compare(const LAFEM::SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_>& matrix_a, const LAFEM::SaddlePointMatrix<MatrixA_, MatrixB_, MatrixD_>& matrix_b)
         {
           bool compare = true;
           compare &= AmaVankaMatrixHelper<MatrixA_>::compare(matrix_a.template at<0,0>(), matrix_b.template at<0,0>());
           compare &= AmaVankaMatrixHelper<MatrixB_>::compare(matrix_a.template at<0,1>(), matrix_b.template at<0,1>());
           compare &= AmaVankaMatrixHelper<MatrixD_>::compare(matrix_a.template at<1,0>(), matrix_b.template at<1,0>());
           return compare;
-        }
+        }*/
 
       }; // struct AmaVankaMatrixHelper<LAFEM::SaddlePointMatrix<...>>
 
       template<typename Matrix_>
       CSRTupleMatrixWrapper<typename Matrix_::DataType, typename Matrix_::IndexType, Intern::AmaVankaMatrixHelper<Matrix_>::num_blocks>
-      get_meta_matrix_wrapper(const Matrix_& matrix)
+      get_meta_matrix_wrapper(const Matrix_& matrix, Memory::Location mem_loc)
       {
         CSRTupleMatrixWrapper<typename Matrix_::DataType, typename Matrix_::IndexType, Intern::AmaVankaMatrixHelper<Matrix_>::num_blocks>
           mat_wrapper;
-        AmaVankaMatrixHelper<Matrix_>::fill_ptr_wrapper(mat_wrapper, matrix, 0, 0);
+        AmaVankaMatrixHelper<Matrix_>::fill_ptr_wrapper(mat_wrapper, matrix, mem_loc, 0, 0);
         AmaVankaMatrixHelper<Matrix_>::fill_column_info(mat_wrapper, matrix, 0, 0);
         return mat_wrapper;
       }
@@ -652,13 +696,13 @@ namespace FEAT
           typedef IT_ IndexType;
 
           // fetch matrix dimensions
-          const Index num_dofs_p = Index(matrix.block_d().rows());
+          const Index num_dofs_p = Index(matrix.block_d().num_rows());
 
           // fetch matrix array
-          const IndexType* row_ptr_b = matrix.block_b().row_ptr();
-          const IndexType* col_idx_b = matrix.block_b().col_ind();
-          const IndexType* row_ptr_d = matrix.block_d().row_ptr();
-          const IndexType* col_idx_d = matrix.block_d().col_ind();
+          const Memory::TypedView<IndexType> row_ptr_b = matrix.block_b().row_ptr_view_r();
+          const Memory::TypedView<IndexType> col_idx_b = matrix.block_b().col_idx_view_r();
+          const Memory::TypedView<IndexType> row_ptr_d = matrix.block_d().row_ptr_view_r();
+          const Memory::TypedView<IndexType> col_idx_d = matrix.block_d().col_idx_view_r();
 
           // PHASE 1: determine pressure macros
           std::map<IndexType, int> map_s;
@@ -761,8 +805,8 @@ namespace FEAT
 
           // create graphs
           macro_dofs.resize(std::size_t(2));
-          macro_dofs.front() = Adjacency::Graph(num_macros, matrix.block_b().rows(), Index(v_idx.size()), v_ptr.data(), v_idx.data());
-          macro_dofs.back()  = Adjacency::Graph(num_macros, matrix.block_d().rows(), Index(p_idx.size()), p_ptr.data(), p_idx.data());
+          macro_dofs.front() = Adjacency::Graph(num_macros, matrix.block_b().num_rows(), Index(v_idx.size()), v_ptr.data(), v_idx.data());
+          macro_dofs.back()  = Adjacency::Graph(num_macros, matrix.block_d().num_rows(), Index(p_idx.size()), p_ptr.data(), p_idx.data());
           return true;
         }
 
@@ -839,9 +883,9 @@ namespace FEAT
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
           // get matrix arrays
-          const DT_* vals = matrix.val();
-          const IT_* row_ptr = matrix.row_ptr();
-          const IT_* col_idx = matrix.col_ind();
+          const Memory::TypedView<DT_> vals = matrix.val_view_r();
+          const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
 
           // get the dofs for our row/col blocks
           const Adjacency::Graph& row_dofs = macro_dofs.at(row_block);
@@ -900,9 +944,9 @@ namespace FEAT
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
           // get matrix arrays
-          const Tiny::Matrix<DT_, bh_, bw_>* vals = matrix.val();
-          const IT_* row_ptr = matrix.row_ptr();
-          const IT_* col_idx = matrix.col_ind();
+          const Memory::TypedView<Tiny::Matrix<DT_, bh_, bw_>> vals = matrix.val_view_r();
+          const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
 
           // get the dofs for our row/col blocks
           const Adjacency::Graph& row_dofs = macro_dofs.at(row_block);
@@ -1199,9 +1243,9 @@ namespace FEAT
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
           // get matrix arrays
-          DT_* vals = matrix.val();
-          const IT_* row_ptr = matrix.row_ptr();
-          const IT_* col_idx = matrix.col_ind();
+          Memory::TypedView<DT_> vals = matrix.val_view_rw();
+          const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
 
           // get the dofs for our row/col blocks
           const Adjacency::Graph& row_dofs = macro_dofs.at(row_block);
@@ -1259,9 +1303,9 @@ namespace FEAT
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
           // get matrix arrays
-          Tiny::Matrix<DT_, bh_, bw_>* vals = matrix.val();
-          const IT_* row_ptr = matrix.row_ptr();
-          const IT_* col_idx = matrix.col_ind();
+          Memory::TypedView<Tiny::Matrix<DT_, bh_, bw_>> vals = matrix.val_view_rw();
+          const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
 
           // get the dofs for our row/col blocks
           const Adjacency::Graph& row_dofs = macro_dofs.at(row_block);
@@ -1418,14 +1462,14 @@ namespace FEAT
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block, const Index col_block)
         {
           // get matrix arrays
-          DT_* vals = matrix.val();
-          const IT_* row_ptr = matrix.row_ptr();
-          const IT_* col_idx = matrix.col_ind();
+          Memory::TypedView<DT_> vals = matrix.val_view_rw();
+          const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
 
           // get the dofs for our row blocks
           const Adjacency::Graph& row_blocks = dof_macros.at(row_block);
           const Index num_rows = row_blocks.get_num_nodes_domain();
-          XASSERT(matrix.rows() == num_rows);
+          XASSERT(matrix.num_rows() == num_rows);
 
           // get graph domain pointer arrays
           const Index* row_dom_ptr = row_blocks.get_domain_ptr();
@@ -1468,14 +1512,14 @@ namespace FEAT
           const std::vector<Adjacency::Graph>& dof_macros, const std::vector<int>& macro_mask, const Index row_block, const Index col_block)
         {
           // get matrix arrays
-          Tiny::Matrix<DT_, bh_, bw_>* vals = matrix.val();
-          const IT_* row_ptr = matrix.row_ptr();
-          const IT_* col_idx = matrix.col_ind();
+          Memory::TypedView<Tiny::Matrix<DT_, bh_, bw_>> vals = matrix.val_view_rw();
+          const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
 
           // get the dofs for our row blocks
           const Adjacency::Graph& row_blocks = dof_macros.at(row_block);
           const Index num_rows = row_blocks.get_num_nodes_domain();
-          XASSERT(matrix.rows() == num_rows);
+          XASSERT(matrix.num_rows() == num_rows);
 
           // get graph domain pointer arrays
           const Index* row_dom_ptr = row_blocks.get_domain_ptr();
@@ -1655,7 +1699,7 @@ namespace FEAT
 
         // ##################### HOST VARIANT ################################
         template<typename DT_, typename IT_, int n_>
-        CUDA_HOST static std::pair<Index,Index> gather_loc(const Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
+        CUDA_HOST static std::pair<Index,Index> gather_loc(const typename Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>::RawData& mat_wrap,
           DT_* local, const Index stride, const Index macro, const Adjacency::Graph** macro_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
@@ -1691,7 +1735,7 @@ namespace FEAT
         }
 
         template<typename DT_, typename IT_, int n_>
-        CUDA_HOST static std::pair<Index,Index> gather_row(const Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
+        CUDA_HOST static std::pair<Index,Index> gather_row(const typename Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>::RawData& mat_wrap,
           DT_* local, const Index stride, const Index macro, const Adjacency::Graph** macro_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
@@ -1699,7 +1743,7 @@ namespace FEAT
           //loop over cols
           for(int l = 0; l < n_; ++l)
           {
-            std::pair<Index, Index> nrc_l = gather_loc(mat_wrap, local, stride, macro, macro_dofs, row_off, row_block, col_off+nrc_r.second, col_block+Index(l));
+            std::pair<Index, Index> nrc_l = gather_loc<DT_,IT_,n_>(mat_wrap, local, stride, macro, macro_dofs, row_off, row_block, col_off+nrc_r.second, col_block+Index(l));
             nrc_r.first = nrc_l.first;
             nrc_r.second += nrc_l.second;
           }
@@ -1708,7 +1752,7 @@ namespace FEAT
         }
 
         template<typename DT_, typename IT_, int n_>
-        CUDA_HOST static std::pair<Index,Index> gather(const Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
+        CUDA_HOST static std::pair<Index,Index> gather(const typename Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>::RawData& mat_wrap,
           DT_* local, const Index stride, const Index macro, const Adjacency::Graph** macro_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
@@ -1716,7 +1760,7 @@ namespace FEAT
           //loop over rows
           for(int l = 0; l < n_; ++l)
           {
-            std::pair<Index, Index> nrc_r = gather_row(mat_wrap, local, stride, macro, macro_dofs, row_off+nrc_f.first, row_block+Index(l), col_off, col_block);
+            std::pair<Index, Index> nrc_r = gather_row<DT_,IT_,n_>(mat_wrap, local, stride, macro, macro_dofs, row_off+nrc_f.first, row_block+Index(l), col_off, col_block);
             nrc_f.first += nrc_r.first;
             nrc_f.second = nrc_r.second;
           }
@@ -1727,8 +1771,8 @@ namespace FEAT
         #ifdef __CUDACC__
         // ##################### DEVICE VARIANT ################################
         template<typename DT_, typename IT_, int n_, bool uniform_macros_>
-        CUDA_HOST_DEVICE static cuda::std::pair<Index,Index> gather_loc(const Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
-          DT_* local, const Index stride, const Index macro, Index** macro_dofs, Index* max_degrees_dofs,
+        CUDA_HOST_DEVICE static cuda::std::pair<Index,Index> gather_loc(const typename Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>::RawData& mat_wrap,
+          DT_* local, const Index stride, const Index macro, const Index** macro_dofs, Index* max_degrees_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
           //gather arrays
@@ -1765,8 +1809,8 @@ namespace FEAT
         }
 
         template<typename DT_, typename IT_, int n_, bool uniform_macros_>
-        CUDA_HOST_DEVICE static cuda::std::pair<Index,Index> gather_row(const Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
-          DT_* local, const Index stride, const Index macro, Index** macro_dofs, Index* max_degrees_dofs,
+        CUDA_HOST_DEVICE static cuda::std::pair<Index,Index> gather_row(const typename Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>::RawData& mat_wrap,
+          DT_* local, const Index stride, const Index macro, const Index** macro_dofs, Index* max_degrees_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
           cuda::std::pair<Index, Index> nrc_r{0,0};
@@ -1782,8 +1826,8 @@ namespace FEAT
         }
 
         template<typename DT_, typename IT_, int n_, bool uniform_macros_>
-        CUDA_HOST_DEVICE static cuda::std::pair<Index,Index> gather(const Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
-          DT_* local, const Index stride, const Index macro, Index** macro_dofs, Index* max_degrees_dofs,
+        CUDA_HOST_DEVICE static cuda::std::pair<Index,Index> gather(const typename Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>::RawData& mat_wrap,
+          DT_* local, const Index stride, const Index macro, const Index** macro_dofs, Index* max_degrees_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
           cuda::std::pair<Index, Index> nrc_f{0,0};
@@ -1849,13 +1893,13 @@ namespace FEAT
 
         //################## Host Version#####################
         template<typename DT_, typename IT_, int n_>
-        CUDA_HOST static std::pair<Index,Index> scatter_add_loc(Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
+        CUDA_HOST static std::pair<Index,Index> scatter_add_loc(typename Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>::RawData& mat_wrap,
           const DT_* local, const Index stride, const Index macro, const Adjacency::Graph** macro_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
           //gather arrays
           const Index cur_ind = Index(n_)*row_block + col_block;
-          DT_* vals = mat_wrap.data_arrays[cur_ind];
+          DT_* vals = const_cast<DT_*>(mat_wrap.data_arrays[cur_ind]);
           const IT_* row_ptr = mat_wrap.row_arrays[cur_ind];
           const IT_* col_idx = mat_wrap.col_arrays[cur_ind];
           const Adjacency::Graph& row_dofs = *macro_dofs[row_block];
@@ -1885,7 +1929,7 @@ namespace FEAT
         }
 
         template<typename DT_, typename IT_, int n_>
-        CUDA_HOST static std::pair<Index,Index> scatter_add_row(Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
+        CUDA_HOST static std::pair<Index,Index> scatter_add_row(typename Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>::RawData& mat_wrap,
           const DT_* local, const Index stride, const Index macro, const Adjacency::Graph** macro_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
@@ -1893,7 +1937,7 @@ namespace FEAT
           //loop over cols
           for(int l = 0; l < n_; ++l)
           {
-            std::pair<Index, Index> nrc_l = scatter_add_loc(mat_wrap, local, stride, macro, macro_dofs, row_off, row_block, col_off+nrc_r.second, col_block+Index(l));
+            std::pair<Index, Index> nrc_l = scatter_add_loc<DT_,IT_,n_>(mat_wrap, local, stride, macro, macro_dofs, row_off, row_block, col_off+nrc_r.second, col_block+Index(l));
             nrc_r.first = nrc_l.first;
             nrc_r.second += nrc_l.second;
           }
@@ -1902,7 +1946,7 @@ namespace FEAT
         }
 
         template<typename DT_, typename IT_, int n_>
-        CUDA_HOST static std::pair<Index,Index> scatter_add(Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
+        CUDA_HOST static std::pair<Index,Index> scatter_add(typename Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>::RawData& mat_wrap,
           const DT_* local, const Index stride, const Index macro, const Adjacency::Graph** macro_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
@@ -1910,7 +1954,7 @@ namespace FEAT
           //loop over rows
           for(int l = 0; l < n_; ++l)
           {
-            std::pair<Index, Index> nrc_r = scatter_add_row(mat_wrap, local, stride, macro, macro_dofs, row_off+nrc_f.first, row_block+Index(l), col_off, col_block);
+            std::pair<Index, Index> nrc_r = scatter_add_row<DT_,IT_,n_>(mat_wrap, local, stride, macro, macro_dofs, row_off+nrc_f.first, row_block+Index(l), col_off, col_block);
             nrc_f.first += nrc_r.first;
             nrc_f.second = nrc_f.second;
           }
@@ -1921,8 +1965,8 @@ namespace FEAT
         #ifdef __CUDACC__
         //################# Device version #######################
         template<typename DT_, typename IT_, int n_, bool uniform_macros_>
-        CUDA_HOST_DEVICE static cuda::std::pair<Index,Index> scatter_add_loc(Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
-          const DT_* local, const Index stride, const Index macro, Index** macro_dofs, Index* max_degrees_dofs,
+        CUDA_HOST_DEVICE static cuda::std::pair<Index,Index> scatter_add_loc(typename Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>::RawData& mat_wrap,
+          const DT_* local, const Index stride, const Index macro, const Index** macro_dofs, Index* max_degrees_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
           //gather arrays
@@ -1959,8 +2003,8 @@ namespace FEAT
         }
 
         template<typename DT_, typename IT_, int n_, bool uniform_macros_>
-        CUDA_HOST_DEVICE static cuda::std::pair<Index,Index> scatter_add_row(Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
-          const DT_* local, const Index stride, const Index macro, Index** macro_dofs, Index* max_degrees_dofs,
+        CUDA_HOST_DEVICE static cuda::std::pair<Index,Index> scatter_add_row(typename Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>::RawData& mat_wrap,
+          const DT_* local, const Index stride, const Index macro, const Index** macro_dofs, Index* max_degrees_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
           cuda::std::pair<Index, Index> nrc_r{0,0};
@@ -1976,8 +2020,8 @@ namespace FEAT
         }
 
         template<typename DT_, typename IT_, int n_, bool uniform_macros_>
-        CUDA_HOST_DEVICE static cuda::std::pair<Index,Index> scatter_add(Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
-          const DT_* local, const Index stride, const Index macro, Index** macro_dofs, Index* max_degrees_dofs,
+        CUDA_HOST_DEVICE static cuda::std::pair<Index,Index> scatter_add(typename Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>::RawData& mat_wrap,
+          const DT_* local, const Index stride, const Index macro, const Index** macro_dofs, Index* max_degrees_dofs,
           const Index row_off, const Index row_block, const Index col_off, const Index col_block)
         {
           cuda::std::pair<Index, Index> nrc_f{0,0};

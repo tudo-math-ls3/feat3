@@ -228,9 +228,9 @@ namespace FEAT
         vec_c.copy(vec_q);
         if(_ilu_p >= 0)
         {
-          DataType* x = vec_c.elements();
-          _ilu.solve_il(x, x);
-          _ilu.solve_ilt(x, x);
+          Memory::TypedView<DataType> x = vec_c.elements_view_rw();
+          _ilu.solve_il(x.get_w(), x.get_w());
+          _ilu.solve_ilt(x.get_w(), x.get_w());
         }
       }
 
@@ -239,9 +239,9 @@ namespace FEAT
         vec_c.copy(vec_q);
         if(_ilu_p >= 0)
         {
-          DataType* x = vec_c.elements();
-          _ilu.solve_dut(x, x);
-          _ilu.solve_du(x, x);
+          Memory::TypedView<DataType> x = vec_c.elements_view_rw();
+          _ilu.solve_dut(x.get_w(), x.get_w());
+          _ilu.solve_du(x.get_w(), x.get_w());
         }
       }
 

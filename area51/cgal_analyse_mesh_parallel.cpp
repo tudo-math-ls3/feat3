@@ -163,9 +163,9 @@ namespace AnalyseMeshCGALParallel
     LocalVectorType& squared_distance_local = squared_distance_global.local();
     LocalVectorType& signed_distance_local = signed_distance_global.local();
 
-    DataType* SignedDist = signed_distance_local.elements();
-    DataType* SqDist = squared_distance_local.elements();
-    DataType* InOut = inside_outside_local.elements();
+    Memory::TypedView<DataType> SignedDist = signed_distance_local.elements_view_w();
+    Memory::TypedView<DataType> SqDist = squared_distance_local.elements_view_w();
+    Memory::TypedView<DataType> InOut = inside_outside_local.elements_view_w();
 
     // Load the off-filename
     String off_file_name;
@@ -220,6 +220,10 @@ namespace AnalyseMeshCGALParallel
     distance_calc.stop();
     comm.print("Time spent with distance calculation: " + distance_calc.elapsed_string(TimeFormat::s_m));
 
+    SignedDist.release();
+    SqDist.release();
+    InOut.release();
+
     // Syncronise
     // sync_0: Add up, sync_1: average value at the boarders
     signed_distance_global.sync_1();
@@ -234,9 +238,9 @@ namespace AnalyseMeshCGALParallel
       vtk_name = vtk_name + "-lvl-"+ stringify(lvl_max) + String("-n-") + stringify(comm.size());
       comm.print("Writing vtk-file: " + vtk_name);
       Geometry::ExportVTK<MeshType> exporter(mesh);
-      exporter.add_vertex_scalar("InsideOutside",inside_outside_local.elements());
-      exporter.add_vertex_scalar("SquaredDistance",squared_distance_local.elements());
-      exporter.add_vertex_scalar("DistanceToOff",signed_distance_local.elements());
+      exporter.add_vertex_scalar("InsideOutside",inside_outside_local);
+      exporter.add_vertex_scalar("SquaredDistance",squared_distance_local);
+      exporter.add_vertex_scalar("DistanceToOff",signed_distance_local);
       exporter.write(vtk_name,comm);
     }
   }

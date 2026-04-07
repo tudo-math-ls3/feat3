@@ -28,33 +28,37 @@ void run(PreferredBackend backend)
   size *= 16/sizeof(DT_);
 
   DenseMatrix<DT_, Index> x(size, size), y(size, size);
-  for (Index i(0) ; i < size ; ++i)
   {
-    for (Index j(0) ; j < size ; ++j)
+    Memory::TypedView<DT_> vx(x.elements_view_w());
+    Memory::TypedView<DT_> vy(y.elements_view_w());
+    for (Index i(0) ; i < size ; ++i)
     {
-      x(i, j, DT_(i%100) * DT_(0.5) * DT_(i%10));
-      y(i, j, -DT_(i%100) * DT_(0.1) * DT_(i%10));
+      for (Index j(0) ; j < size ; ++j)
+      {
+        vx[i*size+j] = DT_(i%100) * DT_(0.5) * DT_(i%10);
+        vy[i*size+j] = -DT_(i%100) * DT_(0.1) * DT_(i%10);
+      }
     }
   }
 
   DM_ r(size, size, 4711.);
 
   DT_ alpha = DT_(1.);
-  DT_ beta = DT_(0.);
 
   Backend::set_preferred_backend(backend);
 
   std::cout<<backend<<" "<<DM_::name()<<" "<<Type::Traits<DT_>::name()<<" rows/cols: " << size << "\n";
 
-  double flops = 2. * double(x.rows() * x.rows() * r.columns() + r.columns());
-  double bytes = 2. * double(x.rows() * x.columns() * y.columns() + r.columns() * r.rows());
+  double flops = 2. * double(x.num_rows() * x.num_rows() * r.num_cols() + r.num_cols());
+  double bytes = 2. * double(x.num_rows() * x.num_cols() * y.num_cols() + r.num_cols() * r.num_rows());
   bytes *= sizeof(DT_);
 
   switch (backend)
   {
     case PreferredBackend::generic :
       {
-        auto func = [&] () { Arch::ProductMatMat::dense_generic<DT_>(r.elements(), alpha, beta, x.elements(), y.elements(), r.elements(), r.rows(), r.columns(), x.columns()); };
+        //auto func = [&] () { Arch::ProductMatMat::dense_generic<DT_>(r.elements(), alpha, beta, x.elements(), y.elements(), r.elements(), r.num_rows(), r.num_cols(), x.num_cols()); };
+        auto func = [&] () { Arch::MatMatMultDenseDense::exec_generic<DT_>(r.elements_arbiter(), alpha, x.elements_arbiter(), y.elements_arbiter(), r.elements_arbiter(), r.num_rows(), r.num_cols(), x.num_cols()); };
         run_bench(func, flops, bytes);
         break;
       }
@@ -62,7 +66,8 @@ void run(PreferredBackend backend)
 #if defined(FEAT_HAVE_MKL) && !defined(FEAT_HAVE_HALFMATH)
     case PreferredBackend::mkl :
       {
-        auto func = [&] () { Arch::ProductMatMat::dense_mkl(r.elements(), alpha, beta, x.elements(), y.elements(), r.elements(), r.rows(), r.columns(), x.columns()); };
+        //auto func = [&] () { Arch::ProductMatMat::dense_mkl(r.elements(), alpha, beta, x.elements(), y.elements(), r.elements(), r.num_rows(), r.num_cols(), x.num_cols()); };
+        auto func = [&] () { Arch::MatMatMultDenseDense::exec_mkl<DT_>(r.elements_arbiter(), alpha, x.elements_arbiter(), y.elements_arbiter(), r.elements_arbiter(), r.num_rows(), r.num_cols(), x.num_cols()); };
         run_bench(func, flops, bytes);
         break;
       }
@@ -71,7 +76,8 @@ void run(PreferredBackend backend)
 #ifdef FEAT_HAVE_CUDA
     case PreferredBackend::cuda :
       {
-        auto func = [&] () { Arch::ProductMatMat::dense_cuda<DT_>(r.elements(), alpha, beta, x.elements(), y.elements(), r.elements(), r.rows(), r.columns(), x.columns()); };
+        //auto func = [&] () { Arch::ProductMatMat::dense_cuda<DT_>(r.elements(), alpha, beta, x.elements(), y.elements(), r.elements(), r.num_rows(), r.num_cols(), x.num_cols()); };
+        auto func = [&] () { Arch::MatMatMultDenseDense::exec_cuda<DT_>(r.elements_arbiter(), alpha, x.elements_arbiter(), y.elements_arbiter(), r.elements_arbiter(), r.num_rows(), r.num_cols(), x.num_cols()); };
         run_bench(func, flops, bytes);
         break;
       }
@@ -81,7 +87,7 @@ void run(PreferredBackend backend)
       throw InternalError("unsupported arch detected!");
   }
 
-  MemoryPool::synchronize();
+  Runtime::synchronize_devices();
   std::cout<<"control norm: "<<double(r.norm_frobenius())<<"\n";
 }
 

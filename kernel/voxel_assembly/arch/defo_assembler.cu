@@ -145,29 +145,29 @@ namespace FEAT
               const CSRMatrixData<DT_, IT_>& matrix_data,
               const AssemblyCubatureData<DT_>& cubature,
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
-              const std::vector<int*>& coloring_maps,
-              const std::vector<Index>& coloring_map_sizes,
+              const Adjacency::ColoringDataHandler& coloring_data,
               DT_ alpha, DT_ nu
               )
       {
-        const Index blocksize = Util::cuda_blocksize_blocked_assembly;
-        // const Index blocksize = 64;
+        const Memory::TypedView<int> color_view = coloring_data.color_map_view(Memory::Location::cuda, Memory::Access::read);
+        const Memory::TypedView<IT_> cell_to_dof_view(dof_mapping.cell_to_dof.view(Memory::Location::cuda, Memory::Access::read));
+        const Memory::TypedView<IT_> cell_to_dof_sorter_view(dof_mapping.cell_to_dof_sorter.view(Memory::Location::cuda, Memory::Access::read));
+        const Memory::TypedView<Tiny::Vector<DT_, Space_::world_dim>> nodes_view(dof_mapping.nodes.view(Memory::Location::cuda, Memory::Access::read));
 
-        for(Index i = 0; i < coloring_maps.size(); ++i)
+        for(Index i = 0; i < coloring_data.get_num_colors(); ++i)
         {
-          dim3 grid;
-          dim3 block;
-          block.x = (unsigned int)blocksize;
-          grid.x = (unsigned int)ceil(double(coloring_map_sizes[i])/double(block.x));
+          dim3 block(static_cast<unsigned int>(Util::cuda_blocksize_spmv));
+          dim3 grid((static_cast<unsigned int>(coloring_data.get_color_size(i)) + block.x - 1u) / block.x); // round up to next integer
 
           //kernel call, since this uses the standard stream, sync before next call is enforced:
           VoxelAssembly::Kernel::template defo_assembler_matrix1_bcsr<Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper><<< grid, block >>>(
               matrix_data.data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,
               (const typename Tiny::Vector<DT_, Space_::world_dim>*) cubature.cub_pt,
               cubature.cub_wg, cubature.num_cubs, alpha,
-              dof_mapping.cell_to_dof, dof_mapping.cell_num,
-              (const typename Tiny::Vector<DT_, Space_::world_dim>*) dof_mapping.nodes, dof_mapping.node_size,
-              (const int*) coloring_maps[i], coloring_map_sizes[i], dof_mapping.cell_to_dof_sorter, nu
+              cell_to_dof_view.get_r(), dof_mapping.cell_num,
+              nodes_view.get_r(), dof_mapping.node_size,
+              &color_view.get_r()[coloring_data.get_color_offset(i)], coloring_data.get_color_size(i),
+              cell_to_dof_sorter_view.get_r(), nu
           );
         }
 
@@ -180,19 +180,23 @@ namespace FEAT
               const CSRMatrixData<DT_, IT_>& matrix_data,
               const AssemblyCubatureData<DT_>& cubature,
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
-              const std::vector<int*>& coloring_maps,
-              const std::vector<Index>& coloring_map_sizes,
+              const Adjacency::ColoringDataHandler& coloring_data,
               DT_ alpha, DT_ nu
               )
       {
-        for(Index col = 0; col < Index(coloring_maps.size()); ++col)
+        const Memory::TypedView<int> color_view = coloring_data.color_map_view(Memory::Location::main, Memory::Access::read);
+        const Memory::TypedView<IT_> cell_to_dof_view(dof_mapping.cell_to_dof.view(Memory::Location::main, Memory::Access::read));
+        const Memory::TypedView<IT_> cell_to_dof_sorter_view(dof_mapping.cell_to_dof_sorter.view(Memory::Location::main, Memory::Access::read));
+        const Memory::TypedView<Tiny::Vector<DT_, Space_::world_dim>> nodes_view(dof_mapping.nodes.view(Memory::Location::main, Memory::Access::read));
+        for(Index col = 0; col < coloring_data.get_num_colors(); ++col)
         {
           VoxelAssembly::Kernel::template defo_assembler_matrix1_csr_host<Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper>(
             matrix_data.data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,
             (const typename Tiny::Vector<DT_, Space_::world_dim>*) cubature.cub_pt,
-            cubature.cub_wg, cubature.num_cubs, alpha, dof_mapping.cell_to_dof, dof_mapping.cell_num,
-            (const typename Tiny::Vector<DT_, Space_::world_dim>*) dof_mapping.nodes, dof_mapping.node_size,
-            (const int*) coloring_maps[col], coloring_map_sizes[col], dof_mapping.cell_to_dof_sorter, nu
+            cubature.cub_wg, cubature.num_cubs, alpha, cell_to_dof_view.get_r(), dof_mapping.cell_num,
+            nodes_view.get_r(), dof_mapping.node_size,
+            &color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col),
+            cell_to_dof_sorter_view.get_r(), nu
           );
         }
       }
@@ -205,50 +209,50 @@ using namespace FEAT;
 using namespace FEAT::VoxelAssembly;
 
 template void Arch::assemble_defo_csr(const Q2StandardQuad&, const CSRMatrixData<double, std::uint32_t>&, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, double, double);
+                                          const Adjacency::ColoringDataHandler&, double, double);
 template void Arch::assemble_defo_csr(const Q2StandardQuad&, const CSRMatrixData<float, std::uint32_t>&, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, float, float);
+                                          const Adjacency::ColoringDataHandler&, float, float);
 template void Arch::assemble_defo_csr(const Q2StandardQuad&, const CSRMatrixData<double, std::uint64_t>&, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, double, double);
+                                          const Adjacency::ColoringDataHandler&, double, double);
 template void Arch::assemble_defo_csr(const Q2StandardQuad&, const CSRMatrixData<float, std::uint64_t>&, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, float, float);
+                                          const Adjacency::ColoringDataHandler&, float, float);
 // #ifdef FEAT_HAVE_HALFMATH
 // template void Arch::assemble_defo_csr(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint32_t>&, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-//                                           const std::vector<int*>&, const std::vector<Index>&, Half, Half);
+//                                           const Adjacency::ColoringDataHandler&, Half, Half);
 // template void Arch::assemble_defo_csr(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint64_t>&, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-//                                           const std::vector<int*>&, const std::vector<Index>&, Half, Half);
+//                                           const Adjacency::ColoringDataHandler&, Half, Half);
 // #endif
 
 template void Arch::assemble_defo_csr_host(const Q2StandardQuad&, const CSRMatrixData<double, std::uint32_t>&, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, double, double);
+                                          const Adjacency::ColoringDataHandler&, double, double);
 template void Arch::assemble_defo_csr_host(const Q2StandardQuad&, const CSRMatrixData<float, std::uint32_t>&, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, float, float);
+                                          const Adjacency::ColoringDataHandler&, float, float);
 template void Arch::assemble_defo_csr_host(const Q2StandardQuad&, const CSRMatrixData<double, std::uint64_t>&, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, double, double);
+                                          const Adjacency::ColoringDataHandler&, double, double);
 template void Arch::assemble_defo_csr_host(const Q2StandardQuad&, const CSRMatrixData<float, std::uint64_t>&, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, float, float);
+                                          const Adjacency::ColoringDataHandler&, float, float);
 
 
 template void Arch::assemble_defo_csr(const Q2StandardHexa&, const CSRMatrixData<double, std::uint32_t>&, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, double, double);
+                                          const Adjacency::ColoringDataHandler&, double, double);
 template void Arch::assemble_defo_csr(const Q2StandardHexa&, const CSRMatrixData<float, std::uint32_t>&, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, float, float);
+                                          const Adjacency::ColoringDataHandler&, float, float);
 template void Arch::assemble_defo_csr(const Q2StandardHexa&, const CSRMatrixData<double, std::uint64_t>&, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, double, double);
+                                          const Adjacency::ColoringDataHandler&, double, double);
 template void Arch::assemble_defo_csr(const Q2StandardHexa&, const CSRMatrixData<float, std::uint64_t>&, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, float, float);
+                                          const Adjacency::ColoringDataHandler&, float, float);
 // #ifdef FEAT_HAVE_HALFMATH
 // template void Arch::assemble_defo_csr(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint32_t>&, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-//                                           const std::vector<int*>&, const std::vector<Index>&, Half, Half);
+//                                           const Adjacency::ColoringDataHandler&, Half, Half);
 // template void Arch::assemble_defo_csr(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint64_t>&, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-//                                           const std::vector<int*>&, const std::vector<Index>&, Half, Half);
+//                                           const Adjacency::ColoringDataHandler&, Half, Half);
 // #endif
 
 template void Arch::assemble_defo_csr_host(const Q2StandardHexa&, const CSRMatrixData<double, std::uint32_t>&, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, double, double);
+                                          const Adjacency::ColoringDataHandler&, double, double);
 template void Arch::assemble_defo_csr_host(const Q2StandardHexa&, const CSRMatrixData<float, std::uint32_t>&, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint32_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, float, float);
+                                          const Adjacency::ColoringDataHandler&, float, float);
 template void Arch::assemble_defo_csr_host(const Q2StandardHexa&, const CSRMatrixData<double, std::uint64_t>&, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, double, double);
+                                          const Adjacency::ColoringDataHandler&, double, double);
 template void Arch::assemble_defo_csr_host(const Q2StandardHexa&, const CSRMatrixData<float, std::uint64_t>&, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
-                                          const std::vector<int*>&, const std::vector<Index>&, float, float);
+                                          const Adjacency::ColoringDataHandler&, float, float);

@@ -349,10 +349,14 @@ namespace FEAT
        * \returns Matrix row count if perspective_ = false.
        * \returns Raw matrix row count if perspective_ = true.
        */
-      template <Perspective perspective_ = Perspective::native>
-      Index rows() const
+      Index num_rows() const
       {
-        return first().template rows<perspective_>() + rest().template rows<perspective_>();
+        return first().num_rows() + rest().num_rows();
+      }
+
+      Index num_rows_raw() const
+      {
+        return first().num_rows_raw() + rest().num_rows_raw();
       }
 
       /**
@@ -361,10 +365,14 @@ namespace FEAT
        * \returns Matrix column count if perspective_ = false.
        * \returns Raw matrix column count if perspective_ = true.
        */
-      template <Perspective perspective_ = Perspective::native>
-      Index columns() const
+      Index num_cols() const
       {
-        return rest().template columns<perspective_>();
+        return rest().num_cols();
+      }
+
+      Index num_cols_raw() const
+      {
+        return rest().num_cols_raw();
       }
 
       /**
@@ -373,22 +381,20 @@ namespace FEAT
        * \returns Matrix non zero element count if perspective_ = false.
        * \returns Raw matrix non zero element count if perspective_ = true.
        */
-      template <Perspective perspective_ = Perspective::native>
-      Index used_elements() const
+      Index num_nzes() const
       {
-        return first().template used_elements<perspective_>() + rest().template used_elements<perspective_>();
+        return first().num_nzes() + rest().num_nzes();
+      }
+
+      Index num_nzes_raw() const
+      {
+        return first().num_nzes_raw() + rest().num_nzes_raw();
       }
 
       /// Returns a descriptive string for this container.
       static String name()
       {
         return String("PowerColMatrix<") + SubMatrixType::name() + "," + stringify(blocks_) + ">";
-      }
-
-      template <Perspective perspective_ = Perspective::native>
-      Index size() const
-      {
-        return rows<perspective_>() * columns<perspective_>();
       }
 
       /**
@@ -432,11 +438,11 @@ namespace FEAT
 
       void apply(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols(), "Vector size of x does not match!");
 
-        DenseVector<DataType, IndexType> r_first(r, first().rows(), 0);
-        DenseVector<DataType, IndexType> r_rest(r, rest().rows(), first().rows());
+        DenseVector<DataType, IndexType> r_first(r, first().num_rows(), 0);
+        DenseVector<DataType, IndexType> r_rest(r, rest().num_rows(), first().num_rows());
 
         first().apply(r_first, x);
         rest().apply(r_rest, x);
@@ -462,11 +468,11 @@ namespace FEAT
 
       void apply_transposed(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_cols(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows(), "Vector size of x does not match!");
 
-        DenseVector<DataType, IndexType> x_first(x, first().rows(), 0);
-        DenseVector<DataType, IndexType> x_rest(x, rest().rows(), first().rows());
+        DenseVector<DataType, IndexType> x_first(x, first().num_rows(), 0);
+        DenseVector<DataType, IndexType> x_rest(x, rest().num_rows(), first().num_rows());
 
         first().apply_transposed(r, x_first);
         rest().apply_transposed(r, x_rest, r, DataType(1));
@@ -497,15 +503,15 @@ namespace FEAT
       void apply(DenseVector<DataType, IndexType>& r, const DenseVector<DataType , IndexType>& x,
                  const DenseVector<DataType , IndexType>& y, DataType alpha = DataType(1)) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->rows(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_rows(), "Vector size of y does not match!");
 
-        DenseVector<DataType, IndexType> r_first(r, first().rows(), 0);
-        DenseVector<DataType, IndexType> r_rest(r, rest().rows(), first().rows());
+        DenseVector<DataType, IndexType> r_first(r, first().num_rows(), 0);
+        DenseVector<DataType, IndexType> r_rest(r, rest().num_rows(), first().num_rows());
 
-        DenseVector<DataType, IndexType> y_first(y, first().rows(), 0);
-        DenseVector<DataType, IndexType> y_rest(y, rest().rows(), first().rows());
+        DenseVector<DataType, IndexType> y_first(y, first().num_rows(), 0);
+        DenseVector<DataType, IndexType> y_rest(y, rest().num_rows(), first().num_rows());
 
         first().apply(r_first, x, y_first, alpha);
         rest().apply(r_rest, x, y_rest, alpha);
@@ -536,12 +542,12 @@ namespace FEAT
       void apply_transposed(DenseVector<DataType, IndexType>& r, const DenseVector<DataType , IndexType>& x,
         const DenseVector<DataType , IndexType>& y, DataType alpha = DataType(1)) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_cols(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_cols(), "Vector size of y does not match!");
 
-        DenseVector<DataType, IndexType> x_first(x, first().rows(), 0);
-        DenseVector<DataType, IndexType> x_rest(x, rest().rows(), first().rows());
+        DenseVector<DataType, IndexType> x_first(x, first().num_rows(), 0);
+        DenseVector<DataType, IndexType> x_rest(x, rest().num_rows(), first().num_rows());
 
         first().apply_transposed(r, x_first, y, alpha);
         rest().apply_transposed(r, x_rest, r, alpha);
@@ -555,8 +561,7 @@ namespace FEAT
       */
       DataType max_rel_diff(const PowerColMatrix& x) const
       {
-        DataType max_rel_diff = Math::max(this->first().max_rel_diff(x.first()), this->rest().max_rel_diff(x.rest()));
-        return max_rel_diff;
+        return Math::max(this->first().max_rel_diff(x.first()), this->rest().max_rel_diff(x.rest()));
       }
 
       /**
@@ -569,7 +574,7 @@ namespace FEAT
        */
       bool same_layout(const PowerColMatrix& x) const
       {
-        return (this->name() == x.name()) && (this->first().same_layout(x.first())) && (this->rest().same_layout(x.rest()));
+        return this->first().same_layout(x.first()) && this->rest().same_layout(x.rest());
       }
 
       /// Returns a new compatible L-Vector.
@@ -584,55 +589,10 @@ namespace FEAT
         return first().create_vector_r();
       }
 
-      /// Returns the number of NNZ-elements of the selected row
-      Index get_length_of_line(const Index row) const
-      {
-        const Index brows(this->first().template rows<Perspective::pod>());
-
-        if (row < brows)
-        {
-          return this->first().get_length_of_line(row);
-        }
-        else
-        {
-          return this->rest().get_length_of_line(row - brows);
-        }
-      }
-
       /// \cond internal
-      /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
-      void set_line(const Index row, DataType * const pval_set, IndexType * const pcol_set,
-                    const Index col_start, const Index stride = 1) const
-      {
-        const Index brows(this->first().template rows<Perspective::pod>());
-
-        if (row < brows)
-        {
-          this->first().set_line(row, pval_set, pcol_set, col_start, stride);
-        }
-        else
-        {
-          this->rest().set_line(row - brows, pval_set, pcol_set, col_start, stride);
-        }
-      }
-
-      void set_line_reverse(const Index row, const DataType * const pval_set, const Index stride = 1)
-      {
-        const Index brows(this->first().template rows<Perspective::pod>());
-
-        if (row < brows)
-        {
-          this->first().set_line_reverse(row, pval_set, stride);
-        }
-        else
-        {
-          this->rest().set_line_reverse(row - brows, pval_set, stride);
-        }
-      }
-
       Index row_degree(const Index row) const
       {
-        const Index first_rows = first().template rows<Perspective::pod>();
+        const Index first_rows = first().num_rows_raw();
         if(row < first_rows)
           return first().row_degree(row);
         else
@@ -642,7 +602,7 @@ namespace FEAT
       template<typename IT2_>
       Index get_row_col_indices(const Index row, IT2_* const pcol_idx, const IT2_ col_offset) const
       {
-        const Index first_rows = first().template rows<Perspective::pod>();
+        const Index first_rows = first().num_rows_raw();
         if(row < first_rows)
           return first().get_row_col_indices(row, pcol_idx, col_offset);
         else
@@ -652,7 +612,7 @@ namespace FEAT
       template<typename DT2_>
       Index get_row_values(const Index row, DT2_ * const pvals) const
       {
-        const Index first_rows = first().template rows<Perspective::pod>();
+        const Index first_rows = first().num_rows_raw();
         if(row < first_rows)
           return first().get_row_values(row, pvals);
         else
@@ -662,7 +622,7 @@ namespace FEAT
       template<typename DT2_>
       Index set_row_values(const Index row, const DT2_ * const pvals)
       {
-        const Index first_rows = first().template rows<Perspective::pod>();
+        const Index first_rows = first().num_rows_raw();
         if(row < first_rows)
           return first().set_row_values(row, pvals);
         else
@@ -708,22 +668,29 @@ namespace FEAT
       /**
        * \brief Conversion method
        *
-       * \param[in] other The source Matrix.
+       * \param[in] source The source Matrix.
        *
        * Use source matrix content as content of current matrix
        */
       template <typename SubType2_>
-      void convert(const PowerColMatrix<SubType2_, blocks_> & other)
+      void convert(const PowerColMatrix<SubType2_, blocks_> & source)
       {
-        this->first().convert(other.first());
-        this->rest().convert(other.rest());
+        this->first().convert(source.first());
+        this->rest().convert(source.rest());
       }
 
       template <typename SubType2_>
-      void convert_reverse(PowerColMatrix<SubType2_, blocks_> & other) const
+      void copy(const PowerColMatrix<SubType2_, blocks_> & source)
       {
-        this->first().convert_reverse(other.first());
-        this->rest().convert_reverse(other.rest());
+        this->first().copy(source.first());
+        this->rest().copy(source.rest());
+      }
+
+      template <typename SubType2_>
+      void copy_to(PowerColMatrix<SubType2_, blocks_> & target) const
+      {
+        this->first().copy_to(target.first());
+        this->rest().copy_to(target.rest());
       }
     };
 
@@ -931,33 +898,39 @@ namespace FEAT
         return 1;
       }
 
-      template <Perspective perspective_ = Perspective::native>
-      Index rows() const
+      Index num_rows() const
       {
-        return first().template rows<perspective_>();
+        return first().num_rows();
       }
 
-      template <Perspective perspective_ = Perspective::native>
-      Index columns() const
+      Index num_cols() const
       {
-        return first().template columns<perspective_>();
+        return first().num_cols();
       }
 
-      template <Perspective perspective_ = Perspective::native>
-      Index used_elements() const
+      Index num_nzes() const
       {
-        return first().template used_elements<perspective_>();
+        return first().num_nzes();
+      }
+
+      Index num_rows_raw() const
+      {
+        return first().num_rows_raw();
+      }
+
+      Index num_cols_raw() const
+      {
+        return first().num_cols_raw();
+      }
+
+      Index num_nzes_raw() const
+      {
+        return first().num_nzes_raw();
       }
 
       static String name()
       {
         return String("PowerColMatrix<") + SubMatrixType::name() + "," + stringify(1) + ">";
-      }
-
-      template <Perspective perspective_ = Perspective::native>
-      Index size() const
-      {
-        return rows<perspective_>() * columns<perspective_>();
       }
 
       void format(DataType value = DataType(0))
@@ -1035,24 +1008,6 @@ namespace FEAT
         return VectorTypeR(first().create_vector_r());
       }
 
-      /// Returns the number of NNZ-elements of the selected row
-      Index get_length_of_line(const Index row) const
-      {
-        return this->first().get_length_of_line(row);
-      }
-
-      /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
-      void set_line(const Index row, DataType * const pval_set, IndexType * const pcol_set,
-                    const Index col_start, const Index stride = 1) const
-      {
-        this->first().set_line(row, pval_set, pcol_set, col_start, stride);
-      }
-
-      void set_line_reverse(const Index row, const DataType * const pval_set, const Index stride = 1)
-      {
-        this->first().set_line_reverse(row, pval_set, stride);
-      }
-
       Index row_degree(const Index row) const
       {
         return first().row_degree(row);
@@ -1097,20 +1052,26 @@ namespace FEAT
       /**
        * \brief Conversion method
        *
-       * \param[in] other The source Matrix.
+       * \param[in] source The source Matrix.
        *
        * Use source matrix content as content of current matrix
        */
       template <typename SubType2_>
-      void convert(const PowerColMatrix<SubType2_, 1> & other)
+      void convert(const PowerColMatrix<SubType2_, 1> & source)
       {
-        this->first().convert(other.first());
+        this->first().convert(source.first());
       }
 
       template <typename SubType2_>
-      void convert_reverse(PowerColMatrix<SubType2_, 1> & other) const
+      void copy(const PowerColMatrix<SubType2_, 1> & source)
       {
-        this->first().convert_reverse(other.first());
+        this->first().copy(source.first());
+      }
+
+      template <typename SubType2_>
+      void copy_to(PowerColMatrix<SubType2_, 1> & target) const
+      {
+        this->first().copy_to(target.first());
       }
 
       /**
@@ -1123,7 +1084,7 @@ namespace FEAT
        */
       bool same_layout(const PowerColMatrix& x) const
       {
-        return (this->name() == x.name()) && (this->first().same_layout(x.first()));
+        return this->first().same_layout(x.first());
       }
     };
     /// \endcond

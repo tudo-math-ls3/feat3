@@ -88,12 +88,17 @@ namespace FEAT
         DenseVector<DataType, IndexType> r00(n00), r01(n01), r1(n1);
 
         // fill vectors
-        for(Index i(0); i < n00; ++i)
-          r00(i, fx00(i));
-        for(Index i(0); i < n01; ++i)
-          r01(i, fx01(i));
-        for(Index i(0); i < n1; ++i)
-          r1(i, fx1(i));
+        {
+          Memory::TypedView<DataType> vr00(r00.elements_view_w());
+          Memory::TypedView<DataType> vr01(r01.elements_view_w());
+          Memory::TypedView<DataType> vr1(r1.elements_view_w());
+          for(Index i(0); i < n00; ++i)
+            vr00[i] = fx00(i);
+          for(Index i(0); i < n01; ++i)
+            vr01[i] = fx01(i);
+          for(Index i(0); i < n1; ++i)
+            vr1[i] = fx1(i);
+        }
 
         // construct data vector
         MetaVector x;
@@ -109,12 +114,18 @@ namespace FEAT
         DenseVector<DataType, IndexType> r00(n00), r01(n01), r1(n1);
 
         // fill vectors
-        for(Index i(0); i < n00; ++i)
-          r00(i, fy00(i));
-        for(Index i(0); i < n01; ++i)
-          r01(i, fy01(i));
-        for(Index i(0); i < n1; ++i)
-          r1(i, fy1(i));
+        {
+          Memory::TypedView<DataType> vr00(r00.elements_view_w());
+          Memory::TypedView<DataType> vr01(r01.elements_view_w());
+          Memory::TypedView<DataType> vr1(r1.elements_view_w());
+          for(Index i(0); i < n00; ++i)
+            vr00[i] = fy00(i);
+          for(Index i(0); i < n01; ++i)
+            vr01[i] = fy01(i);
+          for(Index i(0); i < n1; ++i)
+            vr1[i] = fy1(i);
+        }
+
 
         // construct data vector
         MetaVector y;
@@ -130,12 +141,17 @@ namespace FEAT
         DenseVector<DataType, IndexType> r00(n00), r01(n01), r1(n1);
 
         // fill vectors
-        for(Index i(0); i < n00; ++i)
-          r00(i, fz00(i));
-        for(Index i(0); i < n01; ++i)
-          r01(i, fz01(i));
-        for(Index i(0); i < n1; ++i)
-          r1(i, fz1(i));
+        {
+          Memory::TypedView<DataType> vr00(r00.elements_view_w());
+          Memory::TypedView<DataType> vr01(r01.elements_view_w());
+          Memory::TypedView<DataType> vr1(r1.elements_view_w());
+          for(Index i(0); i < n00; ++i)
+            vr00[i] = fz00(i);
+          for(Index i(0); i < n01; ++i)
+            vr01[i] = fz01(i);
+          for(Index i(0); i < n1; ++i)
+            vr1[i] = fz1(i);
+        }
 
         // construct data vector
         MetaVector z;

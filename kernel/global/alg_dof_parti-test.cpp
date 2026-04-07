@@ -46,7 +46,7 @@ class AlgDofPartiTest :
   typedef LAFEM::SparseMatrixCSR<DataType, IndexType> ADPMatrixType;
 
 public:
-  AlgDofPartiTest(PreferredBackend backend) :
+  explicit AlgDofPartiTest(PreferredBackend backend) :
     UnitTest("AlgDofPartiTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
@@ -54,14 +54,14 @@ public:
   static MirrorType create_mirror_0(const int n, const int k)
   {
     MirrorType mirror((IT_)n, 1);
-    mirror.indices()[0] = IT_(k);
+    mirror.indices_view_w()[0] = IT_(k);
     return mirror;
   }
 
   static MirrorType create_mirror_1(const int n, const int m, const int o, const int p)
   {
     MirrorType mirror((IT_)n, (IT_)m);
-    IndexType* idx = mirror.indices();
+    Memory::TypedView<IndexType> idx = mirror.indices_view_w();
     for(int i(0); i < m; ++i)
       idx[IT_(i)] = IT_(o + i * p);
     return mirror;
@@ -172,8 +172,8 @@ public:
     ADPVectorType adp_vec_y(adp.get_num_owned_dofs());
 
     // upload vectors x and y
-    adp.upload_vector(adp_vec_x.elements(), glob_vec_x.local());
-    adp.upload_vector(adp_vec_y.elements(), glob_vec_y.local());
+    adp.upload_vector(adp_vec_x.elements_view_w().get_w(), glob_vec_x.local());
+    adp.upload_vector(adp_vec_y.elements_view_w().get_w(), glob_vec_y.local());
 
     // perform dot-product of owned dofs
     const DataType owned_dot_x_y = adp_vec_x.dot(adp_vec_y);
@@ -190,8 +190,8 @@ public:
     GlobalVectorType glob_vec_y2(&gate, gate._freqs.clone(LAFEM::CloneMode::Layout));
 
     // download from adp vectors
-    adp.download_vector(adp_vec_x.elements(), glob_vec_x2.local());
-    adp.download_vector(adp_vec_y.elements(), glob_vec_y2.local());
+    adp.download_vector(adp_vec_x.elements_view_r().get_r(), glob_vec_x2.local());
+    adp.download_vector(adp_vec_y.elements_view_r().get_r(), glob_vec_y2.local());
 
     // compute errors to original vectors
     glob_vec_x2.axpy(glob_vec_x, -DataType(1));
@@ -243,23 +243,23 @@ public:
       adp_sys.get_adp_matrix_nzes());
 
     // upload matrix
-    adp_sys.upload_matrix_symbolic(adp_mat.row_ptr(), adp_mat.col_ind());
-    adp_sys.upload_matrix_numeric(adp_mat.val(), adp_mat.row_ptr(), adp_mat.col_ind());
+    adp_sys.upload_matrix_symbolic(adp_mat.row_ptr_view_w().get_w(), adp_mat.col_idx_view_w().get_w());
+    adp_sys.upload_matrix_numeric(adp_mat.val_view_w().get_w(), adp_mat.row_ptr_view_r().get_r(), adp_mat.col_idx_view_r().get_r());
 
     // create two ADP vectors
     ADPVectorType adp_vec_x(adp_sys.get_adp_vector_size());
     ADPVectorType adp_vec_b(adp_sys.get_adp_vector_size());
 
     // upload vector x
-    adp_sys.upload_vector(adp_vec_x.elements(), glob_vec_x.local());
+    adp_sys.upload_vector(adp_vec_x.elements_view_w().get_w(), glob_vec_x.local());
 
     // compute b := A*x
-    adp_sys.apply(adp_vec_b.elements(), adp_vec_x.elements(),
-      adp_mat.val(), adp_mat.row_ptr(), adp_mat.col_ind());
+    adp_sys.apply(adp_vec_b.elements_view_w().get_w(), adp_vec_x.elements_view_r().get_r(),
+      adp_mat.val_view_r().get_r(), adp_mat.row_ptr_view_r().get_r(), adp_mat.col_idx_view_r().get_r());
 
     // create another global vector and download b
     GlobalVectorType glob_vec_b2 = glob_mat.create_vector_l();
-    adp_sys.download_vector(glob_vec_b2.local(), adp_vec_b.elements());
+    adp_sys.download_vector(glob_vec_b2.local(), adp_vec_b.elements_view_r().get_r());
 
     // compute error vector
     glob_vec_b2.axpy(glob_vec_b, -DataType(1));
@@ -268,25 +268,25 @@ public:
   }
 };
 
-AlgDofPartiTest <float, std::uint32_t> alg_dof_parti_test_float_uint32(PreferredBackend::generic);
-AlgDofPartiTest <double, std::uint32_t> alg_dof_parti_test_double_uint32(PreferredBackend::generic);
-AlgDofPartiTest <float, std::uint64_t> alg_dof_parti_test_float_uint64(PreferredBackend::generic);
-AlgDofPartiTest <double, std::uint64_t> alg_dof_parti_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(AlgDofPartiTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(AlgDofPartiTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(AlgDofPartiTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(AlgDofPartiTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-AlgDofPartiTest <float, std::uint64_t> mkl_alg_dof_parti_test_float_uint64(PreferredBackend::mkl);
-AlgDofPartiTest <double, std::uint64_t> mkl_alg_dof_parti_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(AlgDofPartiTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(AlgDofPartiTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-AlgDofPartiTest <__float128, std::uint32_t> alg_dof_parti_test_float128_uint32(PreferredBackend::generic);
-AlgDofPartiTest <__float128, std::uint64_t> alg_dof_parti_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(AlgDofPartiTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(AlgDofPartiTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-AlgDofPartiTest <Half, std::uint32_t> alg_dof_parti_test_half_uint32(PreferredBackend::generic);
-AlgDofPartiTest <Half, std::uint64_t> alg_dof_parti_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(AlgDofPartiTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(AlgDofPartiTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-AlgDofPartiTest <float, std::uint32_t> cuda_alg_dof_parti_test_float_uint32(PreferredBackend::cuda);
-AlgDofPartiTest <double, std::uint32_t> cuda_alg_dof_parti_test_double_uint32(PreferredBackend::cuda);
-AlgDofPartiTest <float, std::uint64_t> cuda_alg_dof_parti_test_float_uint64(PreferredBackend::cuda);
-AlgDofPartiTest <double, std::uint64_t> cuda_alg_dof_parti_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(AlgDofPartiTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(AlgDofPartiTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(AlgDofPartiTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(AlgDofPartiTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif

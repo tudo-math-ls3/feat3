@@ -33,98 +33,106 @@ using namespace FEAT::TestSystem;
 template<
   typename DT_,
   typename IT_>
-class DenseVectorBlockedTest
+class DenseVectorBlockedBasicTest
   : public UnitTest
 {
 public:
-  DenseVectorBlockedTest(PreferredBackend backend)
-    : UnitTest("DenseVectorBlockedTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseVectorBlockedTest()
+  explicit DenseVectorBlockedBasicTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedBasicTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
   virtual void run() const override
   {
-    DT_ eps = TestSystem::tol<DT_>();
+    const DT_ tol = TestSystem::tol<DT_>();
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
     DenseVectorBlocked<DT_, IT_, 2> zero;
     TEST_CHECK(zero.empty());
+    TEST_CHECK_EQUAL(zero.bytes(), 0);
 
     DenseVectorBlocked<DT_, IT_, 2> a(10, DT_(7));
     TEST_CHECK(!a.empty());
-    TEST_CHECK_LESS_THAN(a.max_rel_diff(a), eps);
-    TEST_CHECK_EQUAL(a.bytes(), 20 * sizeof(DT_) + 1 * sizeof(Index));
+    TEST_CHECK_EQUAL(a.size(), 10);
+    TEST_CHECK_EQUAL(a.size_raw(), 20);
+    TEST_CHECK_EQUAL(a.bytes(), 20 * sizeof(DT_));
+
     DenseVectorBlocked<DT_, IT_, 2> b(10, DT_(5));
-    Tiny::Vector<DT_, 2> tv(42);
-    b(7, tv);
+    b.elements_view_rw()[7] = DT_(42);
 
     DenseVectorBlocked<DT_, IT_, 2> b_r(b, 4, 6);
-    TEST_CHECK_EQUAL(b_r(0)[0], b(0+6)[0]);
-    TEST_CHECK_EQUAL(b_r(0)[1], b(0+6)[1]);
-    TEST_CHECK_EQUAL(b_r(1)[0], b(1+6)[0]);
-    TEST_CHECK_EQUAL(b_r(1)[1], b(1+6)[1]);
+    {
+      auto vb = b.elements_view_r();
+      auto vb_r = b_r.elements_view_r();
+      TEST_CHECK_EQUAL(vb_r(0)[0], vb(0+6)[0]);
+      TEST_CHECK_EQUAL(vb_r(0)[1], vb(0+6)[1]);
+      TEST_CHECK_EQUAL(vb_r(1)[0], vb(1+6)[0]);
+      TEST_CHECK_EQUAL(vb_r(1)[1], vb(1+6)[1]);
+    }
 
     DenseVectorBlocked<DT_, IT_, 2> c(b.clone());
     TEST_CHECK_EQUAL(c.size(), b.size());
-    //TEST_CHECK_EQUAL(c(7), b(7));
-    auto t1 = c(7);
-    auto t2 = b(7);
-    auto tp1 = b.elements();
-    for (Index i(0) ; i < 2 ; ++i)
     {
-      TEST_CHECK_EQUAL(t1.v[i], t2.v[i]);
-      TEST_CHECK_EQUAL(tp1[7].v[i], t2.v[i]);
+      auto cv = c.elements_view_r()(Index(7));
+      auto bv = b.elements_view_r()(Index(7));
+      for (int i(0) ; i < 2 ; ++i)
+      {
+        TEST_CHECK_EQUAL(cv[i], bv[i]);
+      }
     }
-    TEST_CHECK_LESS_THAN(c.max_rel_diff(b), eps);
+    TEST_CHECK_LESS_THAN(c.max_rel_diff(b), tol);
+
     c.convert(b);
     TEST_CHECK_EQUAL(c.size(), b.size());
-    //TEST_CHECK_EQUAL(c(7), b(7));
-    t1 = c(7);
-    t2 = b(7);
-    for (Index i(0) ; i < 2 ; ++i)
-      TEST_CHECK_EQUAL(t1.v[i], t2.v[i]);
-    TEST_CHECK_LESS_THAN(c.max_rel_diff(b), eps);
+    {
+      auto cv = c.elements_view_r()(Index(7));
+      auto bv = b.elements_view_r()(Index(7));
+      for (int i(0) ; i < 2 ; ++i)
+      {
+        TEST_CHECK_EQUAL(cv[i], bv[i]);
+      }
+    }
+    TEST_CHECK_LESS_THAN(c.max_rel_diff(b), tol);
+
     DenseVectorBlocked<float, unsigned int, 2> d;
     d.convert(c);
     DenseVectorBlocked<float, unsigned int, 2> e;
     e.convert(b);
     TEST_CHECK_EQUAL(e.size(), d.size());
-    //TEST_CHECK_EQUAL(e(7), d(7));
-    t1 = c(7);
-    t2 = b(7);
-    for (Index i(0) ; i < 2 ; ++i)
-      TEST_CHECK_EQUAL(t1.v[i], t2.v[i]);
-    TEST_CHECK_LESS_THAN(e.max_rel_diff(d), float(eps));
+    {
+      auto dv = d.elements_view_r();
+      auto ev = e.elements_view_r();
+      for (int i(0) ; i < 2 ; ++i)
+      {
+        TEST_CHECK_EQUAL(ev(7)[i], dv(7)[i]);
+      }
+    }
+    TEST_CHECK_LESS_THAN(e.max_rel_diff(d), float(tol));
 
     b.clone(a);
-    TEST_CHECK_NOT_EQUAL((void*)b.elements(), (void*)a.elements());
+    TEST_CHECK_NOT_EQUAL(b.elements_arbiter(), a.elements_arbiter());
     c.convert(a);
-    TEST_CHECK_EQUAL((void*)c.elements(), (void*)a.elements());
-    TEST_CHECK_LESS_THAN(b.max_rel_diff(c), eps);
-    Tiny::Vector<DT_, 2> tv2(23);
-    a(3, tv2);
-    TEST_CHECK_LESS_THAN(a.max_rel_diff(c), eps);
-    TEST_CHECK_LESS_THAN(eps, a.max_rel_diff(b));
+    TEST_CHECK_EQUAL(c.elements_arbiter(), a.elements_arbiter());
+    TEST_CHECK_LESS_THAN(b.max_rel_diff(c), tol);
+    a.elements_view_rw()[3] = DT_(23);
+    TEST_CHECK_LESS_THAN(a.max_rel_diff(c), tol);
+    TEST_CHECK_LESS_THAN(tol, a.max_rel_diff(b));
 
     DenseVector<DT_, IT_> dv(12, DT_(2));
-    dv(7, DT_(3));
+    dv.elements_view_rw()[7] = DT_(3);
     DenseVectorBlocked<DT_, IT_, 3> f(dv);
-    auto t3 = f(2);
+    auto t3 = f.elements_view_r()(2);
     TEST_CHECK_EQUAL(t3.v[0], DT_(2));
     TEST_CHECK_EQUAL(t3.v[1], DT_(3));
-    TEST_CHECK_EQUAL((void*)f.elements(), (void*)dv.elements());
+    TEST_CHECK_EQUAL(f.elements_arbiter(), dv.elements_arbiter());
     DenseVector<DT_, IT_> dv2(f);
-    TEST_CHECK_LESS_THAN(dv2.max_rel_diff(dv), eps);
-    TEST_CHECK_EQUAL((void*)dv2.elements(), (void*)dv.elements());
+    TEST_CHECK_LESS_THAN(dv2.max_rel_diff(dv), tol);
+    TEST_CHECK_EQUAL(dv2.elements_arbiter(), dv.elements_arbiter());
 
-    DenseVectorBlocked<DT_, IT_, 3> g(f.size(), f.template elements<Perspective::pod>());
-    TEST_CHECK_LESS_THAN(g.max_rel_diff(f), eps);
-    TEST_CHECK_EQUAL((void*)g.template elements<Perspective::pod>(), (void*)f.template elements<Perspective::pod>());
+    DenseVectorBlocked<DT_, IT_, 3> g(f.size(), f.elements_arbiter().attach());
+    TEST_CHECK_LESS_THAN(g.max_rel_diff(f), tol);
+    TEST_CHECK_EQUAL(g.elements_arbiter(), f.elements_arbiter());
 
     // random constructor check
     DT_ rnd_range[2];
@@ -141,28 +149,192 @@ public:
 
   }
 };
-DenseVectorBlockedTest <float, std::uint32_t> cpu_dv_blocked_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedTest <double, std::uint32_t> cpu_dv_blocked_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedTest <float, std::uint64_t> cpu_dv_blocked_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedTest <double, std::uint64_t> cpu_dv_blocked_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedBasicTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedBasicTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedBasicTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedBasicTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseVectorBlockedTest <float, std::uint64_t> mkl_cpu_dv_blocked_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedTest <double, std::uint64_t> mkl_cpu_dv_blocked_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedBasicTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedBasicTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedTest <__float128, std::uint32_t> cpu_dv_blocked_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedTest <__float128, std::uint64_t> cpu_dv_blocked_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedBasicTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedBasicTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedTest <Half, std::uint32_t> dv_blocked_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedTest <Half, std::uint64_t> dv_blocked_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedBasicTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedBasicTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedTest <float, std::uint32_t> cuda_dv_blocked_test_float_uint32(PreferredBackend::cuda);
-DenseVectorBlockedTest <double, std::uint32_t> cuda_dv_blocked_test_double_uint32(PreferredBackend::cuda);
-DenseVectorBlockedTest <float, std::uint64_t> cuda_dv_blocked_test_float_uint64(PreferredBackend::cuda);
-DenseVectorBlockedTest <double, std::uint64_t> cuda_dv_blocked_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedBasicTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedBasicTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedBasicTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedBasicTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
+
+
+template<
+  typename DT_,
+  typename IT_,
+  int block_size_>
+class DenseVectorBlockedMaxRelDiffTest
+  : public UnitTest
+{
+public:
+  explicit DenseVectorBlockedMaxRelDiffTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedMaxRelDiffTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual void run() const override
+  {
+    const DT_ tol = TestSystem::tol<DT_>();
+
+    for (Index size(12); size < Index(500); size *= 2)
+    {
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> b(size);
+
+      const Index size_raw = a.size_raw();
+      const Index off0 = (3*size_raw) / 8;
+      const Index off1 = (1*size_raw) / 8;
+      const Index off2 = (6*size_raw) / 8;
+
+      // a = i, b = i
+      {
+        Memory::TypedView<DT_> va = a.elements_view_raw_w();
+        Memory::TypedView<DT_> vb = b.elements_view_raw_w();
+        for (Index i(0); i < size_raw; ++i)
+        {
+          va[i] = vb[i] = DT_(int(i) - int(off0)) * DT_(0.123);
+        }
+      }
+
+      // identical vectors, result should be zero
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(b), tol*tol);
+      TEST_CHECK_LESS_THAN(b.max_rel_diff(a), tol*tol);
+
+      // two values close to zero
+      const DT_ delta_a0(Math::sqrt(Math::eps<DT_>()));
+      const DT_ delta_b0(Math::sqr(Math::eps<DT_>()));
+      const DT_ ref0 = (delta_a0 + delta_b0) / (DT_(1) + delta_a0 + delta_b0);
+      a.elements_view_raw_w()[off0] += delta_a0;
+      b.elements_view_raw_w()[off0] -= delta_b0;
+      TEST_CHECK_RELATIVE(a.max_rel_diff(b), ref0, tol);
+      TEST_CHECK_RELATIVE(b.max_rel_diff(a), ref0, tol);
+
+      const DT_ delta1 = DT_(0.17);
+      const DT_ ref1 = delta1 / (DT_(off0 - off1)*DT_(0.246) + delta1 + DT_(1));
+      a.elements_view_raw_w()[off1] -= delta1;
+      TEST_CHECK_RELATIVE(a.max_rel_diff(b), ref1, tol);
+      TEST_CHECK_RELATIVE(b.max_rel_diff(a), ref1, tol);
+
+      const DT_ delta2 = DT_(0.73);
+      const DT_ ref2 = delta2 / (DT_(off2 - off0)*DT_(0.246) + delta2 + DT_(1));
+      b.elements_view_raw_w()[off2] += delta2;
+      TEST_CHECK_RELATIVE(a.max_rel_diff(b), ref2, tol);
+      TEST_CHECK_RELATIVE(b.max_rel_diff(a), ref2, tol);
+    }
+  }
+};
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxRelDiffTest, float, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxRelDiffTest, double, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxRelDiffTest, float, std::uint64_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxRelDiffTest, double, std::uint64_t, 3, PreferredBackend::generic);
+//#ifdef FEAT_HAVE_MKL
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxRelDiffTest, float, std::uint64_t, 2, PreferredBackend::mkl);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxRelDiffTest, double, std::uint64_t, 3, PreferredBackend::mkl);
+//#endif
+#ifdef FEAT_HAVE_QUADMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxRelDiffTest, __float128, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxRelDiffTest, __float128, std::uint64_t, 3, PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxRelDiffTest, Half, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxRelDiffTest, Half, std::uint64_t, 3, PreferredBackend::generic);
+//#ifdef FEAT_HAVE_CUDA
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxRelDiffTest, Half, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxRelDiffTest, Half, std::uint64_t, 3, PreferredBackend::cuda);
+//#endif
+#endif
+//#ifdef FEAT_HAVE_CUDA
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxRelDiffTest, float, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxRelDiffTest, double, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxRelDiffTest, float, std::uint64_t, 3, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxRelDiffTest, double, std::uint64_t, 3, PreferredBackend::cuda);
+//#endif
+
+template<
+  typename DT_,
+  typename IT_,
+  int block_size_>
+class DenseVectorBlockedSameLayoutTest
+  : public UnitTest
+{
+public:
+  explicit DenseVectorBlockedSameLayoutTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedSameLayoutTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual void run() const override
+  {
+    const Index size = 72;
+
+    DenseVectorBlocked<DT_, IT_, block_size_> a(size, DT_(0));
+
+    // weak copy
+    DenseVectorBlocked<DT_, IT_, block_size_> b = a.clone(CloneMode::Weak);
+    TEST_CHECK(a.same_layout(b));
+
+    // shallow copy
+    DenseVectorBlocked<DT_, IT_, block_size_> c = a.clone(CloneMode::Shallow);
+    TEST_CHECK(a.same_layout(c));
+
+    // same size
+    DenseVectorBlocked<DT_, IT_, block_size_> d(size, DT_(0));
+    TEST_CHECK(a.same_layout(d));
+
+    // different size
+    DenseVectorBlocked<DT_, IT_, block_size_> e(size + 2, DT_(0));
+    TEST_CHECK(!a.same_layout(e));
+
+    // empty vector
+    d.clear();
+    TEST_CHECK(!a.same_layout(d));
+
+    // two empty vectors
+    e.clear();
+    TEST_CHECK(e.same_layout(d));
+  }
+};
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedSameLayoutTest, float, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedSameLayoutTest, double, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedSameLayoutTest, float, std::uint64_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedSameLayoutTest, double, std::uint64_t, 3, PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedSameLayoutTest, float, std::uint64_t, 2, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedSameLayoutTest, double, std::uint64_t, 3, PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedSameLayoutTest, __float128, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedSameLayoutTest, __float128, std::uint64_t, 3, PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedSameLayoutTest, Half, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedSameLayoutTest, Half, std::uint64_t, 3, PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedSameLayoutTest, Half, std::uint32_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedSameLayoutTest, Half, std::uint64_t, 3, PreferredBackend::cuda);
+#endif
+#endif
+#ifdef FEAT_HAVE_CUDA
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedSameLayoutTest, float, std::uint32_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedSameLayoutTest, double, std::uint32_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedSameLayoutTest, float, std::uint64_t, 3, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedSameLayoutTest, double, std::uint64_t, 3, PreferredBackend::cuda);
+#endif
+
 
 template<
   typename DT_,
@@ -171,93 +343,85 @@ class DenseVectorBlockedSerializeTest
   : public UnitTest
 {
 public:
-  DenseVectorBlockedSerializeTest(PreferredBackend backend)
+  explicit DenseVectorBlockedSerializeTest(PreferredBackend backend)
     : UnitTest("DenseVectorBlockedSerializeTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseVectorBlockedSerializeTest()
   {
   }
 
   virtual void run() const override
   {
-    DT_ eps = TestSystem::tol<DT_>();
-    DenseVector<DT_, IT_> dv(12, DT_(2));
-    dv(7, DT_(3));
-    DenseVectorBlocked<DT_, IT_, 3> g(dv);
+    const DT_ tol = TestSystem::tol<DT_>();
 
-    std::stringstream mts;
-    g.write_out(FileMode::fm_mtx, mts);
-    DenseVectorBlocked<DT_, IT_, 3> l(FileMode::fm_mtx, mts);
-    TEST_CHECK_LESS_THAN(l.max_rel_diff(g), eps);
-    //for (Index i(0) ; i < g.template size<Perspective::pod>() ; ++i)
-    //  TEST_CHECK_EQUAL_WITHIN_EPS(l.template elements<Perspective::pod>()[i], g.template elements<Perspective::pod>()[i], DT_(1e-4));
+    const Index io_vector_size = 16*3*5*7;
 
-    std::stringstream ts;
-    g.write_out(FileMode::fm_exp, ts);
-    DenseVectorBlocked<DT_, IT_, 3> m(FileMode::fm_exp, ts);
-    TEST_CHECK_LESS_THAN(m.max_rel_diff(g), eps);
-    //for (Index i(0) ; i < k.size() ; ++i)
-    //  TEST_CHECK_EQUAL_WITHIN_EPS(m(i), k(i), DT_(1e-4));
-
-    BinaryStream bs;
-    g.write_out(FileMode::fm_dvb, bs);
-    bs.seekg(0);
-    DenseVectorBlocked<DT_, IT_, 3> n(FileMode::fm_dvb, bs);
-    TEST_CHECK_LESS_THAN(n.max_rel_diff(g), eps);
-    //for (Index i(0) ; i < k.size() ; ++i)
-    //  TEST_CHECK_EQUAL_WITHIN_EPS(n(i), k(i), DT_(1e-5));
-
-    DenseVector<DT_,IT_> zfp_tester(20);
-    for(Index i(0); i < zfp_tester.size() ; ++i)
+    DenseVector<DT_, IT_> k(io_vector_size);
     {
-      zfp_tester(i, DT_(7)/(((DT_(i)+DT_(0.5))*DT_(i+1))));
+      Memory::TypedView<DT_> vk = k.elements_view_w();
+      for (Index i(0) ; i < k.size() ; ++i)
+        vk[i] = DT_(i) / DT_(12);
     }
-    DenseVectorBlocked<DT_, IT_, 5> tester_blocked(zfp_tester);
-    auto op = g.serialize(LAFEM::SerialConfig(false, false));
-    DenseVectorBlocked<DT_, IT_, 3> o(op);
-    TEST_CHECK_LESS_THAN(o.max_rel_diff(g), eps);
+    DenseVectorBlocked<DT_, IT_, 3> g(k);
+
+    {
+      std::stringstream ioss;
+      g.write_out(FileMode::fm_mtx, ioss);
+      DenseVectorBlocked<DT_, IT_, 3> l(FileMode::fm_mtx, ioss);
+      TEST_CHECK_LESS_THAN(l.max_rel_diff(g), tol);
+    }
+
+    {
+      std::stringstream ioss;
+      g.write_out(FileMode::fm_exp, ioss);
+      DenseVectorBlocked<DT_, IT_, 3> m(FileMode::fm_exp, ioss);
+      TEST_CHECK_LESS_THAN(m.max_rel_diff(g), tol);
+    }
+
+    {
+      BinaryStream bs;
+      g.write_out(FileMode::fm_dvb, bs);
+      bs.seekg(0);
+      DenseVectorBlocked<DT_, IT_, 3> n(FileMode::fm_dvb, bs);
+      TEST_CHECK_LESS_THAN(n.max_rel_diff(g), tol);
+    }
+
+    {
 #ifdef FEAT_HAVE_ZLIB
-    auto zb = tester_blocked.serialize(LAFEM::SerialConfig(true,false));
-    DenseVectorBlocked<DT_, IT_, 5> zlib(zb);
-    TEST_CHECK_LESS_THAN(zlib.max_rel_diff(tester_blocked), eps);
+      auto zb = g.serialize(LAFEM::SerialConfig(true,false));
+      DenseVectorBlocked<DT_, IT_, 3> z(zb);
+      TEST_CHECK_LESS_THAN(z.max_rel_diff(g), tol);
 #endif
-#if defined FEAT_HAVE_ZFP && !defined FEAT_HAVE_HALFMATH
-    auto zp = tester_blocked.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
-    DenseVectorBlocked<DT_, IT_, 5> zfp(zp);
-    for (Index i(0) ; i < tester_blocked.size() ; ++i)
-    {
-      auto tst = zfp(i);
-      for(int j(0) ; j < tst.n ; ++j)
-      {
-        TEST_CHECK_EQUAL_WITHIN_EPS(tst[j], tester_blocked(i)[j], DT_(1e-5));
-      }
     }
+
+    {
+#ifdef FEAT_HAVE_ZFP
+      auto zp = g.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-5)));
+      DenseVectorBlocked<DT_, IT_, 3> y(zp);
+      TEST_CHECK_LESS_THAN(y.max_rel_diff(g), DT_(2e-5));
 #endif
+    }
   }
 };
-DenseVectorBlockedSerializeTest <float, std::uint32_t> cpu_dense_vector_blocked_serialize_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedSerializeTest <double, std::uint32_t> cpu_dense_vector_blocked_serialize_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedSerializeTest <float, std::uint64_t> cpu_dense_vector_blocked_serialize_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedSerializeTest <double, std::uint64_t> cpu_dense_vector_blocked_serialize_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedSerializeTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedSerializeTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedSerializeTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedSerializeTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseVectorBlockedSerializeTest <float, std::uint64_t> mkl_cpu_dense_vector_blocked_serialize_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedSerializeTest <double, std::uint64_t> mkl_cpu_dense_vector_blocked_serialize_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedSerializeTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedSerializeTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 //#ifdef FEAT_HAVE_QUADMATH
-//DenseVectorBlockedSerializeTest <__float128, std::uint32_t> cpu_dense_vector_blocked_serialize_test_float128_uint32(PreferredBackend::generic);
-//DenseVectorBlockedSerializeTest <__float128, std::uint64_t> cpu_dense_vector_blocked_serialize_test_float128_uint64(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedSerializeTest, __float128, std::uint32_t, PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedSerializeTest, __float128, std::uint64_t, PreferredBackend::generic);
 //#endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedSerializeTest <Half, std::uint32_t> dv_blocked_serialize_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedSerializeTest <Half, std::uint64_t> dv_blocked_serialize_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedSerializeTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedSerializeTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedSerializeTest <float, std::uint32_t> cuda_dense_vector_blocked_serialize_test_float_uint32(PreferredBackend::cuda);
-DenseVectorBlockedSerializeTest <double, std::uint32_t> cuda_dense_vector_blocked_serialize_test_double_uint32(PreferredBackend::cuda);
-DenseVectorBlockedSerializeTest <float, std::uint64_t> cuda_dense_vector_blocked_serialize_test_float_uint64(PreferredBackend::cuda);
-DenseVectorBlockedSerializeTest <double, std::uint64_t> cuda_dense_vector_blocked_serialize_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedSerializeTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedSerializeTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedSerializeTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseVectorBlockedSerializeTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
@@ -268,106 +432,166 @@ class DenseVectorBlockedAxpyTest
   : public UnitTest
 {
 public:
-  DenseVectorBlockedAxpyTest(PreferredBackend backend)
+  explicit DenseVectorBlockedAxpyTest(PreferredBackend backend)
     : UnitTest("DenseVectorBlockedAxpyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseVectorBlockedAxpyTest()
   {
   }
 
   virtual void run() const override
   {
-    DT_ eps = TestSystem::tol<DT_>();
+    const DT_ tol = TestSystem::tol<DT_>();
+
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
+
     DT_ s(DT_(0.4711));
-    Tiny::Vector<DT_, block_size_> bs;
+    ValueType bs;
     for(int j(0); j < block_size_; ++j)
       bs[j] = s + DT_(j);
 
-    for (Index size(1) ; size < Index(1e3) ; size*=2)
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
     {
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
       DenseVectorBlocked<DT_, IT_, block_size_> b(size);
-      DenseVectorBlocked<DT_, IT_, block_size_> ref(size);
-      DenseVectorBlocked<DT_, IT_, block_size_> ref2(size);
-      DenseVectorBlocked<DT_, IT_, block_size_> ref_bs(size);
-      DenseVectorBlocked<DT_, IT_, block_size_> ref_bs2(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> ref_a(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> ref_b(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> ref_c(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> ref_d(size);
 
-      for (Index i(0) ; i < size ; ++i)
       {
-        Tiny::Vector<DT_, block_size_> tv1;
-        for (Index j(0) ; j < block_size_ ; ++j)
-          tv1.v[j] = DT_(i % 100) * DT_(1.234) + DT_(j);
-        a(i, tv1);
-        Tiny::Vector<DT_, block_size_> tv2;
-        for (Index j(0) ; j < block_size_ ; ++j)
-          tv2.v[j] = DT_(2) + DT_(i % (42 + j));
-        b(i, tv2);
-        ref(i, s * a(i) + b(i));
-        ref2(i, s * b(i) + b(i));
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        Memory::TypedView<ValueType> vb(b.elements_view_w());
+        Memory::TypedView<ValueType> vref_a(ref_a.elements_view_w());
+        Memory::TypedView<ValueType> vref_b(ref_b.elements_view_w());
 
-        ref_bs(i, Tiny::component_product(bs, b(i)) + ref(i));
-        ref_bs2(i, Tiny::component_product(bs, ref2(i)) + ref2(i));
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+          {
+            va[i][j] = DT_(i % 100) * DT_(1.234) + DT_(j);
+            vb[i][j] = DT_(2) + DT_(i % Index(42 + j));
+          }
+
+          vref_a[i] = s * va(i) + vb(i);
+          vref_b[i] = s * vb(i) + vb(i);
+        }
       }
-
-      DenseVectorBlocked<DT_, IT_, block_size_> c(size);
-      DenseVectorBlocked<DT_, IT_, block_size_> d(size);
-      c.copy(a);
-      d.copy(b);
 
       // r != x
       a.scale(a, s);
       a.axpy(b); /// \todo use axpby here
-      for (Index i(0) ; i < size ; ++i)
-        for (Index j(0) ; j < block_size_ ; ++j)
-          TEST_CHECK_RELATIVE(a(i).v[j], ref(i).v[j], eps);
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref_a), tol);
 
       // r == x
       b.axpy(b, s);
-      for (Index i(0) ; i < size ; ++i)
-        for (Index j(0) ; j < block_size_ ; ++j)
-          TEST_CHECK_RELATIVE(b(i).v[j], ref2(i).v[j], eps);
-
-      // r != x
-      c.scale(c, s);
-      c.axpy(d);
-      c.axpy_blocked(d, bs);
-      for (Index i(0) ; i < size ; ++i)
-        for (Index j(0) ; j < block_size_ ; ++j)
-          TEST_CHECK_RELATIVE(c(i).v[j], ref_bs(i).v[j], eps);
-
-      // r == x
-      d.axpy(d, s);
-      d.axpy_blocked(d, bs);
-      for (Index i(0) ; i < size ; ++i)
-        for (Index j(0) ; j < block_size_ ; ++j)
-          TEST_CHECK_RELATIVE(d(i).v[j], ref_bs2(i).v[j], eps);
+      TEST_CHECK_LESS_THAN(b.max_rel_diff(ref_b), tol);
     }
   }
 };
-DenseVectorBlockedAxpyTest <float, std::uint32_t, 2> dv_axpy_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedAxpyTest <double, std::uint32_t, 2> dv_axpy_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedAxpyTest <float, std::uint64_t, 3> dv_axpy_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedAxpyTest <double, std::uint64_t, 3> dv_axpy_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyTest, float, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyTest, double, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyTest, float, std::uint64_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyTest, double, std::uint64_t, 3, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseVectorBlockedAxpyTest <float, std::uint64_t, 2> mkl_cpu_dense_vector_blocked_axpy_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedAxpyTest <double, std::uint64_t, 3> mkl_cpu_dense_vector_blocked_axpy_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyTest, float, std::uint64_t, 2, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyTest, double, std::uint64_t, 3, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedAxpyTest <__float128, std::uint32_t, 2> dv_axpy_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedAxpyTest <__float128, std::uint64_t, 3> dv_axpy_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyTest, __float128, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyTest, __float128, std::uint64_t, 3, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedAxpyTest <Half, std::uint32_t, 2> dv_blocked_axpy_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedAxpyTest <Half, std::uint64_t, 3> dv_blocked_axpy_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyTest, Half, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyTest, Half, std::uint64_t, 3, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedAxpyTest <float, std::uint32_t, 2> cuda_dv_axpy_test_float_uint32(PreferredBackend::cuda);
-DenseVectorBlockedAxpyTest <double, std::uint32_t, 2> cuda_dv_axpy_test_double_uint32(PreferredBackend::cuda);
-DenseVectorBlockedAxpyTest <float, std::uint64_t, 3> cuda_dv_axpy_test_float_uint64(PreferredBackend::cuda);
-DenseVectorBlockedAxpyTest <double, std::uint64_t, 3> cuda_dv_axpy_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyTest, float, std::uint32_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyTest, double, std::uint32_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyTest, float, std::uint64_t, 3, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyTest, double, std::uint64_t, 3, PreferredBackend::cuda);
 #endif
+
+template<
+  typename DT_,
+  typename IT_,
+  int block_size_>
+class DenseVectorBlockedAxpyBlockedTest
+  : public UnitTest
+{
+public:
+  explicit DenseVectorBlockedAxpyBlockedTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedAxpyBlockedTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual void run() const override
+  {
+    const DT_ tol = TestSystem::tol<DT_>();
+
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
+
+    DT_ s(DT_(0.4711));
+    ValueType bs;
+    for(int j(0); j < block_size_; ++j)
+      bs[j] = s + DT_(j);
+
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
+    {
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> b(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> ref_a(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> ref_b(size);
+
+      {
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        Memory::TypedView<ValueType> vb(b.elements_view_w());
+        Memory::TypedView<ValueType> vref_a(ref_a.elements_view_w());
+        Memory::TypedView<ValueType> vref_b(ref_b.elements_view_w());
+
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+          {
+            va[i][j] = DT_(i % 100) * DT_(1.234) + DT_(j);
+            vb[i][j] = DT_(2) + DT_(i % Index(42 + j));
+            vref_a[i][j] = va[i][j] * (DT_(1) + bs[j]);
+            vref_b[i][j] = vb[i][j] + bs[j] * va[i][j];
+          }
+        }
+      }
+
+      // r != x
+      b.axpy_blocked(a, bs);
+      TEST_CHECK_LESS_THAN(b.max_rel_diff(ref_b), tol);
+
+      // r == x
+      a.axpy_blocked(a, bs);
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref_a), tol);
+    }
+  }
+};
+
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyBlockedTest, float, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyBlockedTest, double, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyBlockedTest, float, std::uint64_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyBlockedTest, double, std::uint64_t, 3, PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyBlockedTest, float, std::uint64_t, 2, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyBlockedTest, double, std::uint64_t, 3, PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyBlockedTest, __float128, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyBlockedTest, __float128, std::uint64_t, 3, PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyBlockedTest, Half, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyBlockedTest, Half, std::uint64_t, 3, PreferredBackend::generic);
+#endif
+//#ifdef FEAT_HAVE_CUDA
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyBlockedTest, float, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyBlockedTest, double, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyBlockedTest, float, std::uint64_t, 3, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedAxpyBlockedTest, double, std::uint64_t, 3, PreferredBackend::cuda);
+//#endif
 
 template<
   typename DT_,
@@ -377,41 +601,114 @@ class DenseVectorBlockedDotTest
   : public UnitTest
 {
 public:
-  DenseVectorBlockedDotTest(PreferredBackend backend)
+  explicit DenseVectorBlockedDotTest(PreferredBackend backend)
     : UnitTest("DenseVectorBlockedDotTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseVectorBlockedDotTest()
   {
   }
 
   virtual void run() const override
   {
-    const DT_ eps = TestSystem::tol<DT_>();
+    const DT_ tol = TestSystem::tol<DT_>();
 
-    for (Index size(1) ; size < Index(1e3) ; size*=2)
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
+
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
     {
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
       DenseVectorBlocked<DT_, IT_, block_size_> a2(size);
       DenseVectorBlocked<DT_, IT_, block_size_> b(size);
       const DT_ den(DT_(1) / DT_(size * block_size_));
-      for (Index i(0) ; i < size ; ++i)
-      {
-        Tiny::Vector<DT_, block_size_> tv1;
-        Tiny::Vector<DT_, block_size_> tv3;
-        for (int j(0) ; j < block_size_ ; ++j)
-        {
-          tv1.v[j] = (DT_(i) * DT_(block_size_) + DT_(j + 1)) * den;
-          tv3.v[j] = Math::sqrt(DT_(i))*DT_(j);
-        }
-        a(i, tv1);
-        a2(i, tv3);
 
-        Tiny::Vector<DT_, block_size_> tv2;
-        for (Index j(0) ; j < block_size_ ; ++j)
-          tv2.v[j] = DT_(1) / DT_(i * block_size_ + j + 1);
-        b(i, tv2);
+      {
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        Memory::TypedView<ValueType> va2(a2.elements_view_w());
+        Memory::TypedView<ValueType> vb(b.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+          {
+            va[i][j] = (DT_(i) * DT_(block_size_) + DT_(j + 1)) * den;
+            va2[i][j] = Math::sqrt(DT_(i))*DT_(j);
+            vb[i][j] = DT_(1) / DT_(int(i) * block_size_ + j + 1);
+          }
+        }
+      }
+
+      // a*b = 1
+      DT_ ref(DT_(1));
+      DT_ c  = a.dot(b);
+      TEST_CHECK_RELATIVE(c, ref, tol);
+      c = b.dot(a);
+      TEST_CHECK_RELATIVE(c, ref, tol);
+      c = b.dot(b);
+      ref = b.norm2();
+      ref *= ref;
+      TEST_CHECK_RELATIVE(c, ref, tol);
+    }
+  }
+};
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotTest, float, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotTest, double, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotTest, float, std::uint64_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotTest, double, std::uint64_t, 2, PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotTest, float, std::uint64_t, 3, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotTest, double, std::uint64_t, 2, PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotTest, __float128, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotTest, __float128, std::uint64_t, 2, PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotTest, Half, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotTest, Half, std::uint64_t, 2, PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotTest, float, std::uint32_t, 3, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotTest, double, std::uint32_t, 3, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotTest, float, std::uint64_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotTest, double, std::uint64_t, 2, PreferredBackend::cuda);
+#endif
+
+template<
+  typename DT_,
+  typename IT_,
+  int block_size_>
+class DenseVectorBlockedDotBlockedTest
+  : public UnitTest
+{
+public:
+  explicit DenseVectorBlockedDotBlockedTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedDotBlockedTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual void run() const override
+  {
+    const DT_ tol = TestSystem::tol<DT_>();
+
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
+
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
+    {
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> a2(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> b(size);
+      const DT_ den(DT_(1) / DT_(size * block_size_));
+
+      {
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        Memory::TypedView<ValueType> va2(a2.elements_view_w());
+        Memory::TypedView<ValueType> vb(b.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+          {
+            va[i][j] = (DT_(i) * DT_(block_size_) + DT_(j + 1)) * den;
+            va2[i][j] = Math::sqrt(DT_(i))*DT_(j);
+            vb[i][j] = DT_(1) / DT_(int(i) * block_size_ + j + 1);
+          }
+        }
       }
 
       Tiny::Vector<DT_, block_size_> d(a.dot_blocked(b));
@@ -420,57 +717,43 @@ public:
 
       Tiny::Vector<DT_, block_size_> ref_bs;
       Tiny::Vector<DT_, block_size_> ref2_bs;
-      for (Index j(0) ; j < block_size_ ; ++j)
+      for (int j(0) ; j < block_size_ ; ++j)
       {
         ref_bs.v[j] = DT_(size)/DT_(size*block_size_);
         ref2_bs.v[j] = DT_(j*j)*(DT_(size*size)-DT_(size))/DT_(2);
       }
 
-      for (Index j(0) ; j < block_size_ ; ++j)
+      for (int j(0) ; j < block_size_ ; ++j)
       {
-       TEST_CHECK_RELATIVE(d.v[j], ref_bs.v[j], eps);
-       TEST_CHECK_RELATIVE(e.v[j], ref_bs.v[j], eps);
-       TEST_CHECK_RELATIVE(f.v[j], ref2_bs.v[j], eps);
+        TEST_CHECK_RELATIVE(d.v[j], ref_bs.v[j], tol);
+        TEST_CHECK_RELATIVE(e.v[j], ref_bs.v[j], tol);
+        TEST_CHECK_RELATIVE(f.v[j], ref2_bs.v[j], tol);
       }
-
-      // a*b = 1
-      DT_ ref(DT_(1));
-      DT_ c  = a.dot(b);
-      TEST_CHECK_RELATIVE(c, ref, eps);
-      c = b.dot(a);
-      TEST_CHECK_RELATIVE(c, ref, eps);
-      c = b.dot(b);
-      ref = b.norm2();
-      ref *= ref;
-      TEST_CHECK_RELATIVE(c, ref, eps);
-
     }
   }
 };
-DenseVectorBlockedDotTest <float, std::uint32_t, 3> dv_dot_product_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedDotTest <double, std::uint32_t, 3> dv_dot_product_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedDotTest <float, std::uint64_t, 2> dv_dot_product_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedDotTest <double, std::uint64_t, 2> dv_dot_product_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotBlockedTest, float, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotBlockedTest, double, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotBlockedTest, float, std::uint64_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotBlockedTest, double, std::uint64_t, 2, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseVectorBlockedDotTest <float, std::uint64_t, 3> mkl_cpu_dense_vector_blocked_dot_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedDotTest <double, std::uint64_t, 2> mkl_cpu_dense_vector_blocked_dot_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotBlockedTest, float, std::uint64_t, 3, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotBlockedTest, double, std::uint64_t, 2, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedDotTest <__float128, std::uint32_t, 3> dv_dot_product_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedDotTest <__float128, std::uint64_t, 2> dv_dot_product_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotBlockedTest, __float128, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotBlockedTest, __float128, std::uint64_t, 2, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-// Disabled because half-precision can not reach eps
-//DenseVectorBlockedDotTest <Half, std::uint32_t,3 > dv_blocked_dot_product_test_half_uint32(PreferredBackend::generic);
-// Disabled because half-precision overflows
-//DenseVectorBlockedDotTest <Half, std::uint64_t, 2> dv_blocked_dot_product_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotBlockedTest, Half, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotBlockedTest, Half, std::uint64_t, 2, PreferredBackend::generic);
 #endif
-#ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedDotTest <float, std::uint32_t, 3> cuda_dv_dot_product_test_float_uint32(PreferredBackend::cuda);
-DenseVectorBlockedDotTest <double, std::uint32_t, 3> cuda_dv_dot_product_test_double_uint32(PreferredBackend::cuda);
-DenseVectorBlockedDotTest <float, std::uint64_t, 2> cuda_dv_dot_product_test_float_uint64(PreferredBackend::cuda);
-DenseVectorBlockedDotTest <double, std::uint64_t, 2> cuda_dv_dot_product_test_double_uint64(PreferredBackend::cuda);
-#endif
+//#ifdef FEAT_HAVE_CUDA
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotBlockedTest, float, std::uint32_t, 3, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotBlockedTest, double, std::uint32_t, 3, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotBlockedTest, float, std::uint64_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedDotBlockedTest, double, std::uint64_t, 2, PreferredBackend::cuda);
+//#endif
 
 template<
   typename DT_,
@@ -480,54 +763,37 @@ class DenseVectorBlockedTripleDotTest
   : public UnitTest
 {
 public:
-  DenseVectorBlockedTripleDotTest(PreferredBackend backend)
+  explicit DenseVectorBlockedTripleDotTest(PreferredBackend backend)
     : UnitTest("DenseVectorBlockedTripleDotTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseVectorBlockedTripleDotTest()
   {
   }
 
   virtual void run() const override
   {
-    const DT_ eps = TestSystem::tol<DT_>();
+    const DT_ tol = TestSystem::tol<DT_>();
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
 
-    for (Index size(1) ; size < Index(1e3) ; size*=2)
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
     {
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
       DenseVectorBlocked<DT_, IT_, block_size_> b(size);
       DenseVectorBlocked<DT_, IT_, block_size_> c(size);
       Tiny::Vector<DT_, block_size_> ref_bs(0);
       const DT_ den(DT_(1) / DT_(size * block_size_));
-      for (Index i(0) ; i < size ; ++i)
+
       {
-        Tiny::Vector<DT_, block_size_> tv1;
-        for (Index j(0) ; j < block_size_ ; ++j)
-          tv1.v[j] = DT_(i * block_size_ + j + 1) * den;
-        a(i, tv1);
-        Tiny::Vector<DT_, block_size_> tv2;
-        for (Index j(0) ; j < block_size_ ; ++j)
-          tv2.v[j] = DT_(1) / DT_(i * block_size_ + j + 1);
-        b(i, tv2);
-        Tiny::Vector<DT_, block_size_> tv3;
-        for (Index j(0) ; j < block_size_ ; ++j)
-          tv3.v[j] =  DT_(i * block_size_ + j + 1);
-        c(i, tv3);
-      }
-
-      for(int j(0); j<block_size_; ++j)
-        ref_bs.v[j] = DT_(size-1)/DT_(2)+DT_(j+1)/DT_(block_size_);
-
-      Tiny::Vector<DT_, block_size_> d(a.triple_dot_blocked(b, c));
-      Tiny::Vector<DT_, block_size_> e(b.triple_dot_blocked(a, c));
-      Tiny::Vector<DT_, block_size_> f(c.triple_dot_blocked(a, b));
-
-      for(int j(0); j<block_size_; ++j)
-      {
-        TEST_CHECK_RELATIVE(d.v[j], ref_bs.v[j], eps);
-        TEST_CHECK_RELATIVE(e.v[j], ref_bs.v[j], eps);
-        TEST_CHECK_RELATIVE(f.v[j], ref_bs.v[j], eps);
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        Memory::TypedView<ValueType> vb(b.elements_view_w());
+        Memory::TypedView<ValueType> vc(c.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+          {
+            va[i][j] = DT_(int(i) * block_size_ + j + 1) * den;
+            vb[i][j] = DT_(1) / DT_(int(i) * block_size_ + j + 1);
+            vc[i][j] =  DT_(int(i) * block_size_ + j + 1);
+          }
+        }
       }
 
       DenseVector<DT_, IT_> ref_a;
@@ -539,38 +805,116 @@ public:
 
       DT_ ref(ref_a.triple_dot(ref_b, ref_c));
       DT_ res  = a.triple_dot(b, c);
-      TEST_CHECK_RELATIVE(res, ref, eps);
+      TEST_CHECK_RELATIVE(res, ref, tol);
       res = b.triple_dot(a, c);
-      TEST_CHECK_RELATIVE(res, ref, eps);
+      TEST_CHECK_RELATIVE(res, ref, tol);
       res = c.triple_dot(b, a);
-      TEST_CHECK_RELATIVE(res, ref, eps);
+      TEST_CHECK_RELATIVE(res, ref, tol);
     }
   }
 };
-DenseVectorBlockedTripleDotTest <float, std::uint32_t, 3> dv_triple_dot_product_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedTripleDotTest <double, std::uint32_t, 3> dv_triple_dot_product_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedTripleDotTest <float, std::uint64_t, 2> dv_triple_dot_product_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedTripleDotTest <double, std::uint64_t, 2> dv_triple_dot_product_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotTest, float, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotTest, double, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotTest, float, std::uint64_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotTest, double, std::uint64_t, 2, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseVectorBlockedTripleDotTest <float, std::uint64_t,3 > mkl_dv_blocked_triple_dot_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedTripleDotTest <double, std::uint64_t, 2> mkl_dv_blocked_triple_dot_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotTest, float, std::uint64_t, 3, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotTest, double, std::uint64_t, 2, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedTripleDotTest <__float128, std::uint32_t, 3> dv_triple_dot_product_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedTripleDotTest <__float128, std::uint64_t, 2> dv_triple_dot_product_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotTest, __float128, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotTest, __float128, std::uint64_t, 2, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-// Disabled because half-precision can not reach eps
-//DenseVectorBlockedTripleDotTest <Half, std::uint32_t, 3> dv_blocked_triple_dot_product_test_half_uint32(PreferredBackend::generic);
-// Disabled because half-precision can not reach eps
-//DenseVectorBlockedTripleDotTest <Half, std::uint64_t, 2> dv_blocked_triple_dot_product_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotTest, Half, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotTest, Half, std::uint64_t, 2, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedTripleDotTest <float, std::uint32_t, 3> cuda_dv_triple_dot_product_test_float_uint32(PreferredBackend::cuda);
-DenseVectorBlockedTripleDotTest <double, std::uint32_t, 3> cuda_dv_triple_dot_product_test_double_uint32(PreferredBackend::cuda);
-DenseVectorBlockedTripleDotTest <float, std::uint64_t, 2> cuda_dv_triple_dot_product_test_float_uint64(PreferredBackend::cuda);
-DenseVectorBlockedTripleDotTest <double, std::uint64_t, 2> cuda_dv_triple_dot_product_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotTest, float, std::uint32_t, 3, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotTest, double, std::uint32_t, 3, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotTest, float, std::uint64_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotTest, double, std::uint64_t, 2, PreferredBackend::cuda);
 #endif
+
+template<
+  typename DT_,
+  typename IT_,
+  int block_size_>
+class DenseVectorBlockedTripleDotBlockedTest
+  : public UnitTest
+{
+public:
+  explicit DenseVectorBlockedTripleDotBlockedTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedTripleDotBlockedTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual void run() const override
+  {
+    const DT_ tol = TestSystem::tol<DT_>();
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
+
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
+    {
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> b(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> c(size);
+      Tiny::Vector<DT_, block_size_> ref_bs(0);
+      const DT_ den(DT_(1) / DT_(size * block_size_));
+
+      {
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        Memory::TypedView<ValueType> vb(b.elements_view_w());
+        Memory::TypedView<ValueType> vc(c.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+          {
+            va[i][j] = DT_(int(i) * block_size_ + j + 1) * den;
+            vb[i][j] = DT_(1) / DT_(int(i) * block_size_ + j + 1);
+            vc[i][j] =  DT_(int(i) * block_size_ + j + 1);
+          }
+        }
+      }
+
+      for(int j(0); j<block_size_; ++j)
+        ref_bs.v[j] = DT_(size-1)/DT_(2)+DT_(j+1)/DT_(block_size_);
+
+      Tiny::Vector<DT_, block_size_> d(a.triple_dot_blocked(b, c));
+      Tiny::Vector<DT_, block_size_> e(b.triple_dot_blocked(a, c));
+      Tiny::Vector<DT_, block_size_> f(c.triple_dot_blocked(a, b));
+
+      for(int j(0); j < block_size_; ++j)
+      {
+        TEST_CHECK_RELATIVE(d.v[j], ref_bs.v[j], tol);
+        TEST_CHECK_RELATIVE(e.v[j], ref_bs.v[j], tol);
+        TEST_CHECK_RELATIVE(f.v[j], ref_bs.v[j], tol);
+      }
+    }
+  }
+};
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotBlockedTest, float, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotBlockedTest, double, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotBlockedTest, float, std::uint64_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotBlockedTest, double, std::uint64_t, 2, PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotBlockedTest, float, std::uint64_t, 3, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotBlockedTest, double, std::uint64_t, 2, PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotBlockedTest, __float128, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotBlockedTest, __float128, std::uint64_t, 2, PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotBlockedTest, Half, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotBlockedTest, Half, std::uint64_t, 2, PreferredBackend::generic);
+#endif
+//#ifdef FEAT_HAVE_CUDA
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotBlockedTest, float, std::uint32_t, 3, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotBlockedTest, double, std::uint32_t, 3, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotBlockedTest, float, std::uint64_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedTripleDotBlockedTest, double, std::uint64_t, 2, PreferredBackend::cuda);
+//#endif
 
 template<
   typename DT_,
@@ -580,94 +924,80 @@ class DenseVectorBlockedComponentProductTest
   : public UnitTest
 {
 public:
-  DenseVectorBlockedComponentProductTest(PreferredBackend backend)
+  explicit DenseVectorBlockedComponentProductTest(PreferredBackend backend)
     : UnitTest("DenseVectorBlockedComponentProductTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseVectorBlockedComponentProductTest()
   {
   }
 
   virtual void run() const override
   {
-    for (Index size(1) ; size < Index(1e3) ; size*=2)
-    {
-      DT_ eps = TestSystem::tol<DT_>();
+    const DT_ tol = TestSystem::tol<DT_>();
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
 
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
+    {
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
       DenseVectorBlocked<DT_, IT_, block_size_> b(size);
       DenseVectorBlocked<DT_, IT_, block_size_> ref(size);
       DenseVectorBlocked<DT_, IT_, block_size_> ref2(size);
 
-      for (Index i(0) ; i < size ; ++i)
       {
-        Tiny::Vector<DT_, block_size_> tv1;
-        for (Index j(0) ; j < block_size_ ; ++j)
-          tv1.v[j] = DT_((DT_(j) + DT_(i)) * DT_(1.234) / DT_(size));
-        a(i, tv1);
-        Tiny::Vector<DT_, block_size_> tv2;
-        for (Index j(0) ; j < block_size_ ; ++j)
-          tv2.v[j] = DT_(size*2*block_size_ - i + 2*j);
-        b(i, tv2);
-        ref(i, component_product(a(i), b(i)) );
-        ref2(i, component_product(a(i), a(i)) );
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        Memory::TypedView<ValueType> vb(b.elements_view_w());
+        Memory::TypedView<ValueType> vref(ref.elements_view_w());
+        Memory::TypedView<ValueType> vref2(ref2.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+          {
+            va[i][j] = DT_((DT_(j) + DT_(i)) * DT_(1.234) / DT_(size));
+            vb[i][j] = DT_(int(size)*2*block_size_ - int(i) + 2*j);
+          }
+          vref[i] = Tiny::component_product(va(i), vb(i));
+          vref2[i] = Tiny::component_product(va(i), va(i));
+        }
       }
 
-      DenseVectorBlocked<DT_, IT_, block_size_> a_tmp(size);
-      a_tmp.copy(a);
-      DenseVectorBlocked<DT_, IT_, block_size_> b_tmp(size);
-      b_tmp.copy(b);
+      DenseVectorBlocked<DT_, IT_, block_size_> a_tmp(a.clone());
+      DenseVectorBlocked<DT_, IT_, block_size_> b_tmp(b.clone());
       DenseVectorBlocked<DT_, IT_, block_size_> c(size);
 
       c.component_product(a, b);
-      for (Index i(0); i < c.template size<Perspective::pod>(); ++i)
-      {
-        TEST_CHECK_RELATIVE(c.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
-      }
+      TEST_CHECK_LESS_THAN(c.max_rel_diff(ref), tol);
 
       a.component_product(a, b);
-      for (Index i(0); i < a.template size<Perspective::pod>(); ++i)
-      {
-        TEST_CHECK_RELATIVE(a.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
-      }
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref), tol);
 
       a.copy(a_tmp);
       b.component_product(a, b);
-      for (Index i(0); i < a.template size<Perspective::pod>(); ++i)
-      {
-        TEST_CHECK_RELATIVE(b.template elements<Perspective::pod>()[i], ref.template elements<Perspective::pod>()[i], eps);
-      }
+      TEST_CHECK_LESS_THAN(b.max_rel_diff(ref), tol);
 
       a.component_product(a, a);
-      for (Index i(0); i < a.template size<Perspective::pod>(); ++i)
-      {
-        TEST_CHECK_RELATIVE(a.template elements<Perspective::pod>()[i], ref2.template elements<Perspective::pod>()[i], eps);
-      }
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref2), tol);
     }
   }
 };
-DenseVectorBlockedComponentProductTest <float, std::uint32_t, 3> dv_blocked_component_product_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedComponentProductTest <double, std::uint32_t, 3> dv_blocked_component_product_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedComponentProductTest <float, std::uint64_t, 2> dv_blocked_component_product_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedComponentProductTest <double, std::uint64_t, 2> dv_blocked_component_product_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentProductTest, float, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentProductTest, double, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentProductTest, float, std::uint64_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentProductTest, double, std::uint64_t, 2, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseVectorBlockedComponentProductTest <float, std::uint64_t, 3> mkl_dv_blocked_component_product_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedComponentProductTest <double, std::uint64_t, 2> mkl_dv_blocked_component_product_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentProductTest, float, std::uint64_t, 3, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentProductTest, double, std::uint64_t, 2, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedComponentProductTest <__float128, std::uint32_t, 3> dv_blocked_component_product_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedComponentProductTest <__float128, std::uint64_t, 2> dv_blocked_component_product_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentProductTest, __float128, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentProductTest, __float128, std::uint64_t, 2, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedComponentProductTest <Half, std::uint32_t, 3> dv_blocked_component_product_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedComponentProductTest <Half, std::uint64_t, 2> dv_blocked_component_product_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentProductTest, Half, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentProductTest, Half, std::uint64_t, 2, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedComponentProductTest <float, std::uint32_t, 3> cuda_dv_blocked_component_product_test_float_uint32(PreferredBackend::cuda);
-DenseVectorBlockedComponentProductTest <double, std::uint32_t, 3> cuda_dv_blocked_component_product_test_double_uint32(PreferredBackend::cuda);
-DenseVectorBlockedComponentProductTest <float, std::uint64_t, 2> cuda_dv_blocked_component_product_test_float_uint64(PreferredBackend::cuda);
-DenseVectorBlockedComponentProductTest <double, std::uint64_t, 2> cuda_dv_blocked_component_product_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentProductTest, float, std::uint32_t, 3, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentProductTest, double, std::uint32_t, 3, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentProductTest, float, std::uint64_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentProductTest, double, std::uint64_t, 2, PreferredBackend::cuda);
 #endif
 
 template<
@@ -678,63 +1008,67 @@ class DenseVectorBlockedComponentCopyTest
   : public UnitTest
 {
 public:
-  DenseVectorBlockedComponentCopyTest(PreferredBackend backend)
+  explicit DenseVectorBlockedComponentCopyTest(PreferredBackend backend)
     : UnitTest("DenseVectorBlockedComponentCopyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseVectorBlockedComponentCopyTest()
   {
   }
 
   virtual void run() const override
   {
-    DT_ eps = TestSystem::tol<DT_>();
-    for(Index size(1); size < Index(1e3); size*=2)
+    const DT_ tol = TestSystem::tol<DT_>();
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
+
+    for(Index size(1); size < Index(1000); size *= 2)
     {
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
       DenseVector<DT_,IT_> v(size);
 
-      for(Index j(0); j < size; ++j)
-        v(j, DT_(j));
+      {
+        Memory::TypedView<DT_> vv(v.elements_view_w());
+        for(Index i(0); i < size; ++i)
+          vv[i] = DT_(i + 1);
+      }
 
+      a.format();
       a.component_copy(v, 0);
-      for (Index i(0); i < a.template size<Perspective::native>(); ++i)
       {
-        TEST_CHECK_RELATIVE(a.template elements<Perspective::native>()[i][0], DT_(i), eps);
+        Memory::TypedView<ValueType> va(a.elements_view_r());
+        for(Index i(0); i < size; ++i)
+        {
+          TEST_CHECK_RELATIVE(va(i)[0], DT_(i + 1), tol);
+          for(int j = 1; j < block_size_; ++j)
+            TEST_CHECK_EQUAL_WITHIN_EPS(va(i)[j], DT_(0), tol);
+        }
       }
 
-      DenseVector<DT_, IT_> v2(size);
-      a.component_copy_to(v2, 0);
-
-      for (Index i(0); i < size; ++i)
-      {
-        TEST_CHECK_RELATIVE(v2(i), DT_(i), eps);
-      }
+      DenseVector<DT_, IT_> w(size);
+      w.format();
+      a.component_copy_to(w, 0);
+      TEST_CHECK_LESS_THAN(w.max_rel_diff(v), tol);
     }
   }
 };
-DenseVectorBlockedComponentCopyTest <float, std::uint32_t, 3> dv_blocked_component_copy_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedComponentCopyTest <double, std::uint32_t, 3> dv_blocked_component_copy_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedComponentCopyTest <float, std::uint64_t, 2> dv_blocked_component_copy_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedComponentCopyTest <double, std::uint64_t, 2> dv_blocked_component_copy_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentCopyTest, float, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentCopyTest, double, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentCopyTest, float, std::uint64_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentCopyTest, double, std::uint64_t, 2, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseVectorBlockedComponentCopyTest <float, std::uint64_t, 3> mkl_dv_blocked_component_copy_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedComponentCopyTest <double, std::uint64_t, 2> mkl_dv_blocked_component_copy_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentCopyTest, float, std::uint64_t, 3, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentCopyTest, double, std::uint64_t, 2, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedComponentCopyTest <__float128, std::uint32_t, 3> dv_blocked_component_copy_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedComponentCopyTest <__float128, std::uint64_t, 2> dv_blocked_component_copy_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentCopyTest, __float128, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentCopyTest, __float128, std::uint64_t, 2, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedComponentCopyTest <Half, std::uint32_t, 3> dv_blocked_component_copy_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedComponentCopyTest <Half, std::uint64_t, 2> dv_blocked_component_copy_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentCopyTest, Half, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentCopyTest, Half, std::uint64_t, 2, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedComponentCopyTest <float, std::uint32_t, 3> cuda_dv_blocked_component_copy_test_float_uint32(PreferredBackend::cuda);
-DenseVectorBlockedComponentCopyTest <double, std::uint32_t, 3> cuda_dv_blocked_component_copy_test_double_uint32(PreferredBackend::cuda);
-DenseVectorBlockedComponentCopyTest <float, std::uint64_t, 2> cuda_dv_blocked_component_copy_test_float_uint64(PreferredBackend::cuda);
-DenseVectorBlockedComponentCopyTest <double, std::uint64_t, 2> cuda_dv_blocked_component_copy_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentCopyTest, float, std::uint32_t, 3, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentCopyTest, double, std::uint32_t, 3, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentCopyTest, float, std::uint64_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedComponentCopyTest, double, std::uint64_t, 2, PreferredBackend::cuda);
 #endif
 
 template<
@@ -745,74 +1079,134 @@ class DenseVectorBlockedScaleTest
   : public UnitTest
 {
 public:
-  DenseVectorBlockedScaleTest(PreferredBackend backend)
+  explicit DenseVectorBlockedScaleTest(PreferredBackend backend)
     : UnitTest("DenseVectorBlockedScaleTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseVectorBlockedScaleTest()
   {
   }
 
   virtual void run() const override
   {
-    DT_ eps = TestSystem::tol<DT_>();
-    for (Index size(1) ; size < Index(1e3) ; size*=2)
+    const DT_ tol = TestSystem::tol<DT_>();
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
+
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
     {
       DT_ s(DT_(4.321));
-      Tiny::Vector<DT_, block_size_> bs;
-      for(int j(0); j < block_size_; ++j)
-        bs[j] = s + DT_(j);
+
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
       DenseVectorBlocked<DT_, IT_, block_size_> ref(size);
-      DenseVectorBlocked<DT_, IT_, block_size_> ref_bs(size);
-      for (Index i(0) ; i < size ; ++i)
       {
-        Tiny::Vector<DT_, block_size_> tv1;
-        for (Index j(0) ; j < block_size_ ; ++j)
-          tv1.v[j] = DT_(DT_(i) * DT_(block_size_) + DT_(j) * DT_(1.234));
-        a(i, tv1);
-        ref(i, a(i) * s);
-
-        ref_bs(i, Tiny::component_product(bs, s*a(i)));
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        Memory::TypedView<ValueType> vref(ref.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+            va[i][j] = DT_(DT_(i) * DT_(block_size_) + DT_(j) * DT_(1.234));
+          vref[i] = va(i) * s;
+        }
       }
 
       DenseVectorBlocked<DT_, IT_, block_size_> b(size);
 
       b.scale(a, s);
-      TEST_CHECK_LESS_THAN(b.max_rel_diff(ref), eps);
+      TEST_CHECK_LESS_THAN(b.max_rel_diff(ref), tol);
 
       a.scale(a, s);
-      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref), eps);
-
-      a.scale_blocked(a, bs);
-      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref_bs), eps);
-
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref), tol);
     }
   }
 };
-DenseVectorBlockedScaleTest <float, std::uint32_t, 3> dv_scale_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedScaleTest <double, std::uint32_t, 3> dv_scale_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedScaleTest <float, std::uint64_t, 2> dv_scale_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedScaleTest <double, std::uint64_t, 2> dv_scale_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleTest, float, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleTest, double, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleTest, float, std::uint64_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleTest, double, std::uint64_t, 2, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseVectorBlockedScaleTest <float, std::uint64_t, 3> mkl_dv_blocked_scale_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedScaleTest <double, std::uint64_t, 2> mkl_dv_blocked_scale_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleTest, float, std::uint64_t, 3, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleTest, double, std::uint64_t, 2, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedScaleTest <__float128, std::uint32_t, 3> dv_scale_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedScaleTest <__float128, std::uint64_t, 2> dv_scale_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleTest, __float128, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleTest, __float128, std::uint64_t, 2, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedScaleTest <Half, std::uint32_t, 3> dv_blocked_scale_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedScaleTest <Half, std::uint64_t, 2> dv_blocked_scale_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleTest, Half, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleTest, Half, std::uint64_t, 2, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedScaleTest <float, std::uint32_t, 3> cuda_dv_scale_test_float_uint32(PreferredBackend::cuda);
-DenseVectorBlockedScaleTest <double, std::uint32_t, 3> cuda_dv_scale_test_double_uint32(PreferredBackend::cuda);
-DenseVectorBlockedScaleTest <float, std::uint64_t, 2> cuda_dv_scale_test_float_uint64(PreferredBackend::cuda);
-DenseVectorBlockedScaleTest <double, std::uint64_t, 2> cuda_dv_scale_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleTest, float, std::uint32_t, 3, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleTest, double, std::uint32_t, 3, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleTest, float, std::uint64_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleTest, double, std::uint64_t, 2, PreferredBackend::cuda);
 #endif
+
+template<
+  typename DT_,
+  typename IT_,
+  int block_size_>
+class DenseVectorBlockedScaleBlockedTest
+  : public UnitTest
+{
+public:
+  explicit DenseVectorBlockedScaleBlockedTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedScaleBlockedTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual void run() const override
+  {
+    const DT_ tol = TestSystem::tol<DT_>();
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
+
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
+    {
+      Tiny::Vector<DT_, block_size_> bs;
+      for(int j(0); j < block_size_; ++j)
+        bs[j] = DT_(4.321) + DT_(j)*DT_(0.1);
+
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+      DenseVectorBlocked<DT_, IT_, block_size_> ref(size);
+      {
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        Memory::TypedView<ValueType> vref(ref.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+          {
+            va[i][j] = DT_(DT_(i) * DT_(block_size_) + DT_(j) * DT_(1.234));
+            vref[i][j] = va[i][j] * bs[j];
+          }
+        }
+      }
+
+      DenseVectorBlocked<DT_, IT_, block_size_> b(size);
+
+      b.scale_blocked(a, bs);
+      TEST_CHECK_LESS_THAN(b.max_rel_diff(ref), tol);
+    }
+  }
+};
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleBlockedTest, float, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleBlockedTest, double, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleBlockedTest, float, std::uint64_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleBlockedTest, double, std::uint64_t, 2, PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleBlockedTest, float, std::uint64_t, 3, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleBlockedTest, double, std::uint64_t, 2, PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleBlockedTest, __float128, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleBlockedTest, __float128, std::uint64_t, 2, PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleBlockedTest, Half, std::uint32_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleBlockedTest, Half, std::uint64_t, 2, PreferredBackend::generic);
+#endif
+//#ifdef FEAT_HAVE_CUDA
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleBlockedTest, float, std::uint32_t, 3, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleBlockedTest, double, std::uint32_t, 3, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleBlockedTest, float, std::uint64_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedScaleBlockedTest, double, std::uint64_t, 2, PreferredBackend::cuda);
+//#endif
 
 template<
   typename DT_,
@@ -822,79 +1216,137 @@ class DenseVectorBlockedNorm2Test
   : public UnitTest
 {
 public:
-  DenseVectorBlockedNorm2Test(PreferredBackend backend)
+  explicit DenseVectorBlockedNorm2Test(PreferredBackend backend)
     : UnitTest("DenseVectorBlockedNorm2Test", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseVectorBlockedNorm2Test()
   {
   }
 
   virtual void run() const override
   {
-    const DT_ eps = TestSystem::tol<DT_>();
+    const DT_ tol = TestSystem::tol<DT_>();
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
 
-    for (Index size(1) ; size < Index(1e3) ; size*=2)
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
     {
       Tiny::Vector<DT_, block_size_> ref_bs(0);
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
 
-      for (Index i(0) ; i < size ; ++i)
       {
-        // a[i] = 1/sqrt(2^i) = (1/2)^(i/2)
-        Tiny::Vector<DT_, block_size_> tv1;
-        for (Index j(0) ; j < block_size_ ; ++j)
-          tv1.v[j] = Math::pow(DT_(0.5), DT_(0.5) * DT_(i * block_size_ + j));
-        a(i, tv1);
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          // a[i] = 1/sqrt(2^i) = (1/2)^(i/2)
+          for (int j(0) ; j < block_size_ ; ++j)
+            va[i][j] = Math::pow(DT_(0.5), DT_(0.5) * DT_(int(i) * block_size_ + j));
+        }
       }
 
       // ||a||_2 = sqrt(2 - 2^{1-n})
-      const DT_ ref(Math::sqrt(DT_(2) - Math::pow(DT_(0.5), DT_(size*block_size_-1))));
-      for (Index j(0) ; j < block_size_ ; ++j)
+      const DT_ ref(Math::sqrt(DT_(2) - Math::pow(DT_(0.5), DT_(int(size)*block_size_-1))));
+
+      DT_ c = a.norm2();
+      TEST_CHECK_RELATIVE(c, ref, tol);
+
+      c = a.norm2sqr();
+      TEST_CHECK_RELATIVE(c, ref*ref, tol);
+    }
+  }
+};
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2Test, float, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2Test, double, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2Test, float, std::uint64_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2Test, double, std::uint64_t, 3, PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2Test, float, std::uint64_t, 2, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2Test, double, std::uint64_t, 3, PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2Test, __float128, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2Test, __float128, std::uint64_t, 3, PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2Test, Half, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2Test, Half, std::uint64_t, 3, PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2Test, float, std::uint32_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2Test, double, std::uint32_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2Test, float, std::uint64_t, 3, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2Test, double, std::uint64_t, 3, PreferredBackend::cuda);
+#endif
+
+template<
+  typename DT_,
+  typename IT_,
+  int block_size_>
+class DenseVectorBlockedNorm2BlockedTest
+  : public UnitTest
+{
+public:
+  explicit DenseVectorBlockedNorm2BlockedTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedNorm2BlockedTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual void run() const override
+  {
+    const DT_ tol = TestSystem::tol<DT_>();
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
+
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
+    {
+      Tiny::Vector<DT_, block_size_> ref_bs(0);
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+
+      {
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          // a[i] = 1/sqrt(2^i) = (1/2)^(i/2)
+          for (int j(0) ; j < block_size_ ; ++j)
+            va[i][j] = Math::pow(DT_(0.5), DT_(0.5) * DT_(int(i) * block_size_ + j));
+        }
+      }
+
+      // ||a||_2 = sqrt(2 - 2^{1-n})
+      for (int j(0) ; j < block_size_ ; ++j)
       {
         ref_bs.v[j] = Math::pow(DT_(0.5), DT_(j))*(DT_(1)-Math::pow(DT_(0.5), DT_(block_size_*size)))/(DT_(1)-Math::pow(DT_(0.5), DT_(block_size_)));
         ref_bs.v[j] = Math::sqrt(ref_bs.v[j]);
       }
 
-      DT_ c = a.norm2();
-      TEST_CHECK_RELATIVE(c, ref, eps);
-
-      c = a.norm2sqr();
-      TEST_CHECK_RELATIVE(c, ref*ref, eps);
-
       Tiny::Vector<DT_, block_size_> d(a.norm2_blocked());
       for(Index j(0); j < block_size_; ++j)
-        TEST_CHECK_RELATIVE(d.v[j], ref_bs.v[j], eps);
+        TEST_CHECK_RELATIVE(d.v[j], ref_bs.v[j], tol);
 
       Tiny::Vector<DT_, block_size_> e(a.norm2sqr_blocked());
       for(Index j(0); j < block_size_; ++j)
-        TEST_CHECK_RELATIVE(e.v[j], ref_bs.v[j]*ref_bs.v[j], eps);
+        TEST_CHECK_RELATIVE(e.v[j], ref_bs.v[j]*ref_bs.v[j], tol);
     }
   }
 };
-DenseVectorBlockedNorm2Test <float, std::uint32_t, 2> dv_norm2_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedNorm2Test <double, std::uint32_t, 2> dv_norm2_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedNorm2Test <float, std::uint64_t, 3> dv_norm2_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedNorm2Test <double, std::uint64_t, 3> dv_norm2_test_double_uint64(PreferredBackend::generic);
-#ifdef FEAT_HAVE_MKL
-DenseVectorBlockedNorm2Test <float, std::uint64_t, 2> mkl_dv_norm2_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedNorm2Test <double, std::uint64_t, 3> mkl_dv_norm2_test_double_uint64(PreferredBackend::mkl);
-#endif
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2BlockedTest, float, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2BlockedTest, double, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2BlockedTest, float, std::uint64_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2BlockedTest, double, std::uint64_t, 3, PreferredBackend::generic);
+//#ifdef FEAT_HAVE_MKL
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2BlockedTest, float, std::uint64_t, 2, PreferredBackend::mkl);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2BlockedTest, double, std::uint64_t, 3, PreferredBackend::mkl);
+//#endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedNorm2Test <__float128, std::uint32_t, 2> dv_norm2_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedNorm2Test <__float128, std::uint64_t, 3> dv_norm2_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2BlockedTest, __float128, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2BlockedTest, __float128, std::uint64_t, 3, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedNorm2Test <Half, std::uint32_t, 2> dv_blocked_norm2_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedNorm2Test <Half, std::uint64_t, 3> dv_blocked_norm2_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2BlockedTest, Half, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2BlockedTest, Half, std::uint64_t, 3, PreferredBackend::generic);
 #endif
-#ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedNorm2Test <float, std::uint32_t, 2> cuda_dv_norm2_test_float_uint32(PreferredBackend::cuda);
-DenseVectorBlockedNorm2Test <double, std::uint32_t, 2> cuda_dv_norm2_test_double_uint32(PreferredBackend::cuda);
-DenseVectorBlockedNorm2Test <float, std::uint64_t, 3> cuda_dv_norm2_test_float_uint64(PreferredBackend::cuda);
-DenseVectorBlockedNorm2Test <double, std::uint64_t, 3> cuda_dv_norm2_test_double_uint64(PreferredBackend::cuda);
-#endif
+//#ifdef FEAT_HAVE_CUDA
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2BlockedTest, float, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2BlockedTest, double, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2BlockedTest, float, std::uint64_t, 3, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedNorm2BlockedTest, double, std::uint64_t, 3, PreferredBackend::cuda);
+//#endif
 
 template<
   typename DT_,
@@ -904,38 +1356,30 @@ class DenseVectorBlockedMaxAbsElementTest
   : public UnitTest
 {
 public:
-  DenseVectorBlockedMaxAbsElementTest(PreferredBackend backend)
+  explicit DenseVectorBlockedMaxAbsElementTest(PreferredBackend backend)
     : UnitTest("DenseVectorBlockedMaxAbsElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseVectorBlockedMaxAbsElementTest()
   {
   }
 
   virtual void run() const override
   {
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
+
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
-    for (Index size(1) ; size < Index(1e4) ; size*=2)
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
     {
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
-      for (Index i(0) ; i < size ; ++i)
+
       {
-        Tiny::Vector<DT_, block_size_> tv1;
-        for (Index j(0) ; j < block_size_ ; ++j)
-          tv1.v[j]  = DT_(DT_((i * block_size_ + j)) * (i%2 == 0 ? DT_(1) : DT_(-1)));
-        a(i, tv1);
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+            va[i][j]  = DT_(DT_((int(i) * block_size_ + j)) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+        }
       }
-
-      Tiny::Vector<DT_, block_size_> b(a.max_abs_element_blocked());
-      Tiny::Vector<DT_, block_size_> ref_bs;
-      for (Index j(0) ; j < block_size_ ; ++j)
-        ref_bs.v[j] = DT_((size-1) * block_size_  + j);
-
-      for(Index j(0); j < block_size_; ++j)
-        TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
 
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
@@ -945,28 +1389,97 @@ public:
     }
   }
 };
-DenseVectorBlockedMaxAbsElementTest <float, std::uint32_t, 2> dv_max_abs_element_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedMaxAbsElementTest <double, std::uint32_t, 2> dv_max_abs_element_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedMaxAbsElementTest <float, std::uint64_t, 3> dv_max_abs_element_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedMaxAbsElementTest <double, std::uint64_t, 3> dv_max_abs_element_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementTest, float, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementTest, double, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementTest, float, std::uint64_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementTest, double, std::uint64_t, 3, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseVectorBlockedMaxAbsElementTest <float, std::uint64_t, 2> mkl_dv_max_abs_element_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedMaxAbsElementTest <double, std::uint64_t, 3> mkl_dv_max_abs_element_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementTest, float, std::uint64_t, 2, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementTest, double, std::uint64_t, 3, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedMaxAbsElementTest <__float128, std::uint32_t, 2> dv_max_abs_element_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedMaxAbsElementTest <__float128, std::uint64_t, 3> dv_max_abs_element_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementTest, __float128, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementTest, __float128, std::uint64_t, 3, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedMaxAbsElementTest <Half, std::uint32_t, 2> dv_blocked_max_abs_element_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedMaxAbsElementTest <Half, std::uint64_t, 3> dv_blocked_max_abs_element_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementTest, Half, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementTest, Half, std::uint64_t, 3, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedMaxAbsElementTest <float, std::uint32_t, 2> cuda_dv_max_abs_element_test_float_uint32(PreferredBackend::cuda);
-DenseVectorBlockedMaxAbsElementTest <double, std::uint32_t, 2> cuda_dv_max_abs_element_test_double_uint32(PreferredBackend::cuda);
-DenseVectorBlockedMaxAbsElementTest <float, std::uint64_t, 3> cuda_dv_max_abs_element_test_float_uint64(PreferredBackend::cuda);
-DenseVectorBlockedMaxAbsElementTest <double, std::uint64_t, 3> cuda_dv_max_abs_element_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementTest, float, std::uint32_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementTest, double, std::uint32_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementTest, float, std::uint64_t, 3, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementTest, double, std::uint64_t, 3, PreferredBackend::cuda);
 #endif
+
+template<
+  typename DT_,
+  typename IT_,
+  int block_size_>
+class DenseVectorBlockedMaxAbsElementBlockedTest
+  : public UnitTest
+{
+public:
+  explicit DenseVectorBlockedMaxAbsElementBlockedTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedMaxAbsElementBlockedTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual void run() const override
+  {
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
+
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
+
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
+    {
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+
+      {
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+            va[i][j]  = DT_(DT_((int(i) * block_size_ + j)) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+        }
+      }
+
+      Adjacency::Permutation prm_rnd(a.size(), rng);
+      a.permute(prm_rnd);
+
+      Tiny::Vector<DT_, block_size_> b(a.max_abs_element_blocked());
+      Tiny::Vector<DT_, block_size_> ref_bs;
+      for (int j(0) ; j < block_size_ ; ++j)
+        ref_bs.v[j] = DT_((int(size)-1) * block_size_  + j);
+
+      for(int j(0); j < block_size_; ++j)
+        TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
+    }
+  }
+};
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementBlockedTest, float, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementBlockedTest, double, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementBlockedTest, float, std::uint64_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementBlockedTest, double, std::uint64_t, 3, PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementBlockedTest, float, std::uint64_t, 2, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementBlockedTest, double, std::uint64_t, 3, PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementBlockedTest, __float128, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementBlockedTest, __float128, std::uint64_t, 3, PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementBlockedTest, Half, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementBlockedTest, Half, std::uint64_t, 3, PreferredBackend::generic);
+#endif
+//#ifdef FEAT_HAVE_CUDA
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementBlockedTest, float, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementBlockedTest, double, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementBlockedTest, float, std::uint64_t, 3, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxAbsElementBlockedTest, double, std::uint64_t, 3, PreferredBackend::cuda);
+//#endif
 
 template<
   typename DT_,
@@ -976,38 +1489,30 @@ class DenseVectorBlockedMinAbsElementTest
   : public UnitTest
 {
 public:
-  DenseVectorBlockedMinAbsElementTest(PreferredBackend backend)
+  explicit DenseVectorBlockedMinAbsElementTest(PreferredBackend backend)
     : UnitTest("DenseVectorBlockedMinAbsElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseVectorBlockedMinAbsElementTest()
   {
   }
 
   virtual void run() const override
   {
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
+
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
-    for (Index size(1) ; size < Index(1e4) ; size*=2)
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
     {
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
-      for (Index i(0) ; i < size ; ++i)
+
       {
-        Tiny::Vector<DT_, block_size_> tv1;
-        for (Index j(0) ; j < block_size_ ; ++j)
-          tv1.v[j]  = DT_(DT_((i * block_size_ + j)) * (i%2 == 0 ? DT_(1) : DT_(-1)));
-        a(i, tv1);
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+            va[i][j]  = DT_(DT_((int(i) * block_size_ + j)) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+        }
       }
-
-      Tiny::Vector<DT_, block_size_> b(a.min_abs_element_blocked());
-      Tiny::Vector<DT_, block_size_> ref_bs;
-      for (Index j(0) ; j < block_size_ ; ++j)
-        ref_bs.v[j] = DT_(j);
-
-      for(Index j(0); j < block_size_; ++j)
-        TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
 
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
@@ -1018,28 +1523,97 @@ public:
     }
   }
 };
-DenseVectorBlockedMinAbsElementTest <float, std::uint32_t, 2> dv_min_abs_element_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedMinAbsElementTest <double, std::uint32_t, 2> dv_min_abs_element_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedMinAbsElementTest <float, std::uint64_t, 3> dv_min_abs_element_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedMinAbsElementTest <double, std::uint64_t, 3> dv_min_abs_element_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementTest, float, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementTest, double, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementTest, float, std::uint64_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementTest, double, std::uint64_t, 3, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseVectorBlockedMinAbsElementTest <float, std::uint64_t, 2> mkl_dv_min_abs_element_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedMinAbsElementTest <double, std::uint64_t, 3> mkl_dv_min_abs_element_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementTest, float, std::uint64_t, 2, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementTest, double, std::uint64_t, 3, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedMinAbsElementTest <__float128, std::uint32_t, 2> dv_min_abs_element_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedMinAbsElementTest <__float128, std::uint64_t, 3> dv_min_abs_element_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementTest, __float128, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementTest, __float128, std::uint64_t, 3, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedMinAbsElementTest <Half, std::uint32_t, 2> dv_blocked_min_abs_element_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedMinAbsElementTest <Half, std::uint64_t, 3> dv_blocked_min_abs_element_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementTest, Half, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementTest, Half, std::uint64_t, 3, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedMinAbsElementTest <float, std::uint32_t, 2> cuda_dv_min_abs_element_test_float_uint32(PreferredBackend::cuda);
-DenseVectorBlockedMinAbsElementTest <double, std::uint32_t, 2> cuda_dv_min_abs_element_test_double_uint32(PreferredBackend::cuda);
-DenseVectorBlockedMinAbsElementTest <float, std::uint64_t, 3> cuda_dv_min_abs_element_test_float_uint64(PreferredBackend::cuda);
-DenseVectorBlockedMinAbsElementTest <double, std::uint64_t, 3> cuda_dv_min_abs_element_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementTest, float, std::uint32_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementTest, double, std::uint32_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementTest, float, std::uint64_t, 3, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementTest, double, std::uint64_t, 3, PreferredBackend::cuda);
 #endif
+
+template<
+  typename DT_,
+  typename IT_,
+  int block_size_>
+class DenseVectorBlockedMinAbsElementBlockedTest
+  : public UnitTest
+{
+public:
+  explicit DenseVectorBlockedMinAbsElementBlockedTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedMinAbsElementBlockedTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual void run() const override
+  {
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
+
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
+
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
+    {
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+
+      {
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+            va[i][j]  = DT_(DT_((int(i) * block_size_ + j)) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+        }
+      }
+
+      //Adjacency::Permutation prm_rnd(a.size(), rng);
+      //a.permute(prm_rnd);
+
+      Tiny::Vector<DT_, block_size_> b(a.min_abs_element_blocked());
+      Tiny::Vector<DT_, block_size_> ref_bs;
+      for (int j(0) ; j < block_size_ ; ++j)
+        ref_bs.v[j] = DT_(j);
+
+      for(int j(0); j < block_size_; ++j)
+        TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
+    }
+  }
+};
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementBlockedTest, float, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementBlockedTest, double, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementBlockedTest, float, std::uint64_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementBlockedTest, double, std::uint64_t, 3, PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementBlockedTest, float, std::uint64_t, 2, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementBlockedTest, double, std::uint64_t, 3, PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementBlockedTest, __float128, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementBlockedTest, __float128, std::uint64_t, 3, PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementBlockedTest, Half, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementBlockedTest, Half, std::uint64_t, 3, PreferredBackend::generic);
+#endif
+//#ifdef FEAT_HAVE_CUDA
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementBlockedTest, float, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementBlockedTest, double, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementBlockedTest, float, std::uint64_t, 3, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinAbsElementBlockedTest, double, std::uint64_t, 3, PreferredBackend::cuda);
+//#endif
 
 template<
   typename DT_,
@@ -1049,38 +1623,29 @@ class DenseVectorBlockedMaxElementTest
   : public UnitTest
 {
 public:
-  DenseVectorBlockedMaxElementTest(PreferredBackend backend)
+  explicit DenseVectorBlockedMaxElementTest(PreferredBackend backend)
     : UnitTest("DenseVectorBlockedMaxElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseVectorBlockedMaxElementTest()
   {
   }
 
   virtual void run() const override
   {
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
+
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
-    for (Index size(1) ; size < Index(1e4) ; size*=2)
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
     {
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
-      for (Index i(0) ; i < size ; ++i)
       {
-        Tiny::Vector<DT_, block_size_> tv1;
-        for (Index j(0) ; j < block_size_ ; ++j)
-          tv1.v[j]  = DT_(DT_((i * block_size_ + j)));
-        a(i, tv1);
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+            va[i][j]  = DT_(DT_((int(i) * block_size_ + j)));
+        }
       }
-
-      Tiny::Vector<DT_, block_size_> b(a.max_element_blocked());
-      Tiny::Vector<DT_, block_size_> ref_bs;
-      for (Index j(0) ; j < block_size_ ; ++j)
-        ref_bs.v[j] = DT_((size-1)*block_size_+j);
-
-      for(Index j(0); j < block_size_; ++j)
-        TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
 
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
@@ -1091,28 +1656,96 @@ public:
     }
   }
 };
-DenseVectorBlockedMaxElementTest <float, std::uint32_t, 2> dv_max_element_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedMaxElementTest <double, std::uint32_t, 2> dv_max_element_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedMaxElementTest <float, std::uint64_t, 3> dv_max_element_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedMaxElementTest <double, std::uint64_t, 3> dv_max_element_test_double_uint64(PreferredBackend::generic);
-#ifdef FEAT_HAVE_MKL
-DenseVectorBlockedMaxElementTest <float, std::uint64_t, 2> mkl_dv_max_element_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedMaxElementTest <double, std::uint64_t, 3> mkl_dv_max_element_test_double_uint64(PreferredBackend::mkl);
-#endif
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementTest, float, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementTest, double, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementTest, float, std::uint64_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementTest, double, std::uint64_t, 3, PreferredBackend::generic);
+//#ifdef FEAT_HAVE_MKL
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementTest, float, std::uint64_t, 2, PreferredBackend::mkl);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementTest, double, std::uint64_t, 3, PreferredBackend::mkl);
+//#endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedMaxElementTest <__float128, std::uint32_t, 2> dv_max_element_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedMaxElementTest <__float128, std::uint64_t, 3> dv_max_element_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementTest, __float128, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementTest, __float128, std::uint64_t, 3, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedMaxElementTest <Half, std::uint32_t, 2> dv_blocked_max_element_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedMaxElementTest <Half, std::uint64_t, 3> dv_blocked_max_element_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementTest, Half, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementTest, Half, std::uint64_t, 3, PreferredBackend::generic);
 #endif
-#ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedMaxElementTest <float, std::uint32_t, 2> cuda_dv_max_element_test_float_uint32(PreferredBackend::cuda);
-DenseVectorBlockedMaxElementTest <double, std::uint32_t, 2> cuda_dv_max_element_test_double_uint32(PreferredBackend::cuda);
-DenseVectorBlockedMaxElementTest <float, std::uint64_t, 3> cuda_dv_max_element_test_float_uint64(PreferredBackend::cuda);
-DenseVectorBlockedMaxElementTest <double, std::uint64_t, 3> cuda_dv_max_element_test_double_uint64(PreferredBackend::cuda);
+//#ifdef FEAT_HAVE_CUDA
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementTest, float, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementTest, double, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementTest, float, std::uint64_t, 3, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementTest, double, std::uint64_t, 3, PreferredBackend::cuda);
+//#endif
+
+template<
+  typename DT_,
+  typename IT_,
+  int block_size_>
+class DenseVectorBlockedMaxElementBlockedTest
+  : public UnitTest
+{
+public:
+  explicit DenseVectorBlockedMaxElementBlockedTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedMaxElementBlockedTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual void run() const override
+  {
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
+
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
+
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
+    {
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+      {
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+            va[i][j]  = DT_(DT_((int(i) * block_size_ + j)));
+        }
+      }
+
+      //Adjacency::Permutation prm_rnd(a.size(), rng);
+      //a.permute(prm_rnd);
+
+      Tiny::Vector<DT_, block_size_> b(a.max_element_blocked());
+      Tiny::Vector<DT_, block_size_> ref_bs;
+      for (int j(0) ; j < block_size_ ; ++j)
+        ref_bs.v[j] = DT_((int(size)-1)*block_size_+j);
+
+      for(int j(0); j < block_size_; ++j)
+        TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
+    }
+  }
+};
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementBlockedTest, float, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementBlockedTest, double, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementBlockedTest, float, std::uint64_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementBlockedTest, double, std::uint64_t, 3, PreferredBackend::generic);
+//#ifdef FEAT_HAVE_MKL
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementBlockedTest, float, std::uint64_t, 2, PreferredBackend::mkl);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementBlockedTest, double, std::uint64_t, 3, PreferredBackend::mkl);
+//#endif
+#ifdef FEAT_HAVE_QUADMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementBlockedTest, __float128, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementBlockedTest, __float128, std::uint64_t, 3, PreferredBackend::generic);
 #endif
+#ifdef FEAT_HAVE_HALFMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementBlockedTest, Half, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementBlockedTest, Half, std::uint64_t, 3, PreferredBackend::generic);
+#endif
+//#ifdef FEAT_HAVE_CUDA
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementBlockedTest, float, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementBlockedTest, double, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementBlockedTest, float, std::uint64_t, 3, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMaxElementBlockedTest, double, std::uint64_t, 3, PreferredBackend::cuda);
+//#endif
 
 template<
   typename DT_,
@@ -1122,37 +1755,27 @@ class DenseVectorBlockedMinElementTest
   : public UnitTest
 {
 public:
-  DenseVectorBlockedMinElementTest(PreferredBackend backend)
+  explicit DenseVectorBlockedMinElementTest(PreferredBackend backend)
     : UnitTest("DenseVectorBlockedMinElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseVectorBlockedMinElementTest()
   {
   }
 
   virtual void run() const override
   {
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
-    for (Index size(1) ; size < Index(1e4) ; size*=2)
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
     {
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
-      for (Index i(0) ; i < size ; ++i)
       {
-        Tiny::Vector<DT_, block_size_> tv1;
-        for (Index j(0) ; j < block_size_ ; ++j)
-          tv1.v[j]  = DT_(DT_((i * block_size_ + j)));
-        a(i, tv1);
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+            va[i][j]  = DT_(DT_((int(i) * block_size_ + j)));
+        }
       }
-
-      Tiny::Vector<DT_, block_size_> b(a.min_element_blocked());
-      Tiny::Vector<DT_, block_size_> ref_bs;
-      for (Index j(0) ; j < block_size_ ; ++j)
-        ref_bs.v[j] = DT_(j);
-
-      for(Index j(0); j < block_size_; ++j)
-        TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
 
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
@@ -1163,28 +1786,94 @@ public:
     }
   }
 };
-DenseVectorBlockedMinElementTest <float, std::uint32_t, 2> dv_min_element_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedMinElementTest <double, std::uint32_t, 2> dv_min_element_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedMinElementTest <float, std::uint64_t, 3> dv_min_element_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedMinElementTest <double, std::uint64_t, 3> dv_min_element_test_double_uint64(PreferredBackend::generic);
-#ifdef FEAT_HAVE_MKL
-DenseVectorBlockedMinElementTest <float, std::uint64_t, 2> mkl_dv_min_element_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedMinElementTest <double, std::uint64_t, 3> mkl_dv_min_element_test_double_uint64(PreferredBackend::mkl);
-#endif
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementTest, float, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementTest, double, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementTest, float, std::uint64_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementTest, double, std::uint64_t, 3, PreferredBackend::generic);
+//#ifdef FEAT_HAVE_MKL
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementTest, float, std::uint64_t, 2, PreferredBackend::mkl);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementTest, double, std::uint64_t, 3, PreferredBackend::mkl);
+//#endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedMinElementTest <__float128, std::uint32_t, 2> dv_min_element_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedMinElementTest <__float128, std::uint64_t, 3> dv_min_element_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementTest, __float128, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementTest, __float128, std::uint64_t, 3, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedMinElementTest <Half, std::uint32_t, 2> dv_blocked_min_element_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedMinElementTest <Half, std::uint64_t, 3> dv_blocked_min_element_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementTest, Half, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementTest, Half, std::uint64_t, 3, PreferredBackend::generic);
 #endif
-#ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedMinElementTest <float, std::uint32_t, 2> cuda_dv_min_element_test_float_uint32(PreferredBackend::cuda);
-DenseVectorBlockedMinElementTest <double, std::uint32_t, 2> cuda_dv_min_element_test_double_uint32(PreferredBackend::cuda);
-DenseVectorBlockedMinElementTest <float, std::uint64_t, 3> cuda_dv_min_element_test_float_uint64(PreferredBackend::cuda);
-DenseVectorBlockedMinElementTest <double, std::uint64_t, 3> cuda_dv_min_element_test_double_uint64(PreferredBackend::cuda);
+//#ifdef FEAT_HAVE_CUDA
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementTest, float, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementTest, double, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementTest, float, std::uint64_t, 3, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementTest, double, std::uint64_t, 3, PreferredBackend::cuda);
+//#endif
+
+template<
+  typename DT_,
+  typename IT_,
+  int block_size_>
+class DenseVectorBlockedMinElementBlockedTest
+  : public UnitTest
+{
+public:
+  explicit DenseVectorBlockedMinElementBlockedTest(PreferredBackend backend)
+    : UnitTest("DenseVectorBlockedMinElementBlockedTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual void run() const override
+  {
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
+    Random rng;
+    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
+    for (Index size(1) ; size < Index(1000) ; size *= 2)
+    {
+      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
+      {
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+            va[i][j]  = DT_(DT_((int(i) * block_size_ + j)));
+        }
+      }
+
+      //Adjacency::Permutation prm_rnd(a.size(), rng);
+      //a.permute(prm_rnd);
+
+      Tiny::Vector<DT_, block_size_> b(a.min_element_blocked());
+      Tiny::Vector<DT_, block_size_> ref_bs;
+      for (int j(0) ; j < block_size_ ; ++j)
+        ref_bs.v[j] = DT_(j);
+
+      for(int j(0); j < block_size_; ++j)
+        TEST_CHECK_EQUAL(b.v[j], ref_bs.v[j]);
+    }
+  }
+};
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementBlockedTest, float, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementBlockedTest, double, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementBlockedTest, float, std::uint64_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementBlockedTest, double, std::uint64_t, 3, PreferredBackend::generic);
+//#ifdef FEAT_HAVE_MKL
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementBlockedTest, float, std::uint64_t, 2, PreferredBackend::mkl);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementBlockedTest, double, std::uint64_t, 3, PreferredBackend::mkl);
+//#endif
+#ifdef FEAT_HAVE_QUADMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementBlockedTest, __float128, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementBlockedTest, __float128, std::uint64_t, 3, PreferredBackend::generic);
 #endif
+#ifdef FEAT_HAVE_HALFMATH
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementBlockedTest, Half, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementBlockedTest, Half, std::uint64_t, 3, PreferredBackend::generic);
+#endif
+//#ifdef FEAT_HAVE_CUDA
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementBlockedTest, float, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementBlockedTest, double, std::uint32_t, 2, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementBlockedTest, float, std::uint64_t, 3, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedMinElementBlockedTest, double, std::uint64_t, 3, PreferredBackend::cuda);
+//#endif
 
 template<
   typename DT_,
@@ -1194,306 +1883,73 @@ class DenseVectorBlockedPermuteTest
   : public UnitTest
 {
 public:
-  DenseVectorBlockedPermuteTest(PreferredBackend backend)
+  explicit DenseVectorBlockedPermuteTest(PreferredBackend backend)
     : UnitTest("DenseVectorBlockedPermuteTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseVectorBlockedPermuteTest()
   {
   }
 
   virtual void run() const override
   {
-    DT_ eps = TestSystem::tol<DT_>();
-    bool one_error(false);
+    const DT_ tol = TestSystem::tol<DT_>();
+    typedef Tiny::Vector<DT_, block_size_> ValueType;
+
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
-    for (Index size(10) ; size < Index(1e4) ; size*=2)
+    for (Index size(10) ; size < Index(1000) ; size *= 2)
     {
       DenseVectorBlocked<DT_, IT_, block_size_> a(size);
-      for (Index i(0) ; i < size ; ++i)
       {
-        Tiny::Vector<DT_, block_size_> tv1;
-        for (Index j(0) ; j < block_size_ ; ++j)
-          tv1.v[j]  = DT_(DT_((i * block_size_ + j)) * (i%2 == 0 ? DT_(1) : DT_(-1)));
-        a(i, tv1);
+        Memory::TypedView<ValueType> va(a.elements_view_w());
+        for (Index i(0) ; i < size ; ++i)
+        {
+          for (int j(0) ; j < block_size_ ; ++j)
+            va[i][j]  = DT_(DT_((int(i) * block_size_ + j)) * (i%2 == 0 ? DT_(1) : DT_(-1)));
+        }
       }
 
-      DenseVectorBlocked<DT_, IT_, block_size_> ref(a.size());
-      ref.copy(a);
+      DenseVectorBlocked<DT_, IT_, block_size_> ref(a.clone());
 
       Adjacency::Permutation prm_rnd(a.size(), rng);
       a.permute(prm_rnd);
 
       //allow identity permutation once per test due to rng...
-      if (a.max_rel_diff(ref) < eps)
+      if(prm_rnd.is_identity())
       {
-        if(one_error)
-        {
-          TEST_CHECK(false);
-        }
-        else
-        {
-          one_error = true;
-        }
+        TEST_CHECK_LESS_THAN(a.max_rel_diff(ref), tol);
+      }
+      else
+      {
+        TEST_CHECK(a.max_rel_diff(ref) > tol);
       }
 
       auto prm_inv = prm_rnd.inverse();
       a.permute(prm_inv);
-      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref), eps);
+
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref), tol);
     }
   }
 };
-DenseVectorBlockedPermuteTest <float, std::uint32_t, 2> dv_permute_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedPermuteTest <double, std::uint32_t, 2> dv_permute_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedPermuteTest <float, std::uint64_t, 3> dv_permute_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedPermuteTest <double, std::uint64_t, 3> dv_permute_test_double_uint64(PreferredBackend::generic);
+
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedPermuteTest, float, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedPermuteTest, double, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedPermuteTest, float, std::uint64_t, 3, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedPermuteTest, double, std::uint64_t, 3, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseVectorBlockedPermuteTest <float, std::uint64_t, 2> mkl_dv_permute_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedPermuteTest <double, std::uint64_t, 3> mkl_dv_permute_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedPermuteTest, float, std::uint64_t, 2, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedPermuteTest, double, std::uint64_t, 3, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedPermuteTest <__float128, std::uint32_t, 2> dv_permute_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedPermuteTest <__float128, std::uint64_t, 3> dv_permute_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedPermuteTest, __float128, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedPermuteTest, __float128, std::uint64_t, 3, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedPermuteTest <Half, std::uint32_t, 2> dv_blocked_permute_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedPermuteTest <Half, std::uint64_t, 3> dv_blocked_permute_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedPermuteTest, Half, std::uint32_t, 2, PreferredBackend::generic);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedPermuteTest, Half, std::uint64_t, 3, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedPermuteTest <float, std::uint32_t, 2> cuda_dv_permute_test_float_uint32(PreferredBackend::cuda);
-DenseVectorBlockedPermuteTest <double, std::uint32_t, 2> cuda_dv_permute_test_double_uint32(PreferredBackend::cuda);
-DenseVectorBlockedPermuteTest <float, std::uint64_t, 3> cuda_dv_permute_test_float_uint64(PreferredBackend::cuda);
-DenseVectorBlockedPermuteTest <double, std::uint64_t, 3> cuda_dv_permute_test_double_uint64(PreferredBackend::cuda);
-#endif
-
-template<
-  typename DT_,
-  typename IT_,
-  int block_size_>
-class DenseVectorBlockedProjectTest
-  : public UnitTest
-{
-public:
-  DenseVectorBlockedProjectTest(PreferredBackend backend)
-    : UnitTest("DenseVectorBlockedPermuteTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseVectorBlockedProjectTest()
-  {
-  }
-
-  virtual void run() const override
-  {
-    Random rng;
-    std::cout << "RNG Seed: " << rng.get_seed() << "\n";
-
-    DT_ eps = TestSystem::tol<DT_>();
-
-    constexpr Index size = Index(1e4);
-
-    DenseVectorBlocked<DT_, IT_, block_size_> vec(rng, size, DT_(-1e4), DT_(1e+4));
-    DenseVectorBlocked<DT_, IT_, block_size_> normal(size, DT_(0));
-
-    Tiny::Vector<DT_, block_size_> tmp_tiny(DT_(0));
-    tmp_tiny[0] = DT_(1);
-
-    for(Index i = 0; i < normal.size(); ++i)
-    {
-      normal(i, tmp_tiny);
-    }
-
-    auto projected_vec = vec.clone();
-
-    vec.project_onto(projected_vec, normal);
-
-    for(Index i = 0; i < vec.size(); ++i)
-    {
-      TEST_CHECK_EQUAL_WITHIN_EPS(projected_vec(i)[0], vec(i)[0],  eps);
-    }
-  }
-};
-DenseVectorBlockedProjectTest <float, std::uint32_t, 2> dv_project_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedProjectTest <double, std::uint32_t, 2> dv_project_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedProjectTest <float, std::uint64_t, 3> dv_project_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedProjectTest <double, std::uint64_t, 3> dv_project_test_double_uint64(PreferredBackend::generic);
-#ifdef FEAT_HAVE_MKL
-DenseVectorBlockedProjectTest <float, std::uint64_t, 2> mkl_dv_project_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedProjectTest <double, std::uint64_t, 3> mkl_dv_project_test_double_uint64(PreferredBackend::mkl);
-#endif
-#ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedProjectTest <__float128, std::uint32_t, 2> dv_project_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedProjectTest <__float128, std::uint64_t, 3> dv_project_test_float128_uint64(PreferredBackend::generic);
-#endif
-#ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedProjectTest <Half, std::uint32_t, 2> dv_blocked_project_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedProjectTest <Half, std::uint64_t, 3> dv_blocked_project_test_half_uint64(PreferredBackend::generic);
-#endif
-
-template<
-  typename DT_,
-  typename IT_,
-  int block_size_>
-class DenseVectorBlockedMaxRelDiffTest
-  : public UnitTest
-{
-public:
-  DenseVectorBlockedMaxRelDiffTest(PreferredBackend backend)
-    : UnitTest("DenseVectorBlockedMaxRelDiffTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseVectorBlockedMaxRelDiffTest() {}
-
-  virtual void run() const override
-  {
-    const DT_ eps = TestSystem::tol<DT_>();
-
-    for (Index size(2); size < Index(1e3); size *= 2)
-    {
-      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
-      DenseVectorBlocked<DT_, IT_, block_size_> b(size);
-
-      for (Index i(0); i < size; ++i)
-      {
-        Tiny::Vector<DT_, block_size_> tv;
-        for (int j = 0; j < block_size_; ++j)
-          tv[j] = DT_(i * block_size_ + Index(j));
-        a(i, tv);
-        b(i, tv);
-      }
-
-      // add delta
-      Tiny::Vector<DT_, block_size_> tv = a(size / 2);
-      const DT_ delta = DT_(123.5);
-      tv[0] += delta;
-      a(size / 2, tv);
-
-      const DT_ ref = delta / (DT_(size) * DT_(block_size_) + delta);
-
-      // Test ||a-b||_inf
-      const DT_ diff1 = a.max_rel_diff(b);
-      TEST_CHECK_RELATIVE(diff1, ref, eps);
-
-      // Symmetrie: ||b-a||_inf
-      const DT_ diff2 = b.max_rel_diff(a);
-      TEST_CHECK_RELATIVE(diff2, ref, eps);
-    }
-  }
-};
-DenseVectorBlockedMaxRelDiffTest <float, std::uint32_t, 2> dense_vector_blocked_max_rel_diff_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedMaxRelDiffTest <double, std::uint32_t, 2> dense_vector_blocked_max_rel_diff_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedMaxRelDiffTest <float, std::uint64_t, 3> dense_vector_blocked_max_rel_diff_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedMaxRelDiffTest <double, std::uint64_t, 3> dense_vector_blocked_max_rel_diff_test_double_uint64(PreferredBackend::generic);
-#ifdef FEAT_HAVE_MKL
-DenseVectorBlockedMaxRelDiffTest <float, std::uint64_t, 2> mkl_dense_vector_blocked_max_rel_diff_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedMaxRelDiffTest <double, std::uint64_t, 3> mkl_dense_vector_blocked_max_rel_diff_test_double_uint64(PreferredBackend::mkl);
-#endif
-#ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedMaxRelDiffTest <__float128, std::uint32_t, 2> dense_vector_blocked_max_rel_diff_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedMaxRelDiffTest <__float128, std::uint64_t, 3> dense_vector_blocked_max_rel_diff_test_float128_uint64(PreferredBackend::generic);
-#endif
-#ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedMaxRelDiffTest <Half, std::uint32_t, 2> dense_vector_blocked_max_rel_diff_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedMaxRelDiffTest <Half, std::uint64_t, 3> dense_vector_blocked_max_rel_diff_test_half_uint64(PreferredBackend::generic);
-#ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedMaxRelDiffTest <Half, std::uint32_t, 2> cuda_dense_vector_blocked_max_rel_diff_test_half_uint32(PreferredBackend::cuda);
-DenseVectorBlockedMaxRelDiffTest <Half, std::uint64_t, 3> cuda_dense_vector_blocked_max_rel_diff_test_half_uint64(PreferredBackend::cuda);
-#endif
-#endif
-#ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedMaxRelDiffTest <float, std::uint32_t, 2> cuda_dense_vector_blocked_max_rel_diff_test_float_uint32(PreferredBackend::cuda);
-DenseVectorBlockedMaxRelDiffTest <double, std::uint32_t, 2> cuda_dense_vector_blocked_max_rel_diff_test_double_uint32(PreferredBackend::cuda);
-DenseVectorBlockedMaxRelDiffTest <float, std::uint64_t, 3> cuda_dense_vector_blocked_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
-DenseVectorBlockedMaxRelDiffTest <double, std::uint64_t, 3> cuda_dense_vector_blocked_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
-#endif
-
-template<
-  typename DT_,
-  typename IT_,
-  int block_size_>
-class DenseVectorBlockedSameLayoutTest
-  : public UnitTest
-{
-public:
-  DenseVectorBlockedSameLayoutTest(PreferredBackend backend)
-    : UnitTest("DenseVectorBlockedSameLayoutTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseVectorBlockedSameLayoutTest() {}
-
-  virtual void run() const override
-  {
-    for (Index size(2); size < Index(1e3); size *= 2)
-    {
-      const Index diff_elem = size / 2;
-
-      DenseVectorBlocked<DT_, IT_, block_size_> a(size);
-
-      // a = i
-      for (Index i(0); i < size; ++i)
-      {
-        Tiny::Vector<DT_, block_size_> tv;
-        for (int j = 0; j < block_size_; ++j)
-          tv[j] = DT_(i * block_size_ + Index(j));
-        a(i, tv);
-      }
-
-      // weak copy
-      DenseVectorBlocked<DT_, IT_, block_size_> b = a.clone(CloneMode::Weak);
-      TEST_CHECK(a.same_layout(b));
-
-      // shallow copy
-      DenseVectorBlocked<DT_, IT_, block_size_> c = a.clone(CloneMode::Shallow);
-      TEST_CHECK(a.same_layout(c));
-
-      // change one element
-      Tiny::Vector<DT_, block_size_> diff1(DT_(0.5));
-      c(diff_elem, diff1);
-      TEST_CHECK(a.same_layout(c));
-
-      // different sizes
-      DenseVectorBlocked<DT_, IT_, block_size_> d(size + 2, DT_(10));
-      DenseVectorBlocked<DT_, IT_, block_size_> e(size, DT_(10));
-      TEST_CHECK(!d.same_layout(e));
-
-      // one different element
-      DenseVectorBlocked<DT_, IT_, block_size_> f(size);
-      Tiny::Vector<DT_, block_size_> diff2(DT_(10));
-      f(diff_elem, diff2);
-      DenseVectorBlocked<DT_, IT_, block_size_> g(size);
-      g(diff_elem, diff1);
-      TEST_CHECK(f.same_layout(g));
-    }
-  }
-};
-DenseVectorBlockedSameLayoutTest <float, std::uint32_t, 2> dense_vector_blocked_same_layout_test_float_uint32(PreferredBackend::generic);
-DenseVectorBlockedSameLayoutTest <double, std::uint32_t, 2> dense_vector_blocked_same_layout_test_double_uint32(PreferredBackend::generic);
-DenseVectorBlockedSameLayoutTest <float, std::uint64_t, 3> dense_vector_blocked_same_layout_test_float_uint64(PreferredBackend::generic);
-DenseVectorBlockedSameLayoutTest <double, std::uint64_t, 3> dense_vector_blocked_same_layout_test_double_uint64(PreferredBackend::generic);
-#ifdef FEAT_HAVE_MKL
-DenseVectorBlockedSameLayoutTest <float, std::uint64_t, 2> mkl_dense_vector_blocked_same_layout_test_float_uint64(PreferredBackend::mkl);
-DenseVectorBlockedSameLayoutTest <double, std::uint64_t, 3> mkl_dense_vector_blocked_same_layout_test_double_uint64(PreferredBackend::mkl);
-#endif
-#ifdef FEAT_HAVE_QUADMATH
-DenseVectorBlockedSameLayoutTest <__float128, std::uint32_t, 2> dense_vector_blocked_same_layout_test_float128_uint32(PreferredBackend::generic);
-DenseVectorBlockedSameLayoutTest <__float128, std::uint64_t, 3> dense_vector_blocked_same_layout_test_float128_uint64(PreferredBackend::generic);
-#endif
-#ifdef FEAT_HAVE_HALFMATH
-DenseVectorBlockedSameLayoutTest <Half, std::uint32_t, 2> dense_vector_blocked_same_layout_test_half_uint32(PreferredBackend::generic);
-DenseVectorBlockedSameLayoutTest <Half, std::uint64_t, 3> dense_vector_blocked_same_layout_test_half_uint64(PreferredBackend::generic);
-#ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedSameLayoutTest <Half, std::uint32_t, 2> cuda_dense_vector_blocked_same_layout_test_half_uint32(PreferredBackend::cuda);
-DenseVectorBlockedSameLayoutTest <Half, std::uint64_t, 3> cuda_dense_vector_blocked_same_layout_test_half_uint64(PreferredBackend::cuda);
-#endif
-#endif
-#ifdef FEAT_HAVE_CUDA
-DenseVectorBlockedSameLayoutTest <float, std::uint32_t, 2> cuda_dense_vector_blocked_same_layout_test_float_uint32(PreferredBackend::cuda);
-DenseVectorBlockedSameLayoutTest <double, std::uint32_t, 2> cuda_dense_vector_blocked_same_layout_test_double_uint32(PreferredBackend::cuda);
-DenseVectorBlockedSameLayoutTest <float, std::uint64_t, 3> cuda_dense_vector_blocked_same_layout_test_float_uint64(PreferredBackend::cuda);
-DenseVectorBlockedSameLayoutTest <double, std::uint64_t, 3> cuda_dense_vector_blocked_same_layout_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedPermuteTest, float, std::uint32_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedPermuteTest, double, std::uint32_t, 2, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedPermuteTest, float, std::uint64_t, 3, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_3T_P(DenseVectorBlockedPermuteTest, double, std::uint64_t, 3, PreferredBackend::cuda);
 #endif

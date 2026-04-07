@@ -33,8 +33,8 @@ namespace FEAT
 
       MKL_INT ret = 0;
       MKL_INT opt = 0;
-      MKL_INT neq = static_cast<MKL_INT>(_system_matrix.rows());
-      MKL_INT nze = static_cast<MKL_INT>(_system_matrix.used_elements());
+      MKL_INT neq = static_cast<MKL_INT>(_system_matrix.num_rows());
+      MKL_INT nze = static_cast<MKL_INT>(_system_matrix.num_nzes());
 
       // create DSS handle
       opt = MKL_DSS_TERM_LVL_ERROR + MKL_DSS_ZERO_BASED_INDEXING;
@@ -55,23 +55,23 @@ namespace FEAT
 
       // get matrix index arrays and convert to MKL_INT if necessary
       std::vector<MKL_INT> row_ptr_v, col_idx_v;
-      const Index* a_row_ptr = _system_matrix.row_ptr();
-      const Index* a_col_idx = _system_matrix.col_ind();
+      const Memory::TypedView<Index> a_row_ptr_view = _system_matrix.row_ptr_view_r();
+      const Memory::TypedView<Index> a_col_idx_view = _system_matrix.col_idx_view_r();
       const MKL_INT* row_ptr = nullptr;
       const MKL_INT* col_idx = nullptr;
       if constexpr(sizeof(Index) == sizeof(MKL_INT))
       {
-        row_ptr = reinterpret_cast<const MKL_INT*>(a_row_ptr);
-        col_idx = reinterpret_cast<const MKL_INT*>(a_col_idx);
+        row_ptr = reinterpret_cast<const MKL_INT*>(a_row_ptr_view.raw_r());
+        col_idx = reinterpret_cast<const MKL_INT*>(a_col_idx_view.raw_r());
       }
       else
       {
         row_ptr_v.resize(std::size_t(neq+1u));
         col_idx_v.resize(std::size_t(nze));
         for(Index i(0); i <= Index(neq); ++i)
-          row_ptr_v[i] = static_cast<MKL_INT>(a_row_ptr[i]);
+          row_ptr_v[i] = static_cast<MKL_INT>(a_row_ptr_view[i]);
         for(Index i(0); i < Index(nze); ++i)
-          col_idx_v[i] = static_cast<MKL_INT>(a_col_idx[i]);
+          col_idx_v[i] = static_cast<MKL_INT>(a_col_idx_view[i]);
         row_ptr = row_ptr_v.data();
         col_idx = col_idx_v.data();
       }
@@ -145,7 +145,8 @@ namespace FEAT
       MKL_INT ret = 0;
       MKL_INT opt = MKL_DSS_INDEFINITE;
 
-      ret = ::dss_factor_real(_mkl_dss_handle, opt, _system_matrix.val());
+      Memory::TypedView<double> val_view(_system_matrix.val_view_r());
+      ret = ::dss_factor_real(_mkl_dss_handle, opt, val_view.get_r());
 
       switch(ret)
       {
@@ -170,7 +171,9 @@ namespace FEAT
     {
       MKL_INT opt = 0;
       MKL_INT nrhs = 1;
-      MKL_INT ret = ::dss_solve_real(_mkl_dss_handle, opt, vec_rhs.elements(), nrhs, vec_sol.elements());
+      Memory::TypedView<double> sol_view(vec_sol.elements_view_w());
+      Memory::TypedView<double> rhs_view(vec_rhs.elements_view_r());
+      MKL_INT ret = ::dss_solve_real(_mkl_dss_handle, opt, rhs_view.get_r(), nrhs, sol_view.get_w());
       return (ret == MKL_DSS_SUCCESS ? Status::success : Status::aborted);
     }
   } // namespace Solver

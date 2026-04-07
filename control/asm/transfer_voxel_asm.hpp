@@ -29,9 +29,9 @@ namespace FEAT
         {
           const Index num_idx = mirror.num_indices();
           Vector_ vector_x(num_idx);
-          const auto* v = vector.elements();
-          auto* x = vector_x.elements();
-          const auto* idx_f = mirror.indices();
+          const auto v = vector.elements_view_r();
+          auto x = vector_x.elements_view_w();
+          const auto idx_f = mirror.indices_view_r();
           for(Index i(0); i < num_idx; ++i)
             x[i] = v[idx_f[i]];
           return vector_x;
@@ -43,19 +43,19 @@ namespace FEAT
         {
           typedef typename Matrix_::IndexType IndexType;
           const Index num_idx = row_mirror.num_indices();
-          const auto* idx_f = row_mirror.indices();
+          const auto idx_f = row_mirror.indices_view_r();
 
-          const IndexType* row_ptr_s = matrix.row_ptr();
-          const IndexType* col_idx_s = matrix.col_ind();
+          const Memory::TypedView<IndexType> row_ptr_s = matrix.row_ptr_view_r();
+          const Memory::TypedView<IndexType> col_idx_s = matrix.col_idx_view_r();
           Index num_nze = 0u;
           for(Index i(0); i < num_idx; ++i)
             num_nze += row_ptr_s[idx_f[i] + 1u] - row_ptr_s[idx_f[i]];
 
-          Matrix_ matrix_x(num_idx, matrix.columns(), num_nze);
-          IndexType* row_ptr_x = matrix_x.row_ptr();
-          IndexType* col_idx_x = matrix_x.col_ind();
-          auto* val_x = matrix_x.val();
-          const auto* val_s = matrix.val();
+          Matrix_ matrix_x(num_idx, matrix.num_cols(), num_nze);
+          Memory::TypedView<IndexType> row_ptr_x = matrix_x.row_ptr_view_w();
+          Memory::TypedView<IndexType> col_idx_x = matrix_x.col_idx_view_w();
+          auto val_x = matrix_x.val_view_w();
+          const auto val_s = matrix.val_view_r();
           row_ptr_x[0] = 0u;
           for(Index i(0); i < num_idx; ++i)
           {
@@ -77,25 +77,25 @@ namespace FEAT
         {
           typedef typename Matrix_::IndexType IndexType;
           const Index num_idx = col_mirror.num_indices();
-          const auto* idx_f = col_mirror.indices();
+          const auto idx_f = col_mirror.indices_view_r();
 
-          std::vector<Index> col_map(matrix.columns(), ~Index(0));
+          std::vector<Index> col_map(matrix.num_cols(), ~Index(0));
           for(Index i(0); i < num_idx; ++i)
             col_map[idx_f[i]] = i;
 
-          const Index num_rows = matrix.rows();
-          const IndexType* row_ptr_s = matrix.row_ptr();
-          const IndexType* col_idx_s = matrix.col_ind();
-          Index used_elems = matrix.used_elements();
+          const Index num_rows = matrix.num_rows();
+          const Memory::TypedView<IndexType> row_ptr_s = matrix.row_ptr_view_r();
+          const Memory::TypedView<IndexType> col_idx_s = matrix.col_idx_view_r();
+          Index used_elems = matrix.num_nzes();
           Index num_nze = 0u;
           for(Index i(0); i < used_elems; ++i)
             num_nze += (col_map[col_idx_s[i]] != ~Index(0));
 
           Matrix_ matrix_x(num_rows, num_idx, num_nze);
-          IndexType* row_ptr_x = matrix_x.row_ptr();
-          IndexType* col_idx_x = matrix_x.col_ind();
-          auto* val_x = matrix_x.val();
-          const auto* val_s = matrix.val();
+          Memory::TypedView<IndexType> row_ptr_x = matrix_x.row_ptr_view_w();
+          Memory::TypedView<IndexType> col_idx_x = matrix_x.col_idx_view_w();
+          auto val_x = matrix_x.val_view_w();
+          const auto val_s = matrix.val_view_r();
           row_ptr_x[0] = 0u;
           for(Index i(0); i < num_rows; ++i)
           {

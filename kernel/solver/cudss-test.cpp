@@ -26,10 +26,6 @@ public:
   {
   }
 
-  virtual ~CUDSSTest()
-  {
-  }
-
   virtual void run() const override
   {
     const double tol = TestSystem::tol<double>();

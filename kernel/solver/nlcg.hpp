@@ -186,7 +186,7 @@ namespace FEAT
             XASSERT(_linesearch != nullptr);
 
             this->_min_stag_iter = 0;
-            _restart_freq = this->_functional.columns() + Index(3);
+            _restart_freq = this->_functional.num_cols() + Index(3);
 
             this->set_ls_iter_digits(Math::ilog10(_linesearch->get_max_iter()));
 
@@ -232,7 +232,7 @@ namespace FEAT
             XASSERT(_linesearch != nullptr);
 
             this->_min_stag_iter = 0;
-            _restart_freq = this->_functional.columns() + Index(3);
+            _restart_freq = this->_functional.num_cols() + Index(3);
 
             this->set_ls_iter_digits(Math::ilog10(_linesearch->get_max_iter()));
 

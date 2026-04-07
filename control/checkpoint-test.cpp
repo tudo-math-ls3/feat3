@@ -50,8 +50,11 @@ public:
   virtual void run() const override
   {
     LAFEM::DenseVector<DT_, IT_> dv1(1234);
-    for (Index i(0) ; i < dv1.size() ; ++i)
-      dv1(i, DT_(i) / DT_(12));
+    {
+      Memory::TypedView<DT_> v1(dv1.elements_view_w());
+      for (Index i(0) ; i < dv1.size() ; ++i)
+        v1[i] = DT_(i) / DT_(12);
+    }
 
     //LAFEM::PowerRowMatrix<LAFEM::PowerRowMatrix<LAFEM::SparseMatrixCSR<DT_, IT_>, 2>, 2> next_powrow;
     //next_powrow.get(0,1) = powrow.clone();
@@ -109,8 +112,7 @@ public:
       LAFEM::DenseVector<DT_, IT_> dv4;
       cp.restore_object(String("dv1"), dv4, false);
       TEST_CHECK_EQUAL(dv1.size(), dv4.size());
-      for(Index i(0) ; i < dv1.size() ; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(dv1(i), dv2(i), DT_(1e-3));
+      TEST_CHECK_LESS_THAN(dv1.max_rel_diff(dv2), DT_(1e-3));
 #endif
 #endif
 
@@ -287,12 +289,18 @@ public:
   {
     DT_ eps = TestSystem::tol<DT_>();
     LAFEM::DenseVector<DT_, IT_> dv1(1234);
-    for (Index i(0) ; i < dv1.size() ; ++i)
-      dv1(i, DT_(i) / DT_(12));
+    {
+      Memory::TypedView<DT_> v1(dv1.elements_view_w());
+      for (Index i(0) ; i < dv1.size() ; ++i)
+        v1[i] = DT_(i) / DT_(12);
+    }
 
     LAFEM::DenseVector<DT_, IT_> dv2(1289);
-    for (Index i(0) ; i < dv2.size() ; ++i)
-      dv2(i, DT_(i) / DT_(16));
+    {
+      Memory::TypedView<DT_> v2(dv2.elements_view_w());
+      for (Index i(0) ; i < dv2.size() ; ++i)
+        v2[i] = DT_(i) / DT_(16);
+    }
     LAFEM::PowerVector<LAFEM::DenseVector<DT_,IT_>, 2> powvec;
     powvec.get(0) = dv1.clone();
     powvec.get(1) = dv2.clone();
@@ -491,12 +499,18 @@ public:
     DT_ eps = TestSystem::tol<DT_>();
     LAFEM::TupleVector<LAFEM::DenseVector<DT_, IT_>, LAFEM::DenseVector<DT_, IT_>> tuple1;
     LAFEM::DenseVector<DT_, IT_> dv1(1234);
-    for (Index i(0) ; i < dv1.size() ; ++i)
-      dv1(i, DT_(i) / DT_(12));
+    {
+      Memory::TypedView<DT_> v(dv1.elements_view_w());
+      for (Index i(0) ; i < dv1.size() ; ++i)
+        v[i] = DT_(i) / DT_(12);
+    }
 
     LAFEM::DenseVector<DT_, IT_> a(329);
-    for (Index i(0) ; i < a.size() ; ++i)
-      a(i, DT_(i) / DT_(7));
+    {
+      Memory::TypedView<DT_> va(a.elements_view_w());
+      for (Index i(0) ; i < a.size() ; ++i)
+        va[i] = DT_(i) / DT_(7);
+    }
 
     tuple1.template at<0>() = dv1.clone();
     tuple1.template at<1>() = a.clone();

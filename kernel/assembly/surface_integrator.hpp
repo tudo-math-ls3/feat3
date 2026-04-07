@@ -13,6 +13,7 @@
 #include <kernel/util/tiny_algebra.hpp>
 
 #include <vector>
+#include <numeric>
 
 namespace FEAT::Assembly
 {

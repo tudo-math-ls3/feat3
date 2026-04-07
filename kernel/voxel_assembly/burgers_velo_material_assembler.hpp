@@ -1077,8 +1077,7 @@ namespace FEAT
               const DT_* conv_data,
               const AssemblyCubatureData<DT_>& cubature,
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
-              const std::vector<int*>& coloring_maps,
-              const std::vector<Index>& coloring_map_sizes,
+              const Adjacency::ColoringDataHandler& coloring_data,
               DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params,
               const AssemblyMaterialData<DT_>& material_params,
               MaterialType mat_type, int shared_mem, int blocksize, int gridsize, bool print_occupancy);
@@ -1112,8 +1111,7 @@ namespace FEAT
               const DT_* primal_data,
               const AssemblyCubatureData<DT_>& cubature,
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
-              const std::vector<int*>& coloring_maps,
-              const std::vector<Index>& coloring_map_sizes,
+              const Adjacency::ColoringDataHandler& coloring_data,
               DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params,
               const AssemblyMaterialData<DT_>& material_params,
               MaterialType material_type,
@@ -1148,8 +1146,7 @@ namespace FEAT
               const DT_* conv_data,
               const AssemblyCubatureData<DT_>& cubature,
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
-              const std::vector<int*>& coloring_maps,
-              const std::vector<Index>& coloring_map_sizes,
+              const Adjacency::ColoringDataHandler& coloring_data,
               DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params,
               const AssemblyMaterialData<DT_>& material_params,
               MaterialType material_type);
@@ -1183,8 +1180,7 @@ namespace FEAT
               const DT_* primal_data,
               const AssemblyCubatureData<DT_>& cubature,
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
-              const std::vector<int*>& coloring_maps,
-              const std::vector<Index>& coloring_map_sizes,
+              const Adjacency::ColoringDataHandler& coloring_data,
               DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params,
               const AssemblyMaterialData<DT_>& material_params,
               MaterialType material_type);
@@ -1305,8 +1301,8 @@ namespace FEAT
       void assemble_matrix1(LAFEM::SparseMatrixBCSR<DataType, IndexType, dim, dim>& matrix, const LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& convect,
        const SpaceType& space, const CubatureFactory_& cubature_factory, DataType alpha = DataType(1)) const
       {
-        XASSERTM(matrix.rows() == space.get_num_dofs(), "invalid matrix dimensions");
-        XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_rows() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_cols() == space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
         //define cubature
@@ -1318,7 +1314,10 @@ namespace FEAT
         typename CubatureRuleType::PointType* cub_pt = cubature.get_points();
         DataType* cub_wg = cubature.get_weights();
 
-        BACKEND_SKELETON_VOID(assemble_matrix1_cuda, assemble_matrix1_generic, assemble_matrix1_generic, matrix, convect, space, cub_pt, cub_wg, num_cubs, alpha)
+        if(Backend::get_preferred_backend() == PreferredBackend::cuda)
+          assemble_matrix1_cuda(matrix, convect, space, cub_pt, cub_wg, num_cubs, alpha);
+        else
+          assemble_matrix1_generic(matrix, convect, space, cub_pt, cub_wg, num_cubs, alpha);
       }
 
       /**
@@ -1349,14 +1348,20 @@ namespace FEAT
         typename CubatureRuleType::PointType* cub_pt = cubature.get_points();
         DataType* cub_wg = cubature.get_weights();
 
-        BACKEND_SKELETON_VOID(assemble_vector_cuda, assemble_vector_generic, assemble_vector_generic, vector, convect, primal, space, cub_pt, cub_wg, num_cubs, alpha)
+        if(Backend::get_preferred_backend() == PreferredBackend::cuda)
+          assemble_vector_cuda(vector, convect, primal, space, cub_pt, cub_wg, num_cubs, alpha);
+        else
+          assemble_vector_generic(vector, convect, primal, space, cub_pt, cub_wg, num_cubs, alpha);
       }
 
       void assemble_matrix1_generic(LAFEM::SparseMatrixBCSR<DataType, IndexType, dim, dim>& matrix, const LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& convect,
        const SpaceType& space, typename Cubature::Rule<ShapeType, DataType, DataType>::PointType* cub_pt, const DataType* cub_wg, int num_cubs, DataType alpha) const
       {
-        VoxelAssembly::CSRMatrixData<DataType, IndexType> mat_data = {matrix.template val<LAFEM::Perspective::pod>(), matrix.row_ptr(), matrix.col_ind(), matrix.rows(), matrix.columns()};
-        const DataType* vec_data = convect.template elements<LAFEM::Perspective::pod>();
+        Memory::TypedView<DT_> val_view(matrix.val_view_raw_rw());
+        const Memory::TypedView<IT_> row_ptr_view(matrix.row_ptr_view_r());
+        const Memory::TypedView<IT_> col_idx_view(matrix.col_idx_view_r());
+        VoxelAssembly::CSRMatrixData<DataType, IndexType> mat_data = {val_view.get_w(), row_ptr_view.get_r(), col_idx_view.get_r(), matrix.num_rows(), matrix.num_cols()};
+        const Memory::TypedView<DT_> vec_data = convect.elements_view_raw_r();
 
         VoxelAssembly::AssemblyCubatureData<DataType> cub_data = {(void*)cub_pt, cub_wg, num_cubs};
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> mapping_data = this->mesh_data.get_assembly_field();
@@ -1364,17 +1369,16 @@ namespace FEAT
         auto material_params = this->wrap_material_params();
 
 
-        VoxelAssembly::Arch::assemble_burgers_velo_material_csr_host(space, mat_data, vec_data, cub_data, mapping_data,
-            this->mesh_data.get_coloring_maps(), this->mesh_data.get_color_map_sizes(), alpha,
-                                  burgers_params, material_params, material_type);
+        VoxelAssembly::Arch::assemble_burgers_velo_material_csr_host(space, mat_data, vec_data.get_r(), cub_data, mapping_data,
+          this->mesh_data.coloring_data, alpha, burgers_params, material_params, material_type);
       }
 
       void assemble_vector_generic(LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& vector, const LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& convect, const LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& primal,
        const SpaceType& space, typename Cubature::Rule<ShapeType, DataType, DataType>::PointType* cub_pt, const DataType* cub_wg, int num_cubs, DataType alpha) const
       {
-        DataType* vec_data = vector.template elements<LAFEM::Perspective::pod>();
-        const DataType* conv_data = convect.template elements<LAFEM::Perspective::pod>();
-        const DataType* primal_data = primal.template elements<LAFEM::Perspective::pod>();
+        Memory::TypedView<DataType> vec_data = vector.elements_view_raw_rw();
+        const Memory::TypedView<DataType> conv_data = convect.elements_view_raw_r();
+        const Memory::TypedView<DataType> primal_data = primal.elements_view_raw_r();
 
         VoxelAssembly::AssemblyCubatureData<DataType> cub_data = {(void*)cub_pt, cub_wg, num_cubs};
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> mapping_data = this->mesh_data.get_assembly_field();
@@ -1382,9 +1386,8 @@ namespace FEAT
         auto material_params = wrap_material_params();
 
 
-        VoxelAssembly::Arch::assemble_burgers_velo_material_defect_host(space, vec_data, conv_data, primal_data, cub_data, mapping_data,
-                                  this->mesh_data.get_coloring_maps(), this->mesh_data.get_color_map_sizes(), alpha,
-                                  burgers_params, material_params, material_type);
+        VoxelAssembly::Arch::assemble_burgers_velo_material_defect_host(space, vec_data.get_w(), conv_data.get_r(), primal_data.get_r(), cub_data, mapping_data,
+          this->mesh_data.coloring_data, alpha, burgers_params, material_params, material_type);
         //free resources
       }
 
@@ -1392,59 +1395,62 @@ namespace FEAT
       void assemble_matrix1_cuda(LAFEM::SparseMatrixBCSR<DataType, IndexType, dim, dim>& matrix, const LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& convect,
        const SpaceType& space, typename Cubature::Rule<ShapeType, DataType, DataType>::PointType* cub_pt, const DataType* cub_wg, int num_cubs, DataType alpha) const
       {
-        VoxelAssembly::CSRMatrixData<DataType, IndexType> mat_data = {matrix.template val<LAFEM::Perspective::pod>(), matrix.row_ptr(), matrix.col_ind(), matrix.rows(), matrix.columns()};
-        const DataType* vec_data = convect.template elements<LAFEM::Perspective::pod>();
+        Memory::TypedView<DT_> val_view(matrix.val_view_raw_rw(Memory::Location::cuda));
+        const Memory::TypedView<IT_> row_ptr_view(matrix.row_ptr_view_r(Memory::Location::cuda));
+        const Memory::TypedView<IT_> col_idx_view(matrix.col_idx_view_r(Memory::Location::cuda));
+        VoxelAssembly::CSRMatrixData<DataType, IndexType> mat_data = {val_view.get_w(), row_ptr_view.get_r(), col_idx_view.get_r(), matrix.num_rows(), matrix.num_cols()};
+        const Memory::TypedView<DT_> vec_data = convect.elements_view_raw_r(Memory::Location::cuda);
 
         typedef typename Cubature::Rule<ShapeType, DataType, DataType>::PointType CubPointType;
         //initialize all necessary pointer arrays and values //maybe more sense to specify cubature rule and set this to a const mem location?
-        void* cub_pt_device = Util::cuda_malloc(Index(num_cubs) * sizeof(CubPointType));
-        Util::cuda_copy_host_to_device(cub_pt_device, (void*)cub_pt, Index(num_cubs) * sizeof(CubPointType));
+        void* cub_pt_device = Memory::alloc_cuda(Index(num_cubs) * sizeof(CubPointType));
+        Memory::memcopy_main_to_cuda(cub_pt_device, (void*)cub_pt, Index(num_cubs) * sizeof(CubPointType));
 
-        void* cub_wg_device = Util::cuda_malloc(Index(num_cubs) * sizeof(DataType));
-        Util::cuda_copy_host_to_device(cub_wg_device, (const void*)cub_wg, Index(num_cubs) * sizeof(DataType));
+        void* cub_wg_device = Memory::alloc_cuda(std::size_t(num_cubs) * sizeof(DataType));
+        Memory::memcopy_main_to_cuda(cub_wg_device, (const void*)cub_wg, std::size_t(num_cubs) * sizeof(DataType));
 
         VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = this->mesh_data.get_assembly_field();
         auto burgers_params = this->wrap_burgers_params();
         auto material_params = wrap_material_params();
 
-        VoxelAssembly::Arch::assemble_burgers_velo_material_csr(space, mat_data, vec_data, d_cub_data, d_mapping_data,
-                  this->mesh_data.get_coloring_maps(), this->mesh_data.get_color_map_sizes(), alpha, burgers_params, material_params, material_type,
+        VoxelAssembly::Arch::assemble_burgers_velo_material_csr(space, mat_data, vec_data.get_r(), d_cub_data, d_mapping_data,
+                  this->mesh_data.coloring_data, alpha, burgers_params, material_params, material_type,
                   this->shared_mem, this->blocksize, this->gridsize, this->print_occupancy);
-        Util::cuda_free(cub_wg_device);
-        Util::cuda_free(cub_pt_device);
+        Memory::free_cuda(cub_wg_device);
+        Memory::free_cuda(cub_pt_device);
       }
 
 
       void assemble_vector_cuda(LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& vector, const LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& convect, const LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& primal,
        const SpaceType& space, typename Cubature::Rule<ShapeType, DataType, DataType>::PointType* cub_pt, const DataType* cub_wg, int num_cubs, DataType alpha) const
       {
-        DataType* vec_data = vector.template elements<LAFEM::Perspective::pod>();
-        const DataType* conv_data = convect.template elements<LAFEM::Perspective::pod>();
-        const DataType* primal_data = primal.template elements<LAFEM::Perspective::pod>();
+        Memory::TypedView<DataType> vec_data = vector.elements_view_raw_rw(Memory::Location::cuda);
+        const Memory::TypedView<DataType> conv_data = convect.elements_view_raw_r(Memory::Location::cuda);
+        const Memory::TypedView<DataType> primal_data = primal.elements_view_raw_r(Memory::Location::cuda);
 
         typedef typename Cubature::Rule<ShapeType, DataType, DataType>::PointType CubPointType;
         //initialize all necessary pointer arrays and values //maybe more sense to specify cubature rule and set this to a const mem location?
-        void* cub_pt_device = Util::cuda_malloc(Index(num_cubs) * sizeof(CubPointType));
-        Util::cuda_copy_host_to_device(cub_pt_device, (void*)cub_pt, Index(num_cubs) * sizeof(CubPointType));
+        void* cub_pt_device = Memory::alloc_cuda(Index(num_cubs) * sizeof(CubPointType));
+        Memory::memcopy_main_to_cuda(cub_pt_device, (void*)cub_pt, Index(num_cubs) * sizeof(CubPointType));
 
-        void* cub_wg_device = Util::cuda_malloc(Index(num_cubs) * sizeof(DataType));
-        Util::cuda_copy_host_to_device(cub_wg_device, (const void*)cub_wg, Index(num_cubs) * sizeof(DataType));
+        void* cub_wg_device = Memory::alloc_cuda(std::size_t(num_cubs) * sizeof(DataType));
+        Memory::memcopy_main_to_cuda(cub_wg_device, (const void*)cub_wg, std::size_t(num_cubs) * sizeof(DataType));
 
         VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = this->mesh_data.get_assembly_field();
         auto burgers_params = this->wrap_burgers_params();
         auto material_params = wrap_material_params();
 
-        VoxelAssembly::Arch::assemble_burgers_velo_material_defect(space, vec_data, conv_data, primal_data, d_cub_data, d_mapping_data,
-                  this->mesh_data.get_coloring_maps(), this->mesh_data.get_color_map_sizes(), alpha, burgers_params, material_params, material_type,
+        VoxelAssembly::Arch::assemble_burgers_velo_material_defect(space, vec_data.get_w(), conv_data.get_r(), primal_data.get_r(), d_cub_data, d_mapping_data,
+                  this->mesh_data.coloring_data, alpha, burgers_params, material_params, material_type,
                   this->shared_mem, this->blocksize, this->gridsize, this->print_occupancy);
-        Util::cuda_free(cub_wg_device);
-        Util::cuda_free(cub_pt_device);
+        Memory::free_cuda(cub_wg_device);
+        Memory::free_cuda(cub_pt_device);
       }
 
       #else //FEAT_HAVE_CUDA
-      void assemble_matrix1_cuda(LAFEM::SparseMatrixBCSR<DataType, IndexType, dim, dim>& DOXY(matrix), const SpaceType& DOXY(space), typename Cubature::Rule<ShapeType, DataType, DataType>::PointType* DOXY(cub_pt), const DataType* DOXY(cub_wg), int DOXY(num_cubs), DataType DOXY(alpha)) const
+      void assemble_matrix1_cuda(LAFEM::SparseMatrixBCSR<DataType, IndexType, dim, dim>& DOXY(matrix), const LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& DOXY(convect), const SpaceType& DOXY(space), typename Cubature::Rule<ShapeType, DataType, DataType>::PointType* DOXY(cub_pt), const DataType* DOXY(cub_wg), int DOXY(num_cubs), DataType DOXY(alpha)) const
       {
         XABORTM("What in the nine hells are you doing here?");
       }

@@ -250,7 +250,7 @@ namespace Stokes3Field
   {
     const std::size_t n = vs.size();
     std::vector<double> s11(n), s22(n), s12(n), s21(n);
-    const auto* s = vs.elements();
+    const auto s = vs.elements_view_r();
     for(std::size_t i(0); i < n; ++i)
     {
       s11[i] = s[i][0];
@@ -270,7 +270,7 @@ namespace Stokes3Field
   {
     const std::size_t n = vs.size();
     std::vector<double> s11(n), s22(n), s12(n);
-    const auto* s = vs.elements();
+    const auto s = vs.elements_view_r();
     for(std::size_t i(0); i < n; ++i)
     {
       s11[i] = s[i][0];
@@ -288,7 +288,7 @@ namespace Stokes3Field
   {
     const std::size_t n = vs.size();
     std::vector<double> s11(n), s22(n), s33(n), s12(n), s23(n), s31(n);
-    const auto* s = vs.elements();
+    const auto s = vs.elements_view_r();
     for(std::size_t i(0); i < n; ++i)
     {
       s11[i] = s[i][0];
@@ -942,21 +942,21 @@ namespace Stokes3Field
     {
       stats.counts[i][Counts::num_ranks] = Index(domain.at(i).layer().comm().size());
       stats.counts[i][Counts::num_elems] = domain.at(i)->get_mesh().get_num_elements();
-      stats.counts[i][Counts::num_dofs_g] = system_levels.at(i)->matrix_sys.rows();
-      stats.counts[i][Counts::num_dofs_l] = system_levels.at(i)->matrix_sys.local().rows();
-      stats.counts[i][Counts::num_dofs_g_v] = system_levels.at(i)->matrix_a.rows();
-      stats.counts[i][Counts::num_dofs_l_v] = system_levels.at(i)->matrix_a.local().rows();
-      stats.counts[i][Counts::num_dofs_g_p] = system_levels.at(i)->matrix_d.rows();
-      stats.counts[i][Counts::num_dofs_l_p] = system_levels.at(i)->matrix_d.local().rows();
-      stats.counts[i][Counts::num_dofs_g_s] = system_levels.at(i)->matrix_m.rows();
-      stats.counts[i][Counts::num_dofs_l_s] = system_levels.at(i)->matrix_m.local().rows();
-      stats.counts[i][Counts::num_nze] = system_levels.at(i)->matrix_sys.local().template used_elements<LAFEM::Perspective::pod>();
-      stats.counts[i][Counts::num_nze_a] = system_levels.at(i)->matrix_a.local().used_elements();
-      stats.counts[i][Counts::num_nze_b] = system_levels.at(i)->matrix_b.local().used_elements();
-      stats.counts[i][Counts::num_nze_d] = system_levels.at(i)->matrix_d.local().used_elements();
-      stats.counts[i][Counts::num_nze_k] = system_levels.at(i)->matrix_k.local().used_elements();
-      stats.counts[i][Counts::num_nze_l] = system_levels.at(i)->matrix_l.local().used_elements();
-      stats.counts[i][Counts::num_nze_m] = system_levels.at(i)->matrix_m.local().used_elements();
+      stats.counts[i][Counts::num_dofs_g] = system_levels.at(i)->matrix_sys.num_rows();
+      stats.counts[i][Counts::num_dofs_l] = system_levels.at(i)->matrix_sys.local().num_rows();
+      stats.counts[i][Counts::num_dofs_g_v] = system_levels.at(i)->matrix_a.num_rows();
+      stats.counts[i][Counts::num_dofs_l_v] = system_levels.at(i)->matrix_a.local().num_rows();
+      stats.counts[i][Counts::num_dofs_g_p] = system_levels.at(i)->matrix_d.num_rows();
+      stats.counts[i][Counts::num_dofs_l_p] = system_levels.at(i)->matrix_d.local().num_rows();
+      stats.counts[i][Counts::num_dofs_g_s] = system_levels.at(i)->matrix_m.num_rows();
+      stats.counts[i][Counts::num_dofs_l_s] = system_levels.at(i)->matrix_m.local().num_rows();
+      stats.counts[i][Counts::num_nze] = system_levels.at(i)->matrix_sys.local().num_nzes_raw();
+      stats.counts[i][Counts::num_nze_a] = system_levels.at(i)->matrix_a.local().num_nzes();
+      stats.counts[i][Counts::num_nze_b] = system_levels.at(i)->matrix_b.local().num_nzes();
+      stats.counts[i][Counts::num_nze_d] = system_levels.at(i)->matrix_d.local().num_nzes();
+      stats.counts[i][Counts::num_nze_k] = system_levels.at(i)->matrix_k.local().num_nzes();
+      stats.counts[i][Counts::num_nze_l] = system_levels.at(i)->matrix_l.local().num_nzes();
+      stats.counts[i][Counts::num_nze_m] = system_levels.at(i)->matrix_m.local().num_nzes();
       stats.counts[i][Counts::bytes_system] = system_levels.at(i)->bytes();
       stats.counts[i][Counts::bytes_matrix] = system_levels.at(i)->matrix_sys.local().bytes();
       stats.counts[i][Counts::elems_mirror] = 0;
@@ -1194,7 +1194,7 @@ namespace Stokes3Field
       Assembly::DiscreteCellProjector::project(vtx_p, vec_sol.local().template at<1>(), the_domain_level.space_pres, cub);
 
       // write pressure
-      exporter.add_cell_scalar("pressure", vtx_p.elements());
+      exporter.add_cell_scalar("pressure", vtx_p);
 
       // finally, write the VTK file
       exporter.write(vtk_name, comm);

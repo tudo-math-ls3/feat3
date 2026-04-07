@@ -20,14 +20,14 @@ namespace FEAT
     /// \cond internal
     namespace Intern
     {
-      int cuda_ilu_apply(double * y, const double * x, double * csrVal, int * csrRowPtr, int * csrColInd, void * vinfo);
-      void * cuda_ilu_init_symbolic(int m, int nnz, double * csrVal, int * csrRowPtr, int * csrColInd);
-      void cuda_ilu_init_numeric(double * csrVal, int * csrRowPtr, int * csrColInd, void * vinfo);
+      int cuda_ilu_apply(double * y, const double * x, const double * csrVal, const int * csrRowPtr, const int * csrColInd, void * vinfo);
+      void * cuda_ilu_init_symbolic(int m, int nnz, double * csrVal, const int * csrRowPtr, const int * csrColInd);
+      void cuda_ilu_init_numeric(double * csrVal, const int * csrRowPtr, const int * csrColInd, void * vinfo);
       void cuda_ilu_done_symbolic(void * vinfo);
 
-      int cuda_ilub_apply(double * y, const double * x, double * csrVal, int * csrRowPtr, int * csrColInd, void * vinfo);
-      void * cuda_ilub_init_symbolic(int m, int nnz, double * csrVal, int * csrRowPtr, int * csrColInd, const int blocksize);
-      void cuda_ilub_init_numeric(double * csrVal, int * csrRowPtr, int * csrColInd, void * vinfo);
+      int cuda_ilub_apply(double * y, const double * x, const double * csrVal, const int * csrRowPtr, const int * csrColInd, void * vinfo);
+      void * cuda_ilub_init_symbolic(int m, int nnz, double * csrVal, const int * csrRowPtr, const int * csrColInd, const int blocksize);
+      void cuda_ilub_init_numeric(double * csrVal, const int * csrRowPtr, const int * csrColInd, void * vinfo);
       void cuda_ilub_done_symbolic(void * vinfo);
 
       /**
@@ -158,7 +158,9 @@ namespace FEAT
         template<typename DT_>
         void set_struct(const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix)
         {
-          this->set_struct_csr(IT_(matrix.rows()), matrix.row_ptr(), matrix.col_ind());
+          const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
+          this->set_struct_csr(IT_(matrix.num_rows()), row_ptr.get_r(), col_idx.get_r());
         }
 
         /**
@@ -170,7 +172,9 @@ namespace FEAT
         template<typename DT_, int m_, int n_>
         void set_struct(const LAFEM::SparseMatrixBCSR<DT_, IT_, m_, n_>& matrix)
         {
-          this->set_struct_csr(IT_(matrix.rows()), matrix.row_ptr(), matrix.col_ind());
+          const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
+          this->set_struct_csr(IT_(matrix.num_rows()), row_ptr.get_r(), col_idx.get_r());
         }
 
         /**
@@ -439,7 +443,10 @@ namespace FEAT
          */
         void copy_data(const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix)
         {
-          this->copy_data_csr(matrix.row_ptr(), matrix.col_ind(), matrix.val());
+          const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
+          const Memory::TypedView<DT_> mat_val = matrix.val_view_r();
+          this->copy_data_csr(row_ptr.get_r(), col_idx.get_r(), mat_val.get_r());
         }
 
         /**
@@ -763,7 +770,10 @@ namespace FEAT
          */
         void copy_data(const LAFEM::SparseMatrixBCSR<DT_, IT_, dim_, dim_>& matrix)
         {
-          this->copy_data_bcsr(matrix.row_ptr(), matrix.col_ind(), matrix.val());
+          const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
+          const Memory::TypedView<MatBlock> mat_val = matrix.val_view_r();
+          this->copy_data_bcsr(row_ptr.get_r(), col_idx.get_r(), mat_val.get_r());
         }
 
         /**
@@ -1044,7 +1054,7 @@ namespace FEAT
 
       virtual void init_symbolic() override
       {
-        if (_matrix.columns() != _matrix.rows())
+        if (_matrix.num_cols() != _matrix.num_rows())
         {
           XABORTM("Matrix is not square!");
         }
@@ -1080,15 +1090,19 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        // get vector data arrays
-        DataType* x = out.elements();
-        const DataType* b = in.elements();
+        // get vector data views
+        Memory::TypedView<DataType> vx = out.elements_view_w();
+        Memory::TypedView<DataType> vb = in.elements_view_r();
 
         // solve: (I+L)*y = b
-        _ilu.solve_il(x, b);
+        _ilu.solve_il(vx.get_w(), vb.get_r());
 
         // solve: (D+U)*x = y
-        _ilu.solve_du(x, x);
+        _ilu.solve_du(vx.get_w(), vx.get_w());
+
+        // release views
+        vb.release();
+        vx.release();
 
         // apply filter
         this->_filter.filter_cor(out);
@@ -1178,7 +1192,7 @@ namespace FEAT
 
       virtual void init_symbolic() override
       {
-        if (_matrix.columns() != _matrix.rows())
+        if (_matrix.num_cols() != _matrix.num_rows())
         {
           XABORTM("Matrix is not square!");
         }
@@ -1214,15 +1228,19 @@ namespace FEAT
       {
         TimeStamp ts_start;
 
-        // get vector data arrays
-        auto* x = out.elements();
-        const auto* b = in.elements();
+        // get vector data views
+        Memory::TypedView<DataType> vx = out.elements_view_w();
+        const Memory::TypedView<DataType> vb = in.elements_view_r();
 
         // solve: (I+L)*y = b
-        _ilu.solve_il(x, b);
+        _ilu.solve_il(vx.get_w(), vb.get_r());
 
         // solve: (D+U)*x = y
-        _ilu.solve_du(x, x);
+        _ilu.solve_du(vx.get_w(), vx.get_w());
+
+        // release views
+        vb.release();
+        vx.release();
 
         // apply filter
         this->_filter.filter_cor(out);
@@ -1322,19 +1340,19 @@ namespace FEAT
 
       virtual void init_symbolic() override
       {
-        if (_matrix.columns() != _matrix.rows())
+        if (_matrix.num_cols() != _matrix.num_rows())
         {
           XABORTM("Matrix is not square!");
         }
 
         _lu_matrix.clone(_matrix, LAFEM::CloneMode::Layout);
 
-        cuda_info = Intern::cuda_ilu_init_symbolic(
-          (int)_lu_matrix.rows(),
-          (int)_lu_matrix.used_elements(),
-          _lu_matrix.val(),
-          (int*)_lu_matrix.row_ptr(),
-          (int*)_lu_matrix.col_ind());
+        Memory::TypedView<DataType> a = _lu_matrix.val_view_rw(Memory::Location::cuda);
+        // cast from 'unsigned int' to 'int'
+        Memory::TypedView<int> row_ptr(std::forward<Memory::View&&>(_lu_matrix.row_ptr_view_r(Memory::Location::cuda)));
+        Memory::TypedView<int> col_idx(std::forward<Memory::View&&>(_lu_matrix.col_idx_view_r(Memory::Location::cuda)));
+        cuda_info = Intern::cuda_ilu_init_symbolic((int)_lu_matrix.num_rows(), (int)_lu_matrix.num_nzes(),
+          a.get_w(), row_ptr.get_r(), col_idx.get_r());
       }
 
       virtual void done_symbolic() override
@@ -1346,33 +1364,37 @@ namespace FEAT
       {
         _lu_matrix.copy(_matrix);
 
-        Intern::cuda_ilu_init_numeric(
-          _lu_matrix.val(),
-          (int*)_lu_matrix.row_ptr(),
-          (int*)_lu_matrix.col_ind(),
-          cuda_info);
+        Memory::TypedView<DataType> a = _lu_matrix.val_view_rw(Memory::Location::cuda);
+        // cast from 'unsigned int' to 'int'
+        Memory::TypedView<int> row_ptr(std::forward<Memory::View&&>(_lu_matrix.row_ptr_view_r(Memory::Location::cuda)));
+        Memory::TypedView<int> col_idx(std::forward<Memory::View&&>(_lu_matrix.col_idx_view_r(Memory::Location::cuda)));
+        Intern::cuda_ilu_init_numeric(a.get_w(), row_ptr.get_r(), col_idx.get_r(), cuda_info);
       }
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
-        XASSERTM(_matrix.rows() == vec_cor.size(), "matrix / vector size mismatch!");
-        XASSERTM(_matrix.rows() == vec_def.size(), "matrix / vector size mismatch!");
+        XASSERTM(_matrix.num_rows() == vec_cor.size(), "matrix / vector size mismatch!");
+        XASSERTM(_matrix.num_rows() == vec_def.size(), "matrix / vector size mismatch!");
 
         TimeStamp ts_start;
 
-        int status = Intern::cuda_ilu_apply(
-          vec_cor.elements(),
-          vec_def.elements(),
-          _lu_matrix.val(),
-          (int*)_lu_matrix.row_ptr(),
-          (int*)_lu_matrix.col_ind(),
-          cuda_info);
+        int status = 0;
+        {
+          Memory::TypedView<DataType> vx = vec_cor.elements_view_w(Memory::Location::cuda);
+          Memory::TypedView<DataType> vb = vec_cor.elements_view_r(Memory::Location::cuda);
+          Memory::TypedView<DataType> a = _lu_matrix.val_view_r(Memory::Location::cuda);
+          // cast from 'unsigned int' to 'int'
+          Memory::TypedView<int> row_ptr(std::forward<Memory::View&&>(_lu_matrix.row_ptr_view_r(Memory::Location::cuda)));
+          Memory::TypedView<int> col_idx(std::forward<Memory::View&&>(_lu_matrix.col_idx_view_r(Memory::Location::cuda)));
+
+          status = Intern::cuda_ilu_apply(vx.get_w(), vb.get_r(), a.get_r(), row_ptr.get_r(), col_idx.get_r(), cuda_info);
+        }
 
         this->_filter.filter_cor(vec_cor);
 
         TimeStamp ts_stop;
         Statistics::add_time_precon(ts_stop.elapsed(ts_start));
-        Statistics::add_flops(_matrix.used_elements() * 2 + vec_cor.size());
+        Statistics::add_flops(_matrix.num_nzes() * 2 + vec_cor.size());
 
         return (status == 0) ? Status::success :  Status::aborted;
       }
@@ -1553,20 +1575,19 @@ namespace FEAT
 
       virtual void init_symbolic() override
       {
-        if (_matrix.columns() != _matrix.rows())
+        if (_matrix.num_cols() != _matrix.num_rows())
         {
           XABORTM("Matrix is not square!");
         }
 
         _lu_matrix.clone(_matrix, LAFEM::CloneMode::Layout);
 
-        cuda_info = Intern::cuda_ilub_init_symbolic(
-          (int)_lu_matrix.rows(),
-          (int)_lu_matrix.used_elements(),
-          _lu_matrix.template val<LAFEM::Perspective::pod>(),
-          (int*)_lu_matrix.row_ptr(),
-          (int*)_lu_matrix.col_ind(),
-          blocksize_);
+        Memory::TypedView<DataType> a = _lu_matrix.val_view_raw_rw(Memory::Location::cuda);
+        Memory::TypedView<int> row_ptr(_lu_matrix.row_ptr_view_r(Memory::Location::cuda));
+        Memory::TypedView<int> col_idx(_lu_matrix.col_idx_view_r(Memory::Location::cuda));
+
+        cuda_info = Intern::cuda_ilub_init_symbolic((int)_lu_matrix.num_rows(), (int)_lu_matrix.num_nzes(),
+          a.get_w(), row_ptr.get_r(), col_idx.get_r(),blocksize_);
       }
 
       virtual void done_symbolic() override
@@ -1578,29 +1599,36 @@ namespace FEAT
       {
         _lu_matrix.copy(_matrix);
 
-        Intern::cuda_ilub_init_numeric(_lu_matrix.template val<LAFEM::Perspective::pod>(), (int*)_lu_matrix.row_ptr(), (int*)_lu_matrix.col_ind(), cuda_info);
+        Memory::TypedView<DataType> a = _lu_matrix.val_view_raw_rw(Memory::Location::cuda);
+        Memory::TypedView<int> row_ptr(_lu_matrix.row_ptr_view_r(Memory::Location::cuda));
+        Memory::TypedView<int> col_idx(_lu_matrix.col_idx_view_r(Memory::Location::cuda));
+
+        Intern::cuda_ilub_init_numeric(a.get_w(), row_ptr.get_r(), col_idx.get_r(), cuda_info);
       }
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
-        XASSERTM(_matrix.rows() == vec_cor.size(), "matrix / vector size mismatch!");
-        XASSERTM(_matrix.rows() == vec_def.size(), "matrix / vector size mismatch!");
+        XASSERTM(_matrix.num_rows() == vec_cor.size(), "matrix / vector size mismatch!");
+        XASSERTM(_matrix.num_rows() == vec_def.size(), "matrix / vector size mismatch!");
 
         TimeStamp ts_start;
 
-        int status = Intern::cuda_ilub_apply(
-          vec_cor.template elements<LAFEM::Perspective::pod>(),
-          vec_def.template elements<LAFEM::Perspective::pod>(),
-          _lu_matrix.template val<LAFEM::Perspective::pod>(),
-          (int*)_lu_matrix.row_ptr(),
-          (int*)_lu_matrix.col_ind(),
-          cuda_info);
+        int status = 0;
+        {
+          Memory::TypedView<DataType> vx = vec_cor.elements_view_raw_w(Memory::Location::cuda);
+          Memory::TypedView<DataType> vb = vec_cor.elements_view_raw_r(Memory::Location::cuda);
+          Memory::TypedView<DataType> a = _lu_matrix.val_view_raw_r(Memory::Location::cuda);
+          Memory::TypedView<int> row_ptr(_lu_matrix.row_ptr_view_r(Memory::Location::cuda));
+          Memory::TypedView<int> col_idx(_lu_matrix.col_idx_view_r(Memory::Location::cuda));
+
+          status = Intern::cuda_ilub_apply(vx.get_w(), vb.get_r(), a.get_r(), row_ptr.get_r(), col_idx.get_r(), cuda_info);
+        }
 
         this->_filter.filter_cor(vec_cor);
 
         TimeStamp ts_stop;
         Statistics::add_time_precon(ts_stop.elapsed(ts_start));
-        Statistics::add_flops(_matrix.used_elements() * 2 + vec_cor.size());
+        Statistics::add_flops(_matrix.num_nzes() * 2 + vec_cor.size());
 
         return (status == 0) ? Status::success :  Status::aborted;
       }

@@ -547,8 +547,8 @@ int main(int argc, char* argv [])
     Assembly::DiscreteVertexProjector::project(vtx_rhs, vec_rhs.local(), the_domain_level.space);
 
     // write velocity
-    exporter.add_vertex_scalar("sol", vtx_sol.elements());
-    exporter.add_vertex_scalar("rhs", vtx_rhs.elements());
+    exporter.add_vertex_scalar("sol", vtx_sol);
+    exporter.add_vertex_scalar("rhs", vtx_rhs);
 
     // finally, write the VTK file
     exporter.write(vtk_name, comm);

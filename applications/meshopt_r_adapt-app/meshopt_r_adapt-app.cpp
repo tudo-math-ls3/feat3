@@ -492,9 +492,10 @@ struct MeshoptRAdaptApp
 
         // Compute maximum of the mesh velocity
         DataType max_mesh_velocity(0);
+        const auto mvl = mesh_velocity.local().elements_view_r();
         for(IT_ i(0); i < mesh_velocity.local().size(); ++i)
         {
-          max_mesh_velocity = Math::max(max_mesh_velocity, (mesh_velocity.local())(i).norm_euclid());
+          max_mesh_velocity = Math::max(max_mesh_velocity, mvl(i).norm_euclid());
         }
 
         comm.print("");

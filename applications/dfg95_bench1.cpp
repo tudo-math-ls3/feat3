@@ -856,8 +856,8 @@ namespace DFG95
 
     // get the vector arrays
     const Index n = vec_def_v.size();
-    const auto* vdef = vec_def_v.elements();
-    const auto* vchr = vec_char.elements();
+    const Memory::TypedView<Tiny::Vector<DT_,dim_>> vdef = vec_def_v.elements_view_r();
+    const Memory::TypedView<DT_> vchr = vec_char.elements_view_r();
     for(Index i(0); i < n; ++i)
     {
       frc.axpy(vchr[i], vdef[i]);
@@ -870,22 +870,22 @@ namespace DFG95
   {
     const auto& loc_v = vector.template at<0>();
     const auto& loc_p = vector.template at<1>();
-    const std::size_t nv = loc_v.template size<LAFEM::Perspective::pod>() * sizeof(SystemDataType);
-    const std::size_t np = loc_p.template size<LAFEM::Perspective::pod>() * sizeof(SystemDataType);
+    const std::size_t nv = loc_v.size_raw() * sizeof(SystemDataType);
+    const std::size_t np = loc_p.size_raw() * sizeof(SystemDataType);
     std::uint64_t header[4u] =
     {
       std::uint64_t(dim),
       sizeof(SystemDataType),
-      loc_v.template size<LAFEM::Perspective::native>(),
-      loc_p.template size<LAFEM::Perspective::native>()
+      loc_v.size(),
+      loc_p.size()
     };
     buffer.resize(nv + np + 32ull);
     char* buf_h = buffer.data();
     char* buf_v = &buf_h[32ull];
     char* buf_p = &buf_v[nv];
     memcpy(buf_h, header, 32ull);
-    memcpy(buf_v, loc_v.elements(), nv);
-    memcpy(buf_p, loc_p.elements(), np);
+    memcpy(buf_v, loc_v.elements_view_r().get_r(), nv);
+    memcpy(buf_p, loc_p.elements_view_r().get_r(), np);
   }
 
   template<typename Vector_>
@@ -893,8 +893,8 @@ namespace DFG95
   {
     auto& loc_v = vector.template at<0>();
     auto& loc_p = vector.template at<1>();
-    const std::size_t nv = loc_v.template size<LAFEM::Perspective::pod>() * sizeof(SystemDataType);
-    const std::size_t np = loc_p.template size<LAFEM::Perspective::pod>() * sizeof(SystemDataType);
+    const std::size_t nv = loc_v.size_raw() * sizeof(SystemDataType);
+    const std::size_t np = loc_p.size_raw() * sizeof(SystemDataType);
 
     XASSERTM(buffer.size() == (nv+np+32ull), "invalid vector buffer size!");
     const char* buf_h = buffer.data();
@@ -905,11 +905,11 @@ namespace DFG95
     memcpy(&header, buf_h, 32ull);
     XASSERTM(int(header[0]) == dim, "invalid vector buffer dimension!");
     XASSERTM(header[1] == sizeof(SystemDataType), "invalid vector buffer data type!");
-    XASSERTM(header[2] == loc_v.template size<LAFEM::Perspective::native>(), "invalid velocity vector buffer size!");
-    XASSERTM(header[3] == loc_p.template size<LAFEM::Perspective::native>(), "invalid pressure vector buffer size!");
+    XASSERTM(header[2] == loc_v.size(), "invalid velocity vector buffer size!");
+    XASSERTM(header[3] == loc_p.size(), "invalid pressure vector buffer size!");
 
-    memcpy(loc_v.elements(), buf_v, nv);
-    memcpy(loc_p.elements(), buf_p, np);
+    memcpy(loc_v.elements_view_w().get_w(), buf_v, nv);
+    memcpy(loc_p.elements_view_w().get_w(), buf_p, np);
   }
 } // namespace DFG95
 
@@ -1472,12 +1472,12 @@ int main(int argc, char* argv[])
     const auto& loc_a = solver_levels.at(i)->matrix_sys.local().block_a();
     const auto& loc_b = solver_levels.at(i)->matrix_sys.local().block_b();
     const auto& loc_d = solver_levels.at(i)->matrix_sys.local().block_d();
-    statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_a.used_elements() + loc_a.rows() + Index(1));
-    statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_b.used_elements() + loc_b.rows() + Index(1));
-    statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_d.used_elements() + loc_d.rows() + Index(1));
-    statistics.bytes[Bytes::matrix_values] += sizeof(SolverDataType) * std::size_t(loc_a.template used_elements<LAFEM::Perspective::pod>());
-    statistics.bytes[Bytes::matrix_values] += sizeof(SolverDataType) * std::size_t(loc_b.template used_elements<LAFEM::Perspective::pod>());
-    statistics.bytes[Bytes::matrix_values] += sizeof(SolverDataType) * std::size_t(loc_d.template used_elements<LAFEM::Perspective::pod>());
+    statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_a.num_nzes() + loc_a.num_rows() + Index(1));
+    statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_b.num_nzes() + loc_b.num_rows() + Index(1));
+    statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_d.num_nzes() + loc_d.num_rows() + Index(1));
+    statistics.bytes[Bytes::matrix_values] += sizeof(SolverDataType) * std::size_t(loc_a.num_nzes_raw());
+    statistics.bytes[Bytes::matrix_values] += sizeof(SolverDataType) * std::size_t(loc_b.num_nzes_raw());
+    statistics.bytes[Bytes::matrix_values] += sizeof(SolverDataType) * std::size_t(loc_d.num_nzes_raw());
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -1522,9 +1522,9 @@ int main(int argc, char* argv[])
 
   {
     // count non-zeros in a and b
-    statistics.counts[Counts::nnze_a] = the_solver_level.matrix_sys.local().block_a().used_elements();
-    statistics.counts[Counts::nnze_b] = the_solver_level.matrix_sys.local().block_b().used_elements();
-    statistics.counts[Counts::nnze_total] = the_solver_level.matrix_sys.local().template used_elements<LAFEM::Perspective::pod>();
+    statistics.counts[Counts::nnze_a] = the_solver_level.matrix_sys.local().block_a().num_nzes();
+    statistics.counts[Counts::nnze_b] = the_solver_level.matrix_sys.local().block_b().num_nzes();
+    statistics.counts[Counts::nnze_total] = the_solver_level.matrix_sys.local().num_nzes_raw();
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2467,7 +2467,7 @@ int main(int argc, char* argv[])
       Assembly::DiscreteCellProjector::project(vtx_p, vec_sol.local().template at<1>(), the_domain_level.space_pres, cub);
 
       // write pressure
-      exporter.add_cell_scalar("pressure", vtx_p.elements());
+      exporter.add_cell_scalar("pressure", vtx_p);
 
       // finally, write the VTK file
       exporter.write(vtk_name, comm);

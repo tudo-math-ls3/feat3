@@ -27,7 +27,7 @@ namespace FEAT
      *
      * Since all solvers work on LAFEM containers, this is hardwired to expect LAFEM containers and just use the
      * first entry, i.e. a scalar function with 3 input parameters results in a LAFEM::DenseVectorBlocked with one
-     * entry of BlockSize 3.
+     * entry of block size 3.
      *
      * Because AnalyticFunctions work in Mem::Main, setting Mem_ to anything else will greatly slow things down due
      * to excessive up-/downloading. It's still here to provide a unified class interface for operators.
@@ -145,7 +145,7 @@ namespace FEAT
          *
          * \returns The number of input variables the operator needs.
          */
-        Index columns()
+        Index num_cols()
         {
           return Index(dim);
         }
@@ -157,7 +157,7 @@ namespace FEAT
          *
          * \returns The number of out variables the operator's gradient gives.
          */
-        Index rows()
+        Index num_rows()
         {
           return Index(dim);
         }
@@ -209,7 +209,7 @@ namespace FEAT
         template<typename FilterType_>
         void prepare(const VectorTypeR& vec_state, FilterType_ DOXY(filter))
         {
-          _my_state = vec_state(0);
+          _my_state = vec_state.elements_view_r()(0);
         }
 
         /**
@@ -227,7 +227,7 @@ namespace FEAT
           ++_num_grad_evals;
           fval = _func_eval.value(_my_state);
           _my_grad = _func_eval.gradient(_my_state);
-          grad(0, _my_grad);
+          grad.elements_view_w()[0] = _my_grad;
         }
 
         /**
@@ -243,7 +243,7 @@ namespace FEAT
         {
           ++_num_hess_evals;
           _my_hess = _func_eval.hessian(_my_state);
-          vec_out(0, _my_hess*vec_in(0));
+          vec_out.elements_view_w()[0] = _my_hess*vec_in.elements_view_r()(0);
         }
 
         /**

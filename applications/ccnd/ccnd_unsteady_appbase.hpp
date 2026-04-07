@@ -315,9 +315,15 @@ namespace CCND
 
       // extract old checkpoint info
       XASSERTM(vcp_info.size() == Index(3), "invalid info vector size");
-      DataType cp_cur_time = vcp_info(Index(0));
-      DataType cp_delta_t  = vcp_info(Index(1));
-      Index cp_time_step   = Index(vcp_info(Index(2)));
+      DataType cp_cur_time = DataType(Index(0));
+      DataType cp_delta_t  = DataType(Index(1));
+      Index cp_time_step   = IndexType(Index(2));
+      {
+        Memory::TypedView<DataType> vcp = vcp_info.elements_view_r();
+        cp_cur_time  = vcp(Index(0));
+        cp_delta_t   = vcp(Index(1));
+        cp_time_step = Index(vcp(Index(2)));
+      }
 
       // choose the restart time based on parameters
       cur_step = (restart_step <= Index(0) ? cp_time_step : restart_step - Index(1));
@@ -441,9 +447,12 @@ namespace CCND
 
       // set up info vector and write that one, too
       LAFEM::DenseVector<DataType, IndexType> vcp_info(Index(3));
-      vcp_info(Index(0), cur_time);
-      vcp_info(Index(1), delta_t);
-      vcp_info(Index(2), DataType(cur_step));
+      {
+        Memory::TypedView<DataType> vcp = vcp_info.elements_view_w();
+        vcp[0] = cur_time;
+        vcp[1] = delta_t;
+        vcp[2] = DataType(cur_step);
+      }
       check_ctrl.add_object("info", vcp_info);
 
       // save checkpoint
@@ -665,8 +674,8 @@ namespace CCND
       }
 
       // write pressure
-      exporter.add_cell_scalar("pressure", vtx_p.elements());
-      exporter.add_cell_scalar("pres_der", vtx_dp.elements());
+      exporter.add_cell_scalar("pressure", vtx_p);
+      exporter.add_cell_scalar("pres_der", vtx_dp);
 
       // finally, write the VTK file
       exporter.write(vtk_name, comm);

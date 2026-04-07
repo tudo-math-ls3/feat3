@@ -417,9 +417,9 @@ namespace AnalyseMeshCGAL
     VectorType squared_distance(number_of_vertices);
     VectorType inside_outside(number_of_vertices);
 
-    DataType* dist_to_off = distance_to_off.elements();
-    DataType* sq_dist = squared_distance.elements();
-    DataType* in_out = inside_outside.elements();
+    Memory::TypedView<DataType> dist_to_off = distance_to_off.elements_view_w();
+    Memory::TypedView<DataType> sq_dist = squared_distance.elements_view_w();
+    Memory::TypedView<DataType> in_out = inside_outside.elements_view_w();
 
     // load the off-file with the cgal-wrapper
     std::cout<<"Loading the off-file\n";
@@ -458,8 +458,6 @@ namespace AnalyseMeshCGAL
       dist_to_off[ivtx] = sign_distance * Math::sqrt(sq_distance);
     }
 
-
-
     // -=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=
     // Post-Processing: Export to VTK file
 
@@ -474,9 +472,9 @@ namespace AnalyseMeshCGAL
       Geometry::ExportVTK<MeshType> exporter(mesh);
 
       // add the solution vector
-      exporter.add_vertex_scalar("InsideOutside", inside_outside.elements());
-      exporter.add_vertex_scalar("SquaredDistance", squared_distance.elements());
-      exporter.add_vertex_scalar("DistanceToOff", distance_to_off.elements());
+      exporter.add_vertex_scalar("InsideOutside", in_out.get_r());
+      exporter.add_vertex_scalar("SquaredDistance", sq_dist.get_r());
+      exporter.add_vertex_scalar("DistanceToOff", dist_to_off.get_r());
 
       //write the VTK file
       exporter.write(vtk_name);

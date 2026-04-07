@@ -690,7 +690,7 @@ namespace FEAT
       void _filter_mat(DTV_* val, const RPT_* row_ptr, const CIT_* col_idx,
         const LAFEM::UnitFilter<DataType, IndexType>& filter)
       {
-        const IndexType n = filter.used_elements();
+        const IndexType n = filter.num_nzes();
         const IndexType* fil_idx = filter.get_indices();
         for(IndexType i = 0; i < n; ++i)
         {
@@ -824,43 +824,43 @@ namespace FEAT
       /// \returns The size of the local ADP vector; equal to _get_num_owned_dofs()
       Index _get_adp_vector_size() const
       {
-        return _system_matrix.rows();
+        return _system_matrix.num_rows();
       }
 
       /// \returns The number of rows of the local ADP matrix; equal to _get_num_owned_dofs()
       Index _get_adp_matrix_num_rows() const
       {
-        return _system_matrix.rows();
+        return _system_matrix.num_rows();
       }
 
       /// \returns The number of columns of the local ADP matrix; equal to _get_num_global_dofs()
       Index _get_adp_matrix_num_cols() const
       {
-        return _system_matrix.columns();
+        return _system_matrix.num_cols();
       }
 
       /// \returns The number of nonzero entries of the local ADP matrix
       Index _get_adp_matrix_num_nzes() const
       {
-        return _system_matrix.template used_elements<LAFEM::Perspective::pod>();
+        return _system_matrix.num_nzes_raw();
       }
 
       /// \returns The total number of nonzero entries of the global ADP matrix
       Index _get_num_global_nonzeros() const
       {
-        return _system_matrix.template used_elements<LAFEM::Perspective::pod>();
+        return _system_matrix.num_nzes_raw();
       }
 
       /// \returns The total number of global DOFs on all processes
       Index _get_num_global_dofs() const
       {
-        return _system_matrix.rows();
+        return _system_matrix.num_rows();
       }
 
       /// \returns The number of global DOFs owned by this process
       Index _get_num_owned_dofs() const
       {
-        return _system_matrix.rows();
+        return _system_matrix.num_rows();
       }
 
       /// \returns The index of the first global DOF owned by this process
@@ -890,7 +890,7 @@ namespace FEAT
       template<typename RPT_, typename CIT_>
       void _upload_symbolic(RPT_* row_ptr, CIT_* col_idx)
       {
-        const Index num_rows = _system_matrix.rows();
+        const Index num_rows = _system_matrix.num_rows();
         row_ptr[0] = RPT_(0);
         for(Index i(0); i < num_rows; ++i)
         {
@@ -916,7 +916,7 @@ namespace FEAT
       template<typename DTV_, typename RPT_, typename CIT_>
       void _upload_numeric(DTV_* val, const RPT_* row_ptr, const CIT_* col_idx)
       {
-        const Index num_rows = _system_matrix.rows();
+        const Index num_rows = _system_matrix.num_rows();
         for(Index i(0); i < num_rows; ++i)
         {
           _system_matrix.get_row_values(i, &val[row_ptr[i]]);
@@ -938,7 +938,7 @@ namespace FEAT
       template<typename DTV_>
       void _upload_vector(DTV_* val, const VectorType& vector)
       {
-        vector.set_vec(val);
+        vector.get_values(val);
       }
 
       /**
@@ -955,7 +955,7 @@ namespace FEAT
       template<typename DTV_>
       void _download_vector(VectorType& vector, const DTV_* val)
       {
-        vector.set_vec_inv(val);
+        vector.set_values(val);
       }
 
       /// auxiliary function: filters the local ADP matrix
@@ -971,7 +971,7 @@ namespace FEAT
       void _filter_mat(DTV_* val, const RPT_* row_ptr, const CIT_* col_idx,
         const LAFEM::UnitFilter<DataType, IndexType>& filter)
       {
-        const IndexType n = filter.used_elements();
+        const IndexType n = filter.num_nzes();
         const IndexType* fil_idx = filter.get_indices();
         for(IndexType i = 0; i < n; ++i)
         {

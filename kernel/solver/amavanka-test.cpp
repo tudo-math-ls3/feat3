@@ -58,21 +58,17 @@ template<typename DT_, typename IT_>
 class AmaVankaTest :
   public UnitTest
 {
-public:
-  AmaVankaTest(PreferredBackend backend) :
-    UnitTest("AmaVankaTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~AmaVankaTest()
-  {
-  }
-
   static constexpr int dim = 2;
   typedef Shape::Hypercube<2> ShapeType;
   typedef Geometry::ConformalMesh<ShapeType> MeshType;
   typedef Geometry::RootMeshNode<MeshType> MeshNode;
   typedef Trafo::Standard::Mapping<MeshType> TrafoType;
+
+public:
+  explicit AmaVankaTest(PreferredBackend backend) :
+    UnitTest("AmaVankaTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
 
   /// tests Vanka for Deformation tensor formulation
   template<template<typename> class Space_>
@@ -194,25 +190,25 @@ public:
   }
 };
 
-//AmaVankaTest<float, unsigned int> amavanka_test_float_uint(PreferredBackend::generic);
-//AmaVankaTest<double, unsigned int> amavanka_test_double_uint(PreferredBackend::generic);
-//AmaVankaTest<float, unsigned long> amavanka_test_float_ulong(PreferredBackend::generic);
-AmaVankaTest <double, std::uint64_t> amavanka_test_double_uint64(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(AmaVankaTest, float, unsigned int, PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(AmaVankaTest, double, unsigned int, PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(AmaVankaTest, float, unsigned long, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(AmaVankaTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-AmaVankaTest <float, std::uint64_t> mkl_amavanka_test_float_uint64(PreferredBackend::mkl);
-AmaVankaTest <double, std::uint64_t> mkl_amavanka_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(AmaVankaTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(AmaVankaTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-AmaVankaTest <__float128, std::uint32_t> amavanka_test_float128_uint32(PreferredBackend::generic);
-AmaVankaTest <__float128, std::uint64_t> amavanka_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(AmaVankaTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(AmaVankaTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-AmaVankaTest <Half, std::uint32_t> amavanka_test_half_uint32(PreferredBackend::generic);
-AmaVankaTest <Half, std::uint64_t> amavanka_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(AmaVankaTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(AmaVankaTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-AmaVankaTest <float, std::uint32_t> cuda_amavanka_test_float_uint32(PreferredBackend::cuda);
-AmaVankaTest <double, std::uint32_t> cuda_amavanka_test_double_uint32(PreferredBackend::cuda);
-AmaVankaTest <float, std::uint64_t> cuda_amavanka_test_float_uint64(PreferredBackend::cuda);
-AmaVankaTest <double, std::uint64_t> cuda_amavanka_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(AmaVankaTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(AmaVankaTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(AmaVankaTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(AmaVankaTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif

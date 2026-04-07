@@ -41,7 +41,7 @@ namespace FEAT
      *
      * This matrix is a "hybrid-blocked-scalar" implementation, i.e. it can act
      * as both a "blocked" null-matrix class as well as a "scalar" null-matrix class
-     * by setting \p BlockHeight_ = \p BlockWidth_ = 1. The compatible L/R vector
+     * by setting \p block_height_ = \p block_width_ = 1. The compatible L/R vector
      * types are chosen to be \p DenseVector or \p DenseVectorBlocked depending on
      * whether the corresponding block dimension is 1 or greater than 1 (in analogy
      * to the SparseMatrixBCSR class).
@@ -51,11 +51,11 @@ namespace FEAT
      *
      * \author Peter Zajac
      */
-    template<typename DT_, typename IT_, int BlockHeight_ = 1, int BlockWidth_ = 1>
+    template<typename DT_, typename IT_, int block_height_ = 1, int block_width_ = 1>
     class NullMatrix
     {
-      static_assert(BlockHeight_ > 0, "invalid block size");
-      static_assert(BlockWidth_ > 0, "invalid block size");
+      static_assert(block_height_ > 0, "invalid block size");
+      static_assert(block_width_ > 0, "invalid block size");
 
     public:
       /// Our datatype
@@ -63,27 +63,27 @@ namespace FEAT
       /// Our indextype
       typedef IT_ IndexType;
       /// Our block height
-      static constexpr int BlockHeight = BlockHeight_;
+      static constexpr int block_height = block_height_;
       /// Our block width
-      static constexpr int BlockWidth = BlockWidth_;
+      static constexpr int block_width = block_width_;
       /// Value type, meaning the type of each block
-      typedef Tiny::Matrix<DataType, BlockHeight, BlockWidth> ValueType;
+      typedef Tiny::Matrix<DataType, block_height, block_width> ValueType;
 
       /// ImageIterator typedef for Adjactor interface implementation
       typedef const IT_* ImageIterator;
 
       /// Our 'base' class type
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      using ContainerType = NullMatrix<DT2_, IT2_, BlockHeight_, BlockWidth_>;
+      using ContainerType = NullMatrix<DT2_, IT2_, block_height_, block_width_>;
 
       /// this typedef lets you create a matrix container with new Datatype and Index types
       template <typename DataType2_, typename IndexType2_>
       using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
       /// Compatible L-vector type
-      typedef typename Intern::BlockedVectorHelper<DT_, IT_, BlockHeight_>::VectorType VectorTypeL;
+      typedef typename Intern::BlockedVectorHelper<DT_, IT_, block_height_>::VectorType VectorTypeL;
       /// Compatible R-vector type
-      typedef typename Intern::BlockedVectorHelper<DT_, IT_, BlockWidth_>::VectorType VectorTypeR;
+      typedef typename Intern::BlockedVectorHelper<DT_, IT_, block_width_>::VectorType VectorTypeR;
 
       static constexpr bool is_global = false;
       static constexpr bool is_local = true;
@@ -167,11 +167,11 @@ namespace FEAT
        */
       template<typename DT2_, typename IT2_>
       void clone(
-        const NullMatrix<DT2_, IT2_, BlockHeight_, BlockWidth_> & other,
+        const NullMatrix<DT2_, IT2_, block_height_, block_width_> & other,
         CloneMode DOXY(clone_mode) = CloneMode::Weak)
       {
-        this->_num_rows = other.rows();
-        this->_num_cols = other.columns();
+        this->_num_rows = other.num_rows();
+        this->_num_cols = other.num_cols();
       }
 
       /**
@@ -182,54 +182,44 @@ namespace FEAT
        * Use source matrix content as content of current matrix
        */
       template <typename DT2_, typename IT2_>
-      void convert(const NullMatrix<DT2_, IT2_, BlockHeight_, BlockWidth_> & other)
+      void convert(const NullMatrix<DT2_, IT2_, block_height_, block_width_> & other)
       {
-        this->_num_rows = other.rows();
-        this->_num_cols = other.columns();
+        this->_num_rows = other.num_rows();
+        this->_num_cols = other.num_cols();
       }
 
-      /**
-       * \brief Retrieve matrix row count.
-       *
-       * \returns Matrix row count if perspective_ = false, e.g. count every block as one row.
-       * \returns Raw matrix row count if perspective_ = true, e.g. row_count * BlockHeight_.
-       */
-      template <Perspective perspective_ = Perspective::native>
-      Index rows() const
+      /// Retrieve matrix row count
+      Index num_rows() const
       {
-        Index result(this->_num_rows);
-        if (perspective_ == Perspective::pod)
-        {
-            result *= Index(BlockHeight_);
-        }
-        return result;
+        return this->_num_rows;
       }
 
-      /**
-       * \brief Retrieve matrix column count.
-       *
-       * \returns Matrix column count if perspective_ = false, e.g. count every block as one column.
-       * \returns Raw matrix column count if perspective_ = true, e.g. column_count * BlockWidth_.
-       */
-      template <Perspective perspective_ = Perspective::native>
-      Index columns() const
+      /// Retrieve matrix column count
+      Index num_cols() const
       {
-        Index result(this->_num_cols);
-        if (perspective_ == Perspective::pod)
-        {
-            result *= Index(BlockWidth_);
-        }
-        return result;
+        return this->_num_cols;
       }
 
-      /**
-       * \brief Retrieve non zero element count.
-       *
-       * \returns Non zero element count if perspective_ = false, e.g. count every block as one entry.
-       * \returns Raw non zero element count if perspective_ = true, e.g. used_elements * BlockHeight_ * BlockWidth_.
-       */
-      template <Perspective perspective_ = Perspective::native>
-      Index used_elements() const
+      /// Retrieve matrix non-zero element count
+      Index num_nzes() const
+      {
+        return Index(0);
+      }
+
+      /// Retrieve matrix row count
+      Index num_rows_raw() const
+      {
+        return this->_num_rows * Index(block_height_);
+      }
+
+      /// Retrieve matrix column count
+      Index num_cols_raw() const
+      {
+        return this->_num_cols * Index(block_width_);
+      }
+
+      /// Retrieve matrix non-zero element count
+      Index num_nzes_raw() const
       {
         return Index(0);
       }
@@ -296,19 +286,20 @@ namespace FEAT
        * \param[in] y The second summand matrix
        * \param[in] alpha A scalar to multiply x with.
        *
-       * \warning All three matrices must have the same non zero layout. This operation assumes this silently and does not check this on its own!
+       * \warning All three matrices must have the same non zero layout.
+       * This operation assumes this silently and does not check this on its own!
        */
       void axpy(
                 const NullMatrix & x,
                 const NullMatrix & y,
                 const DT_ DOXY(alpha) = DT_(1))
       {
-        XASSERTM(x.rows() == y.rows(), "Matrix rows do not match!");
-        XASSERTM(x.rows() == this->rows(), "Matrix rows do not match!");
-        XASSERTM(x.columns() == y.columns(), "Matrix columns do not match!");
-        XASSERTM(x.columns() == this->columns(), "Matrix columns do not match!");
-        XASSERTM(x.used_elements() == y.used_elements(), "Matrix used_elements do not match!");
-        XASSERTM(x.used_elements() == this->used_elements(), "Matrix used_elements do not match!");
+        XASSERTM(x.num_rows() == y.num_rows(), "Matrix rows do not match!");
+        XASSERTM(x.num_rows() == this->num_rows(), "Matrix rows do not match!");
+        XASSERTM(x.num_cols() == y.num_cols(), "Matrix columns do not match!");
+        XASSERTM(x.num_cols() == this->num_cols(), "Matrix columns do not match!");
+        XASSERTM(x.num_nzes() == y.num_nzes(), "Matrix used_elements do not match!");
+        XASSERTM(x.num_nzes() == this->num_nzes(), "Matrix used_elements do not match!");
 
         // nothing to do here
       }
@@ -321,9 +312,9 @@ namespace FEAT
        */
       void scale(const NullMatrix & x, const DT_ DOXY(alpha))
       {
-        XASSERTM(x.rows() == this->rows(), "Row count does not match!");
-        XASSERTM(x.columns() == this->columns(), "Column count does not match!");
-        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        XASSERTM(x.num_rows() == this->num_rows(), "Row count does not match!");
+        XASSERTM(x.num_cols() == this->num_cols(), "Column count does not match!");
+        XASSERTM(x.num_nzes() == this->num_nzes(), "Nonzero count does not match!");
 
         // nothing to do here
       }
@@ -346,7 +337,7 @@ namespace FEAT
        */
       void row_norm2(VectorTypeL& row_norms) const
       {
-        XASSERTM(row_norms.size() == this->rows(), "Matrix/Vector dimension mismatch");
+        XASSERTM(row_norms.size() == this->num_rows(), "Matrix/Vector dimension mismatch");
 
         row_norms.format();
       }
@@ -359,34 +350,7 @@ namespace FEAT
        */
       void row_norm2sqr(VectorTypeL& row_norms) const
       {
-        XASSERTM(row_norms.size() == this->rows(), "Matrix/Vector dimension mismatch");
-
-        row_norms.format();
-      }
-
-      /**
-       * \brief Computes the square of the 2-norm for every row, where every row is scaled by a vector
-       *
-       * \param[out] row_norms
-       * For every (scaled) row, this left-vector will contain the square of its 2-norm
-       *
-       * \param[in] scal
-       * The scaling vector
-       *
-       * This computes
-       * \f[
-       *    row\_norms_i = \sum_{j=0}^{n-1} scal_j (this_{ij})^2
-       * \f]
-       * and is used to compute
-       * \f[
-       *   \mathrm{tr}(B^T \mathrm{diag}(A) B)
-       * \f]
-       *
-       */
-      void row_norm2sqr(VectorTypeL& row_norms, const VectorTypeR& scal) const
-      {
-        XASSERTM(row_norms.size() == this->rows(), "Matrix/Vector dimension mismatch");
-        XASSERTM(scal.size() == this->columns(), "Matrix/scalings dimension mismatch");
+        XASSERTM(row_norms.size() == this->num_rows(), "Matrix/Vector dimension mismatch");
 
         row_norms.format();
       }
@@ -398,9 +362,9 @@ namespace FEAT
        *
        * \note The resulting matrix has transposed block dimensions, too.
        */
-      NullMatrix<DT_, IT_, BlockWidth_, BlockHeight_> transpose() const
+      NullMatrix<DT_, IT_, block_width_, block_height_> transpose() const
       {
-        return NullMatrix<DT_, IT_, BlockWidth_, BlockHeight_>(_num_cols, _num_rows);
+        return NullMatrix<DT_, IT_, block_width_, block_height_>(_num_cols, _num_rows);
       }
 
       /**
@@ -408,7 +372,7 @@ namespace FEAT
        *
        * \param[in] x The matrix to be transposed.
        */
-      void transpose(const NullMatrix<DT_, IT_, BlockWidth_, BlockHeight_> & x)
+      void transpose(const NullMatrix<DT_, IT_, block_width_, block_height_> & x)
       {
         x = this->transpose();
       }
@@ -421,8 +385,8 @@ namespace FEAT
        */
       void apply(DenseVector<DT_, IT_> & r, const DenseVector<DT_, IT_> & x) const
       {
-        XASSERTM(r.size() == this->rows<Perspective::pod>(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns<Perspective::pod>(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_rows_raw(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols_raw(), "Vector size of x does not match!");
 
         r.format();
       }
@@ -435,8 +399,8 @@ namespace FEAT
       */
       void apply_transposed(DenseVector<DT_, IT_> & r, const DenseVector<DT_, IT_> & x) const
       {
-        XASSERTM(r.size() == this->columns<Perspective::pod>(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows<Perspective::pod>(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_cols_raw(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows_raw(), "Vector size of x does not match!");
 
         r.format();
       }
@@ -447,10 +411,10 @@ namespace FEAT
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      void apply(DenseVectorBlocked<DT_, IT_, BlockHeight_> & r, const DenseVector<DT_, IT_> & x) const
+      void apply(DenseVectorBlocked<DT_, IT_, block_height_> & r, const DenseVector<DT_, IT_> & x) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns<Perspective::pod>(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols_raw(), "Vector size of x does not match!");
 
         r.format();
       }
@@ -461,10 +425,10 @@ namespace FEAT
       * \param[out] r The vector that receives the result.
       * \param[in] x The vector to be multiplied by this matrix.
       */
-      void apply_transposed(DenseVectorBlocked<DT_, IT_, BlockWidth_> & r, const DenseVector<DT_, IT_> & x) const
+      void apply_transposed(DenseVectorBlocked<DT_, IT_, block_width_> & r, const DenseVector<DT_, IT_> & x) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows<Perspective::pod>(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_cols(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows_raw(), "Vector size of x does not match!");
 
         r.format();
       }
@@ -475,10 +439,10 @@ namespace FEAT
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      void apply(DenseVector<DT_, IT_> & r, const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x) const
+      void apply(DenseVector<DT_, IT_> & r, const DenseVectorBlocked<DT_, IT_, block_width_> & x) const
       {
-        XASSERTM(r.size() == this->rows<Perspective::pod>(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_rows_raw(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols(), "Vector size of x does not match!");
 
         r.format();
       }
@@ -489,10 +453,10 @@ namespace FEAT
       * \param[out] r The vector that receives the result.
       * \param[in] x The vector to be multiplied by this matrix.
       */
-      void apply_transposed(DenseVector<DT_, IT_> & r, const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x) const
+      void apply_transposed(DenseVector<DT_, IT_> & r, const DenseVectorBlocked<DT_, IT_, block_height_> & x) const
       {
-        XASSERTM(r.size() == this->columns<Perspective::pod>(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_cols_raw(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows(), "Vector size of x does not match!");
 
         r.format();
       }
@@ -503,10 +467,10 @@ namespace FEAT
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      void apply(DenseVectorBlocked<DT_, IT_, BlockHeight_> & r, const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x) const
+      void apply(DenseVectorBlocked<DT_, IT_, block_height_> & r, const DenseVectorBlocked<DT_, IT_, block_width_> & x) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols(), "Vector size of x does not match!");
 
         r.format();
       }
@@ -517,10 +481,10 @@ namespace FEAT
       * \param[out] r The vector that receives the result.
       * \param[in] x The vector to be multiplied by this matrix.
       */
-      void apply_transposed(DenseVectorBlocked<DT_, IT_, BlockWidth_> & r, const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x) const
+      void apply_transposed(DenseVectorBlocked<DT_, IT_, block_width_> & r, const DenseVectorBlocked<DT_, IT_, block_height_> & x) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_cols(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows(), "Vector size of x does not match!");
 
         r.format();
       }
@@ -539,9 +503,9 @@ namespace FEAT
                  const DenseVector<DT_, IT_> & y,
                  const DT_ DOXY(alpha) = DT_(1)) const
       {
-        XASSERTM(r.size() == this->rows<Perspective::pod>(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns<Perspective::pod>(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->rows<Perspective::pod>(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_rows_raw(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols_raw(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_rows_raw(), "Vector size of y does not match!");
 
         r.copy(y);
       }
@@ -560,9 +524,9 @@ namespace FEAT
         const DenseVector<DT_, IT_> & y,
         const DT_ DOXY(alpha) = DT_(1)) const
       {
-        XASSERTM(r.size() == this->columns<Perspective::pod>(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows<Perspective::pod>(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->columns<Perspective::pod>(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_cols_raw(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows_raw(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_cols_raw(), "Vector size of y does not match!");
 
         r.copy(y);
       }
@@ -576,14 +540,14 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVectorBlocked<DT_, IT_, BlockHeight_> & r,
+                 DenseVectorBlocked<DT_, IT_, block_height_> & r,
                  const DenseVector<DT_, IT_> & x,
-                 const DenseVectorBlocked<DT_, IT_, BlockHeight_> & y,
+                 const DenseVectorBlocked<DT_, IT_, block_height_> & y,
                  const DT_ DOXY(alpha) = DT_(1)) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns<Perspective::pod>(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->rows(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols_raw(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_rows(), "Vector size of y does not match!");
 
         r.copy(y);
       }
@@ -596,14 +560,14 @@ namespace FEAT
       * \param[in] alpha A scalar to scale the product with.
       */
       void apply_transposed(
-        DenseVectorBlocked<DT_, IT_, BlockWidth_> & r,
+        DenseVectorBlocked<DT_, IT_, block_width_> & r,
         const DenseVector<DT_, IT_> & x,
-        const DenseVectorBlocked<DT_, IT_, BlockWidth_> & y,
+        const DenseVectorBlocked<DT_, IT_, block_width_> & y,
         const DT_ DOXY(alpha) = DT_(1)) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows<Perspective::pod>(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_cols(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows_raw(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_cols(), "Vector size of y does not match!");
 
         r.copy(y);
       }
@@ -619,13 +583,13 @@ namespace FEAT
        */
       void apply(
                  DenseVector<DT_, IT_> & r,
-                 const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x,
+                 const DenseVectorBlocked<DT_, IT_, block_width_> & x,
                  const DenseVector<DT_, IT_> & y,
                  const DT_ DOXY(alpha) = DT_(1)) const
       {
-        XASSERTM(r.size() == this->rows<Perspective::pod>(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->rows<Perspective::pod>(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_rows_raw(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_rows_raw(), "Vector size of y does not match!");
 
         r.copy(y);
       }
@@ -640,13 +604,13 @@ namespace FEAT
       */
       void apply_transposed(
         DenseVector<DT_, IT_> & r,
-        const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x,
+        const DenseVectorBlocked<DT_, IT_, block_height_> & x,
         const DenseVector<DT_, IT_> & y,
         const DT_ DOXY(alpha) = DT_(1)) const
       {
-        XASSERTM(r.size() == this->columns<Perspective::pod>(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->columns<Perspective::pod>(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_cols_raw(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_cols_raw(), "Vector size of y does not match!");
 
         r.copy(y);
       }
@@ -660,14 +624,14 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVectorBlocked<DT_, IT_, BlockHeight_> & r,
-                 const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x,
-                 const DenseVectorBlocked<DT_, IT_, BlockHeight_> & y,
+                 DenseVectorBlocked<DT_, IT_, block_height_> & r,
+                 const DenseVectorBlocked<DT_, IT_, block_width_> & x,
+                 const DenseVectorBlocked<DT_, IT_, block_height_> & y,
                  const DT_ DOXY(alpha) = DT_(1)) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->rows(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_rows(), "Vector size of y does not match!");
 
         r.copy(y);
       }
@@ -681,14 +645,14 @@ namespace FEAT
       * \param[in] alpha A scalar to scale the product with.
       */
       void apply_transposed(
-        DenseVectorBlocked<DT_, IT_, BlockWidth_> & r,
-        const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x,
-        const DenseVectorBlocked<DT_, IT_, BlockWidth_> & y,
+        DenseVectorBlocked<DT_, IT_, block_width_> & r,
+        const DenseVectorBlocked<DT_, IT_, block_height_> & x,
+        const DenseVectorBlocked<DT_, IT_, block_width_> & y,
         const DT_ DOXY(alpha) = DT_(1)) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_cols(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_cols(), "Vector size of y does not match!");
 
         r.copy(y);
       }
@@ -702,14 +666,14 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVectorBlocked<DT_, IT_, BlockHeight_> & r,
-                 const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x,
+                 DenseVectorBlocked<DT_, IT_, block_height_> & r,
+                 const DenseVectorBlocked<DT_, IT_, block_width_> & x,
                  const DenseVector<DT_, IT_> & y,
                  const DT_ DOXY(alpha) = DT_(1)) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->rows<Perspective::pod>(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_rows_raw(), "Vector size of y does not match!");
 
         r.copy(y);
       }
@@ -723,14 +687,14 @@ namespace FEAT
       * \param[in] alpha A scalar to scale the product with.
       */
       void apply_transposed(
-        DenseVectorBlocked<DT_, IT_, BlockWidth_> & r,
-        const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x,
+        DenseVectorBlocked<DT_, IT_, block_width_> & r,
+        const DenseVectorBlocked<DT_, IT_, block_height_> & x,
         const DenseVector<DT_, IT_> & y,
         const DT_ DOXY(alpha) = DT_(1)) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->columns<Perspective::pod>(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_cols(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_cols_raw(), "Vector size of y does not match!");
 
         r.copy(y);
       }
@@ -740,7 +704,7 @@ namespace FEAT
       /// \copydoc lump_rows()
       void lump_rows(VectorTypeL& lump) const
       {
-        XASSERTM(lump.size() == rows(), "lump vector size does not match matrix row count!");
+        XASSERTM(lump.size() == num_rows(), "lump vector size does not match matrix row count!");
         lump.format();
       }
 
@@ -764,8 +728,8 @@ namespace FEAT
       /// \copydoc extract_diag()
       void extract_diag(VectorTypeL & diag) const
       {
-        XASSERTM(diag.size() == rows(), "diag size does not match matrix row count!");
-        XASSERTM(rows() == columns(), "matrix is not square!");
+        XASSERTM(diag.size() == num_rows(), "diag size does not match matrix row count!");
+        XASSERTM(num_rows() == num_cols(), "matrix is not square!");
         diag.format();
       }
 
@@ -781,30 +745,13 @@ namespace FEAT
       // Returns a new compatible L-Vector.
       VectorTypeL create_vector_l() const
       {
-        return VectorTypeL(this->rows());
+        return VectorTypeL(this->num_rows());
       }
 
       // Returns a new compatible R-Vector.
       VectorTypeR create_vector_r() const
       {
-        return VectorTypeR(this->columns());
-      }
-
-      /// Returns the number of NNZ-elements of the selected row
-      Index get_length_of_line(const Index) const
-      {
-        return Index(0);
-      }
-
-      /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
-      void set_line(const Index, DT_ * const, IT_ * const, const Index, const Index = 1) const
-      {
-        // nothing to do here
-      }
-
-      void set_line_reverse(const Index, DT_ * const, const Index = 1)
-      {
-        // nothing to do here
+        return VectorTypeR(this->num_cols());
       }
 
       Index row_degree(const Index) const
@@ -857,26 +804,26 @@ namespace FEAT
       /** \copydoc Adjactor::get_num_nodes_domain() */
       inline Index get_num_nodes_domain() const
       {
-        return rows();
+        return num_rows();
       }
 
       /** \copydoc Adjactor::get_num_nodes_image() */
       inline Index get_num_nodes_image() const
       {
-        return columns();
+        return num_cols();
       }
 
       /** \copydoc Adjactor::image_begin() */
       inline ImageIterator image_begin(Index domain_node) const
       {
-        XASSERTM(domain_node < rows(), "Domain node index out of range");
+        XASSERTM(domain_node < num_rows(), "Domain node index out of range");
         return nullptr;
       }
 
       /** \copydoc Adjactor::image_end() */
       inline ImageIterator image_end(Index domain_node) const
       {
-        XASSERTM(domain_node < rows(), "Domain node index out of range");
+        XASSERTM(domain_node < num_rows(), "Domain node index out of range");
         return nullptr;
       }
     }; // class NullMatrix

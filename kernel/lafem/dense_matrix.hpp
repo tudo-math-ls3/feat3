@@ -7,18 +7,18 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/lafem/forward.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/math.hpp>
+#include <kernel/lafem/forward.hpp>
 #include <kernel/lafem/container.hpp>
-#include <kernel/lafem/arch/scale.hpp>
-#include <kernel/lafem/arch/norm.hpp>
-#include <kernel/lafem/arch/axpy.hpp>
-#include <kernel/lafem/arch/apply.hpp>
-#include <kernel/lafem/arch/product_matmat.hpp>
-#include <kernel/lafem/arch/transpose.hpp>
 #include <kernel/lafem/dense_vector.hpp>
-
+#include <kernel/lafem/arch/axpy_dense.hpp>
+#include <kernel/lafem/arch/matmatmult_dense_dense.hpp>
+#include <kernel/lafem/arch/matmatmult_sparse_dense.hpp>
+#include <kernel/lafem/arch/matvecmult_dense_dense.hpp>
+#include <kernel/lafem/arch/norm2_dense.hpp>
+#include <kernel/lafem/arch/scale_dense.hpp>
+#include <kernel/lafem/arch/transpose_dense.hpp>
 
 namespace FEAT
 {
@@ -34,9 +34,8 @@ namespace FEAT
      * Data survey: \n
      * _elements[0]: raw number values \n
      *
-     * _scalar_index[0]: container size \n
-     * _scalar_index[1]: row count \n
-     * _scalar_index[2]: column count
+     * _scalar_index[0]: row count \n
+     * _scalar_index[1]: column count
      *
      * Refer to \ref lafem_design for general usage informations.
      *
@@ -45,17 +44,6 @@ namespace FEAT
     template <typename DT_, typename IT_ = Index>
     class DenseMatrix : public Container<DT_, IT_>
     {
-    private:
-      Index & _rows()
-      {
-        return this->_scalar_index.at(1);
-      }
-
-      Index & _columns()
-      {
-        return this->_scalar_index.at(2);
-      }
-
     public:
       /// Our datatype
       typedef DT_ DataType;
@@ -69,17 +57,24 @@ namespace FEAT
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       using ContainerType = DenseMatrix<DT2_, IT2_>;
 
+    protected:
+      Index & _rows()
+      {
+        return this->_scalar_index.at(0);
+      }
+
+      Index & _cols()
+      {
+        return this->_scalar_index.at(1);
+      }
+
+    public:
       /**
        * \brief Constructor
        *
        * Creates an empty non dimensional matrix.
        */
-      explicit DenseMatrix() :
-        Container< DT_, IT_> (0)
-      {
-        this->_scalar_index.push_back(0);
-        this->_scalar_index.push_back(0);
-      }
+      DenseMatrix() = default;
 
       /**
        * \brief Constructor
@@ -89,16 +84,15 @@ namespace FEAT
        *
        * Creates a matrix with given dimensions.
        */
-      explicit DenseMatrix(Index rows_in, Index columns_in) :
-        Container<DT_, IT_>(rows_in * columns_in)
+      explicit DenseMatrix(Index rows_in, Index columns_in)
       {
         XASSERT(rows_in != Index(0) && columns_in != Index(0));
-        this->_scalar_index.at(0) = rows_in * columns_in;
+
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
 
-        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(this->_scalar_index.at(0)));
-        this->_elements_size.push_back(this->_scalar_index.at(0));
+        this->_elements.push_back(Memory::Arbiter(sizeof(DT_) * rows_in * columns_in));
+        this->_elements_size.push_back(rows_in * columns_in);
       }
 
       /**
@@ -111,15 +105,9 @@ namespace FEAT
        * Creates a matrix with given dimensions and value.
        */
       explicit DenseMatrix(Index rows_in, Index columns_in, DT_ value) :
-        Container<DT_, IT_>(rows_in * columns_in)
+        DenseMatrix(rows_in, columns_in)
       {
-        XASSERT(rows_in != Index(0) && columns_in != Index(0));
-        this->_scalar_index.at(0) = rows_in * columns_in;
-        this->_scalar_index.push_back(rows_in);
-        this->_scalar_index.push_back(columns_in);
-        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(this->_scalar_index.at(0)));
-        this->_elements_size.push_back(this->_scalar_index.at(0));
-        MemoryPool::set_memory(this->_elements.at(0), value, this->_scalar_index.at(0));
+        this->format(value);
       }
 
       /**
@@ -130,10 +118,9 @@ namespace FEAT
        * Creates a matrix from the given byte array.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      explicit DenseMatrix(std::vector<char> input) :
-        Container<DT_, IT_>(0)
+      explicit DenseMatrix(std::vector<char> input)
       {
-        deserialize<DT2_, IT2_>(input);
+        this->deserialize<DT2_, IT2_>(input);
       }
 
       //Just a test:
@@ -143,10 +130,9 @@ namespace FEAT
        * \param[in] mode The used file format.
        * \param[in] filename The source file.
        */
-      explicit DenseMatrix(FileMode mode, String filename) :
-      Container<DT_, IT_>(0)
+      explicit DenseMatrix(FileMode mode, String filename)
       {
-        read_from(mode, filename);
+        this->read_from(mode, filename);
       }
 
       /**
@@ -155,12 +141,11 @@ namespace FEAT
        * \param[in] mode The used file format.
        * \param[in] filename The source filestream.
        */
-      explicit DenseMatrix(FileMode mode, std::istream& file) :
-      Container<DT_, IT_>(0)
+      explicit DenseMatrix(FileMode mode, std::istream& file)
       {
-        read_from(mode, file);
+        this->read_from(mode, file);
       }
-      //end of test
+
       /**
        * \brief Move Constructor
        *
@@ -230,52 +215,6 @@ namespace FEAT
       }
 
       /**
-       * \brief Get a pointer to the data array.
-       *
-       * \returns Pointer to the data array.
-       */
-      DT_ * elements()
-      {
-        return this->_elements.at(0);
-      }
-
-      DT_ const * elements() const
-      {
-        return this->_elements.at(0);
-      }
-
-      /**
-       * \brief Retrieve specific matrix element.
-       *
-       * \param[in] row The row of the matrix element.
-       * \param[in] col The column of the matrix element.
-       *
-       * \returns Specific matrix element.
-       */
-      const DT_ operator()(Index row, Index col) const
-      {
-        ASSERT(row < this->rows());
-        ASSERT(col < this->columns());
-        MemoryPool::synchronize();
-        return this->elements()[row * this->columns() + col];
-      }
-
-      /**
-       * \brief Set specific matrix element.
-       *
-       * \param[in] row The row of the matrix element.
-       * \param[in] col The column of the matrix element.
-       * \param[in] value The value to be set.
-       */
-      void operator()(Index row, Index col, DT_ value)
-      {
-        ASSERT(row < this->rows());
-        ASSERT(col < this->columns());
-        MemoryPool::set_memory(this->_elements.at(0) + row * this->columns() + col, value);
-        MemoryPool::synchronize();
-      }
-
-      /**
        * \brief Deserialization of complete container entity.
        *
        * \param[in] input A std::vector, containing the byte array.
@@ -300,7 +239,6 @@ namespace FEAT
        *
        * See \ref FEAT::LAFEM::Container::_serialize for details.
        */
-
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       std::vector<char> serialize(const LAFEM::SerialConfig& config = LAFEM::SerialConfig()) const
       {
@@ -313,7 +251,6 @@ namespace FEAT
        * \param[in] mode The used file format
        * \param[in] filename The file that shall be read in
        */
-      //begin of test
       void read_from(FileMode mode, const String& filename)
       {
         std::ios_base::openmode bin = std::ifstream::in | std::ifstream::binary;
@@ -327,20 +264,19 @@ namespace FEAT
       }
 
       /**
-      *\brief Read in matrix from file
-      *
-      * \param[in] mode The used file format
-      * \param[in] file The stream that shall be writen to.
-      */
+       *\brief Read in matrix from file
+       *
+       * \param[in] mode The used file format
+       * \param[in] file The stream that shall be written to.
+       */
       void read_from(FileMode mode, std::istream& file)
       {
         this->clear();
 
         switch(mode)
         {
-          case FileMode::fm_mtx:
+        case FileMode::fm_mtx:
           {
-
             Index trows, tcols;
             String line;
             std::getline(file, line); // !!? Test on overflow error... could be an enormous matrix... !??
@@ -361,7 +297,7 @@ namespace FEAT
               if (line.at(begin) != '%')
                 break;
             }
-            //Read in number of rows and columns
+            //Read in number of num_rows and num_cols
             {
               String::size_type begin(line.find_first_not_of(" "));
               line.erase(0, begin);
@@ -378,8 +314,9 @@ namespace FEAT
               line.erase(0, end);
             }
 
-            DenseMatrix<DT_, IT_> result(Index(trows), tcols);
+            DenseMatrix<DT_, IT_> tmp(Index(trows), tcols);
             Index i(0);
+            Memory::TypedView<DT_> tmp_view(tmp.elements_view_w());
 
             //Read in value of lines:
             while(!file.eof())
@@ -394,24 +331,27 @@ namespace FEAT
               String sval(line, 0, end);
               DT_ tval((DT_)atof(sval.c_str()));
 
-              Index row(i / tcols);
-              Index col(i % tcols);
-              result(row, col, tval);
+              tmp_view[i] = tval;
 
               ++i;
             }
             XASSERTM(i == trows * tcols, "Dense MTX file did not contain enough entries!");
 
-            this->move(std::move(result));
-            break;
+            tmp_view.release();
+            this->move(std::move(tmp));
 
           }
-          case FileMode::fm_dm:
-          case FileMode::fm_binary:
-            this->template _deserialize<double, std::uint64_t>(FileMode::fm_dm, file);
-            break;
-          default:
-            XABORTM("Filemode not supported!");
+          break;
+
+        case FileMode::fm_dm:
+          [[fallthrough]];
+
+        case FileMode::fm_binary:
+          this->template _deserialize<double, std::uint64_t>(FileMode::fm_dm, file);
+          break;
+
+        default:
+          XABORTM("Filemode not supported!");
         }
       }
 
@@ -430,8 +370,8 @@ namespace FEAT
         char* buff = nullptr;
         if(mode == FileMode::fm_mtx)
         {
-          buff = new char[LAFEM::FileOutStreamBufferSize];
-          file.rdbuf()->pubsetbuf(buff, LAFEM::FileOutStreamBufferSize);
+          buff = new char[LAFEM::file_out_stream_buffer_size];
+          file.rdbuf()->pubsetbuf(buff, LAFEM::file_out_stream_buffer_size);
         }
         file.open(filename.c_str(), bin);
         if(! file.is_open())
@@ -451,48 +391,102 @@ namespace FEAT
       {
         switch(mode)
         {
-          case FileMode::fm_mtx:
+        case FileMode::fm_mtx:
           {
             file << "%%MatrixMarket matrix array real general\n";
-            file << this->rows() << " " << this->columns() << " " << this->used_elements() << "\n";
+            file << this->num_rows() << " " << this->num_cols() << " " << this->num_nzes() << "\n";
+            file << std::scientific << std::setprecision(Type::Traits<DT_>::format_precision);
 
-            for(IT_ row(0) ; row < rows(); ++row)
+            Memory::TypedView<DT_> elem_view(this->elements_view_r());
+            Index tsize = this->num_rows() * this->num_cols();
+            for (Index i(0); i < tsize; ++i)
             {
-              for(IT_ col(0) ; col < columns() ; ++col)
-              {
-                file << stringify_fp_sci((*this)(row, col)) << "\n";
-              }
+              file << elem_view(i) << "\n";
             }
             break;
           }
-          case FileMode::fm_dm:
-          case FileMode::fm_binary:
-            this->template _serialize<double, std::uint64_t>(FileMode::fm_dm, file);
-            break;
-          default:
-            XABORTM("Filemode not supported!");
+
+        case FileMode::fm_dm:
+          [[fallthrough]];
+
+        case FileMode::fm_binary:
+          this->template _serialize<double, std::uint64_t>(FileMode::fm_dm, file);
+          break;
+
+        default:
+          XABORTM("Filemode not supported!");
         }
       }
       //end of test
 
-      /**
-       * \brief Retrieve matrix row count.
-       *
-       * \returns Matrix row count.
-       */
-      Index rows() const
+      /// Retrieve matrix row count
+      Index num_rows() const
       {
-        return this->_scalar_index.at(1);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(0);
       }
 
-      /**
-       * \brief Retrieve matrix column count.
-       *
-       * \returns Matrix column count.
-       */
-      Index columns() const
+      /// Retrieve matrix column count
+      Index num_cols() const
       {
-        return this->_scalar_index.at(2);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(1);
+      }
+
+      /// Retrieve matrix non-zero element count
+      Index num_nzes() const
+      {
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(0) * this->_scalar_index.at(1);
+      }
+
+      /// Retrieve matrix element count
+      Index size() const
+      {
+        return this->num_nzes();
+      }
+
+      /// Checks whether the vector is empty, i.e. if it has size 0
+      bool empty() const
+      {
+        return this->_elements_size.empty() || (this->_elements_size.at(0) <= Index(0));
+      }
+
+      /// Returns a reference to the element array arbiter
+      Memory::Arbiter& elements_arbiter()
+      {
+        return this->_elements.front();
+      }
+
+      /// Returns a reference to the element array arbiter
+      const Memory::Arbiter& elements_arbiter() const
+      {
+        return this->_elements.front();
+      }
+
+      Memory::TypedView<DT_> elements_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::read));
+      }
+
+      Memory::TypedView<DT_> elements_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::write));
+      }
+
+      Memory::TypedView<DT_> elements_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::read_write));
+      }
+
+      Memory::TypedView<DT_> elements_view(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, acc));
       }
 
       /**
@@ -519,19 +513,13 @@ namespace FEAT
       /// Returns a new compatible L-Vector.
       VectorTypeL create_vector_l() const
       {
-        return VectorTypeL(this->rows());
+        return VectorTypeL(this->num_rows());
       }
 
       /// Returns a new compatible R-Vector.
       VectorTypeR create_vector_r() const
       {
-        return VectorTypeR(this->columns());
-      }
-
-      /// Returns the number of NNZ-elements of the selected row
-      Index get_length_of_line(const Index /*row*/) const
-      {
-        return this->columns();
+        return VectorTypeR(this->num_cols());
       }
 
       ///@name Linear algebra operations
@@ -544,16 +532,19 @@ namespace FEAT
        */
       void scale(const DenseMatrix & x, const DT_ alpha)
       {
-        XASSERTM(x.rows() == this->rows(), "Row count does not match!");
-        XASSERTM(x.columns() == this->columns(), "Column count does not match!");
-        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        XASSERTM(x.num_rows() == this->num_rows(), "Row count does not match!");
+        XASSERTM(x.num_cols() == this->num_cols(), "Column count does not match!");
+
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->size());
-        Arch::Scale::value(this->elements(), x.elements(), alpha, this->used_elements());
+        Arch::AxpyDense::template exec<DT_>(this->elements_arbiter(), alpha, x.elements_arbiter(), this->num_nzes());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->size());
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -564,12 +555,15 @@ namespace FEAT
        */
       DT_ norm_frobenius() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->used_elements() * 2);
-        DT_ result = Arch::Norm2::value(this->elements(), this->used_elements());
+        DataType result = Arch::Norm2Dense::template exec<DT_>(this->elements_arbiter(), this->num_nzes());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->num_nzes() * 2);
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
         return result;
@@ -582,18 +576,21 @@ namespace FEAT
        * \param[in] y The second summand vector.
        * \param[in] alpha A scalar to multiply x with.
        */
-      void axpy(
-        const DenseMatrix & x,
-        const DT_ alpha = DT_(1))
+      void axpy(const DenseMatrix & x, const DT_ alpha = DT_(1))
       {
-        XASSERTM(x.size() == this->size(), "Vector size does not match!");
+        XASSERTM(x.num_rows() == this->num_rows(), "Matrix row count does not match!");
+        XASSERTM(x.num_cols() == this->num_cols(), "Matrix column count does not match!");
+
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->size() * 2);
-        Arch::Axpy::value(this->elements(), alpha, x.elements(), this->size());
+        Arch::AxpyDense::template exec<DT_>(this->elements_arbiter(), alpha, x.elements_arbiter(), this->num_nzes());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->size() * 2);
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -605,18 +602,22 @@ namespace FEAT
        */
       void apply(DenseVector<DT_, IT_> & r, const DenseVector<DT_, IT_> & x) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols(), "Vector size of x does not match!");
 
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+        if(this->empty())
+          return;
+
+        XASSERTM(r.elements_arbiter() != x.elements_arbiter(), "Vector x and r must not share the same memory!");
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->used_elements() * 2);
-        Arch::Apply::dense(r.elements(), DT_(1), DT_(0), r.elements(), this->elements(),
-                                 x.elements(), this->rows(), this->columns());
+        Arch::MatVecMultDenseDense::template exec<DT_>(r.elements_arbiter(), DT_(1), Memory::Arbiter(),
+          this->elements_arbiter(), x.elements_arbiter(), this->num_rows(), this->num_cols(), false);
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->num_nzes() * 2);
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
 
@@ -628,18 +629,22 @@ namespace FEAT
       */
       void apply_transposed(DenseVector<DT_, IT_> & r, const DenseVector<DT_, IT_> & x) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_cols(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows(), "Vector size of x does not match!");
 
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+        if(this->empty())
+          return;
+
+        XASSERTM(r.elements_arbiter() != x.elements_arbiter(), "Vector x and r must not share the same memory!");
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->used_elements() * 2);
-        Arch::Apply::dense_transposed(r.elements(), DT_(1), DT_(0), r.elements(), this->elements(),
-          x.elements(), this->rows(), this->columns());
+        Arch::MatVecMultDenseDense::template exec<DT_>(r.elements_arbiter(), DT_(1), Memory::Arbiter(),
+          this->elements_arbiter(), x.elements_arbiter(), this->num_rows(), this->num_cols(), true);
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->num_nzes() * 2);
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
 
@@ -651,31 +656,25 @@ namespace FEAT
        * \param[in] y The summand vector.
        * \param[in] alpha A scalar to scale the product with.
        */
-      void apply(
-                 DenseVector<DT_, IT_> & r,
-                 const DenseVector<DT_, IT_> & x,
-                 const DenseVector<DT_, IT_> & y,
-                 const DT_ alpha = DT_(1)) const
+      void apply(DenseVector<DT_, IT_> & r, const DenseVector<DT_, IT_> & x, const DenseVector<DT_, IT_> & y, const DT_ alpha = DT_(1)) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->rows(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_rows(), "Vector size of y does not match!");
 
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+        if(this->empty())
+          return;
+
+        XASSERTM(r.elements_arbiter() != x.elements_arbiter(), "Vector x and r must not share the same memory!");
 
         TimeStamp ts_start;
 
-        if(Math::abs(alpha) < Math::eps<DT_>())
-        {
-          r.copy(y);
-          return;
-        }
-
-        Statistics::add_flops( (this->used_elements() + this->rows()) * 2 );
-        Arch::Apply::dense(r.elements(), alpha, DT_(1), y.elements(), this->elements(),
-                                 x.elements(), this->rows(), this->columns());
+        Arch::MatVecMultDenseDense::template exec<DT_>(r.elements_arbiter(), alpha, y.elements_arbiter(),
+          this->elements_arbiter(), x.elements_arbiter(), this->num_rows(), this->num_cols(), false);
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops( (this->num_nzes() + this->num_rows()) * 2 );
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
 
@@ -693,25 +692,23 @@ namespace FEAT
         const DenseVector<DT_, IT_> & y,
         const DT_ alpha = DT_(1)) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_cols(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_cols(), "Vector size of y does not match!");
 
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+        if(this->empty())
+          return;
+
+        XASSERTM(r.elements_arbiter() != x.elements_arbiter(), "Vector x and r must not share the same memory!");
 
         TimeStamp ts_start;
 
-        if(Math::abs(alpha) < Math::eps<DT_>())
-        {
-          r.copy(y);
-          return;
-        }
-
-        Statistics::add_flops( (this->used_elements() + this->rows()) * 2 );
-        Arch::Apply::dense_transposed(r.elements(), alpha, DT_(1), y.elements(), this->elements(),
-          x.elements(), this->rows(), this->columns());
+        Arch::MatVecMultDenseDense::template exec<DT_>(r.elements_arbiter(), alpha, y.elements_arbiter(),
+          this->elements_arbiter(), x.elements_arbiter(), this->num_rows(), this->num_cols(), true);
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops( (this->num_nzes() + this->num_rows()) * 2 );
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
 
@@ -723,10 +720,13 @@ namespace FEAT
        */
       DT_ max_rel_diff(const DenseMatrix& x) const
       {
-        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        XASSERTM(x.num_rows() == this->num_rows(), "Matrix row count does not match!");
+        XASSERTM(x.num_cols() == this->num_cols(), "Matrix column count does not match!");
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        DataType max_rel_diff = Arch::MaxRelDiff::value(this->elements(), x.elements(), this->used_elements());
+        DataType max_rel_diff = Arch::MaxRelDiffDense::template exec<DT_>(this->elements_arbiter(), x.elements_arbiter(), this->num_nzes());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -744,60 +744,58 @@ namespace FEAT
        */
       bool same_layout(const DenseMatrix& x) const
       {
-        if(this->size() == 0 && x.size() == 0 && this->get_elements().size() == 0 && x.get_elements().size() == 0)
-          return true;
-
-        if (this->size() != x.size())
+        if (this->num_rows() != x.num_rows())
           return false;
-        if (this->get_elements().size() != x.get_elements().size())
-          return false;
-        if (this->get_indices().size() != x.get_indices().size())
-          return false;
-        if (this->rows() != x.rows())
-          return false;
-        if (this->columns() != x.columns())
+        if (this->num_cols() != x.num_cols())
           return false;
 
         return true;
       }
 
-
-
       /**
        * \brief Calculate \f$ this \leftarrow x \cdot y \f$
        */
-      void multiply(DenseMatrix & x, DenseMatrix & y)
+      void set_product(DenseMatrix & x, DenseMatrix & y)
       {
-        XASSERTM(x.columns() == y.rows(), "dimension mismatch!");
-        XASSERTM(this->rows() == x.rows(), "dimension mismatch!");
-        XASSERTM(this->columns() == y.columns(), "dimension mismatch!");
+        XASSERTM(x.num_cols() == y.num_rows(), "dimension mismatch!");
+        XASSERTM(this->num_rows() == x.num_rows(), "dimension mismatch!");
+        XASSERTM(this->num_cols() == y.num_cols(), "dimension mismatch!");
+
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
-        Statistics::add_flops(x.used_elements() * y.columns()*2);
 
-        Arch::ProductMatMat::dense(this->elements(), DT_(1.0), DT_(0.0), x.elements(),
-                                         y.elements(), this->elements(), this->rows(), this->columns(), x.columns());
+        Arch::MatMatMultDenseDense::template exec<DT_>(this->elements_arbiter(), DT_(1), x.elements_arbiter(),
+          y.elements_arbiter(), Memory::Arbiter(), this->num_rows(), this->num_cols(), x.num_cols());
 
         TimeStamp ts_stop;
+        Statistics::add_flops(x.num_nzes() * y.num_cols()*2);
         Statistics::add_time_blas3(ts_stop.elapsed(ts_start));
       }
 
       /**
        * \brief Calculate \f$ this \leftarrow x \cdot y \f$
+       *
+       * \todo count flops properly
        */
-      void multiply(SparseMatrixCSR<DT_, IT_> & x, DenseMatrix & y)
+      void set_product(SparseMatrixCSR<DT_, IT_> & x, DenseMatrix & y)
       {
-        XASSERTM(x.columns() == y.rows(), "dimension mismatch!");
-        XASSERTM(this->rows() == x.rows(), "dimension mismatch!");
-        XASSERTM(this->columns() == y.columns(), "dimension mismatch!");
+        XASSERTM(x.num_cols() == y.num_rows(), "dimension mismatch!");
+        XASSERTM(this->num_rows() == x.num_rows(), "dimension mismatch!");
+        XASSERTM(this->num_cols() == y.num_cols(), "dimension mismatch!");
+
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
-        //Statistics::add_flops(x.used_elements() * y.columns()*2);
 
-        Arch::ProductMatMat::dsd(this->elements(), DT_(1.0), DT_(0.0), x.val(), x.col_ind(), x.row_ptr(), x.used_elements(),
-                                         y.elements(), this->rows(), this->columns(), x.columns());
+        Arch::MatMatMultSparseDense::template exec<DT_, IT_>(this->elements_arbiter(), DT_(1), x.val_arbiter(),
+          x.col_idx_arbiter(), x.row_ptr_arbiter(), x.num_nzes(), y.elements_arbiter(), Memory::Arbiter(),
+          this->num_rows(), this->num_cols(), x.num_cols());
 
         TimeStamp ts_stop;
+        //Statistics::add_flops(x.num_nzes() * y.num_cols()*2);
         Statistics::add_time_blas3(ts_stop.elapsed(ts_start));
       }
 
@@ -807,26 +805,28 @@ namespace FEAT
        * \param[in] x The first matrix to be scaled with alpha.
        * \param[in] y The second matrix to be multiplied with x.
        * \param[in] alpha A scalar to multiply x with.
-       * \param[in] beta A scalar to multiply z with.
        */
-      void multiply(
+      void add_product(
         const DenseMatrix & x,
         const DenseMatrix & y,
-        const DT_ alpha = DT_(1),
-        const DT_ beta = DT_(1))
+        const DT_ alpha = DT_(1))
       {
-        XASSERTM(x.columns() == y.rows(), "dimension mismatch!");
-        XASSERTM(this->rows() == x.rows(), "dimension mismatch!");
-        XASSERTM(this->columns() == y.columns(), "dimension mismatch!");
+        XASSERTM(x.num_cols() == y.num_rows(), "dimension mismatch!");
+        XASSERTM(this->num_rows() == x.num_rows(), "dimension mismatch!");
+        XASSERTM(this->num_cols() == y.num_cols(), "dimension mismatch!");
+
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->size() * 2);
-        Arch::ProductMatMat::dense(this->elements(), alpha, beta, x.elements(),
-                                         y.elements(), this->elements(), this->rows(), this->columns(), x.columns());
+        Arch::MatMatMultDenseDense::template exec<DT_>(this->elements_arbiter(), alpha, x.elements_arbiter(),
+          y.elements_arbiter(), this->elements_arbiter(), this->num_rows(), this->num_cols(), x.num_cols());
 
         TimeStamp ts_stop;
-        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
+
+        Statistics::add_flops(this->size() * 2);
+        Statistics::add_time_blas3(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -837,39 +837,47 @@ namespace FEAT
        * \param[in] alpha A scalar to multiply x with.
        * \param[in] beta A scalar to multiply this with.
        */
-      void multiply(
+      void add_product(
         const SparseMatrixCSR<DT_, IT_> & x,
         const DenseMatrix & y,
-        const DT_ alpha = DT_(1),
-        const DT_ beta = DT_(1))
+        const DT_ alpha = DT_(1))
       {
-        XASSERTM(x.columns() == y.rows(), "dimension mismatch!");
-        XASSERTM(this->rows() == x.rows(), "dimension mismatch!");
-        XASSERTM(this->columns() == y.columns(), "dimension mismatch!");
+        XASSERTM(x.num_cols() == y.num_rows(), "dimension mismatch!");
+        XASSERTM(this->num_rows() == x.num_rows(), "dimension mismatch!");
+        XASSERTM(this->num_cols() == y.num_cols(), "dimension mismatch!");
+
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(x.used_elements() * y.columns()*2);
-        Arch::ProductMatMat::dsd(this->elements(), alpha, beta, x.val(), x.col_ind(), x.row_ptr(), x.used_elements(),
-                                         y.elements(), this->rows(), this->columns(), x.columns());
+        Arch::MatMatMultSparseDense::template exec<DT_, IT_>(this->elements_arbiter(), alpha, x.val_arbiter(),
+          x.col_idx_arbiter(), x.row_ptr_arbiter(), x.num_nzes(), y.elements_arbiter(), this->elements_arbiter(),
+          this->num_rows(), this->num_cols(), x.num_cols());
 
         TimeStamp ts_stop;
-        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
+
+        Statistics::add_flops(x.num_nzes() * y.num_cols()*2);
+        Statistics::add_time_blas3(ts_stop.elapsed(ts_start));
       }
 
       /// Invert the matrix insitu
       void invert()
       {
-        XASSERTM(this->rows() == this->columns(), "matrix must be square!");
+        XASSERTM(this->num_rows() == this->num_cols(), "matrix must be square!");
+        XASSERT(!this->empty());
+
+        Memory::TypedView<DT_> val = this->elements_view_rw();
+        std::vector<IT_> temp(this->num_rows());
 
         TimeStamp ts_start;
-        Statistics::add_flops(this->used_elements() * this->columns()*2);
 
-        IT_ * temp = new IT_[this->rows()];
-        Math::invert_matrix((IT_)this->rows(), (IT_)this->rows(), this->elements(), temp);
-        delete[] temp;
+        Math::invert_matrix((IT_)this->num_rows(), (IT_)this->num_rows(), val.get_w(), temp.data());
+        /// \todo deal with matrix inversion error
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->num_nzes() * this->num_cols()*2);
         Statistics::add_time_blas3(ts_stop.elapsed(ts_start));
       }
 
@@ -889,73 +897,12 @@ namespace FEAT
        */
       DenseMatrix transpose() const
       {
-        DenseMatrix x_t;
-        x_t.transpose(*this);
-        return x_t;
-      }
-
-      /**
-       * \brief Calculate \f$this \leftarrow x^\top \f$
-       *
-       * \param[in] x The matrix to be transposed.
-       *
-       * \warning This obviously flips the row- and column count of the matrix
-       */
-      void transpose(const DenseMatrix & x)
-      {
-        if (rows() == x.columns() && columns() == x.rows())
-        {
-          Arch::Transpose::value(this->elements(), x.elements(), x.rows(), x.columns());
-        }
-        else
-        {
-          DenseMatrix r(x.columns(), x.rows());
-          Arch::Transpose::value(r.elements(), x.elements(), x.rows(), x.columns());
-          this->move(std::move(r));
-        }
-      }
-
-      /**
-       * \brief Calculate \f$this^\top \f$ inplace
-       *
-       * \warning This obviously flips the row- and column count of the matrix
-       */
-      void transpose_inplace()
-      {
-        Arch::Transpose::value(this->elements(), this->elements(), this->rows(), this->columns());
-
-        Index t(this->rows());
-        this->_rows() = this->columns();
-        this->_columns() = t;
+        DenseMatrix r(this->num_cols(), this->num_rows());
+        Arch::TransposeDense::template exec<DT_>(r.elements_arbiter(), this->elements_arbiter(), this->num_rows(), this->num_cols());
+        return r;
       }
 
       ///@}
-
-      /// \cond internal
-
-      /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
-      void set_line(const Index row, DT_ * const pval_set, IT_ * const pcol_set,
-                    const Index col_start, const Index stride = 1) const
-      {
-        const DT_ * pval(this->elements());
-
-        for (Index i(0); i < columns(); ++i)
-        {
-          pval_set[i * stride] = pval[columns() * row + i];
-          pcol_set[i * stride] = IT_(i) + IT_(col_start);
-        }
-      }
-
-      void set_line_reverse(const Index row, DT_ * const pval_set, const Index stride = 1)
-      {
-        const DT_ * pval(this->elements());
-
-        for (Index i(0); i < columns(); ++i)
-        {
-          pval_set[i * stride] = pval[columns() * row + i];
-        }
-      }
-      /// \endcond
 
       /**
        * \brief DenseMatrix streaming operator
@@ -965,13 +912,17 @@ namespace FEAT
        */
       friend std::ostream & operator<< (std::ostream & lhs, const DenseMatrix & b)
       {
+        const Memory::TypedView<DT_> val = b.elements_view_r();
+
         lhs << "[\n";
-        for (Index i(0) ; i < b.rows() ; ++i)
+        const Index m = b.num_rows();
+        const Index n = b.num_cols();
+        for (Index i(0) ; i < m ; ++i)
         {
           lhs << "[";
-          for (Index j(0) ; j < b.columns() ; ++j)
+          for (Index j(0) ; j < n ; ++j)
           {
-            lhs << "  " << stringify(b(i, j));
+            lhs << "  " << val(i*n + j);
           }
           lhs << "]\n";
         }

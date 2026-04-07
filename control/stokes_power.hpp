@@ -307,14 +307,14 @@ namespace FEAT
           {
             Index n = level_c.space_velo.get_num_dofs();
             parent_mirror_v._sub_mirror = ScalarMirror(n, n);
-            auto* idx = parent_mirror_v._sub_mirror.indices();
+            auto idx = parent_mirror_v._sub_mirror.indices_view_w();
             for(Index i(0); i < n; ++i)
               idx[i] = i;
           }
           {
             Index n = level_c.space_pres.get_num_dofs();
             parent_mirror_p = ScalarMirror(n, n);
-            auto* idx = parent_mirror_p.indices();
+            auto idx = parent_mirror_p.indices_view_w();
             for(Index i(0); i < n; ++i)
               idx[i] = i;
           }

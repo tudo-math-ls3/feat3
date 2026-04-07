@@ -133,9 +133,9 @@ namespace FEAT
        * \returns The new empty mirror
        */
       template<typename Tv_, typename... Tw_>
-      static TupleMirror make_empty(const TupleVector<Tv_, Tw_...>& tmpl_vec)
+      static TupleMirror make_hollow(const TupleVector<Tv_, Tw_...>& tmpl_vec)
       {
-        return TupleMirror(First_::make_empty(tmpl_vec.first()), RestClass::make_empty(tmpl_vec.rest()));
+        return TupleMirror(First_::make_hollow(tmpl_vec.first()), RestClass::make_hollow(tmpl_vec.rest()));
       }
 
       /// \brief Returns the total amount of bytes allocated.
@@ -147,11 +147,21 @@ namespace FEAT
       /**
        * \brief Checks whether the mirror is empty.
        *
-       * \returns \c true, if there are no indices in the mirror, otherwise \c false.
+       * \returns \c true, if the mirror has a size of 0, otherwise \c false
        */
       bool empty() const
       {
         return _first.empty() && _rest.empty();
+      }
+
+      /**
+       * \brief Checks whether the mirror is hollow.
+       *
+       * \returns \c true, if there are no indices in the mirror, otherwise \c false.
+       */
+      bool hollow() const
+      {
+        return _first.hollow() && _rest.hollow();
       }
 
       /// \cond internal
@@ -246,12 +256,22 @@ namespace FEAT
       }
 
       /** \copydoc VectorMirror::mask_scatter() */
-      template<Perspective perspective_, typename Tv_, typename... Tw_>
+      template<typename Tv_, typename... Tw_>
       Index mask_scatter(const LAFEM::TupleVector<Tv_, Tw_...>& vector, std::vector<int>& mask,
         const int value, const Index offset = Index(0)) const
       {
-        Index nf = _first.template mask_scatter<perspective_>(vector.first(), mask, value, offset);
-        Index nr = _rest.template mask_scatter<perspective_>(vector.rest(), mask, value, offset + nf);
+        Index nf = _first.mask_scatter(vector.first(), mask, value, offset);
+        Index nr = _rest.mask_scatter(vector.rest(), mask, value, offset + nf);
+        return nf + nr;
+      }
+
+      /** \copydoc VectorMirror::mask_scatter_raw() */
+      template<typename Tv_, typename... Tw_>
+      Index mask_scatter_raw(const LAFEM::TupleVector<Tv_, Tw_...>& vector, std::vector<int>& mask,
+        const int value, const Index offset = Index(0)) const
+      {
+        Index nf = _first.mask_scatter_raw(vector.first(), mask, value, offset);
+        Index nr = _rest.mask_scatter_raw(vector.rest(), mask, value, offset + nf);
         return nf + nr;
       }
 
@@ -328,9 +348,9 @@ namespace FEAT
       }
 
       template<typename Tv_>
-      static TupleMirror make_empty(const TupleVector<Tv_>& tmpl_vec)
+      static TupleMirror make_hollow(const TupleVector<Tv_>& tmpl_vec)
       {
-        return TupleMirror(First_::make_empty(tmpl_vec.first()));
+        return TupleMirror(First_::make_hollow(tmpl_vec.first()));
       }
 
       /// \brief Returns the total amount of bytes allocated.
@@ -338,9 +358,15 @@ namespace FEAT
       {
         return _first.bytes();
       }
+
       bool empty() const
       {
         return _first.empty();
+      }
+
+      bool hollow() const
+      {
+        return _first.hollow();
       }
 
       First_& first()
@@ -398,11 +424,18 @@ namespace FEAT
         _first.scatter_axpy(vector.first(), buffer, alpha, buffer_offset);
       }
 
-      template<Perspective perspective_, typename Tv_>
+      template<typename Tv_>
       Index mask_scatter(const LAFEM::TupleVector<Tv_>& vector, std::vector<int>& mask,
         const int value, const Index offset = Index(0)) const
       {
-        return _first.template mask_scatter<perspective_>(vector.first(), mask, value, offset);
+        return _first.mask_scatter(vector.first(), mask, value, offset);
+      }
+
+      template<typename Tv_>
+      Index mask_scatter_raw(const LAFEM::TupleVector<Tv_>& vector, std::vector<int>& mask,
+        const int value, const Index offset = Index(0)) const
+      {
+        return _first.mask_scatter_raw(vector.first(), mask, value, offset);
       }
 
       /// auxiliary function for operator<< implementation

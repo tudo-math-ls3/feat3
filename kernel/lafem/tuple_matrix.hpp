@@ -203,41 +203,56 @@ namespace FEAT
 
       /**
        * \brief Returns the total number of rows in this matrix.
-       *
-       * \returns Matrix row count if perspective_ = false.
-       * \returns Raw matrix row count if perspective_ = true.
        */
-      template <Perspective perspective_ = Perspective::native>
-      Index rows() const
+      Index num_rows() const
       {
-        const Index rows_f = _first.template rows<perspective_>();
-        const Index rows_r = _rest.template rows<perspective_>();
+        const Index rows_f = _first.num_rows();
+        const Index rows_r = _rest.num_rows();
         XASSERTM(rows_f == rows_r, "row count mismatch");
         return rows_f;
       }
 
       /**
        * \brief Returns the total number of columns in this matrix.
-       *
-       * \returns Matrix column count if perspective_ = false.
-       * \returns Raw matrix column count if perspective_ = true.
        */
-      template <Perspective perspective_ = Perspective::native>
-      Index columns() const
+      Index num_cols() const
       {
-        return _first.template columns<perspective_>() + _rest.template columns<perspective_>();
+        return _first.num_cols() + _rest.num_cols();
       }
 
       /**
        * \brief Returns the total number of non-zeros in this matrix.
-       *
-       * \returns Matrix non zero element count if perspective_ = false.
-       * \returns Raw matrix non zero element count if perspective_ = true.
        */
-      template <Perspective perspective_ = Perspective::native>
-      Index used_elements() const
+      Index num_nzes() const
       {
-        return _first.template used_elements<perspective_>() + _rest.template used_elements<perspective_>();
+        return _first.num_nzes() + _rest.num_nzes();
+      }
+
+      /**
+       * \brief Returns the total number of rows in this matrix.
+       */
+      Index num_rows_raw() const
+      {
+        const Index rows_f = _first.num_rows_raw();
+        const Index rows_r = _rest.num_rows_raw();
+        XASSERTM(rows_f == rows_r, "row count mismatch");
+        return rows_f;
+      }
+
+      /**
+       * \brief Returns the total number of columns in this matrix.
+       */
+      Index num_cols_raw() const
+      {
+        return _first.num_cols_raw() + _rest.num_cols_raw();
+      }
+
+      /**
+       * \brief Returns the total number of non-zeros in this matrix.
+       */
+      Index num_nzes_raw() const
+      {
+        return _first.num_nzes_raw() + _rest.num_nzes_raw();
       }
 
       /**
@@ -324,27 +339,6 @@ namespace FEAT
         rest().apply_transposed(r.rest(), x, y.rest(), alpha);
       }
 
-      Index get_length_of_line(const Index row) const
-      {
-        return first().get_length_of_line(row) + rest().get_length_of_line(row);
-      }
-
-      void set_line(const Index row, DataType * const pval_set, IndexType * const pcol_set, const Index col_start, const Index stride = 1) const
-      {
-        const Index first_length(first().get_length_of_line(row));
-
-        first().set_line(row, pval_set, pcol_set, col_start, stride);
-        rest().set_line(row, pval_set + stride * first_length, pcol_set + stride * first_length, col_start + first().template columns<Perspective::pod>(), stride);
-      }
-
-      void set_line_reverse(const Index row, DataType * const pval_set, const Index stride = 1)
-      {
-        const Index first_length(first().get_length_of_line(row));
-
-        first().set_line_reverse(row, pval_set, stride);
-        rest().set_line_reverse(row, pval_set + stride * first_length, stride);
-      }
-
       Index row_degree(const Index row) const
       {
         return first().row_degree(row) + rest().row_degree(row);
@@ -353,7 +347,7 @@ namespace FEAT
       template<typename IT2_>
       Index get_row_col_indices(const Index row, IT2_* const pcol_idx, const IT2_ col_offset) const
       {
-        const Index first_cols = first().template columns<Perspective::pod>();
+        const Index first_cols = first().num_cols_raw();
         const Index first_degree = first().get_row_col_indices(row, pcol_idx, col_offset);
         return first_degree + rest().get_row_col_indices(row,  pcol_idx + first_degree, col_offset + IT2_(first_cols));
       }
@@ -407,17 +401,34 @@ namespace FEAT
       }
 
       template<typename OtherFirst_, typename... OtherRest_>
-      void convert(const TupleMatrixRow<OtherFirst_, OtherRest_...>& other)
+      void convert(const TupleMatrixRow<OtherFirst_, OtherRest_...>& source)
       {
-        first().convert(other.first());
-        rest().convert(other.rest());
+        first().convert(source.first());
+        rest().convert(source.rest());
       }
 
       template<typename OtherFirst_, typename... OtherRest_>
-      void convert_reverse(TupleMatrixRow<OtherFirst_, OtherRest_...>& other) const
+      void copy(const TupleMatrixRow<OtherFirst_, OtherRest_...>& source)
       {
-        first().convert_reverse(other.first());
-        rest().convert_reverse(other.rest());
+        first().copy(source.first());
+        rest().copy(source.rest());
+      }
+
+      template<typename OtherFirst_, typename... OtherRest_>
+      void copy_to(TupleMatrixRow<OtherFirst_, OtherRest_...>& target) const
+      {
+        first().copy_to(target.first());
+        rest().copy_to(target.rest());
+      }
+
+      bool same_layout(const TupleMatrixRow& other) const
+      {
+        return first().same_layout(other.first()) && rest().same_layout(other.rest());
+      }
+
+      DataType max_rel_diff(const TupleMatrixRow& other) const
+      {
+        return Math::max(first().max_rel_diff(other.first()), rest().max_rel_diff(other.rest()));
       }
     }; // template class TupleMatrixRow
 
@@ -536,22 +547,34 @@ namespace FEAT
         return first();
       }
 
-      template <Perspective perspective_ = Perspective::native>
-      Index rows() const
+      Index num_rows() const
       {
-        return _first.template rows<perspective_>();
+        return _first.num_rows();
       }
 
-      template <Perspective perspective_ = Perspective::native>
-      Index columns() const
+      Index num_cols() const
       {
-        return _first.template columns<perspective_>();
+        return _first.num_cols();
       }
 
-      template <Perspective perspective_ = Perspective::native>
-      Index used_elements() const
+      Index num_nzes() const
       {
-        return _first.template used_elements<perspective_>();
+        return _first.num_nzes();
+      }
+
+      Index num_rows_raw() const
+      {
+        return _first.num_rows_raw();
+      }
+
+      Index num_cols_raw() const
+      {
+        return _first.num_cols_raw();
+      }
+
+      Index num_nzes_raw() const
+      {
+        return _first.num_nzes_raw();
       }
 
       std::size_t bytes() const
@@ -609,21 +632,6 @@ namespace FEAT
         first().apply_transposed(r.first(), x, y.first(), alpha);
       }
 
-      Index get_length_of_line(const Index row) const
-      {
-        return first().get_length_of_line(row);
-      }
-
-      void set_line(const Index row, DataType * const pval_set, IndexType * const pcol_set, const Index col_start, const Index stride = 1) const
-      {
-        first().set_line(row, pval_set, pcol_set, col_start, stride);
-      }
-
-      void set_line_reverse(const Index row, DataType * const pval_set, const Index stride = 1)
-      {
-        first().set_line_reverse(row, pval_set, stride);
-      }
-
       Index row_degree(const Index row) const
       {
         return first().row_degree(row);
@@ -666,15 +674,31 @@ namespace FEAT
       }
 
       template<typename OtherFirst_>
-      void convert(const TupleMatrixRow<OtherFirst_>& other)
+      void convert(const TupleMatrixRow<OtherFirst_>& source)
       {
-        first().convert(other.first());
+        first().convert(source.first());
       }
 
       template<typename OtherFirst_>
-      void convert_reverse(TupleMatrixRow<OtherFirst_>& other) const
+      void copy(const TupleMatrixRow<OtherFirst_>& source)
       {
-        first().convert_reverse(other.first());
+        first().copy(source.first());
+      }
+
+      template<typename OtherFirst_>
+      void copy_to(TupleMatrixRow<OtherFirst_>& target) const
+      {
+        first().copy_to(target.first());
+      }
+
+      bool same_layout(const TupleMatrixRow& other) const
+      {
+        return first().same_layout(other.first());
+      }
+
+      DataType max_rel_diff(const TupleMatrixRow& other) const
+      {
+        return first().max_rel_diff(other.first());
       }
     }; // template class TupleMatrixRow
     /// \endcond
@@ -954,43 +978,46 @@ namespace FEAT
         return TupleMatrixElement<i_, j_, FirstRow_, RestRows_...>::get(*this);
       }
 
-      /**
-       * \brief Returns the total number of rows in this matrix.
-       *
-       * \returns Matrix row count if perspective_ = false.
-       * \returns Raw matrix row count if perspective_ = true.
-       */
-      template <Perspective perspective_ = Perspective::native>
-      Index rows() const
+      /// Returns the total number of rows in this matrix.
+      Index num_rows() const
       {
-        return _first.template rows<perspective_>() + _rest.template rows<perspective_>();
+        return _first.num_rows() + _rest.num_rows();
       }
 
-      /**
-       * \brief Returns the total number of columns in this matrix.
-       *
-       * \returns Matrix column count if perspective_ = false.
-       * \returns Raw matrix column count if perspective_ = true.
-       */
-      template <Perspective perspective_ = Perspective::native>
-      Index columns() const
+      /// Returns the total number of columns in this matrix.
+      Index num_cols() const
       {
-        const Index cols_f = _first.template columns<perspective_>();
-        const Index cols_r = _rest.template columns<perspective_>();
+        const Index cols_f = _first.num_cols();
+        const Index cols_r = _rest.num_cols();
         XASSERTM(cols_f == cols_r, "column count mismatch");
         return cols_f;
       }
 
-      /**
-       * \brief Returns the total number of non-zeros in this matrix.
-       *
-       * \returns Matrix non zero element count if perspective_ = false.
-       * \returns Raw matrix non zero element count if perspective_ = true.
-       */
-      template <Perspective perspective_ = Perspective::native>
-      Index used_elements() const
+      /// Returns the total number of non-zeros in this matrix.
+      Index num_nzes() const
       {
-        return _first.template used_elements<perspective_>() + _rest.template used_elements<perspective_>();
+        return _first.num_nzes() + _rest.num_nzes();
+      }
+
+      /// Returns the total number of rows in this matrix.
+      Index num_rows_raw() const
+      {
+        return _first.num_rows_raw() + _rest.num_rows_raw();
+      }
+
+      /// Returns the total number of columns in this matrix.
+      Index num_cols_raw() const
+      {
+        const Index cols_f = _first.num_cols_raw();
+        const Index cols_r = _rest.num_cols_raw();
+        XASSERTM(cols_f == cols_r, "column count mismatch");
+        return cols_f;
+      }
+
+      /// Returns the total number of non-zeros in this matrix.
+      Index num_nzes_raw() const
+      {
+        return _first.num_nzes_raw() + _rest.num_nzes_raw();
       }
 
       /**
@@ -1105,36 +1132,9 @@ namespace FEAT
         rest().apply_transposed(r, x.rest(), r, alpha);
       }
 
-      Index get_length_of_line(const Index row) const
-      {
-        const Index first_rows = first().template rows<Perspective::pod>();
-        if(row < first_rows)
-          return first().get_length_of_line(row);
-        else
-          return rest().get_length_of_line(row - first_rows);
-      }
-
-      void set_line(const Index row, DataType * const pval_set, IndexType * const pcol_set, const Index col_start, const Index stride = 1) const
-      {
-        const Index first_rows = first().template rows<Perspective::pod>();
-        if(row < first_rows)
-          first().set_line(row, pval_set, pcol_set, col_start, stride);
-        else
-          rest().set_line(row - first_rows, pval_set, pcol_set, col_start, stride);
-      }
-
-      void set_line_reverse(const Index row, DataType * const pval_set, const Index stride = 1)
-      {
-        const Index first_rows = first().template rows<Perspective::pod>();
-        if(row < first_rows)
-          first().set_line_reverse(row, pval_set, stride);
-        else
-          rest().set_line_reverse(row - first_rows, pval_set, stride);
-      }
-
       Index row_degree(const Index row) const
       {
-        const Index first_rows = first().template rows<Perspective::pod>();
+        const Index first_rows = first().num_rows_raw();
         if(row < first_rows)
           return first().row_degree(row);
         else
@@ -1144,7 +1144,7 @@ namespace FEAT
       template<typename IT2_>
       Index get_row_col_indices(const Index row, IT2_* const pcol_idx, const IT2_ col_offset) const
       {
-        const Index first_rows = first().template rows<Perspective::pod>();
+        const Index first_rows = first().num_rows_raw();
         if(row < first_rows)
           return first().get_row_col_indices(row, pcol_idx, col_offset);
         else
@@ -1154,7 +1154,7 @@ namespace FEAT
       template<typename DT2_>
       Index get_row_values(const Index row, DT2_ * const pvals) const
       {
-        const Index first_rows = first().template rows<Perspective::pod>();
+        const Index first_rows = first().num_rows_raw();
         if(row < first_rows)
           return first().get_row_values(row, pvals);
         else
@@ -1164,7 +1164,7 @@ namespace FEAT
       template<typename DT2_>
       Index set_row_values(const Index row, const DT2_ * const pvals)
       {
-        const Index first_rows = first().template rows<Perspective::pod>();
+        const Index first_rows = first().num_rows_raw();
         if(row < first_rows)
           return first().set_row_values(row, pvals);
         else
@@ -1205,17 +1205,34 @@ namespace FEAT
       }
 
       template<typename OtherFirstRow_, typename... OtherRestRows_>
-      void convert(const TupleMatrix<OtherFirstRow_, OtherRestRows_...>& other)
+      void convert(const TupleMatrix<OtherFirstRow_, OtherRestRows_...>& source)
       {
-        first().convert(other.first());
-        rest().convert(other.rest());
+        first().convert(source.first());
+        rest().convert(source.rest());
       }
 
       template<typename OtherFirstRow_, typename... OtherRestRows_>
-      void convert_reverse(TupleMatrix<OtherFirstRow_, OtherRestRows_...>& other) const
+      void copy(const TupleMatrix<OtherFirstRow_, OtherRestRows_...>& source)
       {
-        first().convert_reverse(other.first());
-        rest().convert_reverse(other.rest());
+        first().copy(source.first());
+        rest().copy(source.rest());
+      }
+
+      template<typename OtherFirstRow_, typename... OtherRestRows_>
+      void copy_to(TupleMatrix<OtherFirstRow_, OtherRestRows_...>& target) const
+      {
+        first().copy_to(target.first());
+        rest().copy_to(target.rest());
+      }
+
+      bool same_layout(const TupleMatrix& other) const
+      {
+        return first().same_layout(other.first()) && rest().same_layout(other.rest());
+      }
+
+      DataType max_rel_diff(const TupleMatrix& other) const
+      {
+        return Math::max(first().max_rel_diff(other.first()), rest().max_rel_diff(other.rest()));
       }
     }; // template class TupleMatrix
 
@@ -1342,22 +1359,34 @@ namespace FEAT
         return TupleMatrixElement<i_, j_, FirstRow_>::get(*this);
       }
 
-      template <Perspective perspective_ = Perspective::native>
-      Index rows() const
+      Index num_rows() const
       {
-        return _first.template rows<perspective_>();
+        return _first.num_rows();
       }
 
-      template <Perspective perspective_ = Perspective::native>
-      Index columns() const
+      Index num_cols() const
       {
-        return _first.template columns<perspective_>();
+        return _first.num_cols();
       }
 
-      template <Perspective perspective_ = Perspective::native>
-      Index used_elements() const
+      Index num_nzes() const
       {
-        return _first.template used_elements<perspective_>();
+        return _first.num_nzes();
+      }
+
+      Index num_rows_raw() const
+      {
+        return _first.num_rows_raw();
+      }
+
+      Index num_cols_raw() const
+      {
+        return _first.num_cols_raw();
+      }
+
+      Index num_nzes_raw() const
+      {
+        return _first.num_nzes_raw();
       }
 
       std::size_t bytes() const
@@ -1417,21 +1446,6 @@ namespace FEAT
         first().apply(r, x.first(), y, alpha);
       }
 
-      Index get_length_of_line(const Index row) const
-      {
-        return first().get_length_of_line(row);
-      }
-
-      void set_line(const Index row, DataType * const pval_set, IndexType * const pcol_set, const Index col_start, const Index stride = 1) const
-      {
-        first().set_line(row, pval_set, pcol_set, col_start, stride);
-      }
-
-      void set_line_reverse(const Index row, DataType * const pval_set, const Index stride = 1)
-      {
-        first().set_line_reverse(row, pval_set, stride);
-      }
-
       Index row_degree(const Index row) const
       {
         return first().row_degree(row);
@@ -1474,15 +1488,31 @@ namespace FEAT
       }
 
       template<typename OtherFirstRow_>
-      void convert(const TupleMatrix<OtherFirstRow_>& other)
+      void convert(const TupleMatrix<OtherFirstRow_>& source)
       {
-        first().convert(other.first());
+        first().convert(source.first());
       }
 
       template<typename OtherFirstRow_>
-      void convert_reverse(TupleMatrix<OtherFirstRow_>& other) const
+      void copy(const TupleMatrix<OtherFirstRow_>& source)
       {
-        first().convert_reverse(other.first());
+        first().copy(source.first());
+      }
+
+      template<typename OtherFirstRow_>
+      void copy_to(TupleMatrix<OtherFirstRow_>& target) const
+      {
+        first().copy_to(target.first());
+      }
+
+      bool same_layout(const TupleMatrix& other) const
+      {
+        return first().same_layout(other.first());
+      }
+
+      DataType max_rel_diff(const TupleMatrix& other) const
+      {
+        return first().max_rel_diff(other.first());
       }
     }; // template class TupleMatrix
     /// \endcond

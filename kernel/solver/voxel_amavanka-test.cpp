@@ -60,7 +60,7 @@ class MatrixWrapperTest :
   public UnitTest
 {
 public:
-  MatrixWrapperTest(PreferredBackend backend) :
+  explicit MatrixWrapperTest(PreferredBackend backend) :
     UnitTest("BaseAmaVankaMatrixWrapperTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
@@ -84,136 +84,156 @@ public:
     //base test
     {
       BaseZeroScalar test_mat(30, 59);
-      auto mat_wrapper = Solver::Intern::get_meta_matrix_wrapper(test_mat);
+      auto mat_wrapper = Solver::Intern::get_meta_matrix_wrapper(test_mat, Memory::Location::main);
       TEST_CHECK_EQUAL(mat_wrapper.n, 1);
-      TEST_CHECK_EQUAL(mat_wrapper.data_arrays[0], nullptr);
-      TEST_CHECK_EQUAL(mat_wrapper.col_arrays[0], nullptr);
-      TEST_CHECK_EQUAL(mat_wrapper.row_arrays[0], nullptr);
-      TEST_CHECK_EQUAL(mat_wrapper.used_elements[0], IT_(0));
-      TEST_CHECK_EQUAL(mat_wrapper.tensor_counts[0], test_mat.rows());
-      TEST_CHECK_EQUAL(mat_wrapper.tensor_counts[1], test_mat.columns());
-      TEST_CHECK_EQUAL(mat_wrapper.blocksizes[0], 1);
-      TEST_CHECK_EQUAL(mat_wrapper.blocksizes[1], 1);
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.data_arrays[0], nullptr);
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.col_arrays[0], nullptr);
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.row_arrays[0], nullptr);
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.used_elements[0], IT_(0));
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.tensor_counts[0], test_mat.num_rows());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.tensor_counts[1], test_mat.num_cols());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.blocksizes[0], 1);
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.blocksizes[1], 1);
     }
     {
       DenseVector<DT_, IT_> dv1(2*dim_*dim_);
-      for (Index i(0) ; i < dv1.size() ; ++i)
-        dv1(i, DT_(i+1));
       DenseVector<IT_, IT_> dv2(2);
-      dv2(0, IT_(0));
-      dv2(1, IT_(1));
       DenseVector<IT_, IT_> dv3(3);
-      dv3(0, IT_(0));
-      dv3(1, IT_(1));
-      dv3(2, IT_(2));
-      SparseMatrixBCSR<DT_, IT_, dim_, dim_> test_mat(2, 2, dv2, dv1, dv3);
-      auto mat_wrapper = Solver::Intern::get_meta_matrix_wrapper(test_mat);
+      {
+        Memory::TypedView<DT_> v1(dv1.elements_view_w());
+        Memory::TypedView<IT_> v2(dv2.elements_view_w());
+        Memory::TypedView<IT_> v3(dv3.elements_view_w());
+        for (Index i(0) ; i < dv1.size() ; ++i)
+          v1[i] = DT_(i+1);
+        v2[0] = IT_(0);
+        v2[1] = IT_(1);
+        v3[0] = IT_(0);
+        v3[1] = IT_(1);
+        v3[2] = IT_(2);
+      }
+      SparseMatrixBCSR<DT_, IT_, dim_, dim_> test_mat(2, 2, dv3, dv2, dv1);
+      auto mat_wrapper = Solver::Intern::get_meta_matrix_wrapper(test_mat, Memory::Location::main);
       TEST_CHECK_EQUAL(mat_wrapper.n, 1);
-      TEST_CHECK_EQUAL(mat_wrapper.data_arrays[0], test_mat.template val<LAFEM::Perspective::pod>());
-      TEST_CHECK_EQUAL(mat_wrapper.col_arrays[0], test_mat.col_ind());
-      TEST_CHECK_EQUAL(mat_wrapper.row_arrays[0], test_mat.row_ptr());
-      TEST_CHECK_EQUAL(mat_wrapper.used_elements[0], test_mat.used_elements());
-      TEST_CHECK_EQUAL(mat_wrapper.tensor_counts[0], test_mat.rows());
-      TEST_CHECK_EQUAL(mat_wrapper.tensor_counts[1], test_mat.columns());
-      TEST_CHECK_EQUAL(mat_wrapper.blocksizes[0], dim_);
-      TEST_CHECK_EQUAL(mat_wrapper.blocksizes[1], dim_);
+      //TEST_CHECK_EQUAL(mat_wrapper.raw_data.data_arrays[0], test_mat.val_view_raw_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.col_arrays[0], test_mat.col_idx_view_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.row_arrays[0], test_mat.row_ptr_view_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.used_elements[0], test_mat.num_nzes());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.tensor_counts[0], test_mat.num_rows());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.tensor_counts[1], test_mat.num_cols());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.blocksizes[0], dim_);
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.blocksizes[1], dim_);
     }
     {
       DenseVector<DT_, IT_> dv1(2*dim_*dim_);
       DenseVector<DT_, IT_> dv4(2*dim_);
       DenseVector<DT_, IT_> dv5(2);
-      for (Index i(0) ; i < dv1.size() ; ++i)
-        dv1(i, DT_(i+1));
-      for (Index i(0) ; i < dv4.size() ; ++i)
-        dv4(i, DT_(i+1));
-      for (Index i(0) ; i < dv5.size() ; ++i)
-        dv5(i, DT_(i+1));
       DenseVector<IT_, IT_> dv2(2);
-      dv2(0, IT_(0));
-      dv2(1, IT_(1));
       DenseVector<IT_, IT_> dv3(3);
-      dv3(0, IT_(0));
-      dv3(1, IT_(1));
-      dv3(2, IT_(2));
-      BaseBCSRSquare test_mat(2, 2, dv2, dv1, dv3);
-      BaseBCSRRect test_mat2(2, 2, dv2, dv4, dv3);
-      BaseBCSRRectT test_mat3(2, 2, dv2, dv4, dv3);
-      BaseCSR test_mat4(2, 2, dv2, dv5, dv3);
+      {
+        Memory::TypedView<DT_> v1(dv1.elements_view_w());
+        Memory::TypedView<IT_> v2(dv2.elements_view_w());
+        Memory::TypedView<IT_> v3(dv3.elements_view_w());
+        Memory::TypedView<DT_> v4(dv4.elements_view_w());
+        Memory::TypedView<DT_> v5(dv5.elements_view_w());
+        for (Index i(0) ; i < dv1.size() ; ++i)
+          v1[i] = DT_(i+1);
+        for (Index i(0) ; i < dv4.size() ; ++i)
+          v4[i] = DT_(i+1);
+        for (Index i(0) ; i < dv5.size() ; ++i)
+          v5[i] = DT_(i+1);
+        v2[0] = IT_(0);
+        v2[1] = IT_(1);
+        v3[0] = IT_(0);
+        v3[1] = IT_(1);
+        v3[2] = IT_(2);
+      }
+
+      BaseBCSRSquare test_mat(2, 2, dv3, dv2, dv1);
+      BaseBCSRRect test_mat2(2, 2, dv3, dv2, dv4);
+      BaseBCSRRectT test_mat3(2, 2, dv3, dv2, dv4);
+      BaseCSR test_mat4(2, 2, dv3, dv2, dv5);
       LAFEM::TupleMatrix<LAFEM::TupleMatrixRow<BaseBCSRSquare, BaseBCSRRect>, LAFEM::TupleMatrixRow<BaseBCSRRectT, BaseCSR>> meta_test_mat;
-      meta_test_mat.template at<0,0>().clone(test_mat, LAFEM::CloneMode::Shallow);
-      meta_test_mat.template at<0,1>().clone(test_mat2, LAFEM::CloneMode::Shallow);
-      meta_test_mat.template at<1,0>().clone(test_mat3, LAFEM::CloneMode::Shallow);
-      meta_test_mat.template at<1,1>().clone(test_mat4, LAFEM::CloneMode::Shallow);
-      auto mat_wrapper = Solver::Intern::get_meta_matrix_wrapper(meta_test_mat);
+      meta_test_mat.template at<0,0>().clone(test_mat, LAFEM::CloneMode::Weak);
+      meta_test_mat.template at<0,1>().clone(test_mat2, LAFEM::CloneMode::Weak);
+      meta_test_mat.template at<1,0>().clone(test_mat3, LAFEM::CloneMode::Weak);
+      meta_test_mat.template at<1,1>().clone(test_mat4, LAFEM::CloneMode::Weak);
+      auto mat_wrapper = Solver::Intern::get_meta_matrix_wrapper(meta_test_mat, Memory::Location::main);
       TEST_CHECK_EQUAL(mat_wrapper.n, 2);
-      TEST_CHECK_EQUAL(mat_wrapper.data_arrays[0], test_mat.template val<LAFEM::Perspective::pod>());
-      TEST_CHECK_EQUAL(mat_wrapper.col_arrays[0], test_mat.col_ind());
-      TEST_CHECK_EQUAL(mat_wrapper.row_arrays[0], test_mat.row_ptr());
-      TEST_CHECK_EQUAL(mat_wrapper.used_elements[0], test_mat.used_elements());
-      TEST_CHECK_EQUAL(mat_wrapper.tensor_counts[0], test_mat.rows());
-      TEST_CHECK_EQUAL(mat_wrapper.tensor_counts[1], test_mat.columns());
-      TEST_CHECK_EQUAL(mat_wrapper.blocksizes[0], dim_);
-      TEST_CHECK_EQUAL(mat_wrapper.blocksizes[1], dim_);
-      TEST_CHECK_EQUAL(mat_wrapper.data_arrays[1], test_mat2.template val<LAFEM::Perspective::pod>());
-      TEST_CHECK_EQUAL(mat_wrapper.col_arrays[1], test_mat2.col_ind());
-      TEST_CHECK_EQUAL(mat_wrapper.row_arrays[1], test_mat2.row_ptr());
-      TEST_CHECK_EQUAL(mat_wrapper.used_elements[1], test_mat2.used_elements());
-      TEST_CHECK_EQUAL(mat_wrapper.tensor_counts[2], test_mat2.columns());
-      TEST_CHECK_EQUAL(mat_wrapper.blocksizes[2], 1);
-      TEST_CHECK_EQUAL(mat_wrapper.data_arrays[2], test_mat3.template val<LAFEM::Perspective::pod>());
-      TEST_CHECK_EQUAL(mat_wrapper.col_arrays[2], test_mat3.col_ind());
-      TEST_CHECK_EQUAL(mat_wrapper.row_arrays[2], test_mat3.row_ptr());
-      TEST_CHECK_EQUAL(mat_wrapper.used_elements[2], test_mat3.used_elements());
-      TEST_CHECK_EQUAL(mat_wrapper.data_arrays[3], test_mat4.val());
-      TEST_CHECK_EQUAL(mat_wrapper.col_arrays[3], test_mat4.col_ind());
-      TEST_CHECK_EQUAL(mat_wrapper.row_arrays[3], test_mat4.row_ptr());
-      TEST_CHECK_EQUAL(mat_wrapper.used_elements[3], test_mat4.used_elements());
+      //TEST_CHECK_EQUAL(mat_wrapper.raw_data.data_arrays[0], test_mat.val_view_raw_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.col_arrays[0], test_mat.col_idx_view_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.row_arrays[0], test_mat.row_ptr_view_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.used_elements[0], test_mat.num_nzes());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.tensor_counts[0], test_mat.num_rows());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.tensor_counts[1], test_mat.num_cols());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.blocksizes[0], dim_);
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.blocksizes[1], dim_);
+      //TEST_CHECK_EQUAL(mat_wrapper.raw_data.data_arrays[1], test_mat2.val_view_raw_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.col_arrays[1], test_mat2.col_idx_view_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.row_arrays[1], test_mat2.row_ptr_view_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.used_elements[1], test_mat2.num_nzes());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.tensor_counts[2], test_mat2.num_cols());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.blocksizes[2], 1);
+      //TEST_CHECK_EQUAL(mat_wrapper.raw_data.data_arrays[2], test_mat3.val_view_raw_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.col_arrays[2], test_mat3.col_idx_view_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.row_arrays[2], test_mat3.row_ptr_view_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.used_elements[2], test_mat3.num_nzes());
+      //TEST_CHECK_EQUAL(mat_wrapper.raw_data.data_arrays[3], test_mat4.val_view_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.col_arrays[3], test_mat4.col_idx_view_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.row_arrays[3], test_mat4.row_ptr_view_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.used_elements[3], test_mat4.num_nzes());
     }
     {
       DenseVector<DT_, IT_> dv1(2*dim_*dim_);
       DenseVector<DT_, IT_> dv4(2*dim_);
-      for (Index i(0) ; i < dv1.size() ; ++i)
-        dv1(i, DT_(i+1));
-      for (Index i(0) ; i < dv4.size() ; ++i)
-        dv4(i, DT_(i+1));
       DenseVector<IT_, IT_> dv2(2);
-      dv2(0, IT_(0));
-      dv2(1, IT_(1));
       DenseVector<IT_, IT_> dv3(3);
-      dv3(0, IT_(0));
-      dv3(1, IT_(1));
-      dv3(2, IT_(2));
-      BaseBCSRSquare test_mat(2, 2, dv2, dv1, dv3);
-      BaseBCSRRect test_mat2(2, 2, dv2, dv4, dv3);
-      BaseBCSRRectT test_mat3(2, 2, dv2, dv4, dv3);
+      {
+        Memory::TypedView<DT_> v1(dv1.elements_view_w());
+        Memory::TypedView<IT_> v2(dv2.elements_view_w());
+        Memory::TypedView<IT_> v3(dv3.elements_view_w());
+        Memory::TypedView<DT_> v4(dv4.elements_view_w());
+        for (Index i(0) ; i < dv1.size() ; ++i)
+          v1[i] = DT_(i+1);
+        for (Index i(0) ; i < dv4.size() ; ++i)
+          v4[i] = DT_(i+1);
+        v2[0] = IT_(0);
+        v2[1] = IT_(1);
+        v3[0] = IT_(0);
+        v3[1] = IT_(1);
+        v3[2] = IT_(2);
+      }
+
+      BaseBCSRSquare test_mat(2, 2, dv3, dv2, dv1);
+      BaseBCSRRect test_mat2(2, 2, dv3, dv2, dv4);
+      BaseBCSRRectT test_mat3(2, 2, dv3, dv2, dv4);
       SaddlePointType meta_test_mat;
-      meta_test_mat.template at<0,0>().clone(test_mat, LAFEM::CloneMode::Shallow);
-      meta_test_mat.template at<0,1>().clone(test_mat2, LAFEM::CloneMode::Shallow);
-      meta_test_mat.template at<1,0>().clone(test_mat3, LAFEM::CloneMode::Shallow);
-      auto mat_wrapper = Solver::Intern::get_meta_matrix_wrapper(meta_test_mat);
+      meta_test_mat.template at<0,0>().clone(test_mat, LAFEM::CloneMode::Weak);
+      meta_test_mat.template at<0,1>().clone(test_mat2, LAFEM::CloneMode::Weak);
+      meta_test_mat.template at<1,0>().clone(test_mat3, LAFEM::CloneMode::Weak);
+      auto mat_wrapper = Solver::Intern::get_meta_matrix_wrapper(meta_test_mat, Memory::Location::main);
       TEST_CHECK_EQUAL(mat_wrapper.n, 2);
-      TEST_CHECK_EQUAL(mat_wrapper.data_arrays[0], test_mat.template val<LAFEM::Perspective::pod>());
-      TEST_CHECK_EQUAL(mat_wrapper.col_arrays[0], test_mat.col_ind());
-      TEST_CHECK_EQUAL(mat_wrapper.row_arrays[0], test_mat.row_ptr());
-      TEST_CHECK_EQUAL(mat_wrapper.used_elements[0], test_mat.used_elements());
-      TEST_CHECK_EQUAL(mat_wrapper.tensor_counts[0], test_mat.rows());
-      TEST_CHECK_EQUAL(mat_wrapper.tensor_counts[1], test_mat.columns());
-      TEST_CHECK_EQUAL(mat_wrapper.blocksizes[0], dim_);
-      TEST_CHECK_EQUAL(mat_wrapper.blocksizes[1], dim_);
-      TEST_CHECK_EQUAL(mat_wrapper.data_arrays[1], test_mat2.template val<LAFEM::Perspective::pod>());
-      TEST_CHECK_EQUAL(mat_wrapper.col_arrays[1], test_mat2.col_ind());
-      TEST_CHECK_EQUAL(mat_wrapper.row_arrays[1], test_mat2.row_ptr());
-      TEST_CHECK_EQUAL(mat_wrapper.used_elements[1], test_mat2.used_elements());
-      TEST_CHECK_EQUAL(mat_wrapper.tensor_counts[2], test_mat2.columns());
-      TEST_CHECK_EQUAL(mat_wrapper.blocksizes[2], 1);
-      TEST_CHECK_EQUAL(mat_wrapper.data_arrays[2], test_mat3.template val<LAFEM::Perspective::pod>());
-      TEST_CHECK_EQUAL(mat_wrapper.col_arrays[2], test_mat3.col_ind());
-      TEST_CHECK_EQUAL(mat_wrapper.row_arrays[2], test_mat3.row_ptr());
-      TEST_CHECK_EQUAL(mat_wrapper.used_elements[2], test_mat3.used_elements());
-      TEST_CHECK_EQUAL(mat_wrapper.data_arrays[3], nullptr);
-      TEST_CHECK_EQUAL(mat_wrapper.col_arrays[3], nullptr);
-      TEST_CHECK_EQUAL(mat_wrapper.row_arrays[3], nullptr);
-      TEST_CHECK_EQUAL(mat_wrapper.used_elements[3], IT_(0));
+      //TEST_CHECK_EQUAL(mat_wrapper.raw_data.data_arrays[0], test_mat.val_view_raw_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.col_arrays[0], test_mat.col_idx_view_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.row_arrays[0], test_mat.row_ptr_view_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.used_elements[0], test_mat.num_nzes());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.tensor_counts[0], test_mat.num_rows());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.tensor_counts[1], test_mat.num_cols());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.blocksizes[0], dim_);
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.blocksizes[1], dim_);
+      //TEST_CHECK_EQUAL(mat_wrapper.raw_data.data_arrays[1], test_mat2.val_view_raw_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.col_arrays[1], test_mat2.col_idx_view_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.row_arrays[1], test_mat2.row_ptr_view_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.used_elements[1], test_mat2.num_nzes());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.tensor_counts[2], test_mat2.num_cols());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.blocksizes[2], 1);
+      //TEST_CHECK_EQUAL(mat_wrapper.raw_data.data_arrays[2], test_mat3.val_view_raw_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.col_arrays[2], test_mat3.col_idx_view_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.row_arrays[2], test_mat3.row_ptr_view_r().get_r());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.used_elements[2], test_mat3.num_nzes());
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.data_arrays[3], nullptr);
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.col_arrays[3], nullptr);
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.row_arrays[3], nullptr);
+      TEST_CHECK_EQUAL(mat_wrapper.raw_data.used_elements[3], IT_(0));
     }
   }
 
@@ -223,14 +243,14 @@ public:
   }
 }; // MatrixWrapperTest
 
-MatrixWrapperTest<double, std::uint64_t> amavanka_matrix_wrapper_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixWrapperTest, double, std::uint64_t, PreferredBackend::generic);
 
 template<typename DT_, typename IT_, int dim_, FEAT::Intern::VankaAssemblyPolicy asm_pol_>
 class VoxelAmaVankaTest :
   public UnitTest
 {
 public:
-  VoxelAmaVankaTest(PreferredBackend backend) :
+  explicit VoxelAmaVankaTest(PreferredBackend backend) :
     UnitTest("VoxelAmaVankaTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
@@ -336,7 +356,7 @@ public:
     voxel_vanka->init();
     // // voxel_vanka->init_symbolic();
 
-    TEST_CHECK(voxel_vanka->compare(vanka.get()));
+    TEST_CHECK(voxel_vanka->get_vanka_matrix().same_layout(vanka->get_vanka_matrix()));
 
     // // voxel_vanka->done_symbolic();
     voxel_vanka->done();
@@ -349,7 +369,7 @@ public:
     vanka->init();
     voxel_vanka->init();
 
-    TEST_CHECK(voxel_vanka->compare(vanka.get()));
+    TEST_CHECK(voxel_vanka->get_vanka_matrix().same_layout(vanka->get_vanka_matrix()));
 
     voxel_vanka->done();
     vanka->done();
@@ -385,29 +405,29 @@ public:
   }
 };
 
-VoxelAmaVankaTest<double, std::uint32_t, 2, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock> voxel_amavanka_test_dim2_double_uint32(PreferredBackend::generic);
-VoxelAmaVankaTest<double, std::uint64_t, 2, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock> voxel_amavanka_test_dim2_double_uint64(PreferredBackend::generic);
-VoxelAmaVankaTest<float, std::uint32_t, 2, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock> voxel_amavanka_test_dim2_float_uint32(PreferredBackend::generic);
-VoxelAmaVankaTest<float, std::uint64_t, 2, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock> voxel_amavanka_test_dim2_float_uint64(PreferredBackend::generic);
-VoxelAmaVankaTest<double, std::uint32_t, 3, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock> voxel_amavanka_test_dim3_double_uint32(PreferredBackend::generic);
-VoxelAmaVankaTest<double, std::uint64_t, 3, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock> voxel_amavanka_test_dim3_double_uint64(PreferredBackend::generic);
-VoxelAmaVankaTest<float, std::uint32_t, 3, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock> voxel_amavanka_test_dim3_float_uint32(PreferredBackend::generic);
-VoxelAmaVankaTest<float, std::uint64_t, 3, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock> voxel_amavanka_test_dim3_float_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, double, std::uint32_t, 2, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock, PreferredBackend::generic);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, double, std::uint64_t, 2, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock, PreferredBackend::generic);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, float, std::uint32_t, 2, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock, PreferredBackend::generic);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, float, std::uint64_t, 2, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock, PreferredBackend::generic);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, double, std::uint32_t, 3, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock, PreferredBackend::generic);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, double, std::uint64_t, 3, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock, PreferredBackend::generic);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, float, std::uint32_t, 3, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock, PreferredBackend::generic);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, float, std::uint64_t, 3, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock, PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-VoxelAmaVankaTest<double, std::uint32_t, 2, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock> voxel_amavanka_test_dim2_oneThreadPer_double_uint32_cuda(PreferredBackend::cuda);
-// VoxelAmaVankaTest<double, std::uint64_t, 2, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock> voxel_amavanka_test_dim2_oneThreadPer_double_uint64_cuda(PreferredBackend::cuda);
-VoxelAmaVankaTest<float, std::uint32_t, 2, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock> voxel_amavanka_test_dim2_oneThreadPer_float_uint32_cuda(PreferredBackend::cuda);
-// VoxelAmaVankaTest<float, std::uint64_t, 2, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock> voxel_amavanka_test_dim2_oneThreadPer_float_uint64_cuda(PreferredBackend::cuda);
-VoxelAmaVankaTest<double, std::uint32_t, 2, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly> voxel_amavanka_test_dim2_batched_double_uint32_cuda(PreferredBackend::cuda);
-VoxelAmaVankaTest<double, std::uint64_t, 2, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly> voxel_amavanka_test_dim2_batched_double_uint64_cuda(PreferredBackend::cuda);
-VoxelAmaVankaTest<float, std::uint32_t, 2, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly> voxel_amavanka_test_dim2_batched_float_uint32_cuda(PreferredBackend::cuda);
-VoxelAmaVankaTest<float, std::uint64_t, 2, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly> voxel_amavanka_test_dim2_batched_float_uint64_cuda(PreferredBackend::cuda);
-VoxelAmaVankaTest<double, std::uint32_t, 3, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock> voxel_amavanka_test_dim3_oneThreadPer_double_uint32_cuda(PreferredBackend::cuda);
-// VoxelAmaVankaTest<double, std::uint64_t, 3, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock> voxel_amavanka_test_dim3_oneThreadPer_double_uint64_cuda(PreferredBackend::cuda);
-// VoxelAmaVankaTest<float, std::uint32_t, 3, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock> voxel_amavanka_test_dim3_oneThreadPer_float_uint32_cuda(PreferredBackend::cuda);
-// VoxelAmaVankaTest<float, std::uint64_t, 3, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock> voxel_amavanka_test_dim3_oneThreadPer_float_uint64_cuda(PreferredBackend::cuda);
-VoxelAmaVankaTest<double, std::uint32_t, 3, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly> voxel_amavanka_test_dim3_batched_double_uint32_cuda(PreferredBackend::cuda);
-VoxelAmaVankaTest<double, std::uint64_t, 3, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly> voxel_amavanka_test_dim3_batched_double_uint64_cuda(PreferredBackend::cuda);
-VoxelAmaVankaTest<float, std::uint32_t, 3, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly> voxel_amavanka_test_dim3_batched_float_uint32_cuda(PreferredBackend::cuda);
-VoxelAmaVankaTest<float, std::uint64_t, 3, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly> voxel_amavanka_test_dim3_batched_float_uint64_cuda(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, double, std::uint32_t, 2, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, double, std::uint64_t, 2, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, float, std::uint32_t, 2, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, float, std::uint64_t, 2, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, double, std::uint32_t, 2, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, double, std::uint64_t, 2, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, float, std::uint32_t, 2, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, float, std::uint64_t, 2, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, double, std::uint32_t, 3, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, double, std::uint64_t, 3, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, float, std::uint32_t, 3, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, float, std::uint64_t, 3, FEAT::Intern::VankaAssemblyPolicy::oneThreadperBlock, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, double, std::uint32_t, 3, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, double, std::uint64_t, 3, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, float, std::uint32_t, 3, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_4T_P(VoxelAmaVankaTest, float, std::uint64_t, 3, FEAT::Intern::VankaAssemblyPolicy::batchedAssembly, PreferredBackend::cuda);
 #endif

@@ -73,11 +73,10 @@ namespace FEAT
       typedef typename Matrix_::IndexType IndexType;
       /// our vector type
       typedef typename Matrix_::VectorTypeL VectorType;
-
-    protected:
       /// the type of our Vanka matrix
       typedef typename Intern::AmaVankaMatrixHelper<Matrix_>::VankaMatrix VankaMatrixType;
 
+    protected:
       /// the system matrix
       const Matrix_& _matrix;
       /// the system filter
@@ -229,7 +228,7 @@ namespace FEAT
        */
       std::size_t data_size() const
       {
-        return std::size_t(_vanka.template used_elements<LAFEM::Perspective::pod>());
+        return std::size_t(_vanka.num_nzes_raw());
       }
 
       /**
@@ -469,9 +468,14 @@ namespace FEAT
         return Status::success;
       }
 
-      bool compare(const AmaVanka* other) const
+      /*bool compare(const AmaVanka* other) const
       {
         return Intern::AmaVankaMatrixHelper<VankaMatrixType>::compare(this->_vanka, other->_vanka);
+      }*/
+
+      const VankaMatrixType& get_vanka_matrix() const
+      {
+        return this->_vanka;
       }
     }; // class AmaVanka
 

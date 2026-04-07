@@ -33,7 +33,7 @@ public:
   typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim> BlockedVectorType;
 
 
-  DiscreteEvaluatorTest(PreferredBackend backend) :
+  explicit DiscreteEvaluatorTest(PreferredBackend backend) :
     UnitTest("DiscreteEvaluatorTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
@@ -139,34 +139,34 @@ public:
 //       std::cout << point << " > " << scalar_err << " | " << vector_err << " | " << matrix_err << "\n";
 
       // check errors against tolerances
-      TEST_CHECK(scalar_err < val_tol);
-      TEST_CHECK(vector_err < grad_tol);
-      TEST_CHECK(matrix_err < hess_tol);
+      TEST_CHECK_LESS_THAN(scalar_err, val_tol);
+      TEST_CHECK_LESS_THAN(vector_err, grad_tol);
+      TEST_CHECK_LESS_THAN(matrix_err, hess_tol);
     }
   }
 }; // class DiscreteEvaluatorTest<...>
 
-DiscreteEvaluatorTest <double, std::uint32_t> discrete_evaluator_test_main_double_uint32(PreferredBackend::generic);
-DiscreteEvaluatorTest <float, std::uint32_t> discrete_evaluator_test_main_float_uint32(PreferredBackend::generic);
-DiscreteEvaluatorTest <double, std::uint64_t> discrete_evaluator_test_main_double_uint64(PreferredBackend::generic);
-DiscreteEvaluatorTest <float, std::uint64_t> discrete_evaluator_test_main_float_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DiscreteEvaluatorTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DiscreteEvaluatorTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DiscreteEvaluatorTest, double, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DiscreteEvaluatorTest, float, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DiscreteEvaluatorTest <float, std::uint64_t> mkl_discrete_evaluator_test_float_uint64(PreferredBackend::mkl);
-DiscreteEvaluatorTest <double, std::uint64_t> mkl_discrete_evaluator_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DiscreteEvaluatorTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DiscreteEvaluatorTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DiscreteEvaluatorTest <__float128, std::uint64_t> discrete_evaluator_test_float128_uint64(PreferredBackend::generic);
-DiscreteEvaluatorTest <__float128, std::uint32_t> discrete_evaluator_test_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DiscreteEvaluatorTest, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DiscreteEvaluatorTest, __float128, std::uint32_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
 // Disabled: val_tol too sharp
-//DiscreteEvaluatorTest <Half, std::uint32_t> discrete_evaluator_test_half_uint32(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(DiscreteEvaluatorTest, Half, std::uint32_t, PreferredBackend::generic);
 // Disabled: val_tol too sharp
-//DiscreteEvaluatorTest <Half, std::uint64_t> discrete_evaluator_test_half_uint64(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(DiscreteEvaluatorTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-DiscreteEvaluatorTest <float, std::uint32_t> cuda_discrete_evaluator_test_float_uint32(PreferredBackend::cuda);
-DiscreteEvaluatorTest <double, std::uint32_t> cuda_discrete_evaluator_test_double_uint32(PreferredBackend::cuda);
-DiscreteEvaluatorTest <float, std::uint64_t> cuda_discrete_evaluator_test_float_uint64(PreferredBackend::cuda);
-DiscreteEvaluatorTest <double, std::uint64_t> cuda_discrete_evaluator_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DiscreteEvaluatorTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DiscreteEvaluatorTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DiscreteEvaluatorTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DiscreteEvaluatorTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif

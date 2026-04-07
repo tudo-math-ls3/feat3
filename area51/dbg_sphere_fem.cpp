@@ -184,7 +184,7 @@ namespace DbgSphereFem
 
       // get the current level
       Level& lvl = *levels.at(lvl_max-ilvl);
-      std::cout << "Dofs.: " << stringify(lvl.matrix.rows()) << "\n";
+      std::cout << "Dofs.: " << stringify(lvl.matrix.num_rows()) << "\n";
 
       // create vectors
       VectorType vec_sol = lvl.matrix.create_vector_l();

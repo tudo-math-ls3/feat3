@@ -162,7 +162,7 @@ namespace SaddlePointAssemblyBench
     Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random rng(seed);
     typedef typename MatrixTypeA::VectorTypeL VectorTypeA;
-    VectorTypeA dummy_conv = VectorTypeA(rng, matrix.rows(), DataType(-1), DataType(1));
+    VectorTypeA dummy_conv = VectorTypeA(rng, matrix.num_rows(), DataType(-1), DataType(1));
     asm_sym_matrix_watch.start();
     VoxelAssembly::VoxelBurgersVeloMaterialAssembler<SpaceVeloType, DataType, IndexType> voxel_defo(space_v, col);
     voxel_defo.deformation = true;
@@ -233,7 +233,7 @@ namespace SaddlePointAssemblyBench
     gmres->set_plot_mode(Solver::PlotMode::none);
     gmres->init_symbolic();
     asm_sym_vanka_watch.stop();
-    bres.matrix_nnz = int(matrix.template used_elements<LAFEM::Perspective::pod>());
+    bres.matrix_nnz = int(matrix.num_nzes_raw());
     bres.vanka_nnz = int(vanka->data_size());
     bres.num_elements = int(mesh.get_num_elements());
 
@@ -328,7 +328,7 @@ namespace SaddlePointAssemblyBench
     asm_sym_matrix_watch.start();
     Assembly::SymbolicAssembler::assemble_matrix_std1(mat_a, space_v);
     typedef typename MatrixTypeA::VectorTypeL VectorTypeA;
-    VectorTypeA dummy_conv(matrix.rows(), DataType(1));
+    VectorTypeA dummy_conv(matrix.num_rows(), DataType(1));
     VoxelAssembly::VoxelBurgersVeloMaterialAssembler<SpaceVeloType, DataType, IndexType> voxel_defo(space_v, col);
     voxel_defo.deformation = true;
     voxel_defo.nu = DataType(1.3);
@@ -398,7 +398,7 @@ namespace SaddlePointAssemblyBench
     gmres->set_plot_mode(Solver::PlotMode::none);
     gmres->init_symbolic();
     asm_sym_vanka_watch.stop();
-    bres.matrix_nnz = int(matrix.template used_elements<LAFEM::Perspective::pod>());
+    bres.matrix_nnz = int(matrix.num_nzes_raw());
     bres.vanka_nnz = int(vanka->data_size());
     bres.num_elements = int(mesh.get_num_elements());
 

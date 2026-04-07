@@ -11,112 +11,6 @@
 // includes, system
 #include <iostream>
 
-
-#ifdef FEAT_HAVE_CUDA
-#define CUDA_SKELETON_VOID(function_cuda, ...)\
-  function_cuda(__VA_ARGS__);\
-  return;
-#define CUDA_SKELETON_VOID_T1(t1, function_cuda, ...)\
-  function_cuda<t1>(__VA_ARGS__);\
-  return;
-#define CUDA_SKELETON_VOID_T2(t1, t2, function_cuda, ...)\
-  function_cuda<t1, t2>(__VA_ARGS__);\
-  return;
-#else
-#define CUDA_SKELETON_VOID(function_cuda, ...)\
-  [[fallthrough]];
-#define CUDA_SKELETON_VOID_T1(t1, function_cuda, ...)\
-  [[fallthrough]];
-#define CUDA_SKELETON_VOID_T2(t1, t2, function_cuda, ...)\
-  [[fallthrough]];
-#endif
-
-#ifdef FEAT_HAVE_MKL
-#define MKL_SKELETON_VOID(function_mkl, ...)\
-  function_mkl(__VA_ARGS__);\
-  return;
-#define MKL_SKELETON_VOID_T1(t1, function_mkl, ...)\
-  function_mkl<t1>(__VA_ARGS__);\
-  return;
-#define MKL_SKELETON_VOID_T2(t1, t2, function_mkl, ...)\
-  function_mkl<t1, t2 >(__VA_ARGS__);\
-  return;
-#else
-#define MKL_SKELETON_VOID(function_mkl, ...)\
-  [[fallthrough]];
-#define MKL_SKELETON_VOID_T1(t1, function_mkl, ...)\
-  [[fallthrough]];
-#define MKL_SKELETON_VOID_T2(t1, t2, function_mkl, ...)\
-  [[fallthrough]];
-#endif
-
-#define BACKEND_SKELETON_VOID(function_cuda, function_mkl, function_generic, ...)\
-  switch(Backend::get_preferred_backend())\
-  {\
-    case FEAT::PreferredBackend::cuda:\
-      CUDA_SKELETON_VOID(function_cuda, __VA_ARGS__)\
-    case FEAT::PreferredBackend::mkl:\
-      MKL_SKELETON_VOID(function_mkl, __VA_ARGS__)\
-    case FEAT::PreferredBackend::generic:\
-    default:\
-      function_generic(__VA_ARGS__);\
-      return;\
-  }
-
-#define BACKEND_SKELETON_VOID_T1(t1, function_cuda, function_mkl, function_generic, ...)\
-  switch(Backend::get_preferred_backend())\
-  {\
-    case FEAT::PreferredBackend::cuda:\
-      CUDA_SKELETON_VOID_T1(t1, function_cuda, __VA_ARGS__)\
-    case FEAT::PreferredBackend::mkl:\
-      MKL_SKELETON_VOID_T1(t1, function_mkl, __VA_ARGS__)\
-    case FEAT::PreferredBackend::generic:\
-    default:\
-      function_generic<t1>(__VA_ARGS__);\
-      return;\
-  }
-
-#define BACKEND_SKELETON_VOID_T2(t1, t2, function_cuda, function_mkl, function_generic, ...)\
-  switch(Backend::get_preferred_backend())\
-  {\
-    case FEAT::PreferredBackend::cuda:\
-      CUDA_SKELETON_VOID_T2(t1, t2, function_cuda, __VA_ARGS__)\
-    case FEAT::PreferredBackend::mkl:\
-      MKL_SKELETON_VOID_T2(t1, t2, function_mkl, __VA_ARGS__)\
-    case FEAT::PreferredBackend::generic:\
-    default:\
-      function_generic<t1, t2>(__VA_ARGS__);\
-      return;\
-  }
-
-#ifdef FEAT_HAVE_CUDA
-#define CUDA_SKELETON_RETURN(function_cuda, ...)\
-  return function_cuda(__VA_ARGS__);
-#else
-#define CUDA_SKELETON_RETURN(function_cuda, ...)\
-  [[fallthrough]];
-#endif
-
-#ifdef FEAT_HAVE_MKL_
-#define MKL_SKELETON_RETURN(function_mkl, ...)\
-  return function_mkl(__VA_ARGS__);
-#else
-#define MKL_SKELETON_RETURN(function_mkl, ...)\
-  [[fallthrough]];
-#endif
-
-#define BACKEND_SKELETON_RETURN(function_cuda, function_mkl, function_generic, ...)\
-  switch(Backend::get_preferred_backend())\
-  {\
-    case FEAT::PreferredBackend::cuda:\
-      CUDA_SKELETON_RETURN(function_cuda, __VA_ARGS__)\
-    case FEAT::PreferredBackend::mkl:\
-      MKL_SKELETON_RETURN(function_mkl, __VA_ARGS__)\
-    case FEAT::PreferredBackend::generic:\
-    default:\
-      return function_generic(__VA_ARGS__);\
-  }
-
 namespace FEAT
 {
   /// The backend that shall be used in all compute heavy calculations
@@ -138,12 +32,27 @@ namespace FEAT
     /// the currently preferred backend
     static PreferredBackend _preferred_backend;
 
+    /// missing backend warnings enabled/disabled
+    static bool _enable_warn_missing;
+
   public:
     /// set new preferred backend
     static void set_preferred_backend(PreferredBackend preferred_backend);
 
     /// get current preferred backend
     static PreferredBackend get_preferred_backend();
+
+    /// enables or disables missing backend warning
+    static void set_warn_missing(bool enabled);
+
+    /// issues a warning about unsupported backend usage
+    static void warn_missing(const char* operation, PreferredBackend preferred_backend, PreferredBackend fallback_backend = PreferredBackend::generic);
+
+    /// issues a warning about unsupported backend usage
+    static void warn_missing(const char* operation)
+    {
+      warn_missing(operation, get_preferred_backend());
+    }
   }; // class Backend
 
   std::ostream & operator<< (std::ostream & left, FEAT::PreferredBackend backend);

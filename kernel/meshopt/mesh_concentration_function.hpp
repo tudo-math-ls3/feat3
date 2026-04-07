@@ -183,10 +183,12 @@ namespace FEAT
       {
         DataType constraint(0);
         const auto& edge_idx = mesh.template get_index_set<1,0>();
+        const auto vd = dist.elements_view_r();
+        const auto vef = edge_freqs.elements_view_r();
         for(Index edge(0); edge < mesh.get_num_entities(1); ++edge)
         {
-          constraint += edge_freqs(edge)*FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-            eval( - dist(edge_idx(edge,0)) * dist(edge_idx(edge,1)));
+          constraint += vef(edge)*FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
+            eval( - vd(edge_idx(edge,0)) * vd(edge_idx(edge,1)));
         }
 
         return constraint;
@@ -200,6 +202,7 @@ namespace FEAT
 
         DataType constraint(0);
         const auto& idx = mesh.template get_index_set<ShapeType::dimension,0>();
+        const auto vd = dist.elements_view_r();
         for(Index cell(0); cell < mesh.get_num_entities(ShapeType::dimension); ++cell)
         {
           constraint_vec[cell] = DataType(0);
@@ -209,7 +212,7 @@ namespace FEAT
             int i(FimType::map(edge,0));
             int j(FimType::map(edge,1));
             DataType my_constraint(FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-                eval(- DataType(1)*dist(idx(cell, i)) * dist(idx(cell, j))) );
+                eval(- DataType(1)*vd(idx(cell, i)) * vd(idx(cell, j))) );
 
             constraint_vec[cell] += my_constraint;
 
@@ -230,21 +233,24 @@ namespace FEAT
         typedef Tiny::Vector<DataType, Mesh_::world_dim> WorldPoint;
 
         WorldPoint grad_loc(DataType(0));
-
+        auto vg = grad.elements_view_w();
+        const auto vd = dist.elements_view_r();
+        const auto vgd = grad_dist.elements_view_r();
+        const auto vef = edge_freqs.elements_view_r();
         for(Index edge(0); edge < mesh.get_num_entities(1); ++edge)
         {
           Index i(edge_idx(edge,0));
           Index j(edge_idx(edge,1));
 
-          auto dist_prod =  dist(i) * dist(j);
+          auto dist_prod =  vd(i) * vd(j);
           // Derivative of the heaviside function
           auto heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
 
-          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
-          grad(i, grad(i) + edge_freqs(edge)*grad_loc);
+          grad_loc =  (-fac * alignment_fval * heaviside_der * vd(j)) * vgd(i);
+          vg[i] += vef(edge)*grad_loc;
 
-          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
-          grad(j, grad(j) + edge_freqs(edge)*grad_loc);
+          grad_loc =  (-fac * alignment_fval * heaviside_der * vd(i)) * vgd(j);
+          vg[j] += vef(edge)*grad_loc;
         }
       }
 
@@ -262,19 +268,21 @@ namespace FEAT
       {
         DataType constraint(0);
         const auto& edge_idx = mesh.template get_index_set<1,0>();
+        const auto vd = dist.elements_view_r();
+        const auto vef = edge_freqs.elements_view_r();
         for(Index edge(0); edge < mesh.get_num_entities(1); ++edge)
         {
-          constraint += edge_freqs(edge)*FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-            eval( - dist(edge_idx(edge,0)) * dist(edge_idx(edge,1)));
+          constraint += vef(edge)*FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
+            eval( - vd(edge_idx(edge,0)) * vd(edge_idx(edge,1)));
         }
 
         const auto& cell_idx = mesh.template get_index_set<ShapeType::dimension,0>();
         for(Index cell(0); cell < mesh.get_num_entities(ShapeType::dimension); ++cell)
         {
           constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-            eval( - dist(cell_idx(cell,0)) * dist(cell_idx(cell,3)));
+            eval( - vd(cell_idx(cell,0)) * vd(cell_idx(cell,3)));
           constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-            eval( - dist(cell_idx(cell,1)) * dist(cell_idx(cell,2)));
+            eval( - vd(cell_idx(cell,1)) * vd(cell_idx(cell,2)));
         }
 
         return constraint;
@@ -288,6 +296,7 @@ namespace FEAT
 
         DataType constraint(0);
         const auto& idx = mesh.template get_index_set<ShapeType::dimension,0>();
+        const auto vd = dist.elements_view_r();
         for(Index cell(0); cell < mesh.get_num_entities(ShapeType::dimension); ++cell)
         {
           constraint_vec[cell] = DataType(0);
@@ -297,7 +306,7 @@ namespace FEAT
             int i(FimType::map(edge,0));
             int j(FimType::map(edge,1));
             DataType my_constraint(FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-                eval(- DataType(1)*dist(idx(cell, i)) * dist(idx(cell, j))) );
+                eval(- DataType(1)*vd(idx(cell, i)) * vd(idx(cell, j))) );
 
             constraint_vec[cell] += my_constraint;
 
@@ -305,9 +314,9 @@ namespace FEAT
           }
 
           DataType my_constraint(FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-              eval( - dist(idx(cell,0)) * dist(idx(cell,3))));
+              eval( - vd(idx(cell,0)) * vd(idx(cell,3))));
           my_constraint = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-            eval( - dist(idx(cell,1)) * dist(idx(cell,2)));
+            eval( - vd(idx(cell,1)) * vd(idx(cell,2)));
 
           constraint_vec[cell] += my_constraint;
 
@@ -328,21 +337,25 @@ namespace FEAT
         typedef Tiny::Vector<DataType, Mesh_::world_dim> WorldPoint;
 
         WorldPoint grad_loc(DataType(0));
+        const auto vd = dist.elements_view_r();
+        auto vg = grad.elements_view_rw();
+        const auto vgd = grad_dist.elements_view_r();
+        const auto vef = edge_freqs.elements_view_r();
 
         for(Index edge(0); edge < mesh.get_num_entities(1); ++edge)
         {
           Index i(edge_idx(edge,0));
           Index j(edge_idx(edge,1));
 
-          auto dist_prod =  dist(i) * dist(j);
+          auto dist_prod =  vd(i) * vd(j);
           // Derivative of the heaviside function
           auto heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
 
-          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
-          grad(i, grad(i) + edge_freqs(edge)*grad_loc);
+          grad_loc =  (-fac * alignment_fval * heaviside_der * vd(j)) * vgd(i);
+          vg[i] += vef(edge)*grad_loc;
 
-          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
-          grad(j, grad(j) + edge_freqs(edge)*grad_loc);
+          grad_loc =  (-fac * alignment_fval * heaviside_der * vd(i)) * vgd(j);
+          vg[j] += vef(edge)*grad_loc;
         }
 
         const auto& cell_idx = mesh.template get_index_set<ShapeType::dimension,0>();
@@ -351,28 +364,28 @@ namespace FEAT
           Index i(cell_idx(cell,Index(0)));
           Index j(cell_idx(cell,Index(3)));
 
-          auto dist_prod = dist(i) * dist(j);
+          auto dist_prod = vd(i) * vd(j);
           // Derivative of the heaviside function
           auto heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
 
-          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
-          grad(i, grad(i)+grad_loc);
+          grad_loc =  (-fac * alignment_fval * heaviside_der * vd(j)) * vgd(i);
+          vg[i] += grad_loc;
 
-          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
-          grad(j, grad(j)+grad_loc);
+          grad_loc =  (-fac * alignment_fval * heaviside_der * vd(i)) * vgd(j);
+          vg[j] += grad_loc;
 
           i = cell_idx(cell,Index(1));
           j = cell_idx(cell,Index(2));
 
-          dist_prod = dist(i) * dist(j);
+          dist_prod = vd(i) * vd(j);
           // Derivative of the heaviside function
           heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
 
-          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
-          grad(i, grad(i)+grad_loc);
+          grad_loc =  (-fac * alignment_fval * heaviside_der * vd(j)) * vgd(i);
+          vg[i] += grad_loc;
 
-          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
-          grad(j, grad(j)+grad_loc);
+          grad_loc =  (-fac * alignment_fval * heaviside_der * vd(i)) * vgd(j);
+          vg[j] += grad_loc;
         }
       }
     };
@@ -389,32 +402,34 @@ namespace FEAT
       {
         DataType constraint(0);
         const auto& edge_idx = mesh.template get_index_set<1,0>();
+        const auto vd = dist.elements_view_r();
+        const auto vef = edge_freqs.elements_view_r();
         for(Index edge(0); edge < mesh.get_num_entities(1); ++edge)
         {
-          constraint += edge_freqs(edge)*FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-            eval( - dist(edge_idx(edge,0)) * dist(edge_idx(edge,1)));
+          constraint += vef(edge)*FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
+            eval( - vd(edge_idx(edge,0)) * vd(edge_idx(edge,1)));
         }
 
         const auto& face_idx = mesh.template get_index_set<2,0>();
         for(Index face(0); face < mesh.get_num_entities(2); ++face)
         {
           constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-            eval( - dist(face_idx(face,0)) * dist(face_idx(face,3)));
+            eval( - vd(face_idx(face,0)) * vd(face_idx(face,3)));
           constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-            eval( - dist(face_idx(face,1)) * dist(face_idx(face,2)));
+            eval( - vd(face_idx(face,1)) * vd(face_idx(face,2)));
         }
 
         const auto& cell_idx = mesh.template get_index_set<3,0>();
         for(Index cell(0); cell < mesh.get_num_entities(3); ++cell)
         {
           constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-            eval( - dist(cell_idx(cell,0)) * dist(cell_idx(cell,7)));
+            eval( - vd(cell_idx(cell,0)) * vd(cell_idx(cell,7)));
           constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-            eval( - dist(cell_idx(cell,1)) * dist(cell_idx(cell,6)));
+            eval( - vd(cell_idx(cell,1)) * vd(cell_idx(cell,6)));
           constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-            eval( - dist(cell_idx(cell,2)) * dist(cell_idx(cell,5)));
+            eval( - vd(cell_idx(cell,2)) * vd(cell_idx(cell,5)));
           constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-            eval( - dist(cell_idx(cell,3)) * dist(cell_idx(cell,4)));
+            eval( - vd(cell_idx(cell,3)) * vd(cell_idx(cell,4)));
         }
 
         return constraint;
@@ -428,6 +443,7 @@ namespace FEAT
         typedef Geometry::Intern::FaceIndexMapping<ShapeType, 2, 0> VertAtFace;
 
         DataType constraint(0);
+        const auto vd = dist.elements_view_r();
         const auto& idx = mesh.template get_index_set<ShapeType::dimension,0>();
         for(Index cell(0); cell < mesh.get_num_entities(ShapeType::dimension); ++cell)
         {
@@ -439,7 +455,7 @@ namespace FEAT
             int i(VertAtEdge::map(edge,0));
             int j(VertAtEdge::map(edge,1));
             DataType my_constraint(FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-                eval(- DataType(1)*dist(idx(cell, Index(i))) * dist(idx(cell, Index(j)))) );
+                eval(- DataType(1)*vd(idx(cell, Index(i))) * vd(idx(cell, Index(j)))) );
 
             constraint_vec[cell] += my_constraint;
 
@@ -456,9 +472,9 @@ namespace FEAT
 
             DataType my_constraint(0);
             my_constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-                eval(- DataType(1)*dist(idx(cell, Index(i0))) * dist(idx(cell, Index(i3))));
+                eval(- DataType(1)*vd(idx(cell, Index(i0))) * vd(idx(cell, Index(i3))));
             my_constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-                eval(- DataType(1)*dist(idx(cell, Index(i1))) * dist(idx(cell, Index(i2))));
+                eval(- DataType(1)*vd(idx(cell, Index(i1))) * vd(idx(cell, Index(i2))));
 
             constraint_vec[cell] += my_constraint;
 
@@ -467,13 +483,13 @@ namespace FEAT
 
           DataType my_constraint(0);
           my_constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-            eval( - dist(idx(cell,0)) * dist(idx(cell,7)));
+            eval( - vd(idx(cell,0)) * vd(idx(cell,7)));
           my_constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-            eval( - dist(idx(cell,1)) * dist(idx(cell,6)));
+            eval( - vd(idx(cell,1)) * vd(idx(cell,6)));
           my_constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-            eval( - dist(idx(cell,2)) * dist(idx(cell,5)));
+            eval( - vd(idx(cell,2)) * vd(idx(cell,5)));
           my_constraint += FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::
-            eval( - dist(idx(cell,3)) * dist(idx(cell,4)));
+            eval( - vd(idx(cell,3)) * vd(idx(cell,4)));
 
           constraint_vec[cell] += my_constraint;
 
@@ -494,21 +510,25 @@ namespace FEAT
         typedef Tiny::Vector<DataType, Mesh_::world_dim> WorldPoint;
 
         WorldPoint grad_loc(DataType(0));
+        auto vg = grad.elements_view_w();
+        const auto vd = dist.elements_view_r();
+        const auto vgd = grad_dist.elements_view_r();
+        const auto vef = edge_freqs.elements_view_r();
 
         for(Index edge(0); edge < mesh.get_num_entities(1); ++edge)
         {
           Index i(edge_idx(edge,0));
           Index j(edge_idx(edge,1));
 
-          auto dist_prod =  dist(i) * dist(j);
+          auto dist_prod =  vd(i) * vd(j);
           // Derivative of the heaviside function
           auto heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
 
-          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
-          grad(i, grad(i) + edge_freqs(edge)*grad_loc);
+          grad_loc =  (-fac * alignment_fval * heaviside_der * vd(j)) * vgd(i);
+          vg[i] += vef(edge)*grad_loc;
 
-          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
-          grad(j, grad(j) + edge_freqs(edge)*grad_loc);
+          grad_loc =  (-fac * alignment_fval * heaviside_der * vd(i)) * vgd(j);
+          vg[j] += vef(edge)*grad_loc;
         }
 
         const auto& face_idx = mesh.template get_index_set<2,0>();
@@ -517,28 +537,28 @@ namespace FEAT
           Index i(face_idx(face,Index(0)));
           Index j(face_idx(face,Index(3)));
 
-          auto dist_prod = dist(i) * dist(j);
+          auto dist_prod = vd(i) * vd(j);
           // Derivative of the heaviside function
           auto heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
 
-          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
-          grad(i, grad(i)+grad_loc);
+          grad_loc =  (-fac * alignment_fval * heaviside_der * vd(j)) * vgd(i);
+          vg[i] += grad_loc;
 
-          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
-          grad(j, grad(j)+grad_loc);
+          grad_loc =  (-fac * alignment_fval * heaviside_der * vd(i)) * vgd(j);
+          vg[j] += grad_loc;
 
           i = face_idx(face,Index(1));
           j = face_idx(face,Index(2));
 
-          dist_prod = dist(i) * dist(j);
+          dist_prod = vd(i) * vd(j);
           // Derivative of the heaviside function
           heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
 
-          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j)) * grad_dist(i);
-          grad(i, grad(i)+grad_loc);
+          grad_loc =  (-fac * alignment_fval * heaviside_der * vd(j)) * vgd(i);
+          vg[i] += grad_loc;
 
-          grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i)) * grad_dist(j);
-          grad(j, grad(j)+grad_loc);
+          grad_loc =  (-fac * alignment_fval * heaviside_der * vd(i)) * vgd(j);
+          vg[j] += grad_loc;
         }
 
         const auto& cell_idx = mesh.template get_index_set<3,0>();
@@ -550,15 +570,15 @@ namespace FEAT
           for(int k(0); k < 4; ++k)
           {
 
-            auto dist_prod = dist(i[k]) * dist(j[k]);
+            auto dist_prod = vd(i[k]) * vd(j[k]);
             // Derivative of the heaviside function
             auto heaviside_der = FEAT::Analytic::Common::template HeavisideRegStatic<DataType>::der_x(-dist_prod);
 
-            grad_loc =  (-fac * alignment_fval * heaviside_der * dist(j[k])) * grad_dist(i[k]);
-            grad(i[k], grad(i[k]) +grad_loc);
+            grad_loc =  (-fac * alignment_fval * heaviside_der * vd(j[k])) * vgd(i[k]);
+            vg[i[k]] += grad_loc;
 
-            grad_loc =  (-fac * alignment_fval * heaviside_der * dist(i[k])) * grad_dist(j[k]);
-            grad(j[k], grad(j[k]) + grad_loc);
+            grad_loc =  (-fac * alignment_fval * heaviside_der * vd(i[k])) * vgd(j[k]);
+            vg[j[k]] += grad_loc;
           }
 
         }
@@ -1000,11 +1020,12 @@ namespace FEAT
 
           for(const auto& it: _mesh_node->get_mesh_part_names())
           {
+            auto vef = _edge_freqs.elements_view_rw();
             if(it.starts_with("_halo"))
             {
               const auto& edge_ts = _mesh_node->find_mesh_part(it)->template get_target_set<1>();
               for(Index edge(0); edge < edge_ts.get_num_entities(); ++edge)
-                _edge_freqs(edge_ts[edge], _edge_freqs(edge_ts[edge])+CoordType(1));
+                vef[edge_ts[edge]] += CoordType(1);
             }
           }
           _edge_freqs.component_invert(_edge_freqs, CoordType(1));
@@ -1035,19 +1056,21 @@ namespace FEAT
 
           _sum_conc = CoordType(0);
 
+          auto vc = this->_conc.elements_view_rw();
+          const auto vd = this->_dist.elements_view_r();
           for(Index cell(0); cell < ncells; ++cell)
           {
             CoordType avg_dist(0);
 
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              avg_dist += this->_dist(idx(cell,j));
+              avg_dist += vd(idx(cell,j));
             }
 
             avg_dist = avg_dist/CoordType(Shape::FaceTraits<ShapeType,0>::count);
 
-            this->_conc(cell, _func.conc_val(avg_dist));
-            _sum_conc += this->_conc(cell);
+            vc[cell] = _func.conc_val(avg_dist);
+            _sum_conc += vc[cell];
           }
         }
 
@@ -1132,6 +1155,12 @@ namespace FEAT
 
             CoordType exponent(CoordType(1)/CoordType(MeshType::world_dim) - CoordType(1));
 
+            const auto vc = this->_conc.elements_view_r();
+            const auto vgc = this->_grad_conc.elements_view_r();
+            const auto vd = _dist.elements_view_r();
+            const auto vgd = _grad_dist.elements_view_r();
+            const auto vgsd = _grad_sum_det.elements_view_r();
+            auto vgh = _grad_h.elements_view_w();
             for(Index cell(0); cell < _mesh_node->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
             {
               grad_loc.format();
@@ -1139,9 +1168,9 @@ namespace FEAT
               {
                 Index i(idx(cell, j));
                 // Get levelset
-                dist_loc(j) = _dist(i);
+                dist_loc(j) = vd(i);
                 // Get levelset gradient
-                grad_dist_loc[j] = _grad_dist(i);
+                grad_dist_loc[j] = vgd(i);
               }
 
               compute_grad_conc_local(grad_loc, dist_loc, grad_dist_loc);
@@ -1153,13 +1182,13 @@ namespace FEAT
                   Index i(idx(cell, j));
 
                   tmp(j*MeshType::world_dim +d) =
-                    CoordType(1)/CoordType(MeshType::world_dim)*Math::pow(_conc(cell)/_sum_conc*sum_det,exponent)
-                    *( _conc(cell)*(_grad_sum_det(i)(d)*_sum_conc + sum_det*_grad_conc(i)(d) )
+                    CoordType(1)/CoordType(MeshType::world_dim)*Math::pow(vc(cell)/_sum_conc*sum_det,exponent)
+                    *( vc(cell)*(vgsd(i)(d)*_sum_conc + sum_det*vgc(i)(d) )
                         + grad_loc(j,d) * sum_det *_sum_conc)
                     / Math::sqr(_sum_conc);
                 }
               }
-              _grad_h(cell, tmp + _grad_h(cell));
+              vgh[cell] += tmp;
 
             }
           } // _func.use_derivative
@@ -1195,6 +1224,9 @@ namespace FEAT
           FEAT::Tiny::Matrix <CoordType, Shape::FaceTraits<ShapeType,0>::count, MeshType::world_dim> dist_loc;
 
           // Compute the functional value for each cell
+          auto vc = this->_grad_conc.elements_view_rw();
+          const auto vd = _dist.elements_view_r();
+          const auto vgd = _grad_dist.elements_view_r();
           for(Index cell(0); cell < _mesh_node->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
             // Collect levelset and levelset grad values
@@ -1203,9 +1235,9 @@ namespace FEAT
               // Global vertex/dof index
               Index i(idx(cell, j));
               // Get levelset
-              grad_dist_loc(j) = _dist(i);
+              grad_dist_loc(j) = vd(i);
               // Get levelset gradient
-              dist_loc[j] = _grad_dist(i);
+              dist_loc[j] = vgd(i);
             }
 
             // Compute gradient of the concentration on this cell
@@ -1214,8 +1246,7 @@ namespace FEAT
             // Add local contributions to global gradient vector
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              Index i(idx(cell, j));
-              this->_grad_conc(i, _grad_conc(i) + grad_loc[j]);
+              vc[idx(cell, j)] += grad_loc[j];
             }
           }
 
@@ -1383,6 +1414,8 @@ namespace FEAT
           WorldPoint my_dist_vec(CoordType(0));
           WorldPoint tmp(CoordType(0));
 
+          auto vd = this->_dist.elements_view_w();
+          auto vgd = this->_grad_dist.elements_view_w();
           for(Index i(0); i < this->_mesh_node->get_mesh()->get_num_entities(0); ++i)
           {
             CoordType my_dist(0);
@@ -1398,14 +1431,14 @@ namespace FEAT
               my_dist_vec += tmp;
 
             }
-            this->_dist(i, my_dist);
+            vd[i] = my_dist;
 
             // Because we added distance function gradient vectors, we have to normalize again if possible
             CoordType my_norm(my_dist_vec.norm_euclid());
             if(my_norm > Math::eps<CoordType>())
               my_dist_vec *= (CoordType(1)/my_norm);
 
-            this->_grad_dist(i, my_dist_vec);
+            vgd[i] = my_dist_vec;
           }
         }
 
@@ -1419,6 +1452,8 @@ namespace FEAT
           WorldPoint my_dist_vec(CoordType(0));
           WorldPoint tmp(CoordType(0));
 
+          auto vd = this->_dist.elements_view_w();
+          auto vgd = this->_grad_dist.elements_view_w();
           for(Index i(0); i < this->_mesh_node->get_mesh()->get_num_entities(0); ++i)
           {
             CoordType my_dist(-Math::huge<CoordType>());
@@ -1439,8 +1474,8 @@ namespace FEAT
 
             }
 
-            this->_dist(i, my_dist);
-            this->_grad_dist(i, my_dist_vec);
+            vd[i] = my_dist;
+            vgd[i] = my_dist_vec;
           }
         }
         /// \copydoc BaseClass::compute_dist()
@@ -1453,6 +1488,8 @@ namespace FEAT
           WorldPoint my_dist_vec(CoordType(0));
           WorldPoint tmp(CoordType(0));
 
+          auto vd = this->_dist.elements_view_w();
+          auto vgd = this->_grad_dist.elements_view_w();
           for(Index i(0); i < this->_mesh_node->get_mesh()->get_num_entities(0); ++i)
           {
             CoordType my_dist(Math::huge<CoordType>());
@@ -1473,8 +1510,8 @@ namespace FEAT
 
             }
 
-            this->_dist(i, my_dist);
-            this->_grad_dist(i, my_dist_vec);
+            vd[i] = my_dist;
+            vgd[i] = my_dist_vec;
           }
         }
 

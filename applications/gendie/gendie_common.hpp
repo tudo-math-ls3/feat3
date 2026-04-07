@@ -371,15 +371,16 @@ namespace Gendie
                   // directly assembly onto the inflow filter
                   loc_unit_asm_inflow.assemble(fil_loc_v, this->_domain.at(i)->space_velo, this->_inflow_bounds.at(std::size_t(id)).get_diri_inflow_function(this->_materials, mesh_unit_scale));
                   //and now convert
-                  if(filter_v_inflow.size() == Index(0))
-                    filter_v_inflow.convert(fil_loc_v);
+                  filter_v_inflow.convert(fil_loc_v);
+                /*if(filter_v_inflow.size() == Index(0))
+                  filter_v_inflow.convert(fil_loc_v);
                   else
                   {
-                    if(fil_loc_v.used_elements() == 0u) // nothing to add here
+                  if(fil_loc_v.num_nzes() == 0u) // nothing to add here
                       continue;
-                    const auto* indx = fil_loc_v.get_indices();
-                    const auto* valx = fil_loc_v.get_values();
-                    for(Index k = 0; k < fil_loc_v.used_elements(); ++k)
+                  const auto indx = fil_loc_v.get_filter_vector().indices_view_r();
+                  const auto valx = fil_loc_v.get_filter_vector().values_view_r();
+                  for(Index k = 0; k < fil_loc_v.num_nzes(); ++k)
                     {
                       if constexpr(dim == 3)
                       {
@@ -387,7 +388,7 @@ namespace Gendie
                         filter_v_inflow.add(indx[k], valn);
                       }
                     }
-                  }
+                }*/
                 }
               }
               else if((name != "bnd:n") && (!name.starts_with("bnd:out")) && ((name_lower.replace_all(String("outflow"), String("")) == 0u)))

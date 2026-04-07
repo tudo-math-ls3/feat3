@@ -118,9 +118,7 @@ namespace FEAT
 
     public:
       /// default CTOR
-      SaddlePointMatrix()
-      {
-      }
+      SaddlePointMatrix() = default;
 
       /**
        * \brief Sub-Matrix move constructor
@@ -128,23 +126,20 @@ namespace FEAT
        * \param[in] matrix_a, matrix_b, matrix_d
        * The three sub-matrices which are to be inserted.
        */
-      explicit SaddlePointMatrix(
-                                 MatrixTypeA&& matrix_a,
-                                 MatrixTypeB&& matrix_b,
-                                 MatrixTypeD&& matrix_d) :
-        _matrix_a(std::move(matrix_a)),
-        _matrix_b(std::move(matrix_b)),
-        _matrix_d(std::move(matrix_d))
+      explicit SaddlePointMatrix(MatrixTypeA&& matrix_a, MatrixTypeB&& matrix_b, MatrixTypeD&& matrix_d) :
+        _matrix_a(std::forward<MatrixTypeA>(matrix_a)),
+        _matrix_b(std::forward<MatrixTypeB>(matrix_b)),
+        _matrix_d(std::forward<MatrixTypeD>(matrix_d))
       {
-        XASSERT(_matrix_a.rows() == _matrix_b.rows());
-        XASSERT(_matrix_a.columns() == _matrix_d.columns());
+        XASSERT(_matrix_a.num_rows() == _matrix_b.num_rows());
+        XASSERT(_matrix_a.num_cols() == _matrix_d.num_cols());
       }
 
       /// move ctor
       SaddlePointMatrix(SaddlePointMatrix&& other) :
-        _matrix_a(std::move(other._matrix_a)),
-        _matrix_b(std::move(other._matrix_b)),
-        _matrix_d(std::move(other._matrix_d))
+        _matrix_a(std::forward<MatrixTypeA>(other._matrix_a)),
+        _matrix_b(std::forward<MatrixTypeB>(other._matrix_b)),
+        _matrix_d(std::forward<MatrixTypeD>(other._matrix_d))
       {
       }
 
@@ -213,9 +208,9 @@ namespace FEAT
       {
         if(this == &other)
           return *this;
-        _matrix_a = std::move(other._matrix_a);
-        _matrix_b = std::move(other._matrix_b);
-        _matrix_d = std::move(other._matrix_d);
+        _matrix_a = std::forward<MatrixTypeA>(other._matrix_a);
+        _matrix_b = std::forward<MatrixTypeB>(other._matrix_b);
+        _matrix_d = std::forward<MatrixTypeD>(other._matrix_d);
         return *this;
       }
 
@@ -345,52 +340,56 @@ namespace FEAT
 
       /**
        * \brief Returns the total number of rows in this matrix.
-       *
-       * \returns Matrix row count if perspective_ = false.
-       * \returns Raw matrix row count if perspective_ = true.
        */
-      template <Perspective perspective_ = Perspective::native>
-      Index rows() const
+      Index num_rows() const
       {
-        return _matrix_a.template rows<perspective_>() + _matrix_d.template rows<perspective_>();
+        return _matrix_a.num_rows() + _matrix_d.num_rows();
       }
 
       /**
        * \brief Returns the total number of columns in this matrix.
-       *
-       * \returns Matrix column count if perspective_ = false.
-       * \returns Raw matrix column count if perspective_ = true.
        */
-      template <Perspective perspective_ = Perspective::native>
-      Index columns() const
+      Index num_cols() const
       {
-        return _matrix_a.template columns<perspective_>() + _matrix_b.template columns<perspective_>();
+        return _matrix_a.num_cols() + _matrix_b.num_cols();
       }
 
       /**
        * \brief Returns the total number of non-zeros in this matrix.
-       *
-       * \returns Matrix non zero element count if perspective_ = false.
-       * \returns Raw matrix non zero element count if perspective_ = true.
        */
-      template <Perspective perspective_ = Perspective::native>
-      Index used_elements() const
+      Index num_nzes() const
       {
-        return _matrix_a.template used_elements<perspective_>() + _matrix_b.template used_elements<perspective_>() + _matrix_d.template used_elements<perspective_>();
+        return _matrix_a.num_nzes() + _matrix_b.num_nzes() + _matrix_d.num_nzes();
+      }
+
+      /**
+       * \brief Returns the total number of rows in this matrix.
+       */
+      Index num_rows_raw() const
+      {
+        return _matrix_a.num_rows_raw() + _matrix_d.num_rows_raw();
+      }
+
+      /**
+       * \brief Returns the total number of columns in this matrix.
+       */
+      Index num_cols_raw() const
+      {
+        return _matrix_a.num_cols_raw() + _matrix_b.num_cols_raw();
+      }
+
+      /**
+       * \brief Returns the total number of non-zeros in this matrix.
+       */
+      Index num_nzes_raw() const
+      {
+        return _matrix_a.num_nzes_raw() + _matrix_b.num_nzes_raw() + _matrix_d.num_nzes_raw();
       }
 
       /// Returns a descriptive string for this container.
       static String name()
       {
-        return String("SaddePointMatrix<") + MatrixTypeA::name() + "," +
-          MatrixTypeB::name() + "," +
-          MatrixTypeD::name() + ">";
-      }
-
-      template <Perspective perspective_ = Perspective::native>
-      Index size() const
-      {
-        return rows<perspective_>() * columns<perspective_>();
+        return String("SaddePointMatrix<") + MatrixTypeA::name() + "," + MatrixTypeB::name() + "," + MatrixTypeD::name() + ">";
       }
 
       /**
@@ -450,14 +449,14 @@ namespace FEAT
 
       void apply(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols(), "Vector size of x does not match!");
 
-        DenseVector<DataType, IndexType> r_first(r, block_a().rows(), 0);
-        DenseVector<DataType, IndexType> r_rest(r, block_d().rows(), block_a().rows());
+        DenseVector<DataType, IndexType> r_first(r, block_a().num_rows(), 0);
+        DenseVector<DataType, IndexType> r_rest(r, block_d().num_rows(), block_a().num_rows());
 
-        DenseVector<DataType, IndexType> x_first(x, block_a().columns(), 0);
-        DenseVector<DataType, IndexType> x_rest(x, block_b().columns(), block_a().columns());
+        DenseVector<DataType, IndexType> x_first(x, block_a().num_cols(), 0);
+        DenseVector<DataType, IndexType> x_rest(x, block_b().num_cols(), block_a().num_cols());
 
         block_a().apply(r_first, x_first);
         block_b().apply(r_first, x_rest, r_first, DataType(1));
@@ -485,14 +484,14 @@ namespace FEAT
 
       void apply_transposed(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_cols(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows(), "Vector size of x does not match!");
 
-        DenseVector<DataType, IndexType> r_first(r, block_a().columns(), 0);
-        DenseVector<DataType, IndexType> r_rest(r, block_b().columns(), block_a().columns());
+        DenseVector<DataType, IndexType> r_first(r, block_a().num_cols(), 0);
+        DenseVector<DataType, IndexType> r_rest(r, block_b().num_cols(), block_a().num_cols());
 
-        DenseVector<DataType, IndexType> x_first(x, block_a().rows(), 0);
-        DenseVector<DataType, IndexType> x_rest(x, block_d().rows(), block_a().rows());
+        DenseVector<DataType, IndexType> x_first(x, block_a().num_rows(), 0);
+        DenseVector<DataType, IndexType> x_rest(x, block_d().num_rows(), block_a().num_rows());
 
         block_a().apply_transposed(r_first, x_first);
         block_d().apply_transposed(r_first, x_rest, r_first, DataType(1));
@@ -526,18 +525,18 @@ namespace FEAT
       void apply(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x,
                  const DenseVector<DataType, IndexType>& y, DataType alpha = DataType(1)) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->rows(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_rows(), "Vector size of y does not match!");
 
-        DenseVector<DataType, IndexType> r_first(r, block_a().rows(), 0);
-        DenseVector<DataType, IndexType> r_rest(r, block_d().rows(), block_a().rows());
+        DenseVector<DataType, IndexType> r_first(r, block_a().num_rows(), 0);
+        DenseVector<DataType, IndexType> r_rest(r, block_d().num_rows(), block_a().num_rows());
 
-        DenseVector<DataType, IndexType> x_first(x, block_a().columns(), 0);
-        DenseVector<DataType, IndexType> x_rest(x, block_b().columns(), block_a().columns());
+        DenseVector<DataType, IndexType> x_first(x, block_a().num_cols(), 0);
+        DenseVector<DataType, IndexType> x_rest(x, block_b().num_cols(), block_a().num_cols());
 
-        DenseVector<DataType, IndexType> y_first(y, block_a().rows(), 0);
-        DenseVector<DataType, IndexType> y_rest(y, block_d().rows(), block_a().rows());
+        DenseVector<DataType, IndexType> y_first(y, block_a().num_rows(), 0);
+        DenseVector<DataType, IndexType> y_rest(y, block_d().num_rows(), block_a().num_rows());
 
         block_a().apply(r_first, x_first, y_first, alpha);
         block_b().apply(r_first, x_rest, r_first, alpha);
@@ -571,18 +570,18 @@ namespace FEAT
       void apply_transposed(DenseVector<DataType, IndexType>& r, const DenseVector<DataType, IndexType>& x,
         const DenseVector<DataType, IndexType>& y, DataType alpha = DataType(1)) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_cols(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_cols(), "Vector size of y does not match!");
 
-        DenseVector<DataType, IndexType> r_first(r, block_a().columns(), 0);
-        DenseVector<DataType, IndexType> r_rest(r, block_b().columns(), block_a().columns());
+        DenseVector<DataType, IndexType> r_first(r, block_a().num_cols(), 0);
+        DenseVector<DataType, IndexType> r_rest(r, block_b().num_cols(), block_a().num_cols());
 
-        DenseVector<DataType, IndexType> x_first(x, block_a().rows(), 0);
-        DenseVector<DataType, IndexType> x_rest(x, block_d().rows(), block_a().rows());
+        DenseVector<DataType, IndexType> x_first(x, block_a().num_rows(), 0);
+        DenseVector<DataType, IndexType> x_rest(x, block_d().num_rows(), block_a().num_rows());
 
-        DenseVector<DataType, IndexType> y_first(y, block_a().columns(), 0);
-        DenseVector<DataType, IndexType> y_rest(y, block_b().columns(), block_a().columns());
+        DenseVector<DataType, IndexType> y_first(y, block_a().num_cols(), 0);
+        DenseVector<DataType, IndexType> y_rest(y, block_b().num_cols(), block_a().num_cols());
 
         block_a().apply_transposed(r_first, x_first, y_first, alpha);
         block_d().apply_transposed(r_first, x_rest, r_first, alpha);
@@ -629,61 +628,9 @@ namespace FEAT
         return VectorTypeR(block_a().create_vector_r(), block_b().create_vector_r());
       }
 
-      /// Returns the number of NNZ-elements of the selected row
-      Index get_length_of_line(const Index row) const
-      {
-        const Index arows(this->block_a().template rows<Perspective::pod>());
-
-        if (row < arows)
-        {
-          return this->block_a().get_length_of_line(row) + this->block_b().get_length_of_line(row);
-        }
-        else
-        {
-          return this->block_d().get_length_of_line(row - arows);
-        }
-      }
-
-      /// \cond internal
-      /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
-      void set_line(const Index row, typename MatrixA_::DataType * const pval_set, typename MatrixA_::IndexType * const pcol_set,
-                    const Index col_start, const Index stride = 1) const
-      {
-        const Index arows(this->block_a().template rows<Perspective::pod>());
-
-        if (row < arows)
-        {
-          const Index length_of_a(this->block_a().get_length_of_line(row));
-
-          this->block_a().set_line(row, pval_set, pcol_set, col_start, stride);
-          this->block_b().set_line(row, pval_set + stride * length_of_a, pcol_set + stride * length_of_a, col_start + this->block_a().template columns<Perspective::pod>(), stride);
-        }
-        else
-        {
-          this->block_d().set_line(row - arows, pval_set, pcol_set, col_start, stride);
-        }
-      }
-
-      void set_line_reverse(const Index row, const typename MatrixA_::DataType * const pval_set, const Index stride = 1)
-      {
-        const Index arows(this->block_a().template rows<Perspective::pod>());
-
-        if (row < arows)
-        {
-          const Index length_of_a(this->block_a().get_length_of_line(row));
-
-          this->block_a().set_line_reverse(row, pval_set, stride);
-          this->block_b().set_line_reverse(row, pval_set + stride * length_of_a, stride);
-        }
-        else
-        {
-          this->block_d().set_line_reverse(row - arows, pval_set, stride);
-        }
-      }
-
       Index row_degree(const Index row) const
       {
-        const Index rows_a = block_a().template rows<Perspective::pod>();
+        const Index rows_a = block_a().num_rows_raw();
         if(row < rows_a)
           return block_a().row_degree(row) + block_b().row_degree(row);
         else
@@ -693,12 +640,12 @@ namespace FEAT
       template<typename IT2_>
       Index get_row_col_indices(const Index row, IT2_* const pcol_idx, const IT2_ col_offset) const
       {
-        const Index rows_a = block_a().template rows<Perspective::pod>();
-        const Index cols_a = block_a().template columns<Perspective::pod>();
+        const Index rows_a = block_a().num_rows_raw();
+        const Index cols_a = block_a().num_cols_raw();
         if(row < rows_a)
         {
           Index degree_a = block_a().get_row_col_indices(row, pcol_idx, col_offset);
-          return degree_a + block_b().get_row_col_indices(row, pcol_idx + degree_a, col_offset + cols_a);
+          return degree_a + block_b().get_row_col_indices(row, pcol_idx + degree_a, col_offset + IT2_(cols_a));
         }
         else
           return block_d().get_row_col_indices(row - rows_a, pcol_idx, col_offset);
@@ -707,7 +654,7 @@ namespace FEAT
       template<typename DT2_>
       Index get_row_values(const Index row, DT2_ * const pvals) const
       {
-        const Index rows_a = block_a().template rows<Perspective::pod>();
+        const Index rows_a = block_a().num_rows_raw();
         if(row < rows_a)
         {
           Index degree_a = block_a().get_row_values(row, pvals);
@@ -720,7 +667,7 @@ namespace FEAT
       template<typename DT2_>
       Index set_row_values(const Index row, const DT2_ * const pvals)
       {
-        const Index rows_a = block_a().template rows<Perspective::pod>();
+        const Index rows_a = block_a().num_rows_raw();
         if(row < rows_a)
         {
           Index degree_a = block_a().set_row_values(row, pvals);
@@ -800,11 +747,19 @@ namespace FEAT
       }
 
       template <typename MatrixA2_, typename MatrixB2_, typename MatrixD2_>
-      void convert_reverse(SaddlePointMatrix<MatrixA2_, MatrixB2_, MatrixD2_> & other) const
+      void copy(const SaddlePointMatrix<MatrixA2_, MatrixB2_, MatrixD2_> & other)
       {
-        this->block_a().convert_reverse(other.block_a());
-        this->block_b().convert_reverse(other.block_b());
-        this->block_d().convert_reverse(other.block_d());
+        this->block_a().copy(other.block_a());
+        this->block_b().copy(other.block_b());
+        this->block_d().copy(other.block_d());
+      }
+
+      template <typename MatrixA2_, typename MatrixB2_, typename MatrixD2_>
+      void copy_to(SaddlePointMatrix<MatrixA2_, MatrixB2_, MatrixD2_> & other) const
+      {
+        this->block_a().copy_to(other.block_a());
+        this->block_b().copy_to(other.block_b());
+        this->block_d().copy_to(other.block_d());
       }
     }; // class SaddlePointMatrix<...>
 

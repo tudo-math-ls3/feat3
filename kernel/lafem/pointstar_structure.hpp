@@ -76,9 +76,10 @@ namespace FEAT
         // allocate memory for vectors of matrix
         DenseVector<IndexType_, IndexType_> vec_offsets(noo);
         DenseVector<DataType_, IndexType_> vec_val(noo * Index(size));
+        vec_val.format();
 
         // fill offsets-vector
-        IndexType_ * const poffsets(vec_offsets.elements());
+        Memory::TypedView<IndexType_ > poffsets(vec_offsets.elements_view_w());
         const Index h_off((noo - 1) / 2);
 
         // save position of main-diagonal
@@ -97,6 +98,7 @@ namespace FEAT
             }
           }
         }
+        poffsets.release();
 
         // return the matrix
         return SparseMatrixBanded<DataType_, IndexType_>(Index(size), Index(size), vec_val, vec_offsets);
@@ -141,18 +143,21 @@ namespace FEAT
         // allocate memory for vectors of matrix
         DenseVector<DataType_, IndexType_> vec_val(Index(size) * num_of_offsets);
         DenseVector<IndexType_, IndexType_> vec_offsets(num_of_offsets);
+        vec_val.format();
 
         // fill vec_offsets
-        IndexType_ * const poffsets(vec_offsets.elements());
-
-        poffsets[d] = IndexType_(size - 1);
-
-        Index tmp(1);
-        for (Index i(0); i < d; ++i)
         {
-          tmp *= pnos[i] - 1;
-          poffsets[d - 1 - i] = size - IndexType_(1 + tmp);
-          poffsets[d + 1 + i] = size + IndexType_(tmp - 1);
+          Memory::TypedView<IndexType_> poffsets(vec_offsets.elements_view_w());
+
+          poffsets[d] = IndexType_(size - 1);
+
+          Index tmp(1);
+          for (Index i(0); i < d; ++i)
+          {
+            tmp *= pnos[i] - 1;
+            poffsets[d - 1 - i] = size - IndexType_(1 + tmp);
+            poffsets[d + 1 + i] = size + IndexType_(tmp - 1);
+          }
         }
 
         // return the matrix

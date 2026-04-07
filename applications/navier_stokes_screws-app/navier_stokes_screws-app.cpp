@@ -277,19 +277,21 @@ class ExtrudedPartiDomainControl :
      * \brief Extrudes a 2d vertex vector to 3d
      */
     template<typename DT_, typename IT_>
-    void extrude_vertex_vector(LAFEM::DenseVectorBlocked<DT_, IT_, MeshType::world_dim>& v,
+    void extrude_vertex_vector(LAFEM::DenseVectorBlocked<DT_, IT_, MeshType::world_dim>& v_out,
     const LAFEM::DenseVectorBlocked<DT_, IT_, Mesh2d::world_dim>& v_in)
     {
       Tiny::Vector<DT_, MeshType::world_dim> tmp(DT_(0));
 
-      for(Index i(0); i < v.size(); ++i)
+      const auto vi = v_in.elements_view_r();
+      auto vo = v_out.elements_view_w();
+      for(Index i(0); i < v_out.size(); ++i)
       {
         Index j(_vtx_map[i]);
         for(int d(0); d < Mesh2d::world_dim; ++d)
         {
-          tmp(d) = v_in(j)(d);
+          tmp(d) = vi(j)(d);
         }
-        v(i, tmp);
+        vo[i] = tmp;
       }
     }
 };
@@ -1186,8 +1188,8 @@ struct NavierStokesScrewsApp
     comm.print("\n");
     for(Index i(0); i < num_levels; ++i)
     {
-      Index ndof_v(system_levels.at(i)->matrix_a.columns());
-      Index ndof_p(system_levels.at(i)->matrix_s.columns());
+      Index ndof_v(system_levels.at(i)->matrix_a.num_cols());
+      Index ndof_p(system_levels.at(i)->matrix_s.num_cols());
       String msg("Level "+stringify(extruded_dom_ctrl.at(i)->get_level_index())+" DoF: "+stringify(ndof_v)+ " / " + stringify(ndof_p));
       comm.print(msg);
     }
@@ -1343,7 +1345,7 @@ struct NavierStokesScrewsApp
 
           //exporter.add_vertex_scalar("extrude_idx", extruded_dom_ctrl._vtx_map.data());
           exporter.add_vertex_vector("v", vec_sol_v.at(0).local());
-          exporter.add_vertex_scalar("p", vec_sol_p.at(0).local().elements());
+          exporter.add_vertex_scalar("p", vec_sol_p.at(0).local());
           //exporter.add_vertex_vector("nu", system_levels.at(l)->filter_velo.local().template at<0>().get_filter_vector());
 #ifdef ANALYTIC_SOLUTION
           Assembly::AnalyticVertexProjector::project(vec_sol_v_analytic.local(), velo_sol, the_domain_level.trafo);
@@ -1353,7 +1355,7 @@ struct NavierStokesScrewsApp
           exporter.add_vertex_vector("v_rhs_analytic", vec_sol_v_analytic.local());
 
           Assembly::AnalyticVertexProjector::project(vec_sol_p_analytic.local(), pres_sol, the_domain_level.trafo);
-          exporter.add_vertex_scalar("p_analytic", vec_sol_p_analytic.local().elements());
+          exporter.add_vertex_scalar("p_analytic", vec_sol_p_analytic.local());
 #endif
 
           exporter.write(vtk_name, comm.rank(), comm.size());
@@ -1448,16 +1450,17 @@ struct NavierStokesScrewsApp
           WorldPoint tmp(DataType(0));
           WorldPoint tmp2(DataType(0));
 
+          auto vcl = coords_loc.elements_view_rw();
           for(Index i(0); i < inner_indices->get_num_entities(); ++i)
           {
             // Index of boundary vertex i in the mesh
             Index j(inner_indices->operator[](i));
             // Translate the point to the centre of rotation
-            tmp = coords_loc(j) - centre_inner;
+            tmp = vcl(j) - centre_inner;
             // Rotate
             tmp2.set_mat_vec_mult(rot, tmp);
             // Translate the point by the new centre of rotation
-            coords_loc(j, centre_inner + tmp2);
+            vcl[j] = centre_inner + tmp2;
           }
         }
 
@@ -1471,15 +1474,16 @@ struct NavierStokesScrewsApp
           WorldPoint tmp2(DataType(0));
 
           // The outer screw rotates centrically, so centre_outer remains the same at all times
+          auto vcl = coords_loc.elements_view_rw();
           for(Index i(0); i < outer_indices->get_num_entities(); ++i)
           {
             // Index of boundary vertex i in the mesh
             Index j(outer_indices->operator[](i));
-            tmp = coords_loc(j) - centre_outer;
+            tmp = vcl(j) - centre_outer;
 
             tmp2.set_mat_vec_mult(rot, tmp);
 
-            coords_loc(j, centre_outer+tmp2);
+            vcl[j] = centre_outer + tmp2;
           }
         }
 
@@ -1542,9 +1546,12 @@ struct NavierStokesScrewsApp
           // Compute maximum of the mesh velocity
           DataType max_mesh_velocity(0);
 
-          for(IT_ i(0); i < mesh_velocity.local().size(); ++i)
           {
-            max_mesh_velocity = Math::max(max_mesh_velocity, (mesh_velocity.local())(i).norm_euclid());
+            const auto mvl = mesh_velocity.local().elements_view_r();
+            for(IT_ i(0); i < mesh_velocity.local().size(); ++i)
+            {
+              max_mesh_velocity = Math::max(max_mesh_velocity, mvl(i).norm_euclid());
+            }
           }
 
           if(mesh_velocity.get_gate() != nullptr)
@@ -1797,7 +1804,7 @@ struct NavierStokesScrewsApp
         for(std::size_t i(0); i < system_levels.size(); ++i)
         {
           auto& loc_mat_a = system_levels.at(i)->matrix_a.local();
-          typename GlobalVeloVector::LocalVectorType vec_cv(vec_conv.local(), loc_mat_a.rows(), IndexType(0));
+          typename GlobalVeloVector::LocalVectorType vec_cv(vec_conv.local(), loc_mat_a.num_rows(), IndexType(0));
           loc_mat_a.format();
           burgers_lhs.assemble_matrix(loc_mat_a, vec_cv, extruded_dom_ctrl.at(i)->space_velo, cubature);
         }
@@ -1997,10 +2004,10 @@ struct NavierStokesScrewsApp
           //}
 
           //exporter.add_vertex_vector("vec_conv", vec_conv.local());
-          //exporter.add_vertex_scalar("div_v", vec_D_v.local().elements());
+          //exporter.add_vertex_scalar("div_v", vec_D_v.local());
 
-          exporter.add_vertex_scalar("p", vec_sol_p.at(0).local().elements());
-          //exporter.add_vertex_scalar("phi", vec_sol_phi.at(0).local().elements());
+          exporter.add_vertex_scalar("p", vec_sol_p.at(0).local());
+          //exporter.add_vertex_scalar("phi", vec_sol_phi.at(0).local());
 
           //// compute and write time-derivatives
           //vec_der_v.axpy(vec_sol_v.at(1), vec_sol_v.at(0), -DataType(1));
@@ -2010,7 +2017,7 @@ struct NavierStokesScrewsApp
           //vec_der_p.scale(vec_der_p, DataType(1) / time_disc.delta_t());
 
           //exporter.add_vertex_vector("v_dt", vec_der_v.local());
-          //exporter.add_vertex_scalar("p_dt", vec_der_p.local().elements());
+          //exporter.add_vertex_scalar("p_dt", vec_der_p.local());
 
           //exporter.add_vertex_vector("v_rhs", vec_rhs_v.local());
 
@@ -2022,7 +2029,7 @@ struct NavierStokesScrewsApp
           exporter.add_vertex_vector("v_analytic", vec_sol_v_analytic.local());
 
           Assembly::AnalyticVertexProjector::project(vec_sol_p_analytic.local(), pres_sol, the_domain_level.trafo);
-          exporter.add_vertex_scalar("p_analytic", vec_sol_p_analytic.local().elements());
+          exporter.add_vertex_scalar("p_analytic", vec_sol_p_analytic.local());
 #endif
 
           exporter.write(vtk_name, comm.rank(), comm.size());
@@ -2226,13 +2233,13 @@ struct NavierStokesScrewsApp
 
     //    meshopt_ctrl->add_to_vtk_exporter(exporter, lvl_index);
     //    exporter.add_vertex_vector("v", vec_sol_v.at(0).local());
-    //    exporter.add_vertex_scalar("p", vec_sol_p.at(0).local().elements());
+    //    exporter.add_vertex_scalar("p", vec_sol_p.at(0).local());
 
     //    //Assembly::AnalyticVertexProjector::project(vec_sol_v_analytic.local(), velo_sol, the_domain_level.trafo);
     //    //exporter.add_vertex_vector("v_analytic", vec_sol_v_analytic.local());
 
     //    //Assembly::AnalyticVertexProjector::project(vec_sol_p_analytic.local(), pres_sol, the_domain_level.trafo);
-    //    //exporter.add_vertex_scalar("p_analytic", vec_sol_p_analytic.local().elements());
+    //    //exporter.add_vertex_scalar("p_analytic", vec_sol_p_analytic.local());
 
     //    exporter.write(vtk_name, comm.rank(), comm.size());
     //  }

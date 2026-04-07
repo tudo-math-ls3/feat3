@@ -26,12 +26,8 @@ class MeanFilterVectorTest
   : public UnitTest
 {
 public:
-  MeanFilterVectorTest(PreferredBackend backend)
+  explicit MeanFilterVectorTest(PreferredBackend backend)
     : UnitTest("MeanFilterVectorTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~MeanFilterVectorTest()
   {
   }
 
@@ -70,25 +66,25 @@ public:
   }
 };
 
-MeanFilterVectorTest <float, std::uint32_t> mean_filter_vector_test_generic_float_uint32(PreferredBackend::generic);
-MeanFilterVectorTest <double, std::uint32_t> mean_filter_vector_test_generic_double_uint32(PreferredBackend::generic);
-MeanFilterVectorTest <float, std::uint64_t> mean_filter_vector_test_generic_float_uint64(PreferredBackend::generic);
-MeanFilterVectorTest <double, std::uint64_t> mean_filter_vector_test_generic_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MeanFilterVectorTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MeanFilterVectorTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MeanFilterVectorTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MeanFilterVectorTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MeanFilterVectorTest <float, std::uint64_t> mkl_mean_filter_vector_test_float_uint64(PreferredBackend::mkl);
-MeanFilterVectorTest <double, std::uint64_t> mkl_mean_filter_vector_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(MeanFilterVectorTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(MeanFilterVectorTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MeanFilterVectorTest <__float128, std::uint64_t> mean_filter_vector_test_float128_uint64(PreferredBackend::generic);
-MeanFilterVectorTest <__float128, std::uint32_t> mean_filter_vector_test_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MeanFilterVectorTest, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MeanFilterVectorTest, __float128, std::uint32_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MeanFilterVectorTest <Half, std::uint32_t> mean_filter_vector_test_half_uint32(PreferredBackend::generic);
-MeanFilterVectorTest <Half, std::uint64_t> mean_filter_vector_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MeanFilterVectorTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MeanFilterVectorTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MeanFilterVectorTest <float, std::uint32_t> mean_filter_vector_test_cuda_float_uint32(PreferredBackend::cuda);
-MeanFilterVectorTest <double, std::uint32_t> mean_filter_vector_test_cuda_double_uint32(PreferredBackend::cuda);
-MeanFilterVectorTest <float, std::uint64_t> mean_filter_vector_test_cuda_float_uint64(PreferredBackend::cuda);
-MeanFilterVectorTest <double, std::uint64_t> mean_filter_vector_test_cuda_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MeanFilterVectorTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MeanFilterVectorTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MeanFilterVectorTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MeanFilterVectorTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif

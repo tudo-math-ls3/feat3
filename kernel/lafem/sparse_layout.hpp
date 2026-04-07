@@ -7,7 +7,7 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/util/memory_pool.hpp>
+#include <kernel/util/memory_arbiter.hpp>
 #include <kernel/lafem/forward.hpp>
 #include <kernel/lafem/base.hpp>
 
@@ -64,7 +64,7 @@ namespace FEAT
     class SparseLayout
     {
     public:
-      std::vector<IT_*> _indices;
+      std::vector<Memory::Arbiter> _indices;
       std::vector<Index> _indices_size;
       std::vector<Index> _scalar_index;
 
@@ -78,13 +78,13 @@ namespace FEAT
       {
       }
 
-      SparseLayout(const std::vector<IT_ *> & indices, const std::vector<Index> & indices_size, const std::vector<Index> & scalar_index) :
-        _indices(indices),
+      explicit SparseLayout(const std::vector<Memory::Arbiter> & indices, const std::vector<Index> & indices_size, const std::vector<Index> & scalar_index) :
+        _indices(),
         _indices_size(indices_size),
         _scalar_index(scalar_index)
       {
-        for(auto i : this->_indices)
-          MemoryPool::increase_memory(i);
+        for(const auto& idx : indices)
+          this->_indices.push_back(idx.attach());
       }
 
       /// move constructor
@@ -98,8 +98,6 @@ namespace FEAT
       /// virtual destructor
       virtual ~SparseLayout()
       {
-        for(auto i : this->_indices)
-          MemoryPool::release_memory(i);
       }
 
       /// move operator=
@@ -117,7 +115,7 @@ namespace FEAT
        *
        * \returns A list of all Index arrays.
        */
-      const std::vector<IT_*> & get_indices() const
+      const std::vector<Memory::Arbiter> & get_indices() const
       {
         return _indices;
       }

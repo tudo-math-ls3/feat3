@@ -113,6 +113,8 @@
       Include="FEAT_HAVE_CUDSS" />
     <FeatDef Condition="'$(FeatHaveMKL)'=='true'"
       Include="FEAT_HAVE_MKL;MKL_ILP64" />
+    <FeatDef Condition="'(EnableEICKT)'=='true'"
+      Include="FEAT_EICKT" />
   </ItemGroup>
 
   <!-- FEAT additional include directory list -->

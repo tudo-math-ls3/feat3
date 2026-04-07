@@ -6,6 +6,7 @@
 #include <test_system/test_system.hpp>
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/sparse_vector.hpp>
+#include <kernel/lafem/sparse_vector_factory.hpp>
 #include <kernel/util/binary_stream.hpp>
 
 using namespace FEAT;
@@ -29,33 +30,41 @@ class SparseVectorTest
   : public UnitTest
 {
 public:
-  SparseVectorTest(PreferredBackend backend)
+  explicit SparseVectorTest(PreferredBackend backend)
     : UnitTest("SparseVectorTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~SparseVectorTest()
   {
   }
 
   virtual void run() const override
   {
-    DT_ eps = TestSystem::tol<DT_>();
+    const DT_ eps = TestSystem::tol<DT_>();
+
     SparseVector<DT_, IT_> zero;
     TEST_CHECK(zero.empty());
 
-    SparseVector<DT_, IT_> a(10);
-    a(3, DT_(7));
-    a(3, DT_(3));
-    a(6, DT_(1));
-    a(5, DT_(6));
-    a(6, DT_(8));
+    SparseVectorFactory<DT_, IT_> a_fac(10);
+    a_fac.add(3, DT_(7));
+    a_fac.add(3, DT_(2));
+    a_fac.add(6, DT_(1));
+    a_fac.add(5, DT_(6));
+    a_fac.add(6, DT_(8));
+
+    SparseVector<DT_, IT_> a(a_fac.make_sv());
     TEST_CHECK(!a.empty());
-    TEST_CHECK_EQUAL(a.used_elements(), Index(3));
-    TEST_CHECK_EQUAL(a(3), DT_(3));
-    TEST_CHECK_EQUAL(a(2), DT_(0));
-    TEST_CHECK_EQUAL(a(5), DT_(6));
-    TEST_CHECK_EQUAL(a(6), DT_(8));
+    TEST_CHECK_EQUAL(a.size(), Index(10));
+    TEST_CHECK_EQUAL(a.num_nzes(), Index(3));
+    {
+      Memory::TypedView<IT_> vi(a.indices_view_r());
+      TEST_CHECK_EQUAL(vi(0), IT_(3));
+      TEST_CHECK_EQUAL(vi(1), IT_(5));
+      TEST_CHECK_EQUAL(vi(2), IT_(6));
+    }
+    {
+      Memory::TypedView<DT_> va(a.elements_view_r());
+      TEST_CHECK_EQUAL(va(0), DT_(2));
+      TEST_CHECK_EQUAL(va(1), DT_(6));
+      TEST_CHECK_EQUAL(va(2), DT_(8));
+    }
 
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
@@ -65,21 +74,21 @@ public:
     prm_rnd = prm_rnd.inverse();
     ap.permute(prm_rnd);
     TEST_CHECK_LESS_THAN(ap.max_rel_diff(a), eps);
-    TEST_CHECK_EQUAL(ap.used_elements(), Index(3));
+    TEST_CHECK_EQUAL(ap.num_nzes(), Index(3));
 
     SparseVector<DT_, IT_> b;
     b.convert(a);
     TEST_CHECK_LESS_THAN(a.max_rel_diff(b), eps);
-    b(6, DT_(1));
+    b.elements_view_rw()[2] = DT_(1);
     TEST_CHECK_LESS_THAN(eps, a.max_rel_diff(b));
     b.clone(a);
-    b(6, DT_(3));
+    b.elements_view_rw()[2] = DT_(3);
     TEST_CHECK_LESS_THAN(eps, a.max_rel_diff(b));
-    TEST_CHECK_NOT_EQUAL((void*)a.elements(), (void*)b.elements());
-    TEST_CHECK_NOT_EQUAL((void*)a.indices(), (void*)b.indices());
+    TEST_CHECK_NOT_EQUAL(a.elements_arbiter(), b.elements_arbiter());
+    TEST_CHECK_NOT_EQUAL(a.indices_arbiter(), b.indices_arbiter());
     b = a.clone();
-    TEST_CHECK_NOT_EQUAL((void*)a.elements(), (void*)b.elements());
-    TEST_CHECK_NOT_EQUAL((void*)a.indices(), (void*)b.indices());
+    TEST_CHECK_NOT_EQUAL(a.elements_arbiter(), b.elements_arbiter());
+    TEST_CHECK_NOT_EQUAL(a.indices_arbiter(), b.indices_arbiter());
 
     SparseVector<float, unsigned int> c;
     c.convert(a);
@@ -88,43 +97,40 @@ public:
     SparseVector<float, unsigned int> e;
     e.convert(a);
     TEST_CHECK_LESS_THAN(d.max_rel_diff(e), float(eps));
-    c(6, DT_(1));
+    c.elements_view_rw()[2] = DT_(1);
     TEST_CHECK_LESS_THAN(float(eps), c.max_rel_diff(e));
 
     a.format();
-    TEST_CHECK_EQUAL(a.used_elements(), Index(3));
-    TEST_CHECK_EQUAL(a(2), DT_(0));
-    TEST_CHECK_EQUAL(a(3), DT_(0));
-
-    //increase vector size above alloc_increment
-    SparseVector<DT_, IT_> p(3001);
-    for (Index i(1) ; i <= p.size() ; ++i)
+    TEST_CHECK_EQUAL(a.num_nzes(), Index(3));
     {
-      p(p.size() - i, DT_(i));
+      Memory::TypedView<DT_> va(a.elements_view_r());
+      TEST_CHECK_EQUAL(va(0), DT_(0));
+      TEST_CHECK_EQUAL(va(1), DT_(0));
+      TEST_CHECK_EQUAL(va(2), DT_(0));
     }
   }
 };
-SparseVectorTest <float, std::uint32_t> dv_test_float_uint32(PreferredBackend::generic);
-SparseVectorTest <double, std::uint32_t> cpu_sparse_vector_test_double_uint32(PreferredBackend::generic);
-SparseVectorTest <float, std::uint64_t> cpu_sparse_vector_test_float_uint64(PreferredBackend::generic);
-SparseVectorTest <double, std::uint64_t> cpu_sparse_vector_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseVectorTest <float, std::uint64_t> mkl_cpu_sparse_vector_test_float_uint64(PreferredBackend::mkl);
-SparseVectorTest <double, std::uint64_t> mkl_cpu_sparse_vector_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseVectorTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseVectorTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseVectorTest <__float128, std::uint64_t> cpu_sparse_vector_test_float128_uint64(PreferredBackend::generic);
-SparseVectorTest <__float128, std::uint32_t> cpu_sparse_vector_test_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorTest, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorTest, __float128, std::uint32_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseVectorTest <Half, std::uint32_t> sparse_vector_test_half_uint32(PreferredBackend::generic);
-SparseVectorTest <Half, std::uint64_t> sparse_vector_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseVectorTest <float, std::uint32_t> cuda_sparse_vector_test_float_uint32(PreferredBackend::cuda);
-SparseVectorTest <double, std::uint32_t> cuda_sparse_vector_test_double_uint32(PreferredBackend::cuda);
-SparseVectorTest <float, std::uint64_t> cuda_sparse_vector_test_float_uint64(PreferredBackend::cuda);
-SparseVectorTest <double, std::uint64_t> cuda_sparse_vector_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseVectorTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseVectorTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseVectorTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseVectorTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
@@ -134,24 +140,23 @@ class SparseVectorSerializeTest
   : public UnitTest
 {
 public:
-  SparseVectorSerializeTest(PreferredBackend backend)
+  explicit SparseVectorSerializeTest(PreferredBackend backend)
     : UnitTest("SparseVectorSerializeTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~SparseVectorSerializeTest()
   {
   }
 
   virtual void run() const override
   {
-    DT_ eps = TestSystem::tol<DT_>();
-    SparseVector<DT_, IT_> a(10);
-    a(3, DT_(7));
-    a(3, DT_(3));
-    a(6, DT_(1));
-    a(5, DT_(6));
-    a(6, DT_(8));
+    const DT_ eps = TestSystem::tol<DT_>();
+
+    SparseVectorFactory<DT_, IT_> a_fac(10);
+    a_fac.add(3, DT_(7));
+    a_fac.add(3, DT_(2));
+    a_fac.add(6, DT_(1));
+    a_fac.add(5, DT_(6));
+    a_fac.add(6, DT_(8));
+
+    SparseVector<DT_, IT_> a(a_fac.make_sv());
 
     std::stringstream ts;
     a.write_out(FileMode::fm_mtx, ts);
@@ -166,43 +171,40 @@ public:
 
     auto op = a.serialize(LAFEM::SerialConfig(false, false));
     SparseVector<DT_, IT_> o(op);
-    for (Index i(0) ; i < a.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(o(i), a(i), eps);
+    TEST_CHECK_LESS_THAN(o.max_rel_diff(a), eps);
 #ifdef FEAT_HAVE_ZLIB
     auto zl = a.serialize(LAFEM::SerialConfig(true, false));
     SparseVector<DT_, IT_> zlib(zl);
-    for (Index i(0) ; i < a.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(zlib(i), a(i), eps);
+    TEST_CHECK_LESS_THAN(zlib.max_rel_diff(a), eps);
 #endif
-#if defined FEAT_HAVE_ZFP && !defined FEAT_HAVE_HALFMATH
+#ifdef FEAT_HAVE_ZFP
     auto zf = a.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
     SparseVector<DT_, IT_> zfp(zf);
-    for (Index i(0) ; i < a.size() ; ++i)
-      TEST_CHECK_EQUAL_WITHIN_EPS(zfp(i), a(i), eps);
+    TEST_CHECK_LESS_THAN(zfp.max_rel_diff(a), DT_(1e-7));
 #endif
   }
 };
-SparseVectorSerializeTest <float, std::uint32_t> cpu_sparse_vector_serialize_test_float_uint32(PreferredBackend::generic);
-SparseVectorSerializeTest <double, std::uint32_t> cpu_sparse_vector_serialize_test_double_uint32(PreferredBackend::generic);
-SparseVectorSerializeTest <float, std::uint64_t> cpu_sparse_vector_serialize_test_float_uint64(PreferredBackend::generic);
-SparseVectorSerializeTest <double, std::uint64_t> cpu_sparse_vector_serialize_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSerializeTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSerializeTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSerializeTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSerializeTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseVectorSerializeTest <float, std::uint64_t> mkl_cpu_sparse_vector_serialize_test_float_uint64(PreferredBackend::mkl);
-SparseVectorSerializeTest <double, std::uint64_t> mkl_cpu_sparse_vector_serialize_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSerializeTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSerializeTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 //#ifdef FEAT_HAVE_QUADMATH
-//SparseVectorSerializeTest <__float128, std::uint64_t> cpu_sparse_vector_serialize_test_float128_uint64(PreferredBackend::generic);
-//SparseVectorSerializeTest <__float128, std::uint32_t> cpu_sparse_vector_serialize_test_float128_uint32(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(SparseVectorSerializeTest, __float128, std::uint64_t, PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(SparseVectorSerializeTest, __float128, std::uint32_t, PreferredBackend::generic);
 //#endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseVectorSerializeTest <Half, std::uint32_t> sparse_vector_serialize_test_half_uint32(PreferredBackend::generic);
-SparseVectorSerializeTest <Half, std::uint64_t> sparse_vector_serialize_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSerializeTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSerializeTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseVectorSerializeTest <float, std::uint32_t> cuda_sparse_vector_serialize_test_float_uint32(PreferredBackend::cuda);
-SparseVectorSerializeTest <double, std::uint32_t> cuda_sparse_vector_serialize_test_double_uint32(PreferredBackend::cuda);
-SparseVectorSerializeTest <float, std::uint64_t> cuda_sparse_vector_serialize_test_float_uint64(PreferredBackend::cuda);
-SparseVectorSerializeTest <double, std::uint64_t> cuda_sparse_vector_serialize_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSerializeTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSerializeTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSerializeTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSerializeTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
@@ -212,69 +214,52 @@ class SparseVectorMaxRelDiffTest
   : public UnitTest
 {
 public:
-  SparseVectorMaxRelDiffTest(PreferredBackend backend)
+  explicit SparseVectorMaxRelDiffTest(PreferredBackend backend)
     : UnitTest("SparseVectorMaxRelDiffTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~SparseVectorMaxRelDiffTest()
   {
   }
 
   virtual void run() const override
   {
     const DT_ eps = TestSystem::tol<DT_>();
-    const DT_ delta = DT_(123.5);
-    const DT_ initial_value = DT_(10.0);
 
     const Index size = 100;
-    const Index diff_index = 42;
+    SparseVectorFactory<DT_, IT_> a_fac(size);
 
-    // reference vector b
-    SparseVector<DT_, IT_> b(size);
+    for(Index k = 0; k < 17; ++k)
+      a_fac.add(((k+23)*131071) % size, DT_(k+1));
 
-    // b(42) = 10
-    b(diff_index, initial_value);
+    SparseVector<DT_, IT_> a(a_fac.make_sv());
+    SparseVector<DT_, IT_> b(a.clone());
 
-    // copy b into a
-    SparseVector<DT_, IT_> a = b.clone();
+    TEST_CHECK_LESS_THAN(a.max_rel_diff(b), eps*eps);
+    TEST_CHECK_LESS_THAN(b.max_rel_diff(a), eps*eps);
 
-    // a(diff_index) = initial_value + delta
-    a(diff_index, delta + a(diff_index));
-
-    // reference value
-    const DT_ ref = delta / (DT_(2) * initial_value + delta);
-
-    // test ||a-b||_infty
-    const DT_ diff_1 = a.max_rel_diff(b);
-    TEST_CHECK_RELATIVE(diff_1, ref, eps);
-
-    // test ||b-a||_infty
-    const DT_ diff_2 = b.max_rel_diff(a);
-    TEST_CHECK_RELATIVE(diff_2, ref, eps);
+    b.elements_view_rw()[7] += DT_(0.314);
+    TEST_CHECK_LESS_THAN(eps, b.max_rel_diff(a));
   }
 };
-SparseVectorMaxRelDiffTest <float, std::uint32_t> cpu_sparse_vector_max_rel_diff_test_float_uint32(PreferredBackend::generic);
-SparseVectorMaxRelDiffTest <double, std::uint32_t> cpu_sparse_vector_max_rel_diff_test_double_uint32(PreferredBackend::generic);
-SparseVectorMaxRelDiffTest <float, std::uint64_t> cpu_sparse_vector_max_rel_diff_test_float_uint64(PreferredBackend::generic);
-SparseVectorMaxRelDiffTest <double, std::uint64_t> cpu_sparse_vector_max_rel_diff_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorMaxRelDiffTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorMaxRelDiffTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorMaxRelDiffTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorMaxRelDiffTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseVectorMaxRelDiffTest <float, std::uint64_t> mkl_cpu_sparse_vector_max_rel_diff_test_float_uint64(PreferredBackend::mkl);
-SparseVectorMaxRelDiffTest <double, std::uint64_t> mkl_cpu_sparse_vector_max_rel_diff_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseVectorMaxRelDiffTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseVectorMaxRelDiffTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseVectorMaxRelDiffTest <__float128, std::uint64_t> cpu_sparse_vector_max_rel_diff_test_float128_uint64(PreferredBackend::generic);
-SparseVectorMaxRelDiffTest <__float128, std::uint32_t> cpu_sparse_vector_max_rel_diff_test_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorMaxRelDiffTest, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorMaxRelDiffTest, __float128, std::uint32_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseVectorMaxRelDiffTest <Half, std::uint32_t> sparse_vector_max_rel_diff_test_half_uint32(PreferredBackend::generic);
-SparseVectorMaxRelDiffTest <Half, std::uint64_t> sparse_vector_max_rel_diff_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorMaxRelDiffTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorMaxRelDiffTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseVectorMaxRelDiffTest <float, std::uint32_t> cuda_sparse_vector_max_rel_diff_test_float_uint32(PreferredBackend::cuda);
-SparseVectorMaxRelDiffTest <double, std::uint32_t> cuda_sparse_vector_max_rel_diff_test_double_uint32(PreferredBackend::cuda);
-SparseVectorMaxRelDiffTest <float, std::uint64_t> cuda_sparse_vector_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
-SparseVectorMaxRelDiffTest <double, std::uint64_t> cuda_sparse_vector_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseVectorMaxRelDiffTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseVectorMaxRelDiffTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseVectorMaxRelDiffTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseVectorMaxRelDiffTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
@@ -284,25 +269,27 @@ class SparseVectorSameLayoutTest
   : public UnitTest
 {
 public:
-  SparseVectorSameLayoutTest(PreferredBackend backend)
+  explicit SparseVectorSameLayoutTest(PreferredBackend backend)
     : UnitTest("SparseVectorSameLayoutTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~SparseVectorSameLayoutTest()
   {
   }
 
   virtual void run() const override
   {
-    const DT_ initial_value = DT_(10.0);
-
     const Index size = 100;
-    const Index diff_index = 42;
+    SparseVectorFactory<DT_, IT_> a_fac(size), z_fac(size+2);
 
-    // reference vector a
-    SparseVector<DT_, IT_> a(size);
-    a(diff_index, initial_value);
+    for(Index k = 0; k < 17; ++k)
+    {
+      a_fac.add(((k+23)*131071) % size, DT_(k+1));
+      z_fac.add(((k+23)*131071) % size, DT_(k+1));
+    }
+
+    SparseVector<DT_, IT_> a(a_fac.make_sv());
+
+    // different sizes
+    SparseVector<DT_, IT_> z(z_fac.make_sv());
+    TEST_CHECK(!a.same_layout(z));
 
     // weak copy
     auto b = a.clone(CloneMode::Weak);
@@ -313,41 +300,30 @@ public:
     TEST_CHECK(a.same_layout(c));
 
     // different values at same position
-    SparseVector<DT_, IT_> d(size);
-    d(diff_index, DT_(0.5));
+    SparseVector<DT_, IT_> d(a.clone());
+    d.elements_view_rw()[7] += DT_(0.5);
     TEST_CHECK(a.same_layout(d));
-
-    // value at different position
-    SparseVector<DT_, IT_> e(size);
-    e(diff_index + 1, initial_value);
-    TEST_CHECK(!a.same_layout(e));
-
-    // different sizes
-    SparseVector<DT_, IT_> f(size + 2);
-    f(diff_index, initial_value);
-    TEST_CHECK(!a.same_layout(f));
-
   }
 };
-SparseVectorSameLayoutTest <float, std::uint32_t> cpu_sparse_vector_same_layout_test_float_uint32(PreferredBackend::generic);
-SparseVectorSameLayoutTest <double, std::uint32_t> cpu_sparse_vector_same_layout_test_double_uint32(PreferredBackend::generic);
-SparseVectorSameLayoutTest <float, std::uint64_t> cpu_sparse_vector_same_layout_test_float_uint64(PreferredBackend::generic);
-SparseVectorSameLayoutTest <double, std::uint64_t> cpu_sparse_vector_same_layout_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSameLayoutTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSameLayoutTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSameLayoutTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSameLayoutTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseVectorSameLayoutTest <float, std::uint64_t> mkl_cpu_sparse_vector_same_layout_test_float_uint64(PreferredBackend::mkl);
-SparseVectorSameLayoutTest <double, std::uint64_t> mkl_cpu_sparse_vector_same_layout_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSameLayoutTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSameLayoutTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseVectorSameLayoutTest <__float128, std::uint64_t> cpu_sparse_vector_same_layout_test_float128_uint64(PreferredBackend::generic);
-SparseVectorSameLayoutTest <__float128, std::uint32_t> cpu_sparse_vector_same_layout_test_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSameLayoutTest, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSameLayoutTest, __float128, std::uint32_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseVectorSameLayoutTest <Half, std::uint32_t> sparse_vector_same_layout_test_half_uint32(PreferredBackend::generic);
-SparseVectorSameLayoutTest <Half, std::uint64_t> sparse_vector_same_layout_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSameLayoutTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSameLayoutTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseVectorSameLayoutTest <float, std::uint32_t> cuda_sparse_vector_same_layout_test_float_uint32(PreferredBackend::cuda);
-SparseVectorSameLayoutTest <double, std::uint32_t> cuda_sparse_vector_same_layout_test_double_uint32(PreferredBackend::cuda);
-SparseVectorSameLayoutTest <float, std::uint64_t> cuda_sparse_vector_same_layout_test_float_uint64(PreferredBackend::cuda);
-SparseVectorSameLayoutTest <double, std::uint64_t> cuda_sparse_vector_same_layout_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSameLayoutTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSameLayoutTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSameLayoutTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseVectorSameLayoutTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif

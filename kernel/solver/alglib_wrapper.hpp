@@ -109,7 +109,7 @@ namespace FEAT
          * Filter to apply to the functional's gradient.
          *
          * \param[in] lbfgs_dim_
-         * How many vectors to keep for the lBFGS hessian update. Defaults to min(7, functional_.columns()).
+         * How many vectors to keep for the lBFGS hessian update. Defaults to min(7, functional_.num_cols()).
          *
          * \param[in] keep_iterates
          * Keep all iterates in a std::deque. Defaults to false.
@@ -132,7 +132,7 @@ namespace FEAT
 
             if(_lbfgs_dim == alglib::ae_int_t(0))
             {
-              _lbfgs_dim = alglib::ae_int_t(Math::min(Index(7), this->_functional.columns()));
+              _lbfgs_dim = alglib::ae_int_t(Math::min(Index(7), this->_functional.num_cols()));
             }
           }
 
@@ -198,7 +198,7 @@ namespace FEAT
 
           // The length of the optimization variable is the raw length of a temporary vector
           _functionalt_var.setlength(alglib::ae_int_t(
-            Intern::derefer<VectorType>(_vec_def, nullptr).template size<LAFEM::Perspective::pod>()));
+            Intern::derefer<VectorType>(_vec_def, nullptr).size_raw()));
 
           for(alglib::ae_int_t i(0); i < _functionalt_var.length(); ++i)
           {
@@ -374,10 +374,10 @@ namespace FEAT
           }
 
           // Copy initial guess to optimization state variable
-          auto vec_sol_elements = Intern::derefer<VectorType>(vec_sol, nullptr).template elements<LAFEM::Perspective::pod>();
+          auto vec_sol_elements = Intern::derefer<VectorType>(vec_sol, nullptr).elements_view_raw_rw();
           for(alglib::ae_int_t i(0); i < _functionalt_var.length(); ++i)
           {
-            _functionalt_var[i] = vec_sol_elements[i];
+            _functionalt_var[i] = vec_sol_elements[Index(i)];
           }
 
           alglib::minlbfgsrestartfrom(_state, _functionalt_var);
@@ -388,7 +388,7 @@ namespace FEAT
 
           for(alglib::ae_int_t i(0); i < _functionalt_var.length(); ++i)
           {
-            vec_sol_elements[i] = DataType(_functionalt_var[i]);
+            vec_sol_elements[Index(i)] = DataType(_functionalt_var[i]);
           }
 
           switch(_report.terminationtype)
@@ -487,11 +487,13 @@ namespace FEAT
           ALGLIBMinLBFGS<FunctionalType, FilterType>* me = reinterpret_cast<ALGLIBMinLBFGS<FunctionalType, FilterType>*>
             (ptr);
 
-          auto vec_tmp_elements = Intern::derefer<VectorType>(me->_vec_tmp, nullptr).template elements<LAFEM::Perspective::pod>();
+          auto vec_tmp_elements = Intern::derefer<VectorType>(me->_vec_tmp, nullptr).elements_view_raw_w();
 
           // Copy back ALGLIB's state variable to our solver
           for(alglib::ae_int_t i(0); i < x.length(); ++i)
-            vec_tmp_elements[i] = DataType(x[i]);
+            vec_tmp_elements[Index(i)] = DataType(x[i]);
+
+          vec_tmp_elements.release();
 
           me->_fval_prev = me->_fval;
           // Prepare the functional
@@ -503,10 +505,10 @@ namespace FEAT
           fval = double(me->_fval);
 
           // Copy the functional's gradient to ALGLIB's grad variable
-          auto vec_def_elements = Intern::derefer<VectorType>(me->_vec_def, nullptr).template elements<LAFEM::Perspective::pod>();
+          const auto vec_def_elements = Intern::derefer<VectorType>(me->_vec_def, nullptr).elements_view_raw_r();
           for(alglib::ae_int_t i(0); i < grad.length(); ++i)
           {
-            grad[i] = double(vec_def_elements[i]);
+            grad[i] = double(vec_def_elements(Index(i)));
           }
 
         }
@@ -523,7 +525,7 @@ namespace FEAT
      * The system filter.
      *
      * \param[in] lbfgs_dim_
-     * How many vectors to keep for the lBFGS hessian update. Defaults to min(7, functional_.columns()).
+     * How many vectors to keep for the lBFGS hessian update. Defaults to min(7, functional_.num_cols()).
      *
      * \param[in] keep_iterates
      * Keep all iterates in a std::deque. Defaults to false.
@@ -720,7 +722,7 @@ namespace FEAT
 
           // The length of the optimization variable is the raw length of a temporary vector
           _functionalt_var.setlength(alglib::ae_int_t(
-            Intern::derefer<VectorType>(_vec_def, nullptr).template size<LAFEM::Perspective::pod>()));
+            Intern::derefer<VectorType>(_vec_def, nullptr).size_raw()));
 
           for(alglib::ae_int_t i(0); i < _functionalt_var.length(); ++i)
           {
@@ -900,10 +902,10 @@ namespace FEAT
             return status;
 
           // Copy initial guess to optimization state variable
-          auto vec_sol_elements = Intern::derefer<VectorType>(vec_sol, nullptr).template elements<LAFEM::Perspective::pod>();
+          auto vec_sol_elements = Intern::derefer<VectorType>(vec_sol, nullptr).elements_view_raw_rw();
           for(alglib::ae_int_t i(0); i < _functionalt_var.length(); ++i)
           {
-            _functionalt_var[i] = vec_sol_elements[i];
+            _functionalt_var[i] = vec_sol_elements[Index(i)];
           }
 
           alglib::mincgrestartfrom(_state, _functionalt_var);
@@ -913,7 +915,7 @@ namespace FEAT
 
           for(alglib::ae_int_t i(0); i < _functionalt_var.length(); ++i)
           {
-            vec_sol_elements[i] = DataType(_functionalt_var[i]);
+            vec_sol_elements[Index(i)] = DataType(_functionalt_var[i]);
           }
 
           switch(_report.terminationtype)
@@ -1010,14 +1012,14 @@ namespace FEAT
           // Downcast because we know what we are doing, right?
           ALGLIBMinCG<FunctionalType, FilterType>* me = reinterpret_cast<ALGLIBMinCG<FunctionalType, FilterType>*>(ptr);
 
-          auto vec_tmp_elements = Intern::derefer<VectorType>(me->_vec_tmp, nullptr).template
-            elements<LAFEM::Perspective::pod>();
+          auto vec_tmp_elements = Intern::derefer<VectorType>(me->_vec_tmp, nullptr).elements_view_raw_w();
 
           // Copy back ALGLIB's state variable to our solver
           for(alglib::ae_int_t i(0); i < x.length(); ++i)
           {
-            vec_tmp_elements[i] = DataType(x[i]);
+            vec_tmp_elements[Index(i)] = DataType(x[i]);
           }
+          vec_tmp_elements.release();
 
           me->_fval_prev = me->_fval;
           // Prepare the functional
@@ -1029,12 +1031,11 @@ namespace FEAT
           fval = double(me->_fval);
 
           // Copy the functional's gradient to ALGLIB's grad variable
-          auto vec_def_elements = Intern::derefer<VectorType>(me->_vec_def, nullptr).template
-            elements<LAFEM::Perspective::pod>();
+          const auto vec_def_elements = Intern::derefer<VectorType>(me->_vec_def, nullptr).elements_view_raw_r();
 
           for(alglib::ae_int_t i(0); i < grad.length(); ++i)
           {
-            grad[i] = double(vec_def_elements[i]);
+            grad[i] = double(vec_def_elements(Index(i)));
           }
 
         }

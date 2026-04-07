@@ -87,6 +87,10 @@
 #include <omp.h>
 #endif
 
+#ifdef FEAT_HAVE_MKL
+#include <mkl.h>
+#endif
+
 using namespace FEAT;
 
 String stringify_flops(double flops, int precision = 3, int width = 7)
@@ -494,10 +498,12 @@ int run(const Dist::Comm& comm, const Index mx, const Index my, const Index nx, 
   Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
   watch_asm_matrix_sym.stop();
 
-  const Index num_nze_l = matrix.used_elements();
+  const Index num_nze_l = matrix.num_nzes();
   const Index num_nze_g = mx*my*num_nze_l;
   comm.print("Local Number of NZEs.....:" + stringify(num_nze_l).pad_front(18));
   comm.print("Total Number of NZEs.....:" + stringify(num_nze_g).pad_front(18));
+
+  matrix.format();
 
   // assemble laplace matrix
   StopWatch watch_asm_matrix_num;
@@ -584,6 +590,9 @@ int run(const Dist::Comm& comm, const Index mx, const Index my, const Index nx, 
   comm.print("\nRunning power iteration for at least " + stringify(min_runtime) + " seconds, please be patient...");
   comm.print_flush();
 
+  // do we need to synchronize the device?
+  bool sync_devices = (preferred_backend == PreferredBackend::cuda);
+
   // power iteration loop
   do
   {
@@ -601,14 +610,19 @@ int run(const Dist::Comm& comm, const Index mx, const Index my, const Index nx, 
     LIKWID_MARKER_STOP("VecTriDot");
     LIKWID_NVMARKER_STOP("NV_VecTriDot");
 
+    if(sync_devices)
+      Runtime::synchronize_devices();
+
     // --------------------------------------------------------------------------------------------
     // STEP 2: sum local norms to obtain global norm of x
     // --------------------------------------------------------------------------------------------
-
     stamp_2.stamp();
 
     // sum dot up via gate and compute euclid norm
     DataType glob_norm = Math::sqrt(gate.sum(loc_norm));
+
+    if(sync_devices)
+      Runtime::synchronize_devices();
 
     // --------------------------------------------------------------------------------------------
     // STEP 3: normalize x by scaling it by its inverse norm: t := x/|x|
@@ -624,6 +638,9 @@ int run(const Dist::Comm& comm, const Index mx, const Index my, const Index nx, 
     LIKWID_MARKER_STOP("VecScale");
     LIKWID_NVMARKER_STOP("NV_VecScale");
 
+    if(sync_devices)
+      Runtime::synchronize_devices();
+
     // --------------------------------------------------------------------------------------------
     // STEP 4: compute local matrix-vector product x := A*t
     // --------------------------------------------------------------------------------------------
@@ -638,6 +655,9 @@ int run(const Dist::Comm& comm, const Index mx, const Index my, const Index nx, 
     LIKWID_MARKER_STOP("MatVecMult");
     LIKWID_NVMARKER_STOP("NV_MatVecMult");
 
+    if(sync_devices)
+      Runtime::synchronize_devices();
+
     // --------------------------------------------------------------------------------------------
     // STEP 5: synchronize vector x as type-0 vector to obtain type-1 vector
     // --------------------------------------------------------------------------------------------
@@ -645,6 +665,9 @@ int run(const Dist::Comm& comm, const Index mx, const Index my, const Index nx, 
 
     /// synchronize type-0 vector x (aka "halo exchange")
     gate.sync_0(vec_x);
+
+    if(sync_devices)
+      Runtime::synchronize_devices();
 
     stamp_end.stamp();
 

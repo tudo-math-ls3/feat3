@@ -34,7 +34,7 @@ namespace FEAT
             for(int k = 0; k < int(color_size); ++k)
             {
               const int imacro = coloring_map[k];
-              const std::pair<Index, Index> nrc = Intern::VoxelAmaVankaCore::gather(mat_wrap, local.get(), stride, Index(imacro), macro_dofs,
+              const std::pair<Index, Index> nrc = Intern::VoxelAmaVankaCore::gather<DT_,IT_,n_>(mat_wrap.raw_data, local.get(), stride, Index(imacro), macro_dofs,
                                                                             Index(0), Index(0), Index(0), Index(0));
               // the approach used for checking the regularity of the local matrix is to check whether
               //
@@ -76,7 +76,7 @@ namespace FEAT
               // scatter local matrix
               if(!singular)
               {
-                Intern::VoxelAmaVankaCore::scatter_add(vanka_wrap, local.get(), stride, Index(imacro), macro_dofs,
+                Intern::VoxelAmaVankaCore::scatter_add<DT_,IT_,n_>(vanka_wrap.raw_data, local.get(), stride, Index(imacro), macro_dofs,
                   Index(0), Index(0), Index(0), Index(0));
               }
 
@@ -105,13 +105,13 @@ namespace FEAT
             for(int k = 0; k < int(color_size); ++k)
             {
               const int imacro = coloring_map[k];
-              const std::pair<Index, Index> nrc = Intern::VoxelAmaVankaCore::gather(mat_wrap, local.get(), stride, Index(imacro), macro_dofs,
+              const std::pair<Index, Index> nrc = Intern::VoxelAmaVankaCore::gather<DT_,IT_,n_>(mat_wrap.raw_data, local.get(), stride, Index(imacro), macro_dofs,
                                                                             Index(0), Index(0), Index(0), Index(0));
 
               // invert matrix
               Math::invert_matrix(nrc.first, stride, local.get(), pivot.get());
 
-              Intern::VoxelAmaVankaCore::scatter_add(vanka_wrap, local.get(), stride, Index(imacro), macro_dofs,
+              Intern::VoxelAmaVankaCore::scatter_add<DT_,IT_,n_>(vanka_wrap.raw_data, local.get(), stride, Index(imacro), macro_dofs,
                 Index(0), Index(0), Index(0), Index(0));
 
               // reformat local matrix TODO: necessary?
@@ -131,14 +131,14 @@ namespace FEAT
         {
           const Index* row_dom_ptr = graphs_dof_macros[i]->get_domain_ptr();
           const Index* row_img_idx = graphs_dof_macros[i]->get_image_idx();
-          const int hw = vanka_wrap.blocksizes[Index(1) + Math::min(Index(i),Index(1))];
-          const int num_rows = int(vanka_wrap.tensor_counts[2*i]);
+          const int hw = vanka_wrap.raw_data.blocksizes[Index(1) + Math::min(Index(i),Index(1))];
+          const int num_rows = int(vanka_wrap.raw_data.tensor_counts[2*i]);
           for(int j = 0; j < n_; ++j)
           {
-            DT_* vals = vanka_wrap.data_arrays[i*n_ + j];
-            const IT_* row_ptr = vanka_wrap.row_arrays[i*n_+j];
-            const IT_* col_idx = vanka_wrap.col_arrays[i*n_+j];
-            const int hb = vanka_wrap.blocksizes[j +1];
+            DT_* vals = vanka_wrap.raw_data.data_arrays[i*n_ + j];
+            const IT_* row_ptr = vanka_wrap.raw_data.row_arrays[i*n_+j];
+            const IT_* col_idx = vanka_wrap.raw_data.col_arrays[i*n_+j];
+            const int hb = vanka_wrap.raw_data.blocksizes[j +1];
             const bool meta_diag = (i == j);
             // now do the actual inner openmp loop over each column of the sub matrix
             FEAT_PRAGMA_OMP(parallel for)
@@ -172,17 +172,19 @@ namespace FEAT
         int* _m_mask = macro_mask.data();
         if(!skip_singular)
           _m_mask = nullptr;
-        auto& coloring_map = coloring_data.get_coloring_maps();
-        for(Index k = 0; k < coloring_map.size(); ++k)
+
+        const Memory::TypedView<int> coloring_view = coloring_data.color_map_view(Memory::Location::main, Memory::Access::read);
+        for(Index k = 0; k < coloring_data.get_num_colors(); ++k)
         {
+          const int* color_ptr = &coloring_view.get_r()[coloring_data.get_color_offset(k)];
           if(skip_singular)
             Solver::Kernel::template assemble_unscaled_vanka_host<DT_, IT_, n_, true>
                                             (mat_wrap, vanka_wrap, graphs_macro_dofs,
-                                             _m_mask, coloring_map[k], coloring_data.get_color_size(k), stride, eps);
+                                             _m_mask, color_ptr, coloring_data.get_color_size(k), stride, eps);
           else
             Solver::Kernel::template assemble_unscaled_vanka_host<DT_, IT_, n_, false>
                                             (mat_wrap, vanka_wrap, graphs_macro_dofs,
-                                             _m_mask, coloring_map[k], coloring_data.get_color_size(k), stride, eps);
+                                             _m_mask, color_ptr, coloring_data.get_color_size(k), stride, eps);
         }
         if(skip_singular)
           Solver::Kernel::template scale_vanka_rows_host<DT_, IT_, n_, true>(vanka_wrap, omega, graphs_dof_macros,_m_mask);

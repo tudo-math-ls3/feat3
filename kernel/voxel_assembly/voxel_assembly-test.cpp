@@ -39,10 +39,11 @@
 
 #include <kernel/adjacency/adjactor.hpp>
 
-
-
 using namespace FEAT;
 using namespace FEAT::TestSystem;
+
+constexpr int _lvl_2d = 3;
+constexpr int _lvl_3d = 2;
 
 /**
  * \brief Base Test class for the voxel assembly classes.
@@ -118,7 +119,6 @@ public:
   }
 
 }; // class VoxelAssemblyTest
-
 
 /**
  * \brief Poisson Voxel Assembly Test class.
@@ -210,9 +210,28 @@ public:
   {
     return;
   }
-
-
 }; // class PoissonVoxelAssemblyTest
+
+
+VoxelPoissonAssemblyTest<double, std::uint32_t, Shape::Hypercube<2>> poisson_vassembly_double_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
+VoxelPoissonAssemblyTest<float, std::uint32_t, Shape::Hypercube<2>> poisson_vassembly_float_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
+VoxelPoissonAssemblyTest<double, std::uint64_t, Shape::Hypercube<2>> poisson_vassembly_double_uint64_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
+VoxelPoissonAssemblyTest<float, std::uint64_t, Shape::Hypercube<2>> poisson_vassembly_float_uint64_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
+VoxelPoissonAssemblyTest<double, std::uint32_t, Shape::Hypercube<3>> poisson_vassembly_double_uint32_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
+VoxelPoissonAssemblyTest<float, std::uint32_t, Shape::Hypercube<3>> poisson_vassembly_float_uint32_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
+VoxelPoissonAssemblyTest<double, std::uint64_t, Shape::Hypercube<3>> poisson_vassembly_double_uint64_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
+VoxelPoissonAssemblyTest<float, std::uint64_t, Shape::Hypercube<3>> poisson_vassembly_float_uint64_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+VoxelPoissonAssemblyTest<double, std::uint32_t, Shape::Hypercube<2>> poisson_vassembly_double_uint32_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
+VoxelPoissonAssemblyTest<float, std::uint32_t, Shape::Hypercube<2>> poisson_vassembly_float_uint32_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
+VoxelPoissonAssemblyTest<double, std::uint64_t, Shape::Hypercube<2>> poisson_vassembly_double_uint64_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
+VoxelPoissonAssemblyTest<float, std::uint64_t, Shape::Hypercube<2>> poisson_vassembly_float_uint64_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
+VoxelPoissonAssemblyTest<double, std::uint32_t, Shape::Hypercube<3>> poisson_vassembly_double_uint32_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
+VoxelPoissonAssemblyTest<float, std::uint32_t, Shape::Hypercube<3>> poisson_vassembly_float_uint32_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
+VoxelPoissonAssemblyTest<double, std::uint64_t, Shape::Hypercube<3>> poisson_vassembly_double_uint64_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
+VoxelPoissonAssemblyTest<float, std::uint64_t, Shape::Hypercube<3>> poisson_vassembly_float_uint64_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
+#endif
+
 
 /**
  * \brief Voxel Defo Assembly Test class.
@@ -287,6 +306,7 @@ public:
     matrix_new.format();
 
     dummy_conv = matrix_ref.create_vector_r();
+    dummy_conv.format();
 
     Assembly::BurgersAssembler<DataType, IndexType, ShapeType::dimension> burgers_asm;
     burgers_asm.deformation = true;
@@ -311,9 +331,34 @@ public:
   {
     return;
   }
-
-
 }; // class VoxelDefoAssemblyTest
+
+
+VoxelDefoAssemblyTest<double, std::uint32_t, Shape::Hypercube<2>> defo_vassembly_double_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
+#ifndef DEBUG
+VoxelDefoAssemblyTest<float, std::uint32_t, Shape::Hypercube<2>> defo_vassembly_float_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
+VoxelDefoAssemblyTest<double, std::uint64_t, Shape::Hypercube<2>> defo_vassembly_double_uint64_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
+VoxelDefoAssemblyTest<float, std::uint64_t, Shape::Hypercube<2>> defo_vassembly_float_uint64_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
+VoxelDefoAssemblyTest<double, std::uint32_t, Shape::Hypercube<3>> defo_vassembly_double_uint32_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
+VoxelDefoAssemblyTest<float, std::uint32_t, Shape::Hypercube<3>> defo_vassembly_float_uint32_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
+VoxelDefoAssemblyTest<double, std::uint64_t, Shape::Hypercube<3>> defo_vassembly_double_uint64_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
+VoxelDefoAssemblyTest<float, std::uint64_t, Shape::Hypercube<3>> defo_vassembly_float_uint64_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+VoxelDefoAssemblyTest<double, std::uint32_t, Shape::Hypercube<2>> defo_vassembly_double_uint32_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
+#ifndef DEBUG
+VoxelDefoAssemblyTest<float, std::uint32_t, Shape::Hypercube<2>> defo_vassembly_float_uint32_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
+VoxelDefoAssemblyTest<double, std::uint64_t, Shape::Hypercube<2>> defo_vassembly_double_uint64_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
+VoxelDefoAssemblyTest<float, std::uint64_t, Shape::Hypercube<2>> defo_vassembly_float_uint64_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
+#endif
+VoxelDefoAssemblyTest<float, std::uint32_t, Shape::Hypercube<3>> defo_vassembly_float_uint32_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
+//only run one 3D gpu test since these have very long runtimes in debug mode...
+#ifndef DEBUG
+VoxelDefoAssemblyTest<double, std::uint32_t, Shape::Hypercube<3>> defo_vassembly_double_uint32_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
+VoxelDefoAssemblyTest<double, std::uint64_t, Shape::Hypercube<3>> defo_vassembly_double_uint64_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
+VoxelDefoAssemblyTest<float, std::uint64_t, Shape::Hypercube<3>> defo_vassembly_float_uint64_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
+#endif
+#endif
 
 /**
  * \brief Voxel Burgers Assembly Test class.
@@ -383,7 +428,7 @@ public:
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
 
-    VectorType dummy_conv = VectorType(rng, matrix_ref.rows(), DataType(-1), DataType(1));
+    VectorType dummy_conv = VectorType(rng, matrix_ref.num_rows(), DataType(-1), DataType(1));
 
     DataType nu = DataType(0.78);
     DataType beta = DataType(0.3);
@@ -486,9 +531,30 @@ public:
     this->compare_defects(vector_new, vector_ref);
 
   }
-
-
 }; // class VoxelDefoAssemblyTest
+
+VoxelBurgersAssemblyTest<double, std::uint32_t, Shape::Hypercube<2>> burgers_vassembly_double_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
+VoxelBurgersAssemblyTest<float, std::uint32_t, Shape::Hypercube<2>> burgers_vassembly_float_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
+VoxelBurgersAssemblyTest<double, std::uint64_t, Shape::Hypercube<2>> burgers_vassembly_double_uint64_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
+VoxelBurgersAssemblyTest<float, std::uint64_t, Shape::Hypercube<2>> burgers_vassembly_float_uint64_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
+VoxelBurgersAssemblyTest<double, std::uint32_t, Shape::Hypercube<3>> burgers_vassembly_double_uint32_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
+#ifndef DEBUG
+VoxelBurgersAssemblyTest<float, std::uint32_t, Shape::Hypercube<3>> burgers_vassembly_float_uint32_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
+VoxelBurgersAssemblyTest<double, std::uint64_t, Shape::Hypercube<3>> burgers_vassembly_double_uint64_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
+VoxelBurgersAssemblyTest<float, std::uint64_t, Shape::Hypercube<3>> burgers_vassembly_float_uint64_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+VoxelBurgersAssemblyTest<double, std::uint32_t, Shape::Hypercube<2>> burgers_vassembly_double_uint32_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
+VoxelBurgersAssemblyTest<float, std::uint32_t, Shape::Hypercube<2>> burgers_vassembly_float_uint32_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
+VoxelBurgersAssemblyTest<double, std::uint64_t, Shape::Hypercube<2>> burgers_vassembly_double_uint64_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
+VoxelBurgersAssemblyTest<float, std::uint64_t, Shape::Hypercube<2>> burgers_vassembly_float_uint64_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
+VoxelBurgersAssemblyTest<float, std::uint32_t, Shape::Hypercube<3>> burgers_vassembly_float_uint32_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
+#ifndef DEBUG
+VoxelBurgersAssemblyTest<double, std::uint32_t, Shape::Hypercube<3>> burgers_vassembly_double_uint32_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
+VoxelBurgersAssemblyTest<double, std::uint64_t, Shape::Hypercube<3>> burgers_vassembly_double_uint64_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
+VoxelBurgersAssemblyTest<float, std::uint64_t, Shape::Hypercube<3>> burgers_vassembly_float_uint64_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
+#endif
+#endif
 
 /**
  * \brief Voxel Burgers Assembly Test class.
@@ -559,7 +625,7 @@ public:
     Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random rng(seed);
 
-    VectorType dummy_conv = VectorType(rng, matrix_ref.rows(), DataType(-1), DataType(1));
+    VectorType dummy_conv = VectorType(rng, matrix_ref.num_rows(), DataType(-1), DataType(1));
 
     DataType nu = DataType(0.78);
     DataType beta = DataType(0.3);
@@ -713,77 +779,6 @@ public:
 
   }
 }; // class VoxelDefoAssemblyTest
-
-constexpr int _lvl_2d = 3;
-constexpr int _lvl_3d = 2;
-
-VoxelPoissonAssemblyTest<double, std::uint32_t, Shape::Hypercube<2>> poisson_vassembly_double_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
-VoxelPoissonAssemblyTest<float, std::uint32_t, Shape::Hypercube<2>> poisson_vassembly_float_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
-VoxelPoissonAssemblyTest<double, std::uint64_t, Shape::Hypercube<2>> poisson_vassembly_double_uint64_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
-VoxelPoissonAssemblyTest<float, std::uint64_t, Shape::Hypercube<2>> poisson_vassembly_float_uint64_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
-VoxelPoissonAssemblyTest<double, std::uint32_t, Shape::Hypercube<3>> poisson_vassembly_double_uint32_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
-VoxelPoissonAssemblyTest<float, std::uint32_t, Shape::Hypercube<3>> poisson_vassembly_float_uint32_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
-VoxelPoissonAssemblyTest<double, std::uint64_t, Shape::Hypercube<3>> poisson_vassembly_double_uint64_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
-VoxelPoissonAssemblyTest<float, std::uint64_t, Shape::Hypercube<3>> poisson_vassembly_float_uint64_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
-#ifdef FEAT_HAVE_CUDA
-VoxelPoissonAssemblyTest<double, std::uint32_t, Shape::Hypercube<2>> poisson_vassembly_double_uint32_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
-VoxelPoissonAssemblyTest<float, std::uint32_t, Shape::Hypercube<2>> poisson_vassembly_float_uint32_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
-VoxelPoissonAssemblyTest<double, std::uint64_t, Shape::Hypercube<2>> poisson_vassembly_double_uint64_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
-VoxelPoissonAssemblyTest<float, std::uint64_t, Shape::Hypercube<2>> poisson_vassembly_float_uint64_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
-VoxelPoissonAssemblyTest<double, std::uint32_t, Shape::Hypercube<3>> poisson_vassembly_double_uint32_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
-VoxelPoissonAssemblyTest<float, std::uint32_t, Shape::Hypercube<3>> poisson_vassembly_float_uint32_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
-VoxelPoissonAssemblyTest<double, std::uint64_t, Shape::Hypercube<3>> poisson_vassembly_double_uint64_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
-VoxelPoissonAssemblyTest<float, std::uint64_t, Shape::Hypercube<3>> poisson_vassembly_float_uint64_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
-#endif
-
-VoxelDefoAssemblyTest<double, std::uint32_t, Shape::Hypercube<2>> defo_vassembly_double_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
-#ifndef DEBUG
-VoxelDefoAssemblyTest<float, std::uint32_t, Shape::Hypercube<2>> defo_vassembly_float_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
-VoxelDefoAssemblyTest<double, std::uint64_t, Shape::Hypercube<2>> defo_vassembly_double_uint64_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
-VoxelDefoAssemblyTest<float, std::uint64_t, Shape::Hypercube<2>> defo_vassembly_float_uint64_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
-VoxelDefoAssemblyTest<double, std::uint32_t, Shape::Hypercube<3>> defo_vassembly_double_uint32_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
-VoxelDefoAssemblyTest<float, std::uint32_t, Shape::Hypercube<3>> defo_vassembly_float_uint32_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
-VoxelDefoAssemblyTest<double, std::uint64_t, Shape::Hypercube<3>> defo_vassembly_double_uint64_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
-VoxelDefoAssemblyTest<float, std::uint64_t, Shape::Hypercube<3>> defo_vassembly_float_uint64_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
-#endif
-#ifdef FEAT_HAVE_CUDA
-VoxelDefoAssemblyTest<double, std::uint32_t, Shape::Hypercube<2>> defo_vassembly_double_uint32_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
-#ifndef DEBUG
-VoxelDefoAssemblyTest<float, std::uint32_t, Shape::Hypercube<2>> defo_vassembly_float_uint32_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
-VoxelDefoAssemblyTest<double, std::uint64_t, Shape::Hypercube<2>> defo_vassembly_double_uint64_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
-VoxelDefoAssemblyTest<float, std::uint64_t, Shape::Hypercube<2>> defo_vassembly_float_uint64_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
-#endif
-VoxelDefoAssemblyTest<float, std::uint32_t, Shape::Hypercube<3>> defo_vassembly_float_uint32_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
-//only run one 3D gpu test since these have very long runtimes in debug mode...
-#ifndef DEBUG
-VoxelDefoAssemblyTest<double, std::uint32_t, Shape::Hypercube<3>> defo_vassembly_double_uint32_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
-VoxelDefoAssemblyTest<double, std::uint64_t, Shape::Hypercube<3>> defo_vassembly_double_uint64_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
-VoxelDefoAssemblyTest<float, std::uint64_t, Shape::Hypercube<3>> defo_vassembly_float_uint64_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
-#endif
-#endif
-
-VoxelBurgersAssemblyTest<double, std::uint32_t, Shape::Hypercube<2>> burgers_vassembly_double_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
-VoxelBurgersAssemblyTest<float, std::uint32_t, Shape::Hypercube<2>> burgers_vassembly_float_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
-VoxelBurgersAssemblyTest<double, std::uint64_t, Shape::Hypercube<2>> burgers_vassembly_double_uint64_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
-VoxelBurgersAssemblyTest<float, std::uint64_t, Shape::Hypercube<2>> burgers_vassembly_float_uint64_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
-VoxelBurgersAssemblyTest<double, std::uint32_t, Shape::Hypercube<3>> burgers_vassembly_double_uint32_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
-#ifndef DEBUG
-VoxelBurgersAssemblyTest<float, std::uint32_t, Shape::Hypercube<3>> burgers_vassembly_float_uint32_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
-VoxelBurgersAssemblyTest<double, std::uint64_t, Shape::Hypercube<3>> burgers_vassembly_double_uint64_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
-VoxelBurgersAssemblyTest<float, std::uint64_t, Shape::Hypercube<3>> burgers_vassembly_float_uint64_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
-#endif
-#ifdef FEAT_HAVE_CUDA
-VoxelBurgersAssemblyTest<double, std::uint32_t, Shape::Hypercube<2>> burgers_vassembly_double_uint32_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
-VoxelBurgersAssemblyTest<float, std::uint32_t, Shape::Hypercube<2>> burgers_vassembly_float_uint32_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
-VoxelBurgersAssemblyTest<double, std::uint64_t, Shape::Hypercube<2>> burgers_vassembly_double_uint64_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
-VoxelBurgersAssemblyTest<float, std::uint64_t, Shape::Hypercube<2>> burgers_vassembly_float_uint64_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
-VoxelBurgersAssemblyTest<float, std::uint32_t, Shape::Hypercube<3>> burgers_vassembly_float_uint32_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
-#ifndef DEBUG
-VoxelBurgersAssemblyTest<double, std::uint32_t, Shape::Hypercube<3>> burgers_vassembly_double_uint32_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
-VoxelBurgersAssemblyTest<double, std::uint64_t, Shape::Hypercube<3>> burgers_vassembly_double_uint64_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
-VoxelBurgersAssemblyTest<float, std::uint64_t, Shape::Hypercube<3>> burgers_vassembly_float_uint64_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
-#endif
-#endif
 
 VoxelBurgersVeloMaterialAssemblyTest<double, std::uint32_t, Shape::Hypercube<2>, VoxelAssembly::MaterialType::carreau> burgers_vm_vassembly_double_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
 VoxelBurgersVeloMaterialAssemblyTest<float, std::uint32_t, Shape::Hypercube<2>, VoxelAssembly::MaterialType::carreau> burgers_vm_vassembly_float_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);

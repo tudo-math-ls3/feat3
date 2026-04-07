@@ -6,6 +6,7 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/lafem/sparse_vector.hpp>
+#include <kernel/lafem/dense_vector.hpp>
 
 namespace FEAT
 {

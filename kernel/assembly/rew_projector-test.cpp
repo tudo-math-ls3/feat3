@@ -48,12 +48,8 @@ class RewProjectorTest :
   typedef Space::CroRavRanTur::Element<QuadTrafo> QuadSpaceRT;
 
 public:
-  RewProjectorTest(PreferredBackend backend) :
+  explicit RewProjectorTest(PreferredBackend backend) :
     UnitTest("RewProjectorTest", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
-  {
-  }
-
-  virtual ~RewProjectorTest()
   {
   }
 
@@ -117,27 +113,27 @@ public:
 
 };
 
-RewProjectorTest <float, std::uint32_t> rew_projector_test_float_uint32(PreferredBackend::generic);
-RewProjectorTest <double, std::uint32_t> rew_projector_test_double_uint32(PreferredBackend::generic);
-RewProjectorTest <float, std::uint64_t> rew_projector_test_float_uint64(PreferredBackend::generic);
-RewProjectorTest <double, std::uint64_t> rew_projector_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(RewProjectorTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(RewProjectorTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(RewProjectorTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(RewProjectorTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-RewProjectorTest <float, std::uint64_t> mkl_rew_projector_test_float_uint64(PreferredBackend::mkl);
-RewProjectorTest <double, std::uint64_t> mkl_rew_projector_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(RewProjectorTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(RewProjectorTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-RewProjectorTest <__float128, std::uint32_t> rew_projector_test_float128_uint32(PreferredBackend::generic);
-RewProjectorTest <__float128, std::uint64_t> rew_projector_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(RewProjectorTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(RewProjectorTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
-#ifdef FEAT_HAVE_HALFMATH
+//#ifdef FEAT_HAVE_HALFMATH
 // Disabled: tol too sharp, error is about 3 times larger than even relaxed tolerance
-////RewProjectorTest <Half, std::uint32_t> rew_projector_test_half_uint32(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(RewProjectorTest, Half, std::uint32_t, PreferredBackend::generic);
 // Disabled: tol too sharp, error is about 3 times larger than even relaxed tolerance
-//RewProjectorTest <Half, std::uint64_t> rew_projector_test_half_uint64(PreferredBackend::generic);
-#endif
+//SPAWN_UNIT_TEST_2T_P(RewProjectorTest, Half, std::uint64_t, PreferredBackend::generic);
+//#endif
 #ifdef FEAT_HAVE_CUDA
-RewProjectorTest <float, std::uint32_t> cuda_rew_projector_test_float_uint32(PreferredBackend::cuda);
-RewProjectorTest <double, std::uint32_t> cuda_rew_projector_test_double_uint32(PreferredBackend::cuda);
-RewProjectorTest <float, std::uint64_t> cuda_rew_projector_test_float_uint64(PreferredBackend::cuda);
-RewProjectorTest <double, std::uint64_t> cuda_rew_projector_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(RewProjectorTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(RewProjectorTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(RewProjectorTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(RewProjectorTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif

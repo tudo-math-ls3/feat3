@@ -219,10 +219,14 @@ namespace FEAT
        *
        * \returns The number of columns of this matrix
        */
-      template<LAFEM::Perspective perspective_ = LAFEM::Perspective::pod>
-      Index columns() const
+      Index num_cols() const
       {
-        return _col_gate->template get_num_global_dofs<perspective_>();
+        return _col_gate->get_num_global_dofs();
+      }
+
+      Index num_cols_raw() const
+      {
+        return _col_gate->get_num_global_dofs_raw();
       }
 
       /**
@@ -235,10 +239,14 @@ namespace FEAT
        *
        * \returns The number of rows of this matrix
        */
-      template<LAFEM::Perspective perspective_ = LAFEM::Perspective::pod>
-      Index rows() const
+      Index num_rows() const
       {
-        return _row_gate->template get_num_global_dofs<perspective_>();
+        return _row_gate->get_num_global_dofs();
+      }
+
+      Index num_rows_raw() const
+      {
+        return _row_gate->get_num_global_dofs_raw();
       }
 
       /**
@@ -251,14 +259,22 @@ namespace FEAT
        *
        * \returns The total number of non-zeros in this matrix
        */
-      template<LAFEM::Perspective perspective_ = LAFEM::Perspective::pod>
-      Index used_elements() const
+      Index num_nzes() const
       {
-        Index my_used_elements(_matrix.template used_elements<perspective_>());
+        Index my_num_nzes(_matrix.num_nzes());
         const Dist::Comm* comm = (_row_gate != nullptr ? _row_gate->get_comm() : (_col_gate != nullptr ? _col_gate->get_comm() : nullptr));
         if((comm != nullptr) && (comm->size() > 1))
-          comm->allreduce(&my_used_elements, &my_used_elements, std::size_t(1), Dist::op_sum);
-        return my_used_elements;
+          comm->allreduce(&my_num_nzes, &my_num_nzes, std::size_t(1), Dist::op_sum);
+        return my_num_nzes;
+      }
+
+      Index num_nzes_raw() const
+      {
+        Index my_num_nzes(_matrix.num_nzes_raw());
+        const Dist::Comm* comm = (_row_gate != nullptr ? _row_gate->get_comm() : (_col_gate != nullptr ? _col_gate->get_comm() : nullptr));
+        if((comm != nullptr) && (comm->size() > 1))
+          comm->allreduce(&my_num_nzes, &my_num_nzes, std::size_t(1), Dist::op_sum);
+        return my_num_nzes;
       }
 
       /// \brief Returns the total amount of bytes allocated.
@@ -555,7 +571,7 @@ namespace FEAT
        */
       void lump_rows(VectorTypeL& lump, bool sync = true) const
       {
-        XASSERTM(lump.local().size() == _matrix.rows(), "lump vector size does not match matrix row count!");
+        XASSERTM(lump.local().size() == _matrix.num_rows(), "lump vector size does not match matrix row count!");
 
         _matrix.lump_rows(lump.local());
 

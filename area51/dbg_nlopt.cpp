@@ -111,7 +111,7 @@ int run(Solver_& solver, Operator_& op)
 
   // This will hold the solution
   auto sol = op.create_vector_r();
-  sol(0,starting_point);
+  sol.elements_view_rw()[0] = starting_point;
   // We need a dummy rhs
   auto rhs = op.create_vector_r();
 
@@ -124,7 +124,7 @@ int run(Solver_& solver, Operator_& op)
   it = min_points.begin();
   for(; it != jt; ++it)
   {
-    DataType dist((sol(0) - *it).norm_euclid());
+    DataType dist((starting_point - *it).norm_euclid());
     if(dist  < min_dist)
       min_dist = dist;
   }
@@ -148,7 +148,7 @@ int run(Solver_& solver, Operator_& op)
     for(; it2 != jt2; ++it2)
     {
       // Get the iterate from the DenseVectorBlocked
-      auto tmp2 = (*it2)(0);
+      auto tmp2 = it2->elements_view_r()(0);
       points.push_back(tmp2);
 
       // Check if we need to adjust the default domain
@@ -212,7 +212,7 @@ int run(Solver_& solver, Operator_& op)
 
   // Write the mesh
   Geometry::ExportVTK<MeshType> writer(*mesh);
-  writer.add_vertex_scalar("f", vtx_vec.elements());
+  writer.add_vertex_scalar("f", vtx_vec);
   writer.add_vertex_vector("grad", vtx_grad);
   writer.write(filename);
 

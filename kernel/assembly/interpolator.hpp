@@ -37,6 +37,8 @@ namespace FEAT
 
           const Index num_entities = space.get_mesh().get_num_entities(shape_dim_);
 
+          Memory::TypedView<ValueType> vals = vector.elements_view_rw();
+
           FEAT_PRAGMA_OMP(parallel)
           {
             // create node functional
@@ -50,8 +52,8 @@ namespace FEAT
             DofAssignType dof_assign(space);
 
             // get the vector data array
-            auto* vals = vector.elements();
-            XASSERT(vals != nullptr);
+            //auto* vals = vector.elements();
+            //XASSERT(vals != nullptr);
 
             // loop over all entities
             FEAT_PRAGMA_OMP(for)

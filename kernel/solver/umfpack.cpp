@@ -181,12 +181,15 @@ namespace FEAT
       // umfpack info array
       double info[UMFPACK_INFO];
 
+      Memory::TypedView<Index> row_ptr_view = _system_matrix.row_ptr_view_r();
+      Memory::TypedView<Index> col_idx_view = _system_matrix.col_idx_view_r();
+
       // try to perform symbolic factorization
       int status = UmfpackWrapper<Index>::init_symbolic(
-        _system_matrix.rows(),
-        _system_matrix.columns(),
-        _system_matrix.row_ptr(),
-        _system_matrix.col_ind(),
+        _system_matrix.num_rows(),
+        _system_matrix.num_cols(),
+        row_ptr_view.get_r(),
+        col_idx_view.get_r(),
         nullptr,
         &_umf_symbolic,
         _umf_control,
@@ -235,11 +238,15 @@ namespace FEAT
       // umfpack info array
       double info[UMFPACK_INFO];
 
+      Memory::TypedView<Index> row_ptr_view = _system_matrix.row_ptr_view_r();
+      Memory::TypedView<Index> col_idx_view = _system_matrix.col_idx_view_r();
+      Memory::TypedView<double> mat_val_view = _system_matrix.val_view_r();
+
       // try to perform symbolic factorization
       int status = UmfpackWrapper<Index>::init_numeric(
-        _system_matrix.row_ptr(),
-        _system_matrix.col_ind(),
-        _system_matrix.val(),
+        row_ptr_view.get_r(),
+        col_idx_view.get_r(),
+        mat_val_view.get_r(),
         _umf_symbolic,
         &_umf_numeric,
         _umf_control,
@@ -286,14 +293,20 @@ namespace FEAT
       // umfpack info array
       double info[UMFPACK_INFO];
 
+      Memory::TypedView<Index> row_ptr_view = _system_matrix.row_ptr_view_r();
+      Memory::TypedView<Index> col_idx_view = _system_matrix.col_idx_view_r();
+      Memory::TypedView<double> mat_val_view = _system_matrix.val_view_r();
+      Memory::TypedView<double> x_view(x.elements_view_w());
+      Memory::TypedView<double> b_view(b.elements_view_r());
+
       // solve
       int status = UmfpackWrapper<Index>::solve(
         UMFPACK_At,
-        _system_matrix.row_ptr(),
-        _system_matrix.col_ind(),
-        _system_matrix.val(),
-        x.elements(),
-        b.elements(),
+        row_ptr_view.get_r(),
+        col_idx_view.get_r(),
+        mat_val_view.get_r(),
+        x_view.get_w(),
+        b_view.get_r(),
         _umf_numeric,
         _umf_control,
         info);
@@ -320,22 +333,22 @@ namespace FEAT
 
       // get the number of rows/columns
       const Index n = _weight_vector.size();
-      if((n != _system_matrix.rows()) || (n != _system_matrix.columns()))
+      if((n != _system_matrix.num_rows()) || (n != _system_matrix.num_cols()))
         throw InvalidMatrixStructureException("system matrix/weight vector dimension mismatch");
 
       // get the number of non-zeroes
-      const Index nnze = _system_matrix.used_elements();
+      const Index nnze = _system_matrix.num_nzes();
 
       // allocate our solver matrix
       _solver_matrix = MatrixType(n+1, n+1, nnze + 2*n);
 
       // get our input matrix arrays
-      const Index* irow_ptr = _system_matrix.row_ptr();
-      const Index* icol_idx = _system_matrix.col_ind();
+      const Memory::TypedView<Index> irow_ptr = _system_matrix.row_ptr_view_r();
+      const Memory::TypedView<Index> icol_idx = _system_matrix.col_idx_view_r();
 
       // get our output matrix arrays
-      Index* orow_ptr = _solver_matrix.row_ptr();
-      Index* ocol_idx = _solver_matrix.col_ind();
+      Memory::TypedView<Index> orow_ptr = _solver_matrix.row_ptr_view_w();
+      Memory::TypedView<Index> ocol_idx = _solver_matrix.col_idx_view_w();
 
       // assemble the solver matrix structure
       orow_ptr[0] = Index(0);
@@ -362,6 +375,12 @@ namespace FEAT
       // set last row pointer
       orow_ptr[n+1] = op;
 
+      // release views
+      ocol_idx.release();
+      orow_ptr.release();
+      icol_idx.release();
+      irow_ptr.release();
+
       // Okay, solver matrix structure assembly complete
 
       // create temporary vectors
@@ -386,18 +405,18 @@ namespace FEAT
     {
       BaseClass::init_numeric();
 
-      const Index n = _system_matrix.rows();
+      const Index n = _system_matrix.num_rows();
 
       // get input matrix arrays
-      const Index* irow_ptr = _system_matrix.row_ptr();
-      const double* idata = _system_matrix.val();
+      const Memory::TypedView<Index> irow_ptr = _system_matrix.row_ptr_view_r();
+      const Memory::TypedView<double> idata = _system_matrix.val_view_r();
 
       // get input vector array
-      const double* weight = _weight_vector.elements();
+      const Memory::TypedView<double> weight_view(_weight_vector.elements_view_r());
 
       // get output matrix arrays
-      const Index* orow_ptr = _solver_matrix.row_ptr();
-      double* odata = _solver_matrix.val();
+      const Memory::TypedView<Index> orow_ptr = _solver_matrix.row_ptr_view_r();
+      Memory::TypedView<double> odata = _solver_matrix.val_view_w();
 
       // loop over all input matrix rows
       for(Index i(0); i < n; ++i)
@@ -409,17 +428,18 @@ namespace FEAT
           odata[op] = idata[ip];
         }
         // copy weight vector entry as last column entry
-        odata[op] = weight[i];
+        odata[op] = weight_view[i];
       }
 
       // copy weight vector into last row
       Index op(orow_ptr[n]);
       for(Index j(0); j < n; ++j, ++op)
       {
-        odata[op] = weight[j];
+        odata[op] = weight_view[j];
       }
 
       // okay, solver matrix data assembly completed
+      odata.release();
 
       // initialize umfpack
       _umfpack.init_numeric();
@@ -437,23 +457,27 @@ namespace FEAT
       const Index n = vec_sol.size();
 
       // copy RHS vector
-      const double* vr = vec_rhs.elements();
-      double* vb = _vec_b.elements();
-      for(Index i(0); i < n; ++i)
       {
-        vb[i] = vr[i];
+        const Memory::TypedView<double> vr = vec_rhs.elements_view_r();
+        Memory::TypedView<double> vb = _vec_b.elements_view_w();
+        for(Index i(0); i < n; ++i)
+        {
+          vb[i] = vr[i];
+        }
+        vb[n] = 0.0;
       }
-      vb[n] = 0.0;
 
       // solve system
       Status status = _umfpack.apply(_vec_x, _vec_b);
 
       // copy sol vector
-      const double* vx = _vec_x.elements();
-      double* vs = vec_sol.elements();
-      for(Index i(0); i < n; ++i)
       {
-        vs[i] = vx[i];
+        const Memory::TypedView<double> vx(_vec_x.elements_view_r());
+        Memory::TypedView<double> vs(vec_sol.elements_view_w());
+        for(Index i(0); i < n; ++i)
+        {
+          vs[i] = vx[i];
+        }
       }
 
       // okay

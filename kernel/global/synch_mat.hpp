@@ -30,6 +30,8 @@ namespace FEAT
      * \tparam VMT_
      * The vector mirror type
      *
+     * \todo make use of cuda-aware MPI
+     *
      * \author Peter Zajac
      */
     template<typename MT_, typename VMT_>
@@ -146,10 +148,10 @@ namespace FEAT
         for(std::size_t i(0); i < n; ++i)
         {
           const BufferMatrixType& sbuf = _send_bufs.at(i);
-          send_dims.at(i)[0] = sbuf.rows();
-          send_dims.at(i)[1] = sbuf.columns();
+          send_dims.at(i)[0] = sbuf.num_rows();
+          send_dims.at(i)[1] = sbuf.num_cols();
           send_dims.at(i)[2] = sbuf.entries_per_nonzero();
-          send_dims.at(i)[3] = sbuf.used_elements();
+          send_dims.at(i)[3] = sbuf.num_nzes();
           _send_reqs[i] = _comm.isend(send_dims.at(i).data(), std::size_t(4), _ranks.at(i));
         }
 
@@ -169,10 +171,14 @@ namespace FEAT
           _recv_bufs.at(i) = BufferMatrixType(nrows, ncols, nnze, nepnz);
         }
 
+        std::vector<Memory::TypedView<typename MT_::IndexType>> recv_views(n);
+        std::vector<Memory::TypedView<typename MT_::IndexType>> send_views(n);
+
         // post buffer row-pointer array receives
         for(std::size_t i(0); i < n; ++i)
         {
-          _recv_reqs[i] = _comm.irecv(_recv_bufs.at(i).row_ptr(), _recv_bufs.at(i).rows()+std::size_t(1), _ranks.at(i));
+          recv_views[i] = _recv_bufs.at(i).row_ptr_view_w();
+          _recv_reqs[i] = _comm.irecv(recv_views[i].get_w(), _recv_bufs.at(i).num_rows() + std::size_t(1), _ranks.at(i));
         }
 
         // wait for all previous sends to finish
@@ -181,7 +187,8 @@ namespace FEAT
         // post buffer row-pointer array sends
         for(std::size_t i(0); i < n; ++i)
         {
-          _send_reqs[i] = _comm.isend(_send_bufs.at(i).row_ptr(), _send_bufs.at(i).rows()+std::size_t(1), _ranks.at(i));
+          send_views[i] = _send_bufs.at(i).row_ptr_view_r();
+          _send_reqs[i] = _comm.isend(send_views[i].get_r(), _send_bufs.at(i).num_rows() + std::size_t(1), _ranks.at(i));
         }
 
         // wait for all previous receives to finish
@@ -190,7 +197,8 @@ namespace FEAT
         // post buffer column-index array receives
         for(std::size_t i(0); i < n; ++i)
         {
-          _recv_reqs[i] = _comm.irecv(_recv_bufs.at(i).col_ind(), _recv_bufs.at(i).used_elements(), _ranks.at(i));
+          recv_views[i] = _recv_bufs.at(i).col_idx_view_w();
+          _recv_reqs[i] = _comm.irecv(recv_views[i].get_w(), _recv_bufs.at(i).num_nzes(), _ranks.at(i));
         }
 
         // wait for all previous sends to finish
@@ -199,7 +207,8 @@ namespace FEAT
         // post buffer column-index array sends
         for(std::size_t i(0); i < n; ++i)
         {
-          _send_reqs[i] = _comm.isend(_send_bufs.at(i).col_ind(), _send_bufs.at(i).used_elements(), _ranks.at(i));
+          send_views[i] = _send_bufs.at(i).col_idx_view_r();
+          _send_reqs[i] = _comm.isend(send_views[i].get_r(), _send_bufs.at(i).num_nzes(), _ranks.at(i));
         }
 
         // wait for all receives and sends to finish
@@ -229,13 +238,17 @@ namespace FEAT
 
         const std::size_t n = _ranks.size();
 
+        std::vector<Memory::TypedView<typename MT_::DataType>> recv_views(n);
+        std::vector<Memory::TypedView<typename MT_::DataType>> send_views(n);
+
         // create receive buffers and post receives
         for(std::size_t i(0); i < n; ++i)
         {
           BufferMatrixType& buf = _recv_bufs.at(i);
 
           // post receive
-          _recv_reqs.get_request(i) = _comm.irecv(buf.val(), buf.val_size(), _ranks.at(i));
+          recv_views[i] = buf.val_view_w();
+          _recv_reqs.get_request(i) = _comm.irecv(recv_views[i].get_w(), buf.num_nzes_raw(), _ranks.at(i));
         }
 
         // post sends
@@ -247,13 +260,15 @@ namespace FEAT
           _mirrors.at(i).gather(buf, matrix);
 
           // post send
-          _send_reqs.get_request(i) = _comm.isend(buf.val(), buf.val_size(), _ranks.at(i));
+          send_views[i] = buf.val_view_r();
+          _send_reqs.get_request(i) = _comm.isend(send_views[i].get_r(), buf.num_nzes_raw(), _ranks.at(i));
         }
 
         // process all pending receives
         for(std::size_t idx(0u); _recv_reqs.wait_any(idx); )
         {
           // scatter the receive buffer
+          recv_views[idx].release();
           _mirrors.at(idx).scatter_axpy(matrix, _recv_bufs.at(idx));
         }
 

@@ -36,32 +36,37 @@ public:
   typedef PowerFilter<ScalarFilter1, 2> PowerFilter2;
   typedef TupleFilter<PowerFilter2, ScalarFilter2> MetaFilter;
 
-   MetaFilterTest(PreferredBackend backend)
+  explicit MetaFilterTest(PreferredBackend backend)
     : UnitTest("MetaFilterTest", Type::Traits<DataType>::name(), Type::Traits<IndexType>::name(), backend)
-  {
-  }
-
-  virtual ~MetaFilterTest()
   {
   }
 
   static MetaFilter gen_filter(Index m)
   {
+    XASSERT(m > 0);
+
     // create a unit-filter
     ScalarVector fv(2);
-    fv(0, DataType(1));
-    fv(1, DataType(5));
+    {
+      Memory::TypedView<DataType> vfv = fv.elements_view_w();
+      vfv[0] = DataType(1);
+      vfv[1] = DataType(5);
+    }
     DenseVector<IndexType, IndexType> idx(2);
-    idx(0, 0);
-    XASSERT(m > 0);
-    idx(1, IndexType(m-1));
+    {
+      Memory::TypedView<IndexType> vi = idx.elements_view_w();
+      vi[0] = IndexType(0);
+      vi[1] = IndexType(m-1);
+    }
     ScalarFilter1 unit_filter(m, fv, idx);
 
     // create vectors for mean-filter
     ScalarVector mfv(m, DataType(1)), mfw(m, DataType(0));
-    DataType* fw(mfw.elements());
-    for(Index i(0); i < m; ++i)
-      fw[i] = DataType(i+1);
+    {
+      Memory::TypedView<DataType> fw(mfw.elements_view_rw());
+      for(Index i(0); i < m; ++i)
+        fw[i] = DataType(i+1);
+    }
 
     // create a mean-filter
     ScalarFilter2 mean_filter(std::move(mfv), std::move(mfw), DataType(0), DataType(((m+1)*(m+2))/2));
@@ -86,15 +91,18 @@ public:
 
   static MetaVector gen_vector_sol(Index m)
   {
+    XASSERT(m > 0);
+
     ScalarVector vx(m, DataType(2));
     ScalarVector vy(m, DataType(3));
     ScalarVector vz(m, DataType(2) / DataType(7));
 
-    DataType* fx(vx.elements());
-    DataType* fy(vy.elements());
-    fx[0] = fy[0] = DataType(1);
-    XASSERT(m > 0);
-    fx[m-1] = fy[m-1] = DataType(5);
+    {
+      Memory::TypedView<DataType> fx(vx.elements_view_rw());
+      Memory::TypedView<DataType> fy(vy.elements_view_rw());
+      fx[0] = fy[0] = DataType(1);
+      fx[m-1] = fy[m-1] = DataType(5);
+    }
 
     // create a power-vector
     PowerVector2 vec;
@@ -108,18 +116,20 @@ public:
 
   static MetaVector gen_vector_def(Index m)
   {
+    XASSERT(m > 0);
     ScalarVector vx(m, DataType(2));
     ScalarVector vy(m, DataType(3));
     ScalarVector vz(m, DataType(0));
 
-    DataType* fx(vx.elements());
-    DataType* fy(vy.elements());
-    DataType* fz(vz.elements());
-    XASSERT(m > 0);
-    fx[0] = fy[0] = fx[m-1] = fy[m-1] = DataType(0);
-    for(Index i(0); i < m; ++i)
     {
-      fz[i] = DataType_(32 - 10*int(i)) / DataType_(42);
+      Memory::TypedView<DataType> fx(vx.elements_view_rw());
+      Memory::TypedView<DataType> fy(vy.elements_view_rw());
+      Memory::TypedView<DataType> fz(vz.elements_view_rw());
+      fx[0] = fy[0] = fx[m-1] = fy[m-1] = DataType(0);
+      for(Index i(0); i < m; ++i)
+      {
+        fz[i] = DataType_(32 - 10*int(i)) / DataType_(42);
+      }
     }
 
     // create a power-vector
@@ -134,7 +144,7 @@ public:
 
   virtual void run() const override
   {
-    const DataType tol = TestSystem::tol<DataType>();
+    const DataType tol(Math::pow(Math::eps<DataType>(), DataType(0.8)));
 
     const Index m(5);
 
@@ -163,25 +173,25 @@ public:
   }
 };
 
-MetaFilterTest <float, std::uint64_t> meta_filter_test_float_uint64(PreferredBackend::generic);
-MetaFilterTest <double, std::uint64_t> meta_filter_test_double_uint64(PreferredBackend::generic);
-MetaFilterTest <float, std::uint32_t> meta_filter_test_float_uint32(PreferredBackend::generic);
-MetaFilterTest <double, std::uint32_t> meta_filter_test_double_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MetaFilterTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MetaFilterTest, double, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MetaFilterTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MetaFilterTest, double, std::uint32_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MetaFilterTest <float, std::uint64_t> mkl_meta_filter_test_float_uint64(PreferredBackend::mkl);
-MetaFilterTest <double, std::uint64_t> mkl_meta_filter_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(MetaFilterTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(MetaFilterTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MetaFilterTest <__float128, std::uint64_t> meta_filter_test_float128_uint64(PreferredBackend::generic);
-MetaFilterTest <__float128, std::uint32_t> meta_filter_test_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MetaFilterTest, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MetaFilterTest, __float128, std::uint32_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MetaFilterTest <Half, std::uint32_t> meta_filter_test_half_uint32(PreferredBackend::generic);
-MetaFilterTest <Half, std::uint64_t> meta_filter_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MetaFilterTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MetaFilterTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MetaFilterTest <float, std::uint64_t> cuda_meta_filter_test_float_uint64(PreferredBackend::cuda);
-MetaFilterTest <double, std::uint64_t> cuda_meta_filter_test_double_uint64(PreferredBackend::cuda);
-MetaFilterTest <float, std::uint32_t> cuda_meta_filter_test_float_uint32(PreferredBackend::cuda);
-MetaFilterTest <double, std::uint32_t> cuda_meta_filter_test_double_uint32(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MetaFilterTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MetaFilterTest, double, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MetaFilterTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MetaFilterTest, double, std::uint32_t, PreferredBackend::cuda);
 #endif

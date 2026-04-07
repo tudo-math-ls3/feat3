@@ -4,6 +4,7 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
+#include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/pointstar_structure.hpp>
@@ -31,33 +32,39 @@ void run(PreferredBackend backend)
 
   // generate FE matrix A
   SparseMatrixBanded<DT_, IT_> bm(PointstarStructureFE::template value<DT_>(1, num_of_nodes));
-  for (Index i(0) ; i < bm.get_elements_size().at(0) ; ++i)
-    bm.val()[i] = DT_((i%4) + 1);
+  {
+    Memory::TypedView<DT_> vb = bm.val_view_w();
+    for (Index i(0) ; i < bm.get_elements_size().at(0) ; ++i)
+      vb[i] = DT_((i%4) + 1);
+  }
   SM_ sys;
   sys.convert(bm);
-  Index size(sys.rows());
+  Index size(sys.num_rows());
 
   std::cout<<backend<<" "<<SM_::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<"\n";
-  std::cout<<"vector size: "<<size<<" used elements: "<<sys.used_elements()<<"\n";
+  std::cout<<"vector size: "<<size<<" used elements: "<<sys.num_nzes()<<"\n";
   DenseVector<DT_, IT_> x(size);
-  for (Index i (0) ; i < x.size() ; ++i)
-    x(i, DT_(i%100) / DT_(100));
+  {
+    Memory::TypedView<DT_> vx = x.elements_view_w();
+    for (Index i (0) ; i < x.size() ; ++i)
+      vx[i] = DT_(i%100) / DT_(100);
+  }
   DenseVector<DT_, IT_> r(size, DT_(4711));
 
   Backend::set_preferred_backend(backend);
 
-  double flops(double(sys.used_elements()));
+  double flops(double(sys.num_nzes()));
   flops *= 2;
 
-  double bytes(double(sys.used_elements()));
+  double bytes(double(sys.num_nzes()));
   bytes *= double(sizeof(DT_));
-  bytes += double(sys.used_elements() * sizeof(IT_));
+  bytes += double(sys.num_nzes() * sizeof(IT_));
   bytes += double(size * sizeof(DT_));
 
   auto func = [&] () { sys.apply(r, x); };
   run_bench(func, flops, bytes);
 
-  MemoryPool::synchronize();
+  Runtime::synchronize_devices();
   std::cout<<"control norm: "<<double(x.norm2())<<"\n";
 }
 

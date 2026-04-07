@@ -528,8 +528,8 @@ namespace CCND
 
         // get the vector arrays
         const Index n = vec_def_unsynced.size();
-        const auto* vdef = vec_def_unsynced.elements();
-        const auto* vchr = vec_char_obstacle.elements();
+        const auto vdef = vec_def_unsynced.elements_view_r();
+        const auto vchr = vec_char_obstacle.elements_view_r();
         for(Index i(0); i < n; ++i)
         {
           frc.axpy(vchr[i], vdef[i]);

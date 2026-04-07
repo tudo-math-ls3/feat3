@@ -149,7 +149,7 @@ namespace FEAT
       this->apply(_perm_pos.data());
     }
 
-    void  Permutation::concat(const Permutation& p)
+    void Permutation::concat(const Permutation& p)
     {
       XASSERT(this->size() == p.size());
       Index* p1 = this->get_perm_pos();
@@ -161,5 +161,21 @@ namespace FEAT
       }
       this->calc_swap_from_perm();
     }
+
+    bool Permutation::is_identity() const
+    {
+      if(this->empty())
+        return true;
+
+      const Index* p = this->get_perm_pos();
+      for (Index i(0); i < this->size(); ++i)
+      {
+        if(p[i] != i)
+          return false;
+      }
+
+      return true;
+    }
+
   } // namespace Adjacency
 } // namespace FEAT

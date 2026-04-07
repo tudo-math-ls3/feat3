@@ -27,7 +27,7 @@ public:
 
   virtual void run() const override
   {
-    const IT_ m = 8;
+    const IT_ m = 7;
     const IT_ num_cells = m*m;
     const IT_ num_edges = 2*m*(m+1);
     const IT_ off_edgev = m*(m+1);
@@ -50,9 +50,9 @@ public:
     // create div(V) matrix
     matrix_d = MatrixD(num_cells, num_edges, 4*num_cells);
     {
-      IT_* row_ptr = matrix_d.row_ptr();
-      IT_* col_idx = matrix_d.col_ind();
-      auto* val   = matrix_d.val();
+      Memory::TypedView<IT_> row_ptr = matrix_d.row_ptr_view_w();
+      Memory::TypedView<IT_> col_idx = matrix_d.col_idx_view_w();
+      auto val   = matrix_d.val_view_w();
       for(IT_ i = 0, k = 0; i < num_cells; ++i)
       {
         row_ptr[i] = k;
@@ -87,12 +87,13 @@ public:
     // note: A represents the bilinearform a(v,psi) = dx^2 v1 + dy^2 v2, which is *NOT* the Laplace operator,
     // because it misses the dy^2 v1 and dx^2 v2 terms; this is just to keep the assembly simpler...
     // this is just a unit test, so it will suffice for this cause
-    matrix_a = MatrixA(Adjacency::Graph(Adjacency::RenderType::injectify_sorted, matrix.block_b(), matrix.block_d()));
-    matrix_a.format(0.0);
+    matrix_a = MatrixA(Adjacency::Graph(Adjacency::RenderType::injectify_sorted, matrix.block_b().adjactor(), matrix.block_d().adjactor()));
+    matrix_a.format();
+
     {
-      const IT_* row_ptr = matrix_a.row_ptr();
-      const IT_* col_idx = matrix_a.col_ind();
-      auto* val = matrix_a.val();
+      const Memory::TypedView<IT_> row_ptr = matrix_a.row_ptr_view_r();
+      const Memory::TypedView<IT_> col_idx = matrix_a.col_idx_view_r();
+      auto val = matrix_a.val_view_rw();
       const DT_ ih2 = DT_(1) / (h*h);
       for(IT_ i = 0; i < off_edgev; ++i)
       {
@@ -120,9 +121,10 @@ public:
     vec_ref.format();
     vec_rhs.format();
     vec_sol.format();
+
     {
-      auto* v = vec_ref.template at<0>().elements();
-      auto* p = vec_ref.template at<1>().elements();
+      auto v = vec_ref.template at<0>().elements_view_w();
+      auto p = vec_ref.template at<1>().elements_view_w();
       const DT_ pi = Math::pi<DT_>();
       // horizontal edges
       for(IT_ i = 0; i < m*(m+1); ++i)
@@ -130,15 +132,15 @@ public:
         const DT_ x = (DT_(i%m)+0.5)/DT_(m);
         const DT_ y = DT_(i/m)/DT_(m);
         v[i][0] = Math::sin(pi*x) * Math::cos(pi*y);
-        //v[i][1] = -Math::cos(pi*x) * Math::sin(pi*y);
+        v[i][1] = DT_(0); //-Math::cos(pi*x) * Math::sin(pi*y);
       }
       // vertical edges
       for(IT_ i = 0; i < m*(m+1); ++i)
       {
         const DT_ x = DT_(i%(m+1))/DT_(m);
         const DT_ y = (DT_(i/(m+1))+0.5)/DT_(m);
-        //v[i][0] = Math::sin(pi*x) * Math::cos(pi*y);
-        v[i][1] = -Math::cos(pi*x) * Math::sin(pi*y);
+        v[off_edgev+i][0] = DT_(0); //Math::sin(pi*x) * Math::cos(pi*y);
+        v[off_edgev+i][1] = -Math::cos(pi*x) * Math::sin(pi*y);
       }
       // cells
       for(IT_ i = 0; i < num_cells; ++i)
@@ -176,20 +178,20 @@ public:
     std::cout << "|def| = " << stringify_fp_sci(vec_def.max_abs_element()) << "\n";
     std::cout << "|err| = " << stringify_fp_sci(vec_ref.max_abs_element()) << "\n";
 
-    TEST_CHECK_EQUAL_WITHIN_EPS(vec_def.max_abs_element(), DT_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(vec_ref.max_abs_element(), DT_(0), tol);
+    TEST_CHECK_LESS_THAN(vec_def.max_abs_element(), tol);
+    TEST_CHECK_LESS_THAN(vec_ref.max_abs_element(), tol);
   }
 };
 
 #ifdef FEAT_HAVE_UMFPACK
-DirectStokesSolverTest<double, std::uint32_t> direct_stokes_solver_test_umfpack_double_u32(PreferredBackend::generic, 1e-12);
-DirectStokesSolverTest<double, std::uint64_t> direct_stokes_solver_test_umfpack_double_u64(PreferredBackend::generic, 1e-12);
+SPAWN_UNIT_TEST_2T_P(DirectStokesSolverTest, double, std::uint32_t, PreferredBackend::generic, 1e-12);
+SPAWN_UNIT_TEST_2T_P(DirectStokesSolverTest, double, std::uint64_t, PreferredBackend::generic, 1e-12);
 #endif
 #ifdef FEAT_HAVE_MKL
-DirectStokesSolverTest<double, std::uint32_t> direct_stokes_solver_test_mkldss_double_u32(PreferredBackend::mkl, 1e-8);
-DirectStokesSolverTest<double, std::uint64_t> direct_stokes_solver_test_mkldss_double_u64(PreferredBackend::mkl, 1e-8);
+SPAWN_UNIT_TEST_2T_P(DirectStokesSolverTest, double, std::uint32_t, PreferredBackend::mkl, 1e-8);
+SPAWN_UNIT_TEST_2T_P(DirectStokesSolverTest, double, std::uint64_t, PreferredBackend::mkl, 1e-8);
 #endif
 #ifdef FEAT_HAVE_CUDSS
-DirectStokesSolverTest<double, std::uint32_t> direct_stokes_solver_test_cudss_double_u32(PreferredBackend::cuda, 1e-10);
-DirectStokesSolverTest<double, std::uint64_t> direct_stokes_solver_test_cudss_double_u64(PreferredBackend::cuda, 1e-10);
+SPAWN_UNIT_TEST_2T_P(DirectStokesSolverTest, double, std::uint32_t, PreferredBackend::cuda, 1e-10);
+SPAWN_UNIT_TEST_2T_P(DirectStokesSolverTest, double, std::uint64_t, PreferredBackend::cuda, 1e-10);
 #endif

@@ -8,26 +8,24 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/memory_arbiter.hpp>
+#include <kernel/util/statistics.hpp>
+#include <kernel/util/time_stamp.hpp>
+#include <kernel/adjacency/graph.hpp>
+#include <kernel/adjacency/permutation.hpp>
 #include <kernel/lafem/forward.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
-#include <kernel/lafem/arch/scale_row_col.hpp>
-#include <kernel/lafem/arch/scale.hpp>
-#include <kernel/lafem/arch/axpy.hpp>
-#include <kernel/lafem/arch/apply.hpp>
-#include <kernel/lafem/arch/norm.hpp>
-#include <kernel/lafem/arch/diagonal.hpp>
-#include <kernel/lafem/arch/lumping.hpp>
-#include <kernel/lafem/arch/row_norm.hpp>
-#include <kernel/adjacency/graph.hpp>
-#include <kernel/adjacency/permutation.hpp>
-#include <kernel/util/statistics.hpp>
-#include <kernel/util/time_stamp.hpp>
 #include <kernel/lafem/vector_mirror.hpp>
+#include <kernel/lafem/arch/axpy_dense.hpp>
+#include <kernel/lafem/arch/max_rel_diff_dense.hpp>
+#include <kernel/lafem/arch/norm2_dense.hpp>
+#include <kernel/lafem/arch/matvecmult_cscr_dense.hpp>
+#include <kernel/lafem/arch/scale_dense.hpp>
 
+// includes, system
 #include <fstream>
-
 
 namespace FEAT
 {
@@ -43,15 +41,14 @@ namespace FEAT
      * This format is very similar to the standard CSR format but stores explicit row numbers for each non empty row.\n\n
      * Data survey: \n
      * _elements[0]: raw non zero number values \n
-     * _indices[0]: column index per non zero element \n
-     * _indices[1]: row start index (including matrix end index)\n
-     * _indices[2]: row number of each non empty row\n
+     * _indices[0]: row start index (including matrix end index)\n
+     * _indices[1]: row number of each non empty row\n
+     * _indices[2]: column index per non zero element \n
      *
-     * _scalar_index[0]: container size \n
-     * _scalar_index[1]: row count \n
-     * _scalar_index[2]: column count \n
+     * _scalar_index[0]: row count \n
+     * _scalar_index[1]: column count \n
+     * _scalar_index[2]: non zero row count
      * _scalar_index[3]: non zero element count (used elements) \n
-     * _scalar_index[4]: non zero row count
      *
      * Refer to \ref lafem_design for general usage informations.
      *
@@ -60,32 +57,6 @@ namespace FEAT
     template <typename DT_, typename IT_ = Index>
     class SparseMatrixCSCR : public Container<DT_, IT_>
     {
-    private:
-      Index & _size()
-      {
-        return this->_scalar_index.at(0);
-      }
-
-      Index & _rows()
-      {
-        return this->_scalar_index.at(1);
-      }
-
-      Index & _columns()
-      {
-        return this->_scalar_index.at(2);
-      }
-
-      Index & _used_elements()
-      {
-        return this->_scalar_index.at(3);
-      }
-
-      Index & _used_rows()
-      {
-        return this->_scalar_index.at(4);
-      }
-
     public:
       /// Our datatype
       typedef DT_ DataType;
@@ -99,8 +70,6 @@ namespace FEAT
       typedef DenseVector<DT_, IT_> VectorTypeR;
       /// Our used layout type
       static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_cscr;
-      /// ImageIterator typedef for Adjactor interface implementation
-      typedef const IT_* ImageIterator;
       /// Our 'base' class type
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       using ContainerType = SparseMatrixCSCR<DT2_, IT2_>;
@@ -112,13 +81,61 @@ namespace FEAT
       static constexpr bool is_global = false;
       static constexpr bool is_local = true;
 
+    protected:
+      Index & _rows()
+      {
+        return this->_scalar_index.at(0);
+      }
+
+      Index & _cols()
+      {
+        return this->_scalar_index.at(1);
+      }
+
+      Index & _nonzero_rows()
+      {
+        return this->_scalar_index.at(2);
+      }
+
+      Index & _nzes()
+      {
+        return this->_scalar_index.at(3);
+      }
+
+      void _alloc(Index rows, Index cols, Index nz_rows, Index nzes)
+      {
+        XASSERT(this->_scalar_index.empty());
+        XASSERT(this->_indices.empty());
+        XASSERT(this->_elements.empty());
+
+        this->_scalar_index.push_back(rows);
+        this->_scalar_index.push_back(cols);
+        this->_scalar_index.push_back(nz_rows);
+        this->_scalar_index.push_back(nzes);
+
+        if(rows <= Index(0))
+          return;
+
+        this->_indices.push_back(Memory::Arbiter(sizeof(IT_) * (nz_rows + 1)));
+        this->_indices_size.push_back(nz_rows + 1);
+
+        this->_indices.push_back(Memory::Arbiter(sizeof(IT_) * nz_rows));
+        this->_indices_size.push_back(nz_rows);
+
+        this->_indices.push_back(Memory::Arbiter(sizeof(IT_) * nzes));
+        this->_indices_size.push_back(nzes);
+
+        this->_elements.push_back(Memory::Arbiter(sizeof(DT_) * nzes));
+        this->_elements_size.push_back(nzes);
+      }
+
+    public:
       /**
        * \brief Constructor
        *
        * Creates an empty non dimensional matrix.
        */
-      explicit SparseMatrixCSCR() :
-        Container<DT_, IT_> (0)
+      SparseMatrixCSCR()
       {
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
@@ -137,8 +154,7 @@ namespace FEAT
        *
        * \note This matrix does not allocate any memory
        */
-      explicit SparseMatrixCSCR(Index rows_in, Index columns_in) :
-        Container<DT_, IT_> (rows_in * columns_in)
+      explicit SparseMatrixCSCR(Index rows_in, Index columns_in)
       {
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
@@ -149,36 +165,19 @@ namespace FEAT
       /**
        * \brief Constructor
        *
-       * \param[in] rows_in The row count of the created matrix.
-       * \param[in] columns_in The column count of the created matrix.
-       * \param[in] used_elements_in The amount of non zero elements of the created matrix.
-       * \param[in] used_rows_in The amount of non zero rows of the created matrix.
+       * \param[in] rows The row count of the created matrix.
+       * \param[in] cols The column count of the created matrix.
+       * \param[in] nz_rows The amount of non zero rows of the created matrix.
+       * \param[in] nzes The amount of non zero elements of the created matrix.
        *
        * Creates an empty (but allocated) matrix.
        *
        * \note The allocated memory will not be initialized.
        */
-      explicit SparseMatrixCSCR(Index rows_in, Index columns_in, Index used_elements_in, Index used_rows_in) :
-        Container<DT_, IT_> (rows_in * columns_in)
+      explicit SparseMatrixCSCR(Index rows, Index cols, Index nz_rows, Index nzes)
       {
-        XASSERT(rows_in != Index(0) && columns_in != Index(0));
-
-        this->_scalar_index.push_back(rows_in);
-        this->_scalar_index.push_back(columns_in);
-        this->_scalar_index.push_back(used_elements_in);
-        this->_scalar_index.push_back(used_rows_in);
-
-        this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(_used_elements()));
-        this->_indices_size.push_back(_used_elements());
-
-        this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(_used_rows() + 1));
-        this->_indices_size.push_back(_used_rows() + 1);
-
-        this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(_used_rows()));
-        this->_indices_size.push_back(_used_rows());
-
-        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(_used_elements()));
-        this->_elements_size.push_back(_used_elements());
+        XASSERT(rows != Index(0) && cols != Index(0));
+        this->_alloc(rows, cols, nz_rows, nzes);
       }
 
       /**
@@ -188,18 +187,16 @@ namespace FEAT
        *
        * Creates an empty matrix with given layout.
        */
-      explicit SparseMatrixCSCR(const SparseLayout<IT_, layout_id> & layout_in) :
-        Container<DT_, IT_> (layout_in._scalar_index.at(0))
+      explicit SparseMatrixCSCR(const SparseLayout<IT_, layout_id> & layout_in)
       {
-        this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
 
-        for (auto i : this->_indices)
-          MemoryPool::increase_memory(i);
+        for(const auto& idx : layout_in.get_indices())
+          this->_indices.push_back(idx.attach());
 
-        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(_used_elements()));
-        this->_elements_size.push_back(_used_elements());
+        this->_elements.push_back(Memory::Arbiter(sizeof(DT_) * _nzes()));
+        this->_elements_size.push_back(_nzes());
       }
 
       /**
@@ -210,10 +207,9 @@ namespace FEAT
        * Creates a CSCR matrix based on the source matrix.
        */
       template <typename MT_>
-      explicit SparseMatrixCSCR(const MT_ & other) :
-        Container<DT_, IT_>(other.size())
+      explicit SparseMatrixCSCR(const MT_ & other)
       {
-        convert(other);
+        this->convert(other);
       }
 
       /**
@@ -224,10 +220,9 @@ namespace FEAT
        *
        * Creates a CSCR matrix based on the source file.
        */
-      explicit SparseMatrixCSCR(FileMode mode, const String& filename) :
-        Container<DT_, IT_>(0)
+      explicit SparseMatrixCSCR(FileMode mode, const String& filename)
       {
-        read_from(mode, filename);
+        this->read_from(mode, filename);
       }
 
       /**
@@ -238,10 +233,9 @@ namespace FEAT
        *
        * Creates a CSCR matrix based on the source filestream.
        */
-      explicit SparseMatrixCSCR(FileMode mode, std::istream& file) :
-        Container<DT_, IT_>(0)
+      explicit SparseMatrixCSCR(FileMode mode, std::istream& file)
       {
-        read_from(mode, file);
+        this->read_from(mode, file);
       }
 
       /**
@@ -249,44 +243,38 @@ namespace FEAT
        *
        * \param[in] rows_in The row count of the created matrix.
        * \param[in] columns_in The column count of the created matrix.
-       * \param[in] col_ind_in Vector with column indices.
+       * \param[in] col_idx_in Vector with column indices.
        * \param[in] val_in Vector with non zero elements.
-       * \param[in] row_ptr_in Vector with start indices of all rows into the val/col_ind arrays.
+       * \param[in] row_ptr_in Vector with start indices of all rows into the val/col_idx arrays.
        * Note that this vector must also contain the end index of the last row and thus has a size of row_count + 1.
-       * \param[in] row_numbers_in Vector with the row number of each used row.
+       * \param[in] row_idx_in Vector with the row number of each used row.
        *
        * Creates a matrix with given dimensions and content.
        */
       explicit SparseMatrixCSCR(const Index rows_in, const Index columns_in,
-                               DenseVector<IT_, IT_> & col_ind_in, DenseVector<DT_, IT_> & val_in, DenseVector<IT_, IT_> & row_ptr_in,
-                               DenseVector<IT_, IT_> & row_numbers_in) :
-        Container<DT_, IT_>(rows_in * columns_in)
+        DenseVector<IT_, IT_> & row_ptr_in, DenseVector<IT_, IT_> & row_idx_in,
+        DenseVector<IT_, IT_> & col_idx_in, DenseVector<DT_, IT_> & val_in)
       {
-        /// \todo maybe create empty matrix if col_ind and val and row_ptr inputs are all three empty
-        XASSERT(col_ind_in.size() > 0);
-        XASSERT(val_in.size() > 0);
+        /// \todo maybe create empty matrix if col_idx and val and row_ptr inputs are all three empty
+        XASSERT(col_idx_in.size() > 0);
+        XASSERT(val_in.size() == col_idx_in.size());
         XASSERT(row_ptr_in.size() > 0);
-        XASSERT(row_numbers_in.size() > 0);
-        XASSERT(row_numbers_in.size() + 1 == row_ptr_in.size());
+        XASSERT(row_idx_in.size() > 0);
+        XASSERT(row_idx_in.size() + 1 == row_ptr_in.size());
 
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
+        this->_scalar_index.push_back(row_idx_in.size());
         this->_scalar_index.push_back(val_in.size());
-        this->_scalar_index.push_back(row_numbers_in.size());
 
-        this->_elements.push_back(val_in.elements());
-        this->_elements_size.push_back(val_in.size());
-        this->_indices.push_back(col_ind_in.elements());
-        this->_indices_size.push_back(col_ind_in.size());
-        this->_indices.push_back(row_ptr_in.elements());
+        this->_indices.push_back(row_ptr_in.elements_arbiter().attach());
         this->_indices_size.push_back(row_ptr_in.size());
-        this->_indices.push_back(row_numbers_in.elements());
-        this->_indices_size.push_back(row_numbers_in.size());
-
-        for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool::increase_memory(this->_elements.at(i));
-        for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool::increase_memory(this->_indices.at(i));
+        this->_indices.push_back(row_idx_in.elements_arbiter().attach());
+        this->_indices_size.push_back(row_idx_in.size());
+        this->_indices.push_back(col_idx_in.elements_arbiter().attach());
+        this->_indices_size.push_back(col_idx_in.size());
+        this->_elements.push_back(val_in.elements_arbiter().attach());
+        this->_elements_size.push_back(val_in.size());
       }
 
       /**
@@ -297,61 +285,43 @@ namespace FEAT
        *
        * Creates a matrix with selected rows from a given csr matrix.
        */
-      explicit SparseMatrixCSCR(const SparseMatrixCSR<DT_, IT_> & csr, const VectorMirror<DT_, IT_> & non_zero_rows) :
-        Container<DT_, IT_>(csr.size())
+      explicit SparseMatrixCSCR(const SparseMatrixCSR<DT_, IT_> & csr, const VectorMirror<DT_, IT_> & non_zero_rows)
       {
         XASSERT(non_zero_rows.num_indices() > 0);
 
-        const IT_ * row_main(nullptr);
-        const IT_ * indices(nullptr);
-        IT_ * trow_main(nullptr);
-        IT_ * tindices(nullptr);
-        row_main = csr.row_ptr();
-        indices = non_zero_rows.indices();
+        const Memory::TypedView<IT_> row_ptr_in = csr.row_ptr_view_r();
+        const Memory::TypedView<DT_> val_in = csr.val_view_r();
+        const Memory::TypedView<IT_> col_idx_in = csr.col_idx_view_r();
+        const Memory::TypedView<IT_> mir_idx = non_zero_rows.indices_view_r();
 
-        Index tused_elements(0);
-        for (Index i(0) ; i < non_zero_rows.num_indices() ; ++i)
+        // count number of non-zeros
+        Index nz_rows = non_zero_rows.num_indices();
+        Index nnzes(0);
+        for (Index i(0) ; i < nz_rows ; ++i)
+          nnzes += row_ptr_in[mir_idx[i]+1] - row_ptr_in[mir_idx[i]];
+
+        this->_alloc(csr.num_rows(), csr.num_cols(), nz_rows, nnzes);
+
+        Memory::TypedView<DT_> val = this->val_view_w();
+        Memory::TypedView<IT_> row_ptr = this->row_ptr_view_w();
+        Memory::TypedView<IT_> col_idx = this->col_idx_view_w();
+        Memory::TypedView<IT_> row_idx = this->row_idx_view_w();
+
+        row_ptr[0] = IT_(0);
+        for(Index i(0); i < nz_rows; ++i)
         {
-          const Index row(indices[i]);
-          tused_elements += row_main[row+1] - row_main[row];
+          IT_ row = mir_idx[i];
+          IT_ j = row_ptr[i];
+          row_idx[i] = row;
+          for(IT_ k(row_ptr_in[row]); k < row_ptr_in[row+1]; ++k, ++j)
+          {
+            val[j] = val_in[k];
+            col_idx[j] = col_idx_in[k];
+          }
+          row_ptr[i+1] = j;
         }
 
-        this->_scalar_index.push_back(csr.rows());
-        this->_scalar_index.push_back(csr.columns());
-        this->_scalar_index.push_back(tused_elements);
-        this->_scalar_index.push_back(non_zero_rows.num_indices());
-
-        this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(_used_elements()));
-        this->_indices_size.push_back(_used_elements());
-
-        this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(_used_rows() + 1));
-        this->_indices_size.push_back(_used_rows() + 1);
-
-        this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(_used_rows()));
-        this->_indices_size.push_back(_used_rows());
-
-        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(_used_elements()));
-        this->_elements_size.push_back(_used_elements());
-
-        Index row_count(0);
-        IT_ offset(0);
-        this->row_ptr()[0]=offset;
-        for (Index i(0) ; i < non_zero_rows.num_indices() ; ++i)
-        {
-          const IT_ row(indices[i]);
-          const IT_ start(row_main[row]);
-          const IT_ end(row_main[row+1]);
-          const IT_ row_size(end - start);
-          MemoryPool::set_memory(this->row_ptr() + row_count + 1, offset + row_size);
-          MemoryPool::set_memory(this->row_numbers() + row_count, row);
-          MemoryPool::copy(this->val() + offset, csr.val() + start, row_size);
-          MemoryPool::copy(this->col_ind() + offset, csr.col_ind() + start, row_size);
-          ++row_count;
-          offset += row_size;
-        }
-
-        delete[] trow_main;
-        delete[] tindices;
+        XASSERT(row_ptr[nz_rows] == nnzes);
       }
 
       /**
@@ -361,17 +331,16 @@ namespace FEAT
        *
        * Creates a CSCR matrix based on a given adjacency graph, representing the sparsity pattern.
        */
-      explicit SparseMatrixCSCR(const Adjacency::Graph & graph) :
-        Container<DT_, IT_>(0)
+      explicit SparseMatrixCSCR(const Adjacency::Graph & graph)
       {
         // get number of rows, columns and indices
         Index num_rows = graph.get_num_nodes_domain();
         Index num_cols = graph.get_num_nodes_image();
         Index num_nzes = graph.get_num_indices();
 
-        if (num_nzes == 0)
+        if (num_nzes <= Index(0))
         {
-          this->move(SparseMatrixCSCR(num_rows, num_cols));
+          this->_alloc(num_rows, num_cols, Index(0), Index(0));
           return;
         }
 
@@ -387,12 +356,12 @@ namespace FEAT
         }
 
         // allocate output matrix
-        SparseMatrixCSCR<DT_, IT_> matrix(num_rows, num_cols, num_nzes, num_nzrs);
+        this->_alloc(num_rows, num_cols, num_nzrs, num_nzes);
 
         // get matrix arrays
-        IndexType* trow_ptr = matrix.row_ptr();
-        IndexType* trow_idx = matrix.row_numbers();
-        IndexType* tcol_idx = matrix.col_ind();
+        Memory::TypedView<IT_> trow_ptr = this->row_ptr_view_w();
+        Memory::TypedView<IT_> trow_idx = this->row_idx_view_w();
+        Memory::TypedView<IT_> tcol_idx = this->col_idx_view_w();
 
         // fill arrays
         trow_ptr[0] = IndexType(dom_ptr[0]);
@@ -408,8 +377,6 @@ namespace FEAT
 
         for(Index k(0); k < num_nzes; ++k)
           tcol_idx[k] = IndexType(img_idx[k]);
-
-        this->convert(matrix);
       }
 
       /**
@@ -420,10 +387,9 @@ namespace FEAT
        * Creates a matrix from the given byte array.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      explicit SparseMatrixCSCR(std::vector<char> input) :
-        Container<DT_, IT_>(0)
+      explicit SparseMatrixCSCR(std::vector<char> input)
       {
-        deserialize<DT2_, IT2_>(input);
+        this->deserialize<DT2_, IT2_>(input);
       }
 
       /**
@@ -504,51 +470,45 @@ namespace FEAT
       template <typename MT_>
       void convert(const MT_ & a)
       {
-        typename MT_::template ContainerType<DT_, IT_> ta;
-        ta.convert(a);
+        XASSERT((void*)this != (void*)&a);
 
-        const Index arows(ta.template rows<Perspective::pod>());
-        const Index acolumns(ta.template columns<Perspective::pod>());
-        const Index aused_elements(ta.template used_elements<Perspective::pod>());
-        Index aused_rows(0);
+        this->clear();
 
-        for (Index i(0); i < arows; ++i)
+        const Index num_rows_a = a.num_rows_raw();
+        const Index num_cols_a = a.num_cols_raw();
+        const Index num_nzes_a = a.num_nzes_raw();
+        if(num_nzes_a <= Index(0))
         {
-          aused_rows += ta.get_length_of_line(i) > 0;
+          this->_alloc(num_rows_a, num_cols_a, Index(0), Index(0));
+          return;
         }
 
-        DenseVector<DT_, IT_> tval(aused_elements);
-        DenseVector<IT_, IT_> tcol_ind(aused_elements);
-        DenseVector<IT_, IT_> trow_ptr(aused_rows + 1);
-        DenseVector<IT_, IT_> trow_numbers(aused_rows);
-
-        DT_ * pval(tval.elements());
-        IT_ * pcol_ind(tcol_ind.elements());
-        IT_ * prow_ptr(trow_ptr.elements());
-        IT_ * prow_numbers(trow_numbers.elements());
-
-        Index row_index(0);
-        Index offset(0);
-        prow_ptr[0] = IT_(0);
-        for (Index i(0); i < arows; ++i)
+        Index num_nz_rows_a(0);
+        for (Index i(0); i < num_rows_a; ++i)
         {
-          Index length = ta.get_length_of_line(i);
-          if (length > 0)
+          num_nz_rows_a += Index(a.row_degree(i) > Index(0) ? 1 : 0);
+        }
+
+        this->_alloc(num_rows_a, num_cols_a, num_nz_rows_a, num_nzes_a);
+
+        Memory::TypedView<IT_> row_ptr = this->row_ptr_view_w();
+        Memory::TypedView<IT_> row_idx = this->row_idx_view_w();
+        Memory::TypedView<IT_> col_idx = this->col_idx_view_w();
+        Memory::TypedView<DT_> val = this->val_view_w();
+
+        row_ptr[0] = Index(0);
+        for(Index row(0), k(0); row < num_rows_a; ++row)
+        {
+          Index nz = a.row_degree(row);
+          if(nz > Index(0))
           {
-            prow_ptr[row_index + 1] = IT_(offset + length);
-            prow_numbers[row_index] = IT_(i);
-            ++row_index;
-            offset += length;
+            a.get_row_col_indices(row, &col_idx[row_ptr[k]], IT_(0));
+            a.get_row_values(row, &val[row_ptr[k]]);
+            row_idx[k] = IT_(row);
+            row_ptr[k+1] = row_ptr[k] + IT_(nz);
+            ++k;
           }
         }
-
-
-        for (Index i(0); i < arows; ++i)
-        {
-          ta.set_line(i, pval + prow_ptr[i], pcol_ind + prow_ptr[i], 0);
-        }
-
-        this->move(SparseMatrixCSCR<DT_, IT_>(arows, acolumns, tcol_ind, tval, trow_ptr, trow_numbers));
       }
 
       /**
@@ -560,26 +520,16 @@ namespace FEAT
        */
       SparseMatrixCSCR & operator= (const SparseLayout<IT_, layout_id> & layout_in)
       {
-        for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool::release_memory(this->_elements.at(i));
-        for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool::release_memory(this->_indices.at(i));
+        this->clear();
 
-        this->_elements.clear();
-        this->_indices.clear();
-        this->_elements_size.clear();
-        this->_indices_size.clear();
-        this->_scalar_index.clear();
-
-        this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
 
-        for (auto i : this->_indices)
-          MemoryPool::increase_memory(i);
+        for(const auto& idx : layout_in.get_indices())
+          this->_indices.push_back(idx.attach());
 
-        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(_used_elements()));
-        this->_elements_size.push_back(_used_elements());
+        this->_elements.push_back(Memory::Arbiter(_nzes() * sizeof(DT_)));
+        this->_elements_size.push_back(_nzes());
 
         return *this;
       }
@@ -642,9 +592,12 @@ namespace FEAT
         switch(mode)
         {
         case FileMode::fm_cscr:
+          [[fallthrough]];
+
         case FileMode::fm_binary:
           this->template _deserialize<double, std::uint64_t>(FileMode::fm_cscr, file);
           break;
+
         default:
           XABORTM("Filemode not supported!");
         }
@@ -665,8 +618,8 @@ namespace FEAT
         char* buff = nullptr;
         if(mode == FileMode::fm_mtx)
         {
-          buff = new char[LAFEM::FileOutStreamBufferSize];
-          file.rdbuf()->pubsetbuf(buff, LAFEM::FileOutStreamBufferSize);
+          buff = new char[LAFEM::file_out_stream_buffer_size];
+          file.rdbuf()->pubsetbuf(buff, LAFEM::file_out_stream_buffer_size);
         }
         file.open(filename.c_str(), bin);
         if(! file.is_open())
@@ -687,45 +640,15 @@ namespace FEAT
         switch(mode)
         {
         case FileMode::fm_cscr:
+          [[fallthrough]];
+
         case FileMode::fm_binary:
           this->template _serialize<double, std::uint64_t>(FileMode::fm_cscr, file);
           break;
+
         default:
           XABORTM("Filemode not supported!");
         }
-      }
-
-      /**
-       * \brief Retrieve specific matrix element.
-       *
-       * \param[in] row The row of the matrix element.
-       * \param[in] col The column of the matrix element.
-       *
-       * \returns Specific matrix element.
-       */
-      DT_ operator()(Index row, Index col) const
-      {
-        ASSERT(row < rows());
-        ASSERT(col < columns());
-
-        Index row_index(0);
-        while (row_index < this->used_rows() && Index(this->row_numbers()[row_index]) < row)
-        {
-          ++row_index;
-        }
-
-        if (row_index == this->used_rows() || Index(this->row_numbers()[row_index]) > row)
-          return DT_(0.);
-
-        //row_numbers[row_index] == row
-        for (Index i(Index(this->row_ptr()[row_index])) ; i < Index(this->row_ptr()[row_index + 1]) ; ++i)
-        {
-          if (Index(this->_indices.at(0)[i]) == col)
-            return this->_elements.at(0)[i];
-          if (Index(this->_indices.at(0)[i]) > col)
-            return DT_(0.);
-        }
-        return DT_(0.);
       }
 
       /**
@@ -738,15 +661,26 @@ namespace FEAT
         return SparseLayout<IT_, layout_id>(this->_indices, this->_indices_size, this->_scalar_index);
       }
 
+      /// Checks whether the matrix is empty, i.e. whether it is a 0x0 matrix
+      bool empty() const
+      {
+        return this->_scalar_index.empty() || (this->_scalar_index.at(0) == Index(0));
+      }
+
+      /// Checks whether the matrix has no non-zero entries, i.e. whether it is a null matrix
+      bool hollow() const
+      {
+        return this->_scalar_index.empty() || (this->_scalar_index.at(3) == Index(0));
+      }
+
       /**
        * \brief Retrieve matrix row count.
        *
        * \returns Matrix row count.
        */
-      template <Perspective = Perspective::native>
-      Index rows() const
+      Index num_rows() const
       {
-        return this->_scalar_index.at(1);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(0);
       }
 
       /**
@@ -754,10 +688,9 @@ namespace FEAT
        *
        * \returns Matrix column count.
        */
-      template <Perspective = Perspective::native>
-      Index columns() const
+      Index num_cols() const
       {
-        return this->_scalar_index.at(2);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(1);
       }
 
       /**
@@ -765,10 +698,9 @@ namespace FEAT
        *
        * \returns Used matrix non zero row count.
        */
-      template <Perspective = Perspective::native>
-      Index used_rows() const
+      Index num_nonzero_rows() const
       {
-        return this->_scalar_index.at(4);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(2);
       }
 
       /**
@@ -776,94 +708,187 @@ namespace FEAT
        *
        * \returns Non zero element count.
        */
-      template <Perspective = Perspective::native>
-      Index used_elements() const
+      Index num_nzes() const
       {
-        return this->_scalar_index.at(3);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(3);
       }
 
-      /**
-       * \brief Retrieve column indices array.
-       *
-       * \returns Column indices array.
-       */
-      IT_ * col_ind()
+      /// Returns the scalar matrix row count
+      Index num_rows_raw() const
       {
-        if (this->_indices.size() == 0)
-          return nullptr;
+        return this->num_rows();
+      }
 
+      /// Returns the scalar matrix column count
+      Index num_cols_raw() const
+      {
+        return this->num_cols();
+      }
+
+      /// Returns the scalar matrix nonzero element count
+      Index num_nzes_raw() const
+      {
+        return this->num_nzes();
+      }
+
+      /// Returns a reference to the row-pointer array arbiter
+      Memory::Arbiter& row_ptr_arbiter()
+      {
         return this->_indices.at(0);
       }
 
-      IT_ const * col_ind() const
+      /// Returns a reference to the row-pointer array arbiter
+      const Memory::Arbiter& row_ptr_arbiter() const
       {
-        if (this->_indices.size() == 0)
-          return nullptr;
-
         return this->_indices.at(0);
       }
 
-      /**
-       * \brief Retrieve non zero element array.
-       *
-       * \returns Non zero element array.
-       */
-      DT_ * val()
+      /// Returns a reference to the row-index array arbiter
+      Memory::Arbiter& row_idx_arbiter()
       {
-        if (this->_elements.size() == 0)
-          return nullptr;
-
-        return this->_elements.at(0);
-      }
-
-      DT_ const * val() const
-      {
-        if (this->_elements.size() == 0)
-          return nullptr;
-
-        return this->_elements.at(0);
-      }
-
-      /**
-       * \brief Retrieve row start index array.
-       *
-       * \returns Row start index array.
-       */
-      IT_ * row_ptr()
-      {
-        if (this->_indices.size() == 0)
-          return nullptr;
-
         return this->_indices.at(1);
       }
 
-      IT_ const * row_ptr() const
+      /// Returns a reference to the row-index array arbiter
+      const Memory::Arbiter& row_idx_arbiter() const
       {
-        if (this->_indices.size() == 0)
-          return nullptr;
-
         return this->_indices.at(1);
       }
 
-      /**
-       * \brief Retrieve row numbers of non zero rows.
-       *
-       * \returns Row number array.
-       */
-      IT_ * row_numbers()
+      /// Returns a reference to the column-index array arbiter
+      Memory::Arbiter& col_idx_arbiter()
       {
-        if (this->_indices.size() == 0)
-          return nullptr;
-
         return this->_indices.at(2);
       }
 
-      IT_ const * row_numbers() const
+      /// Returns a reference to the column-index array arbiter
+      const Memory::Arbiter& col_idx_arbiter() const
       {
-        if (this->_indices.size() == 0)
-          return nullptr;
-
         return this->_indices.at(2);
+      }
+
+      /// Returns a reference to the values array arbiter
+      Memory::Arbiter& val_arbiter()
+      {
+        return this->_elements.front();
+      }
+
+      /// Returns a reference to the values array arbiter
+      const Memory::Arbiter& val_arbiter() const
+      {
+        return this->_elements.front();
+      }
+
+      Memory::TypedView<DT_> val_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::read));
+      }
+
+      Memory::TypedView<DT_> val_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::write));
+      }
+
+      Memory::TypedView<DT_> val_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::read_write));
+      }
+
+      Memory::TypedView<DT_> val_view(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, acc));
+      }
+
+      Memory::TypedView<IT_> row_ptr_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::read));
+      }
+
+      Memory::TypedView<IT_> row_ptr_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::write));
+      }
+
+      Memory::TypedView<IT_> row_ptr_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::read_write));
+      }
+
+      Memory::TypedView<IT_> row_ptr_view(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, acc));
+      }
+
+      Memory::TypedView<IT_> row_idx_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(1).view(loc, Memory::Access::read));
+      }
+
+      Memory::TypedView<IT_> row_idx_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(1).view(loc, Memory::Access::write));
+      }
+
+      Memory::TypedView<IT_> row_idx_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(1).view(loc, Memory::Access::read_write));
+      }
+
+      Memory::TypedView<IT_> row_idx_view(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(1).view(loc, acc));
+      }
+
+      Memory::TypedView<IT_> col_idx_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(2).view(loc, Memory::Access::read));
+      }
+
+      Memory::TypedView<IT_> col_idx_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(2).view(loc, Memory::Access::write));
+      }
+
+      Memory::TypedView<IT_> col_idx_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(2).view(loc, Memory::Access::read_write));
+      }
+
+      Memory::TypedView<IT_> col_idx_view(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(2).view(loc, acc));
       }
 
       /**
@@ -898,20 +923,22 @@ namespace FEAT
        *
        * \warning All three matrices must have the same non zero layout. This operation assumes this silently and does not check this on its own!
        */
-      void axpy(
-                const SparseMatrixCSCR & x,
-                const DT_ alpha = DT_(1))
+      void axpy(const SparseMatrixCSCR & x, const DT_ alpha = DT_(1))
       {
-        XASSERTM(x.rows() == this->rows(), "Matrix rows do not match!");
-        XASSERTM(x.columns() == this->columns(), "Matrix columns do not match!");
-        XASSERTM(x.used_elements() == this->used_elements(), "Matrix used_elements do not match!");
+        XASSERTM(x.num_rows() == this->num_rows(), "Matrix rows do not match!");
+        XASSERTM(x.num_cols() == this->num_cols(), "Matrix columns do not match!");
+        XASSERTM(x.num_nzes() == this->num_nzes(), "Matrix nonzeros do not match!");
+
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->used_elements() * 2);
-        Arch::Axpy::value(this->val(), alpha, x.val(), this->used_elements());
+        Arch::AxpyDense::template exec<DT_>(this->val_arbiter(), alpha, x.val_arbiter(), this->num_nzes());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->num_nzes() * 2);
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -923,16 +950,20 @@ namespace FEAT
        */
       void scale(const SparseMatrixCSCR & x, const DT_ alpha)
       {
-        XASSERTM(x.rows() == this->rows(), "Row count does not match!");
-        XASSERTM(x.columns() == this->columns(), "Column count does not match!");
-        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        XASSERTM(x.num_rows() == this->num_rows(), "Row count does not match!");
+        XASSERTM(x.num_cols() == this->num_cols(), "Column count does not match!");
+        XASSERTM(x.num_nzes() == this->num_nzes(), "Nonzero count does not match!");
+
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->used_elements());
-        Arch::Scale::value(this->val(), x.val(), alpha, this->used_elements());
+        Arch::ScaleDense::template exec<DT_>(this->val_arbiter(), x.val_arbiter(), alpha, this->num_nzes());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->num_nzes());
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -943,12 +974,15 @@ namespace FEAT
        */
       DT_ norm_frobenius() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->used_elements() * 2);
-        DT_ result = Arch::Norm2::value(this->val(), this->used_elements());
+        DT_ result = Arch::Norm2Dense::template exec<DT_>(this->val_arbiter(), this->num_nzes());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->num_nzes() * 2);
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
         return result;
@@ -962,15 +996,17 @@ namespace FEAT
        */
       DT_ max_rel_diff(const SparseMatrixCSCR& x) const
       {
-        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        XASSERTM(x.num_nzes() == this->num_nzes(), "Nonzero count does not match!");
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        DataType max_rel_diff = Arch::MaxRelDiff::value(this->val(), x.val(), this->used_elements());
+        DT_ result = Arch::MaxRelDiffDense::template exec<DT_>(this->val_arbiter(), x.val_arbiter(), this->num_nzes());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
-        return max_rel_diff;
+        return result;
       }
 
       /**
@@ -983,49 +1019,50 @@ namespace FEAT
        */
       bool same_layout(const SparseMatrixCSCR& x) const
       {
-        if(this->size() == 0 && x.size() == 0 && this->get_elements().size() == 0 && this->get_indices().size() == 0 && x.get_elements().size() == 0 && x.get_indices().size() == 0)
+        if (this->num_rows() != x.num_rows())
+          return false;
+        if (this->num_cols() != x.num_cols())
+          return false;
+        if (this->num_nzes() != x.num_nzes())
+          return false;
+        if (this->num_nonzero_rows() != x.num_nonzero_rows())
+          return false;
+
+        if(this->num_nzes() == Index(0))
           return true;
-        if (this->rows() != x.rows())
-          return false;
-        if (this->columns() != x.columns())
-          return false;
-        if (this->used_elements() != x.used_elements())
-          return false;
-        if (this->used_rows() != x.used_rows())
-          return false;
 
-        IT_ * col_ind_a;
-        IT_ * col_ind_b;
-        IT_ * row_ptr_a;
-        IT_ * row_ptr_b;
+        // check if the arbiters for row_ptr, row_idx and col_idx are the same
+        if((this->row_ptr_arbiter() == x.row_ptr_arbiter()) &&
+          (this->row_idx_arbiter() == x.row_idx_arbiter()) &&
+          (this->col_idx_arbiter() == x.col_idx_arbiter()))
+          return true;
 
-        bool ret(true);
+        const Memory::TypedView<IT_> row_ptr_a = this->row_ptr_view_r();
+        const Memory::TypedView<IT_> row_idx_a = this->row_idx_view_r();
+        const Memory::TypedView<IT_> col_idx_a = this->col_idx_view_r();
+        const Memory::TypedView<IT_> row_ptr_b = x.row_ptr_view_r();
+        const Memory::TypedView<IT_> row_idx_b = x.row_idx_view_r();
+        const Memory::TypedView<IT_> col_idx_b = x.col_idx_view_r();
 
-        col_ind_a = const_cast<IT_*>(this->col_ind());
-        row_ptr_a = const_cast<IT_*>(this->row_ptr());
-        col_ind_b = const_cast<IT_*>(x.col_ind());
-        row_ptr_b = const_cast<IT_*>(x.row_ptr());
-        for (Index i(0) ; i < this->used_elements() ; ++i)
+        const Index nzr = this->num_nonzero_rows();
+        for (Index i(0) ; i < nzr; ++i)
         {
-          if (col_ind_a[i] != col_ind_b[i])
-          {
-            ret = false;
-            break;
-          }
+          if(row_ptr_a[i] != row_ptr_b[i])
+            return false;
+          if(row_idx_a[i] != row_idx_b[i])
+            return false;
         }
-        if (ret)
+        if(row_ptr_a[nzr] != row_ptr_b[nzr])
+          return false;
+
+        const Index nze = this->num_nzes();
+        for (Index i(0) ; i < nze ; ++i)
         {
-          for (Index i(0) ; i < this->used_rows() + 1; ++i)
-          {
-            if (row_ptr_a[i] != row_ptr_b[i])
-            {
-              ret = false;
-              break;
-            }
-          }
+          if (col_idx_a[i] != col_idx_b[i])
+            return false;
         }
 
-        return ret;
+        return true;
       }
 
       /**
@@ -1036,24 +1073,28 @@ namespace FEAT
        */
       void apply(DenseVector<DT_, IT_> & r, const DenseVector<DT_, IT_> & x) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols(), "Vector size of x does not match!");
 
-        TimeStamp ts_start;
-
-        if (this->used_elements() == 0)
+        if(this->empty())
+          return;
+        else if(this->hollow())
         {
           r.format();
           return;
         }
 
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+        XASSERTM(r.elements_arbiter() != x.elements_arbiter(), "Vector x and r must not share the same memory!");
 
-        Statistics::add_flops(this->used_elements() * 2);
-        Arch::Apply::cscr(r.elements(), DT_(1), x.elements(), DT_(0), r.elements(),
-            this->val(), this->col_ind(), this->row_ptr(), this->row_numbers(), this->used_rows(), this->rows(), this->columns(), this->used_elements(), false);
+        TimeStamp ts_start;
+
+        Arch::MatVecMultCSCRDense::template exec<DT_, IT_>(r.elements_arbiter(), DT_(1), x.elements_arbiter(), Memory::Arbiter(),
+          this->val_arbiter(), this->col_idx_arbiter(), this->row_ptr_arbiter(), this->row_idx_arbiter(),
+          this->num_rows(), this->num_cols(), this->num_nonzero_rows(), this->num_nzes(), false);
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->num_nzes() * 2);
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
 
@@ -1065,24 +1106,28 @@ namespace FEAT
       */
       void apply_transposed(DenseVector<DT_, IT_> & r, const DenseVector<DT_, IT_> & x) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_cols(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows(), "Vector size of x does not match!");
 
-        TimeStamp ts_start;
-
-        if (this->used_elements() == 0)
+        if(this->empty())
+          return;
+        else if(this->hollow())
         {
           r.format();
           return;
         }
 
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+        XASSERTM(r.elements_arbiter() != x.elements_arbiter(), "Vector x and r must not share the same memory!");
 
-        Statistics::add_flops(this->used_elements() * 2);
-        Arch::Apply::cscr(r.elements(), DT_(1), x.elements(), DT_(0), r.elements(),
-          this->val(), this->col_ind(), this->row_ptr(), this->row_numbers(), this->used_rows(), this->rows(), this->columns(), this->used_elements(), true);
+        TimeStamp ts_start;
+
+        Arch::MatVecMultCSCRDense::template exec<DT_, IT_>(r.elements_arbiter(), DT_(1), x.elements_arbiter(), Memory::Arbiter(),
+          this->val_arbiter(), this->col_idx_arbiter(), this->row_ptr_arbiter(), this->row_idx_arbiter(),
+          this->num_rows(), this->num_cols(), this->num_nonzero_rows(), this->num_nzes(), true);
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->num_nzes() * 2);
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
 
@@ -1095,31 +1140,36 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVector<DT_, IT_> & r,
-                 const DenseVector<DT_, IT_> & x,
-                 const DenseVector<DT_, IT_> & y,
-                 const DT_ alpha = DT_(1)) const
+        DenseVector<DT_, IT_> & r,
+        const DenseVector<DT_, IT_> & x,
+        const DenseVector<DT_, IT_> & y,
+        const DT_ alpha = DT_(1)) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->rows(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_rows(), "Vector size of y does not match!");
 
-        TimeStamp ts_start;
-
-        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
+        if(this->empty())
+          return;
+        // we check alpha strictly for equality to 0, because testing if |alpha| < eps may
+        // lead to false triggers if the matrix/vector contents are also < eps
+        else if(this->hollow() || (alpha == DT_(0)))
         {
           r.copy(y);
-          //r.scale(beta);
           return;
         }
 
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+        XASSERTM(r.elements_arbiter() != x.elements_arbiter(), "Vector x and r must not share the same memory!");
 
-        Statistics::add_flops( (this->used_elements() + this->rows()) * 2 );
-        Arch::Apply::cscr(r.elements(), alpha, x.elements(), DT_(1.), y.elements(),
-            this->val(), this->col_ind(), this->row_ptr(), this->row_numbers(), this->used_rows(), this->rows(), this->columns(), this->used_elements(), false);
+        TimeStamp ts_start;
+
+        Arch::MatVecMultCSCRDense::template exec<DT_, IT_>(r.elements_arbiter(), alpha, x.elements_arbiter(), y.elements_arbiter(),
+          this->val_arbiter(), this->col_idx_arbiter(), this->row_ptr_arbiter(), this->row_idx_arbiter(),
+          this->num_rows(), this->num_cols(), this->num_nonzero_rows(), this->num_nzes(), false);
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops( (this->num_nzes() + this->num_rows()) * 2 );
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
 
@@ -1137,26 +1187,31 @@ namespace FEAT
         const DenseVector<DT_, IT_> & y,
         const DT_ alpha = DT_(1)) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_cols(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_cols(), "Vector size of y does not match!");
 
-        TimeStamp ts_start;
-
-        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
+        if(this->empty())
+          return;
+        // we check alpha strictly for equality to 0, because testing if |alpha| < eps may
+        // lead to false triggers if the matrix/vector contents are also < eps
+        else if(this->hollow() || (alpha == DT_(0)))
         {
           r.copy(y);
-          //r.scale(beta);
           return;
         }
 
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+        XASSERTM(r.elements_arbiter() != x.elements_arbiter(), "Vector x and r must not share the same memory!");
 
-        Statistics::add_flops( (this->used_elements() + this->rows()) * 2 );
-        Arch::Apply::cscr(r.elements(), alpha, x.elements(), DT_(1.), y.elements(),
-          this->val(), this->col_ind(), this->row_ptr(), this->row_numbers(), this->used_rows(), this->rows(), this->columns(), this->used_elements(), true);
+        TimeStamp ts_start;
+
+        Arch::MatVecMultCSCRDense::template exec<DT_, IT_>(r.elements_arbiter(), alpha, x.elements_arbiter(), y.elements_arbiter(),
+          this->val_arbiter(), this->col_idx_arbiter(), this->row_ptr_arbiter(), this->row_idx_arbiter(),
+          this->num_rows(), this->num_cols(), this->num_nonzero_rows(), this->num_nzes(), true);
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops( (this->num_nzes() + this->num_rows()) * 2 );
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
       ///@}
@@ -1164,72 +1219,117 @@ namespace FEAT
       /// Returns a new compatible L-Vector.
       VectorTypeL create_vector_l() const
       {
-        return VectorTypeL(this->rows());
+        return VectorTypeL(this->num_rows());
       }
 
       /// Returns a new compatible R-Vector.
       VectorTypeR create_vector_r() const
       {
-        return VectorTypeR(this->columns());
+        return VectorTypeR(this->num_cols());
       }
-
-      /// Returns the number of NNZ-elements of the selected row
-      Index get_length_of_line(const Index row) const
-      {
-        const IT_ * prow_ptr(this->row_ptr());
-        return Index(prow_ptr[row + 1] - prow_ptr[row]);
-      }
-
-      /// \cond internal
-
-      /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
-      void set_line(const Index row, DT_ * const pval_set, IT_ * const pcol_set,
-                    const Index col_start, const Index stride = 1) const
-      {
-        const IT_ * prow_ptr(this->row_ptr());
-        const IT_ * pcol_ind(this->col_ind());
-        const DT_ * pval(this->val());
-
-        Index row_idx(0);
-        while (row_idx < this->used_rows() && row_idx < row)
-        {
-          ++row_idx;
-        }
-        XASSERTM(row_idx < this->used_rows(), "invalid row number provided!");
-
-        const Index start((Index(prow_ptr[row_idx])));
-        const Index end((Index(prow_ptr[row_idx + 1] - prow_ptr[row_idx])));
-        for (Index i(0); i < end; ++i)
-        {
-          pval_set[i * stride] = pval[start + i];
-          pcol_set[i * stride] = pcol_ind[start + i] + IT_(col_start);
-        }
-      }
-
-      /// \endcond
 
       /**
-       * \brief SparseMatrixCSCR streaming operator
+       * \brief Prints this sparse matrix in human-readable format into an output stream
        *
-       * \param[in] lhs The target stream.
-       * \param[in] b The matrix to be streamed.
+       * \param[inout] os
+       * The output stream to print to
+       *
+       * \param[in]
+       * If \c true, then the matrix will be printed as a dense matrix including all implicit zero entries,
+       * otherwise only the non-zero entries of each non-zero row prefixed by the corresponding column index are printed.
        */
-      friend std::ostream & operator<< (std::ostream & lhs, const SparseMatrixCSCR & b)
+      void print(std::ostream & os, bool print_dense) const
       {
-
-        lhs << "[\n";
-        for (Index i(0) ; i < b.rows() ; ++i)
+        if(this->empty())
         {
-          lhs << "[";
-          for (Index j(0) ; j < b.columns() ; ++j)
-          {
-            lhs << "  " << stringify(b(i, j));
-          }
-          lhs << "]\n";
+          os << "[]";
+          return;
         }
-        lhs << "]\n";
 
-        return lhs;
+        const Memory::TypedView<IT_> row_ptr = this->row_ptr_view_r();
+        const Memory::TypedView<IT_> row_idx = this->row_idx_view_r();
+        const Memory::TypedView<IT_> col_idx = this->col_idx_view_r();
+        const Memory::TypedView<DT_> val = this->val_view_r();
+        const Index nrows = this->num_rows();
+        const Index ncols = this->num_cols();
+        const Index nzrows = this->num_nonzero_rows();
+
+        IT_ l = 0;
+        os << "[\n";
+        for (Index i(0) ; i < nzrows ; ++i)
+        {
+          if(print_dense)
+          {
+            // write leading zero rows
+            for(; l < row_idx[i]; ++l)
+            {
+              os << "[";
+              for(Index j = 0; j < ncols; ++j)
+                os << "  " << DT_(0);
+              os << "]\n";
+            }
+          }
+          else
+          {
+            // write row index
+            os << row_idx[i] << ':';
+          }
+
+          os << "[";
+          IT_ k = 0;
+          for(IT_ j = row_ptr[i]; j < row_ptr[i+1]; ++j)
+          {
+            // write leading zeros
+            if(print_dense)
+            {
+              for(; k < col_idx[j]; ++k)
+                os << "  " << DT_(0);
+            }
+            else
+            {
+              os << "  " << col_idx[j] << ':';
+            }
+
+            // write value
+            os << "  " << val[j];
+            ++k;
+          }
+
+          // write trailing zeros
+          if(print_dense)
+          {
+            for(; k < ncols; ++k)
+              os << "  " << DT_(0);
+            ++l;
+          }
+          os << "]\n";
+        }
+
+        // write trailing zero rows
+        if(print_dense)
+        {
+          for(; l < nrows; ++l)
+          {
+            os << "[";
+            for(Index j = 0; j < ncols; ++j)
+              os << "  " << DT_(0);
+            os << "]\n";
+          }
+        }
+
+        os << "]";
+      }
+
+      /**
+      * \brief SparseMatrixCSR streaming operator
+      *
+      * \param[in] os The target stream.
+      * \param[in] b The matrix to be streamed.
+      */
+      friend std::ostream & operator<< (std::ostream & os, const SparseMatrixCSCR & b)
+      {
+        b.print(os, true);
+        return os;
       }
     }; //SparseMatrixCSCR
 

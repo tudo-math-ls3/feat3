@@ -195,9 +195,9 @@ namespace FEAT
         typedef MeshQualityFunctional<MeshType> BaseClass;
 
         /// Block height of the operator's gradient
-        static constexpr int BlockHeight = MeshType::world_dim;
+        static constexpr int block_height = MeshType::world_dim;
         /// Block Weight of the operator's gradient
-        static constexpr int BlockWidth = MeshType::world_dim;
+        static constexpr int block_width = MeshType::world_dim;
 
         /// ShapeType of said mesh
         typedef typename MeshType::ShapeType ShapeType;
@@ -374,9 +374,10 @@ namespace FEAT
               _slip_asm.emplace(identifier, new_asm);
             }
 
+            Memory::TypedView<DT_> vmu = _mu.elements_view_r();
             for(Index i(0); i < _mu.size(); ++i)
             {
-              _sum_mu += _mu(i);
+              _sum_mu += vmu(i);
             }
 
             sync_scalars.emplace("_sum_mu",&_sum_mu);
@@ -488,9 +489,10 @@ namespace FEAT
               _slip_asm.emplace(identifier, new_asm);
             }
 
+            Memory::TypedView<DT_> vmu = _mu.elements_view_r();
             for(Index i(0); i < _mu.size(); ++i)
             {
-              _sum_mu += _mu(i);
+              _sum_mu += vmu(i);
             }
             sync_scalars.emplace("_sum_mu",&_sum_mu);
 
@@ -546,7 +548,7 @@ namespace FEAT
          *
          * \returns The number of columns.
          */
-        Index columns() const
+        Index num_cols() const
         {
           return _columns;
         }
@@ -556,7 +558,7 @@ namespace FEAT
          *
          * \returns The number of rows.
          */
-        Index rows() const
+        Index num_rows() const
         {
           return _rows;
         }
@@ -603,9 +605,10 @@ namespace FEAT
          */
         virtual void add_to_vtk_exporter(Geometry::ExportVTK<typename Trafo_::MeshType>& exporter) const override
         {
-          exporter.add_cell_scalar("h", this->_h.elements());
-          exporter.add_cell_scalar("lambda", this->_lambda.elements());
-          exporter.add_cell_scalar("mu", this->_mu.elements());
+          exporter.add_cell_scalar("h", this->_h);
+          exporter.add_cell_scalar("lambda", this->_lambda);
+          exporter.add_cell_scalar("mu", this->_mu);
+
 
           DataType* fval_norm(new DataType[this->get_mesh()->get_num_entities(MeshType::shape_dim)]);
           DataType* fval_det(new DataType[this->get_mesh()->get_num_entities(MeshType::shape_dim)]);
@@ -617,7 +620,7 @@ namespace FEAT
 
           if(_mesh_conc != nullptr)
           {
-            exporter.add_vertex_scalar("dist", _mesh_conc->get_dist().elements());
+            exporter.add_vertex_scalar("dist", _mesh_conc->get_dist());
             exporter.add_vertex_vector("grad_dist", _mesh_conc->get_grad_dist());
 
             if(this->_penalty_param > DataType(0))
@@ -993,13 +996,14 @@ namespace FEAT
           lambda_min = Math::huge<CoordType>();
           lambda_max = CoordType(0);
 
+          const Memory::TypedView<DT_> vl = this->_lambda.elements_view_r();
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
             size_defect += Math::abs(this->_trafo.template
-                compute_vol<ShapeType, CoordType>(cell)/vol - this->_lambda(cell));
+                compute_vol<ShapeType, CoordType>(cell)/vol - vl(cell));
 
-            lambda_min = Math::min(lambda_min, this->_lambda(cell));
-            lambda_max = Math::max(lambda_max, this->_lambda(cell));
+            lambda_min = Math::min(lambda_min, vl(cell));
+            lambda_max = Math::max(lambda_max, vl(cell));
           }
 
           vol_min /= vol;
@@ -1052,6 +1056,11 @@ namespace FEAT
           TrafoEvaluator trafo_eval(this->_trafo);
           SpaceEvaluator space_eval(this->trafo_space);
 
+          const auto vcb = this->_coords_buffer.elements_view_r();
+          const auto vh = this->_h.elements_view_r();
+          const auto vmu = this->_mu.elements_view_r();
+          auto vgrad = grad.elements_view_rw();
+
           // Compute the functional value for each cell
           for(Index cell(0); cell < ncells; ++cell)
           {
@@ -1062,34 +1071,31 @@ namespace FEAT
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = this->_coords_buffer(idx(cell,j));
+              x[j] = vcb(idx(cell,j));
             }
 
-            auto mat_tensor = RefCellTrafo_::compute_mat_tensor(x, this->_h(cell));
+            auto mat_tensor = RefCellTrafo_::compute_mat_tensor(x, vh(cell));
 
             this->_cell_functional->eval_fval_grad(
-              fval_loc, grad_loc, mat_tensor, trafo_eval, space_eval, x, this->_h(cell));
+              fval_loc, grad_loc, mat_tensor, trafo_eval, space_eval, x, vh(cell));
 
             // Add the contribution from the dependence of h on the vertex coordinates
             if(this->_mesh_conc != nullptr && this->_mesh_conc->use_derivative())
             {
-              const auto& grad_h = this->_mesh_conc->get_grad_h();
+              const auto grad_h = this->_mesh_conc->get_grad_h().elements_view_r();
               this->_cell_functional->add_grad_h_part(
-                grad_loc, mat_tensor, trafo_eval, space_eval, x, this->_h(cell), grad_h(cell));
+                grad_loc, mat_tensor, trafo_eval, space_eval, x, vh(cell), grad_h(cell));
             }
 
-            fval += this->_mu(cell)*fval_loc;
+            fval += vmu(cell)*fval_loc;
             // Add local contributions to global gradient vector
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              Index i(idx(cell,j));
-              Tiny::Vector<CoordType, MeshType::world_dim, MeshType::world_dim> tmp(grad(i));
-              tmp += this->_mu(cell)*grad_loc[j];
-
-              grad(i,tmp);
+              vgrad[idx(cell,j)] += vmu(cell)*grad_loc[j];
             }
           }
 
+          vgrad.release();
           if(this->_penalty_param > DataType(0))
           {
             XASSERTM(this->_mesh_conc != nullptr,
@@ -1147,6 +1153,10 @@ namespace FEAT
           TrafoEvaluator trafo_eval(this->_trafo);
           SpaceEvaluator space_eval(this->trafo_space);
 
+          const auto vcb = this->_coords_buffer.elements_view_r();
+          const auto vh = this->_h.elements_view_r();
+          const auto vmu = this->_mu.elements_view_r();
+
           // Compute the functional value for each cell
           for(Index cell(0); cell < ncells; ++cell)
           {
@@ -1154,19 +1164,19 @@ namespace FEAT
             trafo_eval.prepare(cell);
             space_eval.prepare(trafo_eval);
 
-            h = this->_h(cell);
+            h = vh(cell);
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = this->_coords_buffer(idx(cell,j));
+              x[j] = vcb(idx(cell,j));
             }
 
-            auto mat_tensor = RefCellTrafo_::compute_mat_tensor(x, this->_h(cell));
+            auto mat_tensor = RefCellTrafo_::compute_mat_tensor(x, vh(cell));
 
             this->_cell_functional->eval_fval_cellwise(fval_loc, mat_tensor, trafo_eval, space_eval, x, h,
             fval_norm[cell], fval_cof[cell], fval_det[cell]);
 
-            fval += this->_mu(cell)*fval_loc;
+            fval += vmu(cell)*fval_loc;
           }
 
         } // eval_fval_cellwise
@@ -1177,11 +1187,12 @@ namespace FEAT
         {
           Index ncells(this->get_mesh()->get_num_entities(ShapeType::dimension));
 
+          Memory::TypedView<DT_> vl = this->_lambda.elements_view_w();
           _sum_lambda = DataType(0);
           for(Index cell(0); cell < ncells; ++cell)
           {
-            _lambda(cell, this->_trafo.template compute_vol<ShapeType, CoordType>(cell));
-            _sum_lambda += _lambda(cell);
+            vl[cell] = this->_trafo.template compute_vol<ShapeType, CoordType>(cell);
+            _sum_lambda += vl(cell);
           }
 
           this->sync_scalars.emplace("_sum_lambda",&_sum_lambda);
@@ -1209,10 +1220,11 @@ namespace FEAT
 
           _lambda.copy(_mesh_conc->get_conc());
 
+          const Memory::TypedView<DT_> vl = this->_lambda.elements_view_r();
           _sum_lambda = DataType(0);
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
-            _sum_lambda += _lambda(cell);
+            _sum_lambda += vl(cell);
           }
           this->sync_scalars.emplace("_sum_lambda",&_sum_lambda);
 

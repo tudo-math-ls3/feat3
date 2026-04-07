@@ -286,16 +286,16 @@ namespace FEAT
        */
       virtual void upload_vector(SolverVectorType& vector, const VectorTypeV& vector_v, const VectorTypeP& vector_p) const
       {
-        const IT_ nv = IT_(vector_v.template size<LAFEM::Perspective::pod>());
+        const IT_ nv = IT_(vector_v.size_raw());
         const IT_ np = IT_(vector_p.size());
         const IT_ nx = IT_(vector.size());
 
-        XASSERTM(nx == IT_(this->_solver_matrix.rows()), "invalid solver vector size");
+        XASSERTM(nx == IT_(this->_solver_matrix.num_rows()), "invalid solver vector size");
         XASSERTM(nv + np <= nx, "invalid velocity/pressure vector size");
 
-        SolverDataType* vec = vector.elements();
-        const DT_* vec_v = vector_v.template elements<LAFEM::Perspective::pod>();
-        const DT_* vec_p = vector_p.elements();
+        Memory::TypedView<SolverDataType> vec = vector.elements_view_w();
+        const Memory::TypedView<DT_> vec_v = vector_v.elements_view_raw_r();
+        const Memory::TypedView<DT_> vec_p = vector_p.elements_view_r();
         IT_ j(0u);
         // copy velocity DOFs
         for(IT_ i(0); i < nv; ++i, ++j)
@@ -319,16 +319,16 @@ namespace FEAT
        */
       virtual void download_vector(const SolverVectorType& vector, VectorTypeV& vector_v, VectorTypeP& vector_p) const
       {
-        const IT_ nv = IT_(vector_v.template size<LAFEM::Perspective::pod>());
+        const IT_ nv = IT_(vector_v.size_raw());
         const IT_ np = IT_(vector_p.size());
         const IT_ nx = IT_(vector.size());
 
-        XASSERTM(nx == IT_(this->_solver_matrix.rows()), "invalid solver vector size");
+        XASSERTM(nx == IT_(this->_solver_matrix.num_rows()), "invalid solver vector size");
         XASSERTM(nv + np <= nx, "invalid velocity/pressure vector size");
 
-        const SolverDataType* vec = vector.elements();
-        DT_* vec_v = vector_v.template elements<LAFEM::Perspective::pod>();
-        DT_* vec_p = vector_p.elements();
+        const Memory::TypedView<SolverDataType> vec = vector.elements_view_r();
+        Memory::TypedView<DT_> vec_v = vector_v.elements_view_raw_w();
+        Memory::TypedView<DT_> vec_p = vector_p.elements_view_w();
         IT_ j(0u);
         // copy velocity DOFs
         for(IT_ i(0); i < nv; ++i, ++j)
@@ -383,19 +383,19 @@ namespace FEAT
       {
         // get the number of DOFs
         const IT_ idim = IT_(dim_);
-        const IT_ num_dofs_v = IT_(_matrix_a.rows());
-        const IT_ num_dofs_p = IT_(_matrix_d.rows());
+        const IT_ num_dofs_v = IT_(_matrix_a.num_rows());
+        const IT_ num_dofs_p = IT_(_matrix_d.num_rows());
 
-        XASSERT(_matrix_a.columns() == num_dofs_v);
-        XASSERT(_matrix_b.columns() == num_dofs_p);
-        XASSERT(_matrix_d.columns() == num_dofs_v);
-        XASSERT(_matrix_b.rows() == num_dofs_v);
-        XASSERT(_matrix_d.rows() == num_dofs_p);
+        XASSERT(_matrix_a.num_cols() == num_dofs_v);
+        XASSERT(_matrix_b.num_cols() == num_dofs_p);
+        XASSERT(_matrix_d.num_cols() == num_dofs_v);
+        XASSERT(_matrix_b.num_rows() == num_dofs_v);
+        XASSERT(_matrix_d.num_rows() == num_dofs_p);
 
         if(_matrix_s != nullptr)
         {
-          XASSERT(_matrix_s->rows() == num_dofs_p);
-          XASSERT(_matrix_s->columns() == num_dofs_p);
+          XASSERT(_matrix_s->num_rows() == num_dofs_p);
+          XASSERT(_matrix_s->num_cols() == num_dofs_p);
         }
 
         // is the mean filter dual vector non-empty?
@@ -412,10 +412,10 @@ namespace FEAT
         const IT_ num_total_dofs = idim*num_dofs_v + num_dofs_p + num_slip_dofs + IT_(_have_mean_filter_p ? 1 : 0);
 
         // get number of matrix NZEs
-        const IT_ num_nze_a = IT_(_matrix_a.used_elements());
-        const IT_ num_nze_b = IT_(_matrix_b.used_elements());
-        const IT_ num_nze_d = IT_(_matrix_d.used_elements());
-        const IT_ num_nze_s = IT_(_matrix_s != nullptr ? _matrix_s->used_elements() : 0u);
+        const IT_ num_nze_a = IT_(_matrix_a.num_nzes());
+        const IT_ num_nze_b = IT_(_matrix_b.num_nzes());
+        const IT_ num_nze_d = IT_(_matrix_d.num_nzes());
+        const IT_ num_nze_s = IT_(_matrix_s != nullptr ? _matrix_s->num_nzes() : 0u);
 
         // compute upper bound for non-zero entry count
         IT_ max_nze = idim*idim*num_nze_a + idim*(num_nze_b + num_nze_d) + num_nze_s;
@@ -449,14 +449,18 @@ namespace FEAT
         // - P is the Lagrange multiplier for the pressure mean filter
 
         // get all the matrix arrays
-        const IT_* row_ptr_a = _matrix_a.row_ptr();
-        const IT_* col_idx_a = _matrix_a.col_ind();
-        const IT_* row_ptr_b = _matrix_b.row_ptr();
-        const IT_* col_idx_b = _matrix_b.col_ind();
-        const IT_* row_ptr_d = _matrix_d.row_ptr();
-        const IT_* col_idx_d = _matrix_d.col_ind();
-        const IT_* row_ptr_s = (_matrix_s != nullptr ? _matrix_s->row_ptr() : nullptr);
-        const IT_* col_idx_s = (_matrix_s != nullptr ? _matrix_s->col_ind() : nullptr);
+        const Memory::TypedView<IT_> row_ptr_a = _matrix_a.row_ptr_view_r();
+        const Memory::TypedView<IT_> col_idx_a = _matrix_a.col_idx_view_r();
+        const Memory::TypedView<IT_> row_ptr_b = _matrix_b.row_ptr_view_r();
+        const Memory::TypedView<IT_> col_idx_b = _matrix_b.col_idx_view_r();
+        const Memory::TypedView<IT_> row_ptr_d = _matrix_d.row_ptr_view_r();
+        const Memory::TypedView<IT_> col_idx_d = _matrix_d.col_idx_view_r();
+        Memory::TypedView<IT_> row_ptr_s, col_idx_s;
+        if(_matrix_s != nullptr)
+        {
+          row_ptr_s = _matrix_s->row_ptr_view_r();
+          col_idx_s = _matrix_s->col_idx_view_r();
+        }
 
         IT_ row(0u), op(0u);
 
@@ -512,7 +516,7 @@ namespace FEAT
             for(IT_ k(0); k < idim; ++k, ++op)
               col_idx[op] = idim*col_idx_d[ip] + k;
           // copy row of S (if it exists)
-          if(row_ptr_s != nullptr)
+          if(_matrix_s != nullptr)
           {
             if(this->_need_main_diagonal)
             {
@@ -550,8 +554,8 @@ namespace FEAT
         // next, add all slip filter entries Q^T
         for(auto it(_slip_filters_v.begin()); it != _slip_filters_v.end(); ++it)
         {
-          const IT_ nsx = IT_(it->used_elements());
-          const IT_* idx = it->get_indices();
+          const IT_ nsx = IT_(it->num_nzes());
+          const Memory::TypedView<IT_> idx = it->get_filter_vector().indices_view_r();
           for(IT_ j(0); j < nsx; ++j)
           {
             for(IT_ k(0); k < idim; ++k, ++op)
@@ -583,14 +587,16 @@ namespace FEAT
         this->_solver_matrix = SolverMatrixType(num_total_dofs, num_total_dofs, num_nze);
 
         // copy row pointer
-        SolverIndexType* row_ptr_x = this->_solver_matrix.row_ptr();
+        Memory::TypedView<SolverIndexType> row_ptr_x = this->_solver_matrix.row_ptr_view_w();
         for(IT_ i(0); i <= num_total_dofs; ++i)
           row_ptr_x[i] = SolverIndexType(row_ptr[i]);
 
         // copy column indices
-        SolverIndexType* col_idx_x = this->_solver_matrix.col_ind();
+        Memory::TypedView<SolverIndexType> col_idx_x = this->_solver_matrix.col_idx_view_w();
         for(IT_ i(0); i < num_nze; ++i)
           col_idx_x[i] = SolverIndexType(col_idx[i]);
+
+        this->_solver_matrix.format();
       }
 
       /**
@@ -601,8 +607,8 @@ namespace FEAT
       virtual void init_numeric()
       {
         // get the number of DOFs
-        const IT_ num_dofs_v = IT_(_matrix_a.rows());
-        const IT_ num_dofs_p = IT_(_matrix_d.rows());
+        const IT_ num_dofs_v = IT_(_matrix_a.num_rows());
+        const IT_ num_dofs_p = IT_(_matrix_d.num_rows());
 
         // the system has the following structure:
         //   | A   B   Q   0 |
@@ -616,16 +622,21 @@ namespace FEAT
         // - P is the Lagrange multiplier for the pressure mean filter
 
         // get all the matrix arrays
-        const IT_* row_ptr_a = _matrix_a.row_ptr();
-        const auto* val_a    = _matrix_a.val();
-        const IT_* row_ptr_b = _matrix_b.row_ptr();
-        const auto* val_b    = _matrix_b.val();
-        const IT_* row_ptr_d = _matrix_d.row_ptr();
-        const auto* val_d    = _matrix_d.val();
-        const IT_* row_ptr_s = (_matrix_s != nullptr ? _matrix_s->row_ptr() : nullptr);
-        const IT_* col_idx_s = (_matrix_s != nullptr ? _matrix_s->col_ind() : nullptr);
-        const auto* val_s    = (_matrix_s != nullptr ? _matrix_s->val() : nullptr);
-        SolverDataType* val_x = _solver_matrix.val();
+        const Memory::TypedView<IT_> row_ptr_a = _matrix_a.row_ptr_view_r();
+        const auto val_a    = _matrix_a.val_view_r();
+        const Memory::TypedView<IT_> row_ptr_b = _matrix_b.row_ptr_view_r();
+        const auto val_b    = _matrix_b.val_view_r();
+        const Memory::TypedView<IT_> row_ptr_d = _matrix_d.row_ptr_view_r();
+        const auto val_d    = _matrix_d.val_view_r();
+        Memory::TypedView<IT_> row_ptr_s, col_idx_s;
+        Memory::TypedView<DT_> val_s;
+        if(_matrix_s != nullptr)
+        {
+          row_ptr_s = _matrix_s->row_ptr_view_r();
+          col_idx_s = _matrix_s->col_idx_view_r();
+          val_s = _matrix_s->val_view_r();
+        }
+        Memory::TypedView<SolverDataType> val_x = _solver_matrix.val_view_w();
 
         IT_ op(0u);
 
@@ -655,9 +666,10 @@ namespace FEAT
             for(IT_ ip(_slip_row_ptr[i]); ip < _slip_row_ptr[i+1]; ++ip, ++op)
             {
               // get the normal vector of this slip filter entry
-              const auto& nu = this->_slip_filters_v.at(_slip_fil_dqu[ip]).get_values()[_slip_fil_idx[ip]];
+              //const auto& nu = this->_slip_filters_v.at(_slip_fil_dqu[ip]).get_filter_vector().elements_view_r()[_slip_fil_idx[ip]];
               // set the normal vector component
-              val_x[op] = SolverDataType(nu[j]);
+              //val_x[op] = SolverDataType(nu[j]);
+              val_x[op] = SolverDataType(this->_slip_filters_v.at(_slip_fil_dqu[ip]).get_filter_vector().elements_view_r()[_slip_fil_idx[ip]][j]);
             }
           }
         }
@@ -678,7 +690,7 @@ namespace FEAT
             for(int k(0); k < dim_; ++k, ++op)
               val_x[op] = SolverDataType(val_d[ip][0][k]);
           // copy row of S (if it exists)
-          if(row_ptr_s != nullptr)
+          if(_matrix_s != nullptr)
           {
             if(this->_need_main_diagonal)
             {
@@ -709,7 +721,7 @@ namespace FEAT
           // copy row of P (if we have a pressure mean filter)
           if(this->_have_mean_filter_p)
           {
-            const auto* v = _mean_filter_p_dual.elements();
+            const auto v = _mean_filter_p_dual.elements_view_r();
             val_x[op++] = SolverDataType(v[i]);
           }
         }
@@ -717,8 +729,8 @@ namespace FEAT
         // next, add all slip filter entries Q^T
         for(auto it(_slip_filters_v.begin()); it != _slip_filters_v.end(); ++it)
         {
-          const IT_ nsx = IT_(it->used_elements());
-          const auto* nu = it->get_values();
+          const IT_ nsx = IT_(it->num_nzes());
+          const auto nu = it->get_filter_vector().elements_view_r();
           for(IT_ j(0); j < nsx; ++j)
           {
             for(int k(0); k < dim_; ++k, ++op)
@@ -731,7 +743,7 @@ namespace FEAT
         // finally, add the pressure mean filter vector P^T (if it exists)
         if(this->_have_mean_filter_p)
         {
-          const auto* v = _mean_filter_p_dual.elements();
+          const auto v = _mean_filter_p_dual.elements_view_r();
           for(IT_ j(0); j < num_dofs_p; ++j, ++op)
             val_x[op] = SolverDataType(v[j]);
           if(this->_need_main_diagonal)
@@ -739,7 +751,7 @@ namespace FEAT
         }
 
         // sanity check
-        XASSERT(op == _solver_matrix.used_elements());
+        XASSERT(op == _solver_matrix.num_nzes());
       }
 
       /// \brief Releases all data allocated during numerical initialization
@@ -936,7 +948,7 @@ namespace FEAT
       /// computes the slip matrix layout Q^T and returns the total number of slip DOFs
       IT_ _compute_slip_matrix_layout()
       {
-        const IT_ nv = IT_(_matrix_a.rows());
+        const IT_ nv = IT_(_matrix_a.num_rows());
 
         _slip_row_ptr.clear();
         _slip_col_idx.clear();
@@ -951,8 +963,8 @@ namespace FEAT
         IT_ count(0u);
         for(std::size_t it(0u); it < this->_slip_filters_v.size(); ++it)
         {
-          const IT_ ni = IT_(this->_slip_filters_v.at(it).used_elements());
-          const IT_* idx = this->_slip_filters_v.at(it).get_indices();
+          const IT_ ni = IT_(this->_slip_filters_v.at(it).num_nzes());
+          const Memory::TypedView<IT_> idx = this->_slip_filters_v.at(it).get_filter_vector().indices_view_r();
           for(IT_ i(0); i < ni; ++i)
             ++_slip_row_ptr.at(idx[i]+1);
           count += ni;
@@ -980,8 +992,8 @@ namespace FEAT
         IT_ offset(0u);
         for(std::size_t it(0u); it < this->_slip_filters_v.size(); ++it)
         {
-          const IT_ ni = IT_(this->_slip_filters_v.at(it).used_elements());
-          const IT_* idx = this->_slip_filters_v.at(it).get_indices();
+          const IT_ ni = IT_(this->_slip_filters_v.at(it).num_nzes());
+          const Memory::TypedView<IT_> idx = this->_slip_filters_v.at(it).get_filter_vector().indices_view_r();
 
           // and emplace them
           for(IT_ i(0); i < ni; ++i)
@@ -1004,12 +1016,12 @@ namespace FEAT
       {
         // reset mask to 0
         _unit_mask_v.clear();
-        _unit_mask_v.resize(_matrix_a.rows(), 0);
+        _unit_mask_v.resize(_matrix_a.num_rows(), 0);
 
         for(const auto& it : this->_unit_filters_v)
         {
-          const IT_ n = IT_(it.used_elements());
-          const IT_* idx = it.get_indices();
+          const IT_ n = IT_(it.num_nzes());
+          const Memory::TypedView<IT_> idx = it.indices_view_r();
           for(IT_ k(0); k < n; ++k)
             _unit_mask_v.at(idx[k]) = 1;
         }
@@ -1020,12 +1032,12 @@ namespace FEAT
       {
         // reset mask to 0
         _unit_mask_p.clear();
-        _unit_mask_p.resize(_matrix_d.rows(), 0);
+        _unit_mask_p.resize(_matrix_d.num_rows(), 0);
 
         for(const auto& it : this->_unit_filters_p)
         {
-          const IT_ n = IT_(it.used_elements());
-          const IT_* idx = it.get_indices();
+          const IT_ n = IT_(it.num_nzes());
+          const Memory::TypedView<IT_> idx = it.indices_view_r();
           for(IT_ k(0); k < n; ++k)
             _unit_mask_p.at(idx[k]) = 1;
         }

@@ -8,9 +8,10 @@
 // includes, FEAT
 #include <kernel/assembly/base.hpp>
 #include <kernel/analytic/function.hpp>
+#include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/sparse_vector_factory.hpp>
 #include <kernel/lafem/unit_filter.hpp>
 #include <kernel/lafem/unit_filter_blocked.hpp>
-#include <kernel/lafem/dense_vector.hpp>
 #include <kernel/geometry/mesh_part.hpp>
 
 // includes, system
@@ -94,19 +95,20 @@ namespace FEAT
         std::set<Index> idx_set;
         Intern::UnitAsmWrapper<shape_dim>::assemble(idx_set, space, _cells);
 
-        // allocate filter if necessary
-        if(filter.size() == Index(0))
-        {
-          filter = LAFEM::UnitFilter<DataType_, IndexType_>(space.get_num_dofs());
-        }
+        // allocate filter to correct sizes
+        filter = LAFEM::UnitFilter<DataType_, IndexType_>(space.get_num_dofs(), Index(idx_set.size()));
 
-        // loop over all dof-indices
+        // get indices/elements views
+        Memory::TypedView<IndexType_> f_idx = filter.get_filter_vector().indices_view_w();
+        Memory::TypedView<DataType_> f_val = filter.get_filter_vector().elements_view_w();
+        f_val.format_to_zero();
+
+        // loop over all dof-indices and copy indices and values to filter
         typename std::set<Index>::const_iterator it(idx_set.begin());
         typename std::set<Index>::const_iterator jt(idx_set.end());
         for(Index i(0); it != jt; ++it, ++i)
         {
-          // store the dof-index
-          filter.add(IndexType_(*it), DataType_(0));
+          f_idx[i] = IndexType_(*it);
         }
       }
 
@@ -135,19 +137,22 @@ namespace FEAT
         std::set<Index> idx_set;
         Intern::UnitAsmWrapper<shape_dim>::assemble(idx_set, space, _cells);
 
-        // allocate filter if necessary
-        if(filter.size() == Index(0))
-        {
-          filter = LAFEM::UnitFilter<DataType_, IndexType_>(space.get_num_dofs());
-        }
+        // allocate filter to correct sizes
+        filter = LAFEM::UnitFilter<DataType_, IndexType_>(space.get_num_dofs(), Index(idx_set.size()));
+        XASSERT(filter.size() <= vector_.size());
 
-        // loop over all dof-indices
+        // get indices/elements views
+        Memory::TypedView<IndexType_> f_idx = filter.get_filter_vector().indices_view_w();
+        Memory::TypedView<DataType_> f_val = filter.get_filter_vector().elements_view_w();
+        Memory::TypedView<DataType_> v_val = vector_.elements_view_r();
+
+        // loop over all dof-indices and copy indices and values to filter
         typename std::set<Index>::const_iterator it(idx_set.begin());
         typename std::set<Index>::const_iterator jt(idx_set.end());
         for(Index i(0); it != jt; ++it, ++i)
         {
-          // store the dof-index
-          filter.add(IndexType_(*it), vector_(IndexType_(*it)));
+          f_idx[i] = IndexType_(*it);
+          f_val[i] = v_val[f_idx[i]];
         }
       }
 
@@ -185,19 +190,20 @@ namespace FEAT
         std::map<Index, DataType_> idx_map;
         Intern::UnitAsmWrapper<shape_dim>::assemble(idx_map, space, _cells, function);
 
-        // allocate filter if necessary
-        if(filter.size() == Index(0))
-        {
-          filter = LAFEM::UnitFilter<DataType_, IndexType_>(space.get_num_dofs());
-        }
+        // allocate filter to correct sizes
+        filter = LAFEM::UnitFilter<DataType_, IndexType_>(space.get_num_dofs(), Index(idx_map.size()));
 
-        // loop over all dof-indices
+        // get indices/elements views
+        Memory::TypedView<IndexType_> f_idx = filter.get_filter_vector().indices_view_w();
+        Memory::TypedView<DataType_> f_val = filter.get_filter_vector().elements_view_w();
+
+        // loop over all dof-indices and copy indices and values to filter
         typename std::map<Index, DataType_>::const_iterator it(idx_map.begin());
         typename std::map<Index, DataType_>::const_iterator jt(idx_map.end());
         for(Index i(0); it != jt; ++it, ++i)
         {
-          // store the dof-index
-          filter.add(IndexType_(it->first), it->second);
+          f_idx[i] = IndexType_(it->first);
+          f_val[i] = it->second;
         }
       }
 
@@ -212,29 +218,29 @@ namespace FEAT
        * \param[in] space
        * The \transient finite-element space for which the filter is to be assembled.
        */
-      template<typename DataType_, typename IndexType_, int BlockSize_, typename Space_>
+      template<typename DataType_, typename IndexType_, int block_size_, typename Space_>
       void assemble(
-        LAFEM::UnitFilterBlocked<DataType_, IndexType_, BlockSize_>& filter,
+        LAFEM::UnitFilterBlocked<DataType_, IndexType_, block_size_>& filter,
         const Space_& space) const
       {
         // build index set
         std::set<Index> idx_set;
         Intern::UnitAsmWrapper<shape_dim>::assemble(idx_set, space, _cells);
 
-        // allocate filter if necessary
-        if (filter.size() == Index(0))
-        {
-          filter = LAFEM::UnitFilterBlocked<DataType_, IndexType_, BlockSize_>(space.get_num_dofs());
-        }
+        // allocate filter to correct sizes
+        filter = LAFEM::UnitFilterBlocked<DataType_, IndexType_, block_size_>(space.get_num_dofs(), Index(idx_set.size()));
+
+        // get indices/elements views
+        Memory::TypedView<IndexType_> f_idx = filter.get_filter_vector().indices_view_w();
+        Memory::TypedView<Tiny::Vector<DataType_, block_size_>> f_val = filter.get_filter_vector().elements_view_w();
+        f_val.format_to_zero();
 
         // loop over all dof-indices
         typename std::set<Index>::const_iterator it(idx_set.begin());
         typename std::set<Index>::const_iterator jt(idx_set.end());
-        typename LAFEM::UnitFilterBlocked<DataType_, IndexType_, BlockSize_>::ValueType tmp(DataType_(0));
         for(Index i(0); it != jt; ++it, ++i)
         {
-          // store the dof-index
-          filter.add(IndexType_(*it), tmp);
+          f_idx[i] = IndexType_(*it);
         }
       }
 
@@ -253,16 +259,16 @@ namespace FEAT
        * An \transient object implementing the Analytic::Function interface representing the vector-valued boundary value
        * function.
        */
-      template<typename DataType_, typename IndexType_, int BlockSize_, typename Space_, typename Function_>
+      template<typename DataType_, typename IndexType_, int block_size_, typename Space_, typename Function_>
       void assemble(
-        LAFEM::UnitFilterBlocked<DataType_, IndexType_, BlockSize_>& filter,
+        LAFEM::UnitFilterBlocked<DataType_, IndexType_, block_size_>& filter,
         const Space_& space,
         const Function_& function) const
       {
         // ensure that the function is a vector field of correct dimension
         typedef typename Function_::ImageType FuncImageType;
         static_assert(FuncImageType::is_vector, "only vector fields are supported");
-        static_assert(FuncImageType::image_dim == BlockSize_, "invalid filter block size");
+        static_assert(FuncImageType::image_dim == block_size_, "invalid filter block size");
 
         // get the value type of the function
         typedef typename Analytic::EvalTraits<DataType_, Function_>::ValueType ValueType;
@@ -271,19 +277,20 @@ namespace FEAT
         std::map<Index, ValueType> idx_map;
         Intern::UnitAsmWrapper<shape_dim>::assemble(idx_map, space, _cells, function);
 
-        // allocate filter if necessary
-        if (filter.size() == Index(0))
-        {
-          filter = LAFEM::UnitFilterBlocked<DataType_, IndexType_, BlockSize_>(space.get_num_dofs());
-        }
+        // allocate filter to correct sizes
+        filter = LAFEM::UnitFilterBlocked<DataType_, IndexType_, block_size_>(space.get_num_dofs(), Index(idx_map.size()));
 
-        // loop over all dof-indices
-        auto it(idx_map.begin());
-        auto jt(idx_map.end());
+        // get indices/elements views
+        Memory::TypedView<IndexType_> f_idx(filter.get_filter_vector().indices_view_w());
+        Memory::TypedView<ValueType> f_val(filter.get_filter_vector().elements_view_w());
+
+        // loop over all dof-indices and copy indices and values to filter
+        typename std::map<Index, ValueType>::const_iterator it(idx_map.begin());
+        typename std::map<Index, ValueType>::const_iterator jt(idx_map.end());
         for(Index i(0); it != jt; ++it, ++i)
         {
-          // store the dof-index
-          filter.add(IndexType_(it->first), it->second);
+          f_idx[i] = IndexType_(it->first);
+          f_val[i] = it->second;
         }
       }
 
@@ -302,29 +309,35 @@ namespace FEAT
        * \param[in] space
        * The \transient finite-element space for which the filter is to be assembled.
        */
-      template<typename DTF_, typename ITF_, typename DTV_, typename ITV_,int BlockSize_, typename Space_>
+      template<typename DTF_, typename ITF_, typename DTV_, typename ITV_,int block_size_, typename Space_>
       void assemble(
-        LAFEM::UnitFilterBlocked<DTF_, ITF_, BlockSize_>& filter,
+        LAFEM::UnitFilterBlocked<DTF_, ITF_, block_size_>& filter,
         const Space_& space,
-        const LAFEM::DenseVectorBlocked<DTV_, ITV_, BlockSize_>& vector_) const
+        const LAFEM::DenseVectorBlocked<DTV_, ITV_, block_size_>& vector_) const
       {
         // build index set
         std::set<Index> idx_set;
         Intern::UnitAsmWrapper<shape_dim>::assemble(idx_set, space, _cells);
 
-        // allocate filter if necessary
-        if (filter.size() == Index(0))
-        {
-          filter = LAFEM::UnitFilterBlocked<DTF_, ITF_, BlockSize_>(space.get_num_dofs());
-        }
+        typedef Tiny::Vector<DTF_, block_size_> ValueTypeF;
+        typedef Tiny::Vector<DTV_, block_size_> ValueTypeV;
 
-        // loop over all dof-indices
+        // allocate filter to correct sizes
+        filter = LAFEM::UnitFilterBlocked<DTF_, ITF_, block_size_>(space.get_num_dofs(), Index(idx_set.size()));
+        XASSERT(filter.size() <= vector_.size());
+
+        // get indices/elements views
+        Memory::TypedView<ITF_> f_idx = filter.get_filter_vector().indices_view_w();
+        Memory::TypedView<ValueTypeF> f_val = filter.get_filter_vector().elements_view_w();
+        const Memory::TypedView<ValueTypeV> v_val = vector_.elements_view_r();
+
+        // loop over all dof-indices and copy indices and values to filter
         typename std::set<Index>::const_iterator it(idx_set.begin());
         typename std::set<Index>::const_iterator jt(idx_set.end());
         for(Index i(0); it != jt; ++it, ++i)
         {
-          // store the dof-index
-          filter.add(ITF_(*it), vector_(ITV_(*it)));
+          f_idx[i] = ITF_(*it);
+          f_val[i] = v_val[f_idx[i]];
         }
       }
     }; // class UnitFilterAssembler

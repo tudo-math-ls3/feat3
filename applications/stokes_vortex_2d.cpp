@@ -434,7 +434,7 @@ namespace StokesVortex2D
       LAFEM::DenseVector<double, Index> vtx_vx, vtx_vy;
       Assembly::DiscreteVertexProjector::project(vtx_vx, vec_sol.local().template at<0>().get(0), the_domain_level.space_velo);
       Assembly::DiscreteVertexProjector::project(vtx_vy, vec_sol.local().template at<0>().get(1), the_domain_level.space_velo);
-      exporter.add_vertex_vector("velocity", vtx_vx.elements(), vtx_vy.elements());
+      exporter.add_vertex_vector("velocity", vtx_vx.elements_view_r().get_r(), vtx_vy.elements_view_r().get_r());
 
       // project pressure
       Cubature::DynamicFactory cub("auto-degree:2");
@@ -442,7 +442,7 @@ namespace StokesVortex2D
       Assembly::DiscreteCellProjector::project(vtx_p, vec_sol.local().template at<1>(), the_domain_level.space_pres, cub);
 
       // write pressure
-      exporter.add_cell_scalar("pressure", vtx_p.elements());
+      exporter.add_cell_scalar("pressure", vtx_p);
 
       // finally, write the VTK file
       exporter.write(vtk_name, comm);

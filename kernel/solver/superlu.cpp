@@ -7,6 +7,8 @@
 
 #if defined(FEAT_HAVE_SUPERLU_DIST) && defined(FEAT_HAVE_MPI)
 
+#include <kernel/util/memory_aux.hpp>
+
 FEAT_DISABLE_WARNINGS
 #define VTUNE 0
 #include <superlu_ddefs.h>
@@ -75,14 +77,14 @@ namespace FEAT
           was_factorized(false)
         {
           // first of all, memclear all SuperLU structures just to be safe
-          memset(&slu_grid, 0, sizeof(gridinfo_t));
-          memset(&slu_opts, 0, sizeof(superlu_dist_options_t));
-          memset(&slu_stats, 0, sizeof(SuperLUStat_t));
-          memset(&slu_matrix, 0, sizeof(SuperMatrix));
-          memset(&slu_matrix_store, 0, sizeof(NRformat_loc));
-          memset(&slu_scale_perm, 0, sizeof(dScalePermstruct_t));
-          memset(&slu_lu_struct, 0, sizeof(dLUstruct_t));
-          memset(&slu_solve_struct, 0, sizeof(dSOLVEstruct_t));
+          Memory::memset_main(&slu_grid, 0, sizeof(gridinfo_t));
+          Memory::memset_main(&slu_opts, 0, sizeof(superlu_dist_options_t));
+          Memory::memset_main(&slu_stats, 0, sizeof(SuperLUStat_t));
+          Memory::memset_main(&slu_matrix, 0, sizeof(SuperMatrix));
+          Memory::memset_main(&slu_matrix_store, 0, sizeof(NRformat_loc));
+          Memory::memset_main(&slu_scale_perm, 0, sizeof(dScalePermstruct_t));
+          Memory::memset_main(&slu_lu_struct, 0, sizeof(dLUstruct_t));
+          Memory::memset_main(&slu_solve_struct, 0, sizeof(dSOLVEstruct_t));
 
           // set up grid
           int ranks(0);
@@ -126,7 +128,7 @@ namespace FEAT
         void init_symbolic()
         {
           // copy column indices arrays, because SuperLU permutes them
-          memcpy(slu_col_idx2.data(), slu_col_idx.data(), sizeof(IT)*slu_col_idx.size());
+          Memory::memcopy_main(slu_col_idx2.data(), slu_col_idx.data(), sizeof(IT)*slu_col_idx.size());
 
           // set up default options
           set_default_options_dist(&slu_opts);
@@ -151,7 +153,7 @@ namespace FEAT
         {
           // reset column-index array because it might have been
           // overwritten by the previous factorization call
-          memcpy(slu_col_idx2.data(), slu_col_idx.data(), sizeof(IT)*slu_col_idx.size());
+          Memory::memcopy_main(slu_col_idx2.data(), slu_col_idx.data(), sizeof(IT)*slu_col_idx.size());
 
           // have we already factorized before?
           slu_opts.Fact = (was_factorized ? SamePattern : DOFACT);

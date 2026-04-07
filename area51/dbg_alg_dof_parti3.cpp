@@ -79,9 +79,9 @@ String stringify_buf(const LAFEM::MatrixMirrorBuffer<DT_, IT_>& buf)
 {
   String s1;
   s1 += "[";
-  const auto* row_ptr = buf.row_ptr();
-  const auto* col_idx = buf.col_ind();
-  Index n = buf.rows();
+  const auto row_ptr = buf.row_ptr_view_r();
+  const auto col_idx = buf.col_idx_view_r();
+  Index n = buf.num_rows();
   for(Index i(0); i < n; ++i)
   {
     if(i > 0u)

@@ -590,7 +590,7 @@ int main(int argc, char* argv [])
 
     // write velocity
     exporter.add_vertex_vector("v", vtx_velo);
-    exporter.add_cell_scalar("p", vtx_pres.elements());
+    exporter.add_cell_scalar("p", vtx_pres);
 
     // finally, write the VTK file
     exporter.write(vtk_name, comm);

@@ -8,24 +8,29 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/likwid_marker.hpp>
+#include <kernel/util/math.hpp>
+#include <kernel/util/memory_arbiter.hpp>
+#include <kernel/util/statistics.hpp>
+#include <kernel/util/time_stamp.hpp>
+#include <kernel/util/tiny_algebra.hpp>
+#include <kernel/adjacency/graph.hpp>
 #include <kernel/lafem/forward.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
-#include <kernel/lafem/arch/scale.hpp>
-#include <kernel/lafem/arch/axpy.hpp>
-#include <kernel/lafem/arch/apply.hpp>
-#include <kernel/lafem/arch/lumping.hpp>
-#include <kernel/lafem/arch/norm.hpp>
-#include <kernel/lafem/arch/scale_row_col.hpp>
-#include <kernel/lafem/arch/row_norm.hpp>
-#include <kernel/lafem/arch/diagonal.hpp>
-#include <kernel/adjacency/graph.hpp>
-#include <kernel/util/tiny_algebra.hpp>
-#include <kernel/util/statistics.hpp>
-#include <kernel/util/time_stamp.hpp>
-#include <kernel/util/likwid_marker.hpp>
+#include <kernel/lafem/arch/axpy_dense.hpp>
+#include <kernel/lafem/arch/diagonal_bcsr.hpp>
+#include <kernel/lafem/arch/lumping_bcsr.hpp>
+#include <kernel/lafem/arch/matvecmult_bcsr_dense.hpp>
+#include <kernel/lafem/arch/norm2_dense.hpp>
+#include <kernel/lafem/arch/row_norm2_bcsr.hpp>
+#include <kernel/lafem/arch/scale_col_bcsr.hpp>
+#include <kernel/lafem/arch/scale_dense.hpp>
+#include <kernel/lafem/arch/scale_row_bcsr.hpp>
 
+// includes, system
 #include <fstream>
 #include <set>
 
@@ -48,18 +53,6 @@ namespace FEAT
       {
         typedef DenseVector< DT_, IT_> VectorType;
       };
-
-      template<typename DT_, int BlockHeight_, int BlockWidth_, Perspective perspective_>
-      struct BCSRPerspectiveHelper
-      {
-        typedef Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> Type;
-      };
-
-      template<typename DT_, int BlockHeight_, int BlockWidth_>
-      struct BCSRPerspectiveHelper<DT_, BlockHeight_, BlockWidth_, Perspective::pod>
-      {
-        typedef DT_ Type;
-      };
     } // namespace Intern
     /// \endcond
 
@@ -74,23 +67,22 @@ namespace FEAT
      * To be consistent with the external interface, the layout information are stored in block-scoped coordinates.\n\n
      * Data survey: \n
      * _elements[0]: raw non zero number values \n
-     * _indices[0]: column index per non zero element \n
-     * _indices[1]: row start index (including matrix end index)\n
+     * _indices[0]: row start index (including matrix end index)\n
+     * _indices[1]: column index per non zero element \n
      *
-     * _scalar_index[0]: container size \n
-     * _scalar_index[1]: row count \n
-     * _scalar_index[2]: column count \n
-     * _scalar_index[3]: non zero element count (used ValueType elements)\n
+     * _scalar_index[0]: row count \n
+     * _scalar_index[1]: column count \n
+     * _scalar_index[2]: non zero element count (used ValueType elements)\n
      *
      * Refer to \ref lafem_design for general usage informations.
      *
      * \author Dirk Ribbrock
      */
-    template <typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
+    template <typename DT_, typename IT_, int block_height_, int block_width_>
     class SparseMatrixBCSR : public Container<DT_, IT_>
     {
-      static_assert(BlockHeight_ > 0, "invalid block size");
-      static_assert(BlockWidth_ > 0, "invalid block size");
+      static_assert(block_height_ > 0, "invalid block size");
+      static_assert(block_width_ > 0, "invalid block size");
 
     public:
       /// Our datatype
@@ -98,163 +90,132 @@ namespace FEAT
       /// Our indextype
       typedef IT_ IndexType;
       /// Our block height
-      static constexpr int BlockHeight = BlockHeight_;
+      static constexpr int block_height = block_height_;
       /// Our block width
-      static constexpr int BlockWidth = BlockWidth_;
+      static constexpr int block_width = block_width_;
       /// Value type, meaning the type of each block
-      typedef Tiny::Matrix<DataType, BlockHeight, BlockWidth> ValueType;
+      typedef Tiny::Matrix<DataType, block_height, block_width> ValueType;
 
       /// Our used layout type
       static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_csr;
 
-      /// ImageIterator typedef for Adjactor interface implementation
-      typedef const IT_* ImageIterator;
-
       /// Our 'base' class type
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      using ContainerType = SparseMatrixBCSR<DT2_, IT2_, BlockHeight_, BlockWidth_>;
+      using ContainerType = SparseMatrixBCSR<DT2_, IT2_, block_height_, block_width_>;
 
       /// this typedef lets you create a matrix container with different Data and Index types
       template <typename DataType2_, typename IndexType2_>
       using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
       /// Compatible L-vector type
-      typedef typename Intern::BCSRVectorHelper<DT_, IT_, BlockHeight_>::VectorType VectorTypeL;
+      typedef typename Intern::BCSRVectorHelper<DT_, IT_, block_height_>::VectorType VectorTypeL;
       /// Compatible R-vector type
-      typedef typename Intern::BCSRVectorHelper<DT_, IT_, BlockWidth_>::VectorType VectorTypeR;
+      typedef typename Intern::BCSRVectorHelper<DT_, IT_, block_width_>::VectorType VectorTypeR;
 
       static constexpr bool is_global = false;
       static constexpr bool is_local = true;
 
-      /**
-       * \brief Scatter-Axpy operation for SparseMatrixBCSR
-       *
-       * Apart from the MatrixType and usage of DataTypeBlocked c&p from SparseMatrixCSR.
-       *
-       * \author Jordi Paul
-       */
-      class ScatterAxpy
-      {
-      public:
-        typedef LAFEM::SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_> MatrixType;
-        typedef DT_ DataType;
-        typedef IT_ IndexType;
-        typedef Tiny::Matrix<DT_, BlockHeight_, BlockWidth_> ValueType;
-
-      private:
-#ifdef DEBUG
-        const IT_ _deadcode;
-#endif
-        Index _num_rows;
-        Index _num_cols;
-        IT_* _row_ptr;
-        IT_* _col_idx;
-        IT_* _col_ptr;
-        ValueType* _data;
-
-      public:
-        explicit ScatterAxpy(MatrixType& matrix) :
-#ifdef DEBUG
-          _deadcode(~IT_(0)),
-#endif
-          _num_rows(matrix.rows()),
-          _num_cols(matrix.columns()),
-          _row_ptr(matrix.row_ptr()),
-          _col_idx(matrix.col_ind()),
-          _col_ptr(nullptr),
-          _data(matrix.val())
-        {
-          // allocate column-pointer array
-          _col_ptr = new IT_[_num_cols];
-#ifdef DEBUG
-          for(Index i(0); i < _num_cols; ++i)
-          {
-            _col_ptr[i] = _deadcode;
-          }
-#endif
-        }
-
-        virtual ~ScatterAxpy()
-        {
-          if(_col_ptr != nullptr)
-          {
-            delete [] _col_ptr;
-          }
-        }
-
-        template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
-        void operator()(const LocalMatrix_& loc_mat, const RowMapping_& row_map,
-                        const ColMapping_& col_map, DT_ alpha = DT_(1))
-        {
-          // loop over all local row entries
-          for(int i(0); i < row_map.get_num_local_dofs(); ++i)
-          {
-            // fetch row index
-            const Index ix = row_map.get_index(i);
-
-            // build column pointer for this row entry contribution
-            for(IT_ k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
-            {
-              _col_ptr[_col_idx[k]] = k;
-            }
-
-            // loop over all local column entries
-            for(int j(0); j < col_map.get_num_local_dofs(); ++j)
-            {
-              // fetch column index
-              const Index jx = col_map.get_index(j);
-
-              // ensure that the column pointer is valid for this index
-              ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
-
-              // incorporate data into global matrix
-              _data[_col_ptr[jx]] += alpha * loc_mat[i][j];
-
-              // continue with next column entry
-            }
-
-#ifdef DEBUG
-            // reformat column-pointer array
-            for(IT_ k(_row_ptr[ix]); k < _row_ptr[ix + 1]; ++k)
-            {
-              _col_ptr[_col_idx[k]] = _deadcode;
-            }
-#endif
-            // continue with next row entry
-          }
-        }
-      }; // class ScatterAxpy
-
-    private:
-      Index & _size()
+    protected:
+      Index & _rows()
       {
         return this->_scalar_index.at(0);
       }
 
-      Index & _rows()
+      Index & _cols()
       {
         return this->_scalar_index.at(1);
       }
 
-      Index & _columns()
+      Index & _nzes()
       {
         return this->_scalar_index.at(2);
       }
 
-      Index & _used_elements()
+      template<bool transposed_, typename VecR_, typename VecX_>
+      void _apply(VecR_& r, const VecX_& x) const
       {
-        return this->_scalar_index.at(3);
+        if constexpr(transposed_)
+        {
+          XASSERTM(r.size_raw() == this->num_cols_raw(), "Vector size of r does not match!");
+          XASSERTM(x.size_raw() == this->num_rows_raw(), "Vector size of x does not match!");
+        }
+        else
+        {
+          XASSERTM(r.size_raw() == this->num_rows_raw(), "Vector size of r does not match!");
+          XASSERTM(x.size_raw() == this->num_cols_raw(), "Vector size of x does not match!");
+        }
+
+        if (this->num_nzes() == Index(0))
+        {
+          r.format();
+          return;
+        }
+
+        XASSERTM(r.elements_arbiter() != x.elements_arbiter(), "Vector x and r must not share the same memory!");
+
+        TimeStamp ts_start;
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
+
+        Arch::MatVecMultBCSRDense::template exec<DT_, IT_, block_height_, block_width_, transposed_>(
+          r.elements_arbiter(),DT_(1), x.elements_arbiter(), Memory::Arbiter(),
+          this->val_arbiter(), this->col_idx_arbiter(), this->row_ptr_arbiter(),
+          this->num_rows(), this->num_cols(), this->num_nzes());
+
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
+        TimeStamp ts_stop;
+
+        Statistics::add_flops(this->num_nzes_raw() * 2);
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+      }
+
+      template<bool transposed_, typename VecR_, typename VecX_, typename VecY_>
+      void _apply(VecR_& r, const VecX_& x, const VecY_& y, const DT_ alpha) const
+      {
+        if constexpr(transposed_)
+        {
+          XASSERTM(r.size_raw() == this->num_cols_raw(), "Vector size of r does not match!");
+          XASSERTM(x.size_raw() == this->num_rows_raw(), "Vector size of x does not match!");
+          XASSERTM(y.size_raw() == this->num_cols_raw(), "Vector size of y does not match!");
+        }
+        else
+        {
+          XASSERTM(r.size_raw() == this->num_rows_raw(), "Vector size of r does not match!");
+          XASSERTM(x.size_raw() == this->num_cols_raw(), "Vector size of x does not match!");
+          XASSERTM(y.size_raw() == this->num_rows_raw(), "Vector size of y does not match!");
+        }
+
+        // we check alpha strictly for equality to 0, because testing if |alpha| < eps may
+        // lead to false triggers if the matrix/vector contents are also < eps
+        if((this->num_nzes() == Index(0)) || (alpha == DT_(0)))
+        {
+          r.copy(y);
+          return;
+        }
+
+        XASSERTM(r.elements_arbiter() != x.elements_arbiter(), "Vector x and r must not share the same memory!");
+
+        TimeStamp ts_start;
+        FEAT_KERNEL_MARKER_START("BCSR-apply");
+
+        Arch::MatVecMultBCSRDense::template exec<DT_, IT_, block_height_, block_width_, transposed_>(
+          r.elements_arbiter(),alpha, x.elements_arbiter(), y.elements_arbiter(),
+          this->val_arbiter(), this->col_idx_arbiter(), this->row_ptr_arbiter(),
+          this->num_rows(), this->num_cols(), this->num_nzes());
+
+        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
+        TimeStamp ts_stop;
+
+        Statistics::add_flops(this->num_nzes_raw() * 2);
+        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
       }
 
     public:
-
       /**
        * \brief Constructor
        *
        * Creates an empty non dimensional matrix.
        */
-      explicit SparseMatrixBCSR() :
-        Container<DT_, IT_> (0)
+      SparseMatrixBCSR()
       {
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
@@ -272,8 +233,7 @@ namespace FEAT
        *
        * \note This matrix does not allocate any memory
        */
-      explicit SparseMatrixBCSR(Index rows_in, Index columns_in) :
-        Container<DT_, IT_> (rows_in * columns_in)
+      explicit SparseMatrixBCSR(Index rows_in, Index columns_in)
       {
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
@@ -285,30 +245,28 @@ namespace FEAT
        *
        * \param[in] rows_in The row count of the created matrix.
        * \param[in] columns_in The column count of the created matrix.
-       * \param[in] used_elements_in The amount of non zero elements of the created matrix.
+       * \param[in] nonzeros_in The amount of non zero elements of the created matrix.
        *
        * Creates an empty (but allocated) matrix.
        *
        * \note The allocated memory will not be initialized.
        */
-      explicit SparseMatrixBCSR(Index rows_in, Index columns_in, Index used_elements_in) :
-        Container<DT_, IT_> (rows_in * columns_in)
+      explicit SparseMatrixBCSR(Index rows_in, Index columns_in, Index nonzeros_in)
       {
         XASSERT(rows_in != Index(0) && columns_in != Index(0));
 
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
-        this->_scalar_index.push_back(used_elements_in);
+        this->_scalar_index.push_back(nonzeros_in);
 
-        this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(_used_elements()));
-        this->_indices_size.push_back(_used_elements());
-
-        this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(_rows() + 1));
+        this->_indices.push_back(Memory::Arbiter(sizeof(IT_) * (_rows() + 1)));
         this->_indices_size.push_back(_rows() + 1);
 
-        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(used_elements<Perspective::pod>()));
-        this->_elements_size.push_back(used_elements<Perspective::pod>());
+        this->_indices.push_back(Memory::Arbiter(sizeof(IT_) * _nzes()));
+        this->_indices_size.push_back(_nzes());
 
+        this->_elements.push_back(Memory::Arbiter(sizeof(DT_) * num_nzes_raw()));
+        this->_elements_size.push_back(num_nzes_raw());
       }
 
       /**
@@ -318,18 +276,17 @@ namespace FEAT
        *
        * Creates an empty matrix with given layout.
        */
-      explicit SparseMatrixBCSR(const SparseLayout<IT_, layout_id> & layout_in) :
-        Container<DT_, IT_> (layout_in._scalar_index.at(0))
+      explicit SparseMatrixBCSR(const SparseLayout<IT_, layout_id> & layout_in)
       {
-        this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
+        //this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
 
-        for (auto i : this->_indices)
-          MemoryPool::increase_memory(i);
+        for(const auto& idx : layout_in.get_indices())
+          this->_indices.push_back(idx.attach());
 
-        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(used_elements<Perspective::pod>()));
-        this->_elements_size.push_back(used_elements<Perspective::pod>());
+        this->_elements.push_back(Memory::Arbiter(sizeof(DT_) * num_nzes_raw()));
+        this->_elements_size.push_back(num_nzes_raw());
       }
 
       /**
@@ -346,8 +303,8 @@ namespace FEAT
         const Index num_rows = graph.get_num_nodes_domain();
         const Index * dom_ptr(graph.get_domain_ptr());
         const Index * img_idx(graph.get_image_idx());
-        IT_ * prow_ptr(this->row_ptr());
-        IT_ * pcol_idx(this->col_ind());
+        Memory::TypedView<IT_> prow_ptr = this->row_ptr_view_w();
+        Memory::TypedView<IT_> pcol_idx = this->col_idx_view_w();
 
         FEAT_PRAGMA_OMP(parallel for)
         for(Index i = 0; i <= num_rows; ++i)
@@ -366,10 +323,9 @@ namespace FEAT
        *
        * Creates a BCSR matrix based on the source file.
        */
-      explicit SparseMatrixBCSR(FileMode mode, const String& filename) :
-        Container< DT_, IT_>(0)
+      explicit SparseMatrixBCSR(FileMode mode, const String& filename)
       {
-        read_from(mode, filename);
+        this->read_from(mode, filename);
       }
 
       /**
@@ -380,10 +336,9 @@ namespace FEAT
        *
        * Creates a BCSR matrix based on the source filestream.
        */
-      explicit SparseMatrixBCSR(FileMode mode, std::istream& file) :
-        Container<DT_, IT_>(0)
+      explicit SparseMatrixBCSR(FileMode mode, std::istream& file)
       {
-        read_from(mode, file);
+        this->read_from(mode, file);
       }
 
       /**
@@ -391,40 +346,34 @@ namespace FEAT
        *
        * \param[in] rows_in The row count of the created matrix.
        * \param[in] columns_in The column count of the created matrix.
-       * \param[in] col_ind_in Vector with column indices.
+       * \param[in] row_ptr_in Vector with start indices of all rows into the val/col_idx arrays.
+       * \param[in] col_idx_in Vector with column indices.
        * \param[in] val_in Vector with non zero elements.
-       * \param[in] row_ptr_in Vector with start indices of all rows into the val/col_ind arrays.
        * Note that this vector must also contain the end index of the last row and thus has a size of row_count + 1.
        *
        * Creates a matrix with given dimensions and content.
        */
       explicit SparseMatrixBCSR(const Index rows_in, const Index columns_in,
-                                      DenseVector< IT_, IT_> & col_ind_in, DenseVector< DT_, IT_> & val_in, DenseVector< IT_, IT_> & row_ptr_in) :
-        Container<DT_, IT_>(rows_in * columns_in)
+        DenseVector<IT_, IT_> & row_ptr_in, DenseVector<IT_, IT_> & col_idx_in, DenseVector<DT_, IT_> & val_in)
       {
-        /// \todo maybe create empty matrix if col_ind and val and row_ptr inputs are all three empty
-        XASSERT(col_ind_in.size() > 0);
-        XASSERT(val_in.size() > 0);
+        /// \todo maybe create empty matrix if col_idx and val and row_ptr inputs are all three empty
         XASSERT(row_ptr_in.size() > 0);
+        XASSERT(col_idx_in.size() > 0);
+        XASSERT(col_idx_in.size() * Index(block_height_ * block_width_) == val_in.size());
 
         XASSERT(rows_in != Index(0) && columns_in != Index(0));
-        XASSERTM(val_in.size() % (BlockHeight_ * BlockWidth_) == 0, "input values size is not a multiple of container blocksize!");
+        XASSERTM(val_in.size() % (block_height_ * block_width_) == 0, "input values size is not a multiple of container blocksize!");
 
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
-        this->_scalar_index.push_back(val_in.size() / Index(BlockHeight_ * BlockWidth_));
+        this->_scalar_index.push_back(val_in.size() / Index(block_height_ * block_width_));
 
-        this->_elements.push_back(val_in.elements());
-        this->_elements_size.push_back(val_in.size());
-        this->_indices.push_back(col_ind_in.elements());
-        this->_indices_size.push_back(col_ind_in.size());
-        this->_indices.push_back(row_ptr_in.elements());
+        this->_indices.push_back(row_ptr_in.elements_arbiter().attach());
         this->_indices_size.push_back(row_ptr_in.size());
-
-        for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool::increase_memory(this->_elements.at(i));
-        for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool::increase_memory(this->_indices.at(i));
+        this->_indices.push_back(col_idx_in.elements_arbiter().attach());
+        this->_indices_size.push_back(col_idx_in.size());
+        this->_elements.push_back(val_in.elements_arbiter().attach());
+        this->_elements_size.push_back(val_in.size());
       }
 
       /**
@@ -435,10 +384,9 @@ namespace FEAT
        * Creates a matrix from the given byte array.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      explicit SparseMatrixBCSR(std::vector<char> input) :
-        Container<DT_, IT_>(0)
+      explicit SparseMatrixBCSR(std::vector<char> input)
       {
-        deserialize<DT2_, IT2_>(input);
+        this->deserialize<DT2_, IT2_>(input);
       }
 
       /**
@@ -463,7 +411,6 @@ namespace FEAT
       SparseMatrixBCSR & operator= (SparseMatrixBCSR && other)
       {
         this->move(std::forward<SparseMatrixBCSR>(other));
-
         return *this;
       }
 
@@ -491,7 +438,7 @@ namespace FEAT
        *
        */
       template<typename DT2_, typename IT2_>
-      void clone(const SparseMatrixBCSR<DT2_, IT2_, BlockHeight_, BlockWidth_> & other, CloneMode clone_mode = CloneMode::Weak)
+      void clone(const SparseMatrixBCSR<DT2_, IT2_, block_height_, block_width_> & other, CloneMode clone_mode = CloneMode::Weak)
       {
         Container<DT_, IT_>::clone(other, clone_mode);
       }
@@ -504,7 +451,7 @@ namespace FEAT
        * Use source matrix content as content of current matrix
        */
       template <typename DT2_, typename IT2_>
-      void convert(const SparseMatrixBCSR<DT2_, IT2_, BlockHeight_, BlockWidth_> & other)
+      void convert(const SparseMatrixBCSR<DT2_, IT2_, block_height_, block_width_> & other)
       {
         this->assign(other);
       }
@@ -514,20 +461,20 @@ namespace FEAT
       {
         this->clear();
         // setup internal sizes
-        Index n_rows = Index(other.rows()) / Index(BlockHeight);
-        Index n_cols = Index(other.columns()) / Index(BlockWidth);
+        Index n_rows = Index(other.num_rows()) / Index(block_height);
+        Index n_cols = Index(other.num_cols()) / Index(block_width);
 
         // temprorary arrays for row and column ptr
         std::vector<IndexType> tmp_row_ptr(n_rows+1u);
         std::vector<IndexType> tmp_col_ptr;
 
         // ptrs of csr matrix
-        const IT2_* _crs_row = other.row_ptr();
-        const IT2_* _crs_col = other.col_ind();
-        const DT2_ * _crs_val = other.val();
+        const Memory::TypedView<IT2_> crs_row = other.row_ptr_view_r();
+        const Memory::TypedView<IT2_> crs_col = other.col_idx_view_r();
+        const Memory::TypedView<DT2_> crs_val = other.val_view_r();
 
         // reserve to sensical size, we will have at most used_element blocks
-        tmp_col_ptr.reserve(other.used_elements());
+        tmp_col_ptr.reserve(other.num_nzes());
 
         // for each block row, gather which blocks should be actually allocated
         std::set<IndexType> tmp_uni_col;
@@ -535,11 +482,11 @@ namespace FEAT
         tmp_row_ptr[0] = IndexType(0);
         for(Index b_row = 0; b_row < n_rows; ++b_row)
         {
-          for(Index l_row = b_row*Index(BlockHeight); l_row < (b_row+1)*Index(BlockHeight); ++l_row)
+          for(Index l_row = b_row*Index(block_height); l_row < (b_row+1)*Index(block_height); ++l_row)
           {
-            for(IT2_ idx = _crs_row[l_row]; idx < _crs_row[l_row+1]; ++idx)
+            for(IT2_ idx = crs_row[l_row]; idx < crs_row[l_row+1]; ++idx)
             {
-              tmp_uni_col.insert(IndexType(_crs_col[idx])/IndexType(BlockWidth));
+              tmp_uni_col.insert(IndexType(crs_col[idx])/IndexType(block_width));
             }
           }
           tmp_row_ptr[b_row+1] = IndexType(tmp_uni_col.size()) + tmp_row_ptr[b_row];
@@ -557,26 +504,29 @@ namespace FEAT
         // std::cout << "\n";
 
         // allocate actual matrix data
-        this->_scalar_index.push_back(n_rows*n_cols);
         this->_scalar_index.push_back(n_rows);
         this->_scalar_index.push_back(n_cols);
         this->_scalar_index.push_back(elements_size);
 
-        this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(_used_elements()));
-        this->_indices_size.push_back(_used_elements());
-
-        this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(_rows() + 1));
+        this->_indices.push_back(Memory::Arbiter(sizeof(IT_) * (_rows() + 1)));
         this->_indices_size.push_back(_rows() + 1);
 
-        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(used_elements<Perspective::pod>()));
-        this->_elements_size.push_back(used_elements<Perspective::pod>());
+        this->_indices.push_back(Memory::Arbiter(sizeof(IT_) * _nzes()));
+        this->_indices_size.push_back(_nzes());
 
-        auto* row_ptr = this->_indices.at(1);
-        auto* col = this->_indices.at(0);
-        auto* val = this->_elements.at(0);
+        this->_elements.push_back(Memory::Arbiter(sizeof(DT_) * num_nzes_raw()));
+        this->_elements_size.push_back(num_nzes_raw());
+
+        // format data
+        this->format();
+
+        Memory::TypedView<IT_> row_ptr(this->_indices.at(0).view(Memory::Location::main, Memory::Access::write));
+        Memory::TypedView<IT_> col_idx(this->_indices.at(1).view(Memory::Location::main, Memory::Access::write));
+        Memory::TypedView<DT_> val(this->_elements.at(0).view(Memory::Location::main, Memory::Access::write));
+
         // now, fill up array data
-        std::copy(tmp_row_ptr.begin(), tmp_row_ptr.end(), row_ptr);
-        std::copy(tmp_col_ptr.begin(), tmp_col_ptr.end(), col);
+        std::copy(tmp_row_ptr.begin(), tmp_row_ptr.end(), row_ptr.get_w());
+        std::copy(tmp_col_ptr.begin(), tmp_col_ptr.end(), col_idx.get_w());
         // std::printf("Row ptr:\n");
         // std::for_each(row_ptr, row_ptr+n_rows+1, [&](const auto& ele){std::cout << ele << ", ";});
         // std::cout << "\n";
@@ -588,27 +538,24 @@ namespace FEAT
         tmp_row_ptr.clear();
         tmp_col_ptr.clear();
 
-        // format data
-        this->format();
-
         // run through crs data and simply write to the correct location, this can be done
         // in parallel
         FEAT_PRAGMA_OMP(parallel for)
         for(Index b_row = Index(0); b_row < n_rows; ++b_row)
         {
-          for(Index l_row = Index(0); l_row < Index(BlockHeight); ++l_row)
+          for(Index l_row = Index(0); l_row < Index(block_height); ++l_row)
           {
             IndexType b_idx = row_ptr[b_row];
-            for(IT2_ idx = _crs_row[b_row*Index(BlockHeight) + l_row]; idx < _crs_row[b_row*Index(BlockHeight) + l_row + Index(1)]; ++idx)
+            for(IT2_ idx = crs_row[b_row*Index(block_height) + l_row]; idx < crs_row[b_row*Index(block_height) + l_row + Index(1)]; ++idx)
             {
               //advance block row index until we find our current row
-              while(col[b_idx] != IndexType(_crs_col[idx]/BlockWidth))
+              while(col_idx[b_idx] != IndexType(crs_col[idx]/block_width))
               {
                 ++b_idx;
               }
-              ASSERTM(col[b_idx] == IndexType(_crs_col[idx]/BlockWidth), "Blocked Column Array does not fit csr columns");
+              ASSERTM(col_idx[b_idx] == IndexType(crs_col[idx]/block_width), "Blocked Column Array does not fit csr columns");
               // write data
-              val[b_idx*BlockHeight*BlockWidth + BlockWidth*l_row + (_crs_col[idx]%BlockWidth)] = DT_(_crs_val[idx]);
+              val[b_idx*block_height*block_width + block_width*l_row + (crs_col[idx]%block_width)] = DT_(crs_val[idx]);
             }
           }
         }
@@ -636,26 +583,20 @@ namespace FEAT
        */
       SparseMatrixBCSR & operator= (const SparseLayout<IT_, layout_id> & layout_in)
       {
-        for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool::release_memory(this->_elements.at(i));
-        for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool::release_memory(this->_indices.at(i));
-
         this->_elements.clear();
         this->_indices.clear();
         this->_elements_size.clear();
         this->_indices_size.clear();
         this->_scalar_index.clear();
 
-        this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
 
-        for (auto i : this->_indices)
-          MemoryPool::increase_memory(i);
+        for(const auto& idx : layout_in.get_indices())
+          this->_indices.push_back(idx.attach());
 
-        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(used_elements<Perspective::pod>()));
-        this->_elements_size.push_back(used_elements<Perspective::pod>());
+        this->_elements.push_back(Memory::Arbiter(num_nzes_raw() * sizeof(DT_)));
+        this->_elements_size.push_back(num_nzes_raw());
 
         return *this;
       }
@@ -721,158 +662,17 @@ namespace FEAT
            *   read_from_mtx(filename);
            *   break;*/
           case FileMode::fm_bcsr:
+            [[fallthrough]];
+
           case FileMode::fm_binary:
             this->template _deserialize<double, std::uint64_t>(FileMode::fm_bcsr, file);
             break;
+
           default:
             XABORTM("Filemode not supported!");
         }
       }
 
-      /*
-       * \brief Read in matrix from MatrixMarket mtx file.
-       *
-       * \param[in] filename The file that shall be read in.
-       */
-      /*void read_from_mtx(String filename)
-      {
-        std::ifstream file(filename.c_str(), std::ifstream::in);
-        if (! file.is_open())
-          XABORTM("Unable to open Matrix file " + filename);
-        read_from_mtx(file);
-        file.close();
-      }*/
-
-      /*
-       * \brief Read in matrix from MatrixMarket mtx stream.
-       *
-       * \param[in] file The stream that shall be read in.
-       */
-      /*void read_from_mtx(std::istream& file)
-      {
-        this->clear();
-        this->_scalar_index.push_back(0);
-        this->_scalar_index.push_back(0);
-        this->_scalar_index.push_back(0);
-        this->_scalar_index.push_back(0);
-
-        itd::map<IT_, std::map<IT_, DT_> > entries; // map<row, map<column, value> >
-
-        Index ue(0);
-        String line;
-        std::getline(file, line);
-        const bool general((line.find("%%MatrixMarket matrix coordinate real general") != String::npos) ? true : false);
-        const bool symmetric((line.find("%%MatrixMarket matrix coordinate real symmetric") != String::npos) ? true : false);
-
-        if (symmetric == false && general == false)
-        {
-          XABORTM("Input-file is not a compatible mtx-file");
-        }
-
-        while(!file.eof())
-        {
-          std::getline(file,line);
-          if (file.eof())
-            XABORTM("Input-file is empty");
-
-          String::size_type begin(line.find_first_not_of(" "));
-          if (line.at(begin) != '%')
-            break;
-        }
-        {
-          String::size_type begin(line.find_first_not_of(" "));
-          line.erase(0, begin);
-          String::size_type end(line.find_first_of(" "));
-          String srow(line, 0, end);
-          Index row((Index)atol(srow.c_str()));
-          line.erase(0, end);
-
-          begin = line.find_first_not_of(" ");
-          line.erase(0, begin);
-          end = line.find_first_of(" ");
-          String scol(line, 0, end);
-          Index col((Index)atol(scol.c_str()));
-          line.erase(0, end);
-          _rows() = row;
-          _columns() = col;
-          _size() = this->rows() * this->columns();
-        }
-
-        while(!file.eof())
-        {
-          std::getline(file, line);
-          if (file.eof())
-            break;
-
-          String::size_type begin(line.find_first_not_of(" "));
-          line.erase(0, begin);
-          String::size_type end(line.find_first_of(" "));
-          String srow(line, 0, end);
-          IT_ row((IT_)atol(srow.c_str()));
-          --row;
-          line.erase(0, end);
-
-          begin = line.find_first_not_of(" ");
-          line.erase(0, begin);
-          end = line.find_first_of(" ");
-          String scol(line, 0, end);
-          IT_ col((IT_)atol(scol.c_str()));
-          --col;
-          line.erase(0, end);
-
-          begin = line.find_first_not_of(" ");
-          line.erase(0, begin);
-          end = line.find_first_of(" ");
-          String sval(line, 0, end);
-          DT_ tval((DT_)atof(sval.c_str()));
-
-          entries[IT_(row)].insert(std::pair<IT_, DT_>(col, tval));
-          ++ue;
-          if (symmetric == true && row != col)
-          {
-            entries[IT_(col)].insert(std::pair<IT_, DT_>(row, tval));
-            ++ue;
-          }
-        }
-        _size() = this->rows() * this->columns();
-        _used_elements() = ue;
-
-        DT_ * tval = new DT_[ue];
-        IT_ * tcol_ind = new IT_[ue];
-        IT_ * trow_ptr = new IT_[rows() + 1];
-
-        IT_ idx(0);
-        Index row_idx(0);
-        for (auto row : entries)
-        {
-          trow_ptr[row_idx] = idx;
-          for (auto col : row.second )
-          {
-            tcol_ind[idx] = col.first;
-            tval[idx] = col.second;
-            ++idx;
-          }
-          row.second.clear();
-          ++row_idx;
-        }
-        trow_ptr[rows()] = IT_(ue);
-        entries.clear();
-
-        this->_elements.push_back(MemoryPool<Mem_>::template allocate_memory<DT_>(_used_elements()));
-        this->_elements_size.push_back(_used_elements());
-        this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(_used_elements()));
-        this->_indices_size.push_back(_used_elements());
-        this->_indices.push_back(MemoryPool<Mem_>::template allocate_memory<IT_>(rows() + 1));
-        this->_indices_size.push_back(rows() + 1);
-
-        MemoryPool<Mem_>::template upload<DT_>(this->_elements.at(0), tval, _used_elements());
-        MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(0), tcol_ind, _used_elements());
-        MemoryPool<Mem_>::template upload<IT_>(this->_indices.at(1), trow_ptr, rows() + 1);
-
-        delete[] tval;
-        delete[] tcol_ind;
-        delete[] trow_ptr;
-      }*/
       /**
        * \brief Write out matrix to file.
        *
@@ -888,8 +688,8 @@ namespace FEAT
         char* buff = nullptr;
         if(mode == FileMode::fm_mtx)
         {
-          buff = new char[LAFEM::FileOutStreamBufferSize];
-          file.rdbuf()->pubsetbuf(buff, LAFEM::FileOutStreamBufferSize);
+          buff = new char[LAFEM::file_out_stream_buffer_size];
+          file.rdbuf()->pubsetbuf(buff, LAFEM::file_out_stream_buffer_size);
         }
         file.open(filename.c_str(), bin);
         if(! file.is_open())
@@ -909,63 +709,43 @@ namespace FEAT
       {
         switch(mode)
         {
-          case FileMode::fm_bcsr:
-          case FileMode::fm_binary:
-            this->template _serialize<double, std::uint64_t>(FileMode::fm_bcsr, file);
-            break;
-          case FileMode::fm_mtx:
-          {
-            file << "%%MatrixMarket matrix coordinate real general\n";
-            file << this->template rows<Perspective::pod>() << " " << this->template columns<Perspective::pod>() << " " << this->template used_elements<Perspective::pod>() << "\n";
+        case FileMode::fm_bcsr:
+          [[fallthrough]];
 
-            for (Index row(0) ; row < rows() ; ++row)
+        case FileMode::fm_binary:
+          this->template _serialize<double, std::uint64_t>(FileMode::fm_bcsr, file);
+          break;
+
+        case FileMode::fm_mtx:
+          {
+            const Memory::TypedView<IT_> trow_ptr = this->row_ptr_view_r();
+            const Memory::TypedView<IT_> tcol_idx = this->col_idx_view_r();
+            const Memory::TypedView<ValueType> tval = this->val_view_r();
+
+            file << "%%MatrixMarket matrix coordinate real general\n";
+            file << this->num_rows_raw() << " " << this->num_cols_raw() << " " << this->num_nzes_raw() << "\n";
+
+            for (Index row(0) ; row < num_rows() ; ++row)
             {
-              const IT_ end(this->row_ptr()[row + 1]);
-              for (IT_ i(this->row_ptr()[row]) ; i < end ; ++i)
+              const IT_ end(trow_ptr[row + 1]);
+              for (IT_ i(trow_ptr[row]) ; i < end ; ++i)
               {
-                auto block = this->val()[i];
-                for (int y(0) ; y < BlockHeight_ ; ++y)
+                const auto& block = tval[i];
+                for (int y(0) ; y < block_height_ ; ++y)
                 {
-                  for (int x(0) ; x < BlockWidth_ ; ++x)
+                  for (int x(0) ; x < block_width_ ; ++x)
                   {
-                    file << ((int)row * BlockHeight_) + y + 1 << " " << ((int)this->col_ind()[i] * BlockWidth_) + x + 1 << " " << stringify_fp_sci(block[y][x]) << "\n";
+                    file << (int(row) * block_height_) + y + 1 << " " << (int(tcol_idx[i]) * block_width_) + x + 1 << " " << block[y][x] << "\n";
                   }
                 }
               }
             }
-            break;
           }
-          default:
-            XABORTM("Filemode not supported!");
+          break;
+
+        default:
+          XABORTM("Filemode not supported!");
         }
-      }
-
-      /**
-       * \brief Retrieve specific matrix element.
-       *
-       * \param[in] row The row of the matrix element.
-       * \param[in] col The column of the matrix element.
-       *
-       * \returns Specific matrix element.
-       */
-      ValueType operator()(Index row, Index col) const
-      {
-        ASSERT(row < rows());
-        ASSERT(col < columns());
-
-        MemoryPool::synchronize();
-
-        for (Index i(this->row_ptr()[row]) ; i < this->row_ptr()[row+1] ; ++i)
-        {
-          if (this->col_ind()[i] == col)
-          {
-            return this->val<Perspective::native>()[i];
-          }
-          if (this->col_ind()[i] > col)
-            break; //return zero element
-        }
-
-        return ValueType(0.);
       }
 
       /**
@@ -978,123 +758,215 @@ namespace FEAT
         return SparseLayout<IT_, layout_id>(this->_indices, this->_indices_size, this->_scalar_index);
       }
 
+      /// Checks whether the matrix is empty, i.e. whether it is a 0x0 matrix
+      bool empty() const
+      {
+        return this->_scalar_index.empty() || (this->_scalar_index.at(0) == Index(0));
+      }
+
+      /// Checks whether the matrix has no non-zero entries, i.e. whether it is a null matrix
+      bool hollow() const
+      {
+        return this->_scalar_index.empty() || (this->_scalar_index.at(2) == Index(0));
+      }
+
       /**
        * \brief Retrieve matrix row count.
        *
        * \returns Matrix row count if perspective_ = false, e.g. count every block as one row.
-       * \returns Raw matrix row count if perspective_ = true, e.g. row_count * BlockHeight_.
+       * \returns Raw matrix row count if perspective_ = true, e.g. row_count * block_height_.
        */
-      template <Perspective perspective_ = Perspective::native>
-      Index rows() const
+      Index num_rows() const
       {
-        if (perspective_ == Perspective::pod)
-          return this->_scalar_index.at(1) * Index(BlockHeight_);
-        else
-          return this->_scalar_index.at(1);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(0);
       }
 
       /**
        * \brief Retrieve matrix column count.
        *
        * \returns Matrix column count if perspective_ = false, e.g. count every block as one column.
-       * \returns Raw matrix column count if perspective_ = true, e.g. column_count * BlockWidth_.
+       * \returns Raw matrix column count if perspective_ = true, e.g. column_count * block_width_.
        */
-      template <Perspective perspective_ = Perspective::native>
-      Index columns() const
+      Index num_cols() const
       {
-        if (perspective_ == Perspective::pod)
-          return this->_scalar_index.at(2) * Index(BlockWidth_);
-        else
-          return this->_scalar_index.at(2);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(1);
       }
 
       /**
        * \brief Retrieve non zero element count.
        *
        * \returns Non zero element count if perspective_ = false, e.g. count every block as one entry.
-       * \returns Raw non zero element count if perspective_ = true, e.g. used_elements * BlockHeight_ * BlockWidth_.
+       * \returns Raw non zero element count if perspective_ = true, e.g. nonzeros * block_height_ * block_width_.
        */
-      template <Perspective perspective_ = Perspective::native>
-      Index used_elements() const
+      Index num_nzes() const
       {
-        if (perspective_ == Perspective::pod)
-          return this->_scalar_index.at(3) * Index(BlockHeight_ * BlockWidth_);
-        else
-          return this->_scalar_index.at(3);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(2);
       }
 
-      /**
-       * \brief Retrieve column indices array.
-       *
-       * \returns Column indices array.
-       */
-      IT_ * col_ind()
+      /// Returns the scalar matrix row count
+      Index num_rows_raw() const
       {
-        if (this->size() == 0)
-          return nullptr;
+        return this->num_rows() * Index(block_height_);
+      }
 
+      /// Returns the scalar matrix column count
+      Index num_cols_raw() const
+      {
+        return this->num_cols() * Index(block_width_);
+      }
+
+      /// Returns the scalar matrix nonzero element count
+      Index num_nzes_raw() const
+      {
+        return this->num_nzes() * Index(block_height_ * block_width_);
+      }
+
+      /// Returns a reference to the row-pointer array arbiter
+      Memory::Arbiter& row_ptr_arbiter()
+      {
         return this->_indices.at(0);
       }
 
-      /// \copydoc col_ind()
-      /// const version.
-      IT_ const * col_ind() const
+      /// Returns a reference to the row-pointer array arbiter
+      const Memory::Arbiter& row_ptr_arbiter() const
       {
-        if (this->size() == 0)
-          return nullptr;
-
         return this->_indices.at(0);
       }
 
-      /**
-       * \brief Retrieve non zero element array.
-       *
-       * \tparam perspective_ template parameter to choose the return value type
-       *
-       * \returns Non zero element array if perspective_ = Perspective::native, e.g. treat every block as one block.
-       * \returns Raw non zero element array if perspective_ = Perspective::pod, e.g. treat every entry of a block separated.
-       */
-      template <Perspective perspective_ = Perspective::native>
-      auto val() const -> const typename Intern::BCSRPerspectiveHelper<DT_, BlockHeight_, BlockWidth_, perspective_>::Type *
+      /// Returns a reference to the column-index array arbiter
+      Memory::Arbiter& col_idx_arbiter()
       {
-        if (this->size() == 0)
-          return nullptr;
-
-        return (const typename Intern::BCSRPerspectiveHelper<DT_, BlockHeight_, BlockWidth_, perspective_>::Type *)(this->_elements.at(0));
-      }
-
-      /// \copydoc val()
-      /// const version.
-      template <Perspective perspective_ = Perspective::native>
-      auto val() -> typename Intern::BCSRPerspectiveHelper<DT_, BlockHeight_, BlockWidth_, perspective_>::Type *
-      {
-        if (this->size() == 0)
-          return nullptr;
-
-        return (typename Intern::BCSRPerspectiveHelper<DT_, BlockHeight_, BlockWidth_, perspective_>::Type *)(this->_elements.at(0));
-      }
-
-      /**
-       * \brief Retrieve row start index array.
-       *
-       * \returns Row start index array.
-       */
-      IT_ * row_ptr()
-      {
-        if (this->_indices.size() == 0)
-          return nullptr;
-
         return this->_indices.at(1);
       }
 
-      /// \copydoc row_ptr()
-      /// const version.
-      IT_ const * row_ptr() const
+      /// Returns a reference to the column-index array arbiter
+      const Memory::Arbiter& col_idx_arbiter() const
       {
-        if (this->_indices.size() == 0)
-          return nullptr;
-
         return this->_indices.at(1);
+      }
+
+      /// Returns a reference to the values array arbiter
+      Memory::Arbiter& val_arbiter()
+      {
+        return this->_elements.front();
+      }
+
+      /// Returns a reference to the values array arbiter
+      const Memory::Arbiter& val_arbiter() const
+      {
+        return this->_elements.front();
+      }
+
+      Memory::TypedView<ValueType> val_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<ValueType>();
+        return Memory::TypedView<ValueType>(this->_elements.at(0).view(loc, Memory::Access::read));
+      }
+
+      Memory::TypedView<ValueType> val_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<ValueType>();
+        return Memory::TypedView<ValueType>(this->_elements.at(0).view(loc, Memory::Access::write));
+      }
+
+      Memory::TypedView<ValueType> val_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<ValueType>();
+        return Memory::TypedView<ValueType>(this->_elements.at(0).view(loc, Memory::Access::read_write));
+      }
+
+      Memory::TypedView<ValueType> val_view(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<ValueType>();
+        return Memory::TypedView<ValueType>(this->_elements.at(0).view(loc, acc));
+      }
+
+      Memory::TypedView<DT_> val_view_raw_r(Memory::Location loc = Memory::Location::main) const
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::read));
+      }
+
+      Memory::TypedView<DT_> val_view_raw_w(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::write));
+      }
+
+      Memory::TypedView<DT_> val_view_raw_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::read_write));
+      }
+
+      Memory::TypedView<DT_> val_view_dt(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, acc));
+      }
+
+      Memory::TypedView<IT_> row_ptr_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::read));
+      }
+
+      Memory::TypedView<IT_> row_ptr_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::write));
+      }
+
+      Memory::TypedView<IT_> row_ptr_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::read_write));
+      }
+
+      Memory::TypedView<IT_> row_ptr_view(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, acc));
+      }
+
+      Memory::TypedView<IT_> col_idx_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(1).view(loc, Memory::Access::read));
+      }
+
+      Memory::TypedView<IT_> col_idx_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(1).view(loc, Memory::Access::write));
+      }
+
+      Memory::TypedView<IT_> col_idx_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(1).view(loc, Memory::Access::read_write));
+      }
+
+      Memory::TypedView<IT_> col_idx_view(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(1).view(loc, acc));
       }
 
       /**
@@ -1129,23 +1001,22 @@ namespace FEAT
        *
        * \warning All three matrices must have the same non zero layout. This operation assumes this silently and does not check this on its own!
        */
-      void axpy(
-                const SparseMatrixBCSR & x,
-                const DT_ alpha = DT_(1))
+      void axpy(const SparseMatrixBCSR & x, const DT_ alpha = DT_(1))
       {
-        XASSERTM(x.rows() == this->rows(), "Matrix rows do not match!");
-        XASSERTM(x.columns() == this->columns(), "Matrix columns do not match!");
-        XASSERTM(x.used_elements() == this->used_elements(), "Matrix used_elements do not match!");
+        XASSERTM(x.num_rows() == this->num_rows(), "Matrix rows do not match!");
+        XASSERTM(x.num_cols() == this->num_cols(), "Matrix columns do not match!");
+        XASSERTM(x.num_nzes() == this->num_nzes(), "Matrix nonzeros do not match!");
+
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
-        Arch::Axpy::value(this->template val<Perspective::pod>(),
-            alpha,
-            x.template val<Perspective::pod>(),
-            this->used_elements<Perspective::pod>());
+        Arch::AxpyDense::template exec<DT_>(this->val_arbiter(), alpha, x.val_arbiter(), this->num_nzes_raw());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->num_nzes_raw() * 2);
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -1157,14 +1028,18 @@ namespace FEAT
        */
       void scale(const SparseMatrixBCSR & x, const DT_ alpha)
       {
-        XASSERTM(x.rows() == this->rows(), "Row count does not match!");
-        XASSERTM(x.columns() == this->columns(), "Column count does not match!");
-        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        XASSERTM(x.num_rows() == this->num_rows(), "Row count does not match!");
+        XASSERTM(x.num_cols() == this->num_cols(), "Column count does not match!");
+        XASSERTM(x.num_nzes() == this->num_nzes(), "Nonzero count does not match!");
+
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
-        Statistics::add_flops(this->used_elements<Perspective::pod>());
-        Arch::Scale::value(this->template val<Perspective::pod>(), x.template val<Perspective::pod>(), alpha, this->used_elements<Perspective::pod>());
+        Arch::ScaleDense::template exec<DT_>(this->val_arbiter(), x.val_arbiter(), alpha, this->num_nzes_raw());
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->num_nzes_raw());
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -1175,11 +1050,13 @@ namespace FEAT
        */
       DT_ norm_frobenius() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
-        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
-        DT_ result = Arch::Norm2::value(this->template val<Perspective::pod>(),
-                                              this->used_elements<Perspective::pod>());
+        DT_ result = Arch::Norm2Dense::template exec<DT_>(this->val_arbiter(), this->num_nzes_raw());
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->num_nzes_raw() * 2);
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
         return result;
       }
@@ -1192,16 +1069,19 @@ namespace FEAT
        */
       void row_norm2(VectorTypeL& row_norms) const
       {
-        XASSERTM(row_norms.size() == this->rows(), "Matrix/Vector dimension mismatch");
+        XASSERTM(row_norms.size() == this->num_rows(), "Matrix/Vector dimension mismatch");
+
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
-        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
 
-        Arch::RowNorm::bcsr_norm2(row_norms.template elements<Perspective::pod>(),
-          this->template val<Perspective::pod>(),
-          col_ind(), row_ptr(), rows(), BlockHeight, BlockWidth);
+        Arch::RowNorm2BCSR::template exec<DT_, IT_>(row_norms.elements_arbiter(), this->val_arbiter(),
+          this->col_idx_arbiter(), this->row_ptr_arbiter(), this->num_rows(), block_height_, block_width, false);
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->num_nzes_raw() * 2);
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
       }
 
@@ -1213,51 +1093,19 @@ namespace FEAT
        */
       void row_norm2sqr(VectorTypeL& row_norms) const
       {
-        XASSERTM(row_norms.size() == this->rows(), "Matrix/Vector dimension mismatch");
+        XASSERTM(row_norms.size() == this->num_rows(), "Matrix/Vector dimension mismatch");
+
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
-        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
 
-        Arch::RowNorm::bcsr_norm2sqr(row_norms.template elements<Perspective::pod>(),
-          this->template val<Perspective::pod>(),
-          col_ind(), row_ptr(), rows(), BlockHeight, BlockWidth);
+        Arch::RowNorm2BCSR::template exec<DT_, IT_>(row_norms.elements_arbiter(), this->val_arbiter(),
+          this->col_idx_arbiter(), this->row_ptr_arbiter(), this->num_rows(), block_height_, block_width, true);
 
         TimeStamp ts_stop;
-        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
-      }
 
-      /**
-       * \brief Computes the square of the 2-norm for every row, where every row is scaled by a vector
-       *
-       * \param[out] row_norms
-       * For every (scaled) row, this left-vector will contain the square of its 2-norm
-       *
-       * \param[in] scal
-       * The scaling vector
-       *
-       * This computes
-       * \f[
-       *    row\_norms_i = \sum_{j=0}^{n-1} scal_j (this_{ij})^2
-       * \f]
-       * and is used to compute
-       * \f[
-       *   \mathrm{tr}(B^T \mathrm{diag}(A) B)
-       * \f]
-       *
-       */
-      void row_norm2sqr(VectorTypeL& row_norms, const VectorTypeR& scal) const
-      {
-        XASSERTM(row_norms.size() == this->rows(), "Matrix/Vector dimension mismatch");
-        XASSERTM(scal.size() == this->columns(), "Matrix/scalings dimension mismatch");
-
-        TimeStamp ts_start;
-        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
-
-        Arch::RowNorm::bcsr_scaled_norm2sqr(row_norms.template elements<Perspective::pod>(),
-           scal.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
-          col_ind(), row_ptr(), rows(), BlockHeight, BlockWidth);
-
-        TimeStamp ts_stop;
+        Statistics::add_flops(this->num_nzes_raw() * 2);
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
       }
 
@@ -1268,13 +1116,11 @@ namespace FEAT
        */
       DT_ max_abs_element() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        Index max_abs_index = Arch::MaxAbsIndex::value(this->template val<Perspective::pod>(), this->template used_elements<Perspective::pod>());
-        ASSERT(max_abs_index < this->template used_elements<Perspective::pod>());
-        DT_ result;
-        MemoryPool::template copy<DT_>(&result, this->template val<Perspective::pod>() + max_abs_index, 1);
-        result = Math::abs(result);
+        DT_ result = Arch::MinMaxValueDense::template exec<DT_>(this->val_arbiter(), this->num_nzes_raw(), false, true);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1289,13 +1135,11 @@ namespace FEAT
        */
       DT_ min_abs_element() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        Index min_abs_index = Arch::MinAbsIndex::value(this->template val<Perspective::pod>(), this->template used_elements<Perspective::pod>());
-        ASSERT(min_abs_index < this->template used_elements<Perspective::pod>());
-        DT_ result;
-        MemoryPool::template copy<DT_>(&result, this->template val<Perspective::pod>() + min_abs_index, 1);
-        result = Math::abs(result);
+        DT_ result = Arch::MinMaxValueDense::template exec<DT_>(this->val_arbiter(), this->num_nzes_raw(), true, true);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1310,12 +1154,11 @@ namespace FEAT
        */
       DT_ max_element() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        Index max_index = Arch::MaxIndex::value(this->template val<Perspective::pod>(), this->template used_elements<Perspective::pod>());
-        ASSERT(max_index < this->template used_elements<Perspective::pod>());
-        DT_ result;
-        MemoryPool::template copy<DT_>(&result, this->template val<Perspective::pod>() + max_index, 1);
+        DT_ result = Arch::MinMaxValueDense::template exec<DT_>(this->val_arbiter(), this->num_nzes_raw(), false, false);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1330,12 +1173,11 @@ namespace FEAT
        */
       DT_ min_element() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        Index min_index = Arch::MinIndex::value(this->template val<Perspective::pod>(), this->template used_elements<Perspective::pod>());
-        ASSERT(min_index < this->template used_elements<Perspective::pod>());
-        DT_ result;
-        MemoryPool::template copy<DT_>(&result, this->template val<Perspective::pod>() + min_index, 1);
+        DT_ result = Arch::MinMaxValueDense::template exec<DT_>(this->val_arbiter(), this->num_nzes_raw(), true, false);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1351,15 +1193,17 @@ namespace FEAT
        */
       DT_ max_rel_diff(const SparseMatrixBCSR& x) const
       {
-        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        XASSERTM(x.num_nzes() == this->num_nzes(), "Nonzero count does not match!");
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        DataType max_rel_diff = Arch::MaxRelDiff::value(this->template val<Perspective::pod>(), x.template val<Perspective::pod>(), this->template used_elements<Perspective::pod>());
+        DT_ result = Arch::MaxRelDiffDense::template exec<DT_>(this->val_arbiter(), x.val_arbiter(), this->num_nzes_raw());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
-        return max_rel_diff;
+        return result;
       }
 
       /**
@@ -1372,49 +1216,44 @@ namespace FEAT
        */
       bool same_layout(const SparseMatrixBCSR& x) const
       {
-        if (this->row_ptr ()== x.row_ptr() && this->col_ind() == x.col_ind())
+        if (this->num_rows() != x.num_rows())
+          return false;
+        if (this->num_cols() != x.num_cols())
+          return false;
+        if (this->num_nzes() != x.num_nzes())
+          return false;
+
+        if(this->num_nzes() == Index(0))
           return true;
-        if(this->size() == 0 && x.size() == 0 && this->get_elements().size() == 0 && this->get_indices().size() == 0 && x.get_elements().size() == 0 && x.get_indices().size() == 0)
+
+        // check if the arbiters for row_ptr and col_idx are the same
+        if((this->row_ptr_arbiter() == x.row_ptr_arbiter()) && (this->col_idx_arbiter() == x.col_idx_arbiter()))
           return true;
-        if (this->rows() != x.rows())
-          return false;
-        if (this->columns() != x.columns())
-          return false;
-        if (this->used_elements() != x.used_elements())
-          return false;
 
-        IT_ * col_ind_a;
-        IT_ * col_ind_b;
-        IT_ * row_ptr_a;
-        IT_ * row_ptr_b;
+        const Memory::TypedView<IT_> row_ptr_a = this->row_ptr_view_r();
+        const Memory::TypedView<IT_> col_idx_a = this->col_idx_view_r();
+        const Memory::TypedView<IT_> row_ptr_b = x.row_ptr_view_r();
+        const Memory::TypedView<IT_> col_idx_b = x.col_idx_view_r();
 
-        col_ind_a = const_cast<IT_*>(this->col_ind());
-        row_ptr_a = const_cast<IT_*>(this->row_ptr());
-        col_ind_b = const_cast<IT_*>(x.col_ind());
-        row_ptr_b = const_cast<IT_*>(x.row_ptr());
-
-        bool ret(true);
-        for (Index i(0) ; i < this->used_elements() ; ++i)
+        const Index n = this->num_rows();
+        for (Index i(0) ; i <= n; ++i)
         {
-          if (col_ind_a[i] != col_ind_b[i])
+          if (row_ptr_a[i] != row_ptr_b[i])
           {
-            ret = false;
-            break;
-          }
-        }
-        if (ret)
-        {
-          for (Index i(0) ; i < this->rows() + 1; ++i)
-          {
-            if (row_ptr_a[i] != row_ptr_b[i])
-            {
-              ret = false;
-              break;
-            }
+            return false;
           }
         }
 
-        return ret;
+        const Index nze = this->num_nzes();
+        for (Index i(0) ; i < nze ; ++i)
+        {
+          if (col_idx_a[i] != col_idx_b[i])
+          {
+            return false;
+          }
+        }
+
+        return true;
       }
 
       /**
@@ -1424,9 +1263,9 @@ namespace FEAT
        *
        * \note The resulting matrix has transposed block dimensions, too.
        */
-      SparseMatrixBCSR<DT_, IT_, BlockWidth_, BlockHeight_> transpose() const
+      SparseMatrixBCSR<DT_, IT_, block_width_, block_height_> transpose() const
       {
-        SparseMatrixBCSR<DT_, IT_, BlockWidth_, BlockHeight_> x_t;
+        SparseMatrixBCSR<DT_, IT_, block_width_, block_height_> x_t;
         x_t.transpose(*this);
         return x_t;
       }
@@ -1436,36 +1275,34 @@ namespace FEAT
        *
        * \param[in] x The matrix to be transposed.
        */
-      void transpose(const SparseMatrixBCSR<DT_, IT_, BlockWidth_, BlockHeight_> & x)
+      void transpose(const SparseMatrixBCSR<DT_, IT_, block_width_, block_height_> & x)
       {
-        using XType = SparseMatrixBCSR<DT_, IT_, BlockWidth_, BlockHeight_>;
-        if (x.used_elements() == 0)
+        using XType = SparseMatrixBCSR<DT_, IT_, block_width_, block_height_>;
+        if (x.num_nzes() == 0)
         {
-          this->move(SparseMatrixBCSR(x.rows(), x.columns()));
+          this->move(SparseMatrixBCSR(x.num_rows(), x.num_cols()));
           return;
         }
 
-        const Index txrows(x.rows());
-        const Index txcolumns(x.columns());
-        const Index txused_elements(x.used_elements());
+        const Index txrows(x.num_rows());
+        const Index txcolumns(x.num_cols());
+        const Index txnonzeros(x.num_nzes());
 
-        const IT_ * ptxcol_ind(x.col_ind());
-        const IT_ * ptxrow_ptr(x.row_ptr());
-        const typename XType::ValueType * ptxval(x.val());
+        const Memory::TypedView<IT_> ptxcol_idx(x.col_idx_view_r());
+        const Memory::TypedView<IT_> ptxrow_ptr(x.row_ptr_view_r());
+        const Memory::TypedView<typename XType::ValueType> ptxval(x.val_view_r());
 
-        DenseVector<IT_, IT_> tcol_ind(txused_elements);
-        DenseVector<DT_, IT_> tval(txused_elements * BlockHeight_ * BlockWidth_);
+        DenseVector<IT_, IT_> tcol_idx(txnonzeros);
+        DenseVector<DT_, IT_> tval(txnonzeros * block_height_ * block_width_);
         DenseVector<IT_, IT_> trow_ptr(txcolumns + 1, IT_(0));
 
-        IT_ * ptcol_ind(tcol_ind.elements());
-        ValueType * ptval((ValueType*)tval.elements());
-        IT_ * ptrow_ptr(trow_ptr.elements());
+        Memory::TypedView<IT_> ptrow_ptr(trow_ptr.elements_view_rw());
+        Memory::TypedView<IT_> ptcol_idx(tcol_idx.elements_view_w());
+        Memory::TypedView<ValueType> ptval(std::forward<Memory::View&&>(tval.elements_view_w()));
 
-        ptrow_ptr[0] = 0;
-
-        for (Index i(0); i < txused_elements; ++i)
+        for (Index i(0); i < txnonzeros; ++i)
         {
-          ++ptrow_ptr[ptxcol_ind[i] + 1];
+          ++ptrow_ptr[ptxcol_idx[i] + 1];
         }
 
         for (Index i(1); i < txcolumns - 1; ++i)
@@ -1477,10 +1314,10 @@ namespace FEAT
         {
           for (IT_ k(ptxrow_ptr[i]); k < ptxrow_ptr[i+1]; ++k)
           {
-            const IT_ l(ptxcol_ind[k]);
+            const IT_ l(ptxcol_idx[k]);
             const IT_ j(ptrow_ptr[l]);
             ptval[j].set_transpose(ptxval[k]);
-            ptcol_ind[j] = IT_(i);
+            ptcol_idx[j] = IT_(i);
             ++ptrow_ptr[l];
           }
         }
@@ -1491,7 +1328,7 @@ namespace FEAT
         }
         ptrow_ptr[0] = 0;
 
-        this->move(SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_> (txcolumns, txrows, tcol_ind, tval, trow_ptr));
+        this->move(SparseMatrixBCSR<DT_, IT_, block_height_, block_width_> (txcolumns, txrows, trow_ptr, tcol_idx, tval));
       }
 
       /**
@@ -1500,37 +1337,45 @@ namespace FEAT
        * \param[in] x The matrix whose rows are to be scaled.
        * \param[in] s The vector to the scale the rows by.
        */
-      void scale_rows(const SparseMatrixBCSR & x, const DenseVectorBlocked<DT_,IT_, BlockHeight_> & s)
+      void scale_rows(const SparseMatrixBCSR & x, const DenseVectorBlocked<DT_,IT_, block_height_> & s)
       {
-        XASSERTM(x.rows() == this->rows(), "Row count does not match!");
-        XASSERTM(x.columns() == this->columns(), "Column count does not match!");
-        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
-        XASSERTM(s.size() == this->rows(), "Vector size does not match!");
+        XASSERTM(x.num_rows() == this->num_rows(), "Row count does not match!");
+        XASSERTM(x.num_cols() == this->num_cols(), "Column count does not match!");
+        XASSERTM(x.num_nzes() == this->num_nzes(), "Nonzero count does not match!");
+        XASSERTM(s.size() == this->num_rows(), "Vector size does not match!");
+
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->used_elements<Perspective::pod>());
-        Arch::ScaleRows::template bcsr<BlockHeight_, BlockWidth_>(this->val<Perspective::pod>(), x.template val<Perspective::pod>(),
-          this->col_ind(), this->row_ptr(), s.template elements<Perspective::pod>(), this->rows(), this->columns(), this->used_elements());
+        Arch::ScaleRowBCSR::template exec<DT_, IT_>(this->val_arbiter(), x.val_arbiter(), this->col_idx_arbiter(),
+          this->row_ptr_arbiter(), s.elements_arbiter(), this->num_rows(), this->num_cols(), this->num_nzes(), block_height, block_width_);
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->num_nzes_raw());
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
-      void scale_cols(const SparseMatrixBCSR & x, const DenseVectorBlocked<DT_,IT_, BlockWidth_> & s)
+      void scale_cols(const SparseMatrixBCSR & x, const DenseVectorBlocked<DT_,IT_, block_width_> & s)
       {
-        XASSERTM(x.rows() == this->rows(), "Row count does not match!");
-        XASSERTM(x.columns() == this->columns(), "Column count does not match!");
-        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
-        XASSERTM(s.size() == this->columns(), "Vector size does not match!");
+        XASSERTM(x.num_rows() == this->num_rows(), "Row count does not match!");
+        XASSERTM(x.num_cols() == this->num_cols(), "Column count does not match!");
+        XASSERTM(x.num_nzes() == this->num_nzes(), "Nonzero count does not match!");
+        XASSERTM(s.size() == this->num_cols(), "Vector size does not match!");
+
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->used_elements<Perspective::pod>());
-        Arch::ScaleCols::template bcsr<BlockHeight_, BlockWidth_>(this->val<Perspective::pod>(), x.template val<Perspective::pod>(),
-          this->col_ind(), this->row_ptr(), s.template elements<Perspective::pod>(), this->rows(), this->columns(), this->used_elements());
+        Arch::ScaleColBCSR::template exec<DT_, IT_>(this->val_arbiter(), x.val_arbiter(), this->col_idx_arbiter(),
+          this->row_ptr_arbiter(), s.elements_arbiter(), this->num_rows(), this->num_cols(), this->num_nzes(), block_height_, block_width_);
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->num_nzes_raw());
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -1542,30 +1387,9 @@ namespace FEAT
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      void apply(DenseVector<DT_, IT_> & r, const DenseVector< DT_, IT_> & x) const
+      void apply(DenseVector<DT_, IT_> & r, const DenseVector<DT_, IT_> & x) const
       {
-        XASSERTM(r.size() == this->rows<Perspective::pod>(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns<Perspective::pod>(), "Vector size of x does not match!");
-
-        TimeStamp ts_start;
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-
-        if (this->used_elements() == 0)
-        {
-          r.format();
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
-        Arch::Apply::template bcsr<BlockHeight_, BlockWidth_>(
-            r.elements(), DT_(1), x.elements(), DT_(0), r.elements(), this->template val<Perspective::pod>(), this->col_ind(),
-            this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+        this->template _apply<false>(r, x);
       }
 
       /**
@@ -1576,30 +1400,9 @@ namespace FEAT
       * \param[out] r The vector that receives the result.
       * \param[in] x The vector to be multiplied by this matrix.
       */
-      void apply_transposed(DenseVector<DT_, IT_> & r, const DenseVector< DT_, IT_> & x) const
+      void apply_transposed(DenseVector<DT_, IT_> & r, const DenseVector<DT_, IT_> & x) const
       {
-        XASSERTM(r.size() == this->columns<Perspective::pod>(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows<Perspective::pod>(), "Vector size of x does not match!");
-
-        TimeStamp ts_start;
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-
-        if (this->used_elements() == 0)
-        {
-          r.format();
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
-        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
-          r.elements(), DT_(1), x.elements(), DT_(0), r.elements(), this->template val<Perspective::pod>(), this->col_ind(),
-          this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
+        this->template _apply<true>(r, x);
       }
 
       /**
@@ -1610,33 +1413,10 @@ namespace FEAT
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      void apply(DenseVectorBlocked<DT_, IT_, BlockHeight_> & r, const DenseVector< DT_, IT_> & x) const
+      void apply(DenseVectorBlocked<DT_, IT_, block_height_> & r, const DenseVector<DT_, IT_> & x) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns<Perspective::pod>(), "Vector size of x does not match!");
-
-        TimeStamp ts_start;
-
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-        if (this->used_elements() == 0)
-        {
-          r.format();
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
-
-        Arch::Apply::template bcsr<BlockHeight_, BlockWidth_>(
-            r.template elements<Perspective::pod>(), DT_(1), x.elements(), DT_(0), r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
-            this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+        this->template _apply<false>(r, x);
       }
-
 
       /**
       * \brief Calculate \f$ r \leftarrow this^\top \cdot x \f$
@@ -1646,31 +1426,9 @@ namespace FEAT
       * \param[out] r The vector that receives the result.
       * \param[in] x The vector to be multiplied by this matrix.
       */
-      void apply_transposed(DenseVectorBlocked<DT_, IT_, BlockWidth_> & r, const DenseVector< DT_, IT_> & x) const
+      void apply_transposed(DenseVectorBlocked<DT_, IT_, block_width_> & r, const DenseVector< DT_, IT_> & x) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows<Perspective::pod>(), "Vector size of x does not match!");
-
-        TimeStamp ts_start;
-
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-        if (this->used_elements() == 0)
-        {
-          r.format();
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
-
-        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
-          r.template elements<Perspective::pod>(), DT_(1), x.elements(), DT_(0), r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
-          this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+        this->template _apply<true>(r, x);
       }
 
       /**
@@ -1681,31 +1439,9 @@ namespace FEAT
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      void apply(DenseVector<DT_, IT_> & r, const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x) const
+      void apply(DenseVector<DT_, IT_> & r, const DenseVectorBlocked<DT_, IT_, block_width_> & x) const
       {
-        XASSERTM(r.size() == this->rows<Perspective::pod>(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
-
-        TimeStamp ts_start;
-
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-        if (this->used_elements() == 0)
-        {
-          r.format();
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
-
-        Arch::Apply::template bcsr<BlockHeight_, BlockWidth_>(
-            r.elements(), DT_(1), x.template elements<Perspective::pod>(), DT_(0), r.elements(), this->template val<Perspective::pod>(), this->col_ind(),
-            this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+        this->template _apply<false>(r, x);
       }
 
       /**
@@ -1716,31 +1452,9 @@ namespace FEAT
       * \param[out] r The vector that receives the result.
       * \param[in] x The vector to be multiplied by this matrix.
       */
-      void apply_transposed(DenseVector<DT_, IT_> & r, const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x) const
+      void apply_transposed(DenseVector<DT_, IT_> & r, const DenseVectorBlocked<DT_, IT_, block_height_> & x) const
       {
-        XASSERTM(r.size() == this->columns<Perspective::pod>(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
-
-        TimeStamp ts_start;
-
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-        if (this->used_elements() == 0)
-        {
-          r.format();
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
-
-        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
-          r.elements(), DT_(1), x.template elements<Perspective::pod>(), DT_(0), r.elements(), this->template val<Perspective::pod>(), this->col_ind(),
-          this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+        this->template _apply<true>(r, x);
       }
 
       /**
@@ -1751,31 +1465,9 @@ namespace FEAT
        * \param[out] r The vector that receives the result.
        * \param[in] x The vector to be multiplied by this matrix.
        */
-      void apply(DenseVectorBlocked<DT_, IT_, BlockHeight_> & r, const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x) const
+      void apply(DenseVectorBlocked<DT_, IT_, block_height_> & r, const DenseVectorBlocked<DT_, IT_, block_width_> & x) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
-
-        TimeStamp ts_start;
-
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-        if (this->used_elements() == 0)
-        {
-          r.format();
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
-
-        Arch::Apply::template bcsr<BlockHeight_, BlockWidth_>(
-            r.template elements<Perspective::pod>(), DT_(1), x.template elements<Perspective::pod>(), DT_(0), r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
-            this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+        this->template _apply<false>(r, x);
       }
 
       /**
@@ -1786,31 +1478,9 @@ namespace FEAT
       * \param[out] r The vector that receives the result.
       * \param[in] x The vector to be multiplied by this matrix.
       */
-      void apply_transposed(DenseVectorBlocked<DT_, IT_, BlockWidth_> & r, const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x) const
+      void apply_transposed(DenseVectorBlocked<DT_, IT_, block_width_> & r, const DenseVectorBlocked<DT_, IT_, block_height_> & x) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
-
-        TimeStamp ts_start;
-
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-        if (this->used_elements() == 0)
-        {
-          r.format();
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops(this->used_elements<Perspective::pod>() * 2);
-
-        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
-          r.template elements<Perspective::pod>(), DT_(1), x.template elements<Perspective::pod>(), DT_(0), r.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
-          this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+        this->template _apply<true>(r, x);
       }
 
       /**
@@ -1830,31 +1500,7 @@ namespace FEAT
                  const DenseVector< DT_, IT_> & y,
                  const DT_ alpha = DT_(1)) const
       {
-        XASSERTM(r.size() == this->rows<Perspective::pod>(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns<Perspective::pod>(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->rows<Perspective::pod>(), "Vector size of y does not match!");
-
-        TimeStamp ts_start;
-
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
-        {
-          r.copy(y);
-          //r.scale(beta);
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
-
-        Arch::Apply::template bcsr<BlockHeight_, BlockWidth_>(
-            r.elements(), alpha, x.elements(), DT_(1), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),
-            this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+        this->template _apply<false>(r, x, y, alpha);
       }
 
       /**
@@ -1874,31 +1520,7 @@ namespace FEAT
         const DenseVector< DT_, IT_> & y,
         const DT_ alpha = DT_(1)) const
       {
-        XASSERTM(r.size() == this->columns<Perspective::pod>(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows<Perspective::pod>(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->columns<Perspective::pod>(), "Vector size of y does not match!");
-
-        TimeStamp ts_start;
-
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
-        {
-          r.copy(y);
-          //r.scale(beta);
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
-
-        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
-          r.elements(), alpha, x.elements(), DT_(1), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),
-          this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+        this->template _apply<true>(r, x, y, alpha);
       }
 
       /**
@@ -1913,35 +1535,12 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVectorBlocked<DT_, IT_, BlockHeight_> & r,
+                 DenseVectorBlocked<DT_, IT_, block_height_> & r,
                  const DenseVector< DT_, IT_> & x,
-                 const DenseVectorBlocked<DT_, IT_, BlockHeight_> & y,
+                 const DenseVectorBlocked<DT_, IT_, block_height_> & y,
                  const DT_ alpha = DT_(1)) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns<Perspective::pod>(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->rows(), "Vector size of y does not match!");
-
-        TimeStamp ts_start;
-
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
-        {
-          r.copy(y);
-          //r.scale(beta);
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
-        Arch::Apply::template bcsr<BlockHeight_, BlockWidth_>(
-            r.template elements<Perspective::pod>(), alpha, x.elements(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
-            this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+        this->template _apply<false>(r, x, y, alpha);
       }
 
       /**
@@ -1956,35 +1555,12 @@ namespace FEAT
       * \param[in] alpha A scalar to scale the product with.
       */
       void apply_transposed(
-        DenseVectorBlocked<DT_, IT_, BlockWidth_> & r,
+        DenseVectorBlocked<DT_, IT_, block_width_> & r,
         const DenseVector< DT_, IT_> & x,
-        const DenseVectorBlocked<DT_, IT_, BlockWidth_> & y,
+        const DenseVectorBlocked<DT_, IT_, block_width_> & y,
         const DT_ alpha = DT_(1)) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows<Perspective::pod>(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
-
-        TimeStamp ts_start;
-
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-        if(this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
-        {
-          r.copy(y);
-          //r.scale(beta);
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops((this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2);
-        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
-          r.template elements<Perspective::pod>(), alpha, x.elements(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(), this->col_ind(),
-          this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+        this->template _apply<true>(r, x, y, alpha);
       }
 
       /**
@@ -2000,34 +1576,11 @@ namespace FEAT
        */
       void apply(
                  DenseVector<DT_, IT_> & r,
-                 const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x,
+                 const DenseVectorBlocked<DT_, IT_, block_width_> & x,
                  const DenseVector< DT_, IT_> & y,
                  const DT_ alpha = DT_(1)) const
       {
-        XASSERTM(r.size() == this->rows<Perspective::pod>(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->rows<Perspective::pod>(), "Vector size of y does not match!");
-
-        TimeStamp ts_start;
-
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
-        {
-          r.copy(y);
-          //r.scale(beta);
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
-        Arch::Apply::template bcsr<BlockHeight_, BlockWidth_>(
-            r.elements(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),
-            this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+        this->template _apply<false>(r, x, y, alpha);
       }
 
       /**
@@ -2043,34 +1596,11 @@ namespace FEAT
       */
       void apply_transposed(
         DenseVector<DT_, IT_> & r,
-        const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x,
+        const DenseVectorBlocked<DT_, IT_, block_height_> & x,
         const DenseVector< DT_, IT_> & y,
         const DT_ alpha = DT_(1)) const
       {
-        XASSERTM(r.size() == this->columns<Perspective::pod>(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->columns<Perspective::pod>(), "Vector size of y does not match!");
-
-        TimeStamp ts_start;
-
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
-        {
-          r.copy(y);
-          //r.scale(beta);
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
-        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
-          r.elements(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.elements(), this->template val<Perspective::pod>(), this->col_ind(),
-          this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+        this->template _apply<true>(r, x, y, alpha);
       }
 
       /**
@@ -2085,35 +1615,12 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVectorBlocked<DT_, IT_, BlockHeight_> & r,
-                 const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x,
-                 const DenseVectorBlocked<DT_, IT_, BlockHeight_> & y,
+                 DenseVectorBlocked<DT_, IT_, block_height_> & r,
+                 const DenseVectorBlocked<DT_, IT_, block_width_> & x,
+                 const DenseVectorBlocked<DT_, IT_, block_height_> & y,
                  const DT_ alpha = DT_(1)) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->rows(), "Vector size of y does not match!");
-
-        TimeStamp ts_start;
-
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
-        {
-          r.copy(y);
-          //r.scale(beta);
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
-        Arch::Apply::template bcsr<BlockHeight_, BlockWidth_>(
-            r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
-            this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+        this->template _apply<false>(r, x, y, alpha);
       }
 
       /**
@@ -2128,35 +1635,12 @@ namespace FEAT
       * \param[in] alpha A scalar to scale the product with.
       */
       void apply_transposed(
-        DenseVectorBlocked<DT_, IT_, BlockWidth_> & r,
-        const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x,
-        const DenseVectorBlocked<DT_, IT_, BlockWidth_> & y,
+        DenseVectorBlocked<DT_, IT_, block_width_> & r,
+        const DenseVectorBlocked<DT_, IT_, block_height_> & x,
+        const DenseVectorBlocked<DT_, IT_, block_width_> & y,
         const DT_ alpha = DT_(1)) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
-
-        TimeStamp ts_start;
-
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
-        {
-          r.copy(y);
-          //r.scale(beta);
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
-        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
-          r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
-          this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+        this->template _apply<true>(r, x, y, alpha);
       }
 
       /**
@@ -2171,35 +1655,12 @@ namespace FEAT
        * \param[in] alpha A scalar to scale the product with.
        */
       void apply(
-                 DenseVectorBlocked<DT_, IT_, BlockHeight_> & r,
-                 const DenseVectorBlocked<DT_, IT_, BlockWidth_> & x,
+                 DenseVectorBlocked<DT_, IT_, block_height_> & r,
+                 const DenseVectorBlocked<DT_, IT_, block_width_> & x,
                  const DenseVector< DT_, IT_> & y,
                  const DT_ alpha = DT_(1)) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->rows<Perspective::pod>(), "Vector size of y does not match!");
-
-        TimeStamp ts_start;
-
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
-        {
-          r.convert(y);
-          //r.scale(beta);
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
-        Arch::Apply::template bcsr<BlockHeight_, BlockWidth_>(
-            r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
-            this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+        this->template _apply<false>(r, x, y, alpha);
       }
 
       /**
@@ -2214,35 +1675,12 @@ namespace FEAT
       * \param[in] alpha A scalar to scale the product with.
       */
       void apply_transposed(
-        DenseVectorBlocked<DT_, IT_, BlockWidth_> & r,
-        const DenseVectorBlocked<DT_, IT_, BlockHeight_> & x,
+        DenseVectorBlocked<DT_, IT_, block_width_> & r,
+        const DenseVectorBlocked<DT_, IT_, block_height_> & x,
         const DenseVector< DT_, IT_> & y,
         const DT_ alpha = DT_(1)) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->columns<Perspective::pod>(), "Vector size of y does not match!");
-
-        TimeStamp ts_start;
-
-        FEAT_KERNEL_MARKER_START("BCSR-apply");
-        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
-        {
-          r.convert(y);
-          //r.scale(beta);
-          return;
-        }
-
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
-
-        Statistics::add_flops( (this->used_elements<Perspective::pod>() + this->rows<Perspective::pod>()) * 2 );
-        Arch::Apply::template bcsr_transposed<BlockHeight_, BlockWidth_>(
-          r.template elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), DT_(1), y.template elements<Perspective::pod>(), this->template val<Perspective::pod>(),
-          this->col_ind(), this->row_ptr(), this->rows(), this->columns(), this->used_elements());
-
-        FEAT_KERNEL_MARKER_STOP("BCSR-apply");
-        TimeStamp ts_stop;
-        Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
+        this->template _apply<true>(r, x, y, alpha);
       }
 
       /**
@@ -2278,35 +1716,35 @@ namespace FEAT
        * otherwise the missing entries are ignored (dropped).
        */
       void add_double_mat_product(
-        const LAFEM::SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& d,
-        const LAFEM::SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& a,
-        const LAFEM::SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& b,
+        const LAFEM::SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& d,
+        const LAFEM::SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& a,
+        const LAFEM::SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& b,
         const DT_ alpha = DT_(1),
         const bool allow_incomplete = false)
       {
         // validate matrix dimensions
-        XASSERT(BlockHeight_ == BlockWidth_);
-        XASSERT(this->rows() == d.rows());
-        XASSERT(d.columns() == a.rows());
-        XASSERT(a.columns() == b.rows());
-        XASSERT(b.columns() == this->columns());
+        XASSERT(block_height_ == block_width_);
+        XASSERT(this->num_rows() == d.num_rows());
+        XASSERT(d.num_cols() == a.num_rows());
+        XASSERT(a.num_cols() == b.num_rows());
+        XASSERT(b.num_cols() == this->num_cols());
 
         // fetch matrix arrays:
-        ValueType* data_x = this->val();
-        const ValueType* data_d = d.val();
-        const ValueType* data_a = a.val();
-        const ValueType* data_b = b.val();
-        const IT_* row_ptr_x = this->row_ptr();
-        const IT_* col_idx_x = this->col_ind();
-        const IT_* row_ptr_d = d.row_ptr();
-        const IT_* col_idx_d = d.col_ind();
-        const IT_* row_ptr_a = a.row_ptr();
-        const IT_* col_idx_a = a.col_ind();
-        const IT_* row_ptr_b = b.row_ptr();
-        const IT_* col_idx_b = b.col_ind();
+        Memory::TypedView<ValueType> data_x = this->val_view_rw();
+        const Memory::TypedView<ValueType> data_d = d.val_view_r();
+        const Memory::TypedView<ValueType> data_a = a.val_view_r();
+        const Memory::TypedView<ValueType> data_b = b.val_view_r();
+        const Memory::TypedView<IT_> row_ptr_x = this->row_ptr_view_r();
+        const Memory::TypedView<IT_> col_idx_x = this->col_idx_view_r();
+        const Memory::TypedView<IT_> row_ptr_d = d.row_ptr_view_r();
+        const Memory::TypedView<IT_> col_idx_d = d.col_idx_view_r();
+        const Memory::TypedView<IT_> row_ptr_a = a.row_ptr_view_r();
+        const Memory::TypedView<IT_> col_idx_a = a.col_idx_view_r();
+        const Memory::TypedView<IT_> row_ptr_b = b.row_ptr_view_r();
+        const Memory::TypedView<IT_> col_idx_b = b.col_idx_view_r();
 
         // loop over all rows of D and X, resp.
-        for(IT_ i(0); i < IT_(this->rows()); ++i)
+        for(IT_ i(0); i < IT_(this->num_rows()); ++i)
         {
           // loop over all non-zeros D_ik in row i of D
           for(IT_ ik(row_ptr_d[i]); ik  < row_ptr_d[i+1]; ++ik)
@@ -2405,34 +1843,34 @@ namespace FEAT
        */
       void add_double_mat_product(
         const LAFEM::SparseMatrixCSR<DT_, IT_>& d,
-        const LAFEM::SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& a,
+        const LAFEM::SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& a,
         const LAFEM::SparseMatrixCSR<DT_, IT_>& b,
         const DT_ alpha = DT_(1),
         const bool allow_incomplete = false)
       {
         // validate matrix dimensions
-        XASSERT(BlockHeight_ == BlockWidth_);
-        XASSERT(this->rows() == d.rows());
-        XASSERT(d.columns() == a.rows());
-        XASSERT(a.columns() == b.rows());
-        XASSERT(b.columns() == this->columns());
+        XASSERT(block_height_ == block_width_);
+        XASSERT(this->num_rows() == d.num_rows());
+        XASSERT(d.num_cols() == a.num_rows());
+        XASSERT(a.num_cols() == b.num_rows());
+        XASSERT(b.num_cols() == this->num_cols());
 
         // fetch matrix arrays:
-        ValueType* data_x = this->val();
-        const DT_* data_d = d.val();
-        const ValueType* data_a = a.val();
-        const DT_* data_b = b.val();
-        const IT_* row_ptr_x = this->row_ptr();
-        const IT_* col_idx_x = this->col_ind();
-        const IT_* row_ptr_d = d.row_ptr();
-        const IT_* col_idx_d = d.col_ind();
-        const IT_* row_ptr_a = a.row_ptr();
-        const IT_* col_idx_a = a.col_ind();
-        const IT_* row_ptr_b = b.row_ptr();
-        const IT_* col_idx_b = b.col_ind();
+        Memory::TypedView<ValueType> data_x = this->val_view_rw();
+        const Memory::TypedView<DT_> data_d = d.val_view_r();
+        const Memory::TypedView<ValueType> data_a = a.val_view_r();
+        const Memory::TypedView<DT_> data_b = b.val_view_r();
+        const Memory::TypedView<IT_> row_ptr_x = this->row_ptr_view_r();
+        const Memory::TypedView<IT_> col_idx_x = this->col_idx_view_r();
+        const Memory::TypedView<IT_> row_ptr_d = d.row_ptr_view_r();
+        const Memory::TypedView<IT_> col_idx_d = d.col_idx_view_r();
+        const Memory::TypedView<IT_> row_ptr_a = a.row_ptr_view_r();
+        const Memory::TypedView<IT_> col_idx_a = a.col_idx_view_r();
+        const Memory::TypedView<IT_> row_ptr_b = b.row_ptr_view_r();
+        const Memory::TypedView<IT_> col_idx_b = b.col_idx_view_r();
 
         // loop over all rows of D and X, resp.
-        for(IT_ i(0); i < IT_(this->rows()); ++i)
+        for(IT_ i(0); i < IT_(this->num_rows()); ++i)
         {
           // loop over all non-zeros D_ik in row i of D
           for(IT_ ik(row_ptr_d[i]); ik  < row_ptr_d[i+1]; ++ik)
@@ -2500,12 +1938,10 @@ namespace FEAT
       /// \copydoc lump_rows()
       void lump_rows(VectorTypeL& lump) const
       {
-        XASSERTM(lump.size() == rows(), "lump vector size does not match matrix row count!");
+        XASSERTM(lump.size() == num_rows(), "lump vector size does not match matrix row count!");
 
-        Arch::Lumping::bcsr(
-          lump.template elements<Perspective::pod>(),
-          this->template val<Perspective::pod>(),
-          col_ind(), row_ptr(), rows(), BlockHeight, BlockWidth);
+        Arch::LumpingBCSR::template exec<DT_, IT_>(lump.elements_arbiter(), this->val_arbiter(),
+          this->col_idx_arbiter(), this->row_ptr_arbiter(), this->num_rows(), block_height, block_width);
       }
 
       /**
@@ -2524,37 +1960,6 @@ namespace FEAT
         return lump;
       }
 
-
-      /**
-       * \brief extract main diagonal vector from matrix
-       *
-       * \param[in] diag_indices
-       * A vector containing the indices of the diagonal entries
-       *
-       * \param[out] diag
-       * The vector containing the diagonal entry values
-       */
-      void extract_diag(VectorTypeL & diag, DenseVector<IT_, IT_> & diag_indices) const
-      {
-        XASSERTM(diag.size() == rows(), "diag size does not match matrix row count!");
-        XASSERTM(rows() == columns(), "matrix is not square!");
-
-        for (Index row(0); row < rows(); row++)
-        {
-          const Index index = diag_indices.elements()[row];
-          typename VectorTypeL::ValueType t(0);
-          if (index != used_elements())
-          {
-            ValueType m = this->template val<LAFEM::Perspective::native>()[index];
-            for (int i(0) ; i < BlockHeight_ ; ++i)
-            {
-              t[i] = m[i][i];
-            }
-          }
-          diag(row, t);
-        }
-      }
-
       /**
        * \brief extract main diagonal vector from matrix
        *
@@ -2563,10 +1968,9 @@ namespace FEAT
        */
       void extract_diag(VectorTypeL & diag) const
       {
-        auto diag_indices = extract_diag_indices();
-        extract_diag(diag, diag_indices);
+        Arch::DiagonalBCSR::template exec<DT_, IT_>(diag.elements_arbiter(), this->val_arbiter(),
+          this->col_idx_arbiter(), this->row_ptr_arbiter(), this->num_rows(), block_height);
       }
-
 
       /**
        * \brief extract main diagonal vector from matrix
@@ -2580,45 +1984,23 @@ namespace FEAT
         return diag;
       }
 
-      /**
-       * \brief extract main diagonal vector from matrix
-       *
-       * \param[out] diag_indices
-       * A vector containing the indices of the diagonal entries
-       */
-      void extract_diag_indices(DenseVector<IT_, IT_> & diag_indices) const
-      {
-        XASSERTM(diag_indices.size() == rows(), "diag size does not match matrix row count!");
-        XASSERTM(rows() == columns(), "matrix is not square!");
-
-        Arch::Diagonal::csr(diag_indices.elements(), col_ind(), row_ptr(), rows());
-      }
-
-      /**
-       * \brief extract main diagonal vector from matrix
-       *
-       * \returns A vector containing the indices of the diagonal entries
-       */
-      DenseVector<IT_, IT_> extract_diag_indices() const
-      {
-        DenseVector<IT_, IT_> diag_indices(this->template rows<LAFEM::Perspective::native>());
-        extract_diag_indices(diag_indices);
-        return diag_indices;
-      }
-
-      /// Permutate matrix rows and columns according to the given Permutations
+      /// Permute matrix rows and columns according to the given Permutations
       void permute(Adjacency::Permutation & perm_row, Adjacency::Permutation & perm_col)
       {
         if (perm_row.size() == 0 && perm_col.size() == 0)
           return;
 
-        XASSERTM(perm_row.size() == this->rows(), "Container rows does not match permutation size");
-        XASSERTM(perm_col.size() == this->columns(), "Container columns does not match permutation size");
+        XASSERTM(perm_row.size() == this->num_rows(), "Container rows does not match permutation size");
+        XASSERTM(perm_col.size() == this->num_cols(), "Container columns does not match permutation size");
 
         // http://de.mathworks.com/help/matlab/math/sparse-matrix-operations.html#f6-13070
-        IT_ * temp_row_ptr = new IT_[rows() + 1];
-        IT_ * temp_col_ind = new IT_[used_elements()];
-        ValueType * temp_val = new ValueType[used_elements()];
+        IT_ * temp_row_ptr = new IT_[num_rows() + 1];
+        IT_ * temp_col_idx = new IT_[num_nzes()];
+        ValueType * temp_val = new ValueType[num_nzes()];
+
+        Memory::TypedView<IT_> row_ptr = this->row_ptr_view_rw();
+        Memory::TypedView<IT_> col_idx = this->col_idx_view_rw();
+        Memory::TypedView<ValueType> val = this->val_view_rw();
 
         Index * perm_pos;
         perm_pos = perm_row.get_perm_pos();
@@ -2626,15 +2008,15 @@ namespace FEAT
         //permute rows from source to temp_*
         Index new_start(0);
         temp_row_ptr[0] = 0;
-        for (Index row(0) ; row < this->rows() ; ++row)
+        for (Index row(0) ; row < this->num_rows() ; ++row)
         {
-          Index row_size(this->row_ptr()[perm_pos[row] + 1] - this->row_ptr()[perm_pos[row]]);
+          Index row_size(row_ptr[perm_pos[row] + 1] - row_ptr[perm_pos[row]]);
 
           //iterate over all elements in single one new and old row
-          for (Index i(new_start), j(this->row_ptr()[perm_pos[row]]) ; i < new_start + row_size ; ++i, ++j)
+          for (Index i(new_start), j(row_ptr[perm_pos[row]]) ; i < new_start + row_size ; ++i, ++j)
           {
-            temp_col_ind[i] = this->col_ind()[j];
-            temp_val[i] = this->val()[j];
+            temp_col_idx[i] = col_idx[j];
+            temp_val[i] = val[j];
           }
 
           new_start += row_size;
@@ -2646,43 +2028,43 @@ namespace FEAT
         perm_pos = perm_col_inv.get_perm_pos();
 
         //permute columns from temp_* to source
-        ::memcpy(this->row_ptr(), temp_row_ptr, (rows() + 1) * sizeof(IT_));
-        ::memcpy(this->val(), temp_val, used_elements() * sizeof(ValueType));
-        for (Index i(0) ; i < used_elements() ; ++i)
+        Memory::memcopy_main(row_ptr.get_w(), temp_row_ptr, (num_rows() + 1) * sizeof(IT_));
+        Memory::memcopy_main(val.get_w(), temp_val, num_nzes() * sizeof(ValueType));
+        for (Index i(0) ; i < num_nzes() ; ++i)
         {
-          this->col_ind()[i] = (IT_)perm_pos[temp_col_ind[i]];
+          col_idx[i] = (IT_)perm_pos[temp_col_idx[i]];
         }
 
         delete[] temp_row_ptr;
-        delete[] temp_col_ind;
+        delete[] temp_col_idx;
         delete[] temp_val;
 
         //sort columns in every row by column index
         IT_ swap_key;
         ValueType swap_val;
-        for (Index row(0) ; row < rows() ; ++row)
+        for (Index row(0) ; row < num_rows() ; ++row)
         {
-          Index offset(this->row_ptr()[row]);
-          Index row_size(this->row_ptr()[row+1] - this->row_ptr()[row]);
+          Index offset(row_ptr[row]);
+          Index row_size(row_ptr[row+1] - row_ptr[row]);
           for (Index i(1), j ; i < row_size ; ++i)
           {
-            swap_key = this->col_ind()[i + offset];
-            swap_val = this->val()[i + offset];
+            swap_key = col_idx[i + offset];
+            swap_val = val[i + offset];
             j = i;
-            while (j > 0 && this->col_ind()[j - 1 + offset] > swap_key)
+            while (j > 0 && col_idx[j - 1 + offset] > swap_key)
             {
-              this->col_ind()[j + offset] = this->col_ind()[j - 1 + offset];
-              this->val()[j + offset] = this->val()[j - 1 + offset];
+              col_idx[j + offset] = col_idx[j - 1 + offset];
+              val[j + offset] = val[j - 1 + offset];
               --j;
             }
-            this->col_ind()[j + offset] = swap_key;
-            this->val()[j + offset] = swap_val;
+            col_idx[j + offset] = swap_key;
+            val[j + offset] = swap_val;
           }
         }
       }
 
       /**
-       * \brief Adds the trace of a double matrix multiplikation to a vector
+       * \brief Adds the trace of a double matrix multiplication to a vector
        *
        * This function performs the following computation:
        * \f[ v \leftarrow v + \alpha \mathrm{tr}( D \textnormal{diag}(A) \cdot B\f]
@@ -2711,7 +2093,7 @@ namespace FEAT
        * The vector representing the diagonal matrix A.
        *
        * \param[in] d, b
-       * The left and right multiplicant matrices
+       * The left and right multiplicand matrices
        *
        * \param[in] alpha
        * The scaling factor for the product.
@@ -2721,37 +2103,34 @@ namespace FEAT
        */
       template<int BHD_>
       void add_trace_double_mat_mult(
-        typename LAFEM::SparseMatrixBCSR< DT_, IT_, BHD_, BlockHeight>::VectorTypeL& v,
-        const LAFEM::SparseMatrixBCSR<DT_, IT_, BHD_, BlockHeight>& d,
-        const LAFEM::DenseVectorBlocked<DT_, IT_, BlockHeight>& a,
+        typename LAFEM::SparseMatrixBCSR< DT_, IT_, BHD_, block_height>::VectorTypeL& v,
+        const LAFEM::SparseMatrixBCSR<DT_, IT_, BHD_, block_height>& d,
+        const LAFEM::DenseVectorBlocked<DT_, IT_, block_height>& a,
         const DT_ alpha = DT_(1)) const
       {
-        typedef LAFEM::SparseMatrixBCSR<DT_, IT_, BHD_, BlockHeight> MatrixD;
+        typedef LAFEM::SparseMatrixBCSR<DT_, IT_, BHD_, block_height> MatrixD;
 
         static constexpr IT_ bhd = IT_(BHD_);
-        static constexpr IT_ bwd = IT_(BlockHeight);
+        static constexpr IT_ bwd = IT_(block_height);
 
-        static constexpr IT_ bh = IT_(BlockHeight);
-        static constexpr IT_ bw = IT_(BlockWidth);
-
-        const auto& b(*this);
+        static constexpr IT_ bh = IT_(block_height);
+        static constexpr IT_ bw = IT_(block_width);
 
         // Check matrix dimensions
-        XASSERT(v.size() == d.rows());
-        XASSERT(d.columns() == a.size());
-        XASSERT(a.size() == b.rows());
-        XASSERT(b.columns() == this->columns());
+        XASSERT(v.size() == d.num_rows());
+        XASSERT(d.num_cols() == a.size());
+        XASSERT(a.size() == this->num_rows());
 
         // Fetch matrix arrays
         // Use POD here to avoid hassle with 1x1 matrices and stuff
-        DT_* data_v = v.template elements<LAFEM::Perspective::pod>();
-        const DT_* data_d = d.template val<LAFEM::Perspective::pod>();
-        const DT_* data_a = a.template elements<LAFEM::Perspective::pod>();
-        const DT_* data_b = b.template val<LAFEM::Perspective::pod>();
-        const IT_* row_ptr_d = d.row_ptr();
-        const IT_* col_idx_d = d.col_ind();
-        const IT_* row_ptr_b = b.row_ptr();
-        const IT_* col_idx_b = b.col_ind();
+        Memory::TypedView<DT_> data_v(v.elements_view_raw_rw());
+        const Memory::TypedView<DT_> data_d = d.val_view_raw_r();
+        const Memory::TypedView<DT_> data_a = a.elements_view_raw_r();
+        const Memory::TypedView<DT_> data_b = this->val_view_raw_r();
+        const Memory::TypedView<IT_> row_ptr_d = d.row_ptr_view_r();
+        const Memory::TypedView<IT_> col_idx_d = d.col_idx_view_r();
+        const Memory::TypedView<IT_> row_ptr_b = this->row_ptr_view_r();
+        const Memory::TypedView<IT_> col_idx_b = this->col_idx_view_r();
 
         // Loop over all rows i of v
         for(IT_ row(0); row < IT_(v.size()); ++row)
@@ -2795,60 +2174,25 @@ namespace FEAT
         }
       }
 
-      /**
-       * \brief SparseMatrixBCSR streaming operator
-       *
-       * \param[in] lhs The target stream.
-       * \param[in] b The matrix to be streamed.
-       */
-      friend std::ostream & operator<< (std::ostream & lhs, const SparseMatrixBCSR & b)
-      {
-        lhs << "[\n";
-        for (Index i(0) ; i < b.rows() ; ++i)
-        {
-          for (int k(0) ; k < BlockHeight_ ; ++k)
-          {
-            lhs << "[";
-            for (Index j(0) ; j < b.columns() ; ++j)
-            {
-              for (int l(0) ; l < BlockWidth_ ; ++l)
-                lhs << "  " << stringify(b(i, j).v[k][l]);
-            }
-            lhs << "]\n";
-          }
-        }
-        lhs << "]\n";
-
-        return lhs;
-      }
-
       /// \cond internal
       // Returns a new compatible L-Vector.
       VectorTypeL create_vector_l() const
       {
-        return VectorTypeL(this->rows());
+        return VectorTypeL(this->num_rows());
       }
 
       // Returns a new compatible R-Vector.
       VectorTypeR create_vector_r() const
       {
-        return VectorTypeR(this->columns());
-      }
-
-      /// Returns the number of NNZ-elements of the selected row
-      Index get_length_of_line(const Index row) const
-      {
-        const auto * prow_ptr(this->row_ptr());
-        const auto trow = row / Index(BlockHeight_);
-        return Index(prow_ptr[trow + 1] - prow_ptr[trow]) * Index(BlockWidth_);
+        return VectorTypeR(this->num_cols());
       }
 
       /// Returns the number of NNZ-elements of the selected row
       Index row_degree(const Index row) const
       {
-        const auto * prow_ptr(this->row_ptr());
-        const auto trow = row / Index(BlockHeight_);
-        return Index(prow_ptr[trow + 1] - prow_ptr[trow]) * Index(BlockWidth_);
+        const Index trow = row / Index(block_height_);
+        const Memory::TypedView<IT_> prow_ptr(this->row_ptr_view_r());
+        return Index(prow_ptr[trow + 1] - prow_ptr[trow]) * Index(block_width_);
       }
 
       /**
@@ -2868,22 +2212,20 @@ namespace FEAT
       template<typename IT2_>
       Index get_row_col_indices(const Index row, IT2_ * const pcol_idx, const IT2_ col_offset) const
       {
-        const auto * prow_ptr(this->row_ptr());
-        const auto * pcol_ind(this->col_ind());
+        const Memory::TypedView<IT_> trow_ptr(this->row_ptr_view_r());
+        const Memory::TypedView<IT_> tcol_idx(this->col_idx_view_r());
+        const Index trow = row / Index(block_height_);
 
-        const auto trow = int(row) / BlockHeight_;
-        //const auto lrow = int(row) % BlockHeight_;
-
-        const Index start = Index(prow_ptr[trow]);
-        const Index end = Index(prow_ptr[trow + 1] - prow_ptr[trow]);
+        const Index start = Index(trow_ptr[trow]);
+        const Index end = Index(trow_ptr[trow + 1] - trow_ptr[trow]);
         for (Index i(0); i < end; ++i)
         {
-          for (Index ti(0); ti < Index(BlockWidth_); ++ti)
+          for (Index ti(0); ti < Index(block_width_); ++ti)
           {
-            pcol_idx[i * Index(BlockWidth_) + ti] = IT2_(pcol_ind[start + i]) * IT2_(BlockWidth_) + IT2_(ti) + col_offset;
+            pcol_idx[i * Index(block_width_) + ti] = IT2_(tcol_idx[start + i]) * IT2_(block_width_) + IT2_(ti) + col_offset;
           }
         }
-        return end * Index(BlockWidth_);
+        return end * Index(block_width_);
       }
 
       /**
@@ -2900,22 +2242,22 @@ namespace FEAT
       template<typename DT2_>
       Index get_row_values(const Index row, DT2_ * const pvals) const
       {
-        const auto * prow_ptr(this->row_ptr());
-        const auto * pval(this->val());
+        const Memory::TypedView<IT_> prow_ptr(this->row_ptr_view_r());
+        const Memory::TypedView<ValueType> pval(this->val_view_r());
 
-        const auto trow = int(row) / BlockHeight_;
-        const auto lrow = int(row) % BlockHeight_;
+        const Index trow = row / Index(block_height_);
+        const int lrow = int(row % Index(block_height_));
 
         const Index start = Index(prow_ptr[trow]);
         const Index end = Index(prow_ptr[trow + 1] - prow_ptr[trow]);
         for (Index i(0); i < end; ++i)
         {
-          for (Index ti(0); ti < Index(BlockWidth_); ++ti)
+          for (int ti(0); ti < block_width_; ++ti)
           {
-            pvals[i * Index(BlockWidth_) + ti] = DT2_(pval[start + i](lrow, int(ti)));
+            pvals[i * Index(block_width_) + Index(ti)] = DT2_(pval[start + i](lrow, ti));
           }
         }
-        return end * Index(BlockWidth_);
+        return end * Index(block_width_);
       }
 
       /**
@@ -2932,96 +2274,250 @@ namespace FEAT
       template<typename DT2_>
       Index set_row_values(const Index row, const DT2_ * const pvals)
       {
-        const auto * prow_ptr(this->row_ptr());
-        auto * pval(this->val());
+        const Memory::TypedView<IT_> prow_ptr(this->row_ptr_view_r());
+        Memory::TypedView<ValueType> pval(this->val_view_rw());
 
-        const auto trow = int(row) / BlockHeight_;
-        const auto lrow = int(row) % BlockHeight_;
+        const Index trow = row / Index(block_height_);
+        const int lrow = int(row % Index(block_height_));
 
         const Index start = Index(prow_ptr[trow]);
         const Index end = Index(prow_ptr[trow + 1] - prow_ptr[trow]);
         for (Index i(0); i < end; ++i)
         {
-          for (Index ti(0); ti < Index(BlockWidth_); ++ti)
+          for (int ti(0); ti < block_width_; ++ti)
           {
-            pval[start + i](lrow, int(ti)) = DT_(pvals[i * Index(BlockWidth_) + ti]);
+            pval[start + i](lrow, ti) = DT_(pvals[i * Index(block_width_) + Index(ti)]);
           }
         }
-        return end * Index(BlockWidth_);
-      }
-
-      /// Writes the non-zero-values and matching col-indices of the selected row in allocated arrays
-      void set_line(const Index row, DT_ * const pval_set, IT_ * const pcol_set,
-                    const Index col_start, const Index stride = 1) const
-      {
-        const auto * prow_ptr(this->row_ptr());
-        const auto * pcol_ind(this->col_ind());
-        const auto * pval(this->val());
-
-        const auto trow = int(row) / BlockHeight_;
-        const auto lrow = int(row) - trow * BlockHeight_;
-
-        const Index start((Index(prow_ptr[trow])));
-        const Index end((Index(prow_ptr[trow + 1] - prow_ptr[trow])));
-        for (Index i(0); i < end; ++i)
-        {
-          for (Index ti(0); ti < Index(BlockWidth_); ++ti)
-          {
-            pval_set[(i * Index(BlockWidth_) + ti) * stride] = pval[start + i](lrow, int(ti));
-            pcol_set[(i * Index(BlockWidth_) + ti) * stride] = pcol_ind[start + i] * IT_(BlockWidth_) + IT_(ti) + IT_(col_start);
-          }
-        }
-      }
-
-      void set_line_reverse(const Index row, const DT_ * const pval_set, const Index stride = 1)
-      {
-        const auto * prow_ptr(this->row_ptr());
-        auto * pval(this->val());
-
-        const auto trow = int(row) / BlockHeight_;
-        const auto lrow = int(row) - trow * BlockHeight_;
-
-        const Index start((Index(prow_ptr[trow])));
-        const Index end((Index(prow_ptr[trow + 1] - prow_ptr[trow])));
-        for (Index i(0); i < end; ++i)
-        {
-          for (Index ti(0); ti < Index(BlockWidth_); ++ti)
-          {
-            pval[start + i](lrow, int(ti)) = pval_set[(i * Index(BlockWidth_) + ti) * stride];
-          }
-        }
+        return end * Index(block_width_);
       }
       /// \endcond
 
-      /* ******************************************************************* */
-      /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
-      /* ******************************************************************* */
+      /**
+       * \brief Prints this sparse matrix in human-readable format into an output stream
+       *
+       * \param[inout] os
+       * The output stream to print to
+       *
+       * \param[in]
+       * If \c true, then the matrix will be printed as a dense matrix including all implicit zero entries,
+       * otherwise only the non-zero entries of each row prefixed by the corresponding column index are printed.
+       */
+      void print(std::ostream & os, bool print_dense) const
+      {
+        if(this->empty())
+        {
+          os << "[]";
+          return;
+        }
+
+        const Memory::TypedView<IT_> row_ptr = this->row_ptr_view_r();
+        const Memory::TypedView<IT_> col_idx = this->col_idx_view_r();
+        const Memory::TypedView<ValueType> val = this->val_view_r();
+        const Index nrows = this->num_rows();
+        const Index ncols = this->num_cols();
+
+        os << "[\n";
+        for (Index i = 0 ; i < nrows ; ++i)
+        {
+          for(int bi = 0; bi < block_height; ++bi)
+          {
+            os << "[";
+            IT_ k = 0;
+            for(IT_ j = row_ptr[i]; j < row_ptr[i+1]; ++j)
+            {
+              // write leading zeros
+              if(print_dense)
+              {
+                for(; k < col_idx[j]; ++k)
+                {
+                  for(int bj = 0; bj < block_width; ++bj)
+                    os << "  " << DT_(0);
+                }
+              }
+              else
+              {
+                os << "  " << col_idx[j] << ":[";
+              }
+
+              // write value
+              for(int bj = 0; bj < block_width; ++bj)
+                os << "  " << val[j][bi][bj];
+              ++k;
+
+              if(!print_dense)
+                os << ']';
+            }
+
+            // write trailing zeros
+            if(print_dense)
+            {
+              for(; k < ncols; ++k)
+              {
+                for(int bj = 0; bj < block_width; ++bj)
+                  os << "  " << DT_(0);
+              }
+            }
+            os << "]\n";
+          }
+        }
+        os << "]";
+      }
+
+      /**
+       * \brief SparseMatrixBCSR streaming operator
+       *
+       * \param[in] os The target stream.
+       * \param[in] b The matrix to be streamed.
+       */
+      friend std::ostream & operator<< (std::ostream & os, const SparseMatrixBCSR & b)
+      {
+        b.print(os, true);
+        return os;
+      }
+
+
     public:
-      /** \copydoc Adjactor::get_num_nodes_domain() */
-      inline Index get_num_nodes_domain() const
+      /**
+       * \brief Adjactor Wrapper for SparseMatrixBCSR
+       *
+       * \author Peter Zajac
+       */
+      class Adjactor
       {
-        return rows();
+      public:
+        /// ImageIterator typedef for Adjactor interface implementation
+        typedef const IT_* ImageIterator;
+
+      private:
+        const SparseMatrixBCSR& _matrix;
+        const Memory::TypedView<IT_> _row_ptr;
+        const Memory::TypedView<IT_> _col_idx;
+
+      public:
+        explicit Adjactor(const SparseMatrixBCSR& matrix) :
+          _matrix(matrix),
+          _row_ptr(matrix.row_ptr_view_r()),
+          _col_idx(matrix.col_idx_view_r())
+        {
+        }
+
+        Adjactor(const Adjactor&) = delete;
+        Adjactor& operator=(const Adjactor&) = delete;
+
+        /** \copydoc Adjactor::get_num_nodes_domain() */
+        inline Index get_num_nodes_domain() const
+        {
+          return _matrix.num_rows();
+        }
+
+        /** \copydoc Adjactor::get_num_nodes_image() */
+        inline Index get_num_nodes_image() const
+        {
+          return _matrix.num_cols();
+        }
+
+        /** \copydoc Adjactor::image_begin() */
+        inline ImageIterator image_begin(Index domain_node) const
+        {
+          XASSERTM(domain_node < _matrix.num_rows(), "Domain node index out of range");
+          return &_col_idx.get_r()[_row_ptr[domain_node]];
+        }
+
+        /** \copydoc Adjactor::image_end() */
+        inline ImageIterator image_end(Index domain_node) const
+        {
+          XASSERTM(domain_node < _matrix.num_rows(), "Domain node index out of range");
+          return &_col_idx.get_r()[_row_ptr[domain_node + 1u]];
+        }
+      }; // class Adjactor
+
+      Adjactor adjactor() const
+      {
+        return Adjactor(*this);
       }
 
-      /** \copydoc Adjactor::get_num_nodes_image() */
-      inline Index get_num_nodes_image() const
+      /**
+       * \brief Scatter-Axpy operation for SparseMatrixBCSR
+       *
+       * Apart from the MatrixType and usage of DataTypeBlocked c&p from SparseMatrixCSR.
+       *
+       * \author Jordi Paul
+       */
+      class ScatterAxpy
       {
-        return columns();
-      }
+      public:
+        typedef LAFEM::SparseMatrixBCSR<DT_, IT_, block_height_, block_width_> MatrixType;
+        typedef DT_ DataType;
+        typedef IT_ IndexType;
+        typedef Tiny::Matrix<DT_, block_height_, block_width_> ValueType;
 
-      /** \copydoc Adjactor::image_begin() */
-      inline ImageIterator image_begin(Index domain_node) const
-      {
-        XASSERTM(domain_node < rows(), "Domain node index out of range");
-        return &this->_indices.at(0)[this->_indices.at(1)[domain_node]];
-      }
+      private:
+#ifdef DEBUG
+        static constexpr IT_ _deadcode = ~IT_(0);
+#endif
+        Index _num_rows;
+        Index _num_cols;
+        Memory::Arbiter _col_ptr_arbiter;
+        Memory::TypedView<IT_> _row_ptr_view;
+        Memory::TypedView<IT_> _col_idx_view;
+        Memory::TypedView<IT_> _col_ptr_view;
+        Memory::TypedView<ValueType> _data_view;
 
-      /** \copydoc Adjactor::image_end() */
-      inline ImageIterator image_end(Index domain_node) const
-      {
-        XASSERTM(domain_node < rows(), "Domain node index out of range");
-        return &this->_indices.at(0)[this->_indices.at(1)[domain_node + 1]];
-      }
+      public:
+        explicit ScatterAxpy(MatrixType& matrix) :
+          _num_rows(matrix.num_rows()),
+          _num_cols(matrix.num_cols()),
+          _col_ptr_arbiter(_num_cols * sizeof(IT_), Memory::Location::main, Memory::Init::format_to_one),
+          _row_ptr_view(matrix.row_ptr_view_r()),
+          _col_idx_view(matrix.col_idx_view_r()),
+          _col_ptr_view(_col_ptr_arbiter.view(Memory::Location::main, Memory::Access::read_write)),
+          _data_view(matrix.val_view(Memory::Location::main, Memory::Access::read_write | Memory::Access::overlap))
+        {
+        }
+
+        template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
+        void operator()(const LocalMatrix_& loc_mat, const RowMapping_& row_map,
+          const ColMapping_& col_map, DT_ alpha = DT_(1))
+        {
+          // loop over all local row entries
+          for(int i(0); i < row_map.get_num_local_dofs(); ++i)
+          {
+            // fetch row index
+            const Index ix = row_map.get_index(i);
+
+            // build column pointer for this row entry contribution
+            for(IT_ k(_row_ptr_view(ix)); k < _row_ptr_view(ix + 1); ++k)
+            {
+              _col_ptr_view[_col_idx_view(k)] = k;
+            }
+
+            // loop over all local column entries
+            for(int j(0); j < col_map.get_num_local_dofs(); ++j)
+            {
+              // fetch column index
+              const Index jx = col_map.get_index(j);
+
+              // ensure that the column pointer is valid for this index
+              ASSERTM(_col_ptr_view[jx] != _deadcode, "invalid column index");
+
+              // incorporate data into global matrix
+              _data_view[_col_ptr_view[jx]] += alpha * loc_mat[i][j];
+
+              // continue with next column entry
+            }
+
+#ifdef DEBUG
+            // reformat column-pointer array
+            for(IT_ k(_row_ptr_view(ix)); k < _row_ptr_view(ix + 1); ++k)
+            {
+              _col_ptr_view[_col_idx_view(k)] = _deadcode;
+            }
+#endif
+            // continue with next row entry
+          }
+        }
+      }; // class ScatterAxpy
     }; // class SparseMatrixBCSR
   } // namespace LAFEM
 } // namespace FEAT

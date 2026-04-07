@@ -37,6 +37,13 @@
 #define FEAT_STRINGIFY_HELPER(x) #x
 #define FEAT_STRINGIFY(x) FEAT_STRINGIFY_HELPER(x)
 #endif
+
+// macro used for macro concatenation
+#ifndef FEAT_CONCAT
+#define FEAT_CONCAT_HELPER(x,y) x##y
+#define FEAT_CONCAT(x,y) FEAT_CONCAT_HELPER(x,y)
+#endif
+
 /// \endcond
 
 // include compiler detection headers

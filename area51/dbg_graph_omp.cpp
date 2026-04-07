@@ -309,8 +309,8 @@ int main(int argc, char* argv[])
 
       stamp_6.stamp();
 
-      crc_row_ptr = Hash::crc32(sizeof(Index)*(matrix.rows()+1u), matrix.row_ptr());
-      crc_col_idx = Hash::crc32(sizeof(Index)*matrix.used_elements(), matrix.col_ind());
+      crc_row_ptr = Hash::crc32(sizeof(Index)*(matrix.num_rows()+1u), matrix.row_ptr_view_r().get_r());
+      crc_col_idx = Hash::crc32(sizeof(Index)*matrix.num_nzes(), matrix.col_idx_view_r().get_r());
 
       time_1 += stamp_1.elapsed(stamp_0);
       time_2 += stamp_2.elapsed(stamp_1);

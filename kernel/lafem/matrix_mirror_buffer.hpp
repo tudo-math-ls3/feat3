@@ -7,11 +7,12 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/lafem/forward.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/memory_arbiter.hpp>
 #include <kernel/util/type_traits.hpp>
-#include <kernel/lafem/container.hpp>
 #include <kernel/adjacency/graph.hpp>
+#include <kernel/lafem/forward.hpp>
+#include <kernel/lafem/container.hpp>
 
 namespace FEAT
 {
@@ -27,21 +28,19 @@ namespace FEAT
      * The data layout resembles the common csr layout, with the exception of multiple data entries per non zero element. \n
      * Data survey: \n
      * _elements[0]: raw number values \n
-     * _indices[0]: column index per non zero element \n
-     * _indices[1]: row start index (including matrix end index)\n
-     * _scalar_index[0]: container size
-     * _scalar_index[1]: row count \n
-     * _scalar_index[2]: column count \n
-     * _scalar_index[3]: non zero element count (used elements) \n
-     * _scalar_index[4]: entries per nonzero count
+     * _indices[0]: row start index (including matrix end index)\n
+     * _indices[1]: column index per non zero element \n
+     * _scalar_index[0]: row count \n
+     * _scalar_index[1]: column count \n
+     * _scalar_index[2]: non zero element count (used elements) \n
+     * _scalar_index[3]: entries per nonzero count
      *
      * \author Dirk Ribbrock
      */
-    template < typename DT_, typename IT_ = Index>
+    template<typename DT_, typename IT_>
     class MatrixMirrorBuffer : public Container<DT_, IT_>
     {
     public:
-
       /// Our datatype
       typedef DT_ DataType;
       /// Our indextype
@@ -61,10 +60,7 @@ namespace FEAT
        *
        * Creates an empty non dimensional buffer.
        */
-      explicit MatrixMirrorBuffer() :
-        Container<DT_, IT_> (0)
-      {
-      }
+      MatrixMirrorBuffer() = default;
 
       /**
        * \brief Basic Constructor
@@ -76,22 +72,21 @@ namespace FEAT
        *
        * Creates a new MatrixMirrorBuffer with the given dimensions.
        */
-      MatrixMirrorBuffer(Index rows_in, Index columns_in, Index used_elements_in, Index entries_per_nonzero_in) :
-        Container<DT_, IT_>(rows_in * columns_in)
+      explicit MatrixMirrorBuffer(Index rows_in, Index columns_in, Index used_elements_in, Index entries_per_nonzero_in)
       {
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
         this->_scalar_index.push_back(used_elements_in);
         this->_scalar_index.push_back(entries_per_nonzero_in);
 
-        this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(used_elements()));
-        this->_indices_size.push_back(used_elements());
+        this->_indices.push_back(Memory::Arbiter(sizeof(IT_) * (num_rows() + 1)));
+        this->_indices_size.push_back(num_rows() + 1);
 
-        this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(rows() + 1));
-        this->_indices_size.push_back(rows() + 1);
+        this->_indices.push_back(Memory::Arbiter(sizeof(IT_) * num_nzes()));
+        this->_indices_size.push_back(num_nzes());
 
-        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(used_elements() * entries_per_nonzero()));
-        this->_elements_size.push_back(used_elements() * entries_per_nonzero());
+        this->_elements.push_back(Memory::Arbiter(sizeof(DT_) * (num_nzes() * entries_per_nonzero())));
+        this->_elements_size.push_back(num_nzes() * entries_per_nonzero());
       }
 
       /**
@@ -102,33 +97,23 @@ namespace FEAT
        * Creates a matrix mirror buffer based on a given adjacency graph, representing the sparsity pattern.
        */
       explicit MatrixMirrorBuffer(const Adjacency::Graph & graph, Index entries_per_nonzero_in) :
-        Container<DT_, IT_>(0)
+        MatrixMirrorBuffer(graph.get_num_nodes_domain(), graph.get_num_nodes_image(), graph.get_num_indices(), entries_per_nonzero_in)
       {
-        Index num_rows = graph.get_num_nodes_domain();
-        Index num_cols = graph.get_num_nodes_image();
-        Index num_nnze = graph.get_num_indices();
-
-        // create temporary vectors
-        LAFEM::DenseVector<IT_, IT_> vrow_ptr(num_rows+1);
-        LAFEM::DenseVector<IT_, IT_> vcol_idx(num_nnze);
-        LAFEM::DenseVector<DT_, IT_> vdata(num_nnze * entries_per_nonzero_in, DT_(0));
-
+        const Index num_nnze = graph.get_num_indices();
+        const Index num_rows = graph.get_num_nodes_domain();
         const Index * dom_ptr(graph.get_domain_ptr());
         const Index * img_idx(graph.get_image_idx());
-        IT_ * prow_ptr(vrow_ptr.elements());
-        IT_ * pcol_idx(vcol_idx.elements());
 
-        // build row-end
-        prow_ptr[0] = IT_(dom_ptr[0]);
-        for(Index i(0); i < num_rows; ++i)
-          prow_ptr[i+1] = IT_(dom_ptr[i+1]);
+        Memory::TypedView<IT_> prow_ptr = this->row_ptr_view_w();
+        Memory::TypedView<IT_> pcol_idx = this->col_idx_view_w();
 
-        // build col-idx
-        for(Index i(0); i < num_nnze; ++i)
+        FEAT_PRAGMA_OMP(parallel for)
+        for(Index i = 0; i <= num_rows; ++i)
+          prow_ptr[i] = IT_(dom_ptr[i]);
+
+        FEAT_PRAGMA_OMP(parallel for)
+        for(Index i = 0; i < num_nnze; ++i)
           pcol_idx[i] = IT_(img_idx[i]);
-
-        // build the matrix
-        this->move(MatrixMirrorBuffer<DT_, IT_>(num_rows, num_cols, entries_per_nonzero_in, vcol_idx, vdata, vrow_ptr));
       }
 
       /**
@@ -137,50 +122,30 @@ namespace FEAT
        * \param[in] rows_in The row count.
        * \param[in] columns_in The column count.
        * \param[in] entries_per_nonzero_in The amount of data entries per nonzero matrix entry.
-       * \param[in] col_ind_in Vector with column indices.
+       * \param[in] col_idx_in Vector with column indices.
        * \param[in] val_in Vector with non zero elements.
-       * \param[in] row_ptr_in Vector with start indices of all rows into the val/col_ind arrays.
+       * \param[in] row_ptr_in Vector with start indices of all num_rows into the val/col_idx arrays.
        * Note that this vector must also contain the end index of the last row and thus has a size of row_count + 1.
        *
        * Creates a new MatrixMirrorBuffer with the given dimensions and content.
        */
       explicit MatrixMirrorBuffer(const Index rows_in, const Index columns_in, Index entries_per_nonzero_in,
-                               DenseVector<IT_, IT_> & col_ind_in, DenseVector<DT_, IT_> & val_in, DenseVector<IT_, IT_> & row_ptr_in) :
-        Container<DT_, IT_>(rows_in * columns_in)
+        DenseVector<IT_, IT_> & col_idx_in, DenseVector<DT_, IT_> & val_in, DenseVector<IT_, IT_> & row_ptr_in)
       {
         XASSERT(val_in.size() % entries_per_nonzero_in == 0);
-        XASSERT(val_in.size() == col_ind_in.size() * entries_per_nonzero_in);
+        XASSERT(val_in.size() == col_idx_in.size() * entries_per_nonzero_in);
 
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
-        this->_scalar_index.push_back(col_ind_in.size());
+        this->_scalar_index.push_back(col_idx_in.size());
         this->_scalar_index.push_back(entries_per_nonzero_in);
 
-        this->_elements.push_back(val_in.elements());
-        this->_elements_size.push_back(val_in.size());
-        this->_indices.push_back(col_ind_in.elements());
-        this->_indices_size.push_back(col_ind_in.size());
-        this->_indices.push_back(row_ptr_in.elements());
+        this->_indices.push_back(row_ptr_in.elements_arbiter().attach());
         this->_indices_size.push_back(row_ptr_in.size());
-
-        for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool::increase_memory(this->_elements.at(i));
-        for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool::increase_memory(this->_indices.at(i));
-      }
-
-      /**
-       * \brief Constructor
-       *
-       * \param[in] input A std::vector, containing the byte array.
-       *
-       * Creates a matrix mirror buffer from the given byte array.
-       */
-      template <typename DT2_ = DT_, typename IT2_ = IT_>
-      explicit MatrixMirrorBuffer(std::vector<char> input) :
-        Container<DT_, IT_>(0)
-      {
-        deserialize<DT2_, IT2_>(input);
+        this->_indices.push_back(col_idx_in.elements_arbiter().attach());
+        this->_indices_size.push_back(col_idx_in.size());
+        this->_elements.push_back(val_in.elements_arbiter().attach());
+        this->_elements_size.push_back(val_in.size());
       }
 
       /**
@@ -202,10 +167,9 @@ namespace FEAT
        *
        * Moves another buffer to the target buffer.
        */
-      MatrixMirrorBuffer & operator= (MatrixMirrorBuffer && other)
+      MatrixMirrorBuffer& operator= (MatrixMirrorBuffer && other)
       {
         this->move(std::forward<MatrixMirrorBuffer>(other));
-
         return *this;
       }
 
@@ -251,40 +215,13 @@ namespace FEAT
       }
 
       /**
-       * \brief Deserialization of complete container entity.
-       *
-       * \param[in] input A std::vector, containing the byte array.
-       *
-       * Recreate a complete container entity by a single binary array.
-       */
-      template <typename DT2_ = DT_, typename IT2_ = IT_>
-      void deserialize(std::vector<char> input)
-      {
-        this->template _deserialize<DT2_, IT2_>(FileMode::fm_csr, input);
-      }
-
-      /**
-       * \brief Serialization of complete container entity.
-       *
-       * Serialize a complete container entity into a single binary array.
-       *
-       * See \ref FEAT::LAFEM::Container::_serialize for details.
-       */
-      template <typename DT2_ = DT_, typename IT2_ = IT_>
-      std::vector<char> serialize() const
-      {
-        return this->template _serialize<DT2_, IT2_>(FileMode::fm_csr);
-      }
-
-      /**
        * \brief Retrieve matrix row count.
        *
        * \returns Matrix row count.
        */
-      template <Perspective = Perspective::native>
-      Index rows() const
+      Index num_rows() const
       {
-        return this->_scalar_index.at(1);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(0);
       }
 
       /**
@@ -292,10 +229,9 @@ namespace FEAT
        *
        * \returns Matrix column count.
        */
-      template <Perspective = Perspective::native>
-      Index columns() const
+      Index num_cols() const
       {
-        return this->_scalar_index.at(2);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(1);
       }
 
       /**
@@ -303,10 +239,9 @@ namespace FEAT
        *
        * \returns Non zero element count.
        */
-      template <Perspective = Perspective::native>
-      Index used_elements() const
+      Index num_nzes() const
       {
-        return this->_scalar_index.at(3);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(2);
       }
 
       /**
@@ -314,10 +249,9 @@ namespace FEAT
        *
        * \returns Entries per non zero element count.
        */
-      template <Perspective = Perspective::native>
       Index entries_per_nonzero() const
       {
-        return this->_scalar_index.at(4);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(3);
       }
 
       /**
@@ -327,76 +261,131 @@ namespace FEAT
        *
        * \returns Total length of value array
        */
-      template <Perspective = Perspective::native>
-      Index val_size() const
+      Index num_nzes_raw() const
       {
-        return this->_scalar_index.at(3) * this->_scalar_index.at(4);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(2) * this->_scalar_index.at(3);
       }
 
-      /**
-       * \brief Retrieve column indices array.
-       *
-       * \returns Column indices array.
-       */
-      IT_ * col_ind()
-      {
-        if (this->_indices.size() == 0)
-          return nullptr;
 
+      /// Returns a reference to the row-pointer array arbiter
+      Memory::Arbiter& row_ptr_arbiter()
+      {
         return this->_indices.at(0);
       }
 
-      IT_ const * col_ind() const
+      /// Returns a reference to the row-pointer array arbiter
+      const Memory::Arbiter& row_ptr_arbiter() const
       {
-        if (this->_indices.size() == 0)
-          return nullptr;
-
         return this->_indices.at(0);
       }
 
-      /**
-       * \brief Retrieve non zero element array.
-       *
-       * \returns Non zero element array.
-       */
-      DT_ * val()
+      /// Returns a reference to the column-index array arbiter
+      Memory::Arbiter& col_idx_arbiter()
       {
-        if (this->_elements.size() == 0)
-          return nullptr;
-
-        return this->_elements.at(0);
-      }
-
-      DT_ const * val() const
-      {
-        if (this->_elements.size() == 0)
-          return nullptr;
-
-        return this->_elements.at(0);
-      }
-
-      /**
-       * \brief Retrieve row start index array.
-       *
-       * \returns Row start index array.
-       */
-      IT_ * row_ptr()
-      {
-        if (this->_indices.size() == 0)
-          return nullptr;
-
         return this->_indices.at(1);
       }
 
-      IT_ const * row_ptr() const
+      /// Returns a reference to the column-index array arbiter
+      const Memory::Arbiter& col_idx_arbiter() const
       {
-        if (this->_indices.size() == 0)
-          return nullptr;
-
         return this->_indices.at(1);
       }
 
-    }; //MatrixMirrorBuffer
+      /// Returns a reference to the values array arbiter
+      Memory::Arbiter& val_arbiter()
+      {
+        return this->_elements.front();
+      }
 
+      /// Returns a reference to the values array arbiter
+      const Memory::Arbiter& val_arbiter() const
+      {
+        return this->_elements.front();
+      }
+
+      Memory::TypedView<DT_> val_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::read));
+      }
+
+      Memory::TypedView<DT_> val_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::write));
+      }
+
+      Memory::TypedView<DT_> val_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<IT_>(this->_elements.at(0).view(loc, Memory::Access::read_write));
+      }
+
+      Memory::TypedView<DT_> val_view(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<IT_>(this->_elements.at(0).view(loc, acc));
+      }
+
+      Memory::TypedView<IT_> row_ptr_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::read));
+      }
+
+      Memory::TypedView<IT_> row_ptr_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::write));
+      }
+
+      Memory::TypedView<IT_> row_ptr_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::read_write));
+      }
+
+      Memory::TypedView<IT_> row_ptr_view(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, acc));
+      }
+
+      Memory::TypedView<IT_> col_idx_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(1).view(loc, Memory::Access::read));
+      }
+
+      Memory::TypedView<IT_> col_idx_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(1).view(loc, Memory::Access::write));
+      }
+
+      Memory::TypedView<IT_> col_idx_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(1).view(loc, Memory::Access::read_write));
+      }
+
+      Memory::TypedView<IT_> col_idx_view(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(1).view(loc, acc));
+      }
+    }; // class MatrixMirrorBuffer<...>
   } // namespace LAFEM
 } // namespace FEAT

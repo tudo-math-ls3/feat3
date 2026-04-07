@@ -334,7 +334,7 @@ int main(int argc, char* argv[])
     // --------------------------------------------------------------------------------------------
 
     // save checkpoint if desired
-    check_point.write_registerd(time_stepping);
+    check_point.write_registered(time_stepping);
 
     // ============================================================================================
     // Step 7: print plot line

@@ -132,7 +132,7 @@ class NLCGTest:
       // Get an initial guess from the Traits class for the given function
       PointType starting_point(DT_(0));
       TestTraitsType::get_starting_point(starting_point);
-      sol(0,starting_point);
+      sol.elements_view_w()[0] = starting_point;
 
       // Solve the optimization problem
       solver->correct(sol, rhs);
@@ -146,9 +146,10 @@ class NLCGTest:
 
       const auto& jt = min_points.end();
       auto it = min_points.begin();
+      auto sol0 = sol.elements_view_r()(0);
       for(; it != jt; ++it)
       {
-        DT_ dist((sol(0) - *it).norm_euclid());
+        DT_ dist((sol0 - *it).norm_euclid());
         if(dist  < min_dist)
         {
           min_dist = dist;
@@ -341,7 +342,7 @@ class NLSDTest:
       // Get an initial guess from the Traits class for the given function
       PointType starting_point(DT_(0));
       TestTraitsType::get_starting_point(starting_point);
-      sol(0,starting_point);
+      sol.elements_view_w()[0] = starting_point;
 
       // Solve the optimization problem
       solver->correct(sol, rhs);
@@ -357,9 +358,10 @@ class NLSDTest:
 
       const auto& jt = min_points.end();
       auto it = min_points.begin();
+      auto sol0 = sol.elements_view_r()(0);
       for(; it != jt; ++it)
       {
-        DT_ dist((sol(0) - *it).norm_euclid());
+        DT_ dist((sol0 - *it).norm_euclid());
         if(dist  < min_dist)
         {
           min_dist = dist;
@@ -478,7 +480,7 @@ class ALGLIBMinLBFGSTest:
       // Get an initial guess from the Traits class for the given function
       PointType starting_point(DT_(0));
       TestTraitsType::get_starting_point(starting_point);
-      sol(0,starting_point);
+      sol.elements_view_w()[0] = starting_point;
 
       // Solve the optimization problem
       solver->correct(sol, rhs);
@@ -494,9 +496,10 @@ class ALGLIBMinLBFGSTest:
 
       const auto& jt = min_points.end();
       auto it = min_points.begin();
+      auto sol0 = sol.elements_view_r()(0);
       for(; it != jt; ++it)
       {
-        DT_ dist((sol(0) - *it).norm_euclid());
+        DT_ dist((sol0 - *it).norm_euclid());
         if(dist  < min_dist)
         {
           min_dist = dist;
@@ -607,7 +610,7 @@ class ALGLIBMinCGTest:
       // Get an initial guess from the Traits class for the given function
       PointType starting_point(DT_(0));
       TestTraitsType::get_starting_point(starting_point);
-      sol(0,starting_point);
+      sol.elements_view_w()[0] = starting_point;
 
       // Solve the optimization problem
       solver->correct(sol, rhs);
@@ -623,9 +626,10 @@ class ALGLIBMinCGTest:
 
       const auto& jt = min_points.end();
       auto it = min_points.begin();
+      auto sol0 = sol.elements_view_r()(0);
       for(; it != jt; ++it)
       {
-        DT_ dist((sol(0) - *it).norm_euclid());
+        DT_ dist((sol0 - *it).norm_euclid());
         if(dist  < min_dist)
         {
           min_dist = dist;

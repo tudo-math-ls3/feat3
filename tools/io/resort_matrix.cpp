@@ -40,7 +40,7 @@ int main(int argc, char ** argv)
     FEAT::Runtime::abort();
   }
 
-  Graph graph(Adjacency::RenderType::as_is, orig);
+  Graph graph(Adjacency::RenderType::as_is, orig.adjactor());
   Index best_radius;
   Index best_radius_index;
   orig.radius_row(best_radius, best_radius_index);

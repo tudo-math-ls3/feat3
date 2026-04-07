@@ -604,7 +604,7 @@ namespace Tutorial08
       Geometry::ExportVTK<MeshType> exporter(mesh);
 
       // add the solution vector
-      exporter.add_vertex_scalar("sol", vec_sol.elements());
+      exporter.add_vertex_scalar("sol", vec_sol);
 
       // finally, write the VTK file
       exporter.write(vtk_name);

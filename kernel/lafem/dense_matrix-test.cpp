@@ -29,263 +29,282 @@ using namespace FEAT::TestSystem;
 template<
   typename DT_,
   typename IT_>
-  class DenseMatrixTest
+class DenseMatrixTest
   : public UnitTest
 {
-
 public:
-
-  DenseMatrixTest(PreferredBackend backend)
+  explicit DenseMatrixTest(PreferredBackend backend)
     : UnitTest("DenseMatrixTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseMatrixTest()
   {
   }
 
   virtual void run() const override
   {
-    DT_ eps = TestSystem::tol<DT_>();
+    const DT_ eps = TestSystem::tol<DT_>();
     DenseMatrix<DT_, IT_> zero;
     TEST_CHECK(zero.empty());
 
     DenseMatrix<DT_, IT_> a(10, 11);
     TEST_CHECK(!a.empty());
-    TEST_CHECK_EQUAL(a.rows(), 10);
-    TEST_CHECK_EQUAL(a.columns(), 11);
+    TEST_CHECK_EQUAL(a.num_rows(), 10);
+    TEST_CHECK_EQUAL(a.num_cols(), 11);
+    TEST_CHECK_EQUAL(a.num_nzes(), 110);
     TEST_CHECK_EQUAL(a.size(), 110);
-    DenseMatrix<DT_, IT_> b(10, 10, 5.);
-    b(7, 6, DT_(42));
+    DenseMatrix<DT_, IT_> b(10, 10, DT_(5));
+    b.elements_view_rw()[7*11 + 6] = DT_(42);
     DenseMatrix<DT_, IT_> c;
     c.convert(b);
-    TEST_CHECK_EQUAL(c.size(), b.size());
-    TEST_CHECK_EQUAL(c.rows(), b.rows());
-    TEST_CHECK_EQUAL(c(7, 6), b(7, 6));
+    TEST_CHECK_EQUAL(c.num_rows(), b.num_rows());
+    TEST_CHECK_EQUAL(b.elements_view_r()(7*11 + 5), c.elements_view_r()(7*11 + 5));
+    TEST_CHECK_EQUAL(b.elements_view_r()(7*11 + 6), c.elements_view_r()(7*11 + 6));
     TEST_CHECK_LESS_THAN(c.max_rel_diff(b), eps);
 
-    DenseMatrix<DT_, IT_> e(11, 12, 5.);
-    TEST_CHECK_EQUAL(e.rows(), 11ul);
-    TEST_CHECK_EQUAL(e.columns(), 12ul);
+    DenseMatrix<DT_, IT_> e(11, 12, DT_(5));
+    TEST_CHECK_EQUAL(e.num_rows(), 11ul);
+    TEST_CHECK_EQUAL(e.num_cols(), 12ul);
 
     DenseMatrix<DT_, IT_> h;
     h.clone(c);
     TEST_CHECK_LESS_THAN(h.max_rel_diff(c), eps);
-    h(1, 2, 3);
+    h.elements_view_rw()[1*11+2] = DT_(3);
     TEST_CHECK_LESS_THAN(eps, h.max_rel_diff(c));
-    TEST_CHECK_NOT_EQUAL((void*)h.elements(), (void*)c.elements());
-
-    // Lehmer matrix inverse test
-    DenseMatrix<DT_, IT_> l(11, 11);
-    for (Index i(0); i < l.rows(); ++i)
-    {
-      for (Index j(0); j < l.rows(); ++j)
-      {
-        l(i, j, DT_(Math::min(i, j) + 1) / DT_(Math::max(i, j) + 1));
-      }
-    }
-    auto m = l.inverse();
-    m.invert();
-    for (Index i(0); i < l.rows(); ++i)
-    {
-      for (Index j(0); j < l.rows(); ++j)
-      {
-        TEST_CHECK_RELATIVE(m(i, j), l(i, j), eps);
-      }
-    }
-
+    TEST_CHECK_NOT_EQUAL(h.elements_arbiter(), c.elements_arbiter());
   }
 };
-DenseMatrixTest <float, std::uint32_t> cpu_dense_matrix_test_float_uint32(PreferredBackend::generic);
-DenseMatrixTest <double, std::uint32_t> cpu_dense_matrix_test_double_uint32(PreferredBackend::generic);
-DenseMatrixTest <float, std::uint64_t> cpu_dense_matrix_test_float_uint64(PreferredBackend::generic);
-DenseMatrixTest <double, std::uint64_t> cpu_dense_matrix_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseMatrixTest <float, std::uint64_t> mkl_cpu_dense_matrix_test_float_uint64(PreferredBackend::mkl);
-DenseMatrixTest <double, std::uint64_t> mkl_cpu_dense_matrix_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseMatrixTest <__float128, std::uint32_t> cpu_dense_matrix_test_float128_uint32(PreferredBackend::generic);
-DenseMatrixTest <__float128, std::uint64_t> cpu_dense_matrix_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseMatrixTest <Half, std::uint32_t> cpu_dense_matrix_test_half_uint32(PreferredBackend::generic);
-DenseMatrixTest <Half, std::uint64_t> cpu_dense_matrix_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTest, Half, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixTest <Half, std::uint32_t> cuda_dense_matrix_test_half_uint32(PreferredBackend::cuda);
-DenseMatrixTest <Half, std::uint64_t> cuda_dense_matrix_test_half_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTest, Half, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTest, Half, std::uint64_t, PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixTest <float, std::uint32_t> cuda_dense_matrix_test_float_uint32(PreferredBackend::cuda);
-DenseMatrixTest <double, std::uint32_t> cuda_dense_matrix_test_double_uint32(PreferredBackend::cuda);
-DenseMatrixTest <float, std::uint64_t> cuda_dense_matrix_test_float_uint64(PreferredBackend::cuda);
-DenseMatrixTest <double, std::uint64_t> cuda_dense_matrix_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class DenseMatrixSerializeTest
+class DenseMatrixInverseTest
   : public UnitTest
 {
-
 public:
-
-  DenseMatrixSerializeTest(PreferredBackend backend)
-    : UnitTest("DenseMatrixSerializeTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseMatrixSerializeTest()
+  explicit DenseMatrixInverseTest(PreferredBackend backend)
+    : UnitTest("DenseMatrixInverseTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
   virtual void run() const override
   {
-    DT_ eps = TestSystem::tol<DT_>();
-    DenseMatrix<DT_, IT_> test_mat(40, 40);
-    for (Index i(0); i < test_mat.rows(); ++i)
+    const DT_ eps = TestSystem::tol<DT_>();
+
+    // Lehmer matrix inverse test
+    for(Index n = 2; n < 5; ++n)
     {
-      for (Index j(0); j < test_mat.rows(); ++j)
+      DenseMatrix<DT_, IT_> leh(n, n), ref(n,n);
       {
-        test_mat(i, j, DT_(Math::min(i, j) + 1) / DT_(Math::max(i, j) + 1));
+        Memory::TypedView<DT_> vl(leh.elements_view_w());
+        for (Index i(0); i < n; ++i)
+        {
+          for (Index j(0); j < n; ++j)
+          {
+            vl[i*n+j] = DT_(Math::min(i, j) + 1) / DT_(Math::max(i, j) + 1);
+          }
+        }
+      }
+
+      ref.format();
+      {
+        Memory::TypedView<DT_> vr(ref.elements_view_rw());
+        DT_ b = -DT_(2) / DT_(3);
+        vr[0*n+0] = DT_(4) / DT_(3);
+        vr[0*n+1] = b;
+        for(Index i(1) ; i < n - 1 ; ++i)
+        {
+          vr[i*n+i-1] = b;
+          vr[i*n+i  ] = DT_(4*Math::cub(i+1)) / DT_(4*Math::sqr(i+1) - 1);
+          vr[i*n+i+1] = b = -DT_((i+2)*(i+1)) / DT_(2*i + 3);
+        }
+        vr[(n-1)*n + n-2] = b;
+        vr[(n-1)*n + n-1] = DT_(n*n) / DT_(2*n - 1);
+      }
+
+      DenseMatrix<DT_, IT_> inv = leh.inverse();
+      {
+        Memory::TypedView<DT_> vx(inv.elements_view_r());
+        Memory::TypedView<DT_> vr(ref.elements_view_r());
+        for(Index i = 0; i < n*n; ++i)
+        {
+          TEST_CHECK_EQUAL_WITHIN_EPS(vx(i), vr(i), eps);
+        }
       }
     }
+  }
+};
+SPAWN_UNIT_TEST_2T_P(DenseMatrixInverseTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixInverseTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixInverseTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixInverseTest, double, std::uint64_t, PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SPAWN_UNIT_TEST_2T_P(DenseMatrixInverseTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixInverseTest, double, std::uint64_t, PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SPAWN_UNIT_TEST_2T_P(DenseMatrixInverseTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixInverseTest, __float128, std::uint64_t, PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SPAWN_UNIT_TEST_2T_P(DenseMatrixInverseTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixInverseTest, Half, std::uint64_t, PreferredBackend::generic);
+#ifdef FEAT_HAVE_CUDA
+SPAWN_UNIT_TEST_2T_P(DenseMatrixInverseTest, Half, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixInverseTest, Half, std::uint64_t, PreferredBackend::cuda);
+#endif
+#endif
+#ifdef FEAT_HAVE_CUDA
+SPAWN_UNIT_TEST_2T_P(DenseMatrixInverseTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixInverseTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixInverseTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixInverseTest, double, std::uint64_t, PreferredBackend::cuda);
+#endif
+
+template<
+  typename DT_,
+  typename IT_>
+class DenseMatrixSerializeTest
+  : public UnitTest
+{
+public:
+  explicit DenseMatrixSerializeTest(PreferredBackend backend)
+    : UnitTest("DenseMatrixSerializeTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual void run() const override
+  {
+    const DT_ eps = TestSystem::tol<DT_>();
+
+    const Index n = 16;
+    DenseMatrix<DT_, IT_> test_mat(n, n);
+    {
+      Memory::TypedView<DT_> vl(test_mat.elements_view_w());
+      for (Index i(0); i < n; ++i)
+      {
+        for (Index j(0); j < n; ++j)
+        {
+          vl[i*n+j] = DT_(Math::min(i, j) + 1) / DT_(Math::max(i, j) + 1);
+        }
+      }
+    }
+
     auto kp = test_mat.serialize(LAFEM::SerialConfig(false, false));
     DenseMatrix<DT_, IT_> k(kp);
     TEST_CHECK_LESS_THAN(k.max_rel_diff(test_mat), eps);
+
 #ifdef FEAT_HAVE_ZLIB
     auto zl = test_mat.serialize(LAFEM::SerialConfig(true, false));
     DenseMatrix<DT_, IT_> k1(zl);
     TEST_CHECK_LESS_THAN(k1.max_rel_diff(test_mat), eps);
 #endif
+
 #ifdef FEAT_HAVE_ZFP
     auto zfp = test_mat.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-6)));
     DenseMatrix<DT_, IT_> k2(zfp);
-    for (Index i(0); i < k2.rows(); ++i)
-    {
-      for (Index j(0); j < k2.rows(); ++j)
-      {
-        TEST_CHECK_EQUAL_WITHIN_EPS(k2(i, j), test_mat(i, j), DT_(1e-6));
-      }
-    }
+    TEST_CHECK_LESS_THAN(k2.max_rel_diff(test_mat), DT_(1e-6));
 #endif
 
-    // DenseMatrix write_out test
-    DenseMatrix<DT_, IT_> u(11, 11);
-    for (Index i(0); i < u.rows(); ++i)
-    {
-      for (Index j(0); j < u.columns(); ++j)
-      {
-        u(i, j, DT_(i + j + 1));
-      }
-    }
     //Binary Test
     {
       BinaryStream bs;
-      u.write_out(FileMode::fm_dm, bs);
+      test_mat.write_out(FileMode::fm_dm, bs);
       bs.seekg(0);
       DenseMatrix<DT_, IT_> test(FileMode::fm_dm, bs);
-      for (Index i(0); i < u.rows(); ++i)
-      {
-        for (Index j(0); j < u.columns(); ++j)
-        {
-          TEST_CHECK_RELATIVE(u(i, j), test(i, j), eps);
-        }
-      }
+      TEST_CHECK_LESS_THAN(test.max_rel_diff(test_mat), eps);
     }
+
     //Mtx Test
     {
       std::stringstream ts;
-      u.write_out(FileMode::fm_mtx, ts);
-      DenseMatrix<DT_, IT_> test2(FileMode::fm_mtx, ts);
-      for (Index i(0); i < u.rows(); ++i)
-      {
-        for (Index j(0); j < u.columns(); ++j)
-        {
-          TEST_CHECK_RELATIVE(u(i, j), test2(i, j), eps);
-        }
-      }
+      test_mat.write_out(FileMode::fm_mtx, ts);
+      DenseMatrix<DT_, IT_> test(FileMode::fm_mtx, ts);
+      TEST_CHECK_LESS_THAN(test.max_rel_diff(test_mat), eps);
     }
+
     //*
     //FileTest-> for now... problem if write rights arent given...
     {
       String filename = "test_dense_matrix_file_bin.txt";
       std::ofstream(filename.c_str());
-      u.write_out(FileMode::fm_dm, filename);
-      DenseMatrix<DT_, IT_> test3(FileMode::fm_dm, filename);
-      for (Index i(0); i < u.rows(); ++i)
-      {
-        for (Index j(0); j < u.columns(); ++j)
-        {
-          TEST_CHECK_RELATIVE(u(i, j), test3(i, j), eps);
-        }
-      }
+      test_mat.write_out(FileMode::fm_dm, filename);
+      DenseMatrix<DT_, IT_> test(FileMode::fm_dm, filename);
+      TEST_CHECK_LESS_THAN(test.max_rel_diff(test_mat), eps);
       std::remove(filename.c_str());
     }
     {
       String filename = "test_dense_matrix_file_mtx.txt";
       std::ofstream(filename.c_str());
-      u.write_out(FileMode::fm_mtx, filename);
-      DenseMatrix<DT_, IT_> test4(FileMode::fm_mtx, filename);
-      for (Index i(0); i < u.rows(); ++i)
-      {
-        for (Index j(0); j < u.columns(); ++j)
-        {
-          TEST_CHECK_RELATIVE(u(i, j), test4(i, j), eps);
-        }
-      }
+      test_mat.write_out(FileMode::fm_mtx, filename);
+      DenseMatrix<DT_, IT_> test(FileMode::fm_mtx, filename);
+      TEST_CHECK_LESS_THAN(test.max_rel_diff(test_mat), eps);
       std::remove(filename.c_str());
     }
     //*/
   }
 };
-DenseMatrixSerializeTest <float, std::uint32_t> cpu_dense_matrix_serialize_test_float_uint32(PreferredBackend::generic);
-DenseMatrixSerializeTest <double, std::uint32_t> cpu_dense_matrix_serialize_test_double_uint32(PreferredBackend::generic);
-DenseMatrixSerializeTest <float, std::uint64_t> cpu_dense_matrix_serialize_test_float_uint64(PreferredBackend::generic);
-DenseMatrixSerializeTest <double, std::uint64_t> cpu_dense_matrix_serialize_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSerializeTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSerializeTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSerializeTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSerializeTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseMatrixSerializeTest <float, std::uint64_t> mkl_cpu_dense_matrix_serialize_test_float_uint64(PreferredBackend::mkl);
-DenseMatrixSerializeTest <double, std::uint64_t> mkl_cpu_dense_matrix_serialize_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSerializeTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSerializeTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 //#ifdef FEAT_HAVE_QUADMATH
-//DenseMatrixSerializeTest <__float128, std::uint32_t> cpu_dense_matrix_serialize_test_float128_uint32(PreferredBackend::generic);
-//DenseMatrixSerializeTest <__float128, std::uint64_t> cpu_dense_matrix_serialize_test_float128_uint64(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(DenseMatrixSerializeTest, __float128, std::uint32_t, PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(DenseMatrixSerializeTest, __float128, std::uint64_t, PreferredBackend::generic);
 //#endif
 #ifdef FEAT_HAVE_HALFMATH
-//DenseMatrixSerializeTest<__half, std::uint32_t> cpu_dense_matrix_serialize_test_half_uint(PreferredBackend::generic);
-//DenseMatrixSerializeTest<__half, std::uint64_t> cpu_dense_matrix_serialize_test_half_ulong(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(DenseMatrixSerializeTest, __half, std::uint32_t, PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(DenseMatrixSerializeTest, __half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixSerializeTest <float, std::uint32_t> cuda_dense_matrix_serialize_test_float_uint32(PreferredBackend::cuda);
-DenseMatrixSerializeTest <double, std::uint32_t> cuda_dense_matrix_serialize_test_double_uint32(PreferredBackend::cuda);
-DenseMatrixSerializeTest <float, std::uint64_t> cuda_dense_matrix_serialize_test_float_uint64(PreferredBackend::cuda);
-DenseMatrixSerializeTest <double, std::uint64_t> cuda_dense_matrix_serialize_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSerializeTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSerializeTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSerializeTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSerializeTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class DenseMatrixApplyTest
+class DenseMatrixApplyTest
   : public UnitTest
 {
 public:
-  double _eps;
-
-  explicit DenseMatrixApplyTest(PreferredBackend backend, double eps)
-    : UnitTest("DenseMatrixApplyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
-    _eps(eps)
-  {
-  }
-
-  virtual ~DenseMatrixApplyTest()
+  explicit DenseMatrixApplyTest(PreferredBackend backend)
+    : UnitTest("DenseMatrixApplyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
   virtual void run() const override
   {
-    DT_ eps = TestSystem::tol<DT_>();
+    const DT_ eps = TestSystem::tol<DT_>();
     DT_ s(DT_(0.123));
     for (Index size(16); size < 100; size *= 2)
     {
@@ -296,53 +315,68 @@ public:
       DenseVector<DT_, IT_> ref(size);
       DenseVector<DT_, IT_> result(size, DT_(4711));
 
-      for (Index i(0); i < x.size(); ++i)
       {
-        x(i, DT_(DT_(1) / (DT_(1) + DT_(i % 100) * DT_(1.234))));
+        Memory::TypedView<DT_> vx(x.elements_view_w());
+        for (Index i(0); i < x.size(); ++i)
+        {
+          vx[i] = DT_(DT_(1) / (DT_(1) + DT_(i % 100) * DT_(1.234)));
+        }
       }
-      for (Index i(0); i < y.size(); ++i)
       {
-        y(i, DT_(DT_(2) - DT_(i % 42)));
+        Memory::TypedView<DT_> vy(y.elements_view_w());
+        for (Index i(0); i < y.size(); ++i)
+        {
+          vy[i] = DT_(DT_(2) - DT_(i % 42));
+        }
       }
-
-      for (Index i(0); i < a.size(); ++i)
       {
-        a.elements()[i] = DT_(DT_(i % 100) * DT_(1.234));
+        Memory::TypedView<DT_> va(a.elements_view_w());
+        for (Index i(0); i < a.size(); ++i)
+        {
+          va[i] = DT_(DT_(i % 100) * DT_(1.234));
+        }
       }
 
       // apply-test for alpha = 0.0
       a.apply(result, x, y, DT_(0.0));
-      for (Index i(0); i < result.size(); ++i)
-        TEST_CHECK_RELATIVE(y(i), result(i), eps);
+      TEST_CHECK_LESS_THAN(y.max_rel_diff(result), eps);
 
       //apply-test for reduced apply call
       a.apply(result, x);
-      for (Index i(0); i < a.rows(); ++i)
       {
-        DT_ sum(0);
-        for (Index j(0); j < a.columns(); ++j)
+        Memory::TypedView<DT_> va(a.elements_view_r());
+        Memory::TypedView<DT_> vx(x.elements_view_r());
+        Memory::TypedView<DT_> vr(ref.elements_view_w());
+        for (Index i(0); i < a.num_rows(); ++i)
         {
-          sum += a(i, j) * x(j);
+          DT_ sum(0);
+          for (Index j(0); j < a.num_cols(); ++j)
+          {
+            sum += va(i * a.num_cols() + j) * vx(j);
+          }
+          vr[i] = sum;
         }
-        ref(i, sum);
       }
-      for (Index i(0); i < result.size(); ++i)
-        TEST_CHECK_RELATIVE(result(i), ref(i), eps);
+      TEST_CHECK_LESS_THAN(ref.max_rel_diff(result), eps);
 
       //apply-test for alpha = -1.0
       a.apply(result, x, y, DT_(-1.0));
-      for (Index i(0); i < a.rows(); ++i)
       {
-        DT_ sum(0);
-        for (Index j(0); j < a.columns(); ++j)
+        Memory::TypedView<DT_> va(a.elements_view_r());
+        Memory::TypedView<DT_> vx(x.elements_view_r());
+        Memory::TypedView<DT_> vy(y.elements_view_r());
+        Memory::TypedView<DT_> vr(ref.elements_view_w());
+        for (Index i(0); i < a.num_rows(); ++i)
         {
-          sum += a(i, j) * x(j);
+          DT_ sum(0);
+          for (Index j(0); j < a.num_cols(); ++j)
+          {
+            sum += va(i * a.num_cols() + j) * vx(j);
+          }
+          vr[i] = vy(i) - sum;
         }
-        ref(i, y(i) - sum);
       }
-
-      for (Index i(0); i < result.size(); ++i)
-        TEST_CHECK_RELATIVE(result(i), ref(i), eps);
+      TEST_CHECK_LESS_THAN(ref.max_rel_diff(result), eps);
 
       // apply-test for s = 0.123
       a.apply(result, x, y, s);
@@ -350,39 +384,37 @@ public:
       Backend::set_preferred_backend(PreferredBackend::generic);
       a.apply(ref, x);
       ref.scale(ref, s);
-      ref.axpy(y); /// \todo use axpby here
-
-      for (Index i(0); i < result.size(); ++i)
-        TEST_CHECK_RELATIVE(result(i), ref(i), eps);
+      ref.axpy(y);
+      TEST_CHECK_LESS_THAN(ref.max_rel_diff(result), eps);
     }
   }
 };
 
-DenseMatrixApplyTest <float, std::uint32_t> dense_matrix_apply_test_float_uint32(PreferredBackend::generic, 1e-3);
-DenseMatrixApplyTest <double, std::uint32_t> dense_matrix_apply_test_double_uint32(PreferredBackend::generic, 1e-5);
-DenseMatrixApplyTest <float, std::uint64_t> dense_matrix_apply_test_float_uint64(PreferredBackend::generic, 1e-3);
-DenseMatrixApplyTest <double, std::uint64_t> dense_matrix_apply_test_double_uint64(PreferredBackend::generic, 1e-5);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseMatrixApplyTest <float, std::uint64_t> mkl_dense_matrix_apply_test_float_uint64(PreferredBackend::mkl, 1e-3);
-DenseMatrixApplyTest <double, std::uint64_t> mkl_dense_matrix_apply_test_double_uint64(PreferredBackend::mkl, 1e-5);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseMatrixApplyTest <__float128, std::uint32_t> dense_matrix_apply_test_float128_uint32(PreferredBackend::generic, 1e-6);
-DenseMatrixApplyTest <__float128, std::uint64_t> dense_matrix_apply_test_float128_uint64(PreferredBackend::generic, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseMatrixApplyTest <Half, std::uint32_t> dense_matrix_apply_test_half_uint32(PreferredBackend::generic, 5e-2);
-DenseMatrixApplyTest <Half, std::uint64_t> dense_matrix_apply_test_half_uint64(PreferredBackend::generic, 5e-2);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTest, Half, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixApplyTest <Half, std::uint32_t> cuda_dense_matrix_apply_test_half_uint32(PreferredBackend::cuda, 5e-1);
-DenseMatrixApplyTest <Half, std::uint64_t> cuda_dense_matrix_apply_test_half_uint64(PreferredBackend::cuda, 5e-1);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTest, Half, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTest, Half, std::uint64_t, PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixApplyTest <float, std::uint32_t> cuda_dense_matrix_apply_test_float_uint32(PreferredBackend::cuda, 1e-2);
-DenseMatrixApplyTest <double, std::uint32_t> cuda_dense_matrix_apply_test_double_uint32(PreferredBackend::cuda, 1e-4);
-DenseMatrixApplyTest <float, std::uint64_t> cuda_dense_matrix_apply_test_float_uint64(PreferredBackend::cuda, 1e-2);
-DenseMatrixApplyTest <double, std::uint64_t> cuda_dense_matrix_apply_test_double_uint64(PreferredBackend::cuda, 1e-4);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
@@ -392,21 +424,14 @@ class DenseMatrixApplyTransposedTest
   : public UnitTest
 {
 public:
-  double _eps;
-
-  explicit DenseMatrixApplyTransposedTest(PreferredBackend backend, double eps)
-    : UnitTest("DenseMatrixApplyTransposedTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
-    _eps(eps)
-  {
-  }
-
-  virtual ~DenseMatrixApplyTransposedTest()
+  explicit DenseMatrixApplyTransposedTest(PreferredBackend backend)
+    : UnitTest("DenseMatrixApplyTransposedTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
   virtual void run() const override
   {
-    DT_ eps = TestSystem::tol<DT_>();
+    const DT_ eps = TestSystem::tol<DT_>();
     DT_ s(DT_(0.123));
     for (Index size(16); size < 100; size *= 2)
     {
@@ -417,53 +442,69 @@ public:
       DenseVector<DT_, IT_> ref(size);
       DenseVector<DT_, IT_> result(size, DT_(4711));
 
-      for (Index i(0); i < x.size(); ++i)
       {
-        x(i, DT_(DT_(1) / (DT_(1) + DT_(i % 100) * DT_(1.234))));
+        Memory::TypedView<DT_> vx(x.elements_view_w());
+        for (Index i(0); i < x.size(); ++i)
+        {
+          vx[i] = DT_(DT_(1) / (DT_(1) + DT_(i % 100) * DT_(1.234)));
+        }
       }
-      for (Index i(0); i < y.size(); ++i)
       {
-        y(i, DT_(DT_(2) - DT_(i % 42)));
+        Memory::TypedView<DT_> vy(y.elements_view_w());
+        for (Index i(0); i < y.size(); ++i)
+        {
+          vy[i] = DT_(DT_(2) - DT_(i % 42));
+        }
       }
-
-      for (Index i(0); i < a.size(); ++i)
       {
-        a.elements()[i] = DT_(DT_(i % 100) * DT_(1.234));
+        Memory::TypedView<DT_> va(a.elements_view_w());
+        for (Index i(0); i < a.size(); ++i)
+        {
+          va[i] = DT_(DT_(i % 100) * DT_(1.234));
+        }
       }
 
       // apply-test for alpha = 0.0
       a.apply_transposed(result, x, y, DT_(0.0));
-      for (Index i(0); i < result.size(); ++i)
-        TEST_CHECK_RELATIVE(y(i), result(i), eps);
+      TEST_CHECK_LESS_THAN(y.max_rel_diff(result), eps);
 
       //apply-test for reduced apply call
       a.apply_transposed(result, x);
-      for (Index i(0); i < a.columns(); ++i)
       {
-        DT_ sum(0);
-        for (Index j(0); j < a.rows(); ++j)
+        Memory::TypedView<DT_> va(a.elements_view_r());
+        Memory::TypedView<DT_> vx(x.elements_view_r());
+        Memory::TypedView<DT_> vr(ref.elements_view_w());
+        for (Index i(0); i < a.num_cols(); ++i)
         {
-          sum += a(j, i) * x(j);
+          DT_ sum(0);
+          for (Index j(0); j < a.num_rows(); ++j)
+          {
+            sum += va(j * a.num_cols() + i) * vx(j);
+          }
+          vr[i] = sum;
         }
-        ref(i, sum);
       }
-      for (Index i(0); i < result.size(); ++i)
-        TEST_CHECK_RELATIVE(result(i), ref(i), eps);
+      TEST_CHECK_LESS_THAN(ref.max_rel_diff(result), eps);
 
-      //apply-test for alpha = -1.0
-      a.apply_transposed(result, x, y, DT_(-1.0));
-      for (Index i(0); i < a.columns(); ++i)
+      //apply-test for alpha = -1.2
+      a.apply_transposed(result, x, y, DT_(-1.2));
       {
-        DT_ sum(0);
-        for (Index j(0); j < a.rows(); ++j)
+        Memory::TypedView<DT_> va(a.elements_view_r());
+        Memory::TypedView<DT_> vx(x.elements_view_r());
+        Memory::TypedView<DT_> vy(y.elements_view_r());
+        Memory::TypedView<DT_> vr(ref.elements_view_w());
+        for (Index i(0); i < a.num_cols(); ++i)
         {
-          sum += a(j, i) * x(j);
+          DT_ sum(0);
+          for (Index j(0); j < a.num_rows(); ++j)
+          {
+            sum += va(j * a.num_cols() + i) * vx(j);
+          }
+          vr[i] = vy(i) - DT_(1.2)*sum;
         }
-        ref(i, y(i) - sum);
       }
 
-      for (Index i(0); i < result.size(); ++i)
-        TEST_CHECK_RELATIVE(result(i), ref(i), eps);
+      TEST_CHECK_LESS_THAN(ref.max_rel_diff(result), eps);
 
       // apply-test for s = 0.123
       a.apply_transposed(result, x, y, s);
@@ -471,65 +512,57 @@ public:
       Backend::set_preferred_backend(PreferredBackend::generic);
       a.apply_transposed(ref, x);
       ref.scale(ref, s);
-      ref.axpy(y); /// \todo use axpby here
+      ref.axpy(y);
 
-      for (Index i(0); i < result.size(); ++i)
-        TEST_CHECK_RELATIVE(result(i), ref(i), eps);
+      TEST_CHECK_LESS_THAN(ref.max_rel_diff(result), eps);
     }
   }
 };
 
-DenseMatrixApplyTransposedTest <float, std::uint32_t> dense_matrix_apply_transposed_test_float_uint32(PreferredBackend::generic, 1e-3);
-DenseMatrixApplyTransposedTest <double, std::uint32_t> dense_matrix_apply_transposed_test_double_uint32(PreferredBackend::generic, 1e-5);
-DenseMatrixApplyTransposedTest <float, std::uint64_t> dense_matrix_apply_transposed_test_float_uint64(PreferredBackend::generic, 1e-3);
-DenseMatrixApplyTransposedTest <double, std::uint64_t> dense_matrix_apply_transposed_test_double_uint64(PreferredBackend::generic, 1e-5);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTransposedTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTransposedTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTransposedTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTransposedTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseMatrixApplyTransposedTest <float, std::uint64_t> mkl_dense_matrix_apply_transposed_test_float_uint64(PreferredBackend::mkl, 1e-3);
-DenseMatrixApplyTransposedTest <double, std::uint64_t> mkl_dense_matrix_apply_transposed_test_double_uint64(PreferredBackend::mkl, 1e-5);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTransposedTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTransposedTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseMatrixApplyTransposedTest <__float128, std::uint32_t> dense_matrix_apply_transposed_test_float128_uint32(PreferredBackend::generic, 1e-6);
-DenseMatrixApplyTransposedTest <__float128, std::uint64_t> dense_matrix_apply_transposed_test_float128_uint64(PreferredBackend::generic, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTransposedTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTransposedTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseMatrixApplyTransposedTest <Half, std::uint32_t> dense_matrix_apply_transposed_test_half_uint32(PreferredBackend::generic, 5e-2);
-DenseMatrixApplyTransposedTest <Half, std::uint64_t> dense_matrix_apply_transposed_test_half_uint64(PreferredBackend::generic, 5e-2);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTransposedTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTransposedTest, Half, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixApplyTransposedTest <Half, std::uint32_t> cuda_dense_matrix_apply_transposed_test_half_uint32(PreferredBackend::cuda, 5e-1);
-DenseMatrixApplyTransposedTest <Half, std::uint64_t> cuda_dense_matrix_apply_transposed_test_half_uint64(PreferredBackend::cuda, 5e-1);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTransposedTest, Half, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTransposedTest, Half, std::uint64_t, PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixApplyTransposedTest <float, std::uint32_t> cuda_dense_matrix_apply_transposed_test_float_uint32(PreferredBackend::cuda, 1e-2);
-DenseMatrixApplyTransposedTest <double, std::uint32_t> cuda_dense_matrix_apply_transposed_test_double_uint32(PreferredBackend::cuda, 1e-4);
-DenseMatrixApplyTransposedTest <float, std::uint64_t> cuda_dense_matrix_apply_transposed_test_float_uint64(PreferredBackend::cuda, 1e-2);
-DenseMatrixApplyTransposedTest <double, std::uint64_t> cuda_dense_matrix_apply_transposed_test_double_uint64(PreferredBackend::cuda, 1e-4);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTransposedTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTransposedTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTransposedTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixApplyTransposedTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class DenseMatrixAxpyTest
+class DenseMatrixAxpyTest
   : public UnitTest
 {
 public:
-  double _eps;
-
-  explicit DenseMatrixAxpyTest(PreferredBackend backend, double eps)
-    : UnitTest("DenseMatrixAxpyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
-    _eps(eps)
-  {
-  }
-
-  virtual ~DenseMatrixAxpyTest()
+  explicit DenseMatrixAxpyTest(PreferredBackend backend)
+    : UnitTest("DenseMatrixAxpyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
   virtual void run() const override
   {
-    DT_ eps = TestSystem::tol<DT_>();
+    const DT_ eps = TestSystem::tol<DT_>();
 
-    for (Index size(1); size < 65; size *= 2)
+    for (Index size(1); size < 33; size *= 2)
     {
       DenseMatrix<DT_, IT_> x(size, size + 2, DT_(0.));
       DenseMatrix<DT_, IT_> y(size, size + 2, DT_(0.));
@@ -538,208 +571,201 @@ public:
       DenseMatrix<DT_, IT_> result(size, size + 2, DT_(1234.));
       DT_ alpha(DT_(1.5));
 
-      for (Index i(0); i < x.size(); ++i)
       {
-        x.elements()[i] = DT_(DT_(1 + i % 100) * DT_(1.234));
-        y.elements()[i] = DT_(1.) / (DT_(1.) + DT_(i % 42));
+        Memory::TypedView<DT_> vx = x.elements_view_w();
+        Memory::TypedView<DT_> vy = y.elements_view_w();
+        for (Index i(0); i < x.size(); ++i)
+        {
+          vx[i] = DT_(DT_(1 + i % 100) * DT_(1.234));
+          vy[i] = DT_(1.) / (DT_(1.) + DT_(i % 42));
+        }
       }
 
-      for (Index i(0); i < ref.rows(); ++i)
       {
-        for (Index k(0); k < ref.columns(); ++k)
+        Index n = ref.num_cols();
+        Memory::TypedView<DT_> vx = x.elements_view_r();
+        Memory::TypedView<DT_> vy = y.elements_view_r();
+        Memory::TypedView<DT_> vr1 = ref.elements_view_w();
+        Memory::TypedView<DT_> vr2 = ref2.elements_view_w();
+        for (Index i(0); i < ref.num_rows(); ++i)
         {
-          ref(i,k, alpha * x(i,k) + y(i,k));
-          ref2(i,k, alpha * y(i,k) + y(i,k));
+          for (Index k(0); k < ref.num_cols(); ++k)
+          {
+            vr1[i*n+k] = alpha * vx(i*n+k) + vy(i*n+k);
+            vr2[i*n+k] = alpha * vy(i*n+k) + vy(i*n+k);
+          }
         }
       }
       // r == x
       result.copy(y);
       result.axpy(result, alpha);
-      for (Index i(0); i < result.rows(); ++i)
-      {
-        for (Index j(0); j < result.columns(); ++j)
-          TEST_CHECK_RELATIVE(result(i, j), ref2(i, j), eps);
-      }
+      TEST_CHECK_LESS_THAN(result.max_rel_diff(ref2), eps);
 
       // r != x
       result.copy(y);
       result.axpy(x, alpha);
 
-      for (Index i(0); i < result.rows(); ++i)
-      {
-        for (Index j(0); j < result.columns(); ++j)
-          TEST_CHECK_RELATIVE(result(i, j), ref(i, j), eps);
-      }
-
-#ifdef FEAT_HAVE_HALFMATH
-      if constexpr(std::is_same_v<DT_, Half>)
-        eps *= Half(4);
-#endif
+      TEST_CHECK_LESS_THAN(result.max_rel_diff(ref), eps);
     }
   }
 };
 
-DenseMatrixAxpyTest <float, std::uint32_t> dense_matrix_axpy_test_float_uint32(PreferredBackend::generic, 1e-3);
-DenseMatrixAxpyTest <double, std::uint32_t> dense_matrix_axpy_test_double_uint32(PreferredBackend::generic, 1e-6);
-DenseMatrixAxpyTest <float, std::uint64_t> dense_matrix_axpy_test_float_uint64(PreferredBackend::generic, 1e-3);
-DenseMatrixAxpyTest <double, std::uint64_t> dense_matrix_axpy_test_double_uint64(PreferredBackend::generic, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAxpyTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAxpyTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAxpyTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAxpyTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseMatrixAxpyTest <float, std::uint64_t> mkl_dense_matrix_axpy_test_float_uint64(PreferredBackend::mkl, 1e-3);
-DenseMatrixAxpyTest <double, std::uint64_t> mkl_dense_matrix_axpy_test_double_uint64(PreferredBackend::mkl, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAxpyTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAxpyTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseMatrixAxpyTest <__float128, std::uint32_t> dense_matrix_axpy_test_float128_uint32(PreferredBackend::generic, 1e-6);
-DenseMatrixAxpyTest <__float128, std::uint64_t> dense_matrix_axpy_test_float128_uint64(PreferredBackend::generic, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAxpyTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAxpyTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseMatrixAxpyTest <Half, std::uint32_t> dense_matrix_axpy_test_half_uint32(PreferredBackend::generic, 1e-2);
-DenseMatrixAxpyTest <Half, std::uint64_t> dense_matrix_axpy_test_half_uint64(PreferredBackend::generic, 1e-2);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAxpyTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAxpyTest, Half, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixAxpyTest <Half, std::uint32_t> cuda_dense_matrix_axpy_test_half_uint32(PreferredBackend::cuda, 1e-2);
-DenseMatrixAxpyTest <Half, std::uint64_t> cuda_dense_matrix_axpy_test_half_uint64(PreferredBackend::cuda, 1e-2);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAxpyTest, Half, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAxpyTest, Half, std::uint64_t, PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixAxpyTest <float, std::uint32_t> cuda_dense_matrix_axpy_test_float_uint32(PreferredBackend::cuda, 1e-3);
-DenseMatrixAxpyTest <double, std::uint32_t> cuda_dense_matrix_axpy_test_double_uint32(PreferredBackend::cuda, 1e-6);
-DenseMatrixAxpyTest <float, std::uint64_t> cuda_dense_matrix_axpy_test_float_uint64(PreferredBackend::cuda, 1e-3);
-DenseMatrixAxpyTest <double, std::uint64_t> cuda_dense_matrix_axpy_test_double_uint64(PreferredBackend::cuda, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAxpyTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAxpyTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAxpyTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAxpyTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class DenseMatrixMultiplyTest
+class DenseMatrixSetProductTest
   : public UnitTest
 {
 public:
-  double _eps;
-
-  explicit DenseMatrixMultiplyTest(PreferredBackend backend, double eps)
-    : UnitTest("DenseMatrixMultiplyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
-    _eps(eps)
-  {
-  }
-
-  virtual ~DenseMatrixMultiplyTest()
+  explicit DenseMatrixSetProductTest(PreferredBackend backend) :
+    UnitTest("DenseMatrixSetProductTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
   virtual void run() const override
   {
-    DT_ eps = TestSystem::tol<DT_>();
+    const DT_ eps = TestSystem::tol<DT_>();
 
-    for (Index size(1); size < 32; size *= 2)
+    for (Index size(1); size < 33; size *= 2)
     {
       DenseMatrix<DT_, IT_> x(size, size + 2, DT_(0.));
       DenseMatrix<DT_, IT_> y(size + 2, size + 1, DT_(0.));
       DenseMatrix<DT_, IT_> ref(size, size + 1, DT_(4711.));
       DenseMatrix<DT_, IT_> result(size, size + 1, DT_(1234.));
 
-      for (Index i(0); i < x.size(); ++i)
       {
-        x.elements()[i] = DT_(DT_(1 + i % 100) * DT_(1.234));
-      }
-      for (Index i(0); i < y.size(); ++i)
-      {
-        y.elements()[i] = DT_(1.) / (DT_(1.) + DT_(i % 42));
-      }
-
-      for (Index i(0); i < ref.rows(); ++i)
-      {
-        for (Index k(0); k < ref.columns(); ++k)
+        Memory::TypedView<DT_> vx = x.elements_view_w();
+        for (Index i(0); i < x.size(); ++i)
         {
-          DT_ sum(0.);
-          for (Index j(0); j < x.columns(); ++j)
-          {
-            sum = sum + x(i, j) * y(j, k);
-          }
-          ref(i, k, sum);
+          vx[i] = DT_(DT_(1 + i % 100) * DT_(1.234));
+        }
+      }
+      {
+        Memory::TypedView<DT_> vy = y.elements_view_w();
+        for (Index i(0); i < y.size(); ++i)
+        {
+          vy[i] = DT_(1.) / (DT_(1.) + DT_(i % 42));
         }
       }
 
-      result.multiply(x, y);
-
-      for (Index i(0); i < result.rows(); ++i)
       {
-        for (Index j(0); j < result.columns(); ++j)
-          TEST_CHECK_RELATIVE(result(i, j), ref(i, j), eps);
+        Memory::TypedView<DT_> vx = x.elements_view_r();
+        Memory::TypedView<DT_> vy = y.elements_view_r();
+        Memory::TypedView<DT_> vr = ref.elements_view_w();
+        const Index ncx = x.num_cols();
+        const Index ncy = y.num_cols();
+        const Index ncr = ref.num_cols();
+        for (Index i(0); i < ref.num_rows(); ++i)
+        {
+          for (Index k(0); k < ref.num_cols(); ++k)
+          {
+            DT_ sum(0.);
+            for (Index j(0); j < x.num_cols(); ++j)
+            {
+              sum = sum + vx(i*ncx + j) * vy(j*ncy + k);
+            }
+            vr[i*ncr + k] = sum;
+          }
+        }
       }
-#ifdef FEAT_HAVE_HALFMATH
-      if constexpr(std::is_same_v<DT_, Half>)
-        eps *= Half(4);
-#endif
+
+      result.set_product(x, y);
+
+      TEST_CHECK_LESS_THAN(result.max_rel_diff(ref), eps);
     }
   }
 };
 
-DenseMatrixMultiplyTest <float, std::uint32_t> dense_matrix_multiply_test_float_uint32(PreferredBackend::generic, 1e-3);
-DenseMatrixMultiplyTest <double, std::uint32_t> dense_matrix_multiply_test_double_uint32(PreferredBackend::generic, 1e-6);
-DenseMatrixMultiplyTest <float, std::uint64_t> dense_matrix_multiply_test_float_uint64(PreferredBackend::generic, 1e-3);
-DenseMatrixMultiplyTest <double, std::uint64_t> dense_matrix_multiply_test_double_uint64(PreferredBackend::generic, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSetProductTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSetProductTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSetProductTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSetProductTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseMatrixMultiplyTest <float, std::uint64_t> mkl_dense_matrix_multiply_test_float_uint64(PreferredBackend::mkl, 1e-3);
-DenseMatrixMultiplyTest <double, std::uint64_t> mkl_dense_matrix_multiply_test_double_uint64(PreferredBackend::mkl, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSetProductTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSetProductTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseMatrixMultiplyTest <__float128, std::uint32_t> dense_matrix_multiply_test_float128_uint32(PreferredBackend::generic, 1e-6);
-DenseMatrixMultiplyTest <__float128, std::uint64_t> dense_matrix_multiply_test_float128_uint64(PreferredBackend::generic, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSetProductTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSetProductTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseMatrixMultiplyTest <Half, std::uint32_t> dense_matrix_multiply_test_half_uint32(PreferredBackend::generic, 1e-2);
-DenseMatrixMultiplyTest <Half, std::uint64_t> dense_matrix_multiply_test_half_uint64(PreferredBackend::generic, 1e-2);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSetProductTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSetProductTest, Half, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixMultiplyTest <Half, std::uint32_t> cuda_dense_matrix_multiply_test_half_uint32(PreferredBackend::cuda, 1e-2);
-DenseMatrixMultiplyTest <Half, std::uint64_t> cuda_dense_matrix_multiply_test_half_uint64(PreferredBackend::cuda, 1e-2);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSetProductTest, Half, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSetProductTest, Half, std::uint64_t, PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixMultiplyTest <float, std::uint32_t> cuda_dense_matrix_multiply_test_float_uint32(PreferredBackend::cuda, 1e-3);
-DenseMatrixMultiplyTest <double, std::uint32_t> cuda_dense_matrix_multiply_test_double_uint32(PreferredBackend::cuda, 1e-6);
-DenseMatrixMultiplyTest <float, std::uint64_t> cuda_dense_matrix_multiply_test_float_uint64(PreferredBackend::cuda, 1e-3);
-DenseMatrixMultiplyTest <double, std::uint64_t> cuda_dense_matrix_multiply_test_double_uint64(PreferredBackend::cuda, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSetProductTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSetProductTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSetProductTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSetProductTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class DenseMatrixCSRMultiplyTest
+class DenseMatrixCSRSetProductTest
   : public UnitTest
 {
 public:
-  double _eps;
-
-  explicit DenseMatrixCSRMultiplyTest(PreferredBackend backend, double eps)
-    : UnitTest("DenseMatrixCSRMultiplyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
-    _eps(eps)
-  {
-  }
-
-  virtual ~DenseMatrixCSRMultiplyTest()
+  explicit DenseMatrixCSRSetProductTest(PreferredBackend backend) :
+    UnitTest("DenseMatrixCSRSetProductTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
   virtual void run() const override
   {
-    DT_ eps = TestSystem::tol<DT_>();
+    const DT_ eps = TestSystem::tol<DT_>();
 
-    for (Index size(1); size < 32; size *= 2)
+    for (Index size(1); size < 33; size *= 2)
     {
       SparseMatrixFactory<DT_, IT_> xfac(size, size + 2);
       DenseMatrix<DT_, IT_> x_dense(size, size + 2, DT_(0.));
-      for (IT_ row(0); row < xfac.rows(); ++row)
       {
-        for (IT_ col(0); col < xfac.columns(); ++col)
+        Memory::TypedView<DT_> vx = x_dense.elements_view_rw();
+        for (IT_ row(0); row < xfac.num_rows(); ++row)
         {
-          if (row == col)
+          for (IT_ col(0); col < xfac.num_cols(); ++col)
           {
-            xfac.add(row, col, DT_(2));
-            x_dense.elements()[row * xfac.columns() + col] = DT_(2);
-          }
-          else if ((row == col + 1) || (row + 1 == col))
-          {
-            xfac.add(row, col, DT_(-1));
-            x_dense.elements()[row * xfac.columns() + col] = DT_(-1);
+            if (row == col)
+            {
+              xfac.add(row, col, DT_(2));
+              vx[row * xfac.num_cols() + col] = DT_(2);
+            }
+            else if ((row == col + 1) || (row + 1 == col))
+            {
+              xfac.add(row, col, DT_(-1));
+              vx[row * xfac.num_cols() + col] = DT_(-1);
+            }
           }
         }
       }
@@ -747,195 +773,188 @@ public:
       DenseMatrix<DT_, IT_> y(size + 2, size + 1, DT_(0.));
       DenseMatrix<DT_, IT_> ref(size, size + 1, DT_(4711.));
       DenseMatrix<DT_, IT_> result(size, size + 1, DT_(1234.));
-      for (Index i(0); i < y.size(); ++i)
       {
-        y.elements()[i] = DT_(1.) / (DT_(1.) + DT_(i % 42));
+        Memory::TypedView<DT_> vy = y.elements_view_w();
+        Index mn = y.num_rows() * y.num_cols();
+        for (Index i(0); i < mn; ++i)
+        {
+          vy[i] = DT_(1.) / (DT_(1.) + DT_(i % 42));
+        }
       }
 
-      ref.multiply(x_dense, y);
-      result.multiply(x, y);
-      for (Index i(0); i < result.rows(); ++i)
-      {
-        for (Index j(0); j < result.columns(); ++j)
-          TEST_CHECK_RELATIVE(result(i, j), ref(i, j), eps);
-      }
-#ifdef FEAT_HAVE_HALFMATH
-      if constexpr(std::is_same_v<DT_, Half>)
-        eps *= Half(4);
-#endif
+      ref.set_product(x_dense, y);
+      result.set_product(x, y);
+      TEST_CHECK_LESS_THAN(result.max_rel_diff(ref), eps);
     }
   }
 };
 
-DenseMatrixCSRMultiplyTest <float, std::uint32_t> dense_matrix_csr_multiply_test_float_uint32(PreferredBackend::generic, 1e-3);
-DenseMatrixCSRMultiplyTest <double, std::uint32_t> dense_matrix_csr_multiply_test_double_uint32(PreferredBackend::generic, 1e-6);
-DenseMatrixCSRMultiplyTest <float, std::uint64_t> dense_matrix_csr_multiply_test_float_uint64(PreferredBackend::generic, 1e-3);
-DenseMatrixCSRMultiplyTest <double, std::uint64_t> dense_matrix_csr_multiply_test_double_uint64(PreferredBackend::generic, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRSetProductTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRSetProductTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRSetProductTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRSetProductTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseMatrixCSRMultiplyTest <float, std::uint64_t> mkl_dense_matrix_csr_multiply_test_float_uint64(PreferredBackend::mkl, 1e-3);
-DenseMatrixCSRMultiplyTest <double, std::uint64_t> mkl_dense_matrix_csr_multiply_test_double_uint64(PreferredBackend::mkl, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRSetProductTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRSetProductTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseMatrixCSRMultiplyTest <__float128, std::uint32_t> dense_csr_matrix_multiply_test_float128_uint32(PreferredBackend::generic, 1e-6);
-DenseMatrixCSRMultiplyTest <__float128, std::uint64_t> dense_csr_matrix_multiply_test_float128_uint64(PreferredBackend::generic, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRSetProductTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRSetProductTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseMatrixCSRMultiplyTest <Half, std::uint32_t> dense_matrix_csr_multiply_test_half_uint32(PreferredBackend::generic, 1e-2);
-DenseMatrixCSRMultiplyTest <Half, std::uint64_t> dense_matrix_csr_multiply_test_half_uint64(PreferredBackend::generic, 1e-2);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRSetProductTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRSetProductTest, Half, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixCSRMultiplyTest <Half, std::uint32_t> cuda_dense_matrix_csr_multiply_test_half_uint32(PreferredBackend::cuda, 1e-2);
-DenseMatrixCSRMultiplyTest <Half, std::uint64_t> cuda_dense_matrix_csr_multiply_test_half_uint64(PreferredBackend::cuda, 1e-2);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRSetProductTest, Half, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRSetProductTest, Half, std::uint64_t, PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixCSRMultiplyTest <float, std::uint32_t> cuda_dense_matrix_csr_multiply_test_float_uint32(PreferredBackend::cuda, 1e-3);
-DenseMatrixCSRMultiplyTest <double, std::uint32_t> cuda_dense_matrix_csr_multiply_test_double_uint32(PreferredBackend::cuda, 1e-6);
-DenseMatrixCSRMultiplyTest <float, std::uint64_t> cuda_dense_matrix_csr_multiply_test_float_uint64(PreferredBackend::cuda, 1e-3);
-DenseMatrixCSRMultiplyTest <double, std::uint64_t> cuda_dense_matrix_csr_multiply_test_double_uint64(PreferredBackend::cuda, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRSetProductTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRSetProductTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRSetProductTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRSetProductTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class DenseMatrixMultiply2Test
+class DenseMatrixAddProductTest
   : public UnitTest
 {
 public:
-  double _eps;
-
-  explicit DenseMatrixMultiply2Test(PreferredBackend backend, double eps)
-    : UnitTest("DenseMatrixMultiply2Test", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
-    _eps(eps)
-  {
-  }
-
-  virtual ~DenseMatrixMultiply2Test()
+  explicit DenseMatrixAddProductTest(PreferredBackend backend)
+    : UnitTest("DenseMatrixAddProductTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
   virtual void run() const override
   {
-    DT_ eps = TestSystem::tol<DT_>();
+    const DT_ eps = TestSystem::tol<DT_>();
 
-    for (Index size(1); size < 65; size *= 2)
+    for (Index size(1); size < 33; size *= 2)
     {
       DenseMatrix<DT_, IT_> x(size, size + 2, DT_(0.));
       DenseMatrix<DT_, IT_> y(size + 2, size + 1, DT_(0.));
       DenseMatrix<DT_, IT_> z(size, size + 1, DT_(0.));
       DenseMatrix<DT_, IT_> ref(size, size + 1, DT_(4711.));
-      //DenseMatrix<DT_, IT_> result(size, size + 1, DT_(1234.));
       DT_ alpha = DT_(3);
-      DT_ beta = DT_(1.5);
 
-      for (Index i(0); i < x.size(); ++i)
       {
-        x.elements()[i] = DT_(DT_(1 + i % 100) * DT_(1.234));
-      }
-      for (Index i(0); i < y.size(); ++i)
-      {
-        y.elements()[i] = DT_(1.) / (DT_(1.) + DT_(i % 42));
-      }
-      for (Index i(0); i < z.size(); ++i)
-      {
-        z.elements()[i] = DT_(1.) / (DT_(1.) + DT_(i % 37));
-      }
-
-      for (Index i(0); i < ref.rows(); ++i)
-      {
-        for (Index k(0); k < ref.columns(); ++k)
+        Memory::TypedView<DT_> vx = x.elements_view_w();
+        for (Index i(0); i < x.size(); ++i)
         {
-          DT_ sum(0.);
-          for (Index j(0); j < x.columns(); ++j)
-          {
-            sum = sum + alpha * x(i, j) * y(j, k);
-          }
-          sum += beta * z(i,k);
-          ref(i, k, sum);
+          vx[i] = DT_(DT_(1 + i % 100) * DT_(1.234));
+        }
+      }
+      {
+        Memory::TypedView<DT_> vy = y.elements_view_w();
+        for (Index i(0); i < y.size(); ++i)
+        {
+          vy[i] = DT_(1.) / (DT_(1.) + DT_(i % 42));
+        }
+      }
+      {
+        Memory::TypedView<DT_> vz = z.elements_view_w();
+        for (Index i(0); i < z.size(); ++i)
+        {
+          vz[i] = DT_(1.) / (DT_(1.) + DT_(i % 37));
         }
       }
 
-      z.multiply(x, y, alpha, beta);
-
-      for (Index i(0); i < z.rows(); ++i)
       {
-        for (Index j(0); j < z.columns(); ++j)
-          TEST_CHECK_RELATIVE(z(i, j), ref(i, j), eps);
+        Memory::TypedView<DT_> vx = x.elements_view_r();
+        Memory::TypedView<DT_> vy = y.elements_view_r();
+        Memory::TypedView<DT_> vz = z.elements_view_r();
+        Memory::TypedView<DT_> vr = ref.elements_view_w();
+        const Index nr = ref.num_rows();
+        const Index nc = ref.num_cols();
+        const Index ncx = x.num_cols();
+        const Index ncy = y.num_cols();
+        for (Index i(0); i < nr; ++i)
+        {
+          for (Index k(0); k < nc; ++k)
+          {
+            DT_ sum(0.);
+            for (Index j(0); j < ncx; ++j)
+            {
+              sum = sum + vx(i * ncx + j) * vy(j * ncy + k);
+            }
+            vr[i * nc + k] = vz(i * nc + k) + alpha*sum;
+          }
+        }
       }
-#ifdef FEAT_HAVE_HALFMATH
-      if constexpr(std::is_same_v<DT_, Half>)
-        eps *= Half(4);
-#endif
+
+      z.add_product(x, y, alpha);
+
+      TEST_CHECK_LESS_THAN(z.max_rel_diff(ref), eps);
     }
   }
 };
 
-DenseMatrixMultiply2Test <float, std::uint32_t> dense_matrix_multiply_2_test_float_uint32(PreferredBackend::generic, 1e-3);
-DenseMatrixMultiply2Test <double, std::uint32_t> dense_matrix_multiply_2_test_double_uint32(PreferredBackend::generic, 1e-6);
-DenseMatrixMultiply2Test <float, std::uint64_t> dense_matrix_multiply_2_test_float_uint64(PreferredBackend::generic, 1e-3);
-DenseMatrixMultiply2Test <double, std::uint64_t> dense_matrix_multiply_2_test_double_uint64(PreferredBackend::generic, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAddProductTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAddProductTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAddProductTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAddProductTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-//DenseMatrixMultiply2Test<float, std::uint64_t> mkl_dense_matrix_multiply_2_test_float_ulong(PreferredBackend::mkl, 1e-3);
-//DenseMatrixMultiply2Test<double, std::uint64_t> mkl_dense_matrix_multiply_2_test_double_ulong(PreferredBackend::mkl, 1e-6);
+//SPAWN_UNIT_TEST_2T_P(DenseMatrixAddProductTest, float, std::uint64_t, PreferredBackend::mkl);
+//SPAWN_UNIT_TEST_2T_P(DenseMatrixAddProductTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseMatrixMultiply2Test <__float128, std::uint32_t> dense_matrix_multiply_2_test_float128_uint32(PreferredBackend::generic, 1e-6);
-DenseMatrixMultiply2Test <__float128, std::uint64_t> dense_matrix_multiply_2_test_float128_uint64(PreferredBackend::generic, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAddProductTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAddProductTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseMatrixMultiply2Test <Half, std::uint32_t> dense_matrix_multiply_2_test_half_uint32(PreferredBackend::generic, 1e-2);
-DenseMatrixMultiply2Test <Half, std::uint64_t> dense_matrix_multiply_2_test_half_uint64(PreferredBackend::generic, 1e-2);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAddProductTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAddProductTest, Half, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixMultiply2Test <Half, std::uint32_t> cuda_dense_matrix_multiply_2_test_half_uint32(PreferredBackend::cuda, 1e-2);
-DenseMatrixMultiply2Test <Half, std::uint64_t> cuda_dense_matrix_multiply_2_test_half_uint64(PreferredBackend::cuda, 1e-2);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAddProductTest, Half, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAddProductTest, Half, std::uint64_t, PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixMultiply2Test <float, std::uint32_t> cuda_dense_matrix_multiply_2_test_float_uint32(PreferredBackend::cuda, 2e-3);
-DenseMatrixMultiply2Test <double, std::uint32_t> cuda_dense_matrix_multiply_2_test_double_uint32(PreferredBackend::cuda, 1e-6);
-DenseMatrixMultiply2Test <float, std::uint64_t> cuda_dense_matrix_multiply_2_test_float_uint64(PreferredBackend::cuda, 2e-3);
-DenseMatrixMultiply2Test <double, std::uint64_t> cuda_dense_matrix_multiply_2_test_double_uint64(PreferredBackend::cuda, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAddProductTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAddProductTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAddProductTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixAddProductTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class DenseMatrixCSRMultiply2Test
+  class DenseMatrixCSRAddProductTest
   : public UnitTest
 {
 public:
-  double _eps;
-
-  explicit DenseMatrixCSRMultiply2Test(PreferredBackend backend, double eps)
-    : UnitTest("DenseMatrixCSRMultiply2Test", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
-    _eps(eps)
-  {
-  }
-
-  virtual ~DenseMatrixCSRMultiply2Test()
+  explicit DenseMatrixCSRAddProductTest(PreferredBackend backend)
+    : UnitTest("DenseMatrixCSRAddProductTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
   virtual void run() const override
   {
-    DT_ eps = TestSystem::tol<DT_>();
+    const DT_ eps = TestSystem::tol<DT_>();
 
-    for (Index size(1); size < 65; size *= 2)
+    for (Index size(1); size < 33; size *= 2)
     {
       SparseMatrixFactory<DT_, IT_> xfac(size, size + 2);
       DenseMatrix<DT_, IT_> x_dense(size, size + 2, DT_(0.));
-      for (IT_ row(0); row < xfac.rows(); ++row)
       {
-        for (IT_ col(0); col < xfac.columns(); ++col)
+        Memory::TypedView<DT_> vx = x_dense.elements_view_rw();
+        for (IT_ row(0); row < xfac.num_rows(); ++row)
         {
-          if (row == col)
+          for (IT_ col(0); col < xfac.num_cols(); ++col)
           {
-            xfac.add(row, col, DT_(2));
-            x_dense.elements()[row * xfac.columns() + col] = DT_(2);
-          }
-          else if ((row == col + 1) || (row + 1 == col))
-          {
-            xfac.add(row, col, DT_(-1));
-            x_dense.elements()[row * xfac.columns() + col] = DT_(-1);
+            if (row == col)
+            {
+              xfac.add(row, col, DT_(2));
+              vx[row * xfac.num_cols() + col] = DT_(2);
+            }
+            else if ((row == col + 1) || (row + 1 == col))
+            {
+              xfac.add(row, col, DT_(-1));
+              vx[row * xfac.num_cols() + col] = DT_(-1);
+            }
           }
         }
       }
@@ -944,123 +963,124 @@ public:
       DenseMatrix<DT_, IT_> z(size, size + 1, DT_(0.));
       DenseMatrix<DT_, IT_> ref(size, size + 1, DT_(4711.));
       DT_ alpha = DT_(3);
-      DT_ beta = DT_(1.5);
 
-      for (Index i(0); i < y.size(); ++i)
       {
-        y.elements()[i] = DT_(1.) / (DT_(1.) + DT_(i % 42));
-      }
-      for (Index i(0); i < z.size(); ++i)
-      {
-        z.elements()[i] = DT_(1.) / (DT_(1.) + DT_(i % 37));
-      }
-
-      for (Index i(0); i < ref.rows(); ++i)
-      {
-        for (Index k(0); k < ref.columns(); ++k)
+        Memory::TypedView<DT_> vy = y.elements_view_w();
+        Index mn = y.num_rows() * y.num_cols();
+        for (Index i(0); i < mn; ++i)
         {
-          DT_ sum(0.);
-          for (Index j(0); j < x_dense.columns(); ++j)
-          {
-            sum = sum + alpha * x_dense(i, j) * y(j, k);
-          }
-          sum += beta * z(i,k);
-          ref(i, k, sum);
+          vy[i] = DT_(1.) / (DT_(1.) + DT_(i % 42));
+        }
+      }
+      {
+        Memory::TypedView<DT_> vz = z.elements_view_w();
+        Index mn = z.num_rows() * z.num_cols();
+        for (Index i(0); i < mn; ++i)
+        {
+          vz[i] = DT_(1.) / (DT_(1.) + DT_(i % 37));
         }
       }
 
-      z.multiply(x, y, alpha, beta);
-
-      for (Index i(0); i < z.rows(); ++i)
       {
-        for (Index j(0); j < z.columns(); ++j)
-          TEST_CHECK_EQUAL_WITHIN_EPS(z(i, j), ref(i, j), eps);
+        Memory::TypedView<DT_> vx = x_dense.elements_view_r();
+        Memory::TypedView<DT_> vy = y.elements_view_r();
+        Memory::TypedView<DT_> vz = z.elements_view_r();
+        Memory::TypedView<DT_> vr = ref.elements_view_w();
+        for (Index i(0); i < ref.num_rows(); ++i)
+        {
+          for (Index k(0); k < ref.num_cols(); ++k)
+          {
+            DT_ sum(0.);
+            for (Index j(0); j < x_dense.num_cols(); ++j)
+            {
+              sum = sum + vx(i * x.num_cols()+ j) * vy(j * y.num_cols() + k);
+            }
+            vr[i * ref.num_cols() + k] = vz(i * z.num_cols() + k) + alpha*sum;
+          }
+        }
       }
-#ifdef FEAT_HAVE_HALFMATH
-      if constexpr(std::is_same_v<DT_, Half>)
-        eps *= Half(4);
-#endif
+
+      z.add_product(x, y, alpha);
+
+      {
+        Memory::TypedView<DT_> vz = z.elements_view_r();
+        Memory::TypedView<DT_> vr = ref.elements_view_r();
+        for (Index i(0); i < z.num_rows(); ++i)
+        {
+          for (Index j(0); j < z.num_cols(); ++j)
+            TEST_CHECK_EQUAL_WITHIN_EPS(vz(i * z.num_cols() + j), vr(i * ref.num_cols() + j), eps);
+        }
+      }
     }
   }
 };
 
-DenseMatrixCSRMultiply2Test <float, std::uint32_t> dense_matrix_csr_multiply_2_test_float_uint32(PreferredBackend::generic, 1e-3);
-DenseMatrixCSRMultiply2Test <double, std::uint32_t> dense_matrix_csr_multiply_2_test_double_uint32(PreferredBackend::generic, 1e-6);
-DenseMatrixCSRMultiply2Test <float, std::uint64_t> dense_matrix_csr_multiply_2_test_float_uint64(PreferredBackend::generic, 1e-3);
-DenseMatrixCSRMultiply2Test <double, std::uint64_t> dense_matrix_csr_multiply_2_test_double_uint64(PreferredBackend::generic, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRAddProductTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRAddProductTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRAddProductTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRAddProductTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseMatrixCSRMultiply2Test <float, std::uint64_t> mkl_dense_matrix_csr_multiply_2_test_float_uint64(PreferredBackend::mkl, 1e-3);
-DenseMatrixCSRMultiply2Test <double, std::uint64_t> mkl_dense_matrix_csr_multiply_2_test_double_uint64(PreferredBackend::mkl, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRAddProductTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRAddProductTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseMatrixCSRMultiply2Test <__float128, std::uint32_t> dense_matrix_csr_multiply_2_test_float128_uint32(PreferredBackend::generic, 1e-6);
-DenseMatrixCSRMultiply2Test <__float128, std::uint64_t> dense_matrix_csr_multiply_2_test_float128_uint64(PreferredBackend::generic, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRAddProductTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRAddProductTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseMatrixCSRMultiply2Test <Half, std::uint32_t> dense_matrix_csr_multiply_2_test_half_uint32(PreferredBackend::generic, 1e-2);
-DenseMatrixCSRMultiply2Test <Half, std::uint64_t> dense_matrix_csr_multiply_2_test_half_uint64(PreferredBackend::generic, 1e-2);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRAddProductTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRAddProductTest, Half, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixCSRMultiply2Test <Half, std::uint32_t> cuda_dense_matrix_csr_multiply_2_test_half_uint32(PreferredBackend::cuda, 1e-2);
-DenseMatrixCSRMultiply2Test <Half, std::uint64_t> cuda_dense_matrix_csr_multiply_2_test_half_uint64(PreferredBackend::cuda, 1e-2);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRAddProductTest, Half, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRAddProductTest, Half, std::uint64_t, PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixCSRMultiply2Test <float, std::uint32_t> cuda_dense_matrix_csr_multiply_2_test_float_uint32(PreferredBackend::cuda, 1e-3);
-DenseMatrixCSRMultiply2Test <double, std::uint32_t> cuda_dense_matrix_csr_multiply_2_test_double_uint32(PreferredBackend::cuda, 1e-6);
-DenseMatrixCSRMultiply2Test <float, std::uint64_t> cuda_dense_matrix_csr_multiply_2_test_float_uint64(PreferredBackend::cuda, 1e-3);
-DenseMatrixCSRMultiply2Test <double, std::uint64_t> cuda_dense_matrix_csr_multiply_2_test_double_uint64(PreferredBackend::cuda, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRAddProductTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRAddProductTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRAddProductTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixCSRAddProductTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class DenseMatrixTranposeTest
+class DenseMatrixTranposeTest
   : public UnitTest
 {
 public:
-  double _eps;
-
-  explicit DenseMatrixTranposeTest(PreferredBackend backend, double eps)
-    : UnitTest("DenseMatrixTranposeTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
-    _eps(eps)
-  {
-  }
-
-  virtual ~DenseMatrixTranposeTest()
+  explicit DenseMatrixTranposeTest(PreferredBackend backend)
+    : UnitTest("DenseMatrixTranposeTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
   virtual void run() const override
   {
-    for (Index size(1); size < 100; size *= 2)
+    for (Index size(1); size < 33; size *= 2)
     {
-      DenseMatrix<DT_, IT_> x(size, size + 2, DT_(0));
-      DenseMatrix<DT_, IT_> result;
+      const Index m = size;
+      const Index n = size + 2;
 
-      for (Index i(0); i < x.size(); ++i)
+      DenseMatrix<DT_, IT_> x(m, n, DT_(0));
+
       {
-        x.elements()[i] = DT_(DT_(1 + i % 100) * DT_(1.234));
-      }
-
-      result.transpose(x);
-
-      for (Index i(0); i < result.rows(); ++i)
-      {
-        for (Index j(0); j < result.columns(); ++j)
+        Memory::TypedView<DT_> v = x.elements_view_w();
+        for (Index i(0); i < m*n; ++i)
         {
-          TEST_CHECK_EQUAL(result(i, j), x(j, i));
+          v[i] = DT_(DT_(1 + i % 100) * DT_(1.234));
         }
       }
 
-      if (Backend::get_preferred_backend() != PreferredBackend::cuda)
-      {
-        result.transpose_inplace();
+      DenseMatrix<DT_, IT_> result = x.transpose();
 
-        for (Index i(0); i < result.rows(); ++i)
+      {
+        Memory::TypedView<DT_> v = x.elements_view_r();
+        Memory::TypedView<DT_> w = result.elements_view_r();
+        for (Index i(0); i < m; ++i)
         {
-          for (Index j(0); j < result.columns(); ++j)
+          for (Index j(0); j < n; ++j)
           {
-            TEST_CHECK_EQUAL(result(i, j), x(i, j));
+            TEST_CHECK_EQUAL(v(i*n+j), w(j*m + i));
           }
         }
       }
@@ -1068,27 +1088,27 @@ public:
   }
 };
 
-DenseMatrixTranposeTest <float, std::uint32_t> dense_matrix_transpose_test_float_uint32(PreferredBackend::generic, 1e-3);
-DenseMatrixTranposeTest <double, std::uint32_t> dense_matrix_transpose_test_double_uint32(PreferredBackend::generic, 1e-6);
-DenseMatrixTranposeTest <float, std::uint64_t> dense_matrix_transpose_test_float_uint64(PreferredBackend::generic, 1e-3);
-DenseMatrixTranposeTest <double, std::uint64_t> dense_matrix_transpose_test_double_uint64(PreferredBackend::generic, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTranposeTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTranposeTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTranposeTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTranposeTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseMatrixTranposeTest <float, std::uint64_t> mkl_dense_matrix_transpose_test_float_uint64(PreferredBackend::mkl, 1e-3);
-DenseMatrixTranposeTest <double, std::uint64_t> mkl_dense_matrix_transpose_test_double_uint64(PreferredBackend::mkl, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTranposeTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTranposeTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseMatrixTranposeTest <__float128, std::uint32_t> dense_matrix_transpose_test_float128_uint32(PreferredBackend::generic, 1e-6);
-DenseMatrixTranposeTest <__float128, std::uint64_t> dense_matrix_transpose_test_float128_uint64(PreferredBackend::generic, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTranposeTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTranposeTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-//DenseMatrixTranposeTest<__half, std::uint32_t> dense_matrix_transpose_test_half_uint(PreferredBackend::generic, 1e-6);
-//DenseMatrixTranposeTest<__half, std::uint64_t> dense_matrix_transpose_test_half_ulong(PreferredBackend::generic, 1e-6);
+//SPAWN_UNIT_TEST_2T_P(DenseMatrixTranposeTest, __half, std::uint32_t, PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(DenseMatrixTranposeTest, __half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixTranposeTest <float, std::uint32_t> cuda_dense_matrix_transpose_test_float_uint32(PreferredBackend::cuda, 1e-1);
-DenseMatrixTranposeTest <double, std::uint32_t> cuda_dense_matrix_transpose_test_double_uint32(PreferredBackend::cuda, 1e-6);
-DenseMatrixTranposeTest <float, std::uint64_t> cuda_dense_matrix_transpose_test_float_uint64(PreferredBackend::cuda, 1e-1);
-DenseMatrixTranposeTest <double, std::uint64_t> cuda_dense_matrix_transpose_test_double_uint64(PreferredBackend::cuda, 1e-6);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTranposeTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTranposeTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTranposeTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixTranposeTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
@@ -1098,78 +1118,89 @@ class DenseMatrixMaxRelDiffTest
   : public UnitTest
 {
 public:
-  DenseMatrixMaxRelDiffTest(PreferredBackend backend)
+  explicit DenseMatrixMaxRelDiffTest(PreferredBackend backend)
     : UnitTest("DenseMatrixMaxRelDiffTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseMatrixMaxRelDiffTest()
   {
   }
 
   virtual void run() const override
   {
-    const DT_ eps = TestSystem::tol<DT_>();
-    const DT_ delta = DT_(123.5);
+    const DT_ tol = TestSystem::tol<DT_>();
 
-    for (Index size(1); size < 100; size *= 2)
+    for (Index size(12); size < Index(70); size *= 2)
     {
-      const Index diff_row = size / 2;
-      const Index diff_col = size - 1;
-      const DT_ initial_value = DT_(10);
+      DenseMatrix<DT_, IT_> a(size, size+2);
+      DenseMatrix<DT_, IT_> b(size, size+2);
 
-      // only initial value in a
-      DenseMatrix<DT_, IT_> a(size, size + 2, initial_value);
+      Index nzes = a.num_nzes();
 
-      // copy a into b
-      DenseMatrix<DT_, IT_> b = a.clone();
+      const Index off0 = (3*nzes) / 8;
+      const Index off1 = (1*nzes) / 8;
+      const Index off2 = (6*nzes) / 8;
 
-      // delta_mat(diff_row, diff_col) = delta
-      DenseMatrix<DT_, IT_> delta_mat(size, size + 2, DT_(0));
-      delta_mat(diff_row, diff_col, delta);
+      // a = i, b = i
+      {
+        Memory::TypedView<DT_> va = a.elements_view_w();
+        Memory::TypedView<DT_> vb = b.elements_view_w();
+        for (Index i(0); i < nzes; ++i)
+        {
+          va[i] = vb[i] = DT_(int(i) - int(off0)) * DT_(0.123);
+        }
+      }
 
-      // a = a + 1.0 * delta_mat
-      a.axpy(delta_mat, DT_(1.0));
+      // identical vectors, result should be zero
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(b), tol*tol);
+      TEST_CHECK_LESS_THAN(b.max_rel_diff(a), tol*tol);
 
-      // reference value
-      const DT_ ref = delta / (DT_(2) * initial_value + delta);
+      // two values close to zero
+      const DT_ delta_a0(Math::sqrt(Math::eps<DT_>()));
+      const DT_ delta_b0(Math::sqr(Math::eps<DT_>()));
+      const DT_ ref0 = (delta_a0 + delta_b0) / (DT_(1) + delta_a0 + delta_b0);
+      a.elements_view_rw()[off0] += delta_a0;
+      b.elements_view_rw()[off0] -= delta_b0;
+      TEST_CHECK_RELATIVE(a.max_rel_diff(b), ref0, tol);
+      TEST_CHECK_RELATIVE(b.max_rel_diff(a), ref0, tol);
 
-      // test ||a-b||_infty
-      const DT_ diff_1 = a.max_rel_diff(b);
-      TEST_CHECK_RELATIVE(diff_1, ref, eps);
+      const DT_ delta1 = DT_(0.17);
+      const DT_ ref1 = delta1 / (DT_(off0 - off1)*DT_(0.246) + delta1 + DT_(1));
+      a.elements_view_rw()[off1] -= delta1;
+      TEST_CHECK_RELATIVE(a.max_rel_diff(b), ref1, tol);
+      TEST_CHECK_RELATIVE(b.max_rel_diff(a), ref1, tol);
 
-      // test ||b-a||_infty
-      const DT_ diff_2 = b.max_rel_diff(a);
-      TEST_CHECK_RELATIVE(diff_2, ref, eps);
+      const DT_ delta2 = DT_(0.73);
+      const DT_ ref2 = delta2 / (DT_(off2 - off0)*DT_(0.246) + delta2 + DT_(1));
+      b.elements_view_rw()[off2] += delta2;
+      TEST_CHECK_RELATIVE(a.max_rel_diff(b), ref2, tol);
+      TEST_CHECK_RELATIVE(b.max_rel_diff(a), ref2, tol);
     }
   }
 };
 
-DenseMatrixMaxRelDiffTest <float, std::uint32_t> dense_matrix_max_rel_diff_test_float_uint32(PreferredBackend::generic);
-DenseMatrixMaxRelDiffTest <double, std::uint32_t> dense_matrix_max_rel_diff_test_double_uint32(PreferredBackend::generic);
-DenseMatrixMaxRelDiffTest <float, std::uint64_t> dense_matrix_max_rel_diff_test_float_uint64(PreferredBackend::generic);
-DenseMatrixMaxRelDiffTest <double, std::uint64_t> dense_matrix_max_rel_diff_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixMaxRelDiffTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixMaxRelDiffTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixMaxRelDiffTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixMaxRelDiffTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseMatrixMaxRelDiffTest <float, std::uint64_t> mkl_dense_matrix_max_rel_diff_test_float_uint64(PreferredBackend::mkl);
-DenseMatrixMaxRelDiffTest <double, std::uint64_t> mkl_dense_matrix_max_rel_diff_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixMaxRelDiffTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixMaxRelDiffTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseMatrixMaxRelDiffTest <__float128, std::uint32_t> dense_matrix_max_rel_diff_test_float128_uint32(PreferredBackend::generic);
-DenseMatrixMaxRelDiffTest <__float128, std::uint64_t> dense_matrix_max_rel_diff_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixMaxRelDiffTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixMaxRelDiffTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseMatrixMaxRelDiffTest <Half, std::uint32_t> dense_matrix_max_rel_diff_test_half_uint32(PreferredBackend::generic);
-DenseMatrixMaxRelDiffTest <Half, std::uint64_t> dense_matrix_max_rel_diff_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixMaxRelDiffTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixMaxRelDiffTest, Half, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixMaxRelDiffTest <Half, std::uint32_t> cuda_dense_matrix_max_rel_diff_test_half_uint32(PreferredBackend::cuda);
-DenseMatrixMaxRelDiffTest <Half, std::uint64_t> cuda_dense_matrix_max_rel_diff_test_half_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixMaxRelDiffTest, Half, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixMaxRelDiffTest, Half, std::uint64_t, PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixMaxRelDiffTest <float, std::uint32_t> cuda_dense_matrix_max_rel_diff_test_float_uint32(PreferredBackend::cuda);
-DenseMatrixMaxRelDiffTest <double, std::uint32_t> cuda_dense_matrix_max_rel_diff_test_double_uint32(PreferredBackend::cuda);
-DenseMatrixMaxRelDiffTest <float, std::uint64_t> cuda_dense_matrix_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
-DenseMatrixMaxRelDiffTest <double, std::uint64_t> cuda_dense_matrix_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixMaxRelDiffTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixMaxRelDiffTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixMaxRelDiffTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixMaxRelDiffTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
@@ -1179,12 +1210,8 @@ class DenseMatrixSameLayoutTest
   : public UnitTest
 {
 public:
-  DenseMatrixSameLayoutTest(PreferredBackend backend)
+  explicit DenseMatrixSameLayoutTest(PreferredBackend backend)
     : UnitTest("DenseMatrixSameLayoutTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~DenseMatrixSameLayoutTest()
   {
   }
 
@@ -1208,7 +1235,7 @@ public:
       TEST_CHECK(a.same_layout(c));
 
       // change one element
-      c(diff_row, diff_col, DT_(0.5));
+      c.elements_view_rw()[diff_row*size+ diff_col] = DT_(0.5);
       TEST_CHECK(a.same_layout(c));
 
       // different sizes
@@ -1217,38 +1244,38 @@ public:
       TEST_CHECK(!d.same_layout(e));
 
       // one different element
-      DenseMatrix<DT_, IT_> f(size, size + 2);
-      f(diff_row, diff_col, initial_value);
-      DenseMatrix<DT_, IT_> g(size, size + 2);
-      g(diff_row, diff_col, DT_(0.5));
+      DenseMatrix<DT_, IT_> f(size, size + 2, DT_(0));
+      f.elements_view_rw()[diff_row*size+ diff_col] = initial_value;
+      DenseMatrix<DT_, IT_> g(size, size + 2, DT_(0));
+      g.elements_view_rw()[diff_row*size+ diff_col] = DT_(0.5);
       TEST_CHECK(f.same_layout(g));
     }
   }
 };
 
-DenseMatrixSameLayoutTest <float, std::uint32_t> dense_matrix_same_layout_test_float_uint32(PreferredBackend::generic);
-DenseMatrixSameLayoutTest <double, std::uint32_t> dense_matrix_same_layout_test_double_uint32(PreferredBackend::generic);
-DenseMatrixSameLayoutTest <float, std::uint64_t> dense_matrix_same_layout_test_float_uint64(PreferredBackend::generic);
-DenseMatrixSameLayoutTest <double, std::uint64_t> dense_matrix_same_layout_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSameLayoutTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSameLayoutTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSameLayoutTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSameLayoutTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-DenseMatrixSameLayoutTest <float, std::uint64_t> mkl_dense_matrix_same_layout_test_float_uint64(PreferredBackend::mkl);
-DenseMatrixSameLayoutTest <double, std::uint64_t> mkl_dense_matrix_same_layout_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSameLayoutTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSameLayoutTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-DenseMatrixSameLayoutTest <__float128, std::uint32_t> dense_matrix_same_layout_test_float128_uint32(PreferredBackend::generic);
-DenseMatrixSameLayoutTest <__float128, std::uint64_t> dense_matrix_same_layout_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSameLayoutTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSameLayoutTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-DenseMatrixSameLayoutTest <Half, std::uint32_t> dense_matrix_same_layout_test_half_uint32(PreferredBackend::generic);
-DenseMatrixSameLayoutTest <Half, std::uint64_t> dense_matrix_same_layout_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSameLayoutTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSameLayoutTest, Half, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixSameLayoutTest <Half, std::uint32_t> cuda_dense_matrix_same_layout_test_half_uint32(PreferredBackend::cuda);
-DenseMatrixSameLayoutTest <Half, std::uint64_t> cuda_dense_matrix_same_layout_test_half_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSameLayoutTest, Half, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSameLayoutTest, Half, std::uint64_t, PreferredBackend::cuda);
 #endif
 #endif
 #ifdef FEAT_HAVE_CUDA
-DenseMatrixSameLayoutTest <float, std::uint32_t> cuda_dense_matrix_same_layout_test_float_uint32(PreferredBackend::cuda);
-DenseMatrixSameLayoutTest <double, std::uint32_t> cuda_dense_matrix_same_layout_test_double_uint32(PreferredBackend::cuda);
-DenseMatrixSameLayoutTest <float, std::uint64_t> cuda_dense_matrix_same_layout_test_float_uint64(PreferredBackend::cuda);
-DenseMatrixSameLayoutTest <double, std::uint64_t> cuda_dense_matrix_same_layout_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSameLayoutTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSameLayoutTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSameLayoutTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(DenseMatrixSameLayoutTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif

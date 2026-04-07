@@ -9,7 +9,7 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/util/time_stamp.hpp>
-#include <kernel/util/memory_pool.hpp>
+#include <kernel/util/kahan_accumulator.hpp>
 
 #include <functional>
 
@@ -29,17 +29,22 @@ namespace FEAT
     void run_bench(std::function<void (void)> func, double flops, double bytes)
     {
 #ifdef FEAT_DEBUG_MODE
-      XABORTM("You are running a benchmark in DEBUG mode!");
+      std::cout << "\n" << String(80, '*') << "\n" << String(80, '*') << "\n\n";
+      std::cout << "WARNING: You are running a benchmark in DEBUG mode!\n\n";
+      std::cout << "This is generally a really bad idea because all performance metrics will\n";
+      std::cout << "be utterly pointless due to missing compile-time optimizations, so only\n";
+      std::cout << "do this if you are currently in bug hunting mode.\n\n";
+      std::cout << String(80, '*') << "\n" << String(80, '*') << "\n\n";
 #endif
 
       Index iters(1);
       //warmup
       func();
-      MemoryPool::synchronize();
+      Runtime::synchronize_devices();
 
       TimeStamp at;
       func();
-      MemoryPool::synchronize();
+      Runtime::synchronize_devices();
       double test_run_time(at.elapsed_now());
       std::cout<<"test time: "<<test_run_time<<"\n";
       if (test_run_time < 0.1)
@@ -54,30 +59,29 @@ namespace FEAT
         {
           func();
         }
-        MemoryPool::synchronize();
+        Runtime::synchronize_devices();
         times.push_back(at.elapsed_now());
       }
 
-      double mean(0);
-      /// \todo use KahanSummation from statistics.hpp, see https://stackoverflow.com/questions/10330002/sum-of-small-double-numbers-c/10330857#10330857 for std::accumulate usage
+      KahanAccumulator<double> mean_ka;
       for (auto & time : times)
-        mean += time;
-      mean /= double(times.size());
-      std::cout<<"TOE: "<<std::fixed<<mean<<"; duration of "<< iters << " function calls, average over " << 10 << " runs.\n";
-      std::cout<<"TOE per function call: "<<std::fixed<<mean/double(iters)<<"\n";
+        mean_ka += time;
+      mean_ka.value /= double(times.size());
+      std::cout<<"TOE: "<<std::fixed<<mean_ka.value<<"; duration of "<< iters << " function calls, average over " << 10 << " runs.\n";
+      std::cout<<"TOE per function call: "<<std::fixed<<mean_ka.value/double(iters)<<"\n";
       flops *= double(iters);
-      flops /= mean;
+      flops /= mean_ka.value;
       flops /= 1000.; // kilo
       flops /= 1000.; // mega
       flops /= 1000.; // giga
       std::cout<<"GFlop/s: "<<flops<<"\n";
       bytes *= double(iters);
-      bytes /= mean;
+      bytes /= mean_ka.value;
       bytes /= 1024.; // kilo
       bytes /= 1024.; // mega
       bytes /= 1024.; // giga
       std::cout<<"GByte/s: "<<bytes<<"\n";
-      std::cout<<"==============================================\n";
+      std::cout << String(80, '=') << "\n";
     }
   }
 }

@@ -938,7 +938,7 @@ namespace CCND_FIBER
             //           Assembly::DiscreteCellProjector::project(der_p, vec_def.local().template at<1>(), the_domain_level.space_pres, cub);
 
             // write pressure
-            exporter.add_cell_scalar("pressure", vtx_p.elements());
+            exporter.add_cell_scalar("pressure", vtx_p);
             //           exporter.add_cell_scalar("pres_der", der_p.elements());
 
             // finally, write the VTK file
@@ -1501,12 +1501,12 @@ namespace CCND_FIBER
             const auto& loc_a = system_levels.at(i)->matrix_sys.local().block_a();
             const auto& loc_b = system_levels.at(i)->matrix_sys.local().block_b();
             const auto& loc_d = system_levels.at(i)->matrix_sys.local().block_d();
-            statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_a.used_elements() + loc_a.rows() + Index(1));
-            statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_b.used_elements() + loc_b.rows() + Index(1));
-            statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_d.used_elements() + loc_d.rows() + Index(1));
-            statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_a.template used_elements<LAFEM::Perspective::pod>());
-            statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_b.template used_elements<LAFEM::Perspective::pod>());
-            statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_d.template used_elements<LAFEM::Perspective::pod>());
+            statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_a.num_nzes() + loc_a.num_rows() + Index(1));
+            statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_b.num_nzes() + loc_b.num_rows() + Index(1));
+            statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_d.num_nzes() + loc_d.num_rows() + Index(1));
+            statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_a.num_nzes_raw());
+            statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_b.num_nzes_raw());
+            statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_d.num_nzes_raw());
           }
 
           // fetch our finest levels
@@ -1529,9 +1529,9 @@ namespace CCND_FIBER
 
           {
             // count non-zeros in a and b
-            statistics.counts[Counts::nnze_a] = the_system_level.matrix_sys.local().block_a().used_elements();
-            statistics.counts[Counts::nnze_b] = the_system_level.matrix_sys.local().block_b().used_elements();
-            statistics.counts[Counts::nnze_total] = the_system_level.matrix_sys.local().template used_elements<LAFEM::Perspective::pod>();
+            statistics.counts[Counts::nnze_a] = the_system_level.matrix_sys.local().block_a().num_nzes();
+            statistics.counts[Counts::nnze_b] = the_system_level.matrix_sys.local().block_b().num_nzes();
+            statistics.counts[Counts::nnze_total] = the_system_level.matrix_sys.local().num_nzes_raw();
           }
 
 

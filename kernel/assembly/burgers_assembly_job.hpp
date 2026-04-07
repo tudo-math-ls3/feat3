@@ -187,7 +187,7 @@ namespace FEAT
       template<typename IndexType_, int conv_dim_>
       static DataType calc_sd_v_norm(const LAFEM::DenseVectorBlocked<DataType_, IndexType_, conv_dim_>& convect)
       {
-        const auto* vals = convect.elements();
+        const auto vals = convect.elements_view_r();
         DataType_ r = DataType_(0);
         for(Index i(0); i < convect.size(); ++i)
           r = Math::max(r, vals[i].norm_euclid());
@@ -276,7 +276,7 @@ namespace FEAT
       static constexpr int shape_dim = SpaceType::shape_dim;
 
       /// the convection vector dimension
-      static constexpr int conv_dim = ConvVectorType::BlockSize;
+      static constexpr int conv_dim = ConvVectorType::block_size;
 
       /// our assembly traits
       typedef AsmTraits1<DataType, SpaceType, TrafoTags::jac_det, SpaceTags::value|SpaceTags::grad> AsmTraits;
@@ -779,10 +779,10 @@ namespace FEAT
       typedef BurgersAssemblyJobBase<DataType, Space_, ConvVector_> BaseClass;
 
       // no nonsense, please
-      static_assert(Matrix_::BlockHeight == Matrix_::BlockWidth, "only square matrix blocks are supported here");
+      static_assert(Matrix_::block_height == Matrix_::block_width, "only square matrix blocks are supported here");
 
       /// the block size
-      static constexpr int block_size = Matrix_::BlockHeight;
+      static constexpr int block_size = Matrix_::block_height;
 
       /// the matrix to be assembled
       MatrixType& matrix;
@@ -874,7 +874,7 @@ namespace FEAT
       typedef BurgersAssemblyJobBase<DataType, Space_, ConvVector_> BaseClass;
 
       /// the block size
-      static constexpr int block_size = Vector_::BlockSize;
+      static constexpr int block_size = Vector_::block_size;
 
       /// the matrix to be assembled
       VectorType& vector;
@@ -926,7 +926,7 @@ namespace FEAT
         /// scatters the local matrix
         void scatter()
         {
-          auto* val_vec = vector.elements();
+          auto val_vec = vector.elements_view_rw();
           for(int loc_i = 0; loc_i < this->dof_mapping.get_num_local_dofs(); ++loc_i)
           {
             const Index cur_i = this->dof_mapping.get_index(loc_i);
@@ -971,7 +971,7 @@ namespace FEAT
       typedef BurgersAssemblyJobBase<DataType, Space_, ConvVector_> BaseClass;
 
       /// the block size
-      static constexpr int block_size = Vector_::BlockSize;
+      static constexpr int block_size = Vector_::block_size;
 
       /// the RHS vector to be assembled
       VectorType& vector_rhs;

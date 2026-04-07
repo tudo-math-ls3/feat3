@@ -530,8 +530,8 @@ namespace Gendie
       exporter.add_vertex_vector("Debug: rhs_v", vec_rhs.local().template at<0>());
     if(vec_viscosity.local().size() == vec_sol.local().template at<0>().size())
     {
-      exporter.add_vertex_scalar("Viscosity [Pa s]", vec_viscosity.local().get_elements().front(), param_holder.visc_scaling_factor);
-      exporter.add_vertex_scalar("NormShearRate [1/s]", vec_shearrate.local().get_elements().front());
+      exporter.add_vertex_scalar("Viscosity [Pa s]", vec_viscosity.local(), param_holder.visc_scaling_factor);
+      exporter.add_vertex_scalar("NormShearRate [1/s]", vec_shearrate.local());
     }
 
 
@@ -564,7 +564,7 @@ namespace Gendie
       //and now interpolate
       Assembly::Interpolator::project(vec_dist, dist_func, domain.front()->space_velo);
       // double metre_scaling_factor{1}; //for now hradcoded here...
-      exporter.add_vertex_scalar("Shell", vec_dist.get_elements().front(), param_holder.velo_scaling_factor);
+      exporter.add_vertex_scalar("Shell", vec_dist, param_holder.velo_scaling_factor);
     }
     else
     {
@@ -585,9 +585,9 @@ namespace Gendie
     }
 
     // write pressure
-    exporter.add_cell_scalar("Pressure [bar]", vtx_p.elements(), param_holder.pres_scaling_factor);
+    exporter.add_cell_scalar("Pressure [bar]", vtx_p, param_holder.pres_scaling_factor);
     if(param_holder.vtk_debug)
-      exporter.add_cell_scalar("Debug: rhs_p", vtx_q.elements());
+      exporter.add_cell_scalar("Debug: rhs_p", vtx_q);
 
     const bool use_q2_fbm = param_holder.assemble_q2_filter;
 
@@ -599,52 +599,40 @@ namespace Gendie
 
       if(param_holder.vtk_debug && use_q2_fbm)
       {
-        const auto& filter_vec_velo = system_level.get_local_velo_unit_filter_seq().find_or_add("fbm").get_filter_vector();
+        const auto& filter_vec_velo = system_level.get_local_velo_unit_filter_seq().find_or_add("fbm");
         LAFEM::DenseVectorBlocked<SystemDataType, SystemIndexType, dim> filter_vec(filter_vec_velo.size());
         filter_vec.format(-1);
-        for(Index k = 0; k < filter_vec_velo.used_elements(); ++k)
-        {
-          filter_vec(filter_vec_velo.indices()[k], filter_vec_velo.elements()[k]);
-        }
+        filter_vec_velo.filter_sol(filter_vec);
 
         exporter.add_vertex_vector("Debug: fbm_filter_v", filter_vec);
       }
 
       if(param_holder.vtk_debug)
       {
-        const auto& filter_vec_velo = system_level.get_local_velo_unit_filter_seq().find_or_add("noflow").get_filter_vector();
+        const auto& filter_vec_velo = system_level.get_local_velo_unit_filter_seq().find_or_add("noflow");
         LAFEM::DenseVectorBlocked<SystemDataType, SystemIndexType, dim> filter_vec(filter_vec_velo.size());
         filter_vec.format(-1);
-        for(Index k = 0; k < filter_vec_velo.used_elements(); ++k)
-        {
-          filter_vec(filter_vec_velo.indices()[k], filter_vec_velo.elements()[k]);
-        }
+        filter_vec_velo.filter_sol(filter_vec);
 
         exporter.add_vertex_vector("Debug: noflow_filter_v", filter_vec);
       }
 
-      if(param_holder.vtk_debug && (system_level.filter_interface_fbm.get_filter_vector().used_elements() > 0))
+      if(param_holder.vtk_debug && (system_level.filter_interface_fbm.get_filter_vector().num_nzes() > 0))
       {
-        const auto& filter_vec_velo = system_level.filter_interface_fbm.get_filter_vector();
+        const auto& filter_vec_velo = system_level.filter_interface_fbm;
         LAFEM::DenseVectorBlocked<SystemDataType, SystemIndexType, dim> filter_vec(filter_vec_velo.size());
         filter_vec.format(-1);
-        for(Index k = 0; k < filter_vec_velo.used_elements(); ++k)
-        {
-          filter_vec(filter_vec_velo.indices()[k], filter_vec_velo.elements()[k]);
-        }
+        filter_vec_velo.filter_sol(filter_vec);
 
         exporter.add_vertex_vector("Debug: interface_filter_v", filter_vec);
       }
 
       if(param_holder.vtk_debug)
       {
-        const auto& filter_vec_velo = system_level.get_local_velo_unit_filter_seq().find_or_add("inflow").get_filter_vector();
+        const auto& filter_vec_velo = system_level.get_local_velo_unit_filter_seq().find_or_add("inflow");
         LAFEM::DenseVectorBlocked<SystemDataType, SystemIndexType, dim> filter_vec(filter_vec_velo.size());
         filter_vec.format(-1);
-        for(Index k = 0; k < filter_vec_velo.used_elements(); ++k)
-        {
-          filter_vec(filter_vec_velo.indices()[k], filter_vec_velo.elements()[k]);
-        }
+        filter_vec_velo.filter_sol(filter_vec);
 
         exporter.add_vertex_vector("Debug: inflow_filter_v", filter_vec);
       }
@@ -943,7 +931,7 @@ namespace Gendie
         auto tv = system_level->gate_velo._freqs.clone(LAFEM::CloneMode::Deep);
         tv.format(1.0);
         dofs_total[_SysID::dofs_v] = Index(system_level->gate_velo.dot(tv, tv));
-        dofs_min[_SysID::dofs_v] = dofs_max[_SysID::dofs_v] = Index(tv.template size<LAFEM::Perspective::pod>());
+        dofs_min[_SysID::dofs_v] = dofs_max[_SysID::dofs_v] = Index(tv.size_raw());
         dofs_total[_SysID::dofs_p] = dofs_min[_SysID::dofs_p] = dofs_max[_SysID::dofs_p] = system_level->gate_pres._freqs.size();
         dofs_total[_SysID::elements] = dofs_min[_SysID::elements] = dofs_max[_SysID::elements] = domain.front()->get_mesh().get_num_elements();
       }
@@ -1061,13 +1049,15 @@ namespace Gendie
 
       auto abiat_at = materials.front().get_abiat_aT(inflow_boundaries.front().get_temperature());
 
-      auto* visco_val = vec_viscosity.local().elements();
-      const auto* shear_val = vec_shearrate.local().elements();
-
-      FEAT_PRAGMA_OMP(parallel for)
-      for(Index i = 0; i < vec_shearrate.local().size(); ++i)
       {
-        visco_val[i] = visco_func(shear_val[i], abiat_at);
+        auto visco_val = vec_viscosity.local().elements_view_w();
+        const auto shear_val = vec_shearrate.local().elements_view_r();
+
+        FEAT_PRAGMA_OMP(parallel for)
+        for(Index i = 0; i < vec_shearrate.local().size(); ++i)
+        {
+          visco_val[i] = visco_func(shear_val[i], abiat_at);
+        }
       }
 
       // to be assure, average, so we have the same value everywhere

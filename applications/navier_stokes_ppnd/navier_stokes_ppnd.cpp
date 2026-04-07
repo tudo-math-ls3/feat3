@@ -2110,7 +2110,7 @@ namespace NavierStokesPP
           Assembly::DiscreteCellProjector::project(vtx_p, vec_sol_p.local(), the_domain_level.space_pres, cub);
 
           // write pressure
-          vtk.add_cell_scalar("p", vtx_p.elements());
+          vtk.add_cell_scalar("p", vtx_p);
 
           // compute and write time-derivatives
           GlobalVeloVector vec_der_v = vec_sol_v.clone();
@@ -2122,7 +2122,7 @@ namespace NavierStokesPP
           Assembly::DiscreteCellProjector::project(vtx_der_p, vec_der_p.local(), the_domain_level.space_pres, cub);
 
           vtk.add_vertex_vector("v_dt", vec_der_v.local());
-          vtk.add_cell_scalar("p_dt", vtx_der_p.elements());
+          vtk.add_cell_scalar("p_dt", vtx_der_p);
 
           // export
           vtk.write(vtk_path, comm);

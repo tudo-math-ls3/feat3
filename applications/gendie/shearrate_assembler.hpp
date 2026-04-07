@@ -231,9 +231,9 @@ namespace Gendie
     // sync vector -> type 0 summed values
     grad_vector.sync_0();
 
-    auto* loc_val_shear = shear_vec.elements();
-    const auto* loc_val_grad = grad_vector.local().elements();
-    const auto* loc_mass_inv = lumped_inv_mass.elements();
+    auto loc_val_shear = shear_vec.elements_view_w();
+    const auto loc_val_grad = grad_vector.local().elements_view_r();
+    const auto loc_mass_inv = lumped_inv_mass.elements_view_r();
 
     // and now apply inverted mass matrix, calculate Du and from there the (clamped) shearrate
     FEAT_PRAGMA_OMP(parallel for)

@@ -72,7 +72,7 @@ namespace FEAT
           Assembly::MirrorAssembler::assemble_mirror(mirror, space, *halo);
 
           // push mirror into gate
-          if(!mirror.empty())
+          if(!mirror.hollow())
             gate.push(rank, std::move(mirror));
         }
 
@@ -130,8 +130,8 @@ namespace FEAT
         // loop over all neighbor ranks
         for(auto rank : neighbors)
         {
-          // create a mirror with empty sub-mirrors of correct size first
-          SystemMirrorType sys_mir = SystemMirrorType::make_empty(sys_loc);
+          // create a mirror with hollow sub-mirrors of correct size first
+          SystemMirrorType sys_mir = SystemMirrorType::make_hollow(sys_loc);
           for(std::size_t i(0); i < ranks_0.size(); ++i)
           {
             if(ranks_0[i] == rank)
@@ -148,8 +148,8 @@ namespace FEAT
               break;
             }
           }
-          // sys_mir cannot be empty, since at least one of the above gates must have a mirror for this neighbor
-          XASSERTM(!sys_mir.empty(), "invalid empty mirror");
+          // sys_mir cannot be hollow, since at least one of the above gates must have a mirror for this neighbor
+          XASSERTM(!sys_mir.hollow(), "invalid hollow mirror");
           gate_sys.push(rank, std::move(sys_mir));
         }
 
@@ -214,7 +214,7 @@ namespace FEAT
         for(auto rank : neighbors)
         {
           // create a mirror with empty sub-mirrors of correct size first
-          SystemMirrorType sys_mir = SystemMirrorType::make_empty(sys_loc);
+          SystemMirrorType sys_mir = SystemMirrorType::make_hollow(sys_loc);
           for(std::size_t i(0); i < ranks_0.size(); ++i)
           {
             if(ranks_0[i] == rank)

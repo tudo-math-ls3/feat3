@@ -7,7 +7,9 @@
 
 // includes, FEAT
 #include <kernel/assembly/asm_traits.hpp>
+#include <kernel/util/memory_arbiter.hpp>
 
+// includes, system
 #include <vector>
 
 namespace FEAT
@@ -99,6 +101,9 @@ namespace FEAT
         // create a vector gather-axpy
         typename VectorIn_::GatherAxpy gather_axpy(coeff);
 
+        // create a view for the vector's elements
+        Memory::TypedView<ValueType> vector_view = vector.elements_view_rw();
+
         // loop over all cells of the mesh
         for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)
         {
@@ -156,7 +161,7 @@ namespace FEAT
             Index vi = vert_idx(cell, k);
 
             // add vertex contribution
-            vector(vi, vector(vi) + value);
+            vector_view[vi] += value;
 
             // update contribution counter
             ++aux[vi];
@@ -176,7 +181,7 @@ namespace FEAT
         {
           if(aux[i] > 1)
           {
-            vector(i, (DataType(1)  / DataType(aux[i])) * vector(i));
+            vector_view[i] *= DataType(1) / DataType(aux[i]);
           }
         }
       }
@@ -258,6 +263,9 @@ namespace FEAT
         // create a vector gather-axpy
         typename VectorIn_::GatherAxpy gather_axpy(coeff);
 
+        // create a view for the vector's elements
+        Memory::TypedView<ValueOutType> vector_view = vector.elements_view_rw();
+
         // loop over all cells of the mesh
         for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)
         {
@@ -315,7 +323,7 @@ namespace FEAT
             Index vi = vert_idx(cell, k);
 
             // add vertex contribution
-            vector(vi, vector(vi) + value);
+            vector_view[vi] += value;
 
             // update contribution counter
             ++aux[vi];
@@ -330,14 +338,12 @@ namespace FEAT
           // continue with next cell
         }
 
-        ValueOutType* vv = vector.elements();
-
         // finally, scale the output vector
         for(Index i(0); i < num_verts; ++i)
         {
           if(aux[i] > 1)
           {
-            vv[i] *= (DataType(1)  / DataType(aux[i]));
+            vector_view[i] *= (DataType(1)  / DataType(aux[i]));
           }
         }
       }
@@ -453,7 +459,7 @@ namespace FEAT
         const Index num_cells(mesh.get_num_entities(ShapeType::dimension));
 
         // create a clear output vector
-        vector = VectorOut_(num_cells, DataType(0));
+        vector = VectorOut_(num_cells);
 
         // create a trafo evaluator
         typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
@@ -475,6 +481,9 @@ namespace FEAT
 
         // create a vector gather-axpy
         typename VectorIn_::GatherAxpy gather_axpy(coeff);
+
+        // create a view for the vector's elements
+        Memory::TypedView<ValueType> vector_view = vector.elements_view_w();
 
         // loop over all cells of the mesh
         for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)
@@ -536,7 +545,7 @@ namespace FEAT
           }
 
           // set contribution
-          vector(cell, (DataType(1) / area) * value);
+          vector_view[cell] = (DataType(1) / area) * value;
 
           // finish evaluators
           space_eval.finish();
@@ -622,7 +631,7 @@ namespace FEAT
         const Index num_cells(mesh.get_num_entities(ShapeType::dimension));
 
         // create a clear output vector
-        vector = VectorOut_(num_cells, DataType(0));
+        vector = VectorOut_(num_cells);
 
         // create a trafo evaluator
         typename AsmTraits::TrafoEvaluator trafo_eval(trafo);
@@ -644,6 +653,9 @@ namespace FEAT
 
         // create a vector gather-axpy
         typename VectorIn_::GatherAxpy gather_axpy(coeff);
+
+        // create a view for the vector's elements
+        Memory::TypedView<ValueOutType> vector_view = vector.element_view_w();
 
         // loop over all cells of the mesh
         for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)
@@ -705,7 +717,7 @@ namespace FEAT
           }
 
           // set contribution
-          vector(cell, (DataType(1) / area) * value);
+          vector_view[cell] = (DataType(1) / area) * value;
 
           // finish evaluators
           space_eval.finish();
@@ -778,6 +790,9 @@ namespace FEAT
         // create a vector gather-axpy
         typename VectorIn_::GatherAxpy gather_axpy(coeff);
 
+        // create a view for the vector's elements
+        Memory::TypedView<ValueType> vector_view = vector.elements_view_w();
+
         // loop over all cells of the mesh
         for(Index cell(0); cell < trafo_eval.get_num_cells(); ++cell)
         {
@@ -822,7 +837,7 @@ namespace FEAT
             }
 
             // save value
-            vector(cell*Index(num_points) + Index(k), value);
+            vector_view[cell*Index(num_points) + Index(k)] = value;
 
             // continue with next vertex
           }

@@ -16,7 +16,7 @@ class TestMatrixFactoryTest :
   public UnitTest
 {
 public:
-  TestMatrixFactoryTest() :
+  explicit TestMatrixFactoryTest() :
     UnitTest("TestMatrixFactoryTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name())
   {
   }
@@ -51,9 +51,9 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix,  4u, 6u, 15u, TestMatrixFlags::generic);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 4u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_EQUAL(matrix.used_elements(), 15u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 4u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_nzes(), 15u);
     check_structure_generic(matrix);
     check_values_generic(matrix);
   }
@@ -65,20 +65,20 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix,  4u, 6u, 15u, TestMatrixFlags::generic);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 4u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_EQUAL(matrix.used_elements(), 15u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 4u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_nzes(), 15u);
     check_structure_generic(matrix);
     check_values_generic(matrix);
   }
 
   void check_structure_generic(const SparseMatrixCSR<DT_, IT_>& matrix) const
   {
-    const Index nrows = matrix.rows();
-    const Index ncols = matrix.columns();
-    const Index nnze = matrix.used_elements();
-    const IT_* row_ptr = matrix.row_ptr();
-    const IT_* col_idx = matrix.col_ind();
+    const Index nrows = matrix.num_rows();
+    const Index ncols = matrix.num_cols();
+    const Index nnze = matrix.num_nzes();
+    const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+    const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
 
     // check row pointer
     TEST_CHECK(row_ptr[0] >= 0u);
@@ -104,14 +104,14 @@ public:
     }
   }
 
-  template<int BlockHeight_, int BlockWidth_>
-  void check_structure_generic(const SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& matrix) const
+  template<int block_height_, int block_width_>
+  void check_structure_generic(const SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& matrix) const
   {
-    const Index nrows = matrix.rows();
-    const Index ncols = matrix.columns();
-    const Index nnze = matrix.used_elements();
-    const IT_* row_ptr = matrix.row_ptr();
-    const IT_* col_idx = matrix.col_ind();
+    const Index nrows = matrix.num_rows();
+    const Index ncols = matrix.num_cols();
+    const Index nnze = matrix.num_nzes();
+    const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+    const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
 
     // check row pointer
     TEST_CHECK(row_ptr[0] >= 0u);
@@ -139,22 +139,22 @@ public:
 
   void check_values_generic(const SparseMatrixCSR<DT_, IT_>& matrix) const
   {
-    const Index nnze = matrix.used_elements();
-    const DT_* val = matrix.val();
+    const Index nnze = matrix.num_nzes();
+    const Memory::TypedView<DT_> val = matrix.val_view_r();
     for(Index i(0); i < nnze; ++i)
     {
       TEST_CHECK_IN_RANGE(val[i], DT_(-1), DT_(1));
     }
   }
 
-  template<int BlockHeight_, int BlockWidth_>
-  void check_values_generic(const SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& matrix) const
+  template<int block_height_, int block_width_>
+  void check_values_generic(const SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& matrix) const
   {
-    const Index nnze = matrix.used_elements();
-    const auto * val = matrix.val();
+    const Index nnze = matrix.num_nzes();
+    const auto val = matrix.val_view_r();
     for(Index i(0); i < nnze; ++i)
-      for(int j(0); j < BlockHeight_; ++j)
-        for(int k(0); k< BlockWidth_; ++k)
+      for(int j(0); j < block_height_; ++j)
+        for(int k(0); k< block_width_; ++k)
           TEST_CHECK_IN_RANGE(val[i][j][k], DT_(-1), DT_(1));
   }
 
@@ -165,9 +165,9 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::symmetric_struct);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 6u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_IN_RANGE(matrix.used_elements(), 14u, 16u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_IN_RANGE(matrix.num_nzes(), 14u, 16u);
     check_structure_symmetric(matrix);
     check_values_generic(matrix);
   }
@@ -179,19 +179,19 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::symmetric_struct);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 6u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_IN_RANGE(matrix.used_elements(), 14u, 16u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_IN_RANGE(matrix.num_nzes(), 14u, 16u);
     check_structure_symmetric(matrix);
     check_values_generic(matrix);
   }
 
   void check_structure_symmetric(const SparseMatrixCSR<DT_, IT_>& matrix) const
   {
-    const Index nrows = matrix.rows();
-    const Index ncols = matrix.columns();
-    const IT_* row_ptr = matrix.row_ptr();
-    const IT_* col_idx = matrix.col_ind();
+    const Index nrows = matrix.num_rows();
+    const Index ncols = matrix.num_cols();
+    const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+    const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
     bool symmetric_entry = false;
 
     TEST_CHECK(nrows == ncols);
@@ -219,17 +219,17 @@ public:
     }
   }
 
-  template<int BlockHeight_, int BlockWidth_>
-  void check_structure_symmetric(const SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& matrix) const
+  template<int block_height_, int block_width_>
+  void check_structure_symmetric(const SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& matrix) const
   {
-    const Index nrows = matrix.rows();
-    const Index ncols = matrix.columns();
-    const IT_* row_ptr = matrix.row_ptr();
-    const IT_* col_idx = matrix.col_ind();
+    const Index nrows = matrix.num_rows();
+    const Index ncols = matrix.num_cols();
+    const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+    const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
     bool symmetric_entry = false;
 
     TEST_CHECK(nrows == ncols);
-    TEST_CHECK(BlockWidth_ == BlockHeight_);
+    TEST_CHECK(block_width_ == block_height_);
 
 
     // Check that the matrix has a symmetric structure
@@ -262,9 +262,9 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix, 6u, 6u, 15u, TestMatrixFlags::symmetric);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 6u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_IN_RANGE(matrix.used_elements(), 14u, 16u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_IN_RANGE(matrix.num_nzes(), 14u, 16u);
     check_symmetric(matrix);
     check_values_generic(matrix);
   }
@@ -276,20 +276,20 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix, 6u, 6u, 15u, TestMatrixFlags::symmetric);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 6u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_IN_RANGE(matrix.used_elements(), 14u, 16u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_IN_RANGE(matrix.num_nzes(), 14u, 16u);
     check_symmetric(matrix);
     check_values_generic(matrix);
   }
 
   void check_symmetric(const SparseMatrixCSR<DT_, IT_>& matrix) const
   {
-    const Index nrows = matrix.rows();
-    const Index ncols = matrix.columns();
-    const IT_* row_ptr = matrix.row_ptr();
-    const IT_* col_idx = matrix.col_ind();
-    const DT_* values = matrix.val();
+    const Index nrows = matrix.num_rows();
+    const Index ncols = matrix.num_cols();
+    const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+    const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
+    const Memory::TypedView<DT_> values = matrix.val_view_r();
     bool symmetric_entry = false;
 
     TEST_CHECK(nrows == ncols);
@@ -319,19 +319,19 @@ public:
     }
   }
 
-  template<int BlockHeight_, int BlockWidth_>
-  void check_symmetric(const SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& matrix) const
+  template<int block_height_, int block_width_>
+  void check_symmetric(const SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& matrix) const
   {
     const DT_ eps = TestSystem::tol<DT_>();
-    const Index nrows = matrix.rows();
-    const Index ncols = matrix.columns();
-    const IT_* row_ptr = matrix.row_ptr();
-    const IT_* col_idx = matrix.col_ind();
-    const auto* values = matrix.val();
+    const Index nrows = matrix.num_rows();
+    const Index ncols = matrix.num_cols();
+    const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+    const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
+    const auto values = matrix.val_view_r();
     bool symmetric_entry = false;
 
     TEST_CHECK(nrows == ncols);
-    TEST_CHECK(BlockHeight_ == BlockWidth_);
+    TEST_CHECK(block_height_ == block_width_);
 
     // Check that the matrix is symmetric
     for(Index i = 0; i < nrows; ++i)
@@ -346,8 +346,8 @@ public:
         {
           if(col_idx[k] == i)
           {
-            for(int l(0); l < BlockHeight_; ++l) {
-              for(int m(0); m < BlockWidth_; ++m) {
+            for(int l(0); l < block_height_; ++l) {
+              for(int m(0); m < block_width_; ++m) {
                 // Ensure that the values are equal for symmetry
                 TEST_CHECK_EQUAL_WITHIN_EPS(values[k][m][l], values[j][l][m], eps);
               }
@@ -368,9 +368,9 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix,  4u, 6u, 15u, TestMatrixFlags::non_negative);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 4u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_EQUAL(matrix.used_elements(), 15u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 4u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_nzes(), 15u);
     check_structure_generic(matrix);
     check_values_non_negative(matrix);
   }
@@ -382,31 +382,31 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix,  4u, 6u, 15u, TestMatrixFlags::non_negative);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 4u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_EQUAL(matrix.used_elements(), 15u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 4u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_nzes(), 15u);
     check_structure_generic(matrix);
     check_values_non_negative(matrix);
   }
 
   void check_values_non_negative(const SparseMatrixCSR<DT_, IT_>& matrix) const
   {
-    const Index nnze = matrix.used_elements();
-    const DT_* val = matrix.val();
+    const Index nnze = matrix.num_nzes();
+    const Memory::TypedView<DT_> val = matrix.val_view_r();
     for(Index i(0); i < nnze; ++i)
     {
       TEST_CHECK(val[i] > DT_(0));
     }
   }
 
-  template<int BlockHeight_, int BlockWidth_>
-  void check_values_non_negative(const SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& matrix) const
+  template<int block_height_, int block_width_>
+  void check_values_non_negative(const SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& matrix) const
   {
-    const Index nnze = matrix.used_elements();
-    const auto* val = matrix.val();
+    const Index nnze = matrix.num_nzes();
+    const auto val = matrix.val_view_r();
     for(Index i(0); i < nnze; ++i)
-      for(int j(0); j < BlockHeight_; ++j)
-        for(int k(0); k < BlockWidth_; ++k)
+      for(int j(0); j < block_height_; ++j)
+        for(int k(0); k < block_width_; ++k)
           TEST_CHECK(val[i][j][k] > DT_(0));
   }
 
@@ -417,9 +417,9 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::non_empty_diag);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 6u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_EQUAL(matrix.used_elements(), 15u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_nzes(), 15u);
     check_structure_non_empty_diag(matrix);
     check_values_generic(matrix);
   }
@@ -431,19 +431,19 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::non_empty_diag);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 6u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_EQUAL(matrix.used_elements(), 15u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_nzes(), 15u);
     check_structure_non_empty_diag(matrix);
     check_values_generic(matrix);
   }
 
   void check_structure_non_empty_diag(const SparseMatrixCSR<DT_, IT_>& matrix) const
   {
-    const Index nrows = matrix.rows();
-    const Index ncols = matrix.columns();
-    const IT_* row_ptr = matrix.row_ptr();
-    const IT_* col_idx = matrix.col_ind();
+    const Index nrows = matrix.num_rows();
+    const Index ncols = matrix.num_cols();
+    const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+    const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
     bool diagonal_entry = false;
 
     TEST_CHECK(nrows == ncols);
@@ -464,17 +464,17 @@ public:
     }
   }
 
-  template<int BlockHeight_, int BlockWidth_>
-  void check_structure_non_empty_diag(const SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& matrix) const
+  template<int block_height_, int block_width_>
+  void check_structure_non_empty_diag(const SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& matrix) const
   {
-    const Index nrows = matrix.rows();
-    const Index ncols = matrix.columns();
-    const IT_* row_ptr = matrix.row_ptr();
-    const IT_* col_idx = matrix.col_ind();
+    const Index nrows = matrix.num_rows();
+    const Index ncols = matrix.num_cols();
+    const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+    const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
     bool diagonal_entry = false;
 
     TEST_CHECK(nrows == ncols);
-    TEST_CHECK(BlockHeight_ == BlockWidth_);
+    TEST_CHECK(block_height_ == block_width_);
 
     for (Index i = 0; i < nrows; ++i)
     {
@@ -499,9 +499,9 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::non_zero_diag);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 6u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_EQUAL(matrix.used_elements(), 15u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_nzes(), 15u);
     check_structure_non_empty_diag(matrix);
     check_values_non_zero_diag(matrix);
   }
@@ -513,20 +513,20 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::non_zero_diag);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 6u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_EQUAL(matrix.used_elements(), 15u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_nzes(), 15u);
     check_structure_non_empty_diag(matrix);
     check_values_non_zero_diag(matrix);
   }
 
   void check_values_non_zero_diag(const SparseMatrixCSR<DT_, IT_>& matrix) const
   {
-    const Index nrows = matrix.rows();
-    const Index ncols = matrix.columns();
-    const IT_* row_ptr = matrix.row_ptr();
-    const IT_* col_idx = matrix.col_ind();
-    const DT_* values = matrix.val();
+    const Index nrows = matrix.num_rows();
+    const Index ncols = matrix.num_cols();
+    const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+    const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
+    const Memory::TypedView<DT_> values = matrix.val_view_r();
 
     TEST_CHECK(nrows == ncols);
 
@@ -543,17 +543,17 @@ public:
     }
   }
 
-  template<int BlockHeight_, int BlockWidth_>
-  void check_values_non_zero_diag(const SparseMatrixBCSR<DT_, IT_, BlockWidth_, BlockHeight_>& matrix) const
+  template<int block_height_, int block_width_>
+  void check_values_non_zero_diag(const SparseMatrixBCSR<DT_, IT_, block_width_, block_height_>& matrix) const
   {
-    const Index nrows = matrix.rows();
-    const Index ncols = matrix.columns();
-    const IT_* row_ptr = matrix.row_ptr();
-    const IT_* col_idx = matrix.col_ind();
-    const auto* values = matrix.val();
+    const Index nrows = matrix.num_rows();
+    const Index ncols = matrix.num_cols();
+    const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+    const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
+    const auto values = matrix.val_view_r();
 
     TEST_CHECK(nrows == ncols);
-    TEST_CHECK(BlockWidth_ == BlockHeight_);
+    TEST_CHECK(block_width_ == block_height_);
 
     for (Index i = 0; i < nrows; ++i)
     {
@@ -561,7 +561,7 @@ public:
       {
         if (col_idx[j] == i) // Check if the column index matches the row index
         {
-          for(int k(0); k < BlockWidth_; ++k)
+          for(int k(0); k < block_width_; ++k)
             TEST_CHECK_NOT_EQUAL(values[j][k][k], DT_(0));
           break;
         }
@@ -576,9 +576,9 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::diagonal_dominant);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 6u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_EQUAL(matrix.used_elements(), 15u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_nzes(), 15u);
     check_structure_non_empty_diag(matrix);
     check_values_diagonal_dominant(matrix);
   }
@@ -590,20 +590,20 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::diagonal_dominant);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 6u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_EQUAL(matrix.used_elements(), 15u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_nzes(), 15u);
     check_structure_non_empty_diag(matrix);
     check_values_diagonal_dominant(matrix);
   }
 
   void check_values_diagonal_dominant(const SparseMatrixCSR<DT_, IT_>& matrix) const
   {
-    const Index nrows = matrix.rows();
-    const Index ncols = matrix.columns();
-    const IT_* row_ptr = matrix.row_ptr();
-    const IT_* col_idx = matrix.col_ind();
-    const DT_* values = matrix.val();
+    const Index nrows = matrix.num_rows();
+    const Index ncols = matrix.num_cols();
+    const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+    const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
+    const Memory::TypedView<DT_> values = matrix.val_view_r();
 
     TEST_CHECK(nrows == ncols);
 
@@ -629,17 +629,17 @@ public:
     }
   }
 
-  template<int BlockHeight_, int BlockWidth_>
-  void check_values_diagonal_dominant(const SparseMatrixBCSR<DT_, IT_,BlockWidth_, BlockHeight_>& matrix) const
+  template<int block_height_, int block_width_>
+  void check_values_diagonal_dominant(const SparseMatrixBCSR<DT_, IT_,block_width_, block_height_>& matrix) const
   {
-    const Index nrows = matrix.rows();
-    const Index ncols = matrix.columns();
-    const IT_* row_ptr = matrix.row_ptr();
-    const IT_* col_idx = matrix.col_ind();
-    const auto* values = matrix.val();
+    const Index nrows = matrix.num_rows();
+    const Index ncols = matrix.num_cols();
+    const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+    const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
+    const auto values = matrix.val_view_r();
 
     TEST_CHECK(nrows == ncols);
-    TEST_CHECK(BlockWidth_ == BlockHeight_);
+    TEST_CHECK(block_width_ == block_height_);
 
     for(Index i = 0; i < nrows; ++i)
     {
@@ -647,12 +647,12 @@ public:
       for(IT_ j = row_ptr[i]; j < row_ptr[i + 1]; ++j)
       {
         if(col_idx[j] != i) // Skip the diagonal block element
-          for(int k(0); k < BlockWidth_; ++k)
-            for(int l(0); l < BlockHeight_; ++l)
+          for(int k(0); k < block_width_; ++k)
+            for(int l(0); l < block_height_; ++l)
               off_diagonal += std::abs(values[j][k][l]);
         else
-          for(int k(0); k < BlockWidth_; ++k)
-            for(int l(0); l < BlockHeight_; ++l)
+          for(int k(0); k < block_width_; ++k)
+            for(int l(0); l < block_height_; ++l)
               if(k != l) // Skip the diagonal element
                 off_diagonal += std::abs(values[j][k][l]);
       }
@@ -661,7 +661,7 @@ public:
       {
         if(col_idx[j] == i) // Check if this is the diagonal block element
         {
-          for(int k(0); k < BlockWidth_; ++k)
+          for(int k(0); k < block_width_; ++k)
             TEST_CHECK(values[j][k][k] > off_diagonal);
           break;
         }
@@ -676,9 +676,9 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::non_negative | TestMatrixFlags::diagonal_dominant);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 6u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_EQUAL(matrix.used_elements(), 15u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_nzes(), 15u);
     check_values_non_negative(matrix);
     check_structure_non_empty_diag(matrix);
     check_values_diagonal_dominant(matrix);
@@ -691,9 +691,9 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::non_negative | TestMatrixFlags::diagonal_dominant);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 6u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_EQUAL(matrix.used_elements(), 15u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_nzes(), 15u);
     check_values_non_negative(matrix);
     check_structure_non_empty_diag(matrix);
     check_values_diagonal_dominant(matrix);
@@ -706,9 +706,9 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::non_negative | TestMatrixFlags::symmetric);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 6u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_IN_RANGE(matrix.used_elements(), 14u, 16u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_IN_RANGE(matrix.num_nzes(), 14u, 16u);
     check_values_non_negative(matrix);
     check_symmetric(matrix);
   }
@@ -720,12 +720,12 @@ public:
     std::cout << "RNG Seed: " << factory.get_rng_seed() << std::endl;
     factory.create(matrix,  6u, 6u, 15u, TestMatrixFlags::non_negative | TestMatrixFlags::symmetric);
 
-    TEST_CHECK_EQUAL(matrix.rows(), 6u);
-    TEST_CHECK_EQUAL(matrix.columns(), 6u);
-    TEST_CHECK_IN_RANGE(matrix.used_elements(), 14u, 16u);
+    TEST_CHECK_EQUAL(matrix.num_rows(), 6u);
+    TEST_CHECK_EQUAL(matrix.num_cols(), 6u);
+    TEST_CHECK_IN_RANGE(matrix.num_nzes(), 14u, 16u);
     check_values_non_negative(matrix);
     check_symmetric(matrix);
   }
 }; // class TestMatrixFactoryTest
 
-TestMatrixFactoryTest<double, std::uint64_t> test_matrix_factory_test_double_uint64;
+SPAWN_UNIT_TEST_2T(TestMatrixFactoryTest, double, std::uint64_t);

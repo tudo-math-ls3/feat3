@@ -122,8 +122,8 @@ namespace FEAT
         _vec_ml(lumped_matrix_a_.clone(LAFEM::CloneMode::Layout)),
         _vec_mr(lumped_matrix_a_.clone(LAFEM::CloneMode::Layout))
       {
-        ASSERT(matrix_d.columns() == matrix_b.rows());
-        ASSERT(matrix_d.used_elements() == matrix_b.used_elements());
+        ASSERT(matrix_d.num_cols() == matrix_b.num_rows());
+        ASSERT(matrix_d.num_nzes() == matrix_b.num_nzes());
 
         inv_lumped_matrix_a.component_invert(lumped_matrix_a_);
       }
@@ -202,9 +202,9 @@ namespace FEAT
        *
        * \returns The number of columns
        */
-      Index columns() const
+      Index num_cols() const
       {
-        return matrix_b.columns();
+        return matrix_b.num_cols();
       }
 
       /**
@@ -215,9 +215,9 @@ namespace FEAT
        *
        * \returns The number of columns
        */
-      Index rows() const
+      Index num_rows() const
       {
-        return matrix_d.columns();
+        return matrix_d.num_rows();
       }
 
       /**
@@ -227,52 +227,15 @@ namespace FEAT
        *
        * \returns The total number of nonzeros in this matrix
        */
-      Index used_elements() const
+      Index num_nzes() const
       {
-        return inv_lumped_matrix_a.used_elements() + matrix_b.used_elements() + matrix_d.used_elements();
+        return inv_lumped_matrix_a.num_nzes() + matrix_b.num_nzes() + matrix_d.num_nzes();
       }
 
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
         return _vec_ml.bytes() + _vec_mr.bytes();
-      }
-
-      /**
-       * \brief Extracts the diagonal
-       *
-       * \param[out] diag
-       * The diagonal of \f$ S \f$
-       *
-       * \param[in] sync
-       * Return diag as type 0 or type 1 (if true)
-       *
-       * \note This operation is only possible because A = diag(a)
-       *
-       * \warning If the matrix \f$ B \f$ is a distributed matrix, this requires synchronization which is expensive.
-       *
-       */
-      void extract_diag(VectorTypeL& diag, bool sync=true) const
-      {
-        // If we have a gate and it contains neighbors, we have to do it the complicated way
-        if(diag.get_gate() != nullptr && !diag.get_gate()->_ranks.empty() )
-        {
-          diag.format();
-
-          typename MatrixB_::LocalMatrixType matrix_b1(matrix_b.convert_to_1());
-
-          matrix_b1.add_trace_double_mat_mult(diag.local(), matrix_d.local(), inv_lumped_matrix_a.local(), DataType(1));
-        }
-        else
-        {
-          matrix_d.local().row_norm2sqr(diag.local(), inv_lumped_matrix_a.local());
-        }
-
-        if(sync)
-        {
-          diag.sync_0();
-        }
-
       }
 
       /**

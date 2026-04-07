@@ -9,26 +9,27 @@
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/math.hpp>
+#include <kernel/util/memory_arbiter.hpp>
+#include <kernel/adjacency/graph.hpp>
 #include <kernel/lafem/forward.hpp>
 #include <kernel/lafem/container.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/sparse_layout.hpp>
-#include <kernel/lafem/arch/scale.hpp>
-#include <kernel/lafem/arch/axpy.hpp>
-#include <kernel/lafem/arch/apply.hpp>
-#include <kernel/lafem/arch/norm.hpp>
-#include <kernel/adjacency/graph.hpp>
+#include <kernel/lafem/arch/axpy_dense.hpp>
+#include <kernel/lafem/arch/matvecmult_banded_dense.hpp>
+#include <kernel/lafem/arch/norm2_dense.hpp>
+#include <kernel/lafem/arch/scale_dense.hpp>
 
+// includes, system
 #include <fstream>
 #include <set>
-
 
 namespace FEAT
 {
   namespace LAFEM
   {
     /**
-     * \brief sparse banded matrix
+     * \brief Sparse banded matrix
      *
      * \tparam DT_ The datatype to be used.
      * \tparam IT_ The indexing type to be used.
@@ -40,11 +41,10 @@ namespace FEAT
      *                                 main diagonal has offset rows - 1 and
      *                                 top-right diagonal has offset row + columns - 2)\n
      *
-     * _scalar_index[0]: container size \n
-     * _scalar_index[1]: row count \n
-     * _scalar_index[2]: column count \n
-     * _scalar_index[3]: non zero element count (used elements) \n
-     * _scalar_index[4]: number of offsets \n
+     * _scalar_index[0]: row count \n
+     * _scalar_index[1]: column count \n
+     * _scalar_index[2]: non zero element count (used elements) \n
+     * _scalar_index[3]: number of offsets \n
      *
      * This class saves a sparse-matrix with a banded structure. For each diagonal of
      * the matrix with non-zero elements there must be reserved memory for the whole
@@ -65,7 +65,7 @@ namespace FEAT
      * To get the position of the diagonals in the matrix, the matching offsets are
      * saved from left to right in the offsets-array.
      * - The first diagonal is the one at the bottom-left and gets the offset = 0,
-     * - the main diaognal has the offset = rows - 1
+     * - the main diagonal has the offset = rows - 1
      * - and the last offset at the top-right has the offset = rows + columns - 2.
      *
      * Refer to \ref lafem_design for general usage informations.
@@ -75,237 +75,6 @@ namespace FEAT
     template <typename DT_, typename IT_ = Index>
     class SparseMatrixBanded : public Container<DT_, IT_>
     {
-    public:
-     /**
-       * \brief Scatter-Axpy operation for SparseMatrixBanded
-       *
-       * \author Christoph Lohmann
-       */
-      class ScatterAxpy
-      {
-      public:
-        typedef LAFEM::SparseMatrixBanded<DT_, IT_> MatrixType;
-        typedef DT_ DataType;
-        typedef IT_ IndexType;
-
-      private:
-#ifdef DEBUG
-        const IT_ _deadcode;
-#endif
-        Index _num_rows;
-        Index _num_cols;
-        Index _num_of_offsets;
-        IT_* _offsets;
-        IT_* _col_ptr;
-        DT_* _data;
-
-      public:
-        explicit ScatterAxpy(MatrixType& matrix) :
-#ifdef DEBUG
-          _deadcode(~IT_(0)),
-#endif
-          _num_rows(matrix.rows()),
-          _num_cols(matrix.columns()),
-          _num_of_offsets(matrix.num_of_offsets()),
-          _offsets(matrix.offsets()),
-          _col_ptr(nullptr),
-          _data(matrix.val())
-        {
-          // allocate column-pointer array
-          _col_ptr = new IT_[_num_cols];
-#ifdef DEBUG
-          for(Index i(0); i < _num_cols; ++i)
-          {
-            _col_ptr[i] = _deadcode;
-          }
-#endif
-        }
-
-        virtual ~ScatterAxpy()
-        {
-          if(_col_ptr != nullptr)
-          {
-            delete [] _col_ptr;
-          }
-        }
-
-        template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
-        void operator()(const LocalMatrix_& loc_mat, const RowMapping_& row_map,
-                        const ColMapping_& col_map, DT_ alpha = DT_(1))
-        {
-          // loop over all local row entries
-          for(int i(0); i < row_map.get_num_local_dofs(); ++i)
-          {
-            // fetch row index
-            const Index ix = row_map.get_index(i);
-
-            // build column pointer for this row entry contribution
-            for(IT_ k(0); k < _num_of_offsets; ++k)
-            {
-              if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
-              {
-                _col_ptr[_offsets[k] + ix + 1 - _num_rows] = IT_(k * _num_rows + ix);
-              }
-            }
-
-            // loop over all local column entries
-            for(int j(0); j < col_map.get_num_local_dofs(); ++j)
-            {
-              // fetch column index
-              const Index jx = col_map.get_index(j);
-
-              // ensure that the column pointer is valid for this index
-              ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
-
-              // incorporate data into global matrix
-              _data[_col_ptr[jx]] += alpha * loc_mat[i][j];
-
-              // continue with next column entry
-            }
-
-#ifdef DEBUG
-            // reformat column-pointer array
-            for(IT_ k(0); k < _num_of_offsets; ++k)
-            {
-              if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
-              {
-                _col_ptr[_offsets[k] + ix + 1 - _num_rows] = _deadcode;
-              }
-            }
-#endif
-            // continue with next row entry
-          }
-        }
-      }; // class ScatterAxpy
-
-      /**
-       * \brief Gather-Axpy operation for SparseMatrixBanded
-       *
-       * \author Christoph Lohmann
-       */
-      class GatherAxpy
-      {
-      public:
-        typedef LAFEM::SparseMatrixBanded<DT_, IT_> MatrixType;
-        typedef DT_ DataType;
-        typedef IT_ IndexType;
-
-      private:
-#ifdef DEBUG
-        const IT_ _deadcode;
-#endif
-        Index _num_rows;
-        Index _num_cols;
-        Index _num_of_offsets;
-        const IT_* _offsets;
-        IT_* _col_ptr;
-        const DT_* _data;
-
-      public:
-        explicit GatherAxpy(const MatrixType& matrix) :
-#ifdef DEBUG
-          _deadcode(~IT_(0)),
-#endif
-          _num_rows(matrix.rows()),
-          _num_cols(matrix.columns()),
-          _num_of_offsets(matrix.num_of_offsets()),
-          _offsets(matrix.offsets()),
-          _col_ptr(nullptr),
-          _data(matrix.val())
-        {
-          // allocate column-pointer array
-          _col_ptr = new IT_[_num_cols];
-#ifdef DEBUG
-          for(Index i(0); i < _num_cols; ++i)
-          {
-            _col_ptr[i] = _deadcode;
-          }
-#endif
-        }
-
-        virtual ~GatherAxpy()
-        {
-          if(_col_ptr != nullptr)
-          {
-            delete [] _col_ptr;
-          }
-        }
-
-        template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
-        void operator()(LocalMatrix_& loc_mat, const RowMapping_& row_map,
-                        const ColMapping_& col_map, DT_ alpha = DT_(1))
-        {
-          // loop over all local row entries
-          for(int i(0); i < row_map.get_num_local_dofs(); ++i)
-          {
-            // fetch row index
-            const Index ix = row_map.get_index(i);
-
-            // build column pointer for this row entry contribution
-            for(IT_ k(0); k < _num_of_offsets; ++k)
-            {
-              if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
-              {
-                _col_ptr[_offsets[k] + ix + 1 - _num_rows] = IT_(k * _num_rows + ix);
-              }
-            }
-
-            // loop over all local column entries
-            for(int j(0); j < col_map.get_num_local_dofs(); ++j)
-            {
-              // fetch column index
-              const Index jx = col_map.get_index(j);
-
-              // ensure that the column pointer is valid for this index
-              ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
-
-              // update local matrix data
-              loc_mat[i][j] += alpha * _data[_col_ptr[jx]];
-
-              // continue with next column entry
-            }
-
-#ifdef DEBUG
-            // reformat column-pointer array
-            for(IT_ k(0); k < _num_of_offsets; ++k)
-            {
-              if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
-              {
-                _col_ptr[_offsets[k] + ix + 1 - _num_rows] = _deadcode;
-              }
-            }
-#endif
-            // continue with next row entry
-          }
-        }
-      }; // class GatherAxpy
-
-    public: //shall be private
-      Index & _size()
-      {
-        return this->_scalar_index.at(0);
-      }
-
-      Index & _rows()
-      {
-        return this->_scalar_index.at(1);
-      }
-
-      Index & _columns()
-      {
-        return this->_scalar_index.at(2);
-      }
-
-      Index & _used_elements()
-      {
-        return this->_scalar_index.at(3);
-      }
-
-      Index & _num_of_offsets()
-      {
-        return this->_scalar_index.at(4);
-      }
-
     public:
       /// Our datatype
       typedef DT_ DataType;
@@ -319,43 +88,6 @@ namespace FEAT
       static constexpr SparseLayoutId layout_id = SparseLayoutId::lt_banded;
       /// our value type
       typedef DT_ ValueType;
-      /// ImageIterator class for Adjactor interface implementation
-      class ImageIterator
-      {
-      private:
-        IT_ _k;
-        const IT_ _s;
-        const IT_ * const _offsets;
-
-      public:
-        ImageIterator() : _k(IT_(0)), _s(IT_(0)), _offsets(nullptr) {}
-
-        ImageIterator(IT_ k, IT_ s, const IT_ * offsets) : _k(k), _s(s), _offsets(offsets) {}
-
-        ImageIterator& operator=(const ImageIterator& other)
-        {
-          _k       = other._k;
-          _s       = other._s;
-          _offsets = other._offsets;
-          return *this;
-        }
-
-        bool operator!=(const ImageIterator& other) const
-        {
-          return this->_k != other._k;
-        }
-
-        ImageIterator& operator++()
-        {
-          ++_k;
-          return *this;
-        }
-
-        Index operator*() const
-        {
-          return Index(_s + _offsets[_k]);
-        }
-      };
       /// Our 'base' class type
       template <typename DT2_ = DT_, typename IT2_ = IT_>
       using ContainerType = SparseMatrixBanded<DT2_, IT2_>;
@@ -364,18 +96,101 @@ namespace FEAT
       template <typename DataType2_, typename IndexType2_>
       using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
+    protected:
+      Index & _rows()
+      {
+        return this->_scalar_index.at(0);
+      }
+
+      Index & _cols()
+      {
+        return this->_scalar_index.at(1);
+      }
+
+      Index & _bands()
+      {
+        return this->_scalar_index.at(2);
+      }
+
+      Index & _nzes()
+      {
+        return this->_scalar_index.at(3);
+      }
+
+
+      /// Returns first row-index of the diagonal matching to the offset i
+      template <typename ITX_>
+      inline Index _start_offset(const Index i, const ITX_ * const offsets,
+        const Index rows_in, const Index columns_in, const Index noo) const
+      {
+        if (i == Index(-1))
+        {
+          return rows_in;
+        }
+        else if (i == noo)
+        {
+          return Index(0);
+        }
+        else
+        {
+          return Math::max(columns_in + Index(1), rows_in + columns_in - Index(offsets[i])) - columns_in - Index(1);
+        }
+      }
+
+      /// Returns last row-index of the diagonal matching to the offset i
+      template <typename ITX_>
+      inline Index _end_offset(const Index i, const ITX_ * const offsets,
+        const Index rows_in, const Index columns_in, const Index noo) const
+      {
+        if (i == Index (-1))
+        {
+          return rows_in - 1;
+        }
+        else if (i == noo)
+        {
+          return Index(-1);
+        }
+        else
+        {
+          return Math::min(rows_in, columns_in + rows_in - Index(offsets[i]) - Index(1)) - Index(1);
+        }
+      }
+
+    public:
       /**
        * \brief Constructor
        *
        * Creates an empty non dimensional matrix.
        */
-      explicit SparseMatrixBanded() :
-        Container<DT_, IT_> (0)
+      SparseMatrixBanded()
       {
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
-        this->_scalar_index.push_back(0);
+      }
+
+      /**
+       * \brief Constructor
+       *
+       * \param[in] rows_in The row count of the created matrix.
+       * \param[in] columns_in The column count of the created matrix.
+       * \param[in] bands_in The band count of the created matrix
+       * \param[in] nzes_in The non-zero entry count of the created matrix
+       *
+       * Creates a matrix with given dimensions and content.
+       */
+      explicit SparseMatrixBanded(const Index rows_in, const Index columns_in, const Index bands_in, const Index nzes_in)
+      {
+        this->_scalar_index.push_back(rows_in);
+        this->_scalar_index.push_back(columns_in);
+        this->_scalar_index.push_back(bands_in);
+        this->_scalar_index.push_back(nzes_in);
+
+        this->_elements.push_back(Memory::Arbiter(sizeof(DT_) * rows_in * bands_in,
+          Memory::Location::none, Memory::Init::format_to_zero));
+        this->_elements_size.push_back(rows_in * bands_in);
+        this->_indices.push_back(Memory::Arbiter(sizeof(IT_) * rows_in * bands_in));
+        this->_indices_size.push_back(rows_in * bands_in);
       }
 
       /**
@@ -385,18 +200,17 @@ namespace FEAT
        *
        * Creates an empty matrix with given layout.
        */
-      explicit SparseMatrixBanded(const SparseLayout<IT_, layout_id> & layout_in) :
-        Container<DT_, IT_> (layout_in._scalar_index.at(0))
+      explicit SparseMatrixBanded(const SparseLayout<IT_, layout_id> & layout_in)
       {
-        this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
 
-        for (auto i : this->_indices)
-          MemoryPool::increase_memory(i);
+        for(const auto& idx : layout_in.get_indices())
+          this->_indices.push_back(idx.attach());
 
-        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(rows() * num_of_offsets()));
-        this->_elements_size.push_back(rows() * num_of_offsets());
+        this->_elements.push_back(Memory::Arbiter(sizeof(DT_) * _rows() * _bands(),
+          Memory::Location::none, Memory::Init::format_to_zero));
+        this->_elements_size.push_back(_rows() * _bands());
       }
 
       /**
@@ -405,16 +219,15 @@ namespace FEAT
        * \param[in] rows_in The row count of the created matrix.
        * \param[in] columns_in The column count of the created matrix.
        * \param[in] val_in The vector with non zero elements.
-       * \param[in] offsets_in The vector of offsets.
+       * \param[in] bands_in The vector of band offsets.
        *
        * Creates a matrix with given dimensions and content.
        */
       explicit SparseMatrixBanded(const Index rows_in, const Index columns_in,
                                   DenseVector<DT_, IT_> & val_in,
-                                  DenseVector<IT_, IT_> & offsets_in) :
-        Container<DT_, IT_>(rows_in * columns_in)
+                                  DenseVector<IT_, IT_> & bands_in)
       {
-        if (val_in.size() != rows_in * offsets_in.size())
+        if (val_in.size() != rows_in * bands_in.size())
         {
           XABORTM("Size of values does not match to number of offsets and row count!");
         }
@@ -422,32 +235,29 @@ namespace FEAT
         this->_scalar_index.push_back(rows_in);
         this->_scalar_index.push_back(columns_in);
 
-        Index tused_elements(0);
+        Index tnonzeros(0);
 
-        for (Index i(0); i < offsets_in.size(); ++i)
+        Memory::TypedView<IT_> vbands(bands_in.elements_view_r());
+        for (Index i(0); i < bands_in.size(); ++i)
         {
-          const Index toffset(Index(offsets_in(i)));
+          const Index toffset(Index(vbands(i)));
 
           if (toffset + Index(2) > rows_in + columns_in)
           {
             XABORTM("Offset out of matrix!");
           }
 
-          tused_elements += columns_in + Math::min(rows_in, columns_in + rows_in - toffset - 1) - Math::max(columns_in + rows_in - toffset - 1, columns_in);
+          tnonzeros += columns_in + Math::min(rows_in, columns_in + rows_in - toffset - 1) - Math::max(columns_in + rows_in - toffset - 1, columns_in);
         }
+        vbands.release();
 
-        this->_scalar_index.push_back(tused_elements);
-        this->_scalar_index.push_back(offsets_in.size());
+        this->_scalar_index.push_back(bands_in.size());
+        this->_scalar_index.push_back(tnonzeros);
 
-        this->_elements.push_back(val_in.elements());
+        this->_elements.push_back(val_in.elements_arbiter().attach());
         this->_elements_size.push_back(val_in.size());
-        this->_indices.push_back(offsets_in.elements());
-        this->_indices_size.push_back(offsets_in.size());
-
-        for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool::increase_memory(this->_elements.at(i));
-        for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool::increase_memory(this->_indices.at(i));
+        this->_indices.push_back(bands_in.elements_arbiter().attach());
+        this->_indices_size.push_back(bands_in.size());
       }
 
       /**
@@ -458,10 +268,9 @@ namespace FEAT
        * Creates a Banded matrix based on the source matrix.
        */
       template <typename MT_>
-      explicit SparseMatrixBanded(const MT_ & other) :
-        Container<DT_, IT_>(other.size())
+      explicit SparseMatrixBanded(const MT_ & other)
       {
-        convert(other);
+        this->convert(other);
       }
 
       /**
@@ -471,8 +280,7 @@ namespace FEAT
        *
        * Creates a matrix based on a given adjacency graph, representing the sparsity pattern.
        */
-      explicit SparseMatrixBanded(const Adjacency::Graph & graph) :
-        Container<DT_, IT_>(0)
+      explicit SparseMatrixBanded(const Adjacency::Graph & graph)
       {
         Index num_rows = graph.get_num_nodes_domain();
         Index num_cols = graph.get_num_nodes_image();
@@ -491,7 +299,7 @@ namespace FEAT
         }
 
         DenseVector<IT_, IT_> toffsets(Index(moffsets.size()));
-        auto * ptoffsets = toffsets.elements();
+        Memory::TypedView<IT_> ptoffsets = toffsets.elements_view_w();
 
         IT_ idx(0);
         for (auto off : moffsets)
@@ -500,11 +308,9 @@ namespace FEAT
           ++idx;
         }
 
-        DenseVector<IT_, IT_> toffsets_mem;
-        toffsets_mem.convert(toffsets);
-        DenseVector<DT_, IT_> tval_mem(Index(moffsets.size()) * num_rows, DT_(0));
+        DenseVector<DT_, IT_> tval(Index(moffsets.size()) * num_rows, DT_(0));
 
-        this->move(SparseMatrixBanded(num_rows, num_cols, tval_mem, toffsets_mem));
+        this->move(SparseMatrixBanded(num_rows, num_cols, tval, toffsets));
       }
 
       /**
@@ -515,10 +321,9 @@ namespace FEAT
        *
        * Creates a banded matrix based on the source filestream.
        */
-      explicit SparseMatrixBanded(FileMode mode, String filename) :
-        Container<DT_, IT_>(0)
+      explicit SparseMatrixBanded(FileMode mode, String filename)
       {
-        read_from(mode, filename);
+        this->read_from(mode, filename);
       }
 
       /**
@@ -529,10 +334,9 @@ namespace FEAT
        *
        * Creates a banded matrix based on the source filestream.
        */
-      explicit SparseMatrixBanded(FileMode mode, std::istream& file) :
-        Container<DT_, IT_>(0)
+      explicit SparseMatrixBanded(FileMode mode, std::istream& file)
       {
-        read_from(mode, file);
+        this->read_from(mode, file);
       }
 
       /**
@@ -543,10 +347,9 @@ namespace FEAT
        * Creates a matrix from the given byte array.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      explicit SparseMatrixBanded(std::vector<char> input) :
-        Container<DT_, IT_>(0)
+      explicit SparseMatrixBanded(std::vector<char> input)
       {
-        deserialize<DT2_, IT2_>(input);
+        this->deserialize<DT2_, IT2_>(input);
       }
 
       /**
@@ -571,7 +374,6 @@ namespace FEAT
       SparseMatrixBanded & operator= (SparseMatrixBanded && other)
       {
         this->move(std::forward<SparseMatrixBanded>(other));
-
         return *this;
       }
 
@@ -613,26 +415,21 @@ namespace FEAT
        */
       SparseMatrixBanded & operator= (const SparseLayout<IT_, layout_id> & layout_in)
       {
-        for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool::release_memory(this->_elements.at(i));
-        for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool::release_memory(this->_indices.at(i));
-
         this->_elements.clear();
         this->_indices.clear();
         this->_elements_size.clear();
         this->_indices_size.clear();
         this->_scalar_index.clear();
 
-        this->_indices.assign(layout_in._indices.begin(), layout_in._indices.end());
         this->_indices_size.assign(layout_in._indices_size.begin(), layout_in._indices_size.end());
         this->_scalar_index.assign(layout_in._scalar_index.begin(), layout_in._scalar_index.end());
 
-        for (auto i : this->_indices)
-          MemoryPool::increase_memory(i);
+        for(const auto& idx : layout_in.get_indices())
+          this->_indices.push_back(idx.attach());
 
-        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(rows() * num_of_offsets()));
-        this->_elements_size.push_back(rows() * num_of_offsets());
+        this->_elements.push_back(Memory::Arbiter(sizeof(DT_) * _rows() * _bands(),
+          Memory::Location::none, Memory::Init::format_to_zero));
+        this->_elements_size.push_back(_rows() * _bands());
 
         return *this;
       }
@@ -653,45 +450,53 @@ namespace FEAT
       template <typename DT2_, typename IT2_>
       void convert(const SparseMatrixCSR<DT2_, IT2_> & csr)
       {
-        XASSERT(csr.template used_elements<Perspective::pod>() > 0);
+        XASSERT(csr.num_nzes() > 0);
+
+        const Memory::TypedView<IT_> row_ptr = csr.row_ptr_view_r();
+        const Memory::TypedView<IT_> col_idx = csr.col_idx_view_r();
+        const Memory::TypedView<DT_> csr_val = csr.val_view_r();
 
         std::set<IT_> offset_set;
-        Index nrows(csr.rows());
-        Index ncolumns(csr.columns());
+        Index nrows(csr.num_rows());
+        Index ncolumns(csr.num_cols());
         for (Index row(0) ; row < nrows ; ++row)
         {
-          for (Index i(csr.row_ptr()[row]) ; i < csr.row_ptr()[row+1] ; ++i)
+          for (Index i(row_ptr[row]) ; i < row_ptr[row+1] ; ++i)
           {
             //compute band offset for each non zero entry
-            IT_ off = IT_(csr.col_ind()[i] - row + nrows - 1);
+            IT_ off = IT_(col_idx[i] - row + nrows - 1);
             offset_set.insert(off);
           }
         }
 
         DenseVector<DT_, IT_> val_new(Index(offset_set.size()) * nrows, DT_(0));
+        Memory::TypedView<DT_ > pval = val_new.elements_view_w();
         for (Index row(0) ; row < nrows ; ++row)
         {
-          for (Index i(csr.row_ptr()[row]) ; i < csr.row_ptr()[row+1] ; ++i)
+          for (Index i(row_ptr[row]) ; i < row_ptr[row+1] ; ++i)
           {
-            Index col = csr.col_ind()[i];
+            Index col = col_idx[i];
             Index offset = (col - row + nrows - 1);
             Index band = Index(std::distance(offset_set.begin(), offset_set.find(IT_(offset))));
-            val_new.elements()[band * nrows + row] = csr.val()[i];
+            pval[band * nrows + row] = csr_val[i];
           }
         }
 
         DenseVector<IT_, IT_> offsets_new(Index(offset_set.size()));
+        Memory::TypedView<IT_> poffsets = offsets_new.elements_view_w();
         auto it_offset = offset_set.begin();
         for (Index i(0) ; i < offset_set.size() ; ++i, ++it_offset)
         {
-          offsets_new(i, *it_offset);
+          poffsets[i] = *it_offset;
         }
         offset_set.clear();
+
+        pval.release();
+        poffsets.release();
 
         SparseMatrixBanded<DT_, IT_> temp(nrows, ncolumns, val_new, offsets_new);
         this->move(std::move(temp));
       }
-
 
       /**
        * \brief Write out matrix to file.
@@ -708,8 +513,8 @@ namespace FEAT
         char* buff = nullptr;
         if(mode == FileMode::fm_mtx)
         {
-          buff = new char[LAFEM::FileOutStreamBufferSize];
-          file.rdbuf()->pubsetbuf(buff, LAFEM::FileOutStreamBufferSize);
+          buff = new char[LAFEM::file_out_stream_buffer_size];
+          file.rdbuf()->pubsetbuf(buff, LAFEM::file_out_stream_buffer_size);
         }
         file.open(filename.c_str(), bin);
         if(! file.is_open())
@@ -729,43 +534,17 @@ namespace FEAT
         switch(mode)
         {
         case FileMode::fm_bm:
+          [[fallthrough]];
+
         case FileMode::fm_binary:
           if (! std::is_same<DT_, double>::value)
             std::cout<<"Warning: You are writing out a banded matrix that is not double precision!\n";
-
-        this->template _serialize<double, std::uint64_t>(FileMode::fm_bm, file);
+          this->template _serialize<double, std::uint64_t>(FileMode::fm_bm, file);
           break;
+
         default:
           XABORTM("Filemode not supported!");
         }
-      }
-
-      /**
-       * \brief Retrieve specific matrix element.
-       *
-       * \param[in] row The row of the matrix element.
-       * \param[in] col The column of the matrix element.
-       *
-       * \returns Specific matrix element.
-       */
-      DT_ operator()(Index row, Index col) const
-      {
-        ASSERT(row < rows());
-        ASSERT(col < columns());
-
-        MemoryPool::synchronize();
-
-        const Index trows(this->_scalar_index.at(1));
-
-        for (Index i(0); i < this->_scalar_index.at(4); ++i)
-        {
-          const Index toffset(this->offsets()[i]);
-          if (row + toffset + Index(1) == col + trows)
-          {
-            return this->val()[i * trows + row];
-          }
-        }
-        return DT_(0.);
       }
 
       /**
@@ -783,10 +562,9 @@ namespace FEAT
        *
        * \returns Matrix row count.
        */
-      template <Perspective = Perspective::native>
-      Index rows() const
+      Index num_rows() const
       {
-        return this->_scalar_index.at(1);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(0);
       }
 
       /**
@@ -794,61 +572,153 @@ namespace FEAT
        *
        * \returns Matrix column count.
        */
-      template <Perspective = Perspective::native>
-      Index columns() const
+      Index num_cols() const
       {
-        return this->_scalar_index.at(2);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(1);
+      }
+
+      /**
+       * \brief Retrieve number of bands.
+       *
+       * \returns Number of bands.
+       */
+      Index num_bands() const
+      {
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(2);
       }
 
       /**
        * \brief Retrieve non zero element count.
        *
+       * This only contains the number of non-zero elements within the matrix region.
+       *
        * \returns Non zero element count.
        */
-      template <Perspective = Perspective::native>
-      Index used_elements() const
+      Index num_nzes() const
       {
-        return this->_scalar_index.at(3);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(3);
+      }
+
+      /// Returns the scalar matrix row count
+      Index num_rows_raw() const
+      {
+        return this->num_rows();
+      }
+
+      /// Returns the scalar matrix column count
+      Index num_cols_raw() const
+      {
+        return this->num_cols();
+      }
+
+      /// Returns the scalar matrix nonzero element count
+      Index num_nzes_raw() const
+      {
+        return this->num_nzes();
       }
 
       /**
-       * \brief Retrieve number of offsets.
+       * \brief Retrieve total element count.
        *
-       * \returns Number of offsets.
+       * This contains the number of non-zero elements within and outside of the matrix region.
+       *
+       * \returns Total element count.
        */
-      Index num_of_offsets() const
+      Index val_size() const
       {
-        return this->_scalar_index.at(4);
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(0) * this->_scalar_index.at(2);
       }
 
-      /**
-       * \brief Retrieve element array.
-       *
-       * \returns Non zero element array.
-       */
-      DT_ * val()
+      /// Checks whether the matrix is empty, i.e. whether it is a 0x0 matrix
+      bool empty() const
       {
-        return this->_elements.at(0);
+        return this->_scalar_index.empty() || (this->_scalar_index.at(0) == Index(0));
       }
 
-      DT_ const * val() const
+      /// Checks whether the matrix has no non-zero entries, i.e. whether it is a null matrix
+      bool hollow() const
       {
-        return this->_elements.at(0);
+        return this->_scalar_index.empty() || (this->_scalar_index.at(2) == Index(0));
       }
 
-      /**
-       * \brief Retrieve offsets array.
-       *
-       * \returns offsets array.
-       */
-      IT_ * offsets()
+      /// Returns a reference to the band offsets array arbiter
+      Memory::Arbiter& offsets_arbiter()
       {
         return this->_indices.at(0);
       }
 
-      IT_ const * offsets() const
+      /// Returns a reference to the band offsets array arbiter
+      const Memory::Arbiter& offsets_arbiter() const
       {
         return this->_indices.at(0);
+      }
+
+      /// Returns a reference to the values array arbiter
+      Memory::Arbiter& val_arbiter()
+      {
+        return this->_elements.front();
+      }
+
+      /// Returns a reference to the values array arbiter
+      const Memory::Arbiter& val_arbiter() const
+      {
+        return this->_elements.front();
+      }
+
+      Memory::TypedView<DT_> val_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::read));
+      }
+
+      Memory::TypedView<DT_> val_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::write));
+      }
+
+      Memory::TypedView<DT_> val_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::read_write));
+      }
+
+      Memory::TypedView<DT_> val_view(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, acc));
+      }
+
+      Memory::TypedView<IT_> offsets_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::read));
+      }
+
+      Memory::TypedView<IT_> offsets_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::write));
+      }
+
+      Memory::TypedView<IT_> offsets_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::read_write));
+      }
+
+      Memory::TypedView<IT_> offsets_view(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, acc));
       }
 
       /**
@@ -881,21 +751,23 @@ namespace FEAT
        * \param[in] y The second summand matrix
        * \param[in] alpha A scalar to multiply x with.
        */
-      void axpy(
-                const SparseMatrixBanded & x,
-                const DT_ alpha = DT_(1))
+      void axpy(const SparseMatrixBanded & x, const DT_ alpha = DT_(1))
       {
-        XASSERTM(x.rows() == this->rows(), "Matrix rows do not match!");
-        XASSERTM(x.columns() == this->columns(), "Matrix columns do not match!");
-        XASSERTM(x.num_of_offsets() == this->num_of_offsets(), "Matrix num_of_offsets do not match!");
-        XASSERTM(x.used_elements() == this->used_elements(), "Matrix used_elements do not match!");
+        XASSERTM(x.num_rows() == this->num_rows(), "Matrix rows do not match!");
+        XASSERTM(x.num_cols() == this->num_cols(), "Matrix columns do not match!");
+        XASSERTM(x.num_bands() == this->num_bands(), "Matrix bands do not match!");
+        XASSERTM(x.num_nzes() == this->num_nzes(), "Matrix nonzeros do not match!");
+
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->used_elements() * 2);
-        Arch::Axpy::value(this->val(), alpha, x.val(), this->rows() * this->num_of_offsets());
+        Arch::AxpyDense::template exec<DT_>(this->val_arbiter(), alpha, x.val_arbiter(), this->val_size());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->val_size() * 2);
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -907,19 +779,22 @@ namespace FEAT
        */
       void scale(const SparseMatrixBanded & x, const DT_ alpha)
       {
-        XASSERTM(x.rows() == this->rows(), "Matrix rows do not match!");
-        XASSERTM(x.columns() == this->columns(), "Matrix columns do not match!");
-        XASSERTM(x.num_of_offsets() == this->num_of_offsets(), "Matrix num_of_offsets do not match!");
-        XASSERTM(x.used_elements() == this->used_elements(), "Matrix used_elements do not match!");
+        XASSERTM(x.num_rows() == this->num_rows(), "Matrix rows do not match!");
+        XASSERTM(x.num_cols() == this->num_cols(), "Matrix columns do not match!");
+        XASSERTM(x.num_bands() == this->num_bands(), "Matrix bands do not match!");
+        XASSERTM(x.num_nzes() == this->num_nzes(), "Matrix nonzeros do not match!");
+
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->used_elements());
-        Arch::Scale::value(this->val(), x.val(), alpha, this->rows() * this->num_of_offsets());
+        Arch::ScaleDense::template exec<DT_>(this->val_arbiter(), x.val_arbiter(), alpha, this->val_size());
 
         TimeStamp ts_stop;
-        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
 
+        Statistics::add_flops(this->val_size());
+        Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
       /**
@@ -929,13 +804,15 @@ namespace FEAT
        */
       DT_ norm_frobenius() const
       {
+        XASSERT(!this->empty());
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->used_elements() * 2);
-        DT_ result = Arch::Norm2::value(this->val(), this->rows() * this->num_of_offsets());
+        DT_ result = Arch::Norm2Dense::template exec<DT_>(this->val_arbiter(), this->val_size());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->val_size() * 2);
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
         return result;
@@ -949,26 +826,29 @@ namespace FEAT
        */
       void apply(DenseVector<DT_, IT_>& r, const DenseVector<DT_, IT_>& x) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols(), "Vector size of x does not match!");
 
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+        if(this->empty())
+          return;
+
+        if (this->num_nzes() == Index(0))
+        {
+          r.format();
+          return;
+        }
+
+        XASSERTM(r.elements_arbiter() != x.elements_arbiter(), "Vector x and r must not share the same memory!");
 
         TimeStamp ts_start;
-        Statistics::add_flops( 2 * this->used_elements() );
 
-        Arch::Apply::banded(r.elements(),
-            DT_(1),
-            x.elements(),
-            DT_(0),
-            r.elements(),
-            this->val(),
-            this->offsets(),
-            this->num_of_offsets(),
-            this->rows(),
-            this->columns());
+        Arch::MatVecMultBandedDense::template exec<DT_, IT_>(
+          r.elements_arbiter(), DT_(1), x.elements_arbiter(), Memory::Arbiter(),
+          this->val_arbiter(), this->offsets_arbiter(), this->num_bands(), this->num_rows(), this->num_cols());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(2 * this->val_size());
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
 
@@ -980,26 +860,28 @@ namespace FEAT
       */
       void apply_transposed(DenseVector<DT_, IT_>& r, const DenseVector<DT_, IT_>& x) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
+        XASSERTM(r.size() == this->num_cols(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows(), "Vector size of x does not match!");
 
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+        if(this->empty())
+          return;
+
+        if (this->num_nzes() == Index(0))
+        {
+          r.format();
+          return;
+        }
+
+        XASSERTM(r.elements_arbiter() != x.elements_arbiter(), "Vector x and r must not share the same memory!");
 
         TimeStamp ts_start;
-        Statistics::add_flops( 2 * this->used_elements() );
 
-        Arch::Apply::banded_transposed(r.elements(),
-          DT_(1),
-          x.elements(),
-          DT_(0),
-          r.elements(),
-          this->val(),
-          this->offsets(),
-          this->num_of_offsets(),
-          this->rows(),
-          this->columns());
+        Arch::MatVecMultBandedDense::template exec<DT_, IT_>(
+          r.elements_arbiter(), DT_(1), x.elements_arbiter(), Memory::Arbiter(),
+          this->val_arbiter(), this->offsets_arbiter(), this->num_bands(), this->num_rows(), this->num_cols(), true);
 
         TimeStamp ts_stop;
+        Statistics::add_flops( 2 * this->val_size() );
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
 
@@ -1016,34 +898,32 @@ namespace FEAT
                  const DenseVector<DT_, IT_>& y,
                  const DT_ alpha = DT_(1)) const
       {
-        XASSERTM(r.size() == this->rows(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->columns(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->rows(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_rows(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_cols(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_rows(), "Vector size of y does not match!");
 
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+        if(this->empty())
+          return;
 
-        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
+        XASSERTM(r.elements_arbiter() != x.elements_arbiter(), "Vector x and r must not share the same memory!");
+
+        // we check alpha strictly for equality to 0, because testing if |alpha| < eps may
+        // lead to false triggers if the matrix/vector contents are also < eps
+        if((this->num_nzes() == Index(0)) || (alpha == DT_(0)))
         {
           r.copy(y);
-          //r.scale(beta);
           return;
         }
 
         TimeStamp ts_start;
-        Statistics::add_flops( 2 * (this->used_elements() + this->rows()) );
 
-        Arch::Apply::banded(r.elements(),
-            alpha,
-            x.elements(),
-            DT_(1),
-            y.elements(),
-            this->val(),
-            this->offsets(),
-            this->num_of_offsets(),
-            this->rows(),
-            this->columns());
+        Arch::MatVecMultBandedDense::template exec<DT_, IT_>(
+          r.elements_arbiter(), alpha, x.elements_arbiter(), y.elements_arbiter(),
+          this->val_arbiter(), this->offsets_arbiter(), this->num_bands(), this->num_rows(), this->num_cols());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops( 2 * (this->val_size() + this->num_rows()) );
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
       }
 
@@ -1060,32 +940,29 @@ namespace FEAT
         const DenseVector<DT_, IT_>& y,
         const DT_ alpha = DT_(1)) const
       {
-        XASSERTM(r.size() == this->columns(), "Vector size of r does not match!");
-        XASSERTM(x.size() == this->rows(), "Vector size of x does not match!");
-        XASSERTM(y.size() == this->columns(), "Vector size of y does not match!");
+        XASSERTM(r.size() == this->num_cols(), "Vector size of r does not match!");
+        XASSERTM(x.size() == this->num_rows(), "Vector size of x does not match!");
+        XASSERTM(y.size() == this->num_cols(), "Vector size of y does not match!");
 
-        XASSERTM(r.template elements<Perspective::pod>() != x.template elements<Perspective::pod>(), "Vector x and r must not share the same memory!");
+        if(this->empty())
+          return;
 
-        if (this->used_elements() == 0 || Math::abs(alpha) < Math::eps<DT_>())
+        XASSERTM(r.elements_arbiter() != x.elements_arbiter(), "Vector x and r must not share the same memory!");
+
+        // we check alpha strictly for equality to 0, because testing if |alpha| < eps may
+        // lead to false triggers if the matrix/vector contents are also < eps
+        if((this->num_nzes() == Index(0)) || (alpha == DT_(0)))
         {
           r.copy(y);
-          //r.scale(beta);
           return;
         }
 
         TimeStamp ts_start;
-        Statistics::add_flops( 2 * (this->used_elements() + this->rows()) );
+        Statistics::add_flops( 2 * (this->val_size() + this->num_rows()) );
 
-        Arch::Apply::banded_transposed(r.elements(),
-          alpha,
-          x.elements(),
-          DT_(1),
-          y.elements(),
-          this->val(),
-          this->offsets(),
-          this->num_of_offsets(),
-          this->rows(),
-          this->columns());
+        Arch::MatVecMultBandedDense::template exec<DT_, IT_>(
+          r.elements_arbiter(), alpha, x.elements_arbiter(), y.elements_arbiter(),
+          this->val_arbiter(), this->offsets_arbiter(), this->num_bands(), this->num_rows(), this->num_cols(), true);
 
         TimeStamp ts_stop;
         Statistics::add_time_blas2(ts_stop.elapsed(ts_start));
@@ -1095,14 +972,21 @@ namespace FEAT
       /// \copydoc extract_diag()
       void extract_diag(VectorTypeL & diag) const
       {
-        XASSERTM(diag.size() == rows(), "diag size does not match matrix row count!");
-        XASSERTM(rows() == columns(), "matrix is not square!");
+        XASSERTM(diag.size() == num_rows(), "diag size does not match matrix row count!");
+        XASSERTM(num_rows() == num_cols(), "matrix is not square!");
 
-        for (Index i(0) ; i < num_of_offsets() ; ++i)
+        if(this->empty())
+          return;
+
+        const Memory::TypedView<IT_> offs = this->offsets_view_r();
+        const Memory::TypedView<DT_> vals = this->val_view_r();
+
+        const Index nrows = this->num_rows();
+        for (Index i(0) ; i < num_bands() ; ++i)
         {
-          if (this->offsets()[i] == this->rows() - 1)
+          if (offs[i]+1 == nrows)
           {
-            MemoryPool::copy(diag.elements(), val() + i * rows(), rows());
+            diag.elements_arbiter().copy(&vals[i*nrows], Memory::Location::main);
             break;
           }
         }
@@ -1137,15 +1021,17 @@ namespace FEAT
        */
       DT_ max_rel_diff(const SparseMatrixBanded& x) const
       {
-        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        XASSERTM(x.num_nzes() == this->num_nzes(), "Nonzero count does not match!");
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        DataType max_rel_diff = Arch::MaxRelDiff::value(this->val(), x.val(), this->used_elements());
+        DT_ result = Arch::MaxRelDiffDense::template exec<DT_>(this->val_arbiter(), x.val_arbiter(), this->val_size());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
-        return max_rel_diff;
+        return result;
       }
 
       /**
@@ -1158,35 +1044,32 @@ namespace FEAT
        */
       bool same_layout(const SparseMatrixBanded& x) const
       {
-        if(this->size() == 0 && x.size() == 0 && this->get_elements().size() == 0 && this->get_indices().size() == 0 && x.get_elements().size() == 0 && x.get_indices().size() == 0)
+        if (this->num_rows() != x.num_rows())
+          return false;
+        if (this->num_cols() != x.num_cols())
+          return false;
+        if (this->num_bands() != x.num_bands())
+          return false;
+        if (this->num_nzes() != x.num_nzes())
+          return false;
+
+        if(this->num_nzes() == Index(0))
           return true;
-        if (this->rows() != x.rows())
-          return false;
-        if (this->columns() != x.columns())
-          return false;
-        if (this->num_of_offsets() != x.num_of_offsets())
-          return false;
-        if (this->used_elements() != x.used_elements())
-          return false;
 
-        IT_ * offsets_a;
-        IT_ * offsets_b;
+        // check if the arbiters for offsets are the same
+        if(this->offsets_arbiter() == x.offsets_arbiter())
+          return true;
 
-        offsets_a = const_cast<IT_*>(this->offsets());
-        offsets_b = const_cast<IT_*>(x.offsets());
-
-        bool ret(true);
-
-        for (Index i(0); i < this->num_of_offsets(); ++i)
+        // compare the offsets
+        const Memory::TypedView<IT_> offsets_a = this->offsets_view_r();
+        const Memory::TypedView<IT_> offsets_b = x.offsets_view_r();
+        for (Index i(0); i < this->num_bands(); ++i)
         {
           if (offsets_a[i] != offsets_b[i])
-          {
-            ret = false;
-            break;
-          }
+            return false;
         }
 
-        return ret;
+        return true;
       }
 
       /**
@@ -1223,6 +1106,7 @@ namespace FEAT
         read_from(mode, file);
         file.close();
       }
+
       /**
        * \brief Read in matrix from stream.
        *
@@ -1234,9 +1118,12 @@ namespace FEAT
         switch(mode)
         {
         case FileMode::fm_bm:
+          [[fallthrough]];
+
         case FileMode::fm_binary:
           this->template _deserialize<double, std::uint64_t>(FileMode::fm_bm, file);
           break;
+
         default:
           XABORTM("Filemode not supported!");
         }
@@ -1245,139 +1132,356 @@ namespace FEAT
       /// Returns a new compatible L-Vector.
       VectorTypeL create_vector_l() const
       {
-        return VectorTypeL(this->rows());
+        return VectorTypeL(this->num_rows());
       }
 
       /// Returns a new compatible R-Vector.
       VectorTypeR create_vector_r() const
       {
-        return VectorTypeR(this->columns());
+        return VectorTypeR(this->num_cols());
       }
 
-      /// Returns first row-index of the diagonal matching to the offset i
-      template <typename ITX_>
-      inline Index _start_offset(const Index i, const ITX_ * const offsets,
-                                const Index rows_in, const Index columns_in, const Index noo) const
+      /**
+       * \brief Prints this sparse matrix in human-readable format into an output stream
+       *
+       * \param[inout] os
+       * The output stream to print to
+       *
+       * \param[in]
+       * If \c true, then the matrix will be printed as a dense matrix including all implicit zero entries,
+       * otherwise only the non-zero entries of each row prefixed by the corresponding column index are printed.
+       */
+      void print(std::ostream& os, bool print_dense) const
       {
-        if (i == Index(-1))
+        if(this->num_rows() <= Index(0))
         {
-          return rows_in;
+          os << "[]";
+          return;
         }
-        else if (i == noo)
+
+        const Memory::TypedView<IT_> off = this->offsets_view_r();
+        const Memory::TypedView<DT_> val = this->val_view_r();
+        const Index nrows = this->num_rows();
+        const Index ncols = this->num_cols();
+        const Index nbands = this->num_bands();
+
+        os << "[\n";
+        for (Index i(0) ; i < nrows ; ++i)
         {
-          return Index(0);
-        }
-        else
-        {
-          return Math::max(columns_in + Index(1), rows_in + columns_in - Index(offsets[i])) - columns_in - Index(1);
-        }
-      }
+          os << "[";
 
-      /// Returns last row-index of the diagonal matching to the offset i
-      template <typename ITX_>
-      inline Index _end_offset(const Index i, const ITX_ * const offsets,
-                              const Index rows_in, const Index columns_in, const Index noo) const
-      {
-        if (i == Index (-1))
-        {
-          return rows_in - 1;
-        }
-        else if (i == noo)
-        {
-          return Index(-1);
-        }
-        else
-        {
-          return Math::min(rows_in, columns_in + rows_in - Index(offsets[i]) - Index(1)) - Index(1);
-        }
-      }
-
-      /// Returns first row-index of the diagonal matching to the offset i
-      Index start_offset(const Index i) const
-      {
-        return this->_start_offset(i, offsets(), rows(), columns(), num_of_offsets());
-      }
-
-      /// Returns last row-index of the diagonal matching to the offset i
-      Index end_offset(const Index i) const
-      {
-        return this->_end_offset(i, offsets(), rows(), columns(), num_of_offsets());
-      }
-
-      /* ******************************************************************* */
-      /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
-      /* ******************************************************************* */
-    public:
-      /** \copydoc Adjactor::get_num_nodes_domain() */
-      inline Index get_num_nodes_domain() const
-      {
-        return rows();
-      }
-
-      /** \copydoc Adjactor::get_num_nodes_image() */
-      inline Index get_num_nodes_image() const
-      {
-        return columns();
-      }
-
-      /** \copydoc Adjactor::image_begin() */
-      inline ImageIterator image_begin(Index domain_node) const
-      {
-        XASSERT(domain_node < rows());
-
-        const IT_ * toffsets(offsets());
-        const IT_ tnum_of_offsets(num_of_offsets());
-        const Index trows(rows());
-
-        for(IT_ k(0); k < tnum_of_offsets; ++k)
-        {
-          if(toffsets[k] + domain_node + 1 >= trows)
-            return ImageIterator(k, domain_node + 1 - trows, toffsets);
-        }
-      }
-
-      /** \copydoc Adjactor::image_end() */
-      inline ImageIterator image_end(Index domain_node) const
-      {
-        XASSERT(domain_node < rows());
-
-        const IT_ * toffsets(offsets());
-        const IT_ tnum_of_offsets(num_of_offsets());
-        const Index trows(rows());
-
-        for(IT_ k(0); k < tnum_of_offsets; ++k)
-        {
-          if(toffsets[k] + domain_node + 1 >= 2 * trows)
+          Index k = 0;
+          for(IT_ j(0); j < nbands; ++j)
           {
-            return ImageIterator(k, domain_node + 1 - trows, toffsets);
+            if((off[j] + i + 2 > nrows) && (off[j] + i + 1 < 2 * nrows))
+            {
+              const Index col_idx = Index(off[j] + i + 1) - nrows;
+              if(print_dense)
+              {
+                for(; k < col_idx; ++k)
+                  os << "  " << DT_(0);
+              }
+              else
+              {
+                os << "  " << col_idx << ":";
+              }
+              os << "  " << val(j * nrows + i);
+              ++k;
+            }
           }
+
+          // write trailing zeros
+          if(print_dense)
+          {
+            for(; k < ncols; ++k)
+              os << "  " << DT_(0);
+          }
+
+          os << "]\n";
         }
-        return ImageIterator(tnum_of_offsets, domain_node + 1 - trows, toffsets);
+        os << "]";
       }
 
       /**
        * \brief SparseMatrixBanded streaming operator
        *
-       * \param[in] lhs The target stream.
+       * \param[in] os The target stream.
        * \param[in] b The matrix to be streamed.
        */
-      friend std::ostream & operator<< (std::ostream & lhs, const SparseMatrixBanded & b)
+      friend std::ostream & operator<< (std::ostream & os, const SparseMatrixBanded & b)
       {
-        lhs << "[\n";
-        for (Index i(0) ; i < b.rows() ; ++i)
-        {
-          lhs << "[";
-          for (Index j(0) ; j < b.columns() ; ++j)
-          {
-            lhs << "  " << stringify(b(i, j));
-          }
-          lhs << "]\n";
-        }
-        lhs << "]\n";
-
-        return lhs;
+        b.print(os, true);
+        return os;
       }
-    };
 
+    public:
+      class Adjactor
+      {
+      public:
+        /// ImageIterator class for Adjactor interface implementation
+        class ImageIterator
+        {
+        private:
+          IT_ _k;
+          const IT_ _s;
+          const IT_ * const _offsets;
+
+        public:
+          ImageIterator() : _k(IT_(0)), _s(IT_(0)), _offsets(nullptr) {}
+
+          ImageIterator(IT_ k, IT_ s, const IT_ * offsets) : _k(k), _s(s), _offsets(offsets) {}
+
+          ImageIterator& operator=(const ImageIterator& other)
+          {
+            _k       = other._k;
+            _s       = other._s;
+            _offsets = other._offsets;
+            return *this;
+          }
+
+          bool operator!=(const ImageIterator& other) const
+          {
+            return this->_k != other._k;
+          }
+
+          ImageIterator& operator++()
+          {
+            ++_k;
+            return *this;
+          }
+
+          Index operator*() const
+          {
+            return Index(_s + _offsets[_k]);
+          }
+        };
+
+      private:
+        const SparseMatrixBanded& _matrix;
+        const Memory::TypedView<IT_> _offsets;
+
+      public:
+        explicit Adjactor(const SparseMatrixBanded& matrix) :
+          _matrix(matrix),
+          _offsets(matrix.offsets_view_r())
+        {
+        }
+
+        /** \copydoc Adjactor::get_num_nodes_domain() */
+        inline Index get_num_nodes_domain() const
+        {
+          return _matrix.num_rows();
+        }
+
+        /** \copydoc Adjactor::get_num_nodes_image() */
+        inline Index get_num_nodes_image() const
+        {
+          return _matrix.num_cols();
+        }
+
+        /** \copydoc Adjactor::image_begin() */
+        inline ImageIterator image_begin(Index domain_node) const
+        {
+          const IT_ tbands(_matrix.num_bands());
+          const Index trows(_matrix.num_rows());
+
+          XASSERT(domain_node < trows);
+
+          for(IT_ k(0); k < tbands; ++k)
+          {
+            if(_offsets[k] + domain_node + 1 >= trows)
+              return ImageIterator(k, domain_node + 1 - trows, _offsets.get_r());
+          }
+        }
+
+        /** \copydoc Adjactor::image_end() */
+        inline ImageIterator image_end(Index domain_node) const
+        {
+          const IT_ tbands(_matrix.num_bands());
+          const Index trows(_matrix.num_rows());
+
+          XASSERT(domain_node < trows);
+
+          for(IT_ k(0); k < tbands; ++k)
+          {
+            if(_offsets[k] + domain_node + 1 >= 2 * trows)
+            {
+              return ImageIterator(k, domain_node + 1 - trows, _offsets.get_r());
+            }
+          }
+          return ImageIterator(tbands, domain_node + 1 - trows, _offsets.get_r());
+        }
+      }; // class Adjactor
+
+      /**
+       * \brief Scatter-Axpy operation for SparseMatrixBanded
+       *
+       * \author Christoph Lohmann
+       */
+      class ScatterAxpy
+      {
+      public:
+        typedef LAFEM::SparseMatrixBanded<DT_, IT_> MatrixType;
+        typedef DT_ DataType;
+        typedef IT_ IndexType;
+
+      private:
+#ifdef DEBUG
+        static constexpr IT_ _deadcode = ~IT_(0);
+#endif
+        Index _num_rows;
+        Index _num_cols;
+        Index _num_bands;
+        Memory::Arbiter _col_ptr_arbiter;
+        const Memory::TypedView<IT_> _offsets;
+        Memory::TypedView<IT_> _col_ptr;
+        Memory::TypedView<DT_> _data;
+
+      public:
+        explicit ScatterAxpy(MatrixType& matrix) :
+          _num_rows(matrix.num_rows()),
+          _num_cols(matrix.num_cols()),
+          _num_bands(matrix.num_bands()),
+          _col_ptr_arbiter(_num_cols * sizeof(IT_), Memory::Location::main, Memory::Init::format_to_one),
+          _offsets(matrix.offsets_view_r()),
+          _col_ptr(_col_ptr_arbiter.view(Memory::Location::main, Memory::Access::read_write)),
+          _data(matrix.val_view(Memory::Location::main, Memory::Access::read_write | Memory::Access::overlap))
+        {
+        }
+
+        template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
+        void operator()(const LocalMatrix_& loc_mat, const RowMapping_& row_map,
+          const ColMapping_& col_map, DT_ alpha = DT_(1))
+        {
+          // loop over all local row entries
+          for(int i(0); i < row_map.get_num_local_dofs(); ++i)
+          {
+            // fetch row index
+            const Index ix = row_map.get_index(i);
+
+            // build column pointer for this row entry contribution
+            for(IT_ k(0); k < _num_bands; ++k)
+            {
+              if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
+              {
+                _col_ptr[_offsets[k] + ix + 1 - _num_rows] = IT_(k * _num_rows + ix);
+              }
+            }
+
+            // loop over all local column entries
+            for(int j(0); j < col_map.get_num_local_dofs(); ++j)
+            {
+              // fetch column index
+              const Index jx = col_map.get_index(j);
+
+              // ensure that the column pointer is valid for this index
+              ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
+
+              // incorporate data into global matrix
+              _data[_col_ptr[jx]] += alpha * loc_mat[i][j];
+
+              // continue with next column entry
+            }
+
+#ifdef DEBUG
+            // reformat column-pointer array
+            for(IT_ k(0); k < _num_bands; ++k)
+            {
+              if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
+              {
+                _col_ptr[_offsets[k] + ix + 1 - _num_rows] = _deadcode;
+              }
+            }
+#endif
+            // continue with next row entry
+          }
+        }
+      }; // class ScatterAxpy
+
+      /**
+       * \brief Gather-Axpy operation for SparseMatrixBanded
+       *
+       * \author Christoph Lohmann
+       */
+      class GatherAxpy
+      {
+      public:
+        typedef LAFEM::SparseMatrixBanded<DT_, IT_> MatrixType;
+        typedef DT_ DataType;
+        typedef IT_ IndexType;
+
+      private:
+#ifdef DEBUG
+        static constexpr IT_ _deadcode = ~IT_(0);
+#endif
+        Index _num_rows;
+        Index _num_cols;
+        Index _num_bands;
+        Memory::Arbiter _col_ptr_arbiter;
+        const Memory::TypedView<IT_> _offsets;
+        Memory::TypedView<IT_> _col_ptr;
+        const Memory::TypedView<DT_> _data;
+
+      public:
+        explicit GatherAxpy(const MatrixType& matrix) :
+          _num_rows(matrix.num_rows()),
+          _num_cols(matrix.num_cols()),
+          _num_bands(matrix.num_bands()),
+          _col_ptr_arbiter(_num_cols * sizeof(IT_), Memory::Location::main, Memory::Init::format_to_one),
+          _offsets(matrix.offsets_view_r()),
+          _col_ptr(_col_ptr_arbiter.view(Memory::Location::main, Memory::Access::read_write)),
+          _data(matrix.val_view_r())
+        {
+        }
+
+        template<typename LocalMatrix_, typename RowMapping_, typename ColMapping_>
+        void operator()(LocalMatrix_& loc_mat, const RowMapping_& row_map,
+          const ColMapping_& col_map, DT_ alpha = DT_(1))
+        {
+          // loop over all local row entries
+          for(int i(0); i < row_map.get_num_local_dofs(); ++i)
+          {
+            // fetch row index
+            const Index ix = row_map.get_index(i);
+
+            // build column pointer for this row entry contribution
+            for(IT_ k(0); k < _num_bands; ++k)
+            {
+              if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
+              {
+                _col_ptr[_offsets[k] + ix + 1 - _num_rows] = IT_(k * _num_rows + ix);
+              }
+            }
+
+            // loop over all local column entries
+            for(int j(0); j < col_map.get_num_local_dofs(); ++j)
+            {
+              // fetch column index
+              const Index jx = col_map.get_index(j);
+
+              // ensure that the column pointer is valid for this index
+              ASSERTM(_col_ptr[jx] != _deadcode, "invalid column index");
+
+              // update local matrix data
+              loc_mat[i][j] += alpha * _data[_col_ptr[jx]];
+
+              // continue with next column entry
+            }
+
+#ifdef DEBUG
+            // reformat column-pointer array
+            for(IT_ k(0); k < _num_bands; ++k)
+            {
+              if(_offsets[k] + ix + 1 >= _num_rows && _offsets[k] + ix + 1 < 2 * _num_rows)
+              {
+                _col_ptr[_offsets[k] + ix + 1 - _num_rows] = _deadcode;
+              }
+            }
+#endif
+            // continue with next row entry
+          }
+        }
+      }; // class GatherAxpy
+    }; // class SparseMatrixBanded
   } // namespace LAFEM
 } // namespace FEAT

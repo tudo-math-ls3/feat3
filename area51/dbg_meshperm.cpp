@@ -267,8 +267,8 @@ void run_xml(SimpleArgParser& args, Geometry::MeshFileReader& mesh_reader, const
 
     process_coloring(exporter, mesh);
     process_layering(exporter, mesh);
-    exporter.add_vertex_scalar("sine", vec_f1.elements());
-    exporter.add_vertex_scalar("prol", vec_f2.elements());
+    exporter.add_vertex_scalar("sine", vec_f1);
+    exporter.add_vertex_scalar("prol", vec_f2);
 
     exporter.write(vtkname);
   }

@@ -7,30 +7,34 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-#include <kernel/lafem/forward.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/util/type_traits.hpp>
+#include <kernel/util/likwid_marker.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/util/random.hpp>
-#include <kernel/lafem/container.hpp>
-#include <kernel/lafem/dense_vector.hpp>
-#include <kernel/lafem/arch/dot_product.hpp>
-#include <kernel/lafem/arch/norm.hpp>
-#include <kernel/lafem/arch/scale.hpp>
-#include <kernel/lafem/arch/axpy.hpp>
-#include <kernel/lafem/arch/component_product.hpp>
-#include <kernel/lafem/arch/component_copy.hpp>
-#include <kernel/lafem/arch/component_invert.hpp>
-#include <kernel/lafem/arch/max_abs_index.hpp>
-#include <kernel/lafem/arch/min_abs_index.hpp>
-#include <kernel/lafem/arch/max_index.hpp>
-#include <kernel/lafem/arch/min_index.hpp>
-#include <kernel/lafem/arch/max_rel_diff.hpp>
-#include <kernel/util/tiny_algebra.hpp>
 #include <kernel/util/statistics.hpp>
 #include <kernel/util/time_stamp.hpp>
+#include <kernel/util/tiny_algebra.hpp>
+#include <kernel/util/type_traits.hpp>
 #include <kernel/adjacency/permutation.hpp>
-#include <kernel/util/likwid_marker.hpp>
+#include <kernel/lafem/forward.hpp>
+#include <kernel/lafem/container.hpp>
+#include <kernel/lafem/arch/axpy_block.hpp>
+#include <kernel/lafem/arch/axpy_dense.hpp>
+#include <kernel/lafem/arch/component_invert_dense.hpp>
+#include <kernel/lafem/arch/component_product_dense.hpp>
+#include <kernel/lafem/arch/copy_stride.hpp>
+#include <kernel/lafem/arch/dot_product_block.hpp>
+#include <kernel/lafem/arch/dot_product_dense.hpp>
+#include <kernel/lafem/arch/max_rel_diff_dense.hpp>
+#include <kernel/lafem/arch/min_max_index_dense.hpp>
+#include <kernel/lafem/arch/min_max_value_block.hpp>
+#include <kernel/lafem/arch/min_max_value_dense.hpp>
+#include <kernel/lafem/arch/norm2_dense.hpp>
+#include <kernel/lafem/arch/norm2_block.hpp>
+#include <kernel/lafem/arch/scale_dense.hpp>
+#include <kernel/lafem/arch/scale_block.hpp>
+#include <kernel/lafem/arch/triple_dot_product_dense.hpp>
+#include <kernel/lafem/arch/triple_dot_product_block.hpp>
 
 #include <iostream>
 #include <fstream>
@@ -41,42 +45,24 @@ namespace FEAT
 {
   namespace LAFEM
   {
-    /// \cond internal
-    namespace Intern
-    {
-      template <typename DT_, int BlockSize_, Perspective perspective_>
-      struct DenseVectorBlockedPerspectiveHelper
-      {
-        typedef Tiny::Vector<DT_, BlockSize_> Type;
-      };
-
-      template <typename DT_, int BlockSize_>
-      struct DenseVectorBlockedPerspectiveHelper<DT_, BlockSize_, Perspective::pod>
-      {
-        typedef DT_ Type;
-      };
-    } // namespace Intern
-    /// \endcond
-
     /**
      * \brief Blocked Dense data vector class template.
      *
      * \tparam DT_ The datatype to be used.
      * \tparam IT_ The indextype to be used.
-     * \tparam BlockSize_ The size of the represented blocks
+     * \tparam block_size_ The size of the represented blocks
      *
      * This class represents a vector of continuous data in memory.\n
-     * Logical, the data are organized in small blocks of BlockSize_ length.\n\n
+     * Logical, the data are organized in small blocks of block_size_ length.\n\n
      * Data survey: \n
      * _elements[0]: raw number values \n
      * _scalar_index[0]: container size - aka block count
-     * _scalar_index[1]: boolean flag, signaling DenseVectorRange usage
      *
      * Refer to \ref lafem_design for general usage informations.
      *
      * \author Dirk Ribbrock
      */
-    template <typename DT_, typename IT_, int BlockSize_>
+    template <typename DT_, typename IT_, int block_size_>
     class DenseVectorBlocked : public Container<DT_, IT_>
     {
     public:
@@ -85,102 +71,22 @@ namespace FEAT
       /// Our indextype
       typedef IT_ IndexType;
       /// Our size of a single block
-      static constexpr int BlockSize = BlockSize_;
+      static constexpr int block_size = block_size_;
       /// Our value type
-      typedef Tiny::Vector<DT_, BlockSize_> ValueType;
+      typedef Tiny::Vector<DT_, block_size_> ValueType;
 
       /// Our 'base' class type
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      using ContainerType = DenseVectorBlocked<DT2_, IT2_, BlockSize_>;
+      using ContainerType = DenseVectorBlocked<DT2_, IT2_, block_size_>;
 
       /// this typedef lets you create a vector container with different Data and Index types
       template <typename DataType2_, typename IndexType2_>
       using ContainerTypeByDI = ContainerType<DataType2_, IndexType2_>;
 
-      /**
-       * \brief Scatter-Axpy operation for DenseVectorBlocked
-       *
-       * \author Peter Zajac
-       */
-      class ScatterAxpy
+    protected:
+      Index& _size_raw()
       {
-      public:
-        typedef LAFEM::DenseVectorBlocked<DT_, IT_, BlockSize_> VectorType;
-        typedef DT_ DataType;
-        typedef IT_ IndexType;
-        typedef Tiny::Vector<DT_, BlockSize_> ValueType;
-
-      private:
-        IT_ _num_entries;
-        ValueType * _data;
-
-      public:
-        explicit ScatterAxpy(VectorType & vector) :
-          _num_entries(IT_(vector.size())),
-          _data(vector.elements())
-        {
-        }
-
-        template <typename LocalVector_, typename Mapping_>
-        void operator()(const LocalVector_ & loc_vec, const Mapping_ & mapping, DT_ alpha = DT_(1))
-        {
-          // loop over all local entries
-          for (int i(0); i < mapping.get_num_local_dofs(); ++i)
-          {
-            // get dof index
-            Index dof_idx = mapping.get_index(i);
-            ASSERT(dof_idx < _num_entries);
-
-            // update vector data
-            _data[dof_idx] += alpha * loc_vec[i];
-          }
-        }
-      }; // class ScatterAxpy
-
-      /**
-       * \brief Gather-Axpy operation for DenseVectorBlocked
-       *
-       * \author Peter Zajac
-       */
-      class GatherAxpy
-      {
-      public:
-        typedef LAFEM::DenseVectorBlocked<DT_, IT_, BlockSize_> VectorType;
-        typedef DT_ DataType;
-        typedef IT_ IndexType;
-        typedef Tiny::Vector<DT_, BlockSize_> ValueType;
-
-      private:
-        Index _num_entries;
-        const ValueType * _data;
-
-      public:
-        explicit GatherAxpy(const VectorType & vector) :
-          _num_entries(vector.size()),
-          _data(vector.elements())
-        {
-        }
-
-        template <typename LocalVector_, typename Mapping_>
-        void operator()(LocalVector_ & loc_vec, const Mapping_ & mapping, DT_ alpha = DT_(1))
-        {
-          // loop over all local entries
-          for (int i(0); i < mapping.get_num_local_dofs(); ++i)
-          {
-            // get dof index
-            Index dof_idx = mapping.get_index(i);
-            ASSERT(dof_idx < _num_entries);
-
-            // update local vector data
-            loc_vec[i].axpy(alpha, _data[dof_idx]);
-          }
-        }
-      }; // class GatherAxpy
-
-    private:
-      Index & _size()
-      {
-        return this->_scalar_index.at(0);
+        return this->_elements_size.at(0);
       }
 
     public:
@@ -189,10 +95,7 @@ namespace FEAT
        *
        * Creates an empty non dimensional vector.
        */
-      explicit DenseVectorBlocked() :
-        Container<DT_, IT_> (0)
-      {
-      }
+      DenseVectorBlocked() = default;
 
       /**
        * \brief Constructor
@@ -202,15 +105,13 @@ namespace FEAT
        *
        * Creates a vector with a given block count.
        */
-      explicit DenseVectorBlocked(Index size_in) :
-        Container<DT_, IT_>(size_in)
+      explicit DenseVectorBlocked(Index size_in)
       {
-        if (size_in == Index(0))
-          return;
-
-        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(size<Perspective::pod>()));
-
-        this->_elements_size.push_back(size<Perspective::pod>());
+        if(size_in > Index(0))
+        {
+          this->_elements.push_back(Memory::Arbiter(sizeof(DT_) * std::size_t(block_size_) * size_in));
+          this->_elements_size.push_back(Index(block_size_) * size_in);
+        }
       }
 
       /**
@@ -225,15 +126,9 @@ namespace FEAT
        * Creates a vector with given size and value.
        */
       explicit DenseVectorBlocked(Index size_in, DT_ value) :
-        Container<DT_, IT_>(size_in)
+        DenseVectorBlocked(size_in)
       {
-        if (size_in == Index(0))
-          return;
-
-        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(size<Perspective::pod>()));
-        this->_elements_size.push_back(size<Perspective::pod>());
-
-        MemoryPool::set_memory(this->_elements.at(0), value, size<Perspective::pod>());
+        this->format(value);
       }
 
       /**
@@ -244,19 +139,13 @@ namespace FEAT
        *
        * Creates a vector with given size and given data.
        */
-      explicit DenseVectorBlocked(Index size_in, DT_ * data) :
-        Container<DT_, IT_>(size_in)
+      explicit DenseVectorBlocked(Index size_in, Memory::Arbiter&& data)
       {
-        if (size_in == Index(0))
-          return;
-
-        this->_elements.push_back(data);
-        this->_elements_size.push_back(size<Perspective::pod>());
-
-        for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool::increase_memory(this->_elements.at(i));
-        for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool::increase_memory(this->_indices.at(i));
+        if(size_in > Index(0))
+        {
+          this->_elements.push_back(std::forward<Memory::Arbiter>(data));
+          this->_elements_size.push_back(Index(block_size_) * size_in);
+        }
       }
 
       /**
@@ -266,10 +155,9 @@ namespace FEAT
        *
        * Creates a vector from a DenseVector source
        */
-      explicit DenseVectorBlocked(const DenseVector<DT_, IT_> & other) :
-        Container<DT_, IT_>(other.size() / Index(BlockSize_))
+      explicit DenseVectorBlocked(const DenseVector<DT_, IT_> & other)
       {
-        convert(other);
+        this->convert(other);
       }
 
       /**
@@ -283,14 +171,14 @@ namespace FEAT
        *
        * \note The created DenseVectorBlocked has no own memory management nor own allocated memory and should be used carefully!
        */
-      explicit DenseVectorBlocked(const DenseVectorBlocked & dv_in, Index size_in, Index offset_in) :
-        Container<DT_, IT_>(size_in)
+      explicit DenseVectorBlocked(const DenseVectorBlocked & dv_in, Index size_in, Index offset_in)
       {
-        this->_foreign_memory = true;
+        XASSERT(size_in > Index(0));
+        XASSERTM(size_in + offset_in <= dv_in.size(), "Ranged vector part exceeds original vector size!");
 
-        DT_ * te(const_cast<DT_ *>(dv_in.template elements<Perspective::pod>()));
-        this->_elements.push_back(te + offset_in * Index(BlockSize_));
-        this->_elements_size.push_back(size<Perspective::pod>());
+        const std::size_t vt_size = sizeof(DT_) * std::size_t(block_size_);
+        this->_elements.push_back(dv_in._elements.front().attach(offset_in * vt_size, size_in * vt_size));
+        this->_elements_size.push_back(size_in * Index(block_size_));
       }
 
       /**
@@ -301,10 +189,9 @@ namespace FEAT
        *
        * Creates a vector from the given source file.
        */
-      explicit DenseVectorBlocked(FileMode mode, const String& filename) :
-        Container<DT_, IT_>(0)
+      explicit DenseVectorBlocked(FileMode mode, const String& filename)
       {
-        read_from(mode, filename);
+        this->read_from(mode, filename);
       }
 
       /**
@@ -315,10 +202,9 @@ namespace FEAT
        *
        * Creates a vector from the given source file.
        */
-      explicit DenseVectorBlocked(FileMode mode, std::istream& file) :
-        Container<DT_, IT_>(0)
+      explicit DenseVectorBlocked(FileMode mode, std::istream& file)
       {
-        read_from(mode, file);
+        this->read_from(mode, file);
       }
 
       /**
@@ -329,10 +215,9 @@ namespace FEAT
        * Creates a vector from the given byte array.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      explicit DenseVectorBlocked(std::vector<char> input) :
-        Container<DT_, IT_>(0)
+      explicit DenseVectorBlocked(std::vector<char> input)
       {
-        deserialize<DT2_, IT2_>(input);
+        this->deserialize<DT2_, IT2_>(input);
       }
 
       /**
@@ -346,14 +231,8 @@ namespace FEAT
        * Creates a vector from the given random number generator.
        */
       explicit DenseVectorBlocked(Random & rng, Index size_in, DataType min, DataType max) :
-        Container<DT_, IT_>(size_in)
+        DenseVectorBlocked(size_in)
       {
-        if (size_in == Index(0))
-          return;
-
-        this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(size<Perspective::pod>()));
-        this->_elements_size.push_back(size<Perspective::pod>());
-
         this->format(rng, min, max);
       }
 
@@ -372,9 +251,7 @@ namespace FEAT
       /**
        * \brief Destructor
        */
-      virtual ~DenseVectorBlocked()
-      {
-      }
+      virtual ~DenseVectorBlocked() = default;
 
       /**
        * \brief Assignment move operator
@@ -415,7 +292,7 @@ namespace FEAT
        *
        */
       template< typename DT2_, typename IT2_>
-      void clone(const DenseVectorBlocked<DT2_, IT2_, BlockSize_> & other, CloneMode clone_mode = CloneMode::Deep)
+      void clone(const DenseVectorBlocked<DT2_, IT2_, block_size_> & other, CloneMode clone_mode = CloneMode::Deep)
       {
         Container<DT_, IT_>::clone(other, clone_mode);
       }
@@ -428,7 +305,7 @@ namespace FEAT
        * Use source vector content as content of current vector
        */
       template <typename DT2_, typename IT2_>
-      void convert(const DenseVectorBlocked<DT2_, IT2_, BlockSize_> & other)
+      void convert(const DenseVectorBlocked<DT2_, IT2_, block_size_> & other)
       {
         this->assign(other);
       }
@@ -443,19 +320,8 @@ namespace FEAT
       template <typename DT2_, typename IT2_>
       void convert(const DenseVector<DT2_, IT2_> & other)
       {
-        XASSERTM(other.size() % Index(BlockSize_) == 0, "DenseVector cannot be converted to given blocksize!");
-
-        this->clear();
-
-        this->_scalar_index.push_back(other.size() / Index(BlockSize_));
-
-        this->_elements.push_back(other.get_elements().at(0));
-        this->_elements_size.push_back(size<Perspective::pod>());
-
-        for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool::increase_memory(this->_elements.at(i));
-        for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool::increase_memory(this->_indices.at(i));
+        XASSERTM(other.size() % Index(block_size_) == 0, "DenseVector cannot be converted to given blocksize!");
+        this->assign(other);
       }
 
       /**
@@ -490,76 +356,90 @@ namespace FEAT
         return this->template _serialize<DT2_, IT2_>(FileMode::fm_dvb, config);
       }
 
-      /**
-       * \brief Retrieve a pointer to the data array.
-       *
-       * \tparam perspective_ template parameter to choose the return value type
-       *
-       * \returns Non zero element array if perspective_ = Perspective::native, e.g. treat every block as one block.
-       * \returns Raw non zero element array if perspective_ = Perspective::pod, e.g. treat every entry of a block separated.
-       */
-      template <Perspective perspective_ = Perspective::native>
-      auto elements() const -> const typename Intern::DenseVectorBlockedPerspectiveHelper<DT_, BlockSize_, perspective_>::Type *
-      {
-        if (this->size() == 0)
-          return nullptr;
-
-        return (const typename Intern::DenseVectorBlockedPerspectiveHelper<DT_, BlockSize_, perspective_>::Type *)(this->_elements.at(0));
-      }
-
-      /// \copydoc val()
-      /// non const version.
-      template <Perspective perspective_ = Perspective::native>
-      auto elements() -> typename Intern::DenseVectorBlockedPerspectiveHelper<DT_, BlockSize_, perspective_>::Type *
-      {
-        if (this->size() == 0)
-          return nullptr;
-
-        return (typename Intern::DenseVectorBlockedPerspectiveHelper<DT_, BlockSize_, perspective_>::Type *)(this->_elements.at(0));
-      }
-
-      /**
-       * \brief The number of elements
-       *
-       * \returns number of elements of type Tiny::Vector<DT_, Blocksize_> if perspective_ = false, e.g. count every block as one entry.
-       * \returns Raw number of elements of type DT_ if perspective_ = true, e.g. size * BlockSize_
-       */
-      template <Perspective perspective_ = Perspective::native>
+      /// Returns the size of this vector, i.e. its number of entries
       Index size() const
       {
-        if constexpr(perspective_ == Perspective::pod)
-          return static_cast<const Container<DT_, IT_> *>(this)->size() * Index(BlockSize_);
-        else
-          return static_cast<const Container<DT_, IT_> *>(this)->size();
+        return this->_elements_size.empty() ? Index(0) : this->_elements_size.at(0) / Index(block_size_);
       }
 
-      /**
-       * \brief Retrieve specific vector element.
-       *
-       * \param[in] index The index of the vector element.
-       *
-       * \returns Specific Tiny::Vector element.
-       */
-      const Tiny::Vector<DT_, BlockSize_> operator()(Index index) const
+      /// Returns the size of this vector in scalar data type entries, i.e. its number of entries multiplied by the block size
+      Index size_raw() const
       {
-        ASSERT(index < this->size());
-
-        MemoryPool::synchronize();
-
-        return this->elements<Perspective::native>()[index];
+        return this->_elements_size.empty() ? Index(0) : this->_elements_size.at(0);
       }
 
-      /**
-       * \brief Set specific vector element.
-       *
-       * \param[in] index The index of the vector element.
-       * \param[in] value The value to be set.
-       */
-      void operator()(Index index, const Tiny::Vector<DT_, BlockSize_> & value)
+      /// Checks whether the vector is empty, i.e. if it has size 0
+      bool empty() const
       {
-        ASSERT(index < this->size());
-        this->elements<Perspective::native>()[index] = value;
-        MemoryPool::synchronize();
+        return this->_elements_size.empty() || (this->_elements_size.at(0) <= Index(0));
+      }
+
+      /// Returns a reference to the element array arbiter
+      Memory::Arbiter& elements_arbiter()
+      {
+        return this->_elements.front();
+      }
+
+      /// Returns a reference to the element array arbiter
+      const Memory::Arbiter& elements_arbiter() const
+      {
+        return this->_elements.front();
+      }
+
+      Memory::TypedView<ValueType> elements_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<ValueType>();
+        return Memory::TypedView<ValueType>(this->_elements.at(0).view(loc, Memory::Access::read));
+      }
+
+      Memory::TypedView<ValueType> elements_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<ValueType>();
+        return Memory::TypedView<ValueType>(this->_elements.at(0).view(loc, Memory::Access::write));
+      }
+
+      Memory::TypedView<ValueType> elements_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<ValueType>();
+        return Memory::TypedView<ValueType>(this->_elements.at(0).view(loc, Memory::Access::read_write));
+      }
+
+      Memory::TypedView<ValueType> elements_view(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<ValueType>();
+        return Memory::TypedView<ValueType>(this->_elements.at(0).view(loc, acc));
+      }
+
+      Memory::TypedView<DT_> elements_view_raw_r(Memory::Location loc = Memory::Location::main) const
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::read));
+      }
+
+      Memory::TypedView<DT_> elements_view_raw_w(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::write));
+      }
+
+      Memory::TypedView<DT_> elements_view_raw_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::read_write));
+      }
+
+      Memory::TypedView<DT_> elements_view_dt(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, acc));
       }
 
       /**
@@ -584,6 +464,17 @@ namespace FEAT
       }
 
       /**
+       * \brief Performs \f$this \leftarrow x\f$.
+       *
+       * \param[in] x The vector to be copied.
+       * \param[in] full Shall we create a full copy, including scalars and index arrays?
+       */
+      void copy(const DenseVector<DT_, IT_>& x, bool full = false)
+      {
+        this->_copy_content(x, full);
+      }
+
+      /**
        * \brief Read in vector from file.
        *
        * \param[in] mode The used file format.
@@ -597,7 +488,7 @@ namespace FEAT
         std::ifstream file(filename.c_str(), bin);
         if (! file.is_open())
           XABORTM("Unable to open Vector file " + filename);
-        read_from(mode, file);
+        this->read_from(mode, file);
         file.close();
       }
 
@@ -651,8 +542,9 @@ namespace FEAT
               XABORTM("Input-file is no dense-vector-file");
           }
 
-          DenseVectorBlocked<DT_, IT_, BlockSize_> tmp(rows / BlockSize_);
-          DT_ * pval(tmp.template elements<Perspective::pod>());
+          DenseVectorBlocked<DT_, IT_, block_size_> tmp(rows / block_size_);
+          Memory::TypedView<DT_> tmp_view(tmp.elements_view_raw_w());
+          DT_* pval = tmp_view.get_w();
 
           while (! file.eof())
           {
@@ -669,6 +561,7 @@ namespace FEAT
             *pval = tval;
             ++pval;
           }
+          tmp_view.release();
           this->move(std::move(tmp));
           break;
         }
@@ -703,13 +596,19 @@ namespace FEAT
             data.push_back(n_z);
           }
 
-          _size() = Index(data.size()) / Index(BlockSize_);
-          this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(Index(data.size())));
-          this->_elements_size.push_back(Index(data.size()));
-          MemoryPool::template copy<DT_>(this->_elements.at(0), &data[0], Index(data.size()));
+          DenseVectorBlocked<DT_, IT_, block_size_> tmp(data.size() / Index(block_size_));
+          {
+            Memory::TypedView<DT_> tmp_view(tmp.elements_view_raw_w());
+            tmp_view.convert_from(data.data());
+          }
+
+          this->move(std::move(tmp));
           break;
         }
+
         case FileMode::fm_dvb:
+          [[fallthrough]];
+
         case FileMode::fm_binary:
         {
           this->clear();
@@ -717,6 +616,7 @@ namespace FEAT
           this->template _deserialize<double, std::uint64_t>(FileMode::fm_dvb, file);
           break;
         }
+
         default:
           XABORTM("Filemode not supported!");
         }
@@ -737,13 +637,13 @@ namespace FEAT
         char* buff = nullptr;
         if(mode == FileMode::fm_mtx)
         {
-          buff = new char[LAFEM::FileOutStreamBufferSize];
-          file.rdbuf()->pubsetbuf(buff, LAFEM::FileOutStreamBufferSize);
+          buff = new char[LAFEM::file_out_stream_buffer_size];
+          file.rdbuf()->pubsetbuf(buff, LAFEM::file_out_stream_buffer_size);
         }
         file.open(filename.c_str(), bin);
         if(! file.is_open())
           XABORTM("Unable to open Matrix file " + filename);
-        write_out(mode, file);
+        this->write_out(mode, file);
         file.close();
         delete[] buff;
       }
@@ -760,37 +660,38 @@ namespace FEAT
         {
         case FileMode::fm_mtx:
         {
-          DenseVectorBlocked<DT_, IT_, BlockSize_> temp;
-          temp.convert(*this);
-
-          const Index tsize(temp.template size<Perspective::pod>());
+          const Index tsize(this->size_raw());
           file << "%%MatrixMarket matrix array real general\n";
           file << tsize << " " << 1 << "\n";
+          file << std::scientific << std::setprecision(Type::Traits<DT_>::format_precision);
 
-          const DT_ * pval(temp.template elements<Perspective::pod>());
-          for (Index i(0); i < tsize; ++i, ++pval)
+          const Memory::TypedView<DT_> elem_view(this->elements_view_raw_r());
+          for (Index i(0); i < tsize; ++i)
           {
-            file << stringify_fp_sci(*pval) << "\n";
+            file << elem_view(i) << "\n";
           }
           break;
         }
+
         case FileMode::fm_exp:
         {
-          DT_ * temp = MemoryPool::template allocate_memory<DT_>((this->size<Perspective::pod>()));
-          MemoryPool::template copy<DT_>(temp, this->template elements<Perspective::pod>(), this->size<Perspective::pod>());
-
-          for (Index i(0); i < this->size<Perspective::pod>(); ++i)
+          const Index tsize(this->size_raw());
+          file << std::scientific << std::setprecision(Type::Traits<DT_>::format_precision);
+          const Memory::TypedView<DT_> elem_view(this->elements_view_raw_r());
+          for (Index i(0); i < tsize; ++i)
           {
-            file << stringify_fp_sci(temp[i]) << "\n";
+            file << elem_view(i) << "\n";
           }
-
-          MemoryPool::release_memory(temp);
           break;
         }
+
         case FileMode::fm_dvb:
+          [[fallthrough]];
+
         case FileMode::fm_binary:
           this->template _serialize<double, std::uint64_t>(FileMode::fm_dvb, file);
           break;
+
         default:
           XABORTM("Filemode not supported!");
         }
@@ -811,17 +712,21 @@ namespace FEAT
       {
         XASSERTM(x.size() == this->size(), "Vector size does not match!");
 
-        FEAT_KERNEL_MARKER_START("DV_axpy");
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
+        FEAT_KERNEL_MARKER_START("DV_axpy");
 
-        Statistics::add_flops(this->size<Perspective::pod>() * 2);
-        Arch::Axpy::value(elements<Perspective::pod>(), alpha, x.template elements<Perspective::pod>(), this->size<Perspective::pod>());
+        Arch::AxpyDense::template exec<DataType>(this->elements_arbiter(), alpha, x.elements_arbiter(), this->size_raw());
 
         FEAT_KERNEL_MARKER_STOP("DV_axpy");
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->size_raw() * 2);
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
+
       /**
        * \brief Calculate \f$this \leftarrow \alpha~ x + this\f$
        *
@@ -835,15 +740,18 @@ namespace FEAT
       {
         XASSERTM(x.size() == this->size(), "Vector size does not match!");
 
-        FEAT_KERNEL_MARKER_START("DV_axpy");
+        if(this->empty())
+          return;
 
         TimeStamp ts_start;
+        FEAT_KERNEL_MARKER_START("DV_axpy");
 
-        Statistics::add_flops(this->size<Perspective::pod>() * 2);
-        Arch::Axpy::value_blocked(elements<Perspective::native>(), alpha, x.template elements<Perspective::native>(), this->size<Perspective::native>());
+        Arch::AxpyBlock::template exec<ValueType>(this->elements_arbiter(), alpha, x.elements_arbiter(), this->size());
 
         FEAT_KERNEL_MARKER_STOP("DV_axpy");
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->size_raw() * 2);
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -858,12 +766,16 @@ namespace FEAT
         XASSERTM(this->size() == x.size(), "Vector size does not match!");
         XASSERTM(this->size() == y.size(), "Vector size does not match!");
 
+        if(this->empty())
+          return;
+
         TimeStamp ts_start;
 
-        Arch::ComponentProduct::value(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->size<Perspective::pod>());
-        Statistics::add_flops(this->size<Perspective::pod>());
+        Arch::ComponentProductDense::template exec<DT_>(this->elements_arbiter(), x.elements_arbiter(), y.elements_arbiter(), this->size_raw());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->size_raw());
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -878,12 +790,17 @@ namespace FEAT
         XASSERTM(block_ >= 0, "Block index has to be a positive integer!");
         XASSERTM(Index(block_) < this->size(), "Block index is too big!");
         XASSERTM(this->size() == x.size(), "Vector size does not match!");
+
+        if(this->empty())
+          return;
+
         TimeStamp ts_start;
 
-        Arch::ComponentCopy::value(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), BlockSize_, block_, this->size<Perspective::native>());
-        Statistics::add_flops(this->size<Perspective::pod>());
+        Arch::CopyStride::template exec<DT_>(this->elements_arbiter(), x.elements_arbiter(), block_size_, block_, 1, 0, x.size());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->size_raw());
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -898,12 +815,17 @@ namespace FEAT
         XASSERTM(block_ >= 0, "Block index has to be a positive integer!");
         XASSERTM(Index(block_) < this->size(), "Block index is too big!");
         XASSERTM(this->size() == x.size(), "Vector size does not match!");
+
+        if(this->empty())
+          return;
+
         TimeStamp ts_start;
 
-        Arch::ComponentCopy::value_to(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), BlockSize_, block_, this->size<Perspective::native>());
-        Statistics::add_flops(this->size<Perspective::pod>());
+        Arch::CopyStride::template exec<DT_>(x.elements_arbiter(), this->elements_arbiter(), 1, 0, block_size_, block_, x.size());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->size_raw());
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -920,12 +842,16 @@ namespace FEAT
       {
         XASSERTM(this->size() == x.size(), "Vector size does not match!");
 
+        if(this->empty())
+          return;
+
         TimeStamp ts_start;
 
-        Arch::ComponentInvert::value(this->template elements<Perspective::pod>(), x.template elements<Perspective::pod>(), alpha, this->size<Perspective::pod>());
-        Statistics::add_flops(this->size<Perspective::pod>());
+        Arch::ComponentInvertDense::template exec<DT_>(this->elements_arbiter(), x.elements_arbiter(), alpha, this->size_raw());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->size_raw());
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -939,12 +865,16 @@ namespace FEAT
       {
         XASSERTM(x.size() == this->size(), "Vector size does not match!");
 
+        if(this->empty())
+          return;
+
         TimeStamp ts_start;
 
-        Arch::Scale::value(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), alpha, this->size<Perspective::pod>());
-        Statistics::add_flops(this->size<Perspective::pod>());
+        Arch::ScaleDense::template exec<DT_>(this->elements_arbiter(), x.elements_arbiter(), alpha, this->size_raw());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->size_raw());
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -958,12 +888,16 @@ namespace FEAT
       {
         XASSERTM(x.size() == this->size(), "Vector size does not match!");
 
+        if(this->empty())
+          return;
+
         TimeStamp ts_start;
 
-        Arch::Scale::value_blocked(elements<Perspective::native>(), x.template elements<Perspective::native>(), alpha, this->size<Perspective::native>());
-        Statistics::add_flops(this->size<Perspective::pod>());
+        Arch::ScaleBlock::template exec<ValueType>(this->elements_arbiter(), x.elements_arbiter(), alpha, this->size());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->size_raw());
         Statistics::add_time_axpy(ts_stop.elapsed(ts_start));
       }
 
@@ -978,15 +912,17 @@ namespace FEAT
        */
       DataType triple_dot(const DenseVectorBlocked & x, const DenseVectorBlocked & y) const
       {
-        XASSERTM(x.template size<Perspective::pod>() == this->template size<Perspective::pod>(), "Vector size does not match!");
-        XASSERTM(y.template size<Perspective::pod>() == this->template size<Perspective::pod>(), "Vector size does not match!");
+        XASSERTM(x.size_raw() == this->size_raw(), "Vector size does not match!");
+        XASSERTM(y.size_raw() == this->size_raw(), "Vector size does not match!");
+        XASSERT(!this->empty());
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->template size<Perspective::pod>() * 3);
-        DataType result = Arch::TripleDotProduct::value(this->template elements<Perspective::pod>(), x.template elements<Perspective::pod>(), y.template elements<Perspective::pod>(), this->template size<Perspective::pod>());
+        DataType result = Arch::TripleDotProductDense::template exec<DT_>(this->elements_arbiter(), x.elements_arbiter(), y.elements_arbiter(), this->size_raw());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->size_raw() * 3);
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
         return result;
@@ -1005,13 +941,15 @@ namespace FEAT
       {
         XASSERTM(x.size() == this->size(), "Vector size does not match!");
         XASSERTM(y.size() == this->size(), "Vector size does not match!");
+        XASSERT(!this->empty());
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->template size<Perspective::pod>() * 3);
-        ValueType result = Arch::TripleDotProduct::value_blocked(elements<Perspective::native>(), x.template elements<Perspective::native>(), y.template elements<Perspective::native>(), this->size<Perspective::native>());
+        ValueType result = Arch::TripleDotProductBlock::template exec<ValueType>(this->elements_arbiter(), x.elements_arbiter(), y.elements_arbiter(), this->size());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->size_raw() * 3);
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
         return result;
@@ -1027,13 +965,15 @@ namespace FEAT
       DataType dot(const DenseVectorBlocked & x) const
       {
         XASSERTM(x.size() == this->size(), "Vector size does not match!");
+        XASSERT(!this->empty());
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->size<Perspective::pod>() * 2);
-        DataType result = Arch::DotProduct::value(elements<Perspective::pod>(), x.template elements<Perspective::pod>(), this->size<Perspective::pod>());
+        DataType result = Arch::DotProductDense::template exec<DT_>(this->elements_arbiter(), x.elements_arbiter(), this->size_raw());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->size_raw() * 2);
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
         return result;
@@ -1049,58 +989,66 @@ namespace FEAT
       ValueType dot_blocked(const DenseVectorBlocked & x) const
       {
         XASSERTM(x.size() == this->size(), "Vector size does not match!");
+        XASSERT(!this->empty());
 
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->size<Perspective::pod>() * 2);
-        ValueType result = Arch::DotProduct::value_blocked(elements<Perspective::native>(), x.template elements<Perspective::native>(), this->size<Perspective::native>());
+        ValueType result = Arch::DotProductBlock::template exec<ValueType>(this->elements_arbiter(), x.elements_arbiter(), this->size());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->size_raw() * 2);
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
         return result;
       }
 
       /**
-       * \brief Calculates and returns the euclid norm of this vector.
+       * \brief Calculates and returns the euclidean norm of this vector.
        *
        * \return The calculated norm.
        */
       DT_ norm2() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->size<Perspective::pod>() * 2);
-        DataType result = Arch::Norm2::value(elements<Perspective::pod>(), this->size<Perspective::pod>());
+        DataType result = Arch::Norm2Dense::template exec<DT_>(this->elements_arbiter(), this->size_raw());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->size_raw() * 2);
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
         return result;
       }
 
       /**
-       * \brief Calculates and returns the euclid norm of this vector.
+       * \brief Calculates and returns the euclidean norm of this vector.
        *
        * \return The calculated blocked norm (A Tiny::Vector).
        */
       ValueType norm2_blocked() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        Statistics::add_flops(this->size<Perspective::pod>() * 2);
-        ValueType result = Arch::Norm2::value_blocked(elements<Perspective::native>(), this->size<Perspective::native>());
+        ValueType result = Arch::Norm2Block::template exec<ValueType>(this->elements_arbiter(), this->size());
 
         TimeStamp ts_stop;
+
+        Statistics::add_flops(this->size_raw() * 2);
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
         return result;
       }
 
       /**
-       * \brief Calculates and returns the squared euclid norm of this vector.
+       * \brief Calculates and returns the squared euclidean norm of this vector.
        *
-       * \return The calculated norm.
+       * \return The calculated squared norm.
        */
       DT_ norm2sqr() const
       {
@@ -1109,20 +1057,15 @@ namespace FEAT
       }
 
       /**
-       * \brief Calculates and returns the squared euclid norm of this vector.
+       * \brief Calculates and returns the squared euclidean norm of this vector.
        *
-       * \return The calculated blocked norm (A Tiny::Vector).
+       * \return The calculated squared blocked norm (A Tiny::Vector).
        */
       ValueType norm2sqr_blocked() const
       {
-        TimeStamp ts_start;
-
-        Statistics::add_flops(this->size<Perspective::pod>() * 2);
-        ValueType result = Arch::Norm2Sqr::value_blocked(elements<Perspective::native>(), this->size<Perspective::native>());
-
-        TimeStamp ts_stop;
-        Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
-
+        ValueType result = norm2_blocked();
+        for(int i = 0; i < block_size_; ++i)
+          result[i] *= result[i];
         return result;
       }
 
@@ -1133,13 +1076,11 @@ namespace FEAT
        */
       DT_ max_abs_element() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        Index max_abs_index = Arch::MaxAbsIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
-        ASSERT(max_abs_index < this->template size<Perspective::pod>());
-        DT_ result;
-        MemoryPool::template copy<DT_>(&result, this->template elements<Perspective::pod>() + max_abs_index, 1);
-        result = Math::abs(result);
+        DT_ result = Arch::MinMaxValueDense::template exec<DT_>(this->elements_arbiter(), this->size_raw(), false, true);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1154,9 +1095,11 @@ namespace FEAT
        */
       ValueType max_abs_element_blocked() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        ValueType result = Arch::MaxAbsIndex::value_blocked(this->template elements<Perspective::native>(), this->template size<Perspective::native>());
+        ValueType result = Arch::MinMaxValueBlock::template exec<ValueType>(this->elements_arbiter(), this->size(), false, true);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1171,13 +1114,11 @@ namespace FEAT
        */
       DT_ min_abs_element() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        Index min_abs_index = Arch::MinAbsIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
-        ASSERT(min_abs_index < this->template size<Perspective::pod>());
-        DT_ result;
-        MemoryPool::template copy<DT_>(&result, this->template elements<Perspective::pod>() + min_abs_index, 1);
-        result = Math::abs(result);
+        DT_ result = Arch::MinMaxValueDense::template exec<DT_>(this->elements_arbiter(), this->size_raw(), true, true);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1192,9 +1133,11 @@ namespace FEAT
        */
       ValueType min_abs_element_blocked() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        ValueType result = Arch::MinAbsIndex::value_blocked(this->template elements<Perspective::native>(), this->template size<Perspective::native>());
+        ValueType result = Arch::MinMaxValueBlock::template exec<ValueType>(this->elements_arbiter(), this->size(), true, true);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1209,12 +1152,11 @@ namespace FEAT
        */
       DT_ max_element() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        Index max_index = Arch::MaxIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
-        ASSERT(max_index < this->template size<Perspective::pod>());
-        DT_ result;
-        MemoryPool::template copy<DT_>(&result, this->template elements<Perspective::pod>() + max_index, 1);
+        DT_ result = Arch::MinMaxValueDense::template exec<DT_>(this->elements_arbiter(), this->size_raw(), false, false);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1229,9 +1171,11 @@ namespace FEAT
        */
       ValueType max_element_blocked() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        ValueType result = Arch::MaxIndex::value_blocked(this->template elements<Perspective::native>(), this->template size<Perspective::native>());
+        ValueType result = Arch::MinMaxValueBlock::template exec<ValueType>(this->elements_arbiter(), this->size(), false, false);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1246,12 +1190,11 @@ namespace FEAT
        */
       DT_ min_element() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        Index min_index = Arch::MinIndex::value(this->template elements<Perspective::pod>(), this->template size<Perspective::pod>());
-        ASSERT(min_index < this->template size<Perspective::pod>());
-        DT_ result;
-        MemoryPool::template copy<DT_>(&result, this->template elements<Perspective::pod>() + min_index, 1);
+        DT_ result = Arch::MinMaxValueDense::template exec<DT_>(this->elements_arbiter(), this->size_raw(), true, false);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1266,9 +1209,11 @@ namespace FEAT
        */
       ValueType min_element_blocked() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        ValueType result = Arch::MinIndex::value_blocked(this->template elements<Perspective::native>(), this->template size<Perspective::native>());
+        ValueType result = Arch::MinMaxValueBlock::template exec<ValueType>(this->elements_arbiter(), this->size(), true, false);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -1284,15 +1229,17 @@ namespace FEAT
        */
       DT_ max_rel_diff(const DenseVectorBlocked & x) const
       {
-        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        XASSERTM(x.size() == this->size(), "vector size mismatch!");
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        DataType max_rel_diff = Arch::MaxRelDiff::value(this->template elements<Perspective::pod>(), x.template elements<Perspective::pod>(), this->template size<Perspective::pod>());
+        DT_ result = Arch::MaxRelDiffDense::template exec<DT_>(this->elements_arbiter(), x.elements_arbiter(), this->size_raw());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
-        return max_rel_diff;
+        return result;
       }
 
       /**
@@ -1305,45 +1252,54 @@ namespace FEAT
        */
       bool same_layout(const DenseVectorBlocked& x) const
       {
-        if (this->size() == 0 && x.size() == 0 && this->get_elements().size() == 0 && x.get_elements().size() == 0)
-          return true;
-        if (this->size() != x.size())
-          return false;
-        if (this->get_elements().size() != x.get_elements().size())
-          return false;
-        if (this->get_indices().size() != x.get_indices().size())
-          return false;
-
-        return true;
+        return this->size() == x.size();
       }
 
       ///@}
 
-      /// Permutate vector according to the given Permutation
+      /// Permute vector according to the given Permutation
       void permute(Adjacency::Permutation & perm)
       {
-        if (perm.size() == 0)
+        if(perm.empty())
           return;
 
         XASSERTM(perm.size() == this->size(), "Container size does not match permutation size");
+        XASSERT(!this->empty());
 
-        perm.apply(elements<Perspective::native>());
+        Memory::TypedView<ValueType> view(this->elements_view(Memory::Location::main, Memory::Access::read_write));
+
+        perm.apply(view.get_w());
       }
 
       /// \cond internal
-      /// Writes the vector-entries in an allocated array
-      void set_vec(DT_ * const pval_set) const
+      /**
+       * \brief Extracts the values of this vector
+       *
+       * \param[out] pvals
+       * A \transient array that receives the values
+       *
+       * \returns The number of values extracted
+       */
+      Index get_values(DT_ * const pval_set) const
       {
-        MemoryPool::copy(pval_set, this->template elements<Perspective::pod>(), this->size<Perspective::pod>());
+        this->_elements.front().copy_to(pval_set, Memory::Location::main);
+        return this->size_raw();
       }
 
-      /// Writes data of an array in the vector
-      void set_vec_inv(const DT_ * const pval_set)
+      /**
+       * \brief Overwrites the values of this vector
+       *
+       * \param[out] pvals
+       * A \transient array containing the values to write to the vector
+       *
+       * \returns The number of values written
+       */
+      Index set_values(const DT_ * const pval_set)
       {
-        MemoryPool::copy(this->template elements<Perspective::pod>(), pval_set, this->size<Perspective::pod>());
+        this->_elements.front().copy(pval_set, Memory::Location::main);
+        return this->size_raw();
       }
       /// \endcond
-
 
       /**
        * \brief DenseVectorBlocked streaming operator
@@ -1353,12 +1309,12 @@ namespace FEAT
        */
       friend std::ostream & operator<<(std::ostream & lhs, const DenseVectorBlocked & b)
       {
+        const Memory::TypedView<DT_> view(b.elements_view_raw_r());
+        const Index n = b.size_raw();
         lhs << "[";
-        for (Index i(0); i < b.size(); ++i)
+        for (Index i(0); i < n; ++i)
         {
-          Tiny::Vector<DT_, BlockSize_> t = b(i);
-          for (int j(0); j < BlockSize_; ++j)
-            lhs << "  " << stringify(t[j]);
+          lhs << "  " << view[i];
         }
         lhs << "]";
 
@@ -1366,26 +1322,84 @@ namespace FEAT
       }
 
       /**
-       * \brief Projects this vector onto a another one
+       * \brief Scatter-Axpy operation for DenseVectorBlocked
        *
-       * \param[out] projected_vector A correctly allocated vector which will be overriden with the projected data
-       * \param[in] normal_vector The vector to be projected on.
-       *
-       * \note The normal vector does not need to be normalized, which in turn leads to the vectors being scaled by the magintude of the entries, besides
-       *       the projection.
+       * \author Peter Zajac
        */
-      template<typename DT2_, typename IT2_>
-      void project_onto(DenseVectorBlocked<DT_, IT_, BlockSize_>& projected_vector, const LAFEM::DenseVectorBlocked<DT2_, IT2_, BlockSize_>& normal_vector) const
+      class ScatterAxpy
       {
-        XASSERTM(this->size() == normal_vector.size(), "Sizes do not match");
-        XASSERTM(this->size() == projected_vector.size(), "Target size do not match");
+      public:
+        typedef LAFEM::DenseVectorBlocked<DT_, IT_, block_size_> VectorType;
+        typedef DT_ DataType;
+        typedef IT_ IndexType;
+        typedef Tiny::Vector<DT_, block_size_> ValueType;
 
-        for(Index i = 0; i < this->size(); ++i)
+      private:
+        const IT_ _num_entries;
+        Memory::TypedView<ValueType> _data_view;
+
+      public:
+        explicit ScatterAxpy(VectorType & vector) :
+          _num_entries(IT_(vector.size())),
+          _data_view(vector.elements_view(Memory::Location::main, Memory::Access::read_write | Memory::Access::overlap))
         {
-          projected_vector(i, Tiny::project_onto(this->operator()(i), normal_vector(i)));
         }
-      }
-    }; // class DenseVectorBlocked<...>
 
+        template <typename LocalVector_, typename Mapping_>
+        void operator()(const LocalVector_ & loc_vec, const Mapping_ & mapping, DT_ alpha = DT_(1))
+        {
+          // loop over all local entries
+          for (int i(0); i < mapping.get_num_local_dofs(); ++i)
+          {
+            // get dof index
+            Index dof_idx = mapping.get_index(i);
+            ASSERT(dof_idx < _num_entries);
+
+            // update vector data
+            _data_view[dof_idx] += alpha * loc_vec[i];
+          }
+        }
+      }; // class ScatterAxpy
+
+      /**
+       * \brief Gather-Axpy operation for DenseVectorBlocked
+       *
+       * \author Peter Zajac
+       */
+      class GatherAxpy
+      {
+      public:
+        typedef LAFEM::DenseVectorBlocked<DT_, IT_, block_size_> VectorType;
+        typedef DT_ DataType;
+        typedef IT_ IndexType;
+        typedef Tiny::Vector<DT_, block_size_> ValueType;
+
+      private:
+        const Index _num_entries;
+        const Memory::TypedView<ValueType> _data_view;
+
+      public:
+        explicit GatherAxpy(const VectorType & vector) :
+          _num_entries(vector.size()),
+          _data_view(vector.elements_view_r())
+        {
+        }
+
+        template <typename LocalVector_, typename Mapping_>
+        void operator()(LocalVector_ & loc_vec, const Mapping_ & mapping, DT_ alpha = DT_(1))
+        {
+          // loop over all local entries
+          for (int i(0); i < mapping.get_num_local_dofs(); ++i)
+          {
+            // get dof index
+            Index dof_idx = mapping.get_index(i);
+            ASSERT(dof_idx < _num_entries);
+
+            // update local vector data
+            loc_vec[i].axpy(alpha, _data_view(dof_idx));
+          }
+        }
+      }; // class GatherAxpy
+    }; // class DenseVectorBlocked<...>
   } // namespace LAFEM
 } // namespace FEAT

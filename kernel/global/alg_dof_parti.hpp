@@ -540,7 +540,7 @@ namespace FEAT
         const LocalVectorType& vec_tmpl = gate.get_freqs();
 
         // get number of total local DOFs on our patch
-        this->_local_dof_count = vec_tmpl.template size<LAFEM::Perspective::pod>();
+        this->_local_dof_count = vec_tmpl.size_raw();
         this->_extra_local_dof_count = extra_local;
         this->_extra_shared_dof_count = extra_shared;
         //this->_local_dof_count += extra_local + extra_shared;
@@ -788,19 +788,23 @@ namespace FEAT
         // Create receive buffers and post receives for all owner-neighbors
         Dist::RequestVector recv_reqs(num_neigh_owner);
         std::vector<BufferVectorType> recv_bufs(num_neigh_owner);
+        std::vector<Memory::TypedView<DataType>> recv_views(num_neigh_owner);
         for(std::size_t i(0); i < num_neigh_owner; ++i)
         {
           // create a vector buffer
           // note: owner mirrors relate to local DOF indices
           recv_bufs.at(i) =  this->_owner_mirrors.at(i).create_buffer(local_vector);
+          // get a write view
+          recv_views.at(i) = recv_bufs.at(i).elements_view_w();
           // post receive from owner neighbor
-          recv_reqs[i] = this->_comm->irecv(recv_bufs.at(i).elements(), recv_bufs.at(i).size(), this->_owner_ranks.at(i));
+          recv_reqs[i] = this->_comm->irecv(recv_views.at(i).get_w(), recv_bufs.at(i).size(), this->_owner_ranks.at(i));
         }
 
         // Create send buffers, fill them with our owned DOFs and send this
         // to our donee-neighbors
         Dist::RequestVector send_reqs(num_neigh_donee);
         std::vector<BufferVectorType> send_bufs(num_neigh_donee);
+        std::vector<Memory::TypedView<DataType>> send_views(num_neigh_owner);
         for(Index i(0); i < num_neigh_donee; ++i)
         {
           // get mirror, create buffer and gather the shared DOFs
@@ -808,8 +812,10 @@ namespace FEAT
           const DoneeMirrorType& mir = this->_donee_mirrors.at(i);
           send_bufs.at(i) = BufferVectorType(mir.num_indices());
           _gather(send_bufs.at(i), owned_dofs, mir);
+          // get a write view
+          send_views.at(i) = send_bufs.at(i).elements_view_r();
           // post send to donee neighbor
-          send_reqs[i] = this->_comm->isend(send_bufs.at(i).elements(), send_bufs.at(i).size(), this->_donee_ranks.at(i));
+          send_reqs[i] = this->_comm->isend(send_views.at(i).get_r(), send_bufs.at(i).size(), this->_donee_ranks.at(i));
         }
 
         // format the output vector
@@ -822,7 +828,7 @@ namespace FEAT
         for(std::size_t idx(0u); recv_reqs.wait_any(idx); )
         {
           // scatter received DOFs into our output vector
-          ADPAuxType::scatter(recv_bufs.at(idx).elements(), local_vector, this->_owner_mirrors.at(idx));
+          ADPAuxType::scatter(recv_views.at(idx).get_w(), local_vector, this->_owner_mirrors.at(idx));
         }
 
         // at this point, all receives should have finished
@@ -863,7 +869,7 @@ namespace FEAT
         const LAFEM::VectorMirror<DataType, IndexType>& donee_mir, Index offset)
       {
         const Index num_idx = donee_mir.num_indices();
-        const IndexType* mir_idx = donee_mir.indices();
+        const Memory::TypedView<IndexType> mir_idx = donee_mir.indices_view_r();
         for(Index j(0); j < num_idx; ++j)
           send_buf[j] = IndexType(offset) + mir_idx[j];
 
@@ -877,8 +883,8 @@ namespace FEAT
         const LAFEM::VectorMirror<DataType, IndexType>& mirror)
       {
         const Index n = mirror.num_indices();
-        const IndexType* idx = mirror.indices();
-        DataType* buf = buffer.elements();
+        const Memory::TypedView<IndexType> idx = mirror.indices_view_r();
+        Memory::TypedView<DataType> buf = buffer.elements_view_w();
         for(Index i = 0u; i < n; ++i)
           buf[i] = DataType(vector[idx[i]]);
         return n;
@@ -939,8 +945,8 @@ namespace FEAT
           const LAFEM::VectorMirror<DT_, IT_>& mirror)
         {
           const Index num_indices = mirror.num_indices();
-          const IT_* mir_idx = mirror.indices();
-          IT_* dof_own = dof_owners.elements();
+          const Memory::TypedView<IT_> mir_idx = mirror.indices_view_r();
+          Memory::TypedView<IT_> dof_own = dof_owners.elements_view_rw();
           for(Index j(0); j < num_indices; ++j)
           {
             IT_& dof_owner = dof_own[mir_idx[j]];
@@ -954,8 +960,8 @@ namespace FEAT
           const LAFEM::DenseVector<IT_, IT_>& dof_owners, Index offset)
         {
           const Index n = dof_owners.size();
-          const IT_* dof_own = dof_owners.elements();
-          IT_* own_idx = owned_dofs.elements();
+          const Memory::TypedView<IT_> dof_own = dof_owners.elements_view_r();
+          Memory::TypedView<IT_> own_idx = owned_dofs.elements_view_rw();
 
           Index k = 0;
           for(Index i = 0; i < n; ++i)
@@ -974,7 +980,7 @@ namespace FEAT
         {
           // count the number of owned DOFs
           const Index n = dof_owners.size();
-          const IT_* dof_own = dof_owners.elements();
+          const Memory::TypedView<IT_> dof_own = dof_owners.elements_view_r();
           Index num_owned = 0u;
           for(Index i = 0; i < n; ++i)
           {
@@ -984,7 +990,7 @@ namespace FEAT
 
           // allocate mirror
           owner_mirror = LAFEM::VectorMirror<DT_, IT_>(n, num_owned);
-          IT_* mir_idx = owner_mirror.indices();
+          Memory::TypedView<IT_> mir_idx = owner_mirror.indices_view_w();
 
           // store owned DOF indices
           for(Index i = 0, k = 0; i < n; ++i)
@@ -1006,8 +1012,8 @@ namespace FEAT
         {
           // get halo mirror indices
           const Index n = halo_mirror.num_indices();
-          const IT_* halo_idx = halo_mirror.indices();
-          const IT_* dof_own = dof_owners.elements();
+          const Memory::TypedView<IT_> halo_idx = halo_mirror.indices_view_r();
+          const Memory::TypedView<IT_> dof_own = dof_owners.elements_view_r();
 
           // count number of owner dofs
           Index num_owner = 0u;
@@ -1024,7 +1030,7 @@ namespace FEAT
             return Index(0);
 
           // store owner DOF indices
-          IT_* own_idx = owner_mirror.indices();
+          Memory::TypedView<IT_> own_idx = owner_mirror.indices_view_rw();
           for(IT_ i = 0, k = 0; i < n; ++i)
           {
             if(dof_own[halo_idx[i]] == neighbor_rank)
@@ -1043,8 +1049,8 @@ namespace FEAT
         {
           // get halo mirror indices
           const Index n = halo_mirror.num_indices();
-          const IT_* halo_idx = halo_mirror.indices();
-          const IT_* own_idx = own_dof_idx.elements();
+          const Memory::TypedView<IT_> halo_idx = halo_mirror.indices_view_r();
+          const Memory::TypedView<IT_> own_idx = own_dof_idx.elements_view_r();
 
           // count number of owner dofs
           Index num_donee = 0u;
@@ -1065,9 +1071,9 @@ namespace FEAT
         {
           // get halo mirror indices
           const Index n = halo_mirror.num_indices();
-          const IT_* halo_idx = halo_mirror.indices();
-          const IT_* own_idx = own_dof_idx.elements();
-          IT_* donee_idx = donee_mirror.indices();
+          const Memory::TypedView<IT_> halo_idx = halo_mirror.indices_view_r();
+          const Memory::TypedView<IT_> own_idx = own_dof_idx.elements_view_r();
+          Memory::TypedView<IT_> donee_idx = donee_mirror.indices_view_rw();
 
           // store donee DOF indices
           Index k = 0u;
@@ -1087,8 +1093,8 @@ namespace FEAT
           LAFEM::DenseVector<IT_, IT_>& global_dof_idx,
           const LAFEM::VectorMirror<DT_, IT_>& owned_mirror, Index offset)
         {
-          IT_* g_dof_idx = global_dof_idx.elements();
-          const IT_* own_idx = owned_mirror.indices();
+          Memory::TypedView<IT_> g_dof_idx = global_dof_idx.elements_view_rw();
+          const Memory::TypedView<IT_> own_idx = owned_mirror.indices_view_r();
           const Index n =  owned_mirror.num_indices();
           for(Index i = 0; i < n; ++i)
             g_dof_idx[own_idx[i]] = IT_(offset + i);
@@ -1097,13 +1103,13 @@ namespace FEAT
 
         template<typename DT_>
         static Index set_owner_dofs(
-          LAFEM::DenseVector<IT_, IT_>& glob_dof_idx,
+          LAFEM::DenseVector<IT_, IT_>& global_dof_idx,
           const std::vector<IT_>& recv_buf,
           const LAFEM::VectorMirror<DT_, IT_>& mirror, Index offset)
         {
           const Index num_indices = mirror.num_indices();
-          const IT_* mir_idx = mirror.indices();
-          IT_* g_dof_idx = glob_dof_idx.elements();
+          const Memory::TypedView<IT_> mir_idx = mirror.indices_view_r();
+          Memory::TypedView<IT_> g_dof_idx = global_dof_idx.elements_view_rw();
           for(Index j(0); j < num_indices; ++j)
             g_dof_idx[mir_idx[j]] = recv_buf[offset + j];
           return num_indices;
@@ -1116,8 +1122,8 @@ namespace FEAT
         {
           XASSERT(mirror.size() == vector.size());
           const Index n = mirror.num_indices();
-          const IT_* idx = mirror.indices();
-          const DT_* val = vector.elements();
+          const Memory::TypedView<IT_> idx = mirror.indices_view_r();
+          const Memory::TypedView<DT_> val = vector.elements_view_r();
           for(Index i = 0u; i < n; ++i)
             buf[i] = DT2_(val[idx[i]]);
           return n;
@@ -1130,8 +1136,8 @@ namespace FEAT
         {
           XASSERT(mirror.size() == vector.size());
           const Index n = mirror.num_indices();
-          const IT_* idx = mirror.indices();
-          DT_* val = vector.elements();
+          const Memory::TypedView<IT_> idx = mirror.indices_view_r();
+          Memory::TypedView<DT_> val = vector.elements_view_rw();
           for(Index i = 0u; i < n; ++i)
             val[idx[i]] = DT_(buf[i]);
           return n;
@@ -1186,8 +1192,8 @@ namespace FEAT
           const LAFEM::VectorMirror<DT_, IT_>& mirror)
         {
           const Index num_indices = mirror.num_indices();
-          const IT_* mir_idx = mirror.indices();
-          auto* dof_own = dof_owners.elements(); // dof_own is a Tiny::Vector<IT_,...>*
+          const Memory::TypedView<IT_> mir_idx = mirror.indices_view_r();
+          Memory::TypedView<Tiny::Vector<IT_, bs_>> dof_own = dof_owners.elements_view_rw();
           for(Index j(0); j < num_indices; ++j)
           {
             auto& dof_owner = dof_own[mir_idx[j]];
@@ -1204,8 +1210,8 @@ namespace FEAT
           const LAFEM::DenseVectorBlocked<IT_, IT_, bs_>& dof_owners, Index offset)
         {
           const Index n = dof_owners.size();
-          const auto* dof_own = dof_owners.elements();
-          auto* own_idx = owned_dofs.elements();
+          const Memory::TypedView<Tiny::Vector<IT_, bs_>> dof_own = dof_owners.elements_view_r();
+          Memory::TypedView<Tiny::Vector<IT_, bs_>> own_idx = owned_dofs.elements_view_rw();
 
           Index k = 0;
           for(Index i = 0; i < n; ++i)
@@ -1227,7 +1233,7 @@ namespace FEAT
         {
           // count the number of owned DOFs
           const Index n = dof_owners.size();
-          const auto* dof_own = dof_owners.elements();
+          const Memory::TypedView<Tiny::Vector<IT_, bs_>> dof_own = dof_owners.elements_view_r();
           Index num_owned = 0u;
           for(Index i = 0; i < n; ++i)
           {
@@ -1237,7 +1243,7 @@ namespace FEAT
 
           // allocate mirror
           owner_mirror = LAFEM::VectorMirror<DT_, IT_>(n, num_owned);
-          IT_* mir_idx = owner_mirror.indices();
+          Memory::TypedView<IT_> mir_idx = owner_mirror.indices_view_w();
 
           // store owned DOF indices
           for(Index i = 0, k = 0; i < n; ++i)
@@ -1259,8 +1265,8 @@ namespace FEAT
         {
           // get halo mirror indices
           const Index n = halo_mirror.num_indices();
-          const IT_* halo_idx = halo_mirror.indices();
-          const auto* dof_own = dof_owners.elements();
+          const Memory::TypedView<IT_> halo_idx = halo_mirror.indices_view_r();
+          const Memory::TypedView<Tiny::Vector<IT_, bs_>> dof_own = dof_owners.elements_view_r();
 
           // count number of owner dofs
           Index num_owner = 0u;
@@ -1277,7 +1283,7 @@ namespace FEAT
             return Index(0);
 
           // store owner DOF indices
-          IT_* own_idx = owner_mirror.indices();
+          Memory::TypedView<IT_> own_idx = owner_mirror.indices_view_rw();
           for(IT_ i = 0, k = 0; i < n; ++i)
           {
             if(dof_own[halo_idx[i]][0] == neighbor_rank)
@@ -1296,8 +1302,8 @@ namespace FEAT
         {
           // get halo mirror indices
           const Index n = halo_mirror.num_indices();
-          const IT_* halo_idx = halo_mirror.indices();
-          const auto* own_idx = own_dof_idx.elements();
+          const Memory::TypedView<IT_> halo_idx = halo_mirror.indices_view_r();
+          Memory::TypedView<Tiny::Vector<IT_, bs_>> own_idx = own_dof_idx.elements_view_r();
 
           // count number of owner dofs
           Index num_donee = 0u;
@@ -1318,9 +1324,9 @@ namespace FEAT
         {
           // get halo mirror indices
           const Index n = halo_mirror.num_indices();
-          const IT_* halo_idx = halo_mirror.indices();
-          const auto* own_idx = own_dof_idx.elements();
-          IT_* donee_idx = donee_mirror.indices();
+          const Memory::TypedView<IT_> halo_idx = halo_mirror.indices_view_r();
+          Memory::TypedView<Tiny::Vector<IT_, bs_>> own_idx = own_dof_idx.elements_view_r();
+          Memory::TypedView<IT_> donee_idx = donee_mirror.indices_view_rw();
 
           // store donee DOF indices
           Index k = 0u;
@@ -1341,8 +1347,8 @@ namespace FEAT
           LAFEM::DenseVectorBlocked<IT_, IT_, bs_>& global_dof_idx,
           const LAFEM::VectorMirror<DT_, IT_>& owned_mirror, Index offset)
         {
-          auto* g_dof_idx = global_dof_idx.elements();
-          const IT_* own_idx = owned_mirror.indices();
+          Memory::TypedView<Tiny::Vector<IT_, bs_>> g_dof_idx = global_dof_idx.elements_view_rw();
+          const Memory::TypedView<IT_> own_idx = owned_mirror.indices_view_r();
           const Index n =  owned_mirror.num_indices();
           for(Index i = 0; i < n; ++i)
           {
@@ -1359,8 +1365,8 @@ namespace FEAT
           const LAFEM::VectorMirror<DT_, IT_>& mirror, Index offset)
         {
           const Index num_indices = mirror.num_indices();
-          const IT_* mir_idx = mirror.indices();
-          auto* g_dof_idx = glob_dof_idx.elements();
+          const Memory::TypedView<IT_> mir_idx = mirror.indices_view_r();
+          Memory::TypedView<Tiny::Vector<IT_, bs_>> g_dof_idx = glob_dof_idx.elements_view_rw();
           for(Index i(0); i < num_indices; ++i)
           {
             for(int j = 0; j < bs_; ++j)
@@ -1376,8 +1382,8 @@ namespace FEAT
         {
           XASSERT(mirror.size() == vector.size());
           const Index n = mirror.num_indices();
-          const IT_* idx = mirror.indices();
-          const auto* val = vector.elements();
+          const Memory::TypedView<IT_> idx = mirror.indices_view_r();
+          const Memory::TypedView<Tiny::Vector<DT_, bs_>> val = vector.elements_view_r();
           for(Index i = 0u, k = 0u; i < n; ++i)
           {
             for(int j = 0; j < bs_; ++j, ++k)
@@ -1393,8 +1399,8 @@ namespace FEAT
         {
           XASSERT(mirror.size() == vector.size());
           const Index n = mirror.num_indices();
-          const IT_* idx = mirror.indices();
-          auto* val = vector.elements();
+          const Memory::TypedView<IT_> idx = mirror.indices_view_r();
+          Memory::TypedView<Tiny::Vector<DT_, bs_>> val = vector.elements_view_rw();
           for(Index i = 0u, k = 0u; i < n; ++i)
           {
             for(int j = 0; j < bs_; ++j, ++k)

@@ -824,19 +824,19 @@ namespace CCND
         const auto& loc_a = system.at(i)->matrix_sys.local().block_a();
         const auto& loc_b = system.at(i)->matrix_sys.local().block_b();
         const auto& loc_d = system.at(i)->matrix_sys.local().block_d();
-        stats.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_a.used_elements() + loc_a.rows() + Index(1));
-        stats.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_b.used_elements() + loc_b.rows() + Index(1));
-        stats.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_d.used_elements() + loc_d.rows() + Index(1));
-        stats.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_a.template used_elements<LAFEM::Perspective::pod>());
-        stats.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_b.template used_elements<LAFEM::Perspective::pod>());
-        stats.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_d.template used_elements<LAFEM::Perspective::pod>());
+        stats.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_a.num_nzes() + loc_a.num_rows() + Index(1));
+        stats.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_b.num_nzes() + loc_b.num_rows() + Index(1));
+        stats.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_d.num_nzes() + loc_d.num_rows() + Index(1));
+        stats.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_a.num_nzes_raw());
+        stats.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_b.num_nzes_raw());
+        stats.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_d.num_nzes_raw());
       }
 
       {
         // count non-zeros in a and b
-        stats.counts[Counts::nnze_a] = system.front()->matrix_sys.local().block_a().used_elements();
-        stats.counts[Counts::nnze_b] = system.front()->matrix_sys.local().block_b().used_elements();
-        stats.counts[Counts::nnze_total] = system.front()->matrix_sys.local().template used_elements<LAFEM::Perspective::pod>();
+        stats.counts[Counts::nnze_a] = system.front()->matrix_sys.local().block_a().num_nzes();
+        stats.counts[Counts::nnze_b] = system.front()->matrix_sys.local().block_b().num_nzes();
+        stats.counts[Counts::nnze_total] = system.front()->matrix_sys.local().num_nzes_raw();
       }
     }
 
@@ -1813,8 +1813,8 @@ namespace CCND
       }
 
       // write pressure
-      exporter.add_cell_scalar("pressure", vtx_p.elements());
-      exporter.add_cell_scalar("rhs_p", vtx_q.elements());
+      exporter.add_cell_scalar("pressure", vtx_p);
+      exporter.add_cell_scalar("rhs_p", vtx_q);
 
       // write FBM masks if
       if(enable_fbm)

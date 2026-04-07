@@ -81,18 +81,16 @@ namespace FEAT
        * it is not possible to find out which DoF of shape dim 0 lie at an edge for the interpolation.
        *
        */
-      template<typename Vector_>
-      static void recurse(Vector_& to_coeffs, const Vector_& from_coeffs, const ToSpace& to_space)
+      template<typename DataType_, typename ValueType_>
+      static void recurse(Memory::TypedView<ValueType_>& vtc, const Memory::TypedView<ValueType_>& vfc, const ToSpace& to_space)
       {
-        typedef typename Vector_::DataType DataType;
-
         const auto& mesh = to_space.get_trafo().get_mesh();
 
         // We use this to identify the vertex DoF at our shape
         const auto& from_vertex_at_shape_idx = mesh.template get_index_set<shape_dim_, 0>();
 
         // This is for mapping to the correct Lagrange2 DoF
-        typename ToSpace::template DofAssignment<shape_dim_, DataType>::Type to_dof_assignment(to_space);
+        typename ToSpace::template DofAssignment<shape_dim_, DataType_>::Type to_dof_assignment(to_space);
 
         for(Index k(0); k < mesh.get_num_entities(shape_dim_); ++k)
         {
@@ -101,24 +99,23 @@ namespace FEAT
           // There is only one Lagrange2 DoF at each entity, but this is easier to understand for future reference
           for(int j(0); j < to_dof_assignment.get_num_assigned_dofs(); ++j)
           {
-
-            typename Vector_::ValueType tmp(0);
+            ValueType_ tmp(0);
 
             for(int i(0); i < from_vertex_at_shape_idx.get_num_indices(); ++i)
             {
-              tmp += from_coeffs(from_vertex_at_shape_idx(k,i));
+              tmp += vfc(from_vertex_at_shape_idx(k,i));
             }
 
             // Linear interpolation
-            tmp *= ( DataType(1)/DataType(from_vertex_at_shape_idx.get_num_indices()) );
+            tmp *= ( DataType_(1)/DataType_(from_vertex_at_shape_idx.get_num_indices()) );
 
             // Emplacement operator
-            to_coeffs(to_dof_assignment.get_index(j), tmp);
+            vtc[to_dof_assignment.get_index(j)] = tmp;
           }
         }
 
         // recurse down
-        Lagrange1To2DofAtEntity<Trafo_, shape_dim_-1>::recurse( to_coeffs, from_coeffs, to_space);
+        Lagrange1To2DofAtEntity<Trafo_, shape_dim_-1>::template recurse<DataType_>( vtc, vfc, to_space);
       }
     };
 
@@ -154,17 +151,16 @@ namespace FEAT
        * it is not possible to find out which DoF of shape dim 0 lie at an edge for the interpolation.
        *
        */
-      template<typename Vector_>
-      static void recurse(Vector_& to_coeffs, const Vector_& from_coeffs, const ToSpace& to_space)
+      //template<typename Vector_>
+      //static void recurse(Vector_& to_coeffs, const Vector_& from_coeffs, const ToSpace& to_space)
+      template<typename DataType_, typename ValueType_>
+      static void recurse(Memory::TypedView<ValueType_>& vtc, const Memory::TypedView<ValueType_>& vfc, const ToSpace& to_space)
       {
-
         const auto& mesh = to_space.get_trafo().get_mesh();
-
         for(Index i(0); i < mesh.get_num_entities(0); ++i)
         {
-          to_coeffs(i, from_coeffs(i));
+          vtc[i] = vfc(i);
         }
-
       }
     };
 
@@ -189,7 +185,7 @@ namespace FEAT
       /**
        * \brief Interpolates a scalar Lagrange1 to Lagrange2 FE function
        *
-       * \tparam DT_
+       * \tparam DataType_
        * Floating point precision of the DoF vector
        *
        * \tparam IT_
@@ -208,19 +204,21 @@ namespace FEAT
        * The \transient space we map from, unused here because we use the IndexSet of the
        * corresponding mesh instead of the DofMapping and DofAssignment
        */
-      template<typename DT_, typename IT_>
-      static void interpolate(LAFEM::DenseVector<DT_, IT_>& to_coeffs,
-      const LAFEM::DenseVector<DT_, IT_>& from_coeffs,
+      template<typename DataType_, typename IT_>
+      static void interpolate(LAFEM::DenseVector<DataType_, IT_>& to_coeffs,
+      const LAFEM::DenseVector<DataType_, IT_>& from_coeffs,
       const ToSpace& to_space,
       const FromSpace& DOXY(from_space))
       {
-        Lagrange1To2DofAtEntity<TrafoType>::recurse(to_coeffs, from_coeffs, to_space);
+        const Memory::TypedView<DataType_> vfc(from_coeffs.elements_view_r());
+        Memory::TypedView<DataType_> vtc(to_coeffs.elements_view_w());
+        Lagrange1To2DofAtEntity<TrafoType>::template recurse<DataType_>(vtc, vfc, to_space);
       }
 
       /**
        * \brief Interpolates a vector valued Lagrange1 to Lagrange2 FE function
        *
-       * \tparam DT_
+       * \tparam DataType_
        * Floating point precision of the DoF vector
        *
        * \tparam IT_
@@ -239,13 +237,16 @@ namespace FEAT
        * The \transient space we map from, unused here because we use the IndexSet of the
        * corresponding mesh instead of the DofMapping and DofAssignment
        */
-      template<typename DT_, typename IT_, int blocksize_>
-      static void interpolate(LAFEM::DenseVectorBlocked<DT_, IT_, blocksize_>& to_coeffs,
-      const LAFEM::DenseVectorBlocked<DT_, IT_, blocksize_>& from_coeffs,
+      template<typename DataType_, typename IT_, int blocksize_>
+      static void interpolate(LAFEM::DenseVectorBlocked<DataType_, IT_, blocksize_>& to_coeffs,
+      const LAFEM::DenseVectorBlocked<DataType_, IT_, blocksize_>& from_coeffs,
       const ToSpace& to_space,
       const FromSpace& DOXY(from_space))
       {
-        Lagrange1To2DofAtEntity<TrafoType>::recurse(to_coeffs, from_coeffs, to_space);
+        typedef Tiny::Vector<DataType_, blocksize_> ValueType;
+        const Memory::TypedView<ValueType> vfc(from_coeffs.elements_view_r());
+        Memory::TypedView<ValueType> vtc(to_coeffs.elements_view_w());
+        Lagrange1To2DofAtEntity<TrafoType>::template recurse<DataType_>(vtc, vfc, to_space);
       }
     }; //FEInterpolator Lagrange1 to Lagrange2
 
@@ -270,7 +271,7 @@ namespace FEAT
       /**
        * \brief Interpolates a scalar Lagrange1 to Lagrange2 FE function
        *
-       * \tparam DT_
+       * \tparam DataType_
        * Floating point precision of the DoF vector
        *
        * \tparam IT_
@@ -289,18 +290,20 @@ namespace FEAT
        * The space we map from, unused here because we use the IndexSet of the corresponding mesh instead of the
        * DofMapping and DofAssignment
        */
-      template<typename DT_, typename IT_>
-      static void interpolate(LAFEM::DenseVector<DT_, IT_>& to_coeffs,
-      const LAFEM::DenseVector<DT_, IT_>& from_coeffs,
+      template<typename DataType_, typename IT_>
+      static void interpolate(LAFEM::DenseVector<DataType_, IT_>& to_coeffs,
+      const LAFEM::DenseVector<DataType_, IT_>& from_coeffs,
       const ToSpace& DOXY(to_space),
       const FromSpace& DOXY(from_space))
       {
+        const Memory::TypedView<DataType_> vfc(from_coeffs.elements_view_r());
+        Memory::TypedView<DataType_> vtc(to_coeffs.elements_view_w());
         //sanity check for the vector sizes
         XASSERTM(to_coeffs.size() < from_coeffs.size(), "Coefficient vectors do not match!\n To_coeffs size is ");
         //due to the two level ordering of Lagrange1 and Lagrange2 elements it is always sufficient to just truncate our vector
         for(Index i(0); i < to_coeffs.size(); ++i)
         {
-          to_coeffs(i, from_coeffs(i));
+          vtc[i] = vfc(i);
         }
         //And we are done
       }
@@ -308,7 +311,7 @@ namespace FEAT
       /**
        * \brief Interpolates a vector Lagrange1 to Lagrange2 FE function
        *
-       * \tparam DT_
+       * \tparam DataType_
        * Floating point precision of the DoF vector
        *
        * \tparam IT_
@@ -327,18 +330,20 @@ namespace FEAT
        * The space we map from, unused here because we use the IndexSet of the corresponding mesh instead of the
        * DofMapping and DofAssignment
        */
-      template<typename DT_, typename IT_, int blocksize_>
-      static void interpolate(LAFEM::DenseVectorBlocked<DT_, IT_, blocksize_>& to_coeffs,
-      const LAFEM::DenseVectorBlocked<DT_, IT_, blocksize_>& from_coeffs,
+      template<typename DataType_, typename IT_, int blocksize_>
+      static void interpolate(LAFEM::DenseVectorBlocked<DataType_, IT_, blocksize_>& to_coeffs,
+      const LAFEM::DenseVectorBlocked<DataType_, IT_, blocksize_>& from_coeffs,
       const ToSpace& DOXY(to_space),
       const FromSpace& DOXY(from_space))
       {
+        const Memory::TypedView<Tiny::Vector<DataType_, blocksize_>> vfc(from_coeffs.elements_view_r());
+        Memory::TypedView<Tiny::Vector<DataType_, blocksize_>> vtc(to_coeffs.elements_view_w());
         //sanity check for the vector sizes
         XASSERTM(to_coeffs.size() < from_coeffs.size(), "Coefficient vectors do not match!\n To_coeffs size is ");
         //due to the two level ordering of Lagrange1 and Lagrange2 elements it is always sufficient to only truncate our vector
         for(Index i(0); i < to_coeffs.size(); ++i)
         {
-          to_coeffs(i, from_coeffs(i));
+          vtc[i] = vfc(i);
         }
         //And we are done
       }
@@ -365,7 +370,7 @@ namespace FEAT
        *
        * \warning This implementation is only due to consistency and should be avoided
        *
-       * \tparam DT_
+       * \tparam DataType_
        * Floating point precision of the DoF vector
        *
        * \tparam IT_

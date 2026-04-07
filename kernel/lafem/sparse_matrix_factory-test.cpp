@@ -29,7 +29,7 @@ class SparseMatrixFactoryTest
   : public UnitTest
 {
 public:
-  SparseMatrixFactoryTest(PreferredBackend backend)
+  explicit SparseMatrixFactoryTest(PreferredBackend backend)
     : UnitTest("SparseMatrixFactoryTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
@@ -61,19 +61,18 @@ public:
     SparseMatrixCSR<DT_, IT_> matrix_csr(factory.make_csr());
 
     //Testing if CSR Matrixs has the correct dimension and NNZ
-    TEST_CHECK_EQUAL(matrix_csr.rows(),8);
-    TEST_CHECK_EQUAL(factory.rows(), 8);
-    TEST_CHECK_EQUAL(matrix_csr.columns(), 7);
-    TEST_CHECK_EQUAL(factory.columns(), 7);
-    TEST_CHECK_EQUAL(factory.size(), IT_(7 * 8));
-    TEST_CHECK_EQUAL(matrix_csr.used_elements(), 7);
-    TEST_CHECK_EQUAL(factory.used_elements(), IT_(7));
+    TEST_CHECK_EQUAL(matrix_csr.num_rows(),8);
+    TEST_CHECK_EQUAL(factory.num_rows(), 8);
+    TEST_CHECK_EQUAL(matrix_csr.num_cols(), 7);
+    TEST_CHECK_EQUAL(factory.num_cols(), 7);
+    TEST_CHECK_EQUAL(matrix_csr.num_nzes(), 7);
+    TEST_CHECK_EQUAL(factory.num_nzes(), IT_(7));
 
-    const IT_* row_ptr = matrix_csr.row_ptr();
-    const IT_* col_ind = matrix_csr.col_ind();
-    const DT_* val = matrix_csr.val();
+    const Memory::TypedView<IT_> row_ptr = matrix_csr.row_ptr_view_r();
+    const Memory::TypedView<IT_> col_ind = matrix_csr.col_idx_view_r();
+    const Memory::TypedView<DT_> val = matrix_csr.val_view_r();
 
-    //Testing if the value array is implemented in the correkt order
+    //Testing if the value array is implemented in the correct order
     TEST_CHECK_EQUAL(val[0], DT_(13.5));
     TEST_CHECK_EQUAL(val[1], DT_(200));
     TEST_CHECK_EQUAL(val[2], DT_(3));
@@ -114,25 +113,25 @@ public:
   }
 }; // class SparseMatrixFactoryTest<...>
 
-SparseMatrixFactoryTest <float, std::uint64_t> sparse_matrix_factory_test_float_uint64(PreferredBackend::generic);
-SparseMatrixFactoryTest <double, std::uint64_t> sparse_matrix_factory_test_double_uint64(PreferredBackend::generic);
-SparseMatrixFactoryTest <float, std::uint32_t> sparse_matrix_factory_test_float_uint32(PreferredBackend::generic);
-SparseMatrixFactoryTest <double, std::uint32_t> sparse_matrix_factory_test_double_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixFactoryTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixFactoryTest, double, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixFactoryTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixFactoryTest, double, std::uint32_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixFactoryTest <float, std::uint64_t> mkl_cpu_sparse_matrix_factory_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixFactoryTest <double, std::uint64_t> mkl_cpu_sparse_matrix_factory_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixFactoryTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixFactoryTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixFactoryTest <__float128, std::uint64_t> sparse_matrix_factory_test_float128_uint64(PreferredBackend::generic);
-SparseMatrixFactoryTest <__float128, std::uint32_t> sparse_matrix_factory_test_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixFactoryTest, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixFactoryTest, __float128, std::uint32_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixFactoryTest <Half, std::uint32_t> sparse_matrix_factory_test_half_uint32(PreferredBackend::generic);
-SparseMatrixFactoryTest <Half, std::uint64_t> sparse_matrix_factory_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixFactoryTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixFactoryTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixFactoryTest <float, std::uint64_t> cuda_sparse_matrix_factory_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixFactoryTest <double, std::uint64_t> cuda_sparse_matrix_factory_test_double_uint64(PreferredBackend::cuda);
-SparseMatrixFactoryTest <float, std::uint32_t> cuda_sparse_matrix_factory_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixFactoryTest <double, std::uint32_t> cuda_sparse_matrix_factory_test_double_uint32(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixFactoryTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixFactoryTest, double, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixFactoryTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixFactoryTest, double, std::uint32_t, PreferredBackend::cuda);
 #endif

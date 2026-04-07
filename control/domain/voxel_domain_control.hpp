@@ -29,6 +29,8 @@
 
 #include <control/domain/parti_domain_control_base.hpp>
 
+#include <numeric>
+
 namespace FEAT
 {
   namespace Control

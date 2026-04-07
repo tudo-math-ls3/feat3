@@ -63,28 +63,28 @@ namespace FEAT
     void cuda_set_blocksize(Index misc, Index reduction, Index spmv, Index axpy, Index scalar_assembly, Index blocked_assembly);
     void cuda_set_device(const int device);
     void cuda_check_last_error();
-    void * cuda_get_device_pointer(void * host);
-    void * cuda_malloc_managed(const Index bytes);
-    void * cuda_malloc(const Index bytes);
-    void * cuda_malloc_host(const Index bytes);
+    //void * cuda_get_device_pointer(void * host);
+    //void * cuda_malloc_managed(const Index bytes);
+    //void * cuda_malloc(const Index bytes);
+    //void * cuda_malloc_host(const Index bytes);
     void * cuda_get_static_memory(const Index bytes);
-    void cuda_free(void * address);
-    void cuda_free_host(void * address);
+    //void cuda_free(void * address);
+    //void cuda_free_host(void * address);
     void cuda_free_static_memory();
     void cuda_initialize(int rank, int ranks_per_node, int ranks_per_uma, int gpus_per_node);
     void cuda_finalize();
     NOINLINE void cuda_synchronize();
     NOINLINE void cuda_force_synchronize();
     void cuda_reset_device();
-    void cuda_copy(void * dest, const void * src, const Index bytes);
-    void cuda_copy_host_to_device(void * dest, const void * src, const Index bytes);
-    void cuda_copy_device_to_host(void * dest, const void * src, const Index bytes);
-    void cuda_copy_device_to_device(void * dest, const void * src, const Index bytes);
+    //void cuda_copy(void * dest, const void * src, const Index bytes);
+    //void cuda_copy_host_to_device(void * dest, const void * src, const Index bytes);
+    //void cuda_copy_device_to_host(void * dest, const void * src, const Index bytes);
+    //void cuda_copy_device_to_device(void * dest, const void * src, const Index bytes);
     void cuda_reset_algos();
-    template <typename DT_>
-    void cuda_set_memory(DT_ * address, const DT_ val, const Index count);
-    template <typename DT1_, typename DT2_>
-    void cuda_convert(DT1_ * dest, const DT2_ * src, const Index count);
+    //template <typename DT_>
+    //void cuda_set_memory(DT_ * address, const DT_ val, const Index count);
+    //template <typename DT1_, typename DT2_>
+    //void cuda_convert(DT1_ * dest, const DT2_ * src, const Index count);
     int cuda_get_device_count();
     int cuda_get_device_id();
     String cuda_get_visible_devices();

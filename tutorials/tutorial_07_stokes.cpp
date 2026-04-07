@@ -518,7 +518,7 @@ namespace Tutorial07
     );
 
     // Now we can add the cell-projected pressure to our VTK exporter:
-    exporter.add_cell_scalar("pressure", cell_pres.elements());
+    exporter.add_cell_scalar("pressure", cell_pres);
 
     // finally, write the VTK file
     exporter.write(vtk_name);

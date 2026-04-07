@@ -22,6 +22,7 @@
 #include <kernel/lafem/slip_filter.hpp>
 #include <kernel/lafem/filter_chain.hpp>
 #include <kernel/lafem/filter_sequence.hpp>
+#include <kernel/lafem/sparse_vector_factory.hpp>
 #include <kernel/lafem/tuple_filter.hpp>
 #include <kernel/global/mean_filter.hpp>
 #include <kernel/lafem/matrix_mirror.hpp>
@@ -125,6 +126,8 @@ namespace FEAT
      * \todo add support for LAFEM::PowerXXX containers
      * \todo add support for LAFEM/Global::MeanFilter
      * \todo add support for LAFEM::SlipFilter
+     *
+     * \todo make use of cuda-aware MPI
      *
      * \author Peter Zajac
      */
@@ -413,7 +416,7 @@ namespace FEAT
           this->_alg_dof_parti->get_all_global_dof_offsets().data());
 
         // apply our owned matrix
-        LAFEM::Arch::Apply::csr_generic(vec_r, DTX_(1), vec_full.data(), DTX_(0), vec_r, val_a, col_idx, row_ptr,
+        LAFEM::Arch::MatVecMultCSRDense::exec_generic_impl(vec_r, DTX_(1), vec_full.data(), (DTX_*)nullptr, val_a, col_idx, row_ptr,
           this->get_adp_matrix_rows(), this->get_adp_matrix_cols(), this->get_adp_matrix_nzes(), false);
       }
 
@@ -558,7 +561,7 @@ namespace FEAT
         const Dist::Comm& comm = *this->get_comm();
 
         // format our internal matrix
-        memset(val, 0, sizeof(DTA_)*this->_num_owned_non_zeros);
+        Memory::memset_main(val, 0, sizeof(DTA_)*this->_num_owned_non_zeros);
 
         const Index num_neigh_owner = adp.get_num_owner_neighbors();
         const Index num_neigh_donee = adp.get_num_donee_neighbors();
@@ -569,15 +572,19 @@ namespace FEAT
         std::vector<BufferVectorType> donee_vbufs(num_neigh_donee);
         std::vector<BufferVectorType> owner_vbufs(num_neigh_owner);
 
+        std::vector<Memory::TypedView<DataType>> donee_views(num_neigh_donee);
+        std::vector<Memory::TypedView<DataType>> owner_views(num_neigh_owner);
+
         // create receive buffers and post receives
         for(Index i(0); i < num_neigh_donee; ++i)
         {
           // create buffer
           BufferVectorType& buf = donee_vbufs.at(i);
           buf = BufferVectorType(this->_donee_data_mirs.at(i).num_indices());
+          donee_views.at(i) = buf.elements_view_w();
 
           // post receive
-          recv_reqs[i] = comm.irecv(buf.elements(), buf.size(), adp.get_donee_rank(i));
+          recv_reqs[i] = comm.irecv(donee_views.at(i).get_w(), buf.size(), adp.get_donee_rank(i));
         }
 
         // post sends
@@ -589,9 +596,10 @@ namespace FEAT
 
           // gather from mirror
           this->_owner_data_mirs.at(i).gather_owner_data(buf, matrix);
+          owner_views.at(i) = buf.elements_view_r();
 
           // post send
-          send_reqs[i] = comm.isend(buf.elements(), buf.size(), adp.get_owner_rank(i));
+          send_reqs[i] = comm.isend(owner_views.at(i).get_r(), buf.size(), adp.get_owner_rank(i));
         }
 
         // upload our own data
@@ -622,8 +630,9 @@ namespace FEAT
        */
       void upload_filter(const LocalFilterType& filter)
       {
-        _unit_filter_rows = LAFEM::UnitFilter<DataType, IndexType>(this->get_num_owned_dofs());
-        ADPFilAuxType::upload_filter(_unit_filter_rows, filter, _alg_dof_parti->get_owned_mirror() ,0u);
+        LAFEM::SparseVectorFactory<DataType, IndexType> factory(this->get_num_owned_dofs());
+        ADPFilAuxType::upload_filter(factory, filter, _alg_dof_parti->get_owned_mirror() ,0u);
+        _unit_filter_rows.get_filter_vector() = factory.make_sv();
       }
 
       /**
@@ -633,14 +642,16 @@ namespace FEAT
        * A \transient pointer to the defect vector data array that is to be filtered.
        */
       template<typename DTV_>
-      void filter_vec_def(DTV_* vec_def)
+      void filter_vec_def(DTV_* vec_def)//, Memory::Location mem_loc)
       {
-        if(_unit_filter_rows.used_elements() <= Index(0))
+        if(_unit_filter_rows.num_nzes() <= Index(0))
           return;
 
         XASSERT(vec_def != nullptr);
 
-        LAFEM::Arch::UnitFilter::filter_def(vec_def, _unit_filter_rows.get_indices(), _unit_filter_rows.used_elements());
+        LAFEM::Arch::UnitFilterDenseVec::exec_generic_impl(vec_def, (DTV_*)nullptr,
+          _unit_filter_rows.get_filter_vector().indices_view_r(Memory::Location::main).get_r(),
+          _unit_filter_rows.num_nzes(), true);
       }
 
       /**
@@ -652,13 +663,14 @@ namespace FEAT
       template<typename DTV_>
       void filter_vec_cor(DTV_* vec_cor)
       {
-        if(_unit_filter_rows.used_elements() <= Index(0))
+        if(_unit_filter_rows.num_nzes() <= Index(0))
           return;
 
         XASSERT(vec_cor != nullptr);
 
-        // UnitFilter has no filter_cor, because it is identical to filter_def
-        LAFEM::Arch::UnitFilter::filter_def(vec_cor, _unit_filter_rows.get_indices(), _unit_filter_rows.used_elements());
+        LAFEM::Arch::UnitFilterDenseVec::exec_generic_impl(vec_cor, (DTV_*)nullptr,
+          _unit_filter_rows.get_filter_vector().indices_view_r(Memory::Location::main).get_r(),
+          _unit_filter_rows.num_nzes(), true);
       }
 
       /**
@@ -678,7 +690,7 @@ namespace FEAT
       template<typename DTA_, typename RPT_, typename CIT_>
       void filter_matrix(DTA_* val, const RPT_* row_ptr, const CIT_* col_idx)
       {
-        if(_unit_filter_rows.used_elements() <= Index(0))
+        if(_unit_filter_rows.num_nzes() <= Index(0))
           return;
 
         XASSERT(val != nullptr);
@@ -686,8 +698,8 @@ namespace FEAT
         XASSERT(col_idx != nullptr);
 
         const Index row_off = this->get_alg_dof_parti()->get_global_dof_offset();
-        const IndexType* row_idx = this->_unit_filter_rows.get_indices();
-        const Index n = this->_unit_filter_rows.used_elements();
+        const Memory::TypedView<IndexType> row_idx = this->_unit_filter_rows.get_filter_vector().indices_view_r();
+        const Index n = this->_unit_filter_rows.num_nzes();
 
         // process all filtered rows
         for(Index i = 0; i < n; ++i)
@@ -731,8 +743,8 @@ namespace FEAT
 
         // allocate buffer
         BufferMatrixType buffer(num_buf_rows, num_global_dofs, num_buf_nze, 1);
-        IndexType* buf_row_ptr = buffer.row_ptr();
-        IndexType* buf_col_idx = buffer.col_ind();
+        Memory::TypedView<IndexType> buf_row_ptr = buffer.row_ptr_view_w();
+        Memory::TypedView<IndexType> buf_col_idx = buffer.col_idx_view_w();
 
         // copy buffer row pointer because we need a disposable copy for the next operation
         for(Index i = 0u; i <= num_buf_rows; ++i)
@@ -740,7 +752,7 @@ namespace FEAT
 
         // gather the column indices
         // we have to use the auxiliary row pointer here because it is overwritten by the following call
-        ADPMatAuxType::gather_mat_buf_col_idx(aux_row.data(), buf_col_idx, local_matrix, row_mirror, global_dof_idx);
+        ADPMatAuxType::gather_mat_buf_col_idx(aux_row.data(), buf_col_idx.get_w(), local_matrix, row_mirror, global_dof_idx);
 
         // sort the buffer column indices; this will make things a lot easier and more efficient later on
         for(Index i = 0u; i < num_buf_rows; ++i)
@@ -771,12 +783,20 @@ namespace FEAT
         _owner_bufs.resize(num_neigh_owner);
         _donee_bufs.resize(num_neigh_donee);
 
+        // allocate owner views
+        std::vector<Memory::TypedView<IndexType>> owner_row_ptr_views(num_neigh_donee);
+        std::vector<Memory::TypedView<IndexType>> owner_col_idx_views(num_neigh_donee);
+
         // create the owner buffers by using the auxiliary helper function.
         for(Index i(0); i < num_neigh_owner; ++i)
         {
           // allocate matrix buffer
           this->_owner_bufs.at(i) = _asm_mat_buf(this->_global_matrix.local(),
             adp.get_owner_mirror(i), adp.get_global_dof_indices(), adp.get_num_global_dofs());
+
+          // create views for row-pointer and column-indices
+          owner_row_ptr_views.at(i) = this->_owner_bufs.at(i).row_ptr_view_r();
+          owner_col_idx_views.at(i) = this->_owner_bufs.at(i).col_idx_view_r();
         }
 
         // We have assembled our owner-neighbor matrix buffers, however, we cannot
@@ -807,15 +827,19 @@ namespace FEAT
         for(Index i(0); i < num_neigh_owner; ++i)
         {
           const BufferMatrixType& sbuf = this->_owner_bufs.at(i);
-          send_dims.at(i)[0] = Index(sbuf.rows());
-          send_dims.at(i)[1] = Index(sbuf.columns());
+          send_dims.at(i)[0] = Index(sbuf.num_rows());
+          send_dims.at(i)[1] = Index(sbuf.num_cols());
           send_dims.at(i)[2] = Index(sbuf.entries_per_nonzero());
-          send_dims.at(i)[3] = Index(sbuf.used_elements());
+          send_dims.at(i)[3] = Index(sbuf.num_nzes());
           send_reqs[i] = comm.isend(send_dims.at(i).data(), std::size_t(4), adp.get_owner_rank(i));
         }
 
         // wait for all receives to finish
         recv_reqs.wait_all();
+
+        // allocate donee views
+        std::vector<Memory::TypedView<IndexType>> donee_row_ptr_views(num_neigh_donee);
+        std::vector<Memory::TypedView<IndexType>> donee_col_idx_views(num_neigh_donee);
 
         // allocate donee-buffers
         for(Index i(0); i < num_neigh_donee; ++i)
@@ -828,13 +852,17 @@ namespace FEAT
 
           // allocate receive buffer
           this->_donee_bufs.at(i) = BufferMatrixType(nrows, ncols, nnze, nepnz);
+
+          // create views for row-pointer and column-indices
+          donee_row_ptr_views.at(i) = this->_donee_bufs.at(i).row_ptr_view_w();
+          donee_col_idx_views.at(i) = this->_donee_bufs.at(i).col_idx_view_w();
         }
 
         // post donee-buffer row-pointer array receives
         for(Index i(0); i < num_neigh_donee; ++i)
         {
-          recv_reqs[i] = comm.irecv(this->_donee_bufs.at(i).row_ptr(),
-            this->_donee_bufs.at(i).rows()+std::size_t(1), adp.get_donee_rank(i));
+          recv_reqs[i] = comm.irecv(donee_row_ptr_views.at(i).get_w(),
+            this->_donee_bufs.at(i).num_rows()+std::size_t(1), adp.get_donee_rank(i));
         }
 
         // wait for all previous sends to finish
@@ -843,8 +871,8 @@ namespace FEAT
         // post owner-buffer row-pointer array sends
         for(Index i(0); i < num_neigh_owner; ++i)
         {
-          send_reqs[i] = comm.isend(this->_owner_bufs.at(i).row_ptr(),
-            this->_owner_bufs.at(i).rows()+std::size_t(1), adp.get_owner_rank(i));
+          send_reqs[i] = comm.isend(owner_row_ptr_views.at(i).get_r(),
+            this->_owner_bufs.at(i).num_rows()+std::size_t(1), adp.get_owner_rank(i));
         }
 
         // wait for all previous receives to finish
@@ -853,8 +881,8 @@ namespace FEAT
         // post donee-buffer column-index array receives
         for(Index i(0); i < num_neigh_donee; ++i)
         {
-          recv_reqs[i] = comm.irecv(this->_donee_bufs.at(i).col_ind(),
-            this->_donee_bufs.at(i).used_elements(), adp.get_donee_rank(i));
+          recv_reqs[i] = comm.irecv(donee_col_idx_views.at(i).get_w(),
+            this->_donee_bufs.at(i).num_nzes(), adp.get_donee_rank(i));
         }
 
         // wait for all previous sends to finish
@@ -863,8 +891,8 @@ namespace FEAT
         // post owner-buffer column-index array sends
         for(Index i(0); i < num_neigh_owner; ++i)
         {
-          send_reqs[i] = comm.isend(this->_owner_bufs.at(i).col_ind(),
-            this->_owner_bufs.at(i).used_elements(), adp.get_owner_rank(i));
+          send_reqs[i] = comm.isend(owner_col_idx_views.at(i).get_r(),
+            this->_owner_bufs.at(i).num_nzes(), adp.get_owner_rank(i));
         }
 
         // wait for all receives and sends to finish
@@ -907,11 +935,11 @@ namespace FEAT
           // note: the donee mirror indices are owned DOF indices
           const auto& mir = adp.get_donee_mirror(ineigh);
           const BufferMatrixType& buf = this->_donee_bufs.at(ineigh);
-          XASSERT(mir.num_indices() == buf.rows());
+          XASSERT(mir.num_indices() == buf.num_rows());
           const Index num_idx = mir.num_indices();
-          const IndexType* mir_idx = mir.indices();
-          const IndexType* buf_ptr = buf.row_ptr();
-          const IndexType* buf_idx = buf.col_ind();
+          const Memory::TypedView<IndexType> mir_idx = mir.indices_view_r();
+          const Memory::TypedView<IndexType> buf_ptr = buf.row_ptr_view_r();
+          const Memory::TypedView<IndexType> buf_idx = buf.col_idx_view_r();
 
           // loop over all matrix buffer rows
           for(Index i(0); i < num_idx; ++i)
@@ -946,17 +974,17 @@ namespace FEAT
         const DoneeMirrorType& mirror,
         const BufferMatrixType& buffer)
       {
-        const Index buf_rows = buffer.rows();
-        const Index num_idx = buffer.used_elements();
-        const IndexType* row_idx = mirror.indices();
+        const Index buf_rows = buffer.num_rows();
+        const Index num_idx = buffer.num_nzes();
+        const Memory::TypedView<IndexType> row_idx = mirror.indices_view_r();
+        const Memory::TypedView<IndexType> buf_ptr = buffer.row_ptr_view_r();
+        const Memory::TypedView<IndexType> buf_idx = buffer.col_idx_view_r();
         const Index* row_ptr = owned_graph.get_domain_ptr();
         const Index* col_idx = owned_graph.get_image_idx();
-        const IndexType* buf_ptr = buffer.row_ptr();
-        const IndexType* buf_idx = buffer.col_ind();
 
         // allocate data mirror
         data_mirror = DoneeMirrorType(owned_graph.get_num_indices(), num_idx);
-        IndexType* dat_idx = data_mirror.indices();
+        Memory::TypedView<IndexType> dat_idx = data_mirror.indices_view_w();
 
         // loop over all buffer matrix rows
         for(Index i(0); i < buf_rows; ++i)
@@ -1023,8 +1051,8 @@ namespace FEAT
       {
         XASSERT(buffer.size() == data_mirror.num_indices());
 
-        const DataType* buf_val = buffer.elements();
-        const IndexType* mir_idx = data_mirror.indices();
+        const Memory::TypedView<DataType> buf_val = buffer.elements_view_r();
+        const Memory::TypedView<IndexType> mir_idx = data_mirror.indices_view_r();
         const Index n = buffer.size();
         for(Index i(0); i < n; ++i)
         {
@@ -1067,8 +1095,8 @@ namespace FEAT
         {
           String s;
           XASSERT(_buf_mir.num_indices() == _loc_mir.num_indices());
-          const IT_* buf_idx = _buf_mir.indices();
-          const IT_* loc_idx = _loc_mir.indices();
+          const Memory::TypedView<IT_> buf_idx = _buf_mir.indices_view_r();
+          const Memory::TypedView<IT_> loc_idx = _loc_mir.indices_view_r();
           for(Index i = 0; i < _buf_mir.num_indices(); ++i)
             s += "  " + stringify(buf_idx[i]) + ":" + stringify(loc_idx[i]);
           return "[" + s + "]*" + stringify(_buf_mir.num_indices());
@@ -1098,12 +1126,12 @@ namespace FEAT
           Index row_offset)
         {
           // get our mirror and matrix arrays
-          const IT_* row_idx = row_mirror.indices();
-          const IT_* row_ptr = local_matrix.row_ptr();
-          const IT_* col_idx = local_matrix.col_ind();
-          const IT_* buf_ptr = buffer.row_ptr();
-          const IT_* buf_idx = buffer.col_ind();
-          const IT_* glob_dof_idx = global_dof_idx.elements();
+          const Memory::TypedView<IT_> row_idx = row_mirror.indices_view_r();
+          const Memory::TypedView<IT_> row_ptr = local_matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = local_matrix.col_idx_view_r();
+          const Memory::TypedView<IT_> buf_ptr = buffer.row_ptr_view_r();
+          const Memory::TypedView<IT_> buf_idx = buffer.col_idx_view_r();
+          const Memory::TypedView<IT_> glob_dof_idx = global_dof_idx.elements_view_r();
           const Index row_mir_num_idx = row_mirror.num_indices();
 
           // count the number of non-zeros that this matrix contributes to the buffer
@@ -1111,7 +1139,7 @@ namespace FEAT
           for(Index i = 0; i < row_mir_num_idx; ++i)
             data_mir_num_idx += row_ptr[row_idx[i]+1u] - row_ptr[row_idx[i]];
 
-          XASSERT(data_mir_num_idx <= buffer.used_elements());
+          XASSERT(data_mir_num_idx <= buffer.num_nzes());
 
           // allocate data mirror
           std::vector<std::pair<IT_, IT_>> aux_data_mir;
@@ -1119,7 +1147,7 @@ namespace FEAT
 
           // vector for row pointers sorted by global indices
           std::vector<IT_> loc_it;
-          loc_it.reserve(local_matrix.columns());
+          loc_it.reserve(local_matrix.num_cols());
 
           // declare a lambda that sorts row pointers by global column indices
           auto sort_rel_loc = [&glob_dof_idx, &col_idx] (IT_ a, IT_ b)
@@ -1160,12 +1188,12 @@ namespace FEAT
 
           // create data mirrors
           Index num_idx = Index(aux_data_mir.size());
-          this->_buf_mir = LAFEM::VectorMirror<DT_, IT_>(buffer.used_elements(), num_idx);
+          this->_buf_mir = LAFEM::VectorMirror<DT_, IT_>(buffer.num_nzes(), num_idx);
           this->_loc_mir = LAFEM::VectorMirror<DT_, IT_>(
-            local_matrix.template used_elements<LAFEM::Perspective::pod>(), num_idx);
+            local_matrix.num_nzes_raw(), num_idx);
 
-          IT_* bm_idx = this->_buf_mir.indices();
-          IT_* lm_idx = this->_loc_mir.indices();
+          Memory::TypedView<IT_> bm_idx = this->_buf_mir.indices_view_w();
+          Memory::TypedView<IT_> lm_idx = this->_loc_mir.indices_view_w();
           for(Index i = 0; i < num_idx; ++i)
           {
             bm_idx[i] = aux_data_mir[i].first;
@@ -1198,18 +1226,18 @@ namespace FEAT
           // get matrix arrays
           const Index* own_row_ptr = owned_graph.get_domain_ptr();
           const Index* own_col_idx = owned_graph.get_image_idx();
-          const IT_* loc_row_ptr = local_matrix.row_ptr();
-          const IT_* loc_col_idx = local_matrix.col_ind();
+          const Memory::TypedView<IT_> loc_row_ptr = local_matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> loc_col_idx = local_matrix.col_idx_view_r();
 
           // allocate data mirror
           std::vector<std::pair<IT_, IT_>> aux_data_mir;
           aux_data_mir.reserve(owned_graph.get_num_indices());
 
           const Index num_owned_dofs = row_mirror.num_indices();
-          const IT_* loc_dof_idx = row_mirror.indices();
-          const IT_* glob_dof_idx = global_dof_idx.elements();
+          const Memory::TypedView<IT_> loc_dof_idx = row_mirror.indices_view_r();
+          const Memory::TypedView<IT_> glob_dof_idx = global_dof_idx.elements_view_r();
 
-          //XASSERT(num_owned_dofs == adp_matrix.rows());
+          //XASSERT(num_owned_dofs == adp_matrix.num_rows());
 
           // row iterator deque
           std::deque<IT_> row_it;
@@ -1253,11 +1281,11 @@ namespace FEAT
 
           // create data mirrors
           Index num_idx = Index(aux_data_mir.size());
-          this->_buf_mir = LAFEM::VectorMirror<DT_, IT_>(local_matrix.used_elements(), num_idx);
-          this->_loc_mir = LAFEM::VectorMirror<DT_, IT_>(local_matrix.used_elements(), num_idx);
+          this->_buf_mir = LAFEM::VectorMirror<DT_, IT_>(local_matrix.num_nzes(), num_idx);
+          this->_loc_mir = LAFEM::VectorMirror<DT_, IT_>(local_matrix.num_nzes(), num_idx);
 
-          IT_* bm_idx = this->_buf_mir.indices();
-          IT_* lm_idx = this->_loc_mir.indices();
+          Memory::TypedView<IT_> bm_idx = this->_buf_mir.indices_view_w();
+          Memory::TypedView<IT_> lm_idx = this->_loc_mir.indices_view_w();
           for(Index i = 0; i < num_idx; ++i)
           {
             bm_idx[i] = aux_data_mir[i].first;
@@ -1270,14 +1298,14 @@ namespace FEAT
         template<typename DTA_>
         void upload_owned_data(DTA_* adp_val, const LAFEM::SparseMatrixCSR<DT_, IT_>& local_matrix) const
         {
-          const DT_* loc_val = local_matrix.val();
-          const IT_* adp_idx = _buf_mir.indices();
-          const IT_* loc_idx = _loc_mir.indices();
+          const Memory::TypedView<DT_> loc_val = local_matrix.val_view_r();
+          const Memory::TypedView<IT_> adp_idx = _buf_mir.indices_view_r();
+          const Memory::TypedView<IT_> loc_idx = _loc_mir.indices_view_r();
           XASSERT(_buf_mir.num_indices() == _loc_mir.num_indices());
           Index n = _buf_mir.num_indices();
           for(Index i = 0; i < n; ++i)
           {
-            ASSERT(loc_idx[i] < local_matrix.used_elements());
+            ASSERT(loc_idx[i] < local_matrix.num_nzes());
             adp_val[adp_idx[i]] = DTA_(loc_val[loc_idx[i]]);
           }
         }
@@ -1296,16 +1324,16 @@ namespace FEAT
          */
         void gather_owner_data(LAFEM::DenseVector<DT_, IT_>& buffer, const LAFEM::SparseMatrixCSR<DT_, IT_>& local_matrix) const
         {
-          DT_* buf_val = buffer.elements();
-          const DT_* loc_val = local_matrix.val();
-          const IT_* buf_idx = this->_buf_mir.indices();
-          const IT_* loc_idx = this->_loc_mir.indices();
+          Memory::TypedView<DT_> buf_val = buffer.elements_view_rw();
+          const Memory::TypedView<DT_> loc_val = local_matrix.val_view_r();
+          const Memory::TypedView<IT_> buf_idx = this->_buf_mir.indices_view_r();
+          const Memory::TypedView<IT_> loc_idx = this->_loc_mir.indices_view_r();
           XASSERT(this->_buf_mir.num_indices() == this->_loc_mir.num_indices());
           Index n = this->_buf_mir.num_indices();
           for(Index i = 0; i < n; ++i)
           {
             ASSERT(buf_idx[i] < buffer.size());
-            ASSERT(loc_idx[i] < local_matrix.used_elements());
+            ASSERT(loc_idx[i] < local_matrix.num_nzes());
             buf_val[buf_idx[i]] = loc_val[loc_idx[i]];
           }
         }
@@ -1339,8 +1367,8 @@ namespace FEAT
         {
           String s;
           XASSERT(_buf_mir.num_indices() == _loc_mir.num_indices());
-          const IT_* buf_idx = _buf_mir.indices();
-          const IT_* loc_idx = _loc_mir.indices();
+          const Memory::TypedView<IT_> buf_idx = _buf_mir.indices_view_r();
+          const Memory::TypedView<IT_> loc_idx = _loc_mir.indices_view_r();
           for(Index i = 0; i < _buf_mir.num_indices(); ++i)
             s += "  " + stringify(buf_idx[i]) + ":" + stringify(loc_idx[i]);
           return "[" + s + "]*" + stringify(_buf_mir.num_indices());
@@ -1354,12 +1382,12 @@ namespace FEAT
           Index row_offset)
         {
           // get our mirror and matrix arrays
-          const IT_* row_idx = row_mirror.indices();
-          const IT_* row_ptr = local_matrix.row_ptr();
-          const IT_* col_idx = local_matrix.col_ind();
-          const IT_* buf_ptr = buffer.row_ptr();
-          const IT_* buf_idx = buffer.col_ind();
-          const auto* glob_dof_idx = global_dof_idx.elements();
+          const Memory::TypedView<IT_> row_idx = row_mirror.indices_view_r();
+          const Memory::TypedView<IT_> row_ptr = local_matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = local_matrix.col_idx_view_r();
+          const Memory::TypedView<IT_> buf_ptr = buffer.row_ptr_view_r();
+          const Memory::TypedView<IT_> buf_idx = buffer.col_idx_view_r();
+          const Memory::TypedView<Tiny::Vector<IT_,bw_>> glob_dof_idx = global_dof_idx.elements_view_r();
           const Index row_mir_num_idx = row_mirror.num_indices();
 
           // count the number of non-zeros that this matrix contributes to the buffer
@@ -1368,7 +1396,7 @@ namespace FEAT
             data_mir_num_idx += row_ptr[row_idx[i]+1u] - row_ptr[row_idx[i]];
           data_mir_num_idx *= Index(bh_*bw_);
 
-          XASSERT(data_mir_num_idx <= buffer.used_elements());
+          XASSERT(data_mir_num_idx <= buffer.num_nzes());
 
           // allocate data mirror
           std::vector<std::pair<IT_, IT_>> aux_data_mir;
@@ -1376,7 +1404,7 @@ namespace FEAT
 
           // vector for row pointers sorted by global indices
           std::vector<IT_> loc_it;
-          loc_it.reserve(local_matrix.columns() * std::size_t(bh_*bw_));
+          loc_it.reserve(local_matrix.num_cols() * std::size_t(bh_*bw_));
 
           // declare a lambda that sorts row pointers by global column indices
           auto sort_rel_loc = [&glob_dof_idx, &col_idx] (IT_ a, IT_ b)
@@ -1426,12 +1454,12 @@ namespace FEAT
 
           // create data mirrors
           Index num_idx = Index(aux_data_mir.size());
-          this->_buf_mir = LAFEM::VectorMirror<DT_, IT_>(buffer.used_elements(), num_idx);
+          this->_buf_mir = LAFEM::VectorMirror<DT_, IT_>(buffer.num_nzes(), num_idx);
           this->_loc_mir = LAFEM::VectorMirror<DT_, IT_>(
-            local_matrix.template used_elements<LAFEM::Perspective::pod>(), num_idx);
+            local_matrix.num_nzes_raw(), num_idx);
 
-          IT_* bm_idx = this->_buf_mir.indices();
-          IT_* lm_idx = this->_loc_mir.indices();
+          Memory::TypedView<IT_> bm_idx = this->_buf_mir.indices_view_w();
+          Memory::TypedView<IT_> lm_idx = this->_loc_mir.indices_view_w();
           for(Index i = 0; i < num_idx; ++i)
           {
             bm_idx[i] = aux_data_mir[i].first;
@@ -1449,12 +1477,12 @@ namespace FEAT
           Index row_offset)
         {
           // get our mirror and matrix arrays
-          const IT_* row_idx = row_mirror.indices();
-          const IT_* row_ptr = local_matrix.row_ptr();
-          const IT_* col_idx = local_matrix.col_ind();
-          const IT_* buf_ptr = buffer.row_ptr();
-          const IT_* buf_idx = buffer.col_ind();
-          const IT_* glob_dof_idx = global_dof_idx.elements();
+          const Memory::TypedView<IT_> row_idx = row_mirror.indices_view_r();
+          const Memory::TypedView<IT_> row_ptr = local_matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = local_matrix.col_idx_view_r();
+          const Memory::TypedView<IT_> buf_ptr = buffer.row_ptr_view_r();
+          const Memory::TypedView<IT_> buf_idx = buffer.col_idx_view_r();
+          const Memory::TypedView<IT_> glob_dof_idx = global_dof_idx.elements_view_r();
           const Index row_mir_num_idx = row_mirror.num_indices();
 
           // count the number of non-zeros that this matrix contributes to the buffer
@@ -1463,7 +1491,7 @@ namespace FEAT
             data_mir_num_idx += row_ptr[row_idx[i]+1u] - row_ptr[row_idx[i]];
           data_mir_num_idx *= Index(bh_);
 
-          XASSERT(data_mir_num_idx <= buffer.used_elements());
+          XASSERT(data_mir_num_idx <= buffer.num_nzes());
 
           // allocate data mirror
           std::vector<std::pair<IT_, IT_>> aux_data_mir;
@@ -1471,7 +1499,7 @@ namespace FEAT
 
           // vector for row pointers sorted by global indices
           std::vector<IT_> loc_it;
-          loc_it.reserve(local_matrix.columns() * std::size_t(bh_));
+          loc_it.reserve(local_matrix.num_cols() * std::size_t(bh_));
 
           // declare a lambda that sorts row pointers by global column indices
           auto sort_rel_loc = [&glob_dof_idx, &col_idx] (IT_ a, IT_ b)
@@ -1517,12 +1545,11 @@ namespace FEAT
 
           // create data mirrors
           Index num_idx = Index(aux_data_mir.size());
-          this->_buf_mir = LAFEM::VectorMirror<DT_, IT_>(buffer.used_elements(), num_idx);
-          this->_loc_mir = LAFEM::VectorMirror<DT_, IT_>(
-            local_matrix.template used_elements<LAFEM::Perspective::pod>(), num_idx);
+          this->_buf_mir = LAFEM::VectorMirror<DT_, IT_>(buffer.num_nzes(), num_idx);
+          this->_loc_mir = LAFEM::VectorMirror<DT_, IT_>(local_matrix.num_nzes_raw(), num_idx);
 
-          IT_* bm_idx = this->_buf_mir.indices();
-          IT_* lm_idx = this->_loc_mir.indices();
+          Memory::TypedView<IT_> bm_idx = this->_buf_mir.indices_view_w();
+          Memory::TypedView<IT_> lm_idx = this->_loc_mir.indices_view_w();
           for(Index i = 0; i < num_idx; ++i)
           {
             bm_idx[i] = aux_data_mir[i].first;
@@ -1542,18 +1569,18 @@ namespace FEAT
           // get matrix arrays
           const Index* own_row_ptr = owned_graph.get_domain_ptr();
           const Index* own_col_idx = owned_graph.get_image_idx();
-          const IT_* loc_row_ptr = local_matrix.row_ptr();
-          const IT_* loc_col_idx = local_matrix.col_ind();
+          const Memory::TypedView<IT_> loc_row_ptr = local_matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> loc_col_idx = local_matrix.col_idx_view_r();
 
           // allocate data mirror
           std::vector<std::pair<IT_, IT_>> aux_data_mir;
           aux_data_mir.reserve(owned_graph.get_num_indices() * std::size_t(bh_*bw_));
 
           const Index num_owned_dofs = row_mirror.num_indices();
-          const IT_* loc_dof_idx = row_mirror.indices();
-          const auto* glob_dof_idx = global_dof_idx.elements();
+          const Memory::TypedView<IT_> loc_dof_idx = row_mirror.indices_view_r();
+          const Memory::TypedView<Tiny::Vector<IT_,bw_>> glob_dof_idx = global_dof_idx.elements_view_r();
 
-          //XASSERT(num_owned_dofs == adp_matrix.rows());
+          //XASSERT(num_owned_dofs == adp_matrix.num_rows());
 
           // row iterator deque
           std::deque<IT_> row_it;
@@ -1606,10 +1633,10 @@ namespace FEAT
           Index num_idx = Index(aux_data_mir.size());
           this->_buf_mir = LAFEM::VectorMirror<DT_, IT_>(owned_graph.get_num_indices(), num_idx);
           this->_loc_mir = LAFEM::VectorMirror<DT_, IT_>(
-            local_matrix.template used_elements<LAFEM::Perspective::pod>(), num_idx);
+            local_matrix.num_nzes_raw(), num_idx);
 
-          IT_* bm_idx = this->_buf_mir.indices();
-          IT_* lm_idx = this->_loc_mir.indices();
+          Memory::TypedView<IT_> bm_idx = this->_buf_mir.indices_view_w();
+          Memory::TypedView<IT_> lm_idx = this->_loc_mir.indices_view_w();
           for(Index i = 0; i < num_idx; ++i)
           {
             bm_idx[i] = aux_data_mir[i].first;
@@ -1629,18 +1656,18 @@ namespace FEAT
           // get matrix arrays
           const Index* own_row_ptr = owned_graph.get_domain_ptr();
           const Index* own_col_idx = owned_graph.get_image_idx();
-          const IT_* loc_row_ptr = local_matrix.row_ptr();
-          const IT_* loc_col_idx = local_matrix.col_ind();
+          const Memory::TypedView<IT_> loc_row_ptr = local_matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> loc_col_idx = local_matrix.col_idx_view_r();
 
           // allocate data mirror
           std::vector<std::pair<IT_, IT_>> aux_data_mir;
           aux_data_mir.reserve(owned_graph.get_num_indices() * std::size_t(bh_));
 
           const Index num_owned_dofs = row_mirror.num_indices();
-          const IT_* loc_dof_idx = row_mirror.indices();
-          const IT_* glob_dof_idx = global_dof_idx.elements();
+          const Memory::TypedView<IT_> loc_dof_idx = row_mirror.indices_view_r();
+          const Memory::TypedView<IT_> glob_dof_idx = global_dof_idx.elements_view_r();
 
-          //XASSERT(num_owned_dofs == adp_matrix.rows());
+          //XASSERT(num_owned_dofs == adp_matrix.num_rows());
 
           // row iterator deque
           std::deque<IT_> row_it;
@@ -1689,11 +1716,10 @@ namespace FEAT
           // create data mirrors
           Index num_idx = Index(aux_data_mir.size());
           this->_buf_mir = LAFEM::VectorMirror<DT_, IT_>(owned_graph.get_num_indices(), num_idx);
-          this->_loc_mir = LAFEM::VectorMirror<DT_, IT_>(
-            local_matrix.template used_elements<LAFEM::Perspective::pod>(), num_idx);
+          this->_loc_mir = LAFEM::VectorMirror<DT_, IT_>(local_matrix.num_nzes_raw(), num_idx);
 
-          IT_* bm_idx = this->_buf_mir.indices();
-          IT_* lm_idx = this->_loc_mir.indices();
+          Memory::TypedView<IT_> bm_idx = this->_buf_mir.indices_view_w();
+          Memory::TypedView<IT_> lm_idx = this->_loc_mir.indices_view_w();
           for(Index i = 0; i < num_idx; ++i)
           {
             bm_idx[i] = aux_data_mir[i].first;
@@ -1706,14 +1732,14 @@ namespace FEAT
         template<typename DTA_>
         void upload_owned_data(DTA_* adp_val, const LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& local_matrix) const
         {
-          const DT_* loc_val = local_matrix.template val<LAFEM::Perspective::pod>();
-          const IT_* adp_idx = _buf_mir.indices();
-          const IT_* loc_idx = _loc_mir.indices();
+          const Memory::TypedView<DT_> loc_val = local_matrix.val_view_raw_r();
+          const Memory::TypedView<IT_> adp_idx = _buf_mir.indices_view_r();
+          const Memory::TypedView<IT_> loc_idx = _loc_mir.indices_view_r();
           XASSERT(_buf_mir.num_indices() == _loc_mir.num_indices());
           Index n = _buf_mir.num_indices();
           for(Index i = 0; i < n; ++i)
           {
-            ASSERT(loc_idx[i] < local_matrix.template used_elements<LAFEM::Perspective::pod>());
+            ASSERT(loc_idx[i] < local_matrix.num_nzes_raw());
             adp_val[adp_idx[i]] = DTA_(loc_val[loc_idx[i]]);
           }
         }
@@ -1722,16 +1748,16 @@ namespace FEAT
           LAFEM::DenseVector<DT_, IT_>& buffer,
           const LAFEM::SparseMatrixBCSR<DT_, IT_, bh_, bw_>& local_matrix) const
         {
-          DT_* buf_val = buffer.elements();
-          const DT_* loc_val = local_matrix.template val<LAFEM::Perspective::pod>();
-          const IT_* buf_idx = this->_buf_mir.indices();
-          const IT_* loc_idx = this->_loc_mir.indices();
+          Memory::TypedView<DT_> buf_val = buffer.elements_view_w();
+          const Memory::TypedView<DT_> loc_val = local_matrix.val_view_raw_r();
+          const Memory::TypedView<IT_> buf_idx = this->_buf_mir.indices_view_r();
+          const Memory::TypedView<IT_> loc_idx = this->_loc_mir.indices_view_r();
           XASSERT(this->_buf_mir.num_indices() == this->_loc_mir.num_indices());
           Index n = this->_buf_mir.num_indices();
           for(Index i = 0; i < n; ++i)
           {
             ASSERT(buf_idx[i] < buffer.size());
-            ASSERT(loc_idx[i] < local_matrix.template used_elements<LAFEM::Perspective::pod>());
+            ASSERT(loc_idx[i] < local_matrix.num_nzes_raw());
             buf_val[buf_idx[i]] = loc_val[loc_idx[i]];
           }
         }
@@ -2240,8 +2266,8 @@ namespace FEAT
           const LAFEM::VectorMirror<DT_, IT_>& row_mirror)
         {
           const Index num_idx = row_mirror.num_indices();
-          const IT_* mir_idx = row_mirror.indices();
-          const IT_* row_ptr = local_matrix.row_ptr();
+          const Memory::TypedView<IT_> mir_idx = row_mirror.indices_view_r();
+          const Memory::TypedView<IT_> row_ptr = local_matrix.row_ptr_view_r();
 
           for(Index i(0); i < num_idx; ++i)
           {
@@ -2259,10 +2285,10 @@ namespace FEAT
           const LAFEM::DenseVector<IT_, IT_>& global_dof_idx)
         {
           const Index num_idx = row_mirror.num_indices();
-          const IT_* mir_idx = row_mirror.indices();
-          const IT_* row_ptr = local_matrix.row_ptr();
-          const IT_* col_idx = local_matrix.col_ind();
-          const IT_* glob_dof_idx = global_dof_idx.elements();
+          const Memory::TypedView<IT_> mir_idx = row_mirror.indices_view_r();
+          const Memory::TypedView<IT_> row_ptr = local_matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = local_matrix.col_idx_view_r();
+          const Memory::TypedView<IT_> glob_dof_idx = global_dof_idx.elements_view_r();
 
           for(Index i(0); i < num_idx; ++i)
           {
@@ -2286,10 +2312,10 @@ namespace FEAT
           const Index row_offset)
         {
           const Index num_rows = row_mirror.num_indices();
-          const IT_* loc_row_ptr = local_matrix.row_ptr();
-          const IT_* loc_col_idx = local_matrix.col_ind();
-          const IT_* row_mir_idx = row_mirror.indices();
-          const IT_* glob_dof_idx = global_dof_idx.elements();
+          const Memory::TypedView<IT_> loc_row_ptr = local_matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> loc_col_idx = local_matrix.col_idx_view_r();
+          const Memory::TypedView<IT_> row_mir_idx = row_mirror.indices_view_r();
+          const Memory::TypedView<IT_> glob_dof_idx = global_dof_idx.elements_view_r();
 
           for(Index i(0); i < num_rows; ++i)
           {
@@ -2322,8 +2348,8 @@ namespace FEAT
           const LAFEM::VectorMirror<DT_, IT_>& row_mirror)
         {
           const Index num_idx = row_mirror.num_indices();
-          const IT_* mir_idx = row_mirror.indices();
-          const IT_* row_ptr = local_matrix.row_ptr();
+          const Memory::TypedView<IT_> mir_idx = row_mirror.indices_view_r();
+          const Memory::TypedView<IT_> row_ptr = local_matrix.row_ptr_view_r();
 
           for(Index i(0), j(0); i < num_idx; ++i)
           {
@@ -2343,10 +2369,10 @@ namespace FEAT
           const LAFEM::DenseVectorBlocked<IT_, IT_, bw_>& global_dof_idx)
         {
           const Index num_idx = row_mirror.num_indices();
-          const IT_* mir_idx = row_mirror.indices();
-          const IT_* row_ptr = local_matrix.row_ptr();
-          const IT_* col_idx = local_matrix.col_ind();
-          const auto* glob_dof_idx = global_dof_idx.elements();
+          const Memory::TypedView<IT_> mir_idx = row_mirror.indices_view_r();
+          const Memory::TypedView<IT_> row_ptr = local_matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = local_matrix.col_idx_view_r();
+          const Memory::TypedView<Tiny::Vector<IT_,bw_>> glob_dof_idx = global_dof_idx.elements_view_r();
 
           for(Index i(0); i < num_idx; ++i)
           {
@@ -2381,10 +2407,10 @@ namespace FEAT
           const LAFEM::DenseVector<IT_, IT_>& global_dof_idx)
         {
           const Index num_idx = row_mirror.num_indices();
-          const IT_* mir_idx = row_mirror.indices();
-          const IT_* row_ptr = local_matrix.row_ptr();
-          const IT_* col_idx = local_matrix.col_ind();
-          const auto* glob_dof_idx = global_dof_idx.elements();
+          const Memory::TypedView<IT_> mir_idx = row_mirror.indices_view_r();
+          const Memory::TypedView<IT_> row_ptr = local_matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = local_matrix.col_idx_view_r();
+          const Memory::TypedView<IT_> glob_dof_idx = global_dof_idx.elements_view_r();
 
           for(Index i(0); i < num_idx; ++i)
           {
@@ -2415,17 +2441,17 @@ namespace FEAT
           const Index row_offset)
         {
           const Index num_rows = row_mirror.num_indices();
-          const IT_* loc_row_ptr = local_matrix.row_ptr();
-          const IT_* loc_col_idx = local_matrix.col_ind();
-          const IT_* row_mir_idx = row_mirror.indices();
-          const auto* glob_dof_idx = global_dof_idx.elements();
+          const Memory::TypedView<IT_> mir_idx = row_mirror.indices_view_r();
+          const Memory::TypedView<IT_> row_ptr = local_matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = local_matrix.col_idx_view_r();
+          const Memory::TypedView<Tiny::Vector<IT_, bw_>> glob_dof_idx = global_dof_idx.elements_view_r();
 
           for(Index i(0); i < num_rows; ++i)
           {
-            const Index lrow = row_mir_idx[i];
-            for(IT_ j(loc_row_ptr[lrow]); j < loc_row_ptr[lrow + 1]; ++j)
+            const Index lrow = mir_idx[i];
+            for(IT_ j(row_ptr[lrow]); j < row_ptr[lrow + 1]; ++j)
             {
-              const auto& gci = glob_dof_idx[loc_col_idx[j]];
+              const auto& gci = glob_dof_idx[col_idx[j]];
               for(int bi = 0; bi < bh_; ++bi)
               {
                 for(int bj = 0; bj < bw_; ++bj)
@@ -2446,17 +2472,17 @@ namespace FEAT
           const Index row_offset)
         {
           const Index num_rows = row_mirror.num_indices();
-          const IT_* loc_row_ptr = local_matrix.row_ptr();
-          const IT_* loc_col_idx = local_matrix.col_ind();
-          const IT_* row_mir_idx = row_mirror.indices();
-          const IT_* glob_dof_idx = global_dof_idx.elements();
+          const Memory::TypedView<IT_> mir_idx = row_mirror.indices_view_r();
+          const Memory::TypedView<IT_> row_ptr = local_matrix.row_ptr_view_r();
+          const Memory::TypedView<IT_> col_idx = local_matrix.col_idx_view_r();
+          const Memory::TypedView<IT_> glob_dof_idx = global_dof_idx.elements_view_r();
 
           for(Index i(0); i < num_rows; ++i)
           {
-            const Index lrow = row_mir_idx[i];
-            for(IT_ j(loc_row_ptr[lrow]); j < loc_row_ptr[lrow + 1]; ++j)
+            const Index lrow = mir_idx[i];
+            for(IT_ j(row_ptr[lrow]); j < row_ptr[lrow + 1]; ++j)
             {
-              const IT_ gci = glob_dof_idx[loc_col_idx[j]];
+              const IT_ gci = glob_dof_idx[col_idx[j]];
               for(int bi = 0; bi < bh_; ++bi)
               {
                 graph.insert(row_offset + i*Index(bh_) + Index(bi), Index(gci));
@@ -2842,7 +2868,7 @@ namespace FEAT
 
           // invent main diagonal for pressure block
           {
-            const auto* p_dof_idx = global_dof_idx.template at<1>().elements();
+            const auto p_dof_idx = global_dof_idx.template at<1>().elements_view_r();
             for(Index i = 0u; i < nd; ++i)
               graph.insert(na + i, p_dof_idx[i]);
           }
@@ -2865,7 +2891,7 @@ namespace FEAT
         }
 
         static Index upload_filter(
-          LAFEM::UnitFilter<DT_, IT_>& DOXY(unit_rows),
+          LAFEM::SparseVectorFactory<DT_, IT_>& DOXY(factory),
           const LAFEM::NoneFilter<DT_, IT_>& DOXY(filter),
           const LAFEM::VectorMirror<DT_, IT_>& row_mirror,
           Index DOXY(row_offset))
@@ -2887,7 +2913,7 @@ namespace FEAT
         }
 
         static Index upload_filter(
-          LAFEM::UnitFilter<DT_, IT_>& DOXY(unit_rows),
+          LAFEM::SparseVectorFactory<DT_, IT_>& DOXY(factory),
           const LAFEM::NoneFilterBlocked<DT_, IT_, bs_>& DOXY(filter),
           const LAFEM::VectorMirror<DT_, IT_>& row_mirror,
           Index DOXY(row_offset))
@@ -2909,17 +2935,17 @@ namespace FEAT
         }
 
         static Index upload_filter(
-          LAFEM::UnitFilter<DT_, IT_>& unit_rows,
+          LAFEM::SparseVectorFactory<DT_, IT_>& factory,
           const LAFEM::UnitFilter<DT_, IT_>& filter,
           const LAFEM::VectorMirror<DT_, IT_>& row_mirror,
           Index row_offset)
         {
-          if(filter.used_elements() <= Index(0))
+          if(filter.num_nzes() <= Index(0))
             return row_count(row_mirror);
 
-          const IT_* fil_idx = filter.get_indices();
-          const IT_* mir_idx = row_mirror.indices();
-          const Index num_fil = filter.used_elements();
+          const Memory::TypedView<IT_> fil_idx = filter.get_filter_vector().indices_view_r();
+          const Memory::TypedView<IT_> mir_idx = row_mirror.indices_view_r();
+          const Index num_fil = filter.num_nzes();
           const Index num_mir = row_mirror.num_indices();
 
           Index i = 0u, j = 0u;
@@ -2931,7 +2957,7 @@ namespace FEAT
               ++j;
             else
             {
-              unit_rows.add(IT_(row_offset + j), DT_(0));
+              factory.add(IT_(row_offset + j), DT_(0));
               ++i;
               ++j;
             }
@@ -2953,19 +2979,19 @@ namespace FEAT
         }
 
         static Index upload_filter(
-          LAFEM::UnitFilter<DT_, IT_>& unit_rows,
+          LAFEM::SparseVectorFactory<DT_, IT_>& factory,
           const LAFEM::UnitFilterBlocked<DT_, IT_, bs_>& filter,
           const LAFEM::VectorMirror<DT_, IT_>& row_mirror,
           Index row_offset)
         {
-          if(filter.used_elements() <= Index(0))
+          if(filter.num_nzes() <= Index(0))
             return row_count(row_mirror);
 
           const bool ignore_nans = filter.get_ignore_nans();
-          const auto* fil_val = filter.get_values();
-          const IT_* fil_idx = filter.get_indices();
-          const IT_* mir_idx = row_mirror.indices();
-          const Index num_fil = filter.used_elements();
+          const auto fil_val = filter.get_filter_vector().elements_view_r();
+          const Memory::TypedView<IT_> fil_idx = filter.get_filter_vector().indices_view_r();
+          const Memory::TypedView<IT_> mir_idx = row_mirror.indices_view_r();
+          const Index num_fil = filter.num_nzes();
           const Index num_mir = row_mirror.num_indices();
 
           Index i = 0u, j = 0u;
@@ -2981,7 +3007,7 @@ namespace FEAT
               for(int k = 0; k < bs_; ++k)
               {
                 if(!ignore_nans || !Math::isnan(fil_val[i][k]))
-                  unit_rows.add(IT_(row_offset + j*Index(bs_) + Index(k)), DT_(0));
+                  factory.add(IT_(row_offset + j*Index(bs_) + Index(k)), DT_(0));
               }
               ++i;
             }
@@ -3003,7 +3029,7 @@ namespace FEAT
         }
 
         static Index upload_filter(
-          LAFEM::UnitFilter<DT_, IT_>& DOXY(unit_rows),
+          LAFEM::SparseVectorFactory<DT_, IT_>& DOXY(factory),
           const LAFEM::MeanFilter<DT_, IT_>& filter,
           const LAFEM::VectorMirror<DT_, IT_>& row_mirror,
           Index DOXY(row_offset))
@@ -3025,7 +3051,7 @@ namespace FEAT
         }
 
         static Index upload_filter(
-          LAFEM::UnitFilter<DT_, IT_>& DOXY(unit_rows),
+          LAFEM::SparseVectorFactory<DT_, IT_>& DOXY(factory),
           const LAFEM::MeanFilterBlocked<DT_, IT_, bs_>& filter,
           const LAFEM::VectorMirror<DT_, IT_>& row_mirror,
           Index DOXY(row_offset))
@@ -3047,7 +3073,7 @@ namespace FEAT
         }
 
         static Index upload_filter(
-          LAFEM::UnitFilter<DT_, IT_>& DOXY(unit_rows),
+          LAFEM::SparseVectorFactory<DT_, IT_>& DOXY(factory),
           const Global::MeanFilter<DT_, IT_>& filter,
           const LAFEM::VectorMirror<DT_, IT_>& row_mirror,
           Index DOXY(row_offset))
@@ -3069,7 +3095,7 @@ namespace FEAT
         }
 
         static Index upload_filter(
-          LAFEM::UnitFilter<DT_, IT_>& DOXY(unit_rows),
+          LAFEM::SparseVectorFactory<DT_, IT_>& DOXY(factory),
           const LAFEM::SlipFilter<DT_, IT_, bs_>& filter,
           const LAFEM::VectorMirror<DT_, IT_>& row_mirror,
           Index DOXY(row_offset))
@@ -3100,13 +3126,13 @@ namespace FEAT
 
         template<typename RowMirror_>
         static Index upload_filter(
-          LAFEM::UnitFilter<DT_, IT_>& unit_rows,
+          LAFEM::SparseVectorFactory<DT_, IT_>& factory,
           const LAFEM::FilterChain<FirstFilter_, RestFilter_...>& filter,
           const RowMirror_& row_mirror,
           Index row_offset)
         {
-          Index n1 = ADPFilAuxFirst::upload_filter(unit_rows, filter.first(), row_mirror, row_offset);
-          Index n2 = ADPFilAuxRest::upload_filter(unit_rows, filter.rest(), row_mirror, row_offset);
+          Index n1 = ADPFilAuxFirst::upload_filter(factory, filter.first(), row_mirror, row_offset);
+          Index n2 = ADPFilAuxRest::upload_filter(factory, filter.rest(), row_mirror, row_offset);
           XASSERT(n1 == n2);
           return n1;
         }
@@ -3129,12 +3155,12 @@ namespace FEAT
 
         template<typename RowMirror_>
         static Index upload_filter(
-          LAFEM::UnitFilter<DT_, IT_>& unit_rows,
+          LAFEM::SparseVectorFactory<DT_, IT_>& factory,
           const LAFEM::FilterChain<FirstFilter_>& filter,
           const RowMirror_& row_mirror,
           Index row_offset)
         {
-          return ADPFilAuxFirst::upload_filter(unit_rows, filter.first(), row_mirror, row_offset);
+          return ADPFilAuxFirst::upload_filter(factory, filter.first(), row_mirror, row_offset);
         }
       }; // class ADPFilAux<LAFEM::FilterChain<FirstFilter_>>
 
@@ -3155,14 +3181,14 @@ namespace FEAT
 
         template<typename RowMirror_>
         static Index upload_filter(
-          LAFEM::UnitFilter<DT_, IT_>& unit_rows,
+          LAFEM::SparseVectorFactory<DT_, IT_>& factory,
           const LAFEM::FilterSequence<SubFilter_>& filter,
           const RowMirror_& row_mirror,
           Index row_offset)
         {
           for(const auto& x : filter)
           {
-            ADPFilAuxSub::upload_filter(unit_rows, x.second, row_mirror, row_offset);
+            ADPFilAuxSub::upload_filter(factory, x.second, row_mirror, row_offset);
           }
           return row_count(row_mirror);
         }
@@ -3188,13 +3214,13 @@ namespace FEAT
 
         template<typename FirstMirror_, typename... RestMirror_>
         static Index upload_filter(
-          LAFEM::UnitFilter<DT_, IT_>& unit_rows,
+          LAFEM::SparseVectorFactory<DT_, IT_>& factory,
           const LAFEM::TupleFilter<FirstFilter_, RestFilter_...>& filter,
           const LAFEM::TupleMirror<FirstMirror_, RestMirror_...>& row_mirror,
           Index row_offset)
         {
-          Index n1 = ADPFilAuxFirst::upload_filter(unit_rows, filter.first(), row_mirror.first(), row_offset);
-          Index n2 = ADPFilAuxRest::upload_filter(unit_rows, filter.rest(), row_mirror.rest(), row_offset + n1);
+          Index n1 = ADPFilAuxFirst::upload_filter(factory, filter.first(), row_mirror.first(), row_offset);
+          Index n2 = ADPFilAuxRest::upload_filter(factory, filter.rest(), row_mirror.rest(), row_offset + n1);
           return n1 + n2;
         }
       }; // class ADPFilAux<LAFEM::TupleFilter<FirstFilter_, RestFilter_...>>
@@ -3216,12 +3242,12 @@ namespace FEAT
 
         template<typename FirstMirror_>
         static Index upload_filter(
-          LAFEM::UnitFilter<DT_, IT_>& unit_rows,
+          LAFEM::SparseVectorFactory<DT_, IT_>& factory,
           const LAFEM::TupleFilter<FirstFilter_>& filter,
           const LAFEM::TupleMirror<FirstMirror_>& row_mirror,
           Index row_offset)
         {
-          return ADPFilAuxFirst::upload_filter(unit_rows, filter.first(), row_mirror.first(), row_offset);
+          return ADPFilAuxFirst::upload_filter(factory, filter.first(), row_mirror.first(), row_offset);
         }
       }; // class ADPFilAux<LAFEM::TupleFilter<FirstFilter_, RestFilter_...>>
     } // namespace Intern

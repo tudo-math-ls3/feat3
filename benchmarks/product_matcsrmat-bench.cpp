@@ -30,21 +30,23 @@ void run(PreferredBackend backend)
   size *= 4;
 
   DT_ alpha(1.);
-  DT_ beta(0.);
 
   DenseMatrix<DT_, Index> r(size, size, DT_(0)), y(size, size);
-  for (Index i(0) ; i < size ; ++i)
   {
-    for (Index j(0) ; j < size ; ++j)
+    Memory::TypedView<DT_> vy(y.elements_view_w());
+    for (Index i(0) ; i < size ; ++i)
     {
-      y(i, j, DT_((1 + i*j) % 100));
+      for (Index j(0) ; j < size ; ++j)
+      {
+        vy[i*size+j] = DT_((1 + i*j) % 100);
+      }
     }
   }
 
   SparseMatrixFactory<DT_, IT_> x_fac(size, size);
-  for (IT_ row(0) ; row < x_fac.rows() ; ++row)
+  for (IT_ row(0) ; row < x_fac.num_rows() ; ++row)
   {
-    for (IT_ col(0) ; col < x_fac.columns() ; ++col)
+    for (IT_ col(0) ; col < x_fac.num_cols() ; ++col)
     {
       if(row == col)
       {
@@ -67,15 +69,16 @@ void run(PreferredBackend backend)
   std::cout<<backend<<" "<<DenseMatrix<DT_, IT_>::name()<<" "<<SparseMatrixCSR<DT_, IT_>::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<" rows/cols: " << size << "\n";
 
   //roughly 5 csr entries per row
-  double flops = 2. * double(5 * x.rows() * r.columns());
-  double bytes = 2. * double(5*2 * x.columns() * y.columns() + r.columns() * r.rows());
+  double flops = 2. * double(5 * x.num_rows() * r.num_cols());
+  double bytes = 2. * double(5*2 * x.num_cols() * y.num_cols() + r.num_cols() * r.num_rows());
   bytes *= sizeof(DT_);
 
   switch (backend)
   {
     case PreferredBackend::generic :
       {
-        auto func = [&] () { Arch::ProductMatMat::dsd_generic<DT_>(r.elements(), alpha, beta, x.val(), x.col_ind(), x.row_ptr(), x.used_elements(), y.elements(), r.rows(), r.columns(), x.columns()); };
+        //auto func = [&] () { Arch::ProductMatMat::dsd_generic<DT_>(r.elements(), alpha, beta, x.val(), x.col_ind(), x.row_ptr(), x.num_nzes(), y.elements(), r.num_rows(), r.num_cols(), x.num_cols()); };
+        auto func = [&] () { Arch::MatMatMultSparseDense::exec_generic<DT_,IT_>(r.elements_arbiter(), alpha, x.val_arbiter(), x.col_idx_arbiter(), x.row_ptr_arbiter(), x.num_nzes(), y.elements_arbiter(), Memory::Arbiter(), r.num_rows(), r.num_cols(), x.num_cols()); };
         run_bench(func, flops, bytes);
         break;
       }
@@ -83,7 +86,8 @@ void run(PreferredBackend backend)
 #ifdef FEAT_HAVE_CUDA
     case PreferredBackend::cuda :
       {
-        auto func = [&] () { Arch::ProductMatMat::dsd_cuda<DT_>(r.elements(), alpha, beta, x.val(), x.col_ind(), x.row_ptr(), x.used_elements(), y.elements(), r.rows(), r.columns(), x.columns()); };
+        //auto func = [&] () { Arch::ProductMatMat::dsd_cuda<DT_>(r.elements(), alpha, beta, x.val(), x.col_ind(), x.row_ptr(), x.num_nzes(), y.elements(), r.num_rows(), r.num_cols(), x.num_cols()); };
+        auto func = [&] () { Arch::MatMatMultSparseDense::exec_cuda<DT_,IT_>(r.elements_arbiter(), alpha, x.val_arbiter(), x.col_idx_arbiter(), x.row_ptr_arbiter(), x.num_nzes(), y.elements_arbiter(), Memory::Arbiter(), r.num_rows(), r.num_cols(), x.num_cols()); };
         run_bench(func, flops, bytes);
         break;
       }
@@ -93,7 +97,7 @@ void run(PreferredBackend backend)
       throw InternalError("unsupported arch detected!");
   }
 
-  MemoryPool::synchronize();
+  Runtime::synchronize_devices();
   std::cout<<"control norm: "<<double(r.norm_frobenius())<<"\n";
 }
 

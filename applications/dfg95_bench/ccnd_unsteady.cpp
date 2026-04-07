@@ -654,12 +654,12 @@ namespace DFG95
       const auto& loc_a = system_levels.at(i)->matrix_sys.local().block_a();
       const auto& loc_b = system_levels.at(i)->matrix_sys.local().block_b();
       const auto& loc_d = system_levels.at(i)->matrix_sys.local().block_d();
-      statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_a.used_elements() + loc_a.rows() + Index(1));
-      statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_b.used_elements() + loc_b.rows() + Index(1));
-      statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_d.used_elements() + loc_d.rows() + Index(1));
-      statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_a.template used_elements<LAFEM::Perspective::pod>());
-      statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_b.template used_elements<LAFEM::Perspective::pod>());
-      statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_d.template used_elements<LAFEM::Perspective::pod>());
+      statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_a.num_nzes() + loc_a.num_rows() + Index(1));
+      statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_b.num_nzes() + loc_b.num_rows() + Index(1));
+      statistics.bytes[Bytes::matrix_struct] += sizeof(IndexType) * std::size_t(loc_d.num_nzes() + loc_d.num_rows() + Index(1));
+      statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_a.num_nzes_raw());
+      statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_b.num_nzes_raw());
+      statistics.bytes[Bytes::matrix_values] += sizeof(DataType) * std::size_t(loc_d.num_nzes_raw());
     }
 
     /* ***************************************************************************************** */
@@ -703,9 +703,9 @@ namespace DFG95
 
     {
       // count non-zeros in a and b
-      statistics.counts[Counts::nnze_a] = the_system_level.matrix_sys.local().block_a().used_elements();
-      statistics.counts[Counts::nnze_b] = the_system_level.matrix_sys.local().block_b().used_elements();
-      statistics.counts[Counts::nnze_total] = the_system_level.matrix_sys.local().template used_elements<LAFEM::Perspective::pod>();
+      statistics.counts[Counts::nnze_a] = the_system_level.matrix_sys.local().block_a().num_nzes();
+      statistics.counts[Counts::nnze_b] = the_system_level.matrix_sys.local().block_b().num_nzes();
+      statistics.counts[Counts::nnze_total] = the_system_level.matrix_sys.local().num_nzes_raw();
     }
 
     /* ***************************************************************************************** */
@@ -967,7 +967,7 @@ namespace DFG95
         Assembly::DiscreteCellProjector::project(vtx_p, vec_sol.local().template at<1>(), the_domain_level.space_pres, cub);
 
         // write pressure
-        exporter.add_cell_scalar("pressure", vtx_p.elements());
+        exporter.add_cell_scalar("pressure", vtx_p);
 
         // finally, write the VTK file
         exporter.write(now_vtk_name, comm);
@@ -1049,9 +1049,15 @@ namespace DFG95
 
       // extract old checkpoint info
       XASSERTM(vcp_info.size() == Index(3), "invalid info vector size");
-      DataType cp_cur_time = vcp_info(Index(0));
-      DataType cp_delta_t  = vcp_info(Index(1));
-      Index cp_time_step   = Index(vcp_info(Index(2)));
+      DataType cp_cur_time = DataType(0);
+      DataType cp_delta_t  = DataType(0);
+      Index cp_time_step   = Index(1);
+      {
+        Memory::TypedView<DataType> vcp = vcp_info.elements_view_r();
+        cp_cur_time  = vcp(Index(0));
+        cp_delta_t   = vcp(Index(1));
+        cp_time_step = Index(vcp(Index(2)));
+      }
 
       // choose the restart time based on parameters
       time_step = (restart_step <= Index(0) ? cp_time_step : restart_step - Index(1));
@@ -1551,9 +1557,12 @@ namespace DFG95
 
         // set up info vector and write that one, too
         LAFEM::DenseVector<DataType, IndexType> vcp_info(Index(3));
-        vcp_info(Index(0), cur_time);
-        vcp_info(Index(1), delta_t);
-        vcp_info(Index(2), DataType(time_step));
+        {
+          Memory::TypedView<DataType> vcp = vcp_info.elements_view_w();
+          vcp[0u] = cur_time;
+          vcp[1u] = delta_t;
+          vcp[2u] = DataType(time_step);
+        }
         check_ctrl.add_object("info", vcp_info);
 
         // save checkpoint
@@ -1692,8 +1701,8 @@ namespace DFG95
           Assembly::DiscreteCellProjector::project(der_p, vec_def.local().template at<1>(), the_domain_level.space_pres, cub);
 
           // write pressure
-          exporter.add_cell_scalar("pressure", vtx_p.elements());
-          exporter.add_cell_scalar("pres_der", der_p.elements());
+          exporter.add_cell_scalar("pressure", vtx_p);
+          exporter.add_cell_scalar("pres_der", der_p);
 
           // finally, write the VTK file
           exporter.write(now_vtk_name, comm);

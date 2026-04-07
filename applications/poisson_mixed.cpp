@@ -126,9 +126,9 @@ namespace PoissonMixed
        *
        * \returns The number of columns
        */
-      Index columns() const
+      Index num_cols() const
       {
-        return matrix_b.columns();
+        return matrix_b.num_cols();
       }
 
       /**
@@ -139,9 +139,9 @@ namespace PoissonMixed
        *
        * \returns The number of columns
        */
-      Index rows() const
+      Index num_rows() const
       {
-        return matrix_d.columns();
+        return matrix_d.num_rows();
       }
 
       /**
@@ -151,44 +151,15 @@ namespace PoissonMixed
        *
        * \returns The total number of nonzeros in this matrix
        */
-      Index used_elements() const
+      Index num_nzes() const
       {
-        return matrix_a.used_elements() + matrix_b.used_elements() + matrix_d.used_elements();
+        return matrix_a.num_nzes() + matrix_b.num_nzes() + matrix_d.num_nzes();
       }
 
       /// \brief Returns the total amount of bytes allocated.
       std::size_t bytes() const
       {
         return _vec_ml.bytes() + _vec_mr.bytes();
-      }
-
-      void extract_diag(VectorTypeL& diag, bool sync=true) const
-      {
-
-        VectorTypeML lumped_matrix_a(matrix_a.create_vector_l());
-        matrix_a.local().lump_rows(lumped_matrix_a.local());
-        lumped_matrix_a.sync_0();
-        lumped_matrix_a.component_invert(lumped_matrix_a);
-
-        if(diag.get_gate() != nullptr && !diag.get_gate()->_ranks.empty() )
-        {
-          diag.format();
-
-          typename MatrixB::LocalMatrix matrix_b1(matrix_b.convert_to_1());
-
-          matrix_b1.add_trace_double_mat_mult(diag.local(), matrix_d.local(), lumped_matrix_a.local(), DataType(1));
-        }
-        else
-        {
-          matrix_d.local().row_norm2sqr(diag.local(), lumped_matrix_a.local());
-        }
-
-
-        if(sync)
-        {
-          diag.sync_0();
-        }
-
       }
 
       void apply(VectorTypeL& r, const VectorTypeR& x) const
@@ -486,8 +457,7 @@ namespace PoissonMixed
       //  matrix_sys.emplace_back(lvl.matrix_a, lvl.matrix_b, lvl.matrix_d, lvl.filter_velo, solver_a);
       //}
 
-      auto jac_smoother = Solver::new_jacobi_precond(matrix_sys.at(i), lvl.filter_pres, 0.7);
-      auto smoother = Solver::new_richardson(matrix_sys.at(i), lvl.filter_pres, 1.0, jac_smoother);
+      auto smoother = Solver::new_richardson(matrix_sys.at(i), lvl.filter_pres, 0.1);
       smoother->set_min_iter(4);
       smoother->set_max_iter(4);
       multigrid_hierarchy->push_level(matrix_sys.at(i), lvl.filter_pres, lvl.transfer_pres, smoother, smoother, smoother);
@@ -520,10 +490,10 @@ namespace PoissonMixed
       //  matrix_sys.emplace_back(lvl.matrix_a, lvl.matrix_b, lvl.matrix_d, lvl.filter_velo, solver_a);
       //}
 
-      auto coarse_precond = Solver::new_jacobi_precond(matrix_sys.back(), lvl.filter_pres, 0.7);
-      auto coarse_solver = Solver::new_richardson(matrix_sys.back(), lvl.filter_pres, 1.0, coarse_precond);
+      auto coarse_solver = Solver::new_richardson(matrix_sys.back(), lvl.filter_pres, 0.1);
       coarse_solver->set_min_iter(4);
       coarse_solver->set_max_iter(4);
+      //coarse_solver->set_plot_mode(Solver::PlotMode::iter);
       multigrid_hierarchy->push_level(matrix_sys.back(), lvl.filter_pres, coarse_solver);
     }
 
@@ -625,8 +595,8 @@ namespace PoissonMixed
       Assembly::DiscreteVertexProjector::project(vtx_rhs, vec_rhs.local(), the_domain_level.space_pres);
 
       // write velocity
-      exporter.add_vertex_scalar("sol", vtx_sol.elements());
-      exporter.add_vertex_scalar("rhs", vtx_rhs.elements());
+      exporter.add_vertex_scalar("sol", vtx_sol);
+      exporter.add_vertex_scalar("rhs", vtx_rhs);
 
       // finally, write the VTK file
       comm.print("Writing "+vtk_name);

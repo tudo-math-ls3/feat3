@@ -7,7 +7,7 @@
 #include <kernel/runtime.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/dist.hpp>
-#include <kernel/util/memory_pool.hpp>
+#include <kernel/util/memory_arbiter.hpp>
 #include <kernel/util/os_windows.hpp>
 #include <kernel/util/likwid_marker.hpp>
 #ifdef FEAT_HAVE_DEATH_HANDLER
@@ -42,7 +42,6 @@ using namespace FEAT;
 // static member initialization
 bool Runtime::_initialized = false;
 bool Runtime::_finalized = false;
-bool Runtime::SyncGuard::sync_on = true;
 
 #ifdef FEAT_HAVE_CUDSS
 static cudssHandle_t feat_cudss_handle = nullptr;
@@ -85,14 +84,15 @@ void Runtime::initialize(int& argc, char**& argv)
 
   // initialize likwid marker api
   FEAT_MARKER_INIT;
-  // initialize memory pool for main memory
-  MemoryPool::initialize();
 
 #ifdef FEAT_HAVE_CUDA
   // initialize memory pool for CUDA memory
   Util::cuda_initialize(my_rank, 1, 1, Util::cuda_get_device_count());
   Util::cuda_set_blocksize(256, 256, 256, 256, 256, 128);
 #endif
+
+  // initialize memory manager (after CUDA)
+  Memory::Manager::initialize(argc, argv);
 
 #ifdef FEAT_HAVE_CUDSS
   if(CUDSS_STATUS_SUCCESS != cudssCreate(&feat_cudss_handle))
@@ -421,8 +421,6 @@ void Runtime::initialize(int& argc, char**& argv)
   }
 
   _initialized = true;
-  // finally initialize Syncguard
-  SyncGuard::sync_on = true;
 }
 
 void Runtime::abort(bool dump_call_stack)
@@ -472,11 +470,12 @@ int Runtime::finalize()
     Runtime::abort();
   }
 
-  MemoryPool::finalize();
-
 #ifdef FEAT_HAVE_CUDSS
   cudssDestroy(feat_cudss_handle);
 #endif
+
+  // finalize memory manager (before CUDA)
+  Memory::Manager::finalize();
 
 #ifdef FEAT_HAVE_CUDA
   Util::cuda_finalize();
@@ -506,5 +505,12 @@ void* Runtime::get_cudss_handle()
   return feat_cudss_handle;
 #else
   return nullptr;
+#endif
+}
+
+void Runtime::synchronize_devices()
+{
+#ifdef FEAT_HAVE_CUDA
+  Util::cuda_synchronize();
 #endif
 }

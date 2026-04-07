@@ -29,13 +29,17 @@ void run(PreferredBackend backend)
 
   DenseMatrix<DT_, Index> x(size, size);
   DenseVector<DT_, Index> y(size);
-  for (Index i(0) ; i < size ; ++i)
   {
-    y.elements()[i]= -DT_(i%100) * DT_(0.1) * DT_(i%10);
-  }
-  for (Index i(0) ; i < size * size ; ++i)
-  {
-    x.elements()[i] = DT_(i%100) * DT_(0.5) * DT_(i%10);
+    Memory::TypedView<DT_> vx(x.elements_view_w());
+    Memory::TypedView<DT_> vy(y.elements_view_w());
+    for (Index i(0) ; i < size ; ++i)
+    {
+      vy[i]= -DT_(i%100) * DT_(0.1) * DT_(i%10);
+    }
+    for (Index i(0) ; i < size * size ; ++i)
+    {
+      vx[i] = DT_(i%100) * DT_(0.5) * DT_(i%10);
+    }
   }
 
   DenseVector<DT_, Index> r(size, 4711.);
@@ -43,10 +47,10 @@ void run(PreferredBackend backend)
   Backend::set_preferred_backend(backend);
   std::cout<<backend<<" "<<DM_::name()<<" "<<Type::Traits<DT_>::name()<<" rows/cols: " << size << "\n";
 
-  double flops(double(x.used_elements()));
+  double flops(double(x.num_nzes()));
   flops *= 2;
 
-  double bytes(double(x.used_elements()));
+  double bytes(double(x.num_nzes()));
   bytes *= double(sizeof(DT_));
   bytes += double(size * sizeof(DT_));
 
@@ -54,7 +58,7 @@ void run(PreferredBackend backend)
   auto func = [&] () { x.apply(r, y); };
   run_bench(func, flops, bytes);
 
-  MemoryPool::synchronize();
+  Runtime::synchronize_devices();
   std::cout<<"control norm: "<<double(r.norm2())<<"\n";
 }
 

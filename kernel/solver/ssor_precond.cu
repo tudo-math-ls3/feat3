@@ -5,9 +5,9 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-
 #include <kernel/util/exception.hpp>
-#include <kernel/util/memory_pool.hpp>
+#include <kernel/util/memory_aux.hpp>
+#include <kernel/util/cuda_util.hpp>
 
 #include <vector>
 #include <algorithm>
@@ -198,7 +198,7 @@ namespace FEAT
         }
 
         cudaDeviceSynchronize();
-#ifdef FEAT_DEBUG_MODE
+#ifdef DEBUG
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -224,7 +224,7 @@ namespace FEAT
         }
 
         cudaDeviceSynchronize();
-#ifdef FEAT_DEBUG_MODE
+#ifdef DEBUG
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -253,7 +253,7 @@ namespace FEAT
         }
 
         cudaDeviceSynchronize();
-#ifdef FEAT_DEBUG_MODE
+#ifdef DEBUG
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -285,7 +285,7 @@ namespace FEAT
         }
 
         cudaDeviceSynchronize();
-#ifdef FEAT_DEBUG_MODE
+#ifdef DEBUG
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));

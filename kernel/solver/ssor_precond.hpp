@@ -19,10 +19,10 @@ namespace FEAT
           int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr);
       int cuda_ssor_backward_apply(int m, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
           int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr);
-      template <int BlockSize_>
+      template <int block_size_>
       int cuda_ssor_forward_bcsr_apply(int m, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
           int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr);
-      template <int BlockSize_>
+      template <int block_size_>
       int cuda_ssor_backward_bcsr_apply(int m, double * y, const double * x, const double * csrVal, const int * csrColInd, int ncolors, double omega,
           int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr);
       void cuda_sor_done_symbolic(int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr);
@@ -115,7 +115,7 @@ namespace FEAT
         _filter(filter),
         _omega(omega)
       {
-        if (_matrix.columns() != _matrix.rows())
+        if (_matrix.num_cols() != _matrix.num_rows())
         {
           XABORTM("Matrix is not square!");
         }
@@ -127,7 +127,7 @@ namespace FEAT
         _filter(filter),
         _omega(1)
       {
-        if (_matrix.columns() != _matrix.rows())
+        if (_matrix.num_cols() != _matrix.num_rows())
         {
           XABORTM("Matrix is not square!");
         }
@@ -156,7 +156,7 @@ namespace FEAT
         _omega = omega;
       }
 
-       virtual void init_symbolic() override
+      virtual void init_symbolic() override
       {
       }
 
@@ -166,8 +166,8 @@ namespace FEAT
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
-        XASSERTM(_matrix.rows() == vec_cor.size(), "matrix / vector size mismatch!");
-        XASSERTM(_matrix.rows() == vec_def.size(), "matrix / vector size mismatch!");
+        XASSERTM(_matrix.num_rows() == vec_cor.size(), "matrix / vector size mismatch!");
+        XASSERTM(_matrix.num_rows() == vec_def.size(), "matrix / vector size mismatch!");
 
         TimeStamp ts_start;
 
@@ -182,7 +182,7 @@ namespace FEAT
 
         TimeStamp ts_stop;
         Statistics::add_time_precon(ts_stop.elapsed(ts_start));
-        Statistics::add_flops(_matrix.used_elements() *2 + 6 * vec_cor.size());
+        Statistics::add_flops(_matrix.num_nzes() *2 + 6 * vec_cor.size());
 
         return Status::success;
       }
@@ -191,12 +191,12 @@ namespace FEAT
       void _apply_intern(const LAFEM::SparseMatrixCSR<DataType, IndexType>& matrix, VectorType& vec_cor, const VectorType& vec_def)
       {
         // create pointers
-        DataType * pout(vec_cor.elements());
-        const DataType * pin(vec_def.elements());
-        const DataType * pval(matrix.val());
-        const IndexType * pcol_ind(matrix.col_ind());
-        const IndexType * prow_ptr(matrix.row_ptr());
-        const IndexType n((IndexType(matrix.rows())));
+        Memory::TypedView<DataType> pout(vec_cor.elements_view_rw());
+        const Memory::TypedView<DataType> pin(vec_def.elements_view_r());
+        const Memory::TypedView<DataType> pval(matrix.val_view_r());
+        const Memory::TypedView<IndexType> pcol_idx(matrix.col_idx_view_r());
+        const Memory::TypedView<IndexType> prow_ptr(matrix.row_ptr_view_r());
+        const IndexType n((IndexType(matrix.num_rows())));
 
         // __forward-insertion__
         // iteration over all rows
@@ -205,9 +205,9 @@ namespace FEAT
           IndexType col;
           DataType d(0);
           // iteration over all elements on the left side of the main-diagonal
-          for (col = prow_ptr[i]; pcol_ind[col] < i; ++col)
+          for (col = prow_ptr[i]; pcol_idx[col] < i; ++col)
           {
-            d += pval[col] * pout[pcol_ind[col]];
+            d += pval[col] * pout[pcol_idx[col]];
           }
           pout[i] = (pin[i] - _omega * d) / pval[col];
         }
@@ -220,22 +220,22 @@ namespace FEAT
           IndexType col;
           DataType d(0);
           // iteration over all elements on the right side of the main-diagonal
-          for (col = prow_ptr[i+1] - IndexType(1); pcol_ind[col] > i; --col)
+          for (col = prow_ptr[i+1] - IndexType(1); pcol_idx[col] > i; --col)
           {
-            d += pval[col] * pout[pcol_ind[col]];
+            d += pval[col] * pout[pcol_idx[col]];
           }
           pout[i] -= _omega * d / pval[col];
         }
       }
     }; // class SSORPrecondWithBackend<generic, SparseMatrixCSR>
 
-    template<typename Filter_, typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-    class SSORPrecondWithBackend<PreferredBackend::generic, LAFEM::SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>, Filter_> :
-      public SSORPrecondBase<typename LAFEM::SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>>
+    template<typename Filter_, typename DT_, typename IT_, int block_height_, int block_width_>
+    class SSORPrecondWithBackend<PreferredBackend::generic, LAFEM::SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>, Filter_> :
+      public SSORPrecondBase<typename LAFEM::SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>>
     {
-      static_assert(BlockHeight_ == BlockWidth_, "only square blocks are supported!");
+      static_assert(block_height_ == block_width_, "only square blocks are supported!");
     public:
-      typedef LAFEM::SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_> MatrixType;
+      typedef LAFEM::SparseMatrixBCSR<DT_, IT_, block_height_, block_width_> MatrixType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
       typedef typename MatrixType::DataType DataType;
@@ -252,9 +252,9 @@ namespace FEAT
         auto* pout(vec_cor.elements());
         const auto* pin(vec_def.elements());
         const auto* pval(matrix.val());
-        const IndexType * pcol_ind(matrix.col_ind());
+        const IndexType * pcol_idx(matrix.col_idx());
         const IndexType * prow_ptr(matrix.row_ptr());
-        const IndexType n((IndexType(matrix.rows())));
+        const IndexType n((IndexType(matrix.num_rows())));
         typename MatrixType::ValueType inverse;
 
         // __forward-insertion__
@@ -264,9 +264,9 @@ namespace FEAT
           IndexType col;
           typename VectorType::ValueType d(0);
           // iteration over all elements on the left side of the main-diagonal
-          for (col = prow_ptr[i]; pcol_ind[col] < i; ++col)
+          for (col = prow_ptr[i]; pcol_idx[col] < i; ++col)
           {
-            d += pval[col] * pout[pcol_ind[col]];
+            d += pval[col] * pout[pcol_idx[col]];
           }
           //pout[i] = (pin[i] - _omega * d) / pval[col];
           inverse.set_inverse(pval[col]);
@@ -281,9 +281,9 @@ namespace FEAT
           IndexType col;
           typename VectorType::ValueType d(0);
           // iteration over all elements on the right side of the main-diagonal
-          for (col = prow_ptr[i+1] - IndexType(1); pcol_ind[col] > i; --col)
+          for (col = prow_ptr[i+1] - IndexType(1); pcol_idx[col] > i; --col)
           {
-            d += pval[col] * pout[pcol_ind[col]];
+            d += pval[col] * pout[pcol_idx[col]];
           }
           //pout[i] -= _omega * d / pval[col];
           inverse.set_inverse(pval[col]);
@@ -310,7 +310,7 @@ namespace FEAT
         _filter(filter),
         _omega(omega)
       {
-        if (_matrix.columns() != _matrix.rows())
+        if (_matrix.num_cols() != _matrix.num_rows())
         {
           XABORTM("Matrix is not square!");
         }
@@ -322,7 +322,7 @@ namespace FEAT
         _filter(filter),
         _omega(1)
       {
-        if (_matrix.columns() != _matrix.rows())
+        if (_matrix.num_cols() != _matrix.num_rows())
         {
           XABORTM("Matrix is not square!");
         }
@@ -364,8 +364,8 @@ namespace FEAT
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
-        XASSERTM(_matrix.rows() == vec_cor.size(), "matrix / vector size mismatch!");
-        XASSERTM(_matrix.rows() == vec_def.size(), "matrix / vector size mismatch!");
+        XASSERTM(_matrix.num_rows() == vec_cor.size(), "matrix / vector size mismatch!");
+        XASSERTM(_matrix.num_rows() == vec_def.size(), "matrix / vector size mismatch!");
 
         TimeStamp ts_start;
 
@@ -378,7 +378,7 @@ namespace FEAT
 
         TimeStamp ts_stop;
         Statistics::add_time_precon(ts_stop.elapsed(ts_start));
-        Statistics::add_flops(_matrix.template used_elements<LAFEM::Perspective::pod>() * 2 + 6 * vec_cor.template size<LAFEM::Perspective::pod>());
+        Statistics::add_flops(_matrix.num_nzes_raw() * 2 + 6 * vec_cor.size_raw());
 
         return Status::success;
       }
@@ -410,6 +410,7 @@ namespace FEAT
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
       typedef typename MatrixType::DataType DataType;
+      typedef typename MatrixType::IndexType IndexType;
 
     protected:
       const MatrixType& _matrix;
@@ -447,7 +448,7 @@ namespace FEAT
         _inverse_row_ptr(nullptr),
         _ncolors(0)
       {
-        if (_matrix.columns() != _matrix.rows())
+        if (_matrix.num_cols() != _matrix.num_rows())
         {
           XABORTM("Matrix is not square!");
         }
@@ -463,7 +464,7 @@ namespace FEAT
         _inverse_row_ptr(nullptr),
         _ncolors(0)
       {
-        if (_matrix.columns() != _matrix.rows())
+        if (_matrix.num_cols() != _matrix.num_rows())
         {
           XABORTM("Matrix is not square!");
         }
@@ -497,7 +498,11 @@ namespace FEAT
 
       virtual void init_symbolic() override
       {
-        Intern::cuda_sor_init_symbolic((int)_matrix.rows(), (int)_matrix.used_elements(), _matrix.val(), (const int*)_matrix.row_ptr(), (const int*)_matrix.col_ind(), _ncolors,
+        Memory::TypedView<DataType> a = _matrix.val_view_r(Memory::Location::cuda);
+        // cast from 'unsigned int' to 'int'
+        Memory::TypedView<int> row_ptr(std::forward<Memory::View&&>(_matrix.row_ptr_view_r(Memory::Location::cuda)));
+        Memory::TypedView<int> col_idx(std::forward<Memory::View&&>(_matrix.col_idx_view_r(Memory::Location::cuda)));
+        Intern::cuda_sor_init_symbolic((int)_matrix.num_rows(), (int)_matrix.num_nzes(), a.get_r(), row_ptr.get_r(), col_idx.get_r(), _ncolors,
           _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
       }
 
@@ -508,13 +513,23 @@ namespace FEAT
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
-        XASSERTM(_matrix.rows() == vec_cor.size(), "matrix / vector size mismatch!");
-        XASSERTM(_matrix.rows() == vec_def.size(), "matrix / vector size mismatch!");
+        XASSERTM(_matrix.num_rows() == vec_cor.size(), "matrix / vector size mismatch!");
+        XASSERTM(_matrix.num_rows() == vec_def.size(), "matrix / vector size mismatch!");
 
         TimeStamp ts_start;
 
-        int status = Intern::cuda_ssor_forward_apply((int)vec_cor.size(), vec_cor.elements(), vec_def.elements(), (const double*)_matrix.val(), (const int*)_matrix.col_ind(), _ncolors, _omega, _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
-        status |= Intern::cuda_ssor_backward_apply((int)vec_cor.size(), vec_cor.elements(), vec_def.elements(), (const double*)_matrix.val(), (const int*)_matrix.col_ind(), _ncolors, _omega, _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
+        int status = 0;
+
+        {
+          Memory::TypedView<DataType> vx = vec_cor.elements_view_w(Memory::Location::cuda);
+          const Memory::TypedView<DataType> vb = vec_def.elements_view_r(Memory::Location::cuda);
+          const Memory::TypedView<DataType> a = _matrix.val_view_r(Memory::Location::cuda);
+          // cast from 'unsigned int' to 'int'
+          Memory::TypedView<int> col_idx(std::forward<Memory::View&&>(_matrix.col_idx_view_r(Memory::Location::cuda)));
+
+          status |= Intern::cuda_ssor_forward_apply((int)vec_cor.size(), vx.get_w(), vb.get_r(), a.get_r(), col_idx.get_r(), _ncolors, _omega, _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
+          status |= Intern::cuda_ssor_backward_apply((int)vec_cor.size(), vx.get_w(), vb.get_r(), a.get_r(), col_idx.get_r(), _ncolors, _omega, _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
+        }
 
         vec_cor.scale(vec_cor, _omega * (2.0 - _omega));
 
@@ -522,22 +537,23 @@ namespace FEAT
 
         TimeStamp ts_stop;
         Statistics::add_time_precon(ts_stop.elapsed(ts_start));
-        Statistics::add_flops(_matrix.used_elements() *2 + 6 * vec_cor.size());
+        Statistics::add_flops(_matrix.num_nzes() *2 + 6 * vec_cor.size());
 
         return (status == 0) ? Status::success :  Status::aborted;
       }
     }; // class SSORPrecondWithBackend<cuda, SparseMatrixCSR>
 
-    template<typename Filter_, int BlockHeight_, int BlockWidth_>
-    class SSORPrecondWithBackend<PreferredBackend::cuda, LAFEM::SparseMatrixBCSR<double, unsigned int, BlockHeight_, BlockWidth_>, Filter_> :
-      public SSORPrecondBase<typename LAFEM::SparseMatrixBCSR<double, unsigned int, BlockHeight_, BlockWidth_>>
+    template<typename Filter_, int block_height_, int block_width_>
+    class SSORPrecondWithBackend<PreferredBackend::cuda, LAFEM::SparseMatrixBCSR<double, unsigned int, block_height_, block_width_>, Filter_> :
+      public SSORPrecondBase<typename LAFEM::SparseMatrixBCSR<double, unsigned int, block_height_, block_width_>>
     {
-      static_assert(BlockHeight_ == BlockWidth_, "only square blocks are supported!");
+      static_assert(block_height_ == block_width_, "only square blocks are supported!");
     public:
-      typedef LAFEM::SparseMatrixBCSR<double, unsigned int, BlockHeight_, BlockWidth_> MatrixType;
+      typedef LAFEM::SparseMatrixBCSR<double, unsigned int, block_height_, block_width_> MatrixType;
       typedef Filter_ FilterType;
       typedef typename MatrixType::VectorTypeL VectorType;
       typedef typename MatrixType::DataType DataType;
+      typedef typename MatrixType::IndexType IndexType;
 
     protected:
       const MatrixType& _matrix;
@@ -575,7 +591,7 @@ namespace FEAT
         _inverse_row_ptr(nullptr),
         _ncolors(0)
       {
-        if (_matrix.columns() != _matrix.rows())
+        if (_matrix.num_cols() != _matrix.num_rows())
         {
           XABORTM("Matrix is not square!");
         }
@@ -591,7 +607,7 @@ namespace FEAT
         _inverse_row_ptr(nullptr),
         _ncolors(0)
       {
-        if (_matrix.columns() != _matrix.rows())
+        if (_matrix.num_cols() != _matrix.num_rows())
         {
           XABORTM("Matrix is not square!");
         }
@@ -625,7 +641,10 @@ namespace FEAT
 
       virtual void init_symbolic() override
       {
-        Intern::cuda_sor_init_symbolic((int)_matrix.rows(), (int)_matrix.used_elements(), _matrix.template val<LAFEM::Perspective::pod>(), (const int*)_matrix.row_ptr(), (const int*)_matrix.col_ind(), _ncolors,
+        Memory::TypedView<DataType> a = _matrix.val_view_raw_r(Memory::Location::cuda);
+        const Memory::TypedView<IndexType> row_ptr = _matrix.row_ptr_view_r(Memory::Location::cuda);
+        const Memory::TypedView<IndexType> col_idx = _matrix.col_idx_view_r(Memory::Location::cuda);
+        Intern::cuda_sor_init_symbolic((int)_matrix.num_rows(), (int)_matrix.num_nzes(), a.get_r(), row_ptr.get_r(), col_idx.get_r(), _ncolors,
           _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
       }
 
@@ -636,13 +655,22 @@ namespace FEAT
 
       virtual Status apply(VectorType& vec_cor, const VectorType& vec_def) override
       {
-        XASSERTM(_matrix.rows() == vec_cor.size(), "matrix / vector size mismatch!");
-        XASSERTM(_matrix.rows() == vec_def.size(), "matrix / vector size mismatch!");
+        XASSERTM(_matrix.num_rows() == vec_cor.size(), "matrix / vector size mismatch!");
+        XASSERTM(_matrix.num_rows() == vec_def.size(), "matrix / vector size mismatch!");
 
         TimeStamp ts_start;
 
-        int status = Intern::cuda_ssor_forward_bcsr_apply<BlockHeight_>((int)vec_cor.size(), vec_cor. template elements<LAFEM::Perspective::pod>(), vec_def.template elements<LAFEM::Perspective::pod>(), _matrix.template val<LAFEM::Perspective::pod>(), (const int*)_matrix.col_ind(), _ncolors, _omega, _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
-        status |= Intern::cuda_ssor_backward_bcsr_apply<BlockHeight_>((int)vec_cor.size(), vec_cor.template elements<LAFEM::Perspective::pod>(), vec_def.template elements<LAFEM::Perspective::pod>(), _matrix.template val<LAFEM::Perspective::pod>(), (const int*)_matrix.col_ind(), _ncolors, _omega, _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
+        int status = 0;
+
+        {
+          Memory::TypedView<DataType> vx = vec_cor.elements_view_raw_w(Memory::Location::cuda);
+          const Memory::TypedView<DataType> vb = vec_def.elements_view_raw_r(Memory::Location::cuda);
+          const Memory::TypedView<DataType> a = _matrix.val_view_raw_r(Memory::Location::cuda);
+          const Memory::TypedView<IndexType> col_idx = _matrix.col_idx_view_r(Memory::Location::cuda);
+
+          status |= Intern::cuda_ssor_forward_bcsr_apply<block_height_>((int)vec_cor.size(), vx.get_w(),vb.get_r(), a.get_r(), col_idx.get_r(), _ncolors, _omega, _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
+          status |= Intern::cuda_ssor_backward_bcsr_apply<block_height_>((int)vec_cor.size(), vx.get_w(), vb.get_r(), a.get_r(), col_idx.get_r(), _ncolors, _omega, _colored_row_ptr, _rows_per_color, _inverse_row_ptr);
+        }
 
         vec_cor.scale(vec_cor, _omega * (2.0 - _omega));
 
@@ -650,7 +678,7 @@ namespace FEAT
 
         TimeStamp ts_stop;
         Statistics::add_time_precon(ts_stop.elapsed(ts_start));
-        Statistics::add_flops(_matrix.template used_elements<LAFEM::Perspective::pod>() *2 + 6 * vec_cor.template size<LAFEM::Perspective::pod>());
+        Statistics::add_flops(_matrix.num_nzes_raw() *2 + 6 * vec_cor.size_raw());
 
         return (status == 0) ? Status::success :  Status::aborted;
       }

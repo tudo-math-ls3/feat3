@@ -68,8 +68,8 @@ namespace DbgAmaVanka
     public Assembly::BilinearOperator
   {
   public:
-    static constexpr int BlockHeight = nsc;
-    static constexpr int BlockWidth = dim;
+    static constexpr int block_height = nsc;
+    static constexpr int block_width = dim;
 
     static constexpr TrafoTags trafo_config = TrafoTags::none;
     static constexpr SpaceTags test_config = SpaceTags::value;
@@ -80,7 +80,7 @@ namespace DbgAmaVanka
       public BilinearOperator::Evaluator<AsmTraits_>
     {
     public:
-      typedef Tiny::Matrix<DataType, BlockHeight, BlockWidth> ValueType;
+      typedef Tiny::Matrix<DataType, block_height, block_width> ValueType;
       typedef typename AsmTraits_::TestBasisData TestBasisData;
       typedef typename AsmTraits_::TrialBasisData TrialBasisData;
 
@@ -141,8 +141,8 @@ namespace DbgAmaVanka
     public Assembly::BilinearOperator
   {
   public:
-    static constexpr int BlockHeight = dim;
-    static constexpr int BlockWidth = nsc;
+    static constexpr int block_height = dim;
+    static constexpr int block_width = nsc;
 
     static constexpr TrafoTags trafo_config = TrafoTags::none;
     static constexpr SpaceTags test_config = SpaceTags::value;
@@ -153,7 +153,7 @@ namespace DbgAmaVanka
       public BilinearOperator::Evaluator<AsmTraits_>
     {
     public:
-      typedef Tiny::Matrix<DataType, BlockHeight, BlockWidth> ValueType;
+      typedef Tiny::Matrix<DataType, block_height, block_width> ValueType;
       typedef typename AsmTraits_::TestBasisData TestBasisData;
       typedef typename AsmTraits_::TrialBasisData TrialBasisData;
 
@@ -212,7 +212,7 @@ namespace DbgAmaVanka
   {
     const std::size_t n = vs.size();
     std::vector<double> s11(n), s22(n), s12(n), s21(n);
-    const auto* s = vs.elements();
+    const auto s = vs.elements_view_r();
     for(std::size_t i(0); i < n; ++i)
     {
       s11[i] = s[i][0];
@@ -232,7 +232,7 @@ namespace DbgAmaVanka
   {
     const std::size_t n = vs.size();
     std::vector<double> s11(n), s22(n), s12(n);
-    const auto* s = vs.elements();
+    const auto s = vs.elements_view_r();
     for(std::size_t i(0); i < n; ++i)
     {
       s11[i] = s[i][0];
@@ -250,7 +250,7 @@ namespace DbgAmaVanka
   {
     const std::size_t n = vs.size();
     std::vector<double> s11(n), s22(n), s33(n), s12(n), s23(n), s31(n);
-    const auto* s = vs.elements();
+    const auto s = vs.elements_view_r();
     for(std::size_t i(0); i < n; ++i)
     {
       s11[i] = s[i][0];
@@ -393,7 +393,7 @@ namespace DbgAmaVanka
       std::cout << "Writing VTK file '" << vtk_name << ".vtu'...\n";
 
       Geometry::ExportVTK<MeshType> exporter(mesh);
-      exporter.add_vertex_scalar("sol", vec_sol.elements());
+      exporter.add_vertex_scalar("sol", vec_sol);
       exporter.write(vtk_name);
     }
   }
@@ -674,7 +674,7 @@ namespace DbgAmaVanka
       Assembly::DiscreteCellProjector::project(cell_pres, vec_sol_p, space_pres, cubature);
 
       // Now we can add the cell-projected pressure to our VTK exporter:
-      exporter.add_cell_scalar("pressure", cell_pres.elements());
+      exporter.add_cell_scalar("pressure", cell_pres);
 
       // finally, write the VTK file
       exporter.write(vtk_name);
@@ -926,7 +926,7 @@ namespace DbgAmaVanka
       Assembly::DiscreteCellProjector::project(cell_pres, vec_sol_p, space_pres, cubature);
 
       // Now we can add the cell-projected pressure to our VTK exporter:
-      exporter.add_cell_scalar("pressure", cell_pres.elements());
+      exporter.add_cell_scalar("pressure", cell_pres);
 
       // finally, write the VTK file
       exporter.write(vtk_name);

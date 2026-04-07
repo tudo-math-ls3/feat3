@@ -1055,9 +1055,12 @@ namespace FEAT
         const Index num_vertices = this->_mesh->get_num_vertices();
         SubdivisionLevels sdls(num_vertices);
 
-        for(Index i(0); i < num_vertices; ++i)
         {
-          sdls[i] = marker(i);
+          const auto vm = marker.elements_view_r();
+          for(Index i(0); i < num_vertices; ++i)
+          {
+            sdls[i] = vm(i);
+          }
         }
 
         AdaptiveMeshType adaptive_mesh(*this->_mesh);

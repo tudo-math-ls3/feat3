@@ -21,39 +21,42 @@ template <typename DT_, typename IT_>
 void run(PreferredBackend backend, const String filename, bool transpose)
 {
   DT_ alpha(1.);
-  DT_ beta(0.);
 
   Backend::set_preferred_backend(PreferredBackend::generic);
 
   SparseMatrixCSR<DT_, IT_> x(FileMode::fm_csr, filename);
   if (transpose)
     x=x.transpose();
-  std::cout<<"csr loaded "<<x.rows()<< " " <<x.columns()<<"\n";
+  std::cout<<"csr loaded "<<x.num_rows()<< " " <<x.num_cols()<<"\n";
 
 
-  DenseMatrix<DT_, Index> r(x.rows(), 5000, DT_(0)), y(x.columns(), 5000, DT_(2.345));
-  for (Index i(0) ; i < y.rows() ; ++i)
+  DenseMatrix<DT_, Index> r(x.num_rows(), 5000, DT_(0)), y(x.num_cols(), 5000, DT_(2.345));
   {
-    for (Index j(0) ; j < y.columns() ; ++j)
+    Memory::TypedView<DT_> vy(y.elements_view_w());
+    for (Index i(0) ; i < y.num_rows() ; ++i)
     {
-      y(i, j, DT_((1 + i*j) % 100));
+      for (Index j(0) ; j < y.num_cols() ; ++j)
+      {
+        vy[i*y.num_cols()+j] = DT_((1 + i*j) % 100);
+      }
     }
   }
 
   Backend::set_preferred_backend(backend);
 
 
-  std::cout<<backend<<" "<<DenseMatrix<DT_, IT_>::name()<<" "<<SparseMatrixCSR<DT_, IT_>::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<" rows/cols/dense: " << x.rows()<<" "<<x.columns()<< " "<<r.columns() << "\n";
+  std::cout<<backend<<" "<<DenseMatrix<DT_, IT_>::name()<<" "<<SparseMatrixCSR<DT_, IT_>::name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<<" rows/cols/dense: " << x.num_rows()<<" "<<x.num_cols()<< " "<<r.num_cols() << "\n";
 
-  double flops = 2. * double(x.used_elements() * y.columns());
-  double bytes = 2. * double(2 * x.used_elements() * x.columns() * y.columns() + r.columns() * r.rows());
+  double flops = 2. * double(x.num_nzes() * y.num_cols());
+  double bytes = 2. * double(2 * x.num_nzes() * x.num_cols() * y.num_cols() + r.num_cols() * r.num_rows());
   bytes *= sizeof(DT_);
 
   switch (backend)
   {
     case PreferredBackend::generic :
       {
-        auto func = [&] () { Arch::ProductMatMat::dsd_generic<DT_>(r.elements(), alpha, beta, x.val(), x.col_ind(), x.row_ptr(), x.used_elements(), y.elements(), r.rows(), r.columns(), x.columns()); };
+        //auto func = [&] () { Arch::ProductMatMat::dsd_generic<DT_>(r.elements(), alpha, beta, x.val(), x.col_ind(), x.row_ptr(), x.num_nzes(), y.elements(), r.num_rows(), r.num_cols(), x.num_cols()); };
+        auto func = [&] () { Arch::MatMatMultSparseDense::exec_generic<DT_,IT_>(r.elements_arbiter(), alpha, x.val_arbiter(), x.col_idx_arbiter(), x.row_ptr_arbiter(), x.num_nzes(), y.elements_arbiter(), Memory::Arbiter(), r.num_rows(), r.num_cols(), x.num_cols()); };
         run_bench(func, flops, bytes);
         break;
       }
@@ -61,7 +64,8 @@ void run(PreferredBackend backend, const String filename, bool transpose)
 #ifdef FEAT_HAVE_CUDA
     case PreferredBackend::cuda :
       {
-        auto func = [&] () { Arch::ProductMatMat::dsd_cuda<DT_>(r.elements(), alpha, beta, x.val(), x.col_ind(), x.row_ptr(), x.used_elements(), y.elements(), r.rows(), r.columns(), x.columns()); };
+        //auto func = [&] () { Arch::ProductMatMat::dsd_cuda<DT_>(r.elements(), alpha, beta, x.val(), x.col_ind(), x.row_ptr(), x.num_nzes(), y.elements(), r.num_rows(), r.num_cols(), x.num_cols()); };
+        auto func = [&] () { Arch::MatMatMultSparseDense::exec_cuda<DT_,IT_>(r.elements_arbiter(), alpha, x.val_arbiter(), x.col_idx_arbiter(), x.row_ptr_arbiter(), x.num_nzes(), y.elements_arbiter(), Memory::Arbiter(), r.num_rows(), r.num_cols(), x.num_cols()); };
         run_bench(func, flops, bytes);
         break;
       }
@@ -71,7 +75,7 @@ void run(PreferredBackend backend, const String filename, bool transpose)
       throw InternalError("unsupported arch detected!");
   }
 
-  MemoryPool::synchronize();
+  Runtime::synchronize_devices();
   std::cout<<"control norm: "<<double(r.norm_frobenius())<<"\n";
 }
 

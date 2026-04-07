@@ -1,0 +1,722 @@
+/** \page memory_arbiter The Memory Arbiter and its View classes
+
+This page describes the concepts and the usage of the FEAT::Memory::Arbiter class as well as its two
+closely related FEAT::Memory::View and FEAT::Memory::TypedView classes.
+
+\tableofcontents
+
+\section memarb_sec_motivation Motivation
+
+When using a computer with some sort of dedicated accelerator hardware -- typically a GPU -- one has
+to deal with the fact that the computer (or each individual compute node in case of a supercomputer
+cluster) now has two disjoint memory pools, namely the "main" or "host" memory, which is only
+accessible by the CPU, as well as the "device" memory, which is only accessible by the accelerator
+hardware's processor, e.g. the GPU. In consequence, if, say, a matrix has been assembled in main
+memory by the CPU and you then want to apply a fast linear solver that is running on the GPU on that
+matrix, then the matrix has to be moved/copied from the host memory to the device memory via the
+fairly slow PCI-express bus, because neither the CPU nor the GPU can directly access the other's
+memory pools.
+
+\image html images/memarb_cpu_gpu.svg
+
+The problem is that this transfer between host and device memory does not happen automagically,
+but instead it has to be performed explicitly by the programmer "by hand" whenever a memory transfer
+is required in the algorithm. For various reasons it is desirable to minimize the amount of memory
+transfers and the synchronizations between CPU and the accelerator that always have to be performed
+as part of the memory transfer; in simple terms: you do not want to copy a memory region from host
+to device memory if that same memory region has already been copied before and it's contents haven't
+changed since the last memory transfer has been performed, but obviously you \e must perform a
+memory transfer if the content \e has changed. Although this can be solved by very carefully
+tracking the flow of memory throughout the algorithm design phase, which may be perfectly feasible
+in fairly small specialist codes, but this approach is almost impossible to realize in a complex
+mathematical software framework consisting of hundreds of nested templated classes for any
+programmer who isn't on the same coding level as John Carmack.
+
+There exist concepts which automate these memory transfers as part of the underlying accelerator
+library (most notably Nvidia's managed memory support) on a page-by-page and access-by-access basic,
+ultimately freeing the programmer from all the headache of having to think about different memory
+pools and memory update patterns at all, but this functionality is not always available and, if it
+is available, it comes with an overhead that ranges from moderate to astronomical depending on
+various factors such as the accelerator type and the operating system (we have in fact measured a
+slowdown of factor 400 in the most extreme case as compared to a manual memcopy).
+
+Finally, the third possible solution to this problem is a middle way between the fully manual
+memory transfer by the programmer and the fully automated memory management by the library discussed
+above. This middle way still requires the programmer to explicitly request that data, e.g. the
+arrays that make up a matrix, is expected to be present in host and/or device memory at a specific
+step of the algorithm, but which leaves all the required book-keeping and the actual triggering of
+memory transfers between host and device to either a full-grown memory manager class or to a more
+light-weight smart-pointer class -- and the latter one is exactly what the memory arbiter in FEAT 3
+implements.
+
+\section memarb_sec_overview Overview
+
+All the classes, enums and helper functions related to the memory arbiter implementation in FEAT 3
+are located in the FEAT::Memory namespace. As mentioned in the motivation above, the memory arbiter
+is effectively just a light-weight smart pointer class similar to the <c>std::shared_ptr</c> class
+from the standard library, however, the memory arbiter can hold a copy of the data array in device
+memory of some accelerator device, which is typically GPU whose resources can be used by either
+Nvidia's CUDA library or AMD's HIP/ROCM library depending on whether you're using an Nvidia or AMD
+GPU -- please note that at the time of writing, AMD HIP/ROCM support has not yet been added to
+FEAT 3 and its memory arbiter classes, but the classes have been prepared so that this extension
+is fairly easy to implement.
+
+The memory arbiter has two important jobs to take care of: firstly, it needs to hold pointers to
+multiple data arrays, which are identical copies but residing in different memory pools (host and
+device[s]) and secondly, it needs to decide when a memory transfer between host and device needs to
+be performed to ensure that the data array in the memory location that the user intends to use in
+the next step of his/her algorithm contains an up-to-date state of the data array, no matter when
+and where the last write operation to the data array was performed. The latter task is the one that
+is tricky, because it requires some book-keeping on which memory location was last used to update
+the memory array contents and to be able to accomplish this in an efficient manner without deep
+interaction with the operating system's internal memory management, the user has to inform the
+memory arbiter whenever he/she intends to modify the arbiter's internal data array, which could in
+theory be done in a manual manner by the means of calling a member function of the arbiter that
+informs it that its internal data array has been updated, but this approach tends to be very error
+prone as users tend to forget to perform this call and these types of errors are almost impossible
+to hunt down and therefore a different mechanism based on \e views was implemented in FEAT 3.
+
+The memory arbiter holds the pointers to the arrays located in host and/or device memory, but it is
+not possible for the user to ask for a host or device memory pointer directly, instead the user has
+to request a \e view of the data for a specific memory location, i.e. host or device, with a
+specific set of access rights, i.e. read-only, read-write or write-only access. The view is only
+a small helper class that is usually instantiated as a <em>scope guard</em> object on the stack and
+that notifies the memory arbiter that it belongs to when it is destroyed once it goes out of scope;
+this allows for the automation of the necessary memory update/transfer book-keeping with minimal
+interaction from the user and, more importantly, it minimizes the risk of memory leaks or forgotten
+memory transfers by incorporating this functionality in the interaction of the memory arbiter and
+its related memory view class. The view object then allows the user to query the raw pointer (either
+in host or device memory) so that he/she can work directly on the raw data arrays without any
+additional overhead introduced by getter/setter function calls or the like.
+
+\section memarb_sec_arbiter The Memory Arbiter class
+
+As already mentioned in the overview, the FEAT::Memory::Arbiter class can be interpreted as a
+<em>smart pointer</em> class similar to <c>std::shared_ptr</c> that automatically synchronizes the
+content of the memory regions that it manages between multiple memory locations, e.g. main aka.
+host aka. system memory and CUDA aka. device aka. GPU memory. Technically, the FEAT::Memory::Arbiter
+class only contains a pointer to an instance of an FEAT::Memory::Block object on the heap, which
+contains and manages all the relevant pointers and book-keeping data, but the user never interacts
+with the memory block object directly, but only via a memory arbiter or a memory view object.
+The memory  block contains an internal reference counter, which is used to automatically free all
+the allocated memory arrays of the block once the last memory arbiter referencing that memory block
+is destroyed.
+
+A memory arbiter object is usually created on the stack or as a class member variable and during
+its constructor call, one at least hast to specify the number of bytes that are to be reserved for
+the data that is to be stored and managed in the arbiter's memory block. Once the arbiter goes out
+of scope, all of its allocated memory is freed unless another arbiter still holds a reference to
+the arbiters memory block:
+
+\code{.cpp}
+{
+  // create an arbiter for an array of 8 int objects
+  Memory::Arbiter arb(8u*sizeof(int));
+
+  // work with the arbiter's memory (see below)
+  ...
+
+  // once the arbiter goes out of scope, its memory is freed
+}
+\endcode
+
+\subsection memarb_arbiter_alloc_init Allocation and Initialization
+
+By default, the memory arbiter does not immediately allocate the memory as it procrastinates the
+allocation until the first view is created by the user or until the user calls the
+\ref FEAT::Memory::Arbiter::alloc "alloc" member function of the arbiter.
+However, it is also possible to tell the arbiter that it should allocate the memory in host and/or
+device memory upon construction.
+Furthermore, one can also tell the constructor how the data array is to be initialized with the
+following available options:
+
+- FEAT::Memory::Init::uninitialized : Leave the memory block uninitialized and therefore its
+  contents in an undefined state.
+
+- FEAT::Memory::Init::format_to_zero : Format all bits of the memory block to zero.
+
+- FEAT::Memory::Init::format_to_one : Format all bits of the memory block to one.
+
+- FEAT::Memory::Init::dont_care : You don't give a damn about what the content of the memory block
+  is initialized with.\n
+  Note: this is equal to FEAT::Memory::Init::uninitialized in optimized builds
+  and equal to FEAT::Memory::Init::format_to_one for debug builds.
+
+\attention Please note that FEAT::Memory::Init::format_to_one formats all <b><u>bits</u></b> of the
+memory block to one, which is fundamentally different from formatting all <b><u>array elements</u></b>
+to one, e.g. if an array of \c int objects if formatted bit-wise to 1 then each array element will
+have the value -1 according to [two's complement representation](https://en.wikipedia.org/wiki/Two%27s_complement),
+whereas an array of float or double objects that is formatted bit-wise to 1 has a value of
+[NaN](https://en.wikipedia.org/wiki/NaN) for each element according to the
+[IEEE-754 encoding](https://en.wikipedia.org/wiki/IEEE_754) of floating point numbers.
+This is in fact the intended behavior of \ref FEAT::Memory::Init::format_to_one "format_to_one",
+as this allows to identify read accesses to uninitialized memory, which is otherwise hard to find
+when the system's standard library formats uninitialized memory to zero.
+If you want to format an array of floating point values to a given floating point value, e.g. 1.0,
+then you have to use the \ref FEAT::Memory::Arbiter::format() "format" member function of the
+arbiter after its creation.
+
+\code{.cpp}
+// create an arbiter for an array of 8 int objects in main memory
+// and format the all bits of the array to zero
+Memory::Arbiter arb_1(8u*sizeof(int), Memory::Location::main, FEAT::Memory::Init::format_to_zero);
+
+// create an arbiter for an array of 4 double objects in CUDA memory
+// and format all bits of the array to one, which results in NaNs values
+Memory::Arbiter arb_2(4u*sizeof(double), Memory::Location::cuda, FEAT::Memory::Init::format_to_one);
+
+// work with the arbiter's memory
+...
+\endcode
+
+\subsection memarb_arbiter_copies Shallow and Deep Copies of Memory Arbiters
+
+Memory arbiters can be moved via the <c>std::move</c> function, but they cannot be copied using the
+copy constructor as it is deleted, which is to prevent the compiler from creating unintended copies.
+If one wants to create a <b>shallow copy</b> of an arbiter that shares the same memory block as the
+source arbiter that it was copied from, then can use the \ref FEAT::Memory::Arbiter::attach() "attach"
+member function of the arbiter.
+On the other hand, if one wants to create a <b>deep copy</b> that obtains an independent copy of the
+memory block, then one can use the \ref FEAT::Memory::Arbiter::clone() "clone" member function:
+
+\code{.cpp}
+// create an arbiter for 8 int's
+Memory::Arbiter arb_1(8u*sizeof(int), Memory::Location::main);
+
+... // format array of arb_1 to x[i] = i
+
+// create a shallow copy of arb_1
+Memory::Arbiter arb_2(arb_1.attach());
+
+// create a deep copy of arb_1
+Memory::Arbiter arb_3(arb_1.clone());
+
+...
+\endcode
+
+In the code above, \c arb_1 and \c arb_2 are both attached to the same memory block, whereas \c arb_3
+received an independent (deep) copy of the memory block referenced by \c arb_1 and \c arb_2.
+
+\image html images/memarb_attach_clone.svg
+
+It is also possible to attach or clone a sub-region of an arbiter's memory block rather than the
+entire source memory block by specifying an offset and a size for the attach or clone function.
+The following example creates a (source) memory arbiter consisting of 8 int objects and it attaches
+another arbiter that only references the 4 elements starting at the 2nd position in the array
+of the source arbiter:
+
+\code{.cpp}
+// create an arbiter for 8 int's
+Memory::Arbiter arb_1(8u*sizeof(int), Memory::Location::main);
+
+... // format array of arb_1 to x[i] = i
+
+// create a shallow copy range of arb_1
+Memory::Arbiter arb_2(arb_1.attach(2u*sizeof(int), 4u*sizeof(int));
+
+...
+\endcode
+
+In the code above, \c arb_1 and \c arb_2 are both attached to the same memory block, however,
+\c arb_2 only references the array elements [2, ..., 5]:
+
+\image html images/memarb_attach_range.svg
+
+In analogy, it is also possible to clone a range of a source memory arbiter, however, in this case
+one has to decide whether the entire source memory block is to be cloned or only the sub-region that
+is actually referenced by the memory arbiter; the default case is the latter one.
+
+\code{.cpp}
+// create an arbiter for 8 int's
+Memory::Arbiter arb_1(8u*sizeof(int), Memory::Location::main);
+
+... // format array of arb_1 to x[i] = i
+
+// create a deep copy range of arb_1's elements 2 through 5
+Memory::Arbiter arb_2(arb_1.clone(2u*sizeof(int), 4u*sizeof(int), false);
+
+// only 4 int objects cloned into block
+XASSERT(arb_2.block_bytes() ==  4u*sizeof(int)); // bytes in block
+XASSERT(arb_2.bytes() ==  4u*sizeof(int)); // bytes referenced by arbiter
+
+// create a deep copy of arb_1's array, but reference only elements 2 through 5
+Memory::Arbiter arb_3(arb_1.clone(2u*sizeof(int), 4u*sizeof(int), true);
+
+// all 8 int objects cloned into block, but only 4 referenced by arbiter
+XASSERT(arb_3.block_bytes() == 8u*sizeof(int)); // bytes in block
+XASSERT(arb_3.bytes() ==  4u*sizeof(int)); // bytes referenced by arbiter
+
+...
+\endcode
+In the code above, \c arb_1, \c arb_2 and \c arb_3 all reference independent memory blocks, where
+\c arb_2 references a memory block that contains only the four elements that were copied from the
+range [2, ..., 5] of source array from \c arb_1, wheres \c arb_3 references a memory block that
+contains copies of all 8 source array elements, but the arbiter \c arb_3 only references the
+range [2, ..., 5] of that block:
+
+\image html images/memarb_clone_range.svg
+
+As already mentioned, it is possible to explicitly tell an arbiter, which has not been allocated
+before, to allocate and optionally initialize its memory by manually calling the alloc member
+function, which also requires a (combination of) memory location(s) and the initialization
+parameters.
+
+\subsection sec_memarb_arbiter_release Freeing Memory and Releasing Arbiters
+
+It is typically not necessary to manually free an arbiter's resources as this is done automatically
+when the arbiter is destroyed by the usual reference-counting smart-pointer magic, but in some cases
+one wants to be able to either free the memory arrays for a specific memory location (e.g. to free
+up some precious GPU memory) or to release the arbiter prematurely and to allow it to free all of
+its attached resources unless another arbiter still references them, of course.
+If you just want to free the data arrays allocated by an arbiter for a specific (combination of)
+memory location(s), then you can use the \ref FEAT::Memory::Arbiter::free "free" member function
+to accomplish this. The arbiter will still be attached to the memory block, which now may not hold
+any data arrays anymore, but the arbiter will still remain in a valid state and a subsequent call to
+\ref FEAT::Memory::Arbiter::alloc "alloc" will re-allocate the arrays of the correct size that is
+still stored in the arbiter, but obviously the previous contents of the memory block will be lost.
+
+\attention
+The \ref FEAT::Memory::Arbiter::free "free" member function of the memory arbiter does not check
+whether more than one memory arbiter is attached to the memory block whose data array is to be freed,
+so it is in the user's responsibility to ensure that the data to be freed is not required elsewhere.
+
+Furthermore, you can also release (or "detach") an arbiter from its memory block by calling the
+\ref FEAT::Memory::Arbiter::release "release" member function, which will decrease the block's
+reference counter and free up all memory if this was the last arbiter referencing this particular
+block, and it will leave the arbiter in an empty state afterwards. Again, it is typically not
+required to do this, however, in some cases -- especially when the arbiter object is a member
+variable of some other object -- one sometimes wants to release the memory arbiter's data before
+the object containing the memory arbiter has reached the end of its lifetime.
+
+\section memarb_views Memory Views, Locations and Access Rights
+
+The \ref FEAT::Memory::Arbiter "Memory::Arbiter" class offers various functions to format and copy
+the memory regions referenced by the arbiter, but obviously one also needs some way to directly
+access the raw data array in either host/main or device/cuda memory. As already mentioned, the
+arbiter class does not offer any functions to \e directly access the data arrays of its memory
+block, simply because the arbiter needs to perform some book-keeping to keep the data arrays in
+host and device memory synchronized. Therefore, the only way to directly access the data arrays is
+by first creating a \e view for the memory, which then directly offers access to the underlying
+memory region via raw or typed pointers and element access operator overloads. The view acts
+primarily as a scope guard that notifies the arbiter when a user is finished reading and/or writing
+to its data array in a specific memory location. The secondary objective of the view is to act as
+a guard against race conditions, especially in the context of multi-threading or overlapping
+host-device algorithms to ensure that all memory locations are kept in synchronization whenever
+a memory location is accessed by a view.
+
+There are two view classes available for the memory arbiter system in FEAT, which are the
+FEAT::Memory::View class and the FEAT::Memory::TypedView<T_> class template, where the latter one
+is a derived class of the former one.
+Internally, the memory arbiter's block stores <c>void*</c> pointers to its data arrays
+and the (untemplated) \ref FEAT::Memory::View "View" class allows the user to query the size of the
+data array in bytes by calling its \ref FEAT::Memory::View::bytes() "bytes" member function
+and it allows to retrieve the raw \p void* pointer to the data array on the memory
+location that the view was created for via the \ref FEAT::Memory::View::raw_r() "raw_r" member
+function for a <c>const void*</c> pointer or via the \ref FEAT::Memory::View::raw_w() "raw_w"
+member function for a mutable <c>void*</c> pointer.
+
+The \ref FEAT::Memory::TypedView "TypedView" class template interprets the memory arbiter's data
+array as an array of elements of type \c T_ and it offers functions to query the number of elements
+of type \p T_ by calling the \ref FEAT::Memory::View::size() "size" member function, as well as
+the member functions \ref FEAT::Memory::TypedView::get_r() "get_r" and
+\ref FEAT::Memory::TypedView::get_w() "get_w" that return a <c>const T_*</c> and a mutable
+<c>T_*</c> pointer to the data array, respectively. Furthermore, this class also offers the two
+\ref FEAT::Memory::TypedView::operator[]() "operator[]" and
+\ref FEAT::Memory::TypedView::operator()() "operator()" overloads, which both offer array element
+access; the \ref FEAT::Memory::TypedView::operator[]() "operator[]" offers both a const and a
+mutable overload, whereas \ref FEAT::Memory::TypedView::operator()() "operator()" offers only
+a const version and is therefore recommended for read-only element access.
+
+\attention
+It is important to note that FEAT::Memory::View::raw_w(), FEAT::Memory::TypedView::get_w() as well
+as the mutable overload of FEAT::Memory::TypedView::operator[]() will throw a
+FEAT::Memory::AccessException if the view was not created with FEAT::Memory::Access::write or
+FEAT::Memory::Access::read_write access rights, see \ref sec_memarb_access. If you created a view
+with read-only access rights, then be sure to use the FEAT::Memory::View::raw_r() and
+FEAT::Memory::TypedView::get_r() member functions as well as the FEAT::Memory::TypedView::operator()()
+for pointer retrieval and element access, respectively. Also remember that the const overload of
+FEAT::Memory::TypedView::operator[]() will only be called by the compiler if you actually declared
+the view object itself as const -- using FEAT::Memory::TypedView::operator()() for read-only access
+circumvents this problem; see also the first example in \ref sec_memarb_access.
+
+Memory Views are designed to be fairly short-lived objects, which are typically created on the stack
+whenever an algorithm requires direct access to a memory arbiter's data, and which are destroyed
+by either going out of scope or by being explicitly released by calling its
+\ref FEAT::Memory::View::release "release" member function immediately after the algorithm is
+finished reading/writing the arbiter's data array contents. In many cases, an algorithm reads/writes
+to the same data array at different stages and in this case it is usually advisable to create a new
+view for each of these stages. It is possible to create views as member variables of some class,
+but in this case one has to keep in mind that the mapped views will prevent any write-views to be
+created for the same arbiter as long as their encapsulating object is not destroyed or until the
+views are released manually, therefore storing views as member variables should be avoided unless
+the encapsulating object is meant to be a short-lived object itself.
+
+\subsection sec_memarb_view_move Moving Views
+
+Instances of the FEAT::Memory::View class are moveable, but they are not copyable and they cannot be
+attached, shallow copied or deep cloned or anything similar like that. If a view object is moved into
+another view object that is still mapped, then the destination view will be first released before
+the source view is moved into it, i.e. there is nothing special to keep in mind when moving views.
+
+The move semantics of the FEAT::Memory::TypedView<T_> class template are a bit more interesting:
+- It is possible to move-construct or move-assign a FEAT::Memory::View object from a
+  FEAT::Memory::TypedView<T_> object regardless of the chosen type \c T_. (This simply a direct
+  consequence from the fact that the TypedView class template is derived from the View class.)
+- It is possible to move-construct or move-assign a FEAT::Memory::TypedView<T_> object from a
+  FEAT::Memory::View object regardless of the chosen type \c T_.
+- It is possible to move-construct or move-assign a FEAT::Memory::TypedView<T_> object from another
+  FEAT::Memory::TypedView<T_> object if and only if the source and destination are instanced
+  for the same type \c T_.
+- It is \b not possible to move-construct or move-assign a FEAT::Memory::TypedView<T1_> object from
+  another FEAT::Memory::TypedView<T2_> object for any type T2_ != T1_.
+
+The forbidden <em>typed view conversion</em> mentioned in the last point above is explicitly deleted
+by intention, as the conversion of typed views of different type is usually an unwanted error case
+and therefore allowing it would lead to hard-to-find bugs in many cases.
+If you \e really need to convert one <c>TypedView<T1_></c> object into another <c>TypedView<T2_></c>
+object for T1_ != T2_, e.g. when in the case <c>T1_ = signed int</c> and <c>T2_ = unsigned int</c>,
+then you can accomplish this by jumping through one extra hoop and wrapping the source object in
+an <c>std::forward<Memory::View&&></c> call, i.e.:
+
+\code{.cpp}
+Memory::Arbiter arb(64u);
+
+// create a signed int view
+Memory::TypedView<signed int> view_si(arb.view(Memory::Location::main, Memory::Access::read_write));
+
+// move-convert to unsigned int view
+Memory::TypedView<unsigned int> view_ui(std::forward<Memory::View&&>(std::move(view_si)));
+\endcode
+
+In analogy to the View class, it should be obvious that TypedView objects are also uncopyable and
+they cannot be attached, shallow copied or deep cloned or anything similar like that.
+
+\subsection sec_memarb_location Memory Locations
+
+Whenever you desire to directly access to the data array of a memory arbiter's block, you obviously
+need to decide whether you require a host (main) memory pointer, that you can use to modify directly
+from your C++ code, or whether you require a device (cuda) pointer that you can pass a CUDA library
+function or to a self-written CUDA kernel. When creating a view by calling the arbiters
+\ref FEAT::Memory::Arbiter::view() "view" or \ref FEAT::Memory::Arbiter::typed_view() "typed_view"
+member function, you simply have to specify the desired FEAT::Memory::Location enum value as the
+first function argument to obtain a view for that specific location and that view will then grant
+you access to the raw host (main) or device (cuda) pointer depending on which memory location the
+view was created for.
+
+Currently, the only two options that you have is FEAT::Memory::Location::main, which represent the
+"normal" host memory accessible to your C++ code, and FEAT::Memory::Location::cuda, which represents
+the "device" memory for a CUDA device for access by CUDA kernels or CUDA library functions.
+In future, this may be extended by support for other accelerator memory pools such as ROCM/HIP or
+something else.
+
+\subsection sec_memarb_access Memory Access Rights
+
+The second question that you have to ask yourself when creating a view for a memory arbiter's data
+array for a specific memory location is which access rights you require for your algorithm:
+
+- Do you require <b>read-and-write</b> access, because your algorithm may read and may overwrite
+  (some parts of) the data array?
+- Do you require <b>read-only</b> access, because your algorithm only reads the contents of the data
+  array but it never modifies it?
+- Do you require <b>write-only</b> access, because your algorithm <b>overwrites <u>the
+  entire data array</u></b> without reading its previous content? (see attention note further below)
+
+The answer to this question serves two purposes: firstly, it is used to prevent race conditions
+in multi-threaded or host-device overlapping codes and, secondly and more importantly, it is
+required by the arbiter's internal logic to determine when a memory transfer between host and
+device memory has to be performed, because for this the arbiter needs to know when the memory
+content might have been modified in one location and that therefore a memory transfer has to be
+initiated to upload the modified contents to another memory location when a read view for that
+location is to be created -- this is part of the book-keeping magic that we have mentioned a
+few times already.
+The desired memory access is specified as a (combination of) FEAT::Memory::Access enum value(s)
+as the second argument when calling the arbiter's \ref FEAT::Memory::Arbiter::view() "view" or
+\ref FEAT::Memory::Arbiter::typed_view() "typed_view" member function.
+
+There are three basic rules that determine how access rights are granted:
+
+- <u><b>Rule #1:</b></u> A write-only or read-write access view for a memory arbiter can only
+be created if there are currently no other views mapped for that particular memory arbiter.
+
+- <u><b>Rule #2:</b></u> If a write-only or read-write access view is mapped for a memory
+arbiter, then no other view can be mapped to that particular arbiter until the write access view
+is released.
+
+- <u><b>Rule #3:</b></u> Thirdly, as long as no write-only or read-write access view are
+mapped for a memory arbiter, one may create as many read-only views for that particular memory
+arbiter simultaneously on all available memory locations as one desires and the arbiter ensures
+that all requested memory locations are up-to-date.
+
+\attention
+When requesting a view with only FEAT::Memory::Access::write access rights (i.e. <u>not</u>
+FEAT::Memory::Access::read_write), then the arbiter <b>silently assumes that you will overwrite
+the <u>entire</u> data array accessible by the view</b> and therefore the arbiter \e may decide to
+not update the data array if the requested memory location is out-of-date before granting the view.
+If you intent to only overwrite parts of the memory region accessible by the view, e.g. as part of
+a \e scatter operation, then you <u><b>must</b></u> request FEAT::Memory::Access::read_write access
+even if you do not intend to read any data from the array, just to ensure that the arbiter
+synchronizes the memory locations (if necessary) before you starting writing values to the data
+array.\n
+<b>If in doubt</b>, then request a view with FEAT::Memory::Access::read_write access rights; in the
+worst case this might throw an exception in your face if two views for the same memory block are
+created concurrently, but it will at least ensure that the data arrays you are given access to are
+synchronized over all memory locations at the cost of (potentially) unnecessary memory transfers.
+
+\note
+When requesting a view with only FEAT::Memory::Access::write access rights for an arbiter that
+references a sub-region of the memory block's entire data array, i.e. when the arbiter's offset
+is > 0 and/or its size less than the entire block size minus the arbiter offset (see also
+\ref memarb_arbiter_copies) then the arbiter will automatically extend the requested access to
+\ref FEAT::Memory::Access::read_write "read_write" to ensure that the memory outside of the
+arbiter's sub-range is synchronized, as it cannot be entirely overwritten by the write-only view.
+In simple terms: you do not need to worry whether an arbiter is a sub-arbiter of another
+arbiter when asking for write-only access to overwrite the sub-arbiters entire data range.
+
+The following example creates two memory arbiters for arrays of 8 \c int objects, then initializes
+the first array as x[i] = i via a simple for loop, then performs a memcopy in cuda device memory
+from the first to the second arbiter and finally writes the contents of the second arbiter to the
+console:
+
+\code{.cpp}
+const std::size_t n = 8;
+
+// create two arbiters for an array of 8 int's
+Memory::Arbiter arb_1(n * sizeof(int));
+Memory::Arbiter arb_2(n * sizeof(int));
+
+// create a typed view with write access in main memory and initialize the array elements
+{
+  Memory::TypedView<int> view(arb_1.view(Memory::Location::main, Memory::Access::write));
+  for(std::size_t i(0); i < n; ++i)
+    view[i] = i; // use operator[] which is mutable
+}
+
+// create two raw views in cuda memory to copy arb_1's array to arb_2's array
+{
+  const Memory::View view_1(arb_1.view(Memory::Location::cuda, Memory::Access::read)); // [1]
+  Memory::View view_2(arb_2.view(Memory::Location::cuda, Memory::Access::write));
+  Memory::memcopy_cuda(arb_2.raw_w(); arb_1.raw_r(), arb_1.bytes());
+}
+
+// create a typed view with read access in main memory for arb_2 and print to console
+{
+  const Memory::TypedView<int> view(arb_2.view(Memory::Location::main, Memory::Access::read)); // [2]
+  for(std::size_t i(0); i < n; ++i)
+    std::cout << view(i) << "\n"; // use operator() which is const
+}
+\endcode
+
+In the code above, only two memory transfers are performed: in the line marked with <c>[1]</c>,
+the host memory array of \c arb_1 is copied into its device memory array, and in the line
+marked with <c>[2]</c>, the device memory array of \c arb_2 is copied into its host memory array.
+
+As already mentioned above, memory views are meant to be as short-lived as possible and so it is
+strongly recommended to put a block scope as small as possible directly around each algorithm
+segment that reads or writes data from/to a memory arbiter's block. Alternatively, if this results
+in a mess of nested block scopes, it is also possible to release a view prematurely by calling its
+\ref FEAT::Memory::View::release "release" member function. Note that you cannot directly
+<em>re-open</em> a view that has been released manually, but you can move a new view into the same
+view object if required and therefore reduce the number of temporarily opened view objects in a
+more complex algorithm:
+
+\code{.cpp}
+// create an arbiter for 64 bytes
+Memory::Arbiter arb(64u);
+
+// create a write view
+Memory::View v(arb.view(Memory::Location::main, Memory::Access::write));
+
+// do something with the view
+...
+
+// release view manually
+v.release();
+
+// do something else
+...
+
+// "re-open" closed view by assigning a new view to it
+v = arb.view(Memory::Location::main, Memory::Access::write);
+
+// do something more with the re-opened view
+...
+\endcode
+
+\section sec_memarb_overlap Overlapping Memory Views
+
+There exist some scenarios, in which it is either advantageous or even straight-out necessary to
+create multiple views with potentially different access rights on potentially different memory
+locations for one and the same memory block, but obviously only a subset of the whole cross product
+of access rights and memory locations can result in a well-defined state after all the views are
+destroyed.
+
+One example where overlapping views are necessary is multi-threaded assembly, where multiple threads
+are allowed to write to the same memory region at the same time, but then the assembly is responsible
+for preventing data race conditions by some means of thread synchronization or data partitioning.
+
+Another example, which is more of a convenience issue, is that for some algorithms, the output
+memory range might be identical to one of the input memory ranges and without overlapping views one
+would have to handle a plethora of different access rights by a potentially lengthy if-else cascade;
+a concrete example is the AXPY operation r := y + alpha*x, where four different cases could occur:
+- r, x and y are three different objects and therefore refer to different memory arbiters
+- r and x are the same object, but y is a different object
+- r and y are the same object, but x is a different object
+- r and x and y are the same object
+- Note that the case r != x = y is fairly uninteresting, as x and y are only read but not written to
+  and read views are implicitly allowed to overlap.
+
+So, to obey the memory access rules stated in \ref sec_memarb_access one would have to write the
+following:
+\code{.cpp}
+void axpy(Memory::Arbiter& r, Memory::Arbiter& y, Memory::Arbiter& x, DataType alpha)
+{
+  if((r == x) && (r == y))
+  {
+    Memory::TypedView<DataType> r_view(r.view(Memory::Location::main, Memory::Access::read_write));
+    axpy_impl(r_view, r_view, r_view, alpha);
+  }
+  else if(r == x)
+  {
+    Memory::TypedView<DataType> r_view(r.view(Memory::Location::main, Memory::Access::read_write));
+    Memory::TypedView<DataType> y_view(y.view(Memory::Location::main, Memory::Access::read));
+    axpy_impl(r_view, y_view, r_view, alpha);
+  }
+  else if(r == y)
+  {
+    Memory::TypedView<DataType> r_view(r.view(Memory::Location::main, Memory::Access::read_write));
+    Memory::TypedView<DataType> x_view(x.view(Memory::Location::main, Memory::Access::read));
+    axpy_impl(r_view, r_view, x_view, alpha);
+  }
+  else // x and y may or may not be the same arbiter
+  {
+    Memory::TypedView<DataType> r_view(r.view(Memory::Location::main, Memory::Access::write));
+    Memory::TypedView<DataType> x_view(x.view(Memory::Location::main, Memory::Access::read));
+    Memory::TypedView<DataType> y_view(y.view(Memory::Location::main, Memory::Access::read));
+    axpy_impl(r_view, y_view, x_view, alpha);
+  }
+}
+\endcode
+
+In consequence, it is necessary to provide the competent programmer with a method to
+bend the three rules stated it \ref sec_memarb_access a little bit. As stated in the third rule,
+it is possible to create overlapping read views, but one can also create overlapping write-only
+and/or read-write views by explicitly OR-combining the memory access flags with
+FEAT::Memory::Access::overlap, however, even then there are some rules in place:
+
+<u><b>Overlapping Write Rule #1:</b></u> If there are no views currently mapped to a memory arbiter,
+then an overlapping write (write-only or read-write) access view can be created for that arbiter.
+
+<u><b>Overlapping Write Rule #2:</b></u> If there is at least one overlapping write-access view
+currently mapped to a memory arbiter for a specific memory location, then another overlapping
+write-only or read-write or read-only view for the same memory location can be created for that
+particular memory arbiter.
+
+The two rules above imply the following corollaries:
+
+- Overlapping write/read views can only be created for the same memory location.
+- If overlapping write/read views are to be created for a memory arbiter, then the first (of the
+  overlapping) views that is created must be an overlapping write-only or read-write view;
+  in other words: If there is a non-overlapping write view or a read-only view mapped to an arbiter
+  then no overlapping write views can be created for that particular arbiter until those views are
+  released first.
+- If you want to overlap a read and a write access view, then the overlapping write access view
+  must be created first and the read access view second; the other way is not allowed.
+- Read views are implicitly overlapping, i.e. it is not necessary to include the
+  FEAT::Memory::Access::overlap when creating an overlapping read view.
+
+With overlapping write views, the AXPY example from above can be handled in a single case,
+where we have to create an overlapping write view for r as the very first step before creating
+(potentially overlapping) read views for x and y:
+\code{.cpp}
+void axpy(Memory::Arbiter& r, Memory::Arbiter& y, Memory::Arbiter& x, DataType alpha)
+{
+  Memory::TypedView<DataType> r_view(r.view(Memory::Location::main, Memory::Access::write | Memory::Access::overlap));
+  Memory::TypedView<DataType> x_view(x.view(Memory::Location::main, Memory::Access::read));
+  Memory::TypedView<DataType> y_view(y.view(Memory::Location::main, Memory::Access::read));
+  axpy_impl(r_view, y_view, x_view, alpha);
+}
+\endcode
+
+Here are some examples of what overlapping combinations are allowed and which result in an error:
+\code{.cpp}
+
+// create an arbiter for 64 bytes:
+Memory::Arbiter arb(64u);
+
+// OK: read-only views are implicitly allowed to overlap as wildly as desired
+{
+  Memory::View view_1(arb.view(Memory::Location::main, Memory::Access::read));
+  Memory::View view_2(arb.view(Memory::Location::main, Memory::Access::read));
+  Memory::View view_3(arb.view(Memory::Location::cuda, Memory::Access::read));
+  Memory::View view_4(arb.view(Memory::Location::cuda, Memory::Access::read));
+}
+
+// OK: three explicitly overlapping write views in same memory location
+{
+  Memory::View view_1(arb.view(Memory::Location::main, Memory::Access::write | Memory::Access::overlap));
+  Memory::View view_2(arb.view(Memory::Location::main, Memory::Access::write | Memory::Access::overlap));
+  Memory::View view_3(arb.view(Memory::Location::main, Memory::Access::read_write | Memory::Access::overlap));
+}
+
+// OK: explicitly overlapping write view allows read views to overlap on same memory location
+{
+  Memory::View view_1(arb.view(Memory::Location::main, Memory::Access::write | Memory::Access::overlap));
+  Memory::View view_2(arb.view(Memory::Location::main, Memory::Access::read));
+}
+
+// ERROR: write views are not implicitly allowed to overlap
+{
+  Memory::View view_1(arb.view(Memory::Location::main, Memory::Access::write));
+  Memory::View view_2(arb.view(Memory::Location::main, Memory::Access::write));
+}
+
+// ERROR: write and read views are not implicitly allowed to overlap
+{
+  Memory::View view_1(arb.view(Memory::Location::main, Memory::Access::write));
+  Memory::View view_2(arb.view(Memory::Location::main, Memory::Access::read));
+}
+
+// ERROR: (overlapping) write cannot be created if a read view already exists
+{
+  Memory::View view_1(arb.view(Memory::Location::main, Memory::Access::read));
+  Memory::View view_2(arb.view(Memory::Location::main, Memory::Access::write | Memory::Access::overlap));
+}
+
+// ERROR: two overlapping write views in different memory locations are not allowed
+{
+  Memory::View view_1(arb.view(Memory::Location::main, Memory::Access::write | Memory::Access::overlap));
+  Memory::View view_2(arb.view(Memory::Location::cuda, Memory::Access::write | Memory::Access::overlap));
+}
+
+// ERROR: read view cannot be mapped to a different memory location
+{
+  Memory::View view_1(arb.view(Memory::Location::main, Memory::Access::write | Memory::Access::overlap));
+  Memory::View view_2(arb.view(Memory::Location::cuda, Memory::Access::read));
+}
+
+// ERROR: first write view is not overlapping
+{
+  Memory::View view_1(arb.view(Memory::Location::main, Memory::Access::write));
+  Memory::View view_2(arb.view(Memory::Location::main, Memory::Access::write | Memory::Access::overlap));
+}
+
+// ERROR: second write view is not overlapping
+{
+  Memory::View view_1(arb.view(Memory::Location::main, Memory::Access::write | Memory::Access::overlap));
+  Memory::View view_2(arb.view(Memory::Location::main, Memory::Access::write));
+}
+\endcode
+
+As a final remark let it be said that the ability to overlap write views should be seen more as a
+\e workaround where the programmer takes responsibility to ensure that whatever he/she decides to
+do with the memory does not result in an inconsistent state between memory locations and that it
+does not result in a race condition, which can be pretty tricky depending on the algorithm. The
+usual non-overlapping memory access rules as stated in \ref sec_memarb_access exist for a reason and
+they are meant to help you by preventing many commonly overseen race conditions and therefore it
+is strongly advised that one only creates overlapping write-access views if that is either strictly
+necessary or circumventing them would result in lengthy if-else cascades and if the effects of
+overlapping write views are perfectly clear to you. You have been warned.
+
+\author Peter Zajac
+
+*/

@@ -51,12 +51,12 @@ namespace Stokes2Vtk
     const Index num_elems = space.get_mesh().get_num_elements();
 
     // assemble matrix structure if necessary
-    if(matrix.used_elements() == 0u)
+    if(matrix.num_nzes() == 0u)
     {
       const Index num_rows = row_bs * num_elems;
       matrix = LAFEM::SparseMatrixCSR<DT_, IT_>(row_bs * num_elems, col_bs * num_elems, row_bs * col_bs * num_elems);
-      IT_* row_ptr = matrix.row_ptr();
-      IT_* col_idx = matrix.col_ind();
+      Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_w();
+      Memory::TypedView<IT_> col_idx = matrix.col_idx_view_w();
 
       for(Index irow(0), inze(0); irow < num_rows; ++irow)
       {
@@ -82,8 +82,8 @@ namespace Stokes2Vtk
     // create space evaluation data
     typename AsmTraits::SpaceEvalData space_data;
 
-    const IT_* row_ptr = matrix.row_ptr();
-    DT_* val = matrix.val();
+    const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+    Memory::TypedView<DT_> val = matrix.val_view_rw();
 
     // loop over all elements
     for(Index ielem(0); ielem < num_elems; ++ielem)
@@ -382,7 +382,7 @@ namespace Stokes2Vtk
       String buffer;
       buffer.reserve(vec_velo_size * std::size_t(30*dim) + vec_pres_size * 30u);
       buffer += "<PointData>\n<DataArray type=\"Float64\" Name=\"velocity\" NumberOfComponents=\"" + stringify(dim) +"\" Format=\"ascii\">\n";
-      const Tiny::Vector<double, dim>* velo_val = vector.template at<0>().elements();
+      const Memory::TypedView<Tiny::Vector<double, dim>> velo_val = vector.template at<0>().elements_view_r();
       for(Index i(0); i < num_velo_dofs; ++i)
       {
         buffer += stringify(velo_val[i][0]);
@@ -398,7 +398,7 @@ namespace Stokes2Vtk
       if(want_diff)
       {
         buffer += "</DataArray>\n<DataArray type=\"Float64\" Name=\"velocity_diff\" NumberOfComponents=\"" + stringify(dim) +"\" Format=\"ascii\">\n";
-        const Tiny::Vector<double, dim>* velo_prev = vec_prev.template at<0>().elements();
+        const Memory::TypedView<Tiny::Vector<double, dim>> velo_prev = vec_prev.template at<0>().elements_view_r();
         for(Index i(0); i < num_velo_dofs; ++i)
         {
           buffer += stringify(velo_val[i][0] - velo_prev[i][0]);
@@ -417,7 +417,7 @@ namespace Stokes2Vtk
         // prolongate and write out pressure vector
         auto vec_p = pres_pol.create_vector_l();
         pres_pol.apply(vec_p, vector.template at<1>());
-        double* pres_val = vec_p.elements();
+        const Memory::TypedView<double> pres_val = vec_p.elements_view_r();
         const Index np = vec_p.size();
         buffer += "<CellData>\n<DataArray type=\"Float64\" Name=\"pressure\" Format=\"ascii\">\n";
         for(Index i(0); i < np; ++i)

@@ -7,6 +7,7 @@
 #include <kernel/base_header.hpp>
 
 #include <kernel/lafem/pointstar_factory.hpp>
+#include <kernel/lafem/sparse_vector_factory.hpp>
 #include <kernel/global/gate.hpp>
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/vector.hpp>
@@ -62,14 +63,14 @@ public:
   static MirrorType create_mirror_0(const int n, const int k)
   {
     MirrorType mirror((Index)n, 1);
-    mirror.indices()[0] = Index(k);
+    mirror.indices_view_w()[0] = Index(k);
     return mirror;
   }
 
   static MirrorType create_mirror_1(const int n, const int m, const int o, const int p)
   {
     MirrorType mirror((Index)n, (Index)m);
-    IndexType* idx = mirror.indices();
+    Memory::TypedView<IndexType> idx = mirror.indices_view_w();
     for(int i(0); i < m; ++i)
       idx[Index(i)] = Index(o + i * p);
     return mirror;
@@ -187,14 +188,15 @@ public:
     matrix.local() = psf.matrix_csr_neumann();
 
     // create global filter
-    GlobalFilterType filter(m*m);
+    LAFEM::SparseVectorFactory<DT_, IT_> filter_factory(m*m);
     for(const auto& mir : bnds)
     {
       const Index n = mir.num_indices();
-      const IndexType* idx = mir.indices();
+      const Memory::TypedView<IndexType> idx = mir.indices_view_r();
       for(Index i(0); i < n; ++i)
-        filter.local().add(idx[i], DT_(0));
+        filter_factory.add(idx[i], DT_(0));
     }
+    GlobalFilterType filter(filter_factory.make_sv());
 
     // >>>>> DEBUG >>>>>
     /*
@@ -231,7 +233,7 @@ public:
       const IT_ jj = IT_(comm.rank()) % IT_(np);
 
       const IT_ n = IT_(isqrt(vec_ref.local().size()));
-      DataType* v = vec_ref.local().elements();
+      Memory::TypedView<DataType> v = vec_ref.local().elements_view_w();
 
       // global size in one dimension; remember 1 DOF overlap
       const IT_ gn = IT_(np) * (n - IT_(1)) + IT_(1);
@@ -339,19 +341,19 @@ public:
 }; // class DirectSparseSolverTest<...>
 
 #ifdef FEAT_HAVE_UMFPACK
-DirectSparseSolverTest<double, Index> direct_sparse_solver_test_double_index_umfpack("umfpack");
+SPAWN_UNIT_TEST_2T_P(DirectSparseSolverTest, double, Index, "umfpack");
 #endif
 
 #ifdef FEAT_HAVE_SUPERLU_DIST
-DirectSparseSolverTest<double, Index> direct_sparse_solver_test_double_index_superlu("superlu");
+SPAWN_UNIT_TEST_2T_P(DirectSparseSolverTest, double, Index, "superlu");
 #endif
 
 #ifdef FEAT_HAVE_CUDSS
-DirectSparseSolverTest<double, Index> direct_sparse_solver_test_double_index_cudss("cudss");
+SPAWN_UNIT_TEST_2T_P(DirectSparseSolverTest, double, Index, "cudss");
 #endif
 
 #ifdef FEAT_HAVE_MKL
-DirectSparseSolverTest<double, Index> direct_sparse_solver_test_double_index_mkldss("mkldss");
+SPAWN_UNIT_TEST_2T_P(DirectSparseSolverTest, double, Index, "mkldss");
 #endif
 
 #ifdef FEAT_HAVE_MUMPS

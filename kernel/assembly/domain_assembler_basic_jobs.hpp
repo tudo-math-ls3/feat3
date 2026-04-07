@@ -1139,8 +1139,8 @@ namespace FEAT
       const typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
     {
       XASSERTM(dom_asm.get_trafo() == space.get_trafo(), "domain assembler and space have different trafos");
-      XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix column count");
-      XASSERTM(matrix.rows() == space.get_num_dofs(), "invalid matrix row count");
+      XASSERTM(matrix.num_cols() == space.get_num_dofs(), "invalid matrix column count");
+      XASSERTM(matrix.num_rows() == space.get_num_dofs(), "invalid matrix row count");
 
       DomainAssemblyBilinearOperatorMatrixJob1<BilOp_, Matrix_, Space_> job(
         bilinear_operator, matrix, space, cubature, alpha);
@@ -1303,8 +1303,8 @@ namespace FEAT
     {
       XASSERTM(dom_asm.get_trafo() == test_space.get_trafo(), "domain assembler and test space have different trafos");
       XASSERTM(dom_asm.get_trafo() == trial_space.get_trafo(), "domain assembler and trial space have different trafos");
-      XASSERTM(matrix.columns() == trial_space.get_num_dofs(), "invalid matrix column count");
-      XASSERTM(matrix.rows() == test_space.get_num_dofs(), "invalid matrix row count");
+      XASSERTM(matrix.num_cols() == trial_space.get_num_dofs(), "invalid matrix column count");
+      XASSERTM(matrix.num_rows() == test_space.get_num_dofs(), "invalid matrix row count");
 
       DomainAssemblyBilinearOperatorMatrixJob2<BilOp_, Matrix_, TestSpace_, TrialSpace_> job(
         bilinear_operator, matrix, test_space, trial_space, cubature, alpha);
@@ -2219,6 +2219,7 @@ namespace FEAT
 
       /// our output vectortype
       typedef typename Intern::OutVectorHelper<DataType, Index, max_der_>::VectorType OutVectorType;
+      typedef typename OutVectorType::ValueType OutVectorValueType;
 
       /// our cell fucntion integral type
       typedef FunctionCellIntegralInfo<FunctionIntegralType, OutVectorType> FunctionCellIntegralType;
@@ -2340,11 +2341,14 @@ namespace FEAT
 
         void scatter()
         {
+          /// the view for the output vector
+          Memory::TypedView<OutVectorValueType> out_vector_view = out_vector.elements_view_rw();
+
           // get cell index
           Index cell = dof_mapping.get_current_cell_index();
           if constexpr(max_der_ == 0)
           {
-            out_vector(cell, cell_integral.norm_h0_sqr);
+            out_vector_view[cell] = cell_integral.norm_h0_sqr;
           }
           else
           {
@@ -2355,7 +2359,7 @@ namespace FEAT
             if constexpr(max_der_ > 1)
               loc_vec[2] = cell_integral.norm_h2_sqr;
             //scatter the tiny vector
-            out_vector(cell, loc_vec);
+            out_vector_view[cell] = loc_vec;
           }
         }
 

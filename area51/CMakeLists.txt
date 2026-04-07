@@ -68,6 +68,9 @@ target_link_libraries(dbg-isoparam-3 feat)
 add_executable(dbg-integrator dbg_integrator.cpp)
 target_link_libraries(dbg-integrator feat)
 
+add_executable(dbg-memory-arbiter dbg_memory_arbiter.cpp)
+target_link_libraries(dbg-memory-arbiter feat)
+
 add_executable(dbg-mesh-width dbg_mesh_width.cpp)
 target_link_libraries(dbg-mesh-width feat)
 

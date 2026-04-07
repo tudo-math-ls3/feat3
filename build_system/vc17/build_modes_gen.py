@@ -30,6 +30,7 @@ build_tags = [
   'omp',
   'mkl',
   'mpi',
+  "eickt"
 ]
 
 # enabled build modes
@@ -40,7 +41,8 @@ build_modes = [
   'dbg-mkl', 'opt-mkl',
   'dbg-cuda', 'opt-cuda',
   'dbg-cuda-mkl-omp', 'opt-cuda-mkl-omp',
-  'dbg-cuda-mkl-omp-mpi', 'opt-cuda-mkl-omp-mpi'
+  'dbg-cuda-mkl-omp-mpi', 'opt-cuda-mkl-omp-mpi',
+  'dbg-cuda-mkl-eickt', 'opt-cuda-mkl-eickt',
 ]
 platforms = ['x64']
 
@@ -69,6 +71,7 @@ for bm in build_modes:
   fo.write(modeline(bm, 'mpi', 'EnableMPI'))
   fo.write(modeline(bm, 'mkl', 'EnableMKL'))
   fo.write(modeline(bm, 'cuda', 'EnableCUDA'))
+  fo.write(modeline(bm, 'eickt', 'EnableEICKT'))
   fo.write('</PropertyGroup>\n')
 fo.write('</Project>\n')
 fo.close()

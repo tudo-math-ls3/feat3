@@ -549,10 +549,13 @@ namespace FETI{
       const IndexType local_size = mirror_dofs[dom_index +1] - start_size;
       LocalVectorType tmp(local_size);
       tmp.format();
+      auto tv = tmp.elements_view_w();
+      auto vv = vector.elements_view_r();
       for(IndexType i(0); i < local_size; ++i)
       {
-        tmp(i, vector(start_size +i));
+        tv[i] = vv(start_size + i);
       }
+      tv.release();
       return tmp;
     }
 
@@ -688,14 +691,14 @@ namespace FETI{
      */
     void vector_update(std::vector<LocalVectorType> &target, std::vector<LocalVectorType> &input, DataType scalar)
     {
-      DataType tmp = 0;
       for(IndexType i(0); i < gate_ranks_size ; ++i)
       {
         XASSERTM(target[i].size() == input[i].size(), "Sizes do not match!");
+        auto tv = target[i].elements_view_rw();
+        auto iv = input[i].elements_view_r();
         for(IndexType j(0); j < target[i].size(); ++j)
         {
-          tmp = target[i](j);
-          target[i](j, tmp + scalar*input[i](j));
+          tv[j] += scalar*iv(j);
         }
       }
     }
@@ -706,14 +709,14 @@ namespace FETI{
      */
     void vector_update_alt(std::vector<LocalVectorType> &target, std::vector<LocalVectorType> &input, DataType scalar)
     {
-      DataType tmp = 0;
       for(IndexType i(0); i < gate_ranks_size ; ++i)
       {
         XASSERTM(target[i].size() == input[i].size(), "Sizes do not match!");
+        auto tv = target[i].elements_view_rw();
+        auto iv = input[i].elements_view_r();
         for(IndexType j(0); j < target[i].size(); ++j)
         {
-          tmp = target[i](j);
-          target[i](j, scalar*tmp + input[i](j));
+          tv[j] = scalar*tv[j] + iv(j);
         }
       }
     }
@@ -772,10 +775,12 @@ namespace FETI{
     {
       IndexType n = 2*(this->neighbour_maxsize +1);
       BufferMain buff(n);
+      auto vb = buff.elements_view_w();
       if(!this->floating)
       {
-        buff(0, double(this->domain_rank));
-        buff(n/2, 1.);
+        vb[0] = double(this->domain_rank);
+        vb[n/2] =  1.;
+        vb.release();
         return buff;
       }
       IndexType counter = 0;
@@ -788,11 +793,12 @@ namespace FETI{
           continue;
         }
         DataType scalar = DataType(this->mirror_dofs[i+1] - this->mirror_dofs[i]);
-        buff(i-counter, DataType(neighbour));
-        buff(i-counter+(n/2), -scalar);
+        vb[i-counter] = DataType(neighbour);
+        vb[i-counter+(n/2)] = -scalar;
       }
-      buff(gate_ranks_size-counter, DataType(this->domain_rank));
-      buff(gate_ranks_size-counter+(n/2), DataType(this->mirror_dofs.back()));
+      vb[gate_ranks_size-counter] =  DataType(this->domain_rank);
+      vb[gate_ranks_size-counter+(n/2)] = DataType(this->mirror_dofs.back());
+      vb.release();
       return buff; //no mobe, because buff is a local object...
     }
 
@@ -879,10 +885,11 @@ namespace FETI{
       {
         // we calculate the scalarproduct on the domain itself and between its neighbours in one loop
         // in parallel: each domain constructs its own row...
+        const auto rbi = recv_bufs.at(i).elements_view_r();
         for(IndexType j(0); j < neighbour_maxsize +1; ++j)
         {
-          factory.add(i, IndexType(recv_bufs.at(i)(j)), recv_bufs.at(i)(j+neighbour_maxsize+1));
-          if(IndexType(recv_bufs.at(i)(j)) == i)
+          factory.add(i, IndexType(rbi(j)), rbi(j+neighbour_maxsize+1));
+          if(IndexType(rbi(j)) == i)
             break;
         }
       }
@@ -899,15 +906,17 @@ namespace FETI{
 
     void assemble_lambda_0(std::vector<std::shared_ptr<LocalDomain>> &domain_vec)
     {
+      auto rsb = right_side_buffer.elements_view_rw();
       for(IndexType i(0); i < domain_vec.size() ; ++i)
       {
         //negativ sign because ive done this in my matlab code too... have to think about this, but if a \in range(R) also -a should be...
         // so this should also be a admissible start vector...
         if(domain_vec[i]->floating)
-            right_side_buffer(i, -domain_vec[i]->vec_rhs_local.dot(domain_vec[i]->R_vector));
+          rsb[i] = -domain_vec[i]->vec_rhs_local.dot(domain_vec[i]->R_vector);
         else
-          right_side_buffer(i, 0.);
+          rsb[i] = 0.;
       }
+      rsb.release();
       Q_factorized->apply(right_side, right_side_buffer);
       //now apply each BR to right_side
       for(auto it = domain_vec.begin() ; it != domain_vec.end() ; ++it)
@@ -929,12 +938,13 @@ namespace FETI{
       //this should not be needed... for now we format these vectors
       right_side.format();
       right_side_buffer.format();
+      auto rsb = right_side_buffer.elements_view_rw();
 
       for(IndexType loc_index(0); loc_index < domain_vec.size() ; ++loc_index)
       {
         if(!domain_vec[loc_index]->floating)
         {
-          right_side_buffer(loc_index, 0.);
+          rsb[loc_index] = 0.;
           continue;
         }
         DataType scalar{0};
@@ -944,16 +954,16 @@ namespace FETI{
         {
           LocalVectorType tmp_R = loc->gate_mirrors[i].create_buffer(loc->R_vector);
           loc->gate_mirrors[i].gather(tmp_R, loc->R_vector);
-          DataType val = 0;
+          auto trv = tmp_R.elements_view_rw();
           for(IndexType j(0); j < tmp_R.size(); ++j)
           {
-            val = tmp_R(j);
-            tmp_R(j, loc->gate_signs[i]*val);
+            trv[j] = loc->gate_signs[i]*trv[j];
           }
           scalar += tmp_R.dot(loc->residuum[i]);
         }
-        right_side_buffer(loc_index, scalar);
+        rsb[loc_index] = scalar;
       }
+      rsb.release();
       Q_factorized->apply(right_side, right_side_buffer);
 
      //now distribute right side to each domain... as we distributed BR beforehand, this can be applied locally
@@ -981,12 +991,13 @@ namespace FETI{
       //this should not be needed... for now we format these vectors
       right_side.format();
       right_side_buffer.format();
+      auto rsb = right_side_buffer.elements_view_rw();
 
       for(IndexType loc_index(0); loc_index < domain_vec.size() ; ++loc_index)
       {
         if(!domain_vec[loc_index]->floating)
         {
-          right_side_buffer(loc_index, 0.);
+          rsb[loc_index] = 0.;
           continue;
         }
         DataType scalar{0};
@@ -996,16 +1007,16 @@ namespace FETI{
         {
           LocalVectorType tmp_R = loc->gate_mirrors[i].create_buffer(loc->R_vector);
           loc->gate_mirrors[i].gather(tmp_R, loc->R_vector);
-          DataType val = 0;
+          auto trv = tmp_R.elements_view_rw();
           for(IndexType j(0); j < tmp_R.size(); ++j)
           {
-            val = tmp_R(j);
-            tmp_R(j, loc->gate_signs[i]*val);
+            trv[j] =  loc->gate_signs[i]*trv[j];
           }
           scalar += tmp_R.dot(loc->w[i]);
         }
-        right_side_buffer(loc_index, scalar);
+        rsb[loc_index] = scalar;
       }
+      rsb.release();
       Q_factorized->apply(right_side, right_side_buffer);
 
      //now distribute right side to each domain... as we distributed BR beforehand, this can be applied locally
@@ -1032,12 +1043,13 @@ namespace FETI{
       //this should not be needed... for now we format these vectors
       right_side.format();
       right_side_buffer.format();
+      auto rsb = right_side_buffer.elements_view_rw();
 
       for(IndexType loc_index(0); loc_index < domain_vec.size() ; ++loc_index)
       {
         if(!domain_vec[loc_index]->floating)
         {
-          right_side_buffer(loc_index, 0.);
+          rsb[loc_index] = 0.;
           continue;
         }
         DataType scalar{0};
@@ -1047,16 +1059,16 @@ namespace FETI{
         {
           LocalVectorType tmp_R = loc->gate_mirrors[i].create_buffer(loc->R_vector);
           loc->gate_mirrors[i].gather(tmp_R, loc->R_vector);
-          DataType val = 0;
+          auto trv = tmp_R.elements_view_rw();
           for(IndexType j(0); j < tmp_R.size(); ++j)
           {
-            val = tmp_R(j);
-            tmp_R(j, loc->gate_signs[i]*val);
+            trv[j] = loc->gate_signs[i]*trv[j];
           }
           scalar += tmp_R.dot(loc->residuum_copy[i]);
         }
-        right_side_buffer(loc_index, scalar);
+        rsb[loc_index] = scalar;
       }
+      rsb.release();
       Q_factorized->apply(right_side, right_side_buffer);
 
 
@@ -1219,9 +1231,11 @@ namespace FETI{
           LocalVectorType & second = domain_vec[IndexType((*it)->gate_ranks[i])]->Fs_vector[this_index];
 
           XASSERTM(first.size() == second.size(), "Sizes do not match");
-          for(IndexType j(0); j<first.size(); ++j)
+          const auto vf = first.elements_view_r();
+          const auto vs = second.elements_view_r();
+          for(IndexType j(0); j < first.size(); ++j)
           {
-            if(std::abs(first(j)-second(j)) >= tol)
+            if(std::abs(vf(j)-vs(j)) >= tol)
             {
               std::cout << "Error occured for Fs between domain " << (*it)->domain_rank << " and domain " << (*it)->gate_ranks[i] << "\n";
               std::cout << "First vector: " << first << "\n";
@@ -1244,9 +1258,11 @@ namespace FETI{
           LocalVectorType & second = domain_vec[IndexType((*it)->gate_ranks[i])]->residuum[this_index];
 
           XASSERTM(first.size() == second.size(), "Sizes do not match");
-          for(IndexType j(0); j<first.size(); ++j)
+          const auto vf = first.elements_view_r();
+          const auto vs = second.elements_view_r();
+          for(IndexType j(0); j < first.size(); ++j)
           {
-            if(std::abs(first(j)-second(j)) >= tol)
+            if(std::abs(vf(j)-vs(j)) >= tol)
             {
               std::cout << "Error occured for residuum between domain " << (*it)->domain_rank << " and domain " << (*it)->gate_ranks[i] << "\n";
               std::cout << "First vector: " << first << "\n";
@@ -1268,9 +1284,11 @@ namespace FETI{
           LocalVectorType & second = domain_vec[IndexType((*it)->gate_ranks[i])]->lambda_0[this_index];
 
           XASSERTM(first.size() == second.size(), "Sizes do not match");
-          for(IndexType j(0); j<first.size(); ++j)
+          const auto vf = first.elements_view_r();
+          const auto vs = second.elements_view_r();
+          for(IndexType j(0); j < first.size(); ++j)
           {
-            if(std::abs(first(j)-second(j)) >= tol)
+            if(std::abs(vf(j)-vs(j)) >= tol)
             {
               std::cout << "Error occured for lambda between domain " << (*it)->domain_rank << " and domain " << (*it)->gate_ranks[i] << "\n";
               std::cout << "First vector: " << first << "\n";
@@ -1292,9 +1310,11 @@ namespace FETI{
           LocalVectorType & second = domain_vec[IndexType((*it)->gate_ranks[i])]->s_vector[this_index];
 
           XASSERTM(first.size() == second.size(), "Sizes do not match");
-          for(IndexType j(0); j<first.size(); ++j)
+          const auto vf = first.elements_view_r();
+          const auto vs = second.elements_view_r();
+          for(IndexType j(0); j < first.size(); ++j)
           {
-            if(std::abs(first(j)-second(j)) >= tol)
+            if(std::abs(vf(j)-vs(j)) >= tol)
             {
               std::cout << "Error occured for s between domain " << (*it)->domain_rank << " and domain " << (*it)->gate_ranks[i] << "\n";
               std::cout << "First vector: " << first << "\n";
@@ -1459,9 +1479,12 @@ namespace FETI{
 
 
      //distribute alpha to the floating domains:
-     for(IndexType i(0); i < domain_vec.size() ; ++i)
      {
-       domain_vec[i]->alpha = alpha(i);
+       const auto va = alpha.elements_view_r();
+       for(IndexType i(0); i < domain_vec.size() ; ++i)
+       {
+         domain_vec[i]->alpha = va(i);
+       }
      }
 
      //now calclulate the local_solutions

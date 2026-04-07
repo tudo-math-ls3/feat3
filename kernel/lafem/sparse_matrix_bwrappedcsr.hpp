@@ -23,8 +23,8 @@ namespace FEAT
      * \tparam IT_
      * Index type
      *
-     * \tparam BlockSize_
-     * Size of the matrice's blocks
+     * \tparam block_size_
+     * Size of the matrix's blocks
      *
      * This class acts as a wrapper around a standard SparseMatrixCSR  pretending to be a SparseMatrixBCSR.
      * This is required i.e. for the inter-level transfer of vectors in multigrid. This operation is just a
@@ -35,7 +35,7 @@ namespace FEAT
      * \author Jordi Paul
      *
      */
-    template<typename DT_, typename IT_, int BlockSize_>
+    template<typename DT_, typename IT_, int block_size_>
     class SparseMatrixBWrappedCSR : public LAFEM::SparseMatrixCSR<DT_, IT_>
     {
     public:
@@ -45,14 +45,14 @@ namespace FEAT
       typedef IT_ IndexType;
 
       /// The block height the SparseMatrixBWrappedCSR pretends to have
-      static constexpr int BlockHeight = BlockSize_;
+      static constexpr int block_height = block_size_;
       /// The block width the SparseMatrixBWrappedCSR pretends to have
-      static constexpr int BlockWidth = BlockSize_;
+      static constexpr int block_width = block_size_;
 
       /// The real type of the underlying matrix
       typedef LAFEM::SparseMatrixCSR<DT_, IT_> BaseClass;
       /// What this matrix pretends to be
-      typedef LAFEM::SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockSize_> PretendType;
+      typedef LAFEM::SparseMatrixBCSR<DT_, IT_, block_size_, block_size_> PretendType;
 
       /// Vector type accepted for multiplication form the left
       typedef typename PretendType::VectorTypeL VectorTypeL;
@@ -64,7 +64,7 @@ namespace FEAT
 
       /// Our 'base' class type
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      using ContainerType = SparseMatrixBWrappedCSR<DT2_, IT2_, BlockSize_>;
+      using ContainerType = SparseMatrixBWrappedCSR<DT2_, IT2_, block_size_>;
 
       /// this typedef lets you create a matrix container with different Data and Index types
       template <typename DataType2_, typename IndexType2_>
@@ -97,7 +97,7 @@ namespace FEAT
        */
       VectorTypeL create_vector_l() const
       {
-        return VectorTypeL(this->rows());
+        return VectorTypeL(this->num_rows());
       }
 
       /**
@@ -108,7 +108,7 @@ namespace FEAT
        */
       VectorTypeR create_vector_r() const
       {
-        return VectorTypeR(this->columns());
+        return VectorTypeR(this->num_cols());
       }
 
       template <typename DT2_, typename IT2_>

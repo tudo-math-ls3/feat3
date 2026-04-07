@@ -108,9 +108,9 @@ public:
 
     // scale the a_11 and a_nn by 1/2 to emulate Neumann BCs
     {
-      double* data = mat_sys.val();
+      Memory::TypedView<double> data = mat_sys.val_view_rw();
       data[0] *= 0.5;
-      data[mat_sys.used_elements()-1] *= 0.5;
+      data[mat_sys.num_nzes()-1] *= 0.5;
     }
 
     // create a one-vector as Lagrange multiplier
@@ -118,9 +118,12 @@ public:
 
     // create a reference solution vector: x_i := cos(pi*i/(n-1))
     VectorType vec_ref(n, 0.0);
-    for(Index i(0); i < n; ++i)
     {
-      vec_ref(i, Math::cos(pi * double(i) / double(n-1)));
+      Memory::TypedView<double> vr = vec_ref.elements_view_w();
+      for(Index i(0); i < n; ++i)
+      {
+        vr[i] = Math::cos(pi * double(i) / double(n-1));
+      }
     }
 
     // create an rhs vector
@@ -142,14 +145,8 @@ public:
       umfpack.done();
     }
 
-    // subtract reference solution
-    vec_sol.axpy(vec_ref, -1.0);
-
-    // compute the norm
-    double nrm2 = vec_sol.norm2();
-
-    // check norm
-    TEST_CHECK_EQUAL_WITHIN_EPS(nrm2, 0.0, tol);
+    // check against reference solution
+    TEST_CHECK_LESS_THAN(vec_sol.max_rel_diff(vec_ref), tol);
   }
 };
 
@@ -205,14 +202,8 @@ public:
       umfpack.done();
     }
 
-    // subtract reference solution
-    vec_sol.axpy(vec_ref, -DT_(1));
-
-    // compute the norm
-    DT_ nrm2 = vec_sol.norm2();
-
-    // check norm
-    TEST_CHECK_EQUAL_WITHIN_EPS(nrm2, DT_(0), tol);
+    // check against reference solution
+    TEST_CHECK_LESS_THAN(vec_sol.max_rel_diff(vec_ref), tol);
   }
 };
 

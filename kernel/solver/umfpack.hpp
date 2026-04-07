@@ -356,35 +356,35 @@ namespace FEAT
         const MatrixTypeD& matrix_d = _system_matrix.block_d();
 
         // get velocity/pressure space dimensions
-        const Index n_v = matrix_b.rows();
-        const Index n_p = matrix_b.columns();
+        const Index n_v = matrix_b.num_rows();
+        const Index n_p = matrix_b.num_cols();
 
         // verify matrix dimensions
-        XASSERT(n_v == matrix_a.rows());
-        XASSERT(n_v == matrix_a.columns());
-        XASSERT(n_p == matrix_d.rows());
-        XASSERT(n_v == matrix_d.columns());
+        XASSERT(n_v == matrix_a.num_rows());
+        XASSERT(n_v == matrix_a.num_cols());
+        XASSERT(n_p == matrix_d.num_rows());
+        XASSERT(n_v == matrix_d.num_cols());
         XASSERTM(n_p == _weight_vector.size(), "invalid weight vector/mean filter size");
 
         // get the number of non-zeroes in sub-matrices
-        const Index nnze_a = matrix_a.used_elements();
-        const Index nnze_b = matrix_b.used_elements();
-        const Index nnze_d = matrix_d.used_elements();
+        const Index nnze_a = matrix_a.num_nzes();
+        const Index nnze_b = matrix_b.num_nzes();
+        const Index nnze_d = matrix_d.num_nzes();
 
         // allocate our solver matrix
         _solver_matrix = UmfMatrixType(dim_*n_v+n_p+1, dim_*n_v+n_p+1, dim_*dim_*nnze_a + dim_*(nnze_b+nnze_d) + 2*n_p);
 
         // get our input matrix arrays
-        const IT_* irow_ptr_a = matrix_a.row_ptr();
-        const IT_* icol_idx_a = matrix_a.col_ind();
-        const IT_* irow_ptr_b = matrix_b.row_ptr();
-        const IT_* icol_idx_b = matrix_b.col_ind();
-        const IT_* irow_ptr_d = matrix_d.row_ptr();
-        const IT_* icol_idx_d = matrix_d.col_ind();
+        const Memory::TypedView<IT_> irow_ptr_a = matrix_a.row_ptr_view_r();
+        const Memory::TypedView<IT_> icol_idx_a = matrix_a.col_idx_view_r();
+        const Memory::TypedView<IT_> irow_ptr_b = matrix_b.row_ptr_view_r();
+        const Memory::TypedView<IT_> icol_idx_b = matrix_b.col_idx_view_r();
+        const Memory::TypedView<IT_> irow_ptr_d = matrix_d.row_ptr_view_r();
+        const Memory::TypedView<IT_> icol_idx_d = matrix_d.col_idx_view_r();
 
         // get our output matrix arrays
-        Index* orow_ptr = _solver_matrix.row_ptr();
-        Index* ocol_idx = _solver_matrix.col_ind();
+        Memory::TypedView<Index> orow_ptr = _solver_matrix.row_ptr_view_r();
+        Memory::TypedView<Index> ocol_idx = _solver_matrix.col_idx_view_r();
 
         // assemble the solver matrix structure
         orow_ptr[0] = Index(0);
@@ -466,23 +466,23 @@ namespace FEAT
         const MatrixTypeD& matrix_d = _system_matrix.block_d();
 
         // get velocity/pressure space dimensions
-        const Index n_v = matrix_b.rows();
-        const Index n_p = matrix_b.columns();
+        const Index n_v = matrix_b.num_rows();
+        const Index n_p = matrix_b.num_cols();
 
         // get our input matrix arrays
-        const IT_* irow_ptr_a = matrix_a.row_ptr();
-        const auto* idata_a   = matrix_a.val();
-        const IT_* irow_ptr_b = matrix_b.row_ptr();
-        const auto* idata_b   = matrix_b.val();
-        const IT_* irow_ptr_d = matrix_d.row_ptr();
-        const auto* idata_d   = matrix_d.val();
+        const Memory::TypedView<IT_> irow_ptr_a = matrix_a.row_ptr_view_r();
+        const auto idata_a   = matrix_a.val_view_r();
+        const Memory::TypedView<IT_> irow_ptr_b = matrix_b.row_ptr_view_r();
+        const auto idata_b   = matrix_b.val_view_r();
+        const Memory::TypedView<IT_> irow_ptr_d = matrix_d.row_ptr_view_r();
+        const auto idata_d   = matrix_d.val_view_r();
 
         // get input vector array
-        const DT_* weight = _weight_vector.elements();
+        const Memory::TypedView<DT_> weight = _weight_vector.elements_view_r();
 
         // get output matrix arrays
-        const Index* orow_ptr = _solver_matrix.row_ptr();
-        double* odata = _solver_matrix.val();
+        const Memory::TypedView<Index> orow_ptr = _solver_matrix.row_ptr_view_r();
+        Memory::TypedView<double> odata = _solver_matrix.val_view_w();
 
         // loop over all rows of A and B
         for(Index i(0); i < n_v; ++i)
@@ -554,32 +554,39 @@ namespace FEAT
         const Index n_p = vec_sol.template at<1>().size();
 
         // copy RHS vector
-        const DT_* vr_v = vec_rhs.template at<0>().template elements<LAFEM::Perspective::pod>();
-        const DT_* vr_p = vec_rhs.template at<1>().elements();
-        double* vb = _vec_b.elements();
+        {
+          const Memory::TypedView<DT_> vr_v = vec_rhs.template at<0>().elements_view_raw_r();
+          const Memory::TypedView<DT_> vr_p = vec_rhs.template at<1>().elements_view_r();
+          Memory::TypedView<double> vvb = _vec_b.elements_view_w();
+          double *vb = vvb.get_w();
 
-        // copy velocity RHS
-        for(Index i(0); i < n_v; ++i, ++vb)
-          *vb = double(vr_v[i]);
-        // copy pressure RHS
-        for(Index i(0); i < n_p; ++i, ++vb)
-          *vb = double(vr_p[i]);
-        // append Lagrange multiplier RHS
-        *vb = 0.0;
+          // copy velocity RHS
+          for(Index i(0); i < n_v; ++i, ++vb)
+            *vb = double(vr_v[i]);
+          // copy pressure RHS
+          for(Index i(0); i < n_p; ++i, ++vb)
+            *vb = double(vr_p[i]);
+          // append Lagrange multiplier RHS
+          *vb = 0.0;
+        }
 
         // solve system
         Status status = _umfpack.apply(_vec_x, _vec_b);
 
         // copy sol vector
-        const double* vx = _vec_x.elements();
-        DT_* vs_v = vec_sol.template at<0>().template elements<LAFEM::Perspective::pod>();
-        DT_* vs_p = vec_sol.template at<1>().elements();
-        // copy velocity solution
-        for(Index i(0); i < n_v; ++i, ++vx)
-          vs_v[i] = DT_(*vx);
-        // copy pressure solution
-        for(Index i(0); i < n_p; ++i, ++vx)
-          vs_p[i] = DT_(*vx);
+        {
+          Memory::TypedView<DT_> vs_v = vec_sol.template at<0>().elements_view_raw_w();
+          Memory::TypedView<DT_> vs_p = vec_sol.template at<1>().elements_view_w();
+          const Memory::TypedView<double> vvx = _vec_x.elements_view_r();
+          const double* vx = vvx.get_r();
+
+          // copy velocity solution
+          for(Index i(0); i < n_v; ++i, ++vx)
+            vs_v[i] = DT_(*vx);
+          // copy pressure solution
+          for(Index i(0); i < n_p; ++i, ++vx)
+            vs_p[i] = DT_(*vx);
+        }
 
         // okay
         return status;
@@ -667,6 +674,36 @@ namespace FEAT
       /// the actual Umfpack solver object
       Umfpack _umfpack;
 
+      void _copy_matrix_vals(const MatrixType& matrix)
+      {
+        // convert our system matrix to <double, Index> (if necessary)
+        typename MatrixType::template ContainerType<double, Index> mat_double;
+        mat_double.convert(matrix);
+
+        // get the array of our CSR matrix
+        const Memory::TypedView<Index> row_ptr = _umf_matrix.row_ptr_view_r();
+        Memory::TypedView<double> val = _umf_matrix.val_view_w();
+
+        // copy entries into our CSR matrix
+        for(Index i(0); i < _umf_matrix.num_rows(); ++i)
+          mat_double.get_row_values(i, &val.get_w()[row_ptr[i]]);
+      }
+
+      template<typename IT2_>
+      void _copy_matrix_values(const LAFEM::SparseMatrixCSR<double, IT2_>& matrix)
+      {
+        // if MatrixType_ is a double CSR matrix, it might happen that _umf_matrix and
+        // matrix have the same vals array, so we need to avoid copying the array into itself
+        if(_umf_matrix.val_arbiter() != matrix.val_arbiter())
+          _copy_matrix_vals(matrix);
+      }
+
+      template<typename MT_>
+      void _copy_matrix_values(const MT_& matrix)
+      {
+        _copy_matrix_vals(matrix);
+      }
+
     public:
       explicit GenericUmfpack(const MatrixType& matrix) :
         _matrix(matrix),
@@ -726,18 +763,8 @@ namespace FEAT
       {
         BaseClass::init_numeric();
 
-        // convert our system matrix to <double, Index> (if necessary)
-        typename MatrixType::template ContainerType<double, Index> mat_double;
-        mat_double.convert(_matrix);
-
-        // get the array of our CSR matrix
-        const Index* row_ptr = _umf_matrix.row_ptr();
-        /*const*/ Index* col_idx = _umf_matrix.col_ind();
-        double* val = _umf_matrix.val();
-
-        // copy entries into our CSR matrix
-        for(Index i(0); i < _umf_matrix.rows(); ++i)
-          mat_double.set_line(i, val + row_ptr[i], col_idx + row_ptr[i], 0);
+        // call helper function to copy matrix values
+        _copy_matrix_values(_matrix);
 
         // factorize
         _umfpack.init_numeric();
@@ -760,7 +787,7 @@ namespace FEAT
 
         // convert sol vector
         _tmp_vsol.convert(_umf_vsol);
-        _tmp_vsol.copy_inv(vec_sol);
+        _tmp_vsol.copy_to(vec_sol);
 
         return status;
       }

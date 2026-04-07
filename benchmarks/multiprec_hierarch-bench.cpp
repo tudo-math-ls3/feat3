@@ -125,21 +125,21 @@ namespace MultiPrecHierarchBench
   LAFEM::SparseMatrixCSR<DT_, IT_> expand_prol(const LAFEM::SparseMatrixCSR<DT_, IT_>& prol,
     const Index n, const DT_ alpha = DT_(1))
   {
-    XASSERT(prol.rows() <= n);
+    XASSERT(prol.num_rows() <= n);
 
     // expand prolongation matrix
-    const Index pnr = prol.rows();
-    const Index pnc = prol.columns();
-    const Index pnz = prol.used_elements();
-    const IT_* row_ptr_p = prol.row_ptr();
-    const IT_* col_idx_p = prol.col_ind();
-    const DT_* val_p = prol.val();
+    const Index pnr = prol.num_rows();
+    const Index pnc = prol.num_cols();
+    const Index pnz = prol.num_nzes();
+    const Memory::TypedView<IT_> row_ptr_p = prol.row_ptr_view_r();
+    const Memory::TypedView<IT_> col_idx_p = prol.col_idx_view_r();
+    const Memory::TypedView<DT_> val_p = prol.val_view_r();
 
     // allocate expanded matrix
     LAFEM::SparseMatrixCSR<DT_, IT_> ex_prol(n, n, pnz + n - pnc);
-    IT_* row_ptr_q = ex_prol.row_ptr();
-    IT_* col_idx_q = ex_prol.col_ind();
-    DT_* val_q = ex_prol.val();
+    Memory::TypedView<IT_> row_ptr_q = ex_prol.row_ptr_view_w();
+    Memory::TypedView<IT_> col_idx_q = ex_prol.col_idx_view_w();
+    Memory::TypedView<DT_> val_q = ex_prol.val_view_w();
 
     // copy coarse identity
     for(Index i(0); i < pnc; ++i)
@@ -187,17 +187,17 @@ namespace MultiPrecHierarchBench
     const LAFEM::SparseMatrixCSR<DT_, IT_>& prol,
     const DT_ alpha = DT_(1))
   {
-    const Index n = matrix.rows();
+    const Index n = matrix.num_rows();
 
     // expand prolongation matrix
-    LAFEM::SparseMatrixCSR<DT_, IT_> mprol = expand_prol(prol, matrix.rows(), alpha);
+    LAFEM::SparseMatrixCSR<DT_, IT_> mprol = expand_prol(prol, matrix.num_rows(), alpha);
     LAFEM::SparseMatrixCSR<DT_, IT_> mrest = mprol.transpose();
 
     // (R*A*P) * (P^-1x) = R*b
 
     // compute matrix structure
-    Adjacency::Graph gap(Adjacency::RenderType::injectify_sorted, matrix, mprol);
-    Adjacency::Graph grap(Adjacency::RenderType::injectify_sorted, mrest, gap);
+    Adjacency::Graph gap(Adjacency::RenderType::injectify_sorted, matrix.adjactor(), mprol.adjactor());
+    Adjacency::Graph grap(Adjacency::RenderType::injectify_sorted, mrest.adjactor(), gap);
 
     // compute matrix
     LAFEM::SparseMatrixCSR<DT_, IT_> matrix_r(grap);
@@ -206,9 +206,9 @@ namespace MultiPrecHierarchBench
 
     // shrink matrix
     {
-      const DT_* val = matrix_r.val();
+      const Memory::TypedView<DT_> val = matrix_r.val_view_r();
       DT_ max_val = DT_(0);
-      for(Index i(0); i < matrix_r.used_elements(); ++i)
+      for(Index i(0); i < matrix_r.num_nzes(); ++i)
         max_val = Math::max(max_val, Math::abs(val[i]));
       matrix_r.shrink(max_val * Math::pow(Math::eps<DT_>(), DT_(0.7)));
     }
@@ -230,7 +230,7 @@ namespace MultiPrecHierarchBench
     const Mesh_& mesh)
   {
     const auto& vtx = mesh.get_vertex_set();
-    const Index n = matrix.rows();
+    const Index n = matrix.num_rows();
     XASSERT(n == vtx.get_num_vertices());
 
     std::map<double, Index> vtx_map;
@@ -247,11 +247,11 @@ namespace MultiPrecHierarchBench
       }
     }
 
-    const IT_* row_ptr = matrix.row_ptr();
-    const IT_* col_idx = matrix.col_ind();
-    const DT_* mat_val = matrix.val();
-    const DT_* rhs_val = vec_rhs.elements();
-    DT_* sol_val = vec_sol.elements();
+    const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+    const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
+    const Memory::TypedView<DT_> mat_val = matrix.val_view_r();
+    const Memory::TypedView<DT_> rhs_val = vec_rhs.elements_view_r();
+    Memory::TypedView<DT_> sol_val = vec_sol.elements_view_rw();
 
     std::vector<DT_> va(n), vb(n), vc(n), vd(n), vx(n);
 
@@ -416,9 +416,9 @@ namespace MultiPrecHierarchBench
           reduce_system(matrix_r, vec_rhs_r, *it);
           filter.filter_rhs(vec_rhs_r);
         }
-        std::cout << stringify(matrix.rows()).pad_front(12);
-        std::cout << stringify(matrix.used_elements()).pad_front(12);
-        std::cout << stringify(matrix_r.used_elements()).pad_front(12);
+        std::cout << stringify(matrix.num_rows()).pad_front(12);
+        std::cout << stringify(matrix.num_nzes()).pad_front(12);
+        std::cout << stringify(matrix_r.num_nzes()).pad_front(12);
       }
 
       // SOLVER

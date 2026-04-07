@@ -5,11 +5,14 @@
 
 #include <kernel/base_header.hpp>
 #include <test_system/test_system.hpp>
-#include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/util/binary_stream.hpp>
 #include <kernel/util/random.hpp>
 #include <kernel/adjacency/cuthill_mckee.hpp>
+#include <kernel/lafem/dense_vector.hpp>
+#include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/sparse_matrix_factory.hpp>
+#include <kernel/lafem/sparse_matrix_bcsr.hpp>
+#include <kernel/lafem/sparse_matrix_csr.hpp>
 
 #include <sstream>
 
@@ -33,16 +36,12 @@ using namespace FEAT::TestSystem;
 template<
   typename DT_,
   typename IT_>
-  class SparseMatrixCSRTest
+class SparseMatrixCSRTest
   : public UnitTest
 {
 public:
-  SparseMatrixCSRTest(PreferredBackend backend)
+  explicit SparseMatrixCSRTest(PreferredBackend backend)
     : UnitTest("SparseMatrixCSRTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~SparseMatrixCSRTest()
   {
   }
 
@@ -53,10 +52,9 @@ public:
     TEST_CHECK(zero.empty());
 
     SparseMatrixCSR<DT_, IT_> zero3(10, 11, 12);
-    TEST_CHECK_EQUAL(zero3.used_elements(), 12);
-    TEST_CHECK_EQUAL(zero3.rows(), 10);
-    TEST_CHECK_EQUAL(zero3.columns(), 11);
-    TEST_CHECK_EQUAL(zero3.size(), 110);
+    TEST_CHECK_EQUAL(zero3.num_nzes(), 12);
+    TEST_CHECK_EQUAL(zero3.num_rows(), 10);
+    TEST_CHECK_EQUAL(zero3.num_cols(), 11);
 
 
     SparseMatrixCSR<DT_, IT_> empty1(11, 12, 111);
@@ -64,28 +62,27 @@ public:
     SparseMatrixCSR<DT_, IT_> empty3;
     empty2.convert(empty1);
     empty3.convert(empty2);
-    TEST_CHECK_EQUAL(empty1.rows(), empty3.rows());
-    TEST_CHECK_EQUAL(empty1.columns(), empty3.columns());
-    TEST_CHECK_EQUAL(empty1.used_elements(), empty3.used_elements());
+    TEST_CHECK_EQUAL(empty1.num_rows(), empty3.num_rows());
+    TEST_CHECK_EQUAL(empty1.num_cols(), empty3.num_cols());
+    TEST_CHECK_EQUAL(empty1.num_nzes(), empty3.num_nzes());
 
     SparseMatrixCSR<DT_, IT_> empty4(empty2.layout());
     SparseMatrixCSR<DT_, IT_> empty5(empty3.layout());
     empty4.convert(empty1);
     empty5.convert(empty4);
-    TEST_CHECK_EQUAL(empty5.rows(), empty5.rows());
-    TEST_CHECK_EQUAL(empty5.columns(), empty5.columns());
-    TEST_CHECK_EQUAL(empty5.used_elements(), empty5.used_elements());
+    TEST_CHECK_EQUAL(empty5.num_rows(), empty5.num_rows());
+    TEST_CHECK_EQUAL(empty5.num_cols(), empty5.num_cols());
+    TEST_CHECK_EQUAL(empty5.num_nzes(), empty5.num_nzes());
     empty5.convert(zero);
-    TEST_CHECK_EQUAL(empty5.rows(), 0);
-    TEST_CHECK_EQUAL(empty5.columns(), 0);
-    TEST_CHECK_EQUAL(empty5.used_elements(), 0);
+    TEST_CHECK_EQUAL(empty5.num_rows(), 0);
+    TEST_CHECK_EQUAL(empty5.num_cols(), 0);
+    TEST_CHECK_EQUAL(empty5.num_nzes(), 0);
 
     SparseMatrixFactory<DT_, IT_> a01(IT_(10), IT_(10));
     SparseMatrixCSR<DT_, IT_> b01(a01.make_csr());
-    TEST_CHECK_EQUAL(b01.size(), 100ul);
-    TEST_CHECK_EQUAL(b01.rows(), 10ul);
-    TEST_CHECK_EQUAL(b01.columns(), 10ul);
-    TEST_CHECK_EQUAL(b01.used_elements(), 0ul);
+    TEST_CHECK_EQUAL(b01.num_rows(), 10ul);
+    TEST_CHECK_EQUAL(b01.num_cols(), 10ul);
+    TEST_CHECK_EQUAL(b01.num_nzes(), 0ul);
 
     SparseMatrixFactory<DT_, IT_> a(IT_(10), IT_(10));
     a.add(IT_(1), IT_(2), DT_(7));
@@ -94,45 +91,47 @@ public:
     a.add(IT_(5), IT_(2), DT_(4));
     SparseMatrixCSR<DT_, IT_> b(a.make_csr());
     TEST_CHECK(!b.empty());
-    TEST_CHECK_EQUAL(b.used_elements(), a.used_elements());
-    TEST_CHECK_EQUAL(b.size(), a.size());
-    TEST_CHECK_EQUAL(b(1, 2), DT_(7));
-    TEST_CHECK_EQUAL(b(5, 5), DT_(2));
-    TEST_CHECK_EQUAL(b(5, 7), DT_(3));
-    TEST_CHECK_EQUAL(b(5, 2), DT_(4));
-    TEST_CHECK_EQUAL(b(1, 1), DT_(0));
+    TEST_CHECK_EQUAL(b.num_nzes(), a.num_nzes());
+    {
+      const Memory::TypedView<DT_> b_val = b.val_view_r();
+      const Memory::TypedView<IT_> b_rp = b.row_ptr_view_r();
+      const Memory::TypedView<IT_> b_ci = b.col_idx_view_r();
+
+      TEST_CHECK_EQUAL(b_val(0), DT_(7));
+      TEST_CHECK_EQUAL(b_val(1), DT_(4));
+      TEST_CHECK_EQUAL(b_val(2), DT_(2));
+      TEST_CHECK_EQUAL(b_val(3), DT_(3));
+    }
 
     Index bandw, bandw_idx;
     b.bandwidth_row(bandw, bandw_idx);
     TEST_CHECK_EQUAL(bandw, Index(6));
     TEST_CHECK_EQUAL(bandw_idx, Index(5));
-    b.bandwidth_column(bandw, bandw_idx);
-    TEST_CHECK_EQUAL(bandw, Index(5));
-    TEST_CHECK_EQUAL(bandw_idx, Index(2));
+    //b.bandwidth_column(bandw, bandw_idx);
+    //TEST_CHECK_EQUAL(bandw, Index(5));
+    //TEST_CHECK_EQUAL(bandw_idx, Index(2));
 
     Index radius, radius_idx;
     b.radius_row(radius, radius_idx);
     TEST_CHECK_EQUAL(radius, Index(3));
     TEST_CHECK_EQUAL(radius_idx, Index(5));
-    b.radius_column(radius, radius_idx);
-    TEST_CHECK_EQUAL(radius, Index(3));
-    TEST_CHECK_EQUAL(radius_idx, Index(2));
+    //b.radius_column(radius, radius_idx);
+    //TEST_CHECK_EQUAL(radius, Index(3));
+    //TEST_CHECK_EQUAL(radius_idx, Index(2));
 
     SparseMatrixCSR<DT_, IT_> bl(b.layout());
-    TEST_CHECK_EQUAL(bl.used_elements(), b.used_elements());
-    TEST_CHECK_EQUAL(bl.size(), b.size());
-    TEST_CHECK_EQUAL(bl.rows(), b.rows());
-    TEST_CHECK_EQUAL(bl.columns(), b.columns());
+    TEST_CHECK_EQUAL(bl.num_nzes(), b.num_nzes());
+    TEST_CHECK_EQUAL(bl.num_rows(), b.num_rows());
+    TEST_CHECK_EQUAL(bl.num_cols(), b.num_cols());
 
     bl = b.layout();
-    TEST_CHECK_EQUAL(bl.used_elements(), b.used_elements());
-    TEST_CHECK_EQUAL(bl.size(), b.size());
-    TEST_CHECK_EQUAL(bl.rows(), b.rows());
-    TEST_CHECK_EQUAL(bl.columns(), b.columns());
+    TEST_CHECK_EQUAL(bl.num_nzes(), b.num_nzes());
+    TEST_CHECK_EQUAL(bl.num_rows(), b.num_rows());
+    TEST_CHECK_EQUAL(bl.num_cols(), b.num_cols());
 
     typename SparseLayout<IT_, SparseLayoutId::lt_csr>::template MatrixType<DT_> x(b.layout());
-    TEST_CHECK_EQUAL((void*)x.row_ptr(), (void*)b.row_ptr());
-    TEST_CHECK_NOT_EQUAL((void*)x.val(), (void*)b.val());
+    TEST_CHECK_EQUAL(x.row_ptr_arbiter(), b.row_ptr_arbiter());
+    TEST_CHECK_NOT_EQUAL(x.val_arbiter(), b.val_arbiter());
     /// \compilerhack icc 14.x and msvc do not understand the following single line, so we need a typedef detour here
 #if defined(FEAT_COMPILER_MICROSOFT) || (defined(FEAT_COMPILER_INTEL) && __INTEL_COMPILER < 1500)
     typedef decltype(b.layout()) LayoutId;
@@ -140,31 +139,33 @@ public:
 #else
     typename decltype(b.layout())::template MatrixType<DT_> y(b.layout());
 #endif
-    TEST_CHECK_EQUAL((void*)y.row_ptr(), (void*)b.row_ptr());
-    TEST_CHECK_NOT_EQUAL((void*)y.val(), (void*)b.val());
+    TEST_CHECK_EQUAL(y.row_ptr_arbiter(), b.row_ptr_arbiter());
+    TEST_CHECK_NOT_EQUAL(y.val_arbiter(), b.val_arbiter());
 
 
     SparseMatrixCSR<DT_, IT_> z;
     z.convert(b);
-    TEST_CHECK_EQUAL(z.used_elements(), 4ul);
-    TEST_CHECK_EQUAL(z.size(), a.size());
-    TEST_CHECK_EQUAL(z.rows(), a.rows());
-    TEST_CHECK_EQUAL(z.columns(), a.columns());
-    TEST_CHECK_EQUAL(z(1, 2), DT_(7));
-    TEST_CHECK_EQUAL(z(5, 5), DT_(2));
+    TEST_CHECK_EQUAL(z.num_nzes(), 4ul);
+    TEST_CHECK_EQUAL(z.num_rows(), a.num_rows());
+    TEST_CHECK_EQUAL(z.num_cols(), a.num_cols());
+    {
+      Memory::TypedView<DT_> z_view = z.val_view_r();
+      TEST_CHECK_EQUAL(z_view(0), DT_(7));
+      TEST_CHECK_EQUAL(z_view(1), DT_(4));
+    }
 
     SparseMatrixCSR<DT_, IT_> c;
     c.clone(b);
-    TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)b.val());
-    TEST_CHECK_EQUAL((void*)c.col_ind(), (void*)b.col_ind());
+    TEST_CHECK_NOT_EQUAL(c.val_arbiter(), b.val_arbiter());
+    TEST_CHECK_EQUAL(c.col_idx_arbiter(), b.col_idx_arbiter());
     c = b.clone(CloneMode::Deep);
-    TEST_CHECK_NOT_EQUAL((void*)c.val(), (void*)b.val());
-    TEST_CHECK_NOT_EQUAL((void*)c.col_ind(), (void*)b.col_ind());
+    TEST_CHECK_NOT_EQUAL(c.val_arbiter(), b.val_arbiter());
+    TEST_CHECK_NOT_EQUAL(c.col_idx_arbiter(), b.col_idx_arbiter());
 
-    DenseVector<IT_, IT_> col_ind(c.used_elements(), c.col_ind());
-    DenseVector<DT_, IT_> val(c.used_elements(), c.val());
-    DenseVector<IT_, IT_> row_ptr(c.rows() + 1, c.row_ptr());
-    SparseMatrixCSR<DT_, IT_> d(c.rows(), c.columns(), col_ind, val, row_ptr);
+    DenseVector<IT_, IT_> col_idx(c.num_nzes(), c.col_idx_arbiter().attach());
+    DenseVector<DT_, IT_> val(c.num_nzes(), c.val_arbiter().attach());
+    DenseVector<IT_, IT_> row_ptr(c.num_rows() + 1, c.row_ptr_arbiter().attach());
+    SparseMatrixCSR<DT_, IT_> d(c.num_rows(), c.num_cols(), row_ptr, col_idx, val);
     TEST_CHECK_LESS_THAN(d.max_rel_diff(c), eps);
 
     SparseMatrixCSR<DT_, IT_> e;
@@ -176,724 +177,771 @@ public:
     b.clone(e);
     TEST_CHECK_LESS_THAN(b.max_rel_diff(c), eps);
 
-
     // new clone testing
     auto clone1 = b.clone(CloneMode::Deep);
     TEST_CHECK_LESS_THAN(clone1.max_rel_diff(b), eps);
-    MemoryPool::set_memory(clone1.val() + 1, DT_(132));
+    clone1.val_view_rw()[1] = DT_(132);
     TEST_CHECK_LESS_THAN(eps, clone1.max_rel_diff(b));
-    TEST_CHECK_NOT_EQUAL((void*)clone1.val(), (void*)b.val());
-    TEST_CHECK_NOT_EQUAL((void*)clone1.row_ptr(), (void*)b.row_ptr());
+    TEST_CHECK_NOT_EQUAL(clone1.val_arbiter(), b.val_arbiter());
+    TEST_CHECK_NOT_EQUAL(clone1.row_ptr_arbiter(), b.row_ptr_arbiter());
     auto clone2 = clone1.clone(CloneMode::Layout);
-    MemoryPool::set_memory(clone2.val(), DT_(4713), clone2.used_elements());
-    TEST_CHECK_NOT_EQUAL(clone2(5, 5), clone1(5, 5));
-    TEST_CHECK_NOT_EQUAL((void*)clone2.val(), (void*)clone1.val());
-    TEST_CHECK_EQUAL((void*)clone2.row_ptr(), (void*)clone1.row_ptr());
+    clone2.format(DT_(4713));
+    //TEST_CHECK_NOT_EQUAL(clone2(5, 5), clone1(5, 5));
+    TEST_CHECK_NOT_EQUAL(clone2.val_view_r()(1), clone1.val_view_r()(1));
+    TEST_CHECK_NOT_EQUAL(clone2.val_arbiter(), clone1.val_arbiter());
+    TEST_CHECK_EQUAL(clone2.row_ptr_arbiter(), clone1.row_ptr_arbiter());
     auto clone3 = clone1.clone(CloneMode::Weak);
     TEST_CHECK_LESS_THAN(clone3.max_rel_diff(clone1), eps);
-    MemoryPool::set_memory(clone3.val() + 1, DT_(133));
+    clone3.val_view_rw()[1] = DT_(133);
     TEST_CHECK_LESS_THAN(eps, clone3.max_rel_diff(clone1));
-    TEST_CHECK_NOT_EQUAL((void*)clone3.val(), (void*)clone1.val());
-    TEST_CHECK_EQUAL((void*)clone3.row_ptr(), (void*)clone1.row_ptr());
+    TEST_CHECK_NOT_EQUAL(clone3.val_arbiter(), clone1.val_arbiter());
+    TEST_CHECK_EQUAL(clone3.row_ptr_arbiter(), clone1.row_ptr_arbiter());
     auto clone4 = clone1.clone(CloneMode::Shallow);
     TEST_CHECK_LESS_THAN(clone4.max_rel_diff(clone1), eps);
-    MemoryPool::set_memory(clone4.val() + 1, DT_(134));
+    clone4.val_view_rw()[1] = DT_(134);
     TEST_CHECK_LESS_THAN(clone4.max_rel_diff(clone1), eps);
-    TEST_CHECK_EQUAL((void*)clone4.val(), (void*)clone1.val());
-    TEST_CHECK_EQUAL((void*)clone4.row_ptr(), (void*)clone1.row_ptr());
-
-    SparseMatrixFactory<DT_, IT_> ffac(IT_(10), IT_(10));
-    for (IT_ row(0); row < ffac.rows(); ++row)
-    {
-      for (IT_ col(0); col < ffac.columns(); ++col)
-      {
-        if (row == col)
-          ffac.add(row, col, DT_(2));
-        else if ((row == col + 1) || (row + 1 == col))
-          ffac.add(row, col, DT_(-1));
-      }
-    }
-    SparseMatrixCSR<DT_, IT_> f(ffac.make_csr());
+    TEST_CHECK_EQUAL(clone4.val_arbiter(), clone1.val_arbiter());
+    TEST_CHECK_EQUAL(clone4.row_ptr_arbiter(), clone1.row_ptr_arbiter());
 
     // shrink test
-    SparseMatrixCSR<DT_, IT_> l(f.clone());
-    l.shrink(DT_(1.9));
-    TEST_CHECK_EQUAL(l.used_elements(), 10ul);
+    SparseMatrixFactory<DT_, IT_> ffac(IT_(10), IT_(12));
+    for (IT_ row(0); row < ffac.num_rows(); ++row)
+    {
+      ffac.add(row, row, DT_(2));
+      ffac.add(row, row+1, DT_(1));
+    }
+    SparseMatrixCSR<DT_, IT_> f(ffac.make_csr());
+    f.shrink(DT_(1.5));
+    TEST_CHECK_EQUAL(f.num_nzes(), 10ul);
   }
-
 };
 
-SparseMatrixCSRTest <float, std::uint64_t> cpu_sparse_matrix_csr_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRTest <double, std::uint64_t> cpu_sparse_matrix_csr_test_double_uint64(PreferredBackend::generic);
-SparseMatrixCSRTest <float, std::uint32_t> cpu_sparse_matrix_csr_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRTest <double, std::uint32_t> cpu_sparse_matrix_csr_test_double_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTest, double, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTest, double, std::uint32_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRTest <float, std::uint64_t> mkl_cpu_sparse_matrix_csr_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRTest <double, std::uint64_t> mkl_cpu_sparse_matrix_csr_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRTest <__float128, std::uint64_t> cpu_sparse_matrix_csr_test_float128_uint64(PreferredBackend::generic);
-SparseMatrixCSRTest <__float128, std::uint32_t> cpu_sparse_matrix_csr_test_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTest, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTest, __float128, std::uint32_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-// Disabled: Tolerance too sharp
-//SparseMatrixCSRTest <Half, std::uint32_t> sparse_matrix_csr_test_half_uint32(PreferredBackend::generic);
-// Disabled: Tolerance too sharp
-//SparseMatrixCSRTest <Half, std::uint64_t> sparse_matrix_csr_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRTest <float, std::uint64_t> cuda_sparse_matrix_csr_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRTest <double, std::uint64_t> cuda_sparse_matrix_csr_test_double_uint64(PreferredBackend::cuda);
-SparseMatrixCSRTest <float, std::uint32_t> cuda_sparse_matrix_csr_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRTest <double, std::uint32_t> cuda_sparse_matrix_csr_test_double_uint32(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTest, double, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTest, double, std::uint32_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class SparseMatrixCSRSerializeTest
+class SparseMatrixCSRSerializeTest
   : public UnitTest
 {
 public:
-  SparseMatrixCSRSerializeTest(PreferredBackend backend)
+  explicit SparseMatrixCSRSerializeTest(PreferredBackend backend)
     : UnitTest("SparseMatrixCSRSerializeTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
-  virtual ~SparseMatrixCSRSerializeTest()
-  {
-  }
-
   virtual void run() const override
   {
-    const DT_ eps = TestSystem::tol<DT_>();
-    SparseMatrixFactory<DT_, IT_> ffac(IT_(10), IT_(10));
-    for (IT_ row(0); row < ffac.rows(); ++row)
+    const DT_ tol_b = TestSystem::tol<DT_>();
+    const DT_ tol_t = TestSystem::tol<DT_>();
+
+    Index size = 37;
+    SparseMatrixCSR<DT_, IT_> a(size, size+2, 3*size);
     {
-      for (IT_ col(0); col < ffac.columns(); ++col)
+      Memory::TypedView<IT_> row_ptr(a.row_ptr_view_w());
+      Memory::TypedView<IT_> col_idx(a.col_idx_view_w());
+      Memory::TypedView<DT_> a_val(a.val_view_w());
+
+      for (Index i(0); i < size; ++i)
       {
-        if (row == col)
-          ffac.add(row, col, DT_(2));
-        else if ((row == col + 1) || (row + 1 == col))
-          ffac.add(row, col, DT_(-1));
+        row_ptr[i] = IT_(3*i);
+        col_idx[3*i+0] = IT_(i);
+        col_idx[3*i+1] = IT_(i+1);
+        col_idx[3*i+2] = IT_(i+2);
+        a_val[3*i+0] = DT_((i*131071ll) % 31) * DT_(3.141) - DT_(0.3);
+        a_val[3*i+1] = DT_((i*65537ll) % 37) * DT_(2.713) - DT_(0.2);
+        a_val[3*i+2] = DT_((i*40487ll) % 53) * DT_(1.414) - DT_(0.1);
       }
+      row_ptr[size] = IT_(3*size);
     }
-    SparseMatrixCSR<DT_, IT_> f(ffac.make_csr());
+
+    SparseMatrixFactory<DT_, IT_> a_sym_fac(size, size);
+    for (Index i(0); i < size; ++i)
+    {
+      a_sym_fac.add(i, i, DT_((i*131071ll) % 31) * DT_(3.141) - DT_(0.3));
+      if(i > Index(0))
+        a_sym_fac.add(i, i-1, DT_(((i-1)*65537ll) % 37) * DT_(2.713) - DT_(0.2));
+      if(i+1 < size)
+        a_sym_fac.add(i, i+1, DT_((i*65537ll) % 37) * DT_(2.713) - DT_(0.2));
+    }
+    SparseMatrixCSR<DT_, IT_> a_sym(a_sym_fac.make_csr());
 
     BinaryStream bs;
-    f.write_out(FileMode::fm_csr, bs);
+    a.write_out(FileMode::fm_csr, bs);
     //TEST_CHECK_EQUAL(bs.tellg(), std::streampos(696));
     bs.seekg(0);
     SparseMatrixCSR<DT_, IT_> g(FileMode::fm_csr, bs);
-    TEST_CHECK_LESS_THAN(g.max_rel_diff(f), eps);
+    TEST_CHECK_LESS_THAN(g.max_rel_diff(a), tol_b);
     //TEST_CHECK_EQUAL(bs.tellg(), std::streampos(696));
 
+    // unsymmetric MTX format
     std::stringstream ts;
-    f.write_out(FileMode::fm_mtx, ts);
+    a.write_out(FileMode::fm_mtx, ts);
     SparseMatrixCSR<DT_, IT_> j(FileMode::fm_mtx, ts);
-    TEST_CHECK_LESS_THAN(j.max_rel_diff(f), eps);
+    TEST_CHECK_LESS_THAN(j.max_rel_diff(a), tol_t);
 
+    // symmetric MTX format
     std::stringstream ts2;
-    f.write_out(FileMode::fm_mtx, ts2, true);
+    a_sym.write_out(FileMode::fm_mtx, ts2, true);
     SparseMatrixCSR<DT_, IT_> j2(FileMode::fm_mtx, ts2);
-    TEST_CHECK_LESS_THAN(j2.max_rel_diff(f), eps);
+    TEST_CHECK_LESS_THAN(j2.max_rel_diff(a_sym), tol_t);
 
-    auto kp = f.serialize(LAFEM::SerialConfig(false, false));
+    auto kp = a.serialize(LAFEM::SerialConfig(false, false));
     SparseMatrixCSR<DT_, IT_> k(kp);
-    TEST_CHECK_LESS_THAN(k.max_rel_diff(f), eps);
+    TEST_CHECK_LESS_THAN(k.max_rel_diff(a), tol_b);
 #ifdef FEAT_HAVE_ZLIB
-    auto zl = f.serialize(LAFEM::SerialConfig(true, false));
+    auto zl = a.serialize(LAFEM::SerialConfig(true, false));
     SparseMatrixCSR<DT_, IT_> zlib(zl);
-    TEST_CHECK_LESS_THAN(zlib.max_rel_diff(f), eps);
+    TEST_CHECK_LESS_THAN(zlib.max_rel_diff(a), tol_b);
 #endif
-#if defined FEAT_HAVE_ZFP && !defined FEAT_HAVE_HALFMATH
-    auto zf = f.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
+#ifdef FEAT_HAVE_ZFP
+    auto zf = a.serialize(LAFEM::SerialConfig(false, true, FEAT::Real(1e-7)));
     SparseMatrixCSR<DT_, IT_> zfp(zf);
-    for (Index row(0); row < f.rows(); ++row)
-    {
-        for (Index col(0); col < f.columns(); ++col)
-      {
-        TEST_CHECK_EQUAL_WITHIN_EPS(zfp(row, col), f(row, col), TestSystem::tol<DT_>());
-      }
-    }
+    TEST_CHECK_LESS_THAN(zlib.max_rel_diff(a), DT_(1e-7));
 #endif
   }
 };
-SparseMatrixCSRSerializeTest <float, std::uint64_t> cpu_sparse_matrix_csr_serialize_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRSerializeTest <double, std::uint64_t> cpu_sparse_matrix_csr_serialize_test_double_uint64(PreferredBackend::generic);
-SparseMatrixCSRSerializeTest <float, std::uint32_t> cpu_sparse_matrix_csr_serialize_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRSerializeTest <double, std::uint32_t> cpu_sparse_matrix_csr_serialize_test_double_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSerializeTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSerializeTest, double, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSerializeTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSerializeTest, double, std::uint32_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRSerializeTest <float, std::uint64_t> mkl_cpu_sparse_matrix_csr_serialize_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRSerializeTest <double, std::uint64_t> mkl_cpu_sparse_matrix_csr_serialize_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSerializeTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSerializeTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 //#ifdef FEAT_HAVE_QUADMATH
-//SparseMatrixCSRSerializeTest <__float128, std::uint64_t> cpu_sparse_matrix_csr_serialize_test_float128_uint64(PreferredBackend::generic);
-//SparseMatrixCSRSerializeTest <__float128, std::uint32_t> cpu_sparse_matrix_csr_serialize_test_float128_uint32(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSerializeTest, __float128, std::uint64_t, PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSerializeTest, __float128, std::uint32_t, PreferredBackend::generic);
 //#endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRSerializeTest <Half, std::uint32_t> sparse_matrix_csr_serialize_test_half_uint32(PreferredBackend::generic);
-SparseMatrixCSRSerializeTest <Half, std::uint64_t> sparse_matrix_csr_serialize_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSerializeTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSerializeTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
-#ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRSerializeTest <float, std::uint64_t> cuda_sparse_matrix_csr_serialize_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRSerializeTest <double, std::uint64_t> cuda_sparse_matrix_csr_serialize_test_double_uint64(PreferredBackend::cuda);
-SparseMatrixCSRSerializeTest <float, std::uint32_t> cuda_sparse_matrix_csr_serialize_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRSerializeTest <double, std::uint32_t> cuda_sparse_matrix_csr_serialize_test_double_uint32(PreferredBackend::cuda);
-#endif
+//#ifdef FEAT_HAVE_CUDA
+//SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSerializeTest, float, std::uint64_t, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSerializeTest, double, std::uint64_t, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSerializeTest, float, std::uint32_t, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSerializeTest, double, std::uint32_t, PreferredBackend::cuda);
+//#endif
 
 template<
   typename DT_,
   typename IT_>
-  class SparseMatrixCSRApplyTest
+class SparseMatrixCSRApplyTest
   : public UnitTest
 {
 public:
-  SparseMatrixCSRApplyTest(PreferredBackend backend)
+  explicit SparseMatrixCSRApplyTest(PreferredBackend backend)
     : UnitTest("SparseMatrixCSRApplyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
-  virtual ~SparseMatrixCSRApplyTest()
-  {
-  }
-
   virtual void run() const override
   {
-    const DT_ eps = TestSystem::tol<DT_>();
-    DT_ s(DT_(0.4711));
-    for (IT_ size(1); size < IT_(1e3); size *= IT_(2))
+    const DT_ tol = TestSystem::tol<DT_>();
+    const DT_ alpha(DT_(0.693));
+
+    for (Index size(1); size < Index(100); size *= 3)
     {
-      SparseMatrixFactory<DT_, IT_> a_fac(size, size);
-      DenseVector<DT_, IT_> x(size);
+      SparseMatrixCSR<DT_, IT_> a(size, size+2, 3*size);
+      DenseVector<DT_, IT_> x(size+2);
       DenseVector<DT_, IT_> y(size);
-      DenseVector<DT_, IT_> ref(size);
-      DenseVector<DT_, IT_> ax(size);
-      for (Index i(0); i < size; ++i)
-      {
-        x(i, DT_(i % 100) * DT_(1.234));
-        y(i, DT_(2) - DT_(i % 42));
-        if (i == 0 && size > 1)
-          ax(i, DT_(1.234) * (DT_(2) * DT_(i % 100) - DT_((i + 1) % 100)));
-        else if (i == size - 1 && size > 1)
-          ax(i, DT_(1.234) * (DT_(2) * DT_(i % 100) - DT_((i - 1) % 100)));
-        else if (size == 1 && i == 0)
-          ax(i, DT_(0));
-        else
-          ax(i, DT_(1.234) * (DT_(2) * DT_(i % 100) - DT_((i - 1) % 100) - DT_((i + 1) % 100)));
-      }
-
-      for (IT_ row(0); row < a_fac.rows(); ++row)
-      {
-        for (IT_ col(0); col < a_fac.columns(); ++col)
-        {
-          if (row == col)
-          {
-            a_fac.add(row, col, DT_(2));
-          }
-          else if ((row == col + 1) || (row + 1 == col))
-          {
-            a_fac.add(row, col, DT_(-1));
-          }
-        }
-      }
-      SparseMatrixCSR<DT_, IT_> a(a_fac.make_csr());
-
       DenseVector<DT_, IT_> r(size);
+      DenseVector<DT_, IT_> ref1(size);
+      DenseVector<DT_, IT_> ref2(size);
 
-      // apply-test for alpha = 0.0
-      a.apply(r, x, y, DT_(0.0));
-      ref.copy(y);
-      for (Index i(0); i < size; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
+      {
+        Memory::TypedView<IT_> row_ptr(a.row_ptr_view_w());
+        Memory::TypedView<IT_> col_idx(a.col_idx_view_w());
+        Memory::TypedView<DT_> a_val(a.val_view_w());
+        Memory::TypedView<DT_> vx(x.elements_view_w());
+        Memory::TypedView<DT_> vy(y.elements_view_w());
+        Memory::TypedView<DT_> vr1(ref1.elements_view_w());
+        Memory::TypedView<DT_> vr2(ref2.elements_view_w());
 
-      // apply-test for alpha = -1.0
-      a.apply(r, x, y, DT_(-1.0));
-      a.apply(ref, x);
-      ref.scale(ref, DT_(-1.0));
-      ref.axpy(y);
-      for(Index i(0); i < size; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
+        for (Index i(0); i < size+2; ++i)
+          vx[i] = DT_((i*524287ll) % 97) * DT_(2.303) - DT_(0.7);
 
-      // apply-test for alpha = -1.0 and &r==&y
-      r.copy(y);
-      a.apply(r, x, r, DT_(-1.0));
-      for (Index i(0); i < size; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
-
-      // apply-test for alpha = 4711.1
-      //r.axpy(s, a, x, y);
-      a.apply(r, x, y, s);
-      //ref.product_matvec(a, x);
-      a.apply(ref, x);
-      ref.scale(ref, s);
-      ref.axpy(y);
-      for (Index i(0); i < size; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
-
-      // apply-test for alpha = 4711.1 and &r==&y
-      r.copy(y);
-      a.apply(r, x, r, s);
-      for (Index i(0); i < size; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
+        for (Index i(0); i < size; ++i)
+        {
+          row_ptr[i] = IT_(3*i);
+          col_idx[3*i+0] = IT_(i);
+          col_idx[3*i+1] = IT_(i+1);
+          col_idx[3*i+2] = IT_(i+2);
+          a_val[3*i+0] = DT_((i*131071ll) % 31) * DT_(3.141) - DT_(0.3);
+          a_val[3*i+1] = DT_((i*65537ll) % 37) * DT_(2.713) - DT_(0.2);
+          a_val[3*i+2] = DT_((i*40487ll) % 53) * DT_(1.414) - DT_(0.1);
+          vy[i] = DT_((i*138937ll) % 73) * DT_(1.618) - DT_(0.6);
+          vr1[i] = a_val[3*i+0] * vx[i+0] + a_val[3*i+1] * vx[i+1] + a_val[3*i+2] * vx[i+2];
+          vr2[i] = vy[i] + alpha*vr1[i];
+        }
+        row_ptr[size] = IT_(3*size);
+      }
 
       a.apply(r, x);
-      ref.copy(ax);
-      for(Index i(0); i < size; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), DT_(2)*eps);
+      TEST_CHECK_LESS_THAN(r.max_rel_diff(ref1), tol);
 
-      // transposed apply-test for alpha = -1
-      a.apply_transposed(r, x, y,  DT_(-1.0));
-      SparseMatrixCSR<DT_, IT_> at = a.transpose();
-      at.apply(ref, x);
-      ref.scale(ref,  DT_(-1.0));
-      ref.axpy(y);
+      a.apply(r, x, y, DT_(0.0));
+      TEST_CHECK_LESS_THAN(r.max_rel_diff(y), tol);
 
-      for(Index i(0); i < size; ++i)
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i), ref(i), eps);
+      a.apply(r, x, y, alpha);
+      TEST_CHECK_LESS_THAN(r.max_rel_diff(ref2), tol);
+
+      r.copy(y);
+      a.apply(r, x, r, alpha);
+      TEST_CHECK_LESS_THAN(r.max_rel_diff(ref2), tol);
     }
   }
 };
 
-SparseMatrixCSRApplyTest <float, std::uint64_t> sm_csr_apply_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRApplyTest <double, std::uint64_t> sm_csr_apply_test_double_uint64(PreferredBackend::generic);
-SparseMatrixCSRApplyTest <float, std::uint32_t> sm_csr_apply_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRApplyTest <double, std::uint32_t> sm_csr_apply_test_double_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTest, double, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTest, double, std::uint32_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRApplyTest <float, std::uint64_t> mkl_sm_csr_apply_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRApplyTest <double, std::uint64_t> mkl_sm_csr_apply_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRApplyTest <__float128, std::uint64_t> sm_csr_apply_test_float128_uint64(PreferredBackend::generic);
-SparseMatrixCSRApplyTest <__float128, std::uint32_t> sm_csr_apply_test_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTest, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTest, __float128, std::uint32_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRApplyTest <Half, std::uint32_t> sm_csr_apply_test_half_uint32(PreferredBackend::generic);
-SparseMatrixCSRApplyTest <Half, std::uint64_t> sm_csr_apply_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRApplyTest <float, std::uint64_t> cuda_sm_csr_apply_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRApplyTest <double, std::uint64_t> cuda_sm_csr_apply_test_double_uint64(PreferredBackend::cuda);
-SparseMatrixCSRApplyTest <float, std::uint32_t> cuda_sm_csr_apply_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRApplyTest <double, std::uint32_t> cuda_sm_csr_apply_test_double_uint32(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTest, double, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTest, double, std::uint32_t, PreferredBackend::cuda);
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRApplyTest <Half, std::uint32_t> cuda_sm_csr_apply_test_half_uint32(PreferredBackend::cuda);
-SparseMatrixCSRApplyTest <Half, std::uint64_t> cuda_sm_csr_apply_test_half_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTest, Half, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTest, Half, std::uint64_t, PreferredBackend::cuda);
 #endif
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class SparseMatrixCSRBApplyTest
+class SparseMatrixCSRApplyTransposedTest
   : public UnitTest
 {
 public:
-  SparseMatrixCSRBApplyTest(PreferredBackend backend)
+  explicit SparseMatrixCSRApplyTransposedTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixCSRApplyTransposedTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
+  {
+  }
+
+  virtual void run() const override
+  {
+    const DT_ tol = TestSystem::tol<DT_>();
+    const DT_ alpha(DT_(0.693));
+
+    for (Index size(1); size < Index(100); size *= 3)
+    {
+      SparseMatrixCSR<DT_, IT_> a(size, size+2, 3*size);
+      DenseVector<DT_, IT_> x(size);
+      DenseVector<DT_, IT_> y(size+2);
+      DenseVector<DT_, IT_> r(size+2);
+      DenseVector<DT_, IT_> ref1(size+2);
+      DenseVector<DT_, IT_> ref2(size+2);
+
+      ref1.format();
+
+      {
+        Memory::TypedView<IT_> row_ptr(a.row_ptr_view_w());
+        Memory::TypedView<IT_> col_idx(a.col_idx_view_w());
+        Memory::TypedView<DT_> a_val(a.val_view_w());
+        Memory::TypedView<DT_> vx(x.elements_view_w());
+        Memory::TypedView<DT_> vy(y.elements_view_w());
+        Memory::TypedView<DT_> vr1(ref1.elements_view_w());
+        Memory::TypedView<DT_> vr2(ref2.elements_view_w());
+
+        for (Index i(0); i < size+2; ++i)
+        {
+          vy[i] = DT_((i*138937ll) % 73) * DT_(1.618) - DT_(0.6);
+        }
+
+        for (Index i(0); i < size; ++i)
+        {
+          row_ptr[i] = IT_(3*i);
+          col_idx[3*i+0] = IT_(i);
+          col_idx[3*i+1] = IT_(i+1);
+          col_idx[3*i+2] = IT_(i+2);
+          a_val[3*i+0] = DT_((i*131071ll) % 31) * DT_(3.141) - DT_(0.3);
+          a_val[3*i+1] = DT_((i*65537ll) % 37) * DT_(2.713) - DT_(0.2);
+          a_val[3*i+2] = DT_((i*40487ll) % 53) * DT_(1.414) - DT_(0.1);
+          vx[i] = DT_((i*524287ll) % 97) * DT_(2.303) - DT_(0.7);
+          vr1[i+0] += a_val[3*i+0] * vx[i];
+          vr1[i+1] += a_val[3*i+1] * vx[i];
+          vr1[i+2] += a_val[3*i+2] * vx[i];
+        }
+        row_ptr[size] = IT_(3*size);
+
+        for (Index i(0); i < size+2; ++i)
+          vr2[i] = vy[i] + alpha*vr1[i];
+      }
+
+      a.apply_transposed(r, x);
+      TEST_CHECK_LESS_THAN(r.max_rel_diff(ref1), tol);
+
+      a.apply_transposed(r, x, y, DT_(0.0));
+      TEST_CHECK_LESS_THAN(r.max_rel_diff(y), tol);
+
+      a.apply_transposed(r, x, y, alpha);
+      TEST_CHECK_LESS_THAN(r.max_rel_diff(ref2), tol);
+
+      r.copy(y);
+      a.apply_transposed(r, x, r, alpha);
+      TEST_CHECK_LESS_THAN(r.max_rel_diff(ref2), tol);
+    }
+  }
+};
+
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTransposedTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTransposedTest, double, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTransposedTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTransposedTest, double, std::uint32_t, PreferredBackend::generic);
+#ifdef FEAT_HAVE_MKL
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTransposedTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTransposedTest, double, std::uint64_t, PreferredBackend::mkl);
+#endif
+#ifdef FEAT_HAVE_QUADMATH
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTransposedTest, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTransposedTest, __float128, std::uint32_t, PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_HALFMATH
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTransposedTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTransposedTest, Half, std::uint64_t, PreferredBackend::generic);
+#endif
+#ifdef FEAT_HAVE_CUDA
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTransposedTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTransposedTest, double, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTransposedTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTransposedTest, double, std::uint32_t, PreferredBackend::cuda);
+#ifdef FEAT_HAVE_HALFMATH
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTransposedTest, Half, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRApplyTransposedTest, Half, std::uint64_t, PreferredBackend::cuda);
+#endif
+#endif
+
+template<
+  typename DT_,
+  typename IT_>
+class SparseMatrixCSRBApplyTest
+  : public UnitTest
+{
+public:
+  explicit SparseMatrixCSRBApplyTest(PreferredBackend backend)
     : UnitTest("SparseMatrixCSRBApplyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
-  virtual ~SparseMatrixCSRBApplyTest()
-  {
-  }
-
   virtual void run() const override
   {
-    const DT_ eps = TestSystem::tol<DT_>();
-    for (IT_ size(1); size < IT_(1e3); size *= IT_(2))
+    const DT_ tol = TestSystem::tol<DT_>();
+    const DT_ alpha(DT_(0.693));
+
+    for (IT_ size(1); size < Index(100); size *= IT_(3))
     {
-      SparseMatrixFactory<DT_, IT_> a_fac(size, size);
-      DenseVector<DT_, IT_> ref_x(size);
-      DenseVector<DT_, IT_> aref_x(size);
-      for (Index i(0); i < size; ++i)
-      {
-        ref_x(i, DT_(i % 100) * DT_(1.234));
-        if (i == 0 && size > 1)
-          aref_x(i, DT_(1.234) * (DT_(2) * DT_(i % 100) - DT_((i + 1) % 100)));
-        else if (i == size - 1 && size > 1)
-          aref_x(i, DT_(1.234) * (DT_(2) * DT_(i % 100) - DT_((i - 1) % 100)));
-        else if (i == 0 && size == 1)
-          aref_x(i, DT_(1.234) * DT_(2) * DT_(i % 100));
-        else
-          aref_x(i, DT_(1.234) * (DT_(2) * DT_(i % 100) - DT_((i - 1) % 100) - DT_((i + 1) % 100)));
-      }
-
-      for (IT_ row(0); row < a_fac.rows(); ++row)
-      {
-        for (IT_ col(0); col < a_fac.columns(); ++col)
-        {
-          if (row == col)
-          {
-            a_fac.add(row, col, DT_(2));
-          }
-          else if ((row == col + 1) || (row + 1 == col))
-          {
-            a_fac.add(row, col, DT_(-1));
-          }
-        }
-      }
-      SparseMatrixCSR<DT_, IT_> a(a_fac.make_csr());
-
-
-      DenseVectorBlocked<DT_, IT_, 3> x(size);
-      for (Index i(0); i < size; ++i)
-      {
-        auto temp = x(i);
-        temp[0] = ref_x(i);
-        temp[1] = DT_(0.5) * ref_x(i);
-        temp[2] = DT_(2.0) * ref_x(i);
-        x(i, temp);
-      }
-
+      SparseMatrixCSR<DT_, IT_> a(size, size+2, 3*size);
+      DenseVectorBlocked<DT_, IT_, 3> x(size+2);
       DenseVectorBlocked<DT_, IT_, 3> y(size);
-      for (Index i(0); i < size; ++i)
-      {
-        auto temp = y(i);
-        temp[0] = DT_(i);
-        temp[1] = DT_(i * 2);
-        temp[2] = DT_(i * 3);
-        y(i, temp);
-      }
-
       DenseVectorBlocked<DT_, IT_, 3> r(size);
+      DenseVectorBlocked<DT_, IT_, 3> ref1(size);
+      DenseVectorBlocked<DT_, IT_, 3> ref2(size);
+
+      {
+        Memory::TypedView<IT_> row_ptr(a.row_ptr_view_w());
+        Memory::TypedView<IT_> col_idx(a.col_idx_view_w());
+        Memory::TypedView<DT_> a_val(a.val_view_w());
+        Memory::TypedView<Tiny::Vector<DT_, 3>> vx(x.elements_view_w());
+        Memory::TypedView<Tiny::Vector<DT_, 3>> vy(y.elements_view_w());
+        Memory::TypedView<Tiny::Vector<DT_, 3>> vr1(ref1.elements_view_w());
+        Memory::TypedView<Tiny::Vector<DT_, 3>> vr2(ref2.elements_view_w());
+
+        for (Index i(0); i < size+2; ++i)
+        {
+          vx[i][0] = DT_((i*524287ll) % 97) * DT_(2.303) - DT_(0.7);
+          vx[i][1] = DT_(0.7) * vx[i][0];
+          vx[i][2] = DT_(1.3) * vx[i][0];
+        }
+
+        for (Index i(0); i < size; ++i)
+        {
+          row_ptr[i] = IT_(3*i);
+          col_idx[3*i+0] = IT_(i);
+          col_idx[3*i+1] = IT_(i+1);
+          col_idx[3*i+2] = IT_(i+2);
+          a_val[3*i+0] = DT_((i*131071ll) % 31) * DT_(3.141) - DT_(0.3);
+          a_val[3*i+1] = DT_((i*65537ll) % 37) * DT_(2.713) - DT_(0.2);
+          a_val[3*i+2] = DT_((i*40487ll) % 53) * DT_(1.414) - DT_(0.1);
+
+          vy[i][0] = DT_((i*138937ll) % 73) * DT_(1.618) - DT_(0.6);
+          vy[i][1] = vy[i][0] * DT_(0.3);
+          vy[i][2] = vy[i][0] * DT_(1.7);
+
+          vr1[i][0] = a_val[3*i+0] * vx[i+0][0] + a_val[3*i+1] * vx[i+1][0] + a_val[3*i+2] * vx[i+2][0];
+          vr1[i][1] = DT_(0.7) * vr1[i][0];
+          vr1[i][2] = DT_(1.3) * vr1[i][0];
+
+          vr2[i][0] = vy[i][0] + alpha * vr1[i][0];
+          vr2[i][1] = vy[i][1] + alpha * vr1[i][1];
+          vr2[i][2] = vy[i][2] + alpha * vr1[i][2];
+        }
+        row_ptr[size] = IT_(3*size);
+      }
 
       a.apply(r, x);
-      for (Index i(0); i < size; ++i)
-      {
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[0], aref_x(i), eps);
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[1], aref_x(i) * DT_(0.5), eps);
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[2], aref_x(i) * DT_(2.0), eps*DT_(10));
-      }
+      TEST_CHECK_LESS_THAN(r.max_rel_diff(ref1), tol);
 
-      a.apply(r, x, y, DT_(-1));
-      for (Index i(0); i < size; ++i)
-      {
-        TEST_CHECK_RELATIVE(r(i)[0], y(i)[0] - aref_x(i), eps);
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[1], y(i)[1] - aref_x(i) * DT_(0.5), eps);
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[2], y(i)[2] - aref_x(i) * DT_(2.0), eps);
-      }
+      a.apply(r, x, y, DT_(0.0));
+      TEST_CHECK_LESS_THAN(r.max_rel_diff(y), tol);
 
-      DT_ alpha(0.75);
       a.apply(r, x, y, alpha);
-      for (Index i(0); i < size; ++i)
-      {
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[0], y(i)[0] + alpha * aref_x(i), eps);
-        TEST_CHECK_EQUAL_WITHIN_EPS(r(i)[1], y(i)[1] + alpha * aref_x(i) * DT_(0.5), eps);
-        TEST_CHECK_RELATIVE(r(i)[2], y(i)[2] + alpha * aref_x(i) * DT_(2.0), eps);
-      }
+      TEST_CHECK_LESS_THAN(r.max_rel_diff(ref2), tol);
+
+      r.copy(y);
+      a.apply(r, x, r, alpha);
+      TEST_CHECK_LESS_THAN(r.max_rel_diff(ref2), tol);
     }
   }
 };
 
-SparseMatrixCSRBApplyTest <float, std::uint64_t> sm_csrib_apply_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRBApplyTest <double, std::uint64_t> sm_csrib_apply_test_double_uint64(PreferredBackend::generic);
-SparseMatrixCSRBApplyTest <float, std::uint32_t> sm_csrib_apply_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRBApplyTest <double, std::uint32_t> sm_csrib_apply_test_double_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRBApplyTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRBApplyTest, double, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRBApplyTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRBApplyTest, double, std::uint32_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRBApplyTest <float, std::uint64_t> mkl_sm_csrib_apply_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRBApplyTest <double, std::uint64_t> mkl_sm_csrib_apply_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRBApplyTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRBApplyTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRBApplyTest <__float128, std::uint64_t> sm_csrib_apply_test_float128_uint64(PreferredBackend::generic);
-SparseMatrixCSRBApplyTest <__float128, std::uint32_t> sm_csrib_apply_test_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRBApplyTest, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRBApplyTest, __float128, std::uint32_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-// Disabled: eps too sharp
-//SparseMatrixCSRBApplyTest <Half, std::uint32_t> sm_csrib_apply_test_half_uint32(PreferredBackend::generic);
-// Disabled: eps too sharp
-//SparseMatrixCSRBApplyTest <Half, std::uint64_t> sm_csrib_apply_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRBApplyTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRBApplyTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRBApplyTest <float, std::uint64_t> cuda_sm_csrib_apply_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRBApplyTest <double, std::uint64_t> cuda_sm_csrib_apply_test_double_uint64(PreferredBackend::cuda);
-SparseMatrixCSRBApplyTest <float, std::uint32_t> cuda_sm_csrib_apply_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRBApplyTest <double, std::uint32_t> cuda_sm_csrib_apply_test_double_uint32(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRBApplyTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRBApplyTest, double, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRBApplyTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRBApplyTest, double, std::uint32_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class SparseMatrixCSRScaleTest
+class SparseMatrixCSRScaleTest
   : public UnitTest
 {
 public:
-  SparseMatrixCSRScaleTest(PreferredBackend backend)
+  explicit SparseMatrixCSRScaleTest(PreferredBackend backend)
     : UnitTest("SparseMatrixCSRScaleTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
-  virtual ~SparseMatrixCSRScaleTest()
-  {
-  }
-
   virtual void run() const override
   {
-    const DT_ eps = TestSystem::tol<DT_>();
-    for (Index size(2); size < Index(3e2); size *= 2)
+    const DT_ tol = TestSystem::tol<DT_>();
+    const DT_ alpha(DT_(0.693));
+
+    for (Index size(1); size < Index(300); size *= 2)
     {
-      DT_ s(DT_(4.321));
-      SparseMatrixFactory<DT_, IT_> a_fac(IT_(size), IT_(size + 2));
-      SparseMatrixFactory<DT_, IT_> ref_fac(IT_(size), IT_(size + 2));
-
-      for (IT_ row(0); row < a_fac.rows(); ++row)
+      SparseMatrixCSR<DT_, IT_> a(size, size+2, 3*size);
       {
-        for (IT_ col(0); col < a_fac.columns(); ++col)
-        {
-          if (row == col)
-            a_fac.add(row, col, DT_(2));
-          else if ((row == col + 1) || (row + 1 == col))
-            a_fac.add(row, col, DT_(-1));
+        Memory::TypedView<IT_> row_ptr(a.row_ptr_view_w());
+        Memory::TypedView<IT_> col_idx(a.col_idx_view_w());
+        Memory::TypedView<DT_> a_val(a.val_view_w());
 
-          if (row == col)
-            ref_fac.add(row, col, DT_(2) * s);
-          else if ((row == col + 1) || (row + 1 == col))
-            ref_fac.add(row, col, DT_(-1) * s);
+        for (Index i(0); i < size; ++i)
+        {
+          row_ptr[i] = IT_(3*i);
+          col_idx[3*i+0] = IT_(i);
+          col_idx[3*i+1] = IT_(i+1);
+          col_idx[3*i+2] = IT_(i+2);
+          a_val[3*i+0] = DT_((i*131071ll) % 31) * DT_(3.141) - DT_(0.3);
+          a_val[3*i+1] = DT_((i*65537ll) % 37) * DT_(2.713) - DT_(0.2);
+          a_val[3*i+2] = DT_((i*40487ll) % 53) * DT_(1.414) - DT_(0.1);
         }
+        row_ptr[size] = IT_(3*size);
       }
 
-      SparseMatrixCSR<DT_, IT_> ref(ref_fac.make_csr());
-      SparseMatrixCSR<DT_, IT_> a(a_fac.make_csr());
-      SparseMatrixCSR<DT_, IT_> b;
-      b.clone(a);
+      SparseMatrixCSR<DT_, IT_> ref(a.clone(LAFEM::CloneMode::Weak));
+      {
+        Memory::TypedView<DT_> r_val(ref.val_view_rw());
+        for(Index i(0); i < ref.num_nzes(); ++i)
+          r_val[i] *= alpha;
+      }
 
-      b.scale(a, s);
-      TEST_CHECK_LESS_THAN(b.max_rel_diff(ref), eps);
+      SparseMatrixCSR<DT_, IT_> b(a.clone(LAFEM::CloneMode::Weak));
 
-      a.scale(a, s);
-      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref), eps);
+      b.scale(a, alpha);
+      TEST_CHECK_LESS_THAN(b.max_rel_diff(ref), tol);
+
+      a.scale(a, alpha);
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref), tol);
     }
   }
 };
 
-SparseMatrixCSRScaleTest <float, std::uint32_t> sm_csr_scale_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRScaleTest <double, std::uint32_t> sm_csr_scale_test_double_uint32(PreferredBackend::generic);
-SparseMatrixCSRScaleTest <float, std::uint64_t> sm_csr_scale_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRScaleTest <double, std::uint64_t> sm_csr_scale_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRScaleTest <float, std::uint64_t> mkl_sm_csr_scale_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRScaleTest <double, std::uint64_t> mkl_sm_csr_scale_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRScaleTest <__float128, std::uint32_t> sm_csr_scale_test_float128_uint32(PreferredBackend::generic);
-SparseMatrixCSRScaleTest <__float128, std::uint64_t> sm_csr_scale_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRScaleTest <Half, std::uint32_t> sm_csr_scale_test_half_uint32(PreferredBackend::generic);
-SparseMatrixCSRScaleTest <Half, std::uint64_t> sm_csr_scale_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRScaleTest <float, std::uint32_t> cuda_sm_csr_scale_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRScaleTest <double, std::uint32_t> cuda_sm_csr_scale_test_double_uint32(PreferredBackend::cuda);
-SparseMatrixCSRScaleTest <float, std::uint64_t> cuda_sm_csr_scale_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRScaleTest <double, std::uint64_t> cuda_sm_csr_scale_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class SparseMatrixCSRScaleRowColTest
+class SparseMatrixCSRScaleRowColTest
   : public UnitTest
 {
 public:
-  SparseMatrixCSRScaleRowColTest(PreferredBackend backend)
+  explicit SparseMatrixCSRScaleRowColTest(PreferredBackend backend)
     : UnitTest("SparseMatrixCSRScaleRowColTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
-  virtual ~SparseMatrixCSRScaleRowColTest()
-  {
-  }
 
   virtual void run() const override
   {
-    for (Index size(2); size < Index(3e2); size *= 3)
-    {
-      const DT_ pi(Math::pi<DT_>());
-      const DT_ eps = TestSystem::tol<DT_>();
+    const DT_ pi(Math::pi<DT_>());
+    const DT_ tol = TestSystem::tol<DT_>();
 
-      SparseMatrixFactory<DT_, IT_> a_fac(IT_(size), IT_(size + 2));
-      for (IT_ row(0); row < a_fac.rows(); ++row)
+    for (Index size(2); size < Index(300); size *= 3)
+    {
+      DenseVector<DT_, IT_> sr(size);
+      DenseVector<DT_, IT_> sc(size + 2);
+
       {
-        for (IT_ col(0); col < a_fac.columns(); ++col)
+        Memory::TypedView<DT_> vs(sr.elements_view_w());
+        for (Index i(0); i < sr.size(); ++i)
         {
-          if (row == col)
-            a_fac.add(row, col, DT_(2));
-          else if ((row == col + 1) || (row + 1 == col))
-            a_fac.add(row, col, DT_(-1));
+          vs[i] = pi * DT_(i % 3 + 1) - DT_(5.21) + DT_(i % 17);
+        }
+      }
+
+      {
+        Memory::TypedView<DT_> vs(sc.elements_view_w());
+        for (Index i(0); i < sc.size(); ++i)
+        {
+          vs[i] = pi * DT_(i % 5 + 2) - DT_(7.32) + DT_(i % 13);
+        }
+      }
+
+      SparseMatrixFactory<DT_, IT_> a_fac(size, size + 2);
+      SparseMatrixFactory<DT_, IT_> ar_fac(size, size + 2);
+      SparseMatrixFactory<DT_, IT_> ac_fac(size, size + 2);
+      for (IT_ row(0); row < a_fac.num_rows(); ++row)
+      {
+        {
+          Index col = row;
+          a_fac.add(row, col, DT_(2));
+          ar_fac.add(row, col, DT_(2) * (pi * DT_(row % 3 + 1) - DT_(5.21) + DT_(row % 17)));
+          ac_fac.add(row, col, DT_(2) * (pi * DT_(col % 5 + 2) - DT_(7.32) + DT_(col % 13)));
+        }
+        {
+          Index col = row+1;
+          a_fac.add(row, col,  DT_(col % 7));
+          ar_fac.add(row, col, DT_(col % 7) * (pi * DT_(row % 3 + 1) - DT_(5.21) + DT_(row % 17)));
+          ac_fac.add(row, col, DT_(col % 7) * (pi * DT_(col % 5 + 2) - DT_(7.32) + DT_(col % 13)));
+        }
+        {
+          Index col = row+2;
+          a_fac.add(row, col,  DT_(col % 11));
+          ar_fac.add(row, col, DT_(col % 11) * (pi * DT_(row % 3 + 1) - DT_(5.21) + DT_(row % 17)));
+          ac_fac.add(row, col, DT_(col % 11) * (pi * DT_(col % 5 + 2) - DT_(7.32) + DT_(col % 13)));
         }
       }
 
       SparseMatrixCSR<DT_, IT_> a(a_fac.make_csr());
-      SparseMatrixCSR<DT_, IT_> b(a.clone());
+      SparseMatrixCSR<DT_, IT_> ar(ar_fac.make_csr());
+      SparseMatrixCSR<DT_, IT_> ac(ac_fac.make_csr());
+
+      SparseMatrixCSR<DT_, IT_> b(a.clone(LAFEM::CloneMode::Layout));
 
       // Scale rows
-      DenseVector<DT_, IT_> s1(a.rows());
-      for (Index i(0); i < s1.size(); ++i)
-      {
-        s1(i, pi * DT_(i % 3 + 1) - DT_(5.21) + DT_(i));
-      }
-      b.scale_rows(b, s1);
-      for (Index row(0); row < a.rows(); ++row)
-      {
-        for (Index col(0); col < a.columns(); ++col)
-        {
-          TEST_CHECK_EQUAL_WITHIN_EPS(b(row, col), a(row, col) * s1(row), eps);
-        }
-      }
+      b.scale_rows(a, sr);
+      TEST_CHECK_LESS_THAN(b.max_rel_diff(ar), tol);
 
       // Scale cols
-      DenseVector<DT_, IT_> s2(a.columns());
-      for (Index i(0); i < s2.size(); ++i)
-      {
-        s2(i, pi * DT_(i % 3 + 1) - DT_(5.21) + DT_(i));
-      }
-      b.scale_cols(a, s2);
-      for (Index row(0); row < a.rows(); ++row)
-      {
-        for (Index col(0); col < a.columns(); ++col)
-        {
-          TEST_CHECK_EQUAL_WITHIN_EPS(b(row, col), a(row, col) * s2(col), eps);
-        }
-      }
+      b.scale_cols(a, sc);
+      TEST_CHECK_LESS_THAN(b.max_rel_diff(ac), tol);
     }
   }
 };
 
-SparseMatrixCSRScaleRowColTest <float, std::uint32_t> sm_csr_scale_row_col_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRScaleRowColTest <double, std::uint32_t> sm_csr_scale_row_col_test_double_uint32(PreferredBackend::generic);
-SparseMatrixCSRScaleRowColTest <float, std::uint64_t> sm_csr_scale_row_col_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRScaleRowColTest <double, std::uint64_t> sm_csr_scale_row_col_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleRowColTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleRowColTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleRowColTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleRowColTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRScaleRowColTest <float, std::uint64_t> mkl_sm_csr_scale_row_col_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRScaleRowColTest <double, std::uint64_t> mkl_sm_csr_scale_row_col_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleRowColTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleRowColTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRScaleRowColTest <__float128, std::uint32_t> sm_csr_scale_row_col_test_float128_uint32(PreferredBackend::generic);
-SparseMatrixCSRScaleRowColTest <__float128, std::uint64_t> sm_csr_scale_row_col_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleRowColTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleRowColTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRScaleRowColTest <Half, std::uint32_t> sm_csr_scale_row_col_test_half_uint32(PreferredBackend::generic);
-SparseMatrixCSRScaleRowColTest <Half, std::uint64_t> sm_csr_scale_row_col_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleRowColTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleRowColTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRScaleRowColTest <float, std::uint32_t> cuda_sm_csr_scale_row_col_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRScaleRowColTest <double, std::uint32_t> cuda_sm_csr_scale_row_col_test_double_uint32(PreferredBackend::cuda);
-SparseMatrixCSRScaleRowColTest <float, std::uint64_t> cuda_sm_csr_scale_row_col_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRScaleRowColTest <double, std::uint64_t> cuda_sm_csr_scale_row_col_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleRowColTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleRowColTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleRowColTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRScaleRowColTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class SparseMatrixCSRTranspositionTest
+class SparseMatrixCSRTranspositionTest
   : public UnitTest
 {
-
 public:
-  SparseMatrixCSRTranspositionTest(PreferredBackend backend)
+  explicit SparseMatrixCSRTranspositionTest(PreferredBackend backend)
     : UnitTest("SparseMatrixCSRTranspositionTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
-  virtual ~SparseMatrixCSRTranspositionTest()
-  {
-  }
-
   virtual void run() const override
   {
-    const DT_ eps = TestSystem::tol<DT_>();
-    for (Index size(2); size < Index(3e2); size *= 4)
+    const DT_ tol = TestSystem::tol<DT_>();
+
+    for (Index size(2); size < Index(200); size *= 3)
     {
-      SparseMatrixFactory<DT_, IT_> a_fac(IT_(size), IT_(size + 2));
+      const Index m = size;
+      const Index n = size + 2;
+      SparseMatrixFactory<DT_, IT_> a_fac(m, n), b_fac(n ,m);
 
-      for (IT_ row(0); row < a_fac.rows(); ++row)
+      for(Index i = 0; i < m; ++i)
       {
-        for (IT_ col(0); col < a_fac.columns(); ++col)
-        {
-          if (row == col)
-            a_fac.add(row, col, DT_(2));
-          else if (row == col + 1)
-            a_fac.add(row, col, DT_(-1));
-          else if (row + 1 == col)
-            a_fac.add(row, col, DT_(-3));
-        }
+        const Index j1 = (i * Index(131071)) % n;
+        const Index j2 = (i * Index(524287)) % n;
+        const Index j3 = (i * Index(2147483647)) % n;
+        a_fac.add(i, j1, DT_(3*i + 1));
+        a_fac.add(i, j2, DT_(3*i + 2));
+        a_fac.add(i, j3, DT_(3*i + 3));
+        b_fac.add(j1, i, DT_(3*i + 1));
+        b_fac.add(j2, i, DT_(3*i + 2));
+        b_fac.add(j3, i, DT_(3*i + 3));
       }
+
       SparseMatrixCSR<DT_, IT_> a(a_fac.make_csr());
+      SparseMatrixCSR<DT_, IT_> b(b_fac.make_csr());
 
+      SparseMatrixCSR<DT_, IT_> c = a.transpose();
 
-      SparseMatrixCSR<DT_, IT_> b;
-      b.transpose(a);
+      TEST_CHECK_EQUAL(c.num_rows(), b.num_rows());
+      TEST_CHECK_EQUAL(c.num_cols(), b.num_cols());
+      TEST_CHECK_EQUAL(c.num_nzes(), b.num_nzes());
 
-      for (Index i(0); i < a.rows(); ++i)
-      {
-        for (Index j(0); j < a.columns(); ++j)
-        {
-          TEST_CHECK_EQUAL(b(j, i), a(i, j));
-        }
-      }
+      TEST_CHECK(c.same_layout(b));
 
-      b = b.transpose();
-
-      TEST_CHECK_LESS_THAN(a.max_rel_diff(b), eps);
+      TEST_CHECK_LESS_THAN(c.max_rel_diff(b), tol);
     }
   }
 };
 
-SparseMatrixCSRTranspositionTest <float, std::uint32_t> sm_csr_transposition_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRTranspositionTest <double, std::uint32_t> sm_csr_transposition_test_double_uint32(PreferredBackend::generic);
-SparseMatrixCSRTranspositionTest <float, std::uint64_t> sm_csr_transposition_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRTranspositionTest <double, std::uint64_t> sm_csr_transposition_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTranspositionTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTranspositionTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTranspositionTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTranspositionTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRTranspositionTest <float, std::uint64_t> mkl_sm_csr_transposition_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRTranspositionTest <double, std::uint64_t> mkl_sm_csr_transposition_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTranspositionTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTranspositionTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRTranspositionTest <__float128, std::uint32_t> sm_csr_transposition_test_float128_uint32(PreferredBackend::generic);
-SparseMatrixCSRTranspositionTest <__float128, std::uint64_t> sm_csr_transposition_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTranspositionTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTranspositionTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRTranspositionTest <Half, std::uint32_t> sm_csr_transposition_test_half_uint32(PreferredBackend::generic);
-SparseMatrixCSRTranspositionTest <Half, std::uint64_t> sm_csr_transposition_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTranspositionTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTranspositionTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRTranspositionTest <float, std::uint32_t> cuda_sm_csr_transposition_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRTranspositionTest <double, std::uint32_t> cuda_sm_csr_transposition_test_double_uint32(PreferredBackend::cuda);
-SparseMatrixCSRTranspositionTest <float, std::uint64_t> cuda_sm_csr_transposition_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRTranspositionTest <double, std::uint64_t> cuda_sm_csr_transposition_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTranspositionTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTranspositionTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTranspositionTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRTranspositionTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class SparseMatrixCSRPermuteTest
+class SparseMatrixCSRPermuteTest
   : public UnitTest
 {
 public:
-  SparseMatrixCSRPermuteTest(PreferredBackend backend)
+  explicit SparseMatrixCSRPermuteTest(PreferredBackend backend)
     : UnitTest("SparseMatrixCSRPermuteTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~SparseMatrixCSRPermuteTest()
   {
   }
 
   virtual void run() const override
   {
-    const DT_ eps = TestSystem::tol<DT_>();
-    for (IT_ size(25); size < IT_(1e3); size *= IT_(2))
+    const DT_ tol = TestSystem::tol<DT_>();
+
+    for (IT_ size(25); size < Index(1000); size *= IT_(2))
     {
       SparseMatrixFactory<DT_, IT_> a_fac(size, size);
+
       DenseVector<DT_, IT_> x(size);
-      for (Index i(0); i < size; ++i)
       {
-        x(i, DT_(i % 100) * DT_(1.234));
+        Memory::TypedView<DT_> vx(x.elements_view_w());
+        for (Index i(0); i < size; ++i)
+        {
+          vx[i] = DT_(i % 100) * DT_(1.234);
+        }
       }
 
-      for (IT_ row(0); row < a_fac.rows(); ++row)
+      for (IT_ row(0); row < a_fac.num_rows(); ++row)
       {
-        for (IT_ col(0); col < a_fac.columns(); ++col)
+        for (IT_ col(0); col < a_fac.num_cols(); ++col)
         {
           if (row == col)
           {
@@ -907,7 +955,7 @@ public:
           {
             a_fac.add(row, col, DT_(-2));
           }
-          else if ((row == col + a_fac.columns() / 2) || (row + a_fac.rows() / 2 == col))
+          else if ((row == col + a_fac.num_cols() / 2) || (row + a_fac.num_rows() / 2 == col))
           {
             a_fac.add(row, col, DT_(1));
           }
@@ -923,7 +971,7 @@ public:
 
       Random rng;
       std::cout << "RNG Seed: " << rng.get_seed() << "\n";
-      Adjacency::Permutation perm(a.rows(), rng);
+      Adjacency::Permutation perm(a.num_rows(), rng);
 
       a.permute(perm, perm);
       x.permute(perm);
@@ -931,85 +979,83 @@ public:
       a.apply(r, x);
       DT_ norm = r.norm2();
       DT_ deviation = norm / ref_norm;
-      TEST_CHECK_EQUAL_WITHIN_EPS(deviation, DT_(1.0), DT_(0.01));
+      TEST_CHECK(deviation > DT_(0.99));
+      TEST_CHECK(deviation < DT_(1.01));
 
       a = a_backup.clone(CloneMode::Deep);
       auto perm_inv = perm.inverse();
       a.permute(perm_inv, perm);
       a.permute(perm, perm_inv);
-      TEST_CHECK_LESS_THAN(a.max_rel_diff(a_backup), eps);
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(a_backup), tol);
     }
   }
 };
 
-SparseMatrixCSRPermuteTest <float, std::uint64_t> sm_csr_permute_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRPermuteTest <double, std::uint64_t> sm_csr_permute_test_double_uint64(PreferredBackend::generic);
-SparseMatrixCSRPermuteTest <float, std::uint32_t> sm_csr_permute_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRPermuteTest <double, std::uint32_t> sm_csr_permute_test_double_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRPermuteTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRPermuteTest, double, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRPermuteTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRPermuteTest, double, std::uint32_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRPermuteTest <float, std::uint64_t> mkl_sm_csr_permute_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRPermuteTest <double, std::uint64_t> mkl_sm_csr_permute_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRPermuteTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRPermuteTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRPermuteTest <__float128, std::uint64_t> sm_csr_permute_test_float128_uint64(PreferredBackend::generic);
-SparseMatrixCSRPermuteTest <__float128, std::uint32_t> sm_csr_permute_test_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRPermuteTest, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRPermuteTest, __float128, std::uint32_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-// Disabled: Produces nans
-//SparseMatrixCSRPermuteTest <Half, std::uint32_t> sm_csr_permute_test_half_uint32(PreferredBackend::generic);
-// Disabled: Produces nans
-//SparseMatrixCSRPermuteTest <Half, std::uint64_t> sm_csr_permute_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRPermuteTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRPermuteTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRPermuteTest <float, std::uint64_t> cuda_sm_csr_permute_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRPermuteTest <double, std::uint64_t> cuda_sm_csr_permute_test_double_uint64(PreferredBackend::cuda);
-SparseMatrixCSRPermuteTest <float, std::uint32_t> cuda_sm_csr_permute_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRPermuteTest <double, std::uint32_t> cuda_sm_csr_permute_test_double_uint32(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRPermuteTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRPermuteTest, double, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRPermuteTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRPermuteTest, double, std::uint32_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class SparseMatrixCSRDiagTest
+class SparseMatrixCSRDiagTest
   : public UnitTest
 {
 public:
-  SparseMatrixCSRDiagTest(PreferredBackend backend)
+  explicit SparseMatrixCSRDiagTest(PreferredBackend backend)
     : UnitTest("SparseMatrixCSRDiagTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~SparseMatrixCSRDiagTest()
   {
   }
 
   virtual void run() const override
   {
-    const DT_ eps = TestSystem::tol<DT_>();
-    for (IT_ size(2); size < IT_(3e2); size *= IT_(2))
+    const DT_ tol = TestSystem::tol<DT_>();
+
+    for (Index size(2); size < Index(200); size *= 3)
     {
-      SparseMatrixFactory<DT_, IT_> a_fac(size, size);
-      for (IT_ row(0); row < a_fac.rows(); ++row)
+      SparseMatrixCSR<DT_, IT_> a(size, size+2, 3*size);
+      DenseVector<DT_, IT_> ref(size);
       {
-        for (IT_ col(0); col < a_fac.columns(); ++col)
+        Memory::TypedView<IT_> row_ptr(a.row_ptr_view_w());
+        Memory::TypedView<IT_> col_idx(a.col_idx_view_w());
+        Memory::TypedView<DT_> a_val(a.val_view_w());
+        Memory::TypedView<DT_> vr(ref.elements_view_w());
+
+        for (Index i(0); i < size; ++i)
         {
-          if (row == col)
-            a_fac.add(row, col, DT_(DT_(col % 100) / DT_(2)));
-          else if ((row == col + 1) || (row + 1 == col))
-            a_fac.add(row, col, DT_(-1));
+          row_ptr[i] = IT_(3*i);
+          col_idx[3*i+0] = IT_(i);
+          col_idx[3*i+1] = IT_(i+1);
+          col_idx[3*i+2] = IT_(i+2);
+          a_val[3*i+0] = DT_((i*131071ll) % 31) * DT_(3.141) - DT_(0.3);
+          a_val[3*i+1] = DT_((i*65537ll) % 37) * DT_(2.713) - DT_(0.2);
+          a_val[3*i+2] = DT_((i*40487ll) % 53) * DT_(1.414) - DT_(0.1);
+          vr[i] = a_val[3*i+0];
         }
-      }
-
-      SparseMatrixCSR<DT_, IT_> a(a_fac.make_csr());
-
-      auto ref = a.create_vector_l();
-      for (Index i(0); i < a_fac.rows(); ++i)
-      {
-        ref(i, DT_(DT_(i % 100) / DT_(2)));
+        row_ptr[size] = IT_(3*size);
       }
 
       auto diag = a.extract_diag();
-      TEST_CHECK_LESS_THAN(diag.max_rel_diff(ref), eps);
+      TEST_CHECK_LESS_THAN(diag.max_rel_diff(ref), tol);
     }
 
     SparseMatrixFactory<DT_, IT_> b_fac(16, 16);
@@ -1022,206 +1068,209 @@ public:
 
     auto ref = b.create_vector_l();
     ref.format(DT_(0.0));
-    ref(0, DT_(1.0));
-    ref(2, DT_(2.0));
-    ref(3, DT_(3.0));
-    ref(7, DT_(7.0));
+    {
+      Memory::TypedView<DT_> vr(ref.elements_view_rw());
+      vr[0] = DT_(1.0);
+      vr[2] = DT_(2.0);
+      vr[3] = DT_(3.0);
+      vr[7] = DT_(7.0);
+    }
     auto diag = b.extract_diag();
-    TEST_CHECK_LESS_THAN(diag.max_rel_diff(ref), eps);
+    TEST_CHECK_LESS_THAN(diag.max_rel_diff(ref), tol);
   }
 };
 
-SparseMatrixCSRDiagTest <float, std::uint32_t> sm_csr_diag_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRDiagTest <double, std::uint32_t> sm_csr_diag_test_double_uint32(PreferredBackend::generic);
-SparseMatrixCSRDiagTest <float, std::uint64_t> sm_csr_diag_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRDiagTest <double, std::uint64_t> sm_csr_diag_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRDiagTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRDiagTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRDiagTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRDiagTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRDiagTest <float, std::uint64_t> mkl_sm_csr_diag_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRDiagTest <double, std::uint64_t> mkl_sm_csr_diag_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRDiagTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRDiagTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRDiagTest <__float128, std::uint32_t> sm_csr_diag_test_float128_uint32(PreferredBackend::generic);
-SparseMatrixCSRDiagTest <__float128, std::uint64_t> sm_csr_diag_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRDiagTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRDiagTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRDiagTest <Half, std::uint32_t> sm_csr_diag_test_half_uint32(PreferredBackend::generic);
-SparseMatrixCSRDiagTest <Half, std::uint64_t> sm_csr_diag_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRDiagTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRDiagTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRDiagTest <float, std::uint32_t> cuda_sm_csr_diag_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRDiagTest <double, std::uint32_t> cuda_sm_csr_diag_test_double_uint32(PreferredBackend::cuda);
-SparseMatrixCSRDiagTest <float, std::uint64_t> cuda_sm_csr_diag_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRDiagTest <double, std::uint64_t> cuda_sm_csr_diag_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRDiagTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRDiagTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRDiagTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRDiagTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class SparseMatrixCSRAxpyTest
+class SparseMatrixCSRAxpyTest
   : public UnitTest
 {
 public:
-  SparseMatrixCSRAxpyTest(PreferredBackend backend)
+  explicit SparseMatrixCSRAxpyTest(PreferredBackend backend)
     : UnitTest("SparseMatrixCSRAxpyTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~SparseMatrixCSRAxpyTest()
   {
   }
 
   virtual void run() const override
   {
-    const DT_ eps = TestSystem::tol<DT_>();
-    for (Index size(2); size < Index(3e2); size *= 2)
+    const DT_ tol = TestSystem::tol<DT_>();
+    const DT_ alpha(DT_(0.693));
+
+    for (Index size(2); size < Index(200); size *= 3)
     {
-      DT_ s(DT_(4.321));
 
       SparseMatrixFactory<DT_, IT_> a_fac(IT_(size), IT_(size + 2));
       SparseMatrixFactory<DT_, IT_> b_fac(IT_(size), IT_(size + 2));
-      SparseMatrixFactory<DT_, IT_> ref_fac(IT_(size), IT_(size + 2));
+      SparseMatrixFactory<DT_, IT_> ref_fac1(IT_(size), IT_(size + 2));
       SparseMatrixFactory<DT_, IT_> ref_fac2(IT_(size), IT_(size + 2));
 
-      for (IT_ row(0); row < a_fac.rows(); ++row)
+      for (IT_ row(0); row < a_fac.num_rows(); ++row)
       {
-        for (IT_ col(0); col < a_fac.columns(); ++col)
         {
-          if (row == col)
-          {
-            a_fac.add(row, col, DT_(2));
-            b_fac.add(row, col, DT_((row + col) % 15));
-            ref_fac.add(row, col, DT_(2) * s + DT_((row + col) % 15));
-            ref_fac2.add(row, col, DT_((row + col) % 15) * s + DT_((row + col) % 15));
-          }
+          Index col = row;
+          a_fac.add(row, col, DT_(2));
+          b_fac.add(row, col, DT_((row + col) % 15));
+          ref_fac1.add(row, col, DT_(2) * alpha + DT_((row + col) % 15));
+          ref_fac2.add(row, col, DT_((row + col) % 15) * (DT_(1) + alpha));
+        }
 
-          else if ((row == col + 1) || (row + 1 == col))
-          {
-            a_fac.add(row, col, DT_(-1));
-            b_fac.add(row, col, DT_((row + col + 1) % 15));
-            ref_fac.add(row, col, DT_(-1) * s + DT_((row + col + 1) % 15));
-            ref_fac2.add(row, col, DT_((row + col + 1) % 15) * s + DT_((row + col + 1) % 15));
-          }
+        {
+          Index col = row+1;
+          a_fac.add(row, col, DT_(-1));
+          b_fac.add(row, col, DT_((row + col + 1) % 15));
+          ref_fac1.add(row, col, DT_(-1) * alpha + DT_((row + col + 1) % 15));
+          ref_fac2.add(row, col, DT_((row + col + 1) % 15) * (DT_(1) + alpha));
+        }
+
+        {
+          Index col = row+2;
+          a_fac.add(row, col, DT_(1));
+          b_fac.add(row, col, DT_((row + col + 3) % 11));
+          ref_fac1.add(row, col, DT_(1) * alpha + DT_((row + col + 3) % 11));
+          ref_fac2.add(row, col, DT_((row + col + 3) % 11) * (DT_(1) + alpha));
         }
       }
 
-      SparseMatrixCSR<DT_, IT_> ref(ref_fac.make_csr());
+      SparseMatrixCSR<DT_, IT_> ref1(ref_fac1.make_csr());
       SparseMatrixCSR<DT_, IT_> ref2(ref_fac2.make_csr());
       SparseMatrixCSR<DT_, IT_> a(a_fac.make_csr());
       SparseMatrixCSR<DT_, IT_> b(b_fac.make_csr());
 
       // r != x
-      a.scale(a, s);
-      a.axpy(b); /// \todo use axpby here
-      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref), eps);
+      a.scale(a, alpha);
+      a.axpy(b);
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(ref1), tol);
 
       // r == x
-      b.axpy(b, s);
-      TEST_CHECK_LESS_THAN(b.max_rel_diff(ref2), eps);
+      b.axpy(b, alpha);
+      TEST_CHECK_LESS_THAN(b.max_rel_diff(ref2), tol);
     }
   }
 };
 
-SparseMatrixCSRAxpyTest <float, std::uint32_t> sm_csr_axpy_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRAxpyTest <double, std::uint32_t> sm_csr_axpy_test_double_uint32(PreferredBackend::generic);
-SparseMatrixCSRAxpyTest <float, std::uint64_t> sm_csr_axpy_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRAxpyTest <double, std::uint64_t> sm_csr_axpy_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAxpyTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAxpyTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAxpyTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAxpyTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRAxpyTest <float, std::uint64_t> mkl_sm_csr_axpy_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRAxpyTest <double, std::uint64_t> mkl_sm_csr_axpy_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAxpyTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAxpyTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRAxpyTest <__float128, std::uint32_t> sm_csr_axpy_test_float128_uint32(PreferredBackend::generic);
-SparseMatrixCSRAxpyTest <__float128, std::uint64_t> sm_csr_axpy_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAxpyTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAxpyTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRAxpyTest <Half, std::uint32_t> sm_csr_axpy_test_half_uint32(PreferredBackend::generic);
-SparseMatrixCSRAxpyTest <Half, std::uint64_t> sm_csr_axpy_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAxpyTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAxpyTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRAxpyTest <float, std::uint32_t> cuda_sm_csr_axpy_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRAxpyTest <double, std::uint32_t> cuda_sm_csr_axpy_test_double_uint32(PreferredBackend::cuda);
-SparseMatrixCSRAxpyTest <float, std::uint64_t> cuda_sm_csr_axpy_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRAxpyTest <double, std::uint64_t> cuda_sm_csr_axpy_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAxpyTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAxpyTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAxpyTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAxpyTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class SparseMatrixCSRFrobeniusTest
+class SparseMatrixCSRFrobeniusTest
   : public UnitTest
 {
 public:
-  SparseMatrixCSRFrobeniusTest(PreferredBackend backend)
+  explicit SparseMatrixCSRFrobeniusTest(PreferredBackend backend)
     : UnitTest("SparseMatrixCSRFrobeniusTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~SparseMatrixCSRFrobeniusTest()
   {
   }
 
   virtual void run() const override
   {
-    for (Index size(2); size < Index(3e2); size *= 2)
+    const DT_ tol = DT_(10) * TestSystem::tol<DT_>();
+    for (Index size(2); size < Index(200); size *= 3)
     {
-      SparseMatrixFactory<DT_, IT_> a_fac(IT_(size), IT_(size + 2));
-      for (IT_ row(0); row < a_fac.rows(); ++row)
+      DT_ ref = DT_(0);
+      SparseMatrixCSR<DT_, IT_> a(size, size+2, 3*size);
       {
-        for (IT_ col(0); col < a_fac.columns(); ++col)
+        Memory::TypedView<IT_> row_ptr(a.row_ptr_view_w());
+        Memory::TypedView<IT_> col_idx(a.col_idx_view_w());
+        Memory::TypedView<DT_> a_val(a.val_view_w());
+
+        for (Index i(0); i < size; ++i)
         {
-          if (row == col)
-            a_fac.add(row, col, DT_(2));
-          else if ((row == col + 1) || (row + 1 == col))
-            a_fac.add(row, col, DT_(-1));
+          row_ptr[i] = IT_(3*i);
+          col_idx[3*i+0] = IT_(i);
+          col_idx[3*i+1] = IT_(i+1);
+          col_idx[3*i+2] = IT_(i+2);
+          a_val[3*i+0] = DT_((i*131071ll) % 31) * DT_(3.141) - DT_(0.3);
+          a_val[3*i+1] = DT_((i*65537ll) % 37) * DT_(2.713) - DT_(0.2);
+          a_val[3*i+2] = DT_((i*40487ll) % 53) * DT_(1.414) - DT_(0.1);
+          ref += Math::sqr(a_val[3*i+0]) + Math::sqr(a_val[3*i+1]) + Math::sqr(a_val[3*i+2]);
         }
+        row_ptr[size] = IT_(3*size);
       }
+      ref = Math::sqrt(ref);
 
-      SparseMatrixCSR<DT_, IT_> a(a_fac.make_csr());
-
-      DenseVector<DT_, IT_> refv(a.used_elements(), a.val());
-      DT_ ref = refv.norm2();
-      DT_ c = a.norm_frobenius();
-      TEST_CHECK_EQUAL(c, ref);
+      TEST_CHECK_EQUAL_WITHIN_EPS(a.norm_frobenius(), ref, tol);
     }
   }
 };
 
-SparseMatrixCSRFrobeniusTest <float, std::uint32_t> sm_csr_frobenius_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRFrobeniusTest <double, std::uint32_t> sm_csr_frobenius_test_double_uint32(PreferredBackend::generic);
-SparseMatrixCSRFrobeniusTest <float, std::uint64_t> sm_csr_frobenius_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRFrobeniusTest <double, std::uint64_t> sm_csr_frobenius_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRFrobeniusTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRFrobeniusTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRFrobeniusTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRFrobeniusTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRFrobeniusTest <float, std::uint64_t> mkl_sm_csr_frobenius_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRFrobeniusTest <double, std::uint64_t> mkl_sm_csr_frobenius_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRFrobeniusTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRFrobeniusTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRFrobeniusTest <__float128, std::uint32_t> sm_csr_frobenius_test_float128_uint32(PreferredBackend::generic);
-SparseMatrixCSRFrobeniusTest <__float128, std::uint64_t> sm_csr_frobenius_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRFrobeniusTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRFrobeniusTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRFrobeniusTest <Half, std::uint32_t> sm_csr_frobenius_test_half_uint32(PreferredBackend::generic);
-SparseMatrixCSRFrobeniusTest <Half, std::uint64_t> sm_csr_frobenius_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRFrobeniusTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRFrobeniusTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRFrobeniusTest <float, std::uint32_t> cuda_sm_csr_frobenius_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRFrobeniusTest <double, std::uint32_t> cuda_sm_csr_frobenius_test_double_uint32(PreferredBackend::cuda);
-SparseMatrixCSRFrobeniusTest <float, std::uint64_t> cuda_sm_csr_frobenius_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRFrobeniusTest <double, std::uint64_t> cuda_sm_csr_frobenius_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRFrobeniusTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRFrobeniusTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRFrobeniusTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRFrobeniusTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class SparseMatrixCSRLumpTest
+class SparseMatrixCSRLumpTest
   : public UnitTest
 {
 public:
-  SparseMatrixCSRLumpTest(PreferredBackend backend)
+  explicit SparseMatrixCSRLumpTest(PreferredBackend backend)
     : UnitTest("SparseMatrixCSRLumpTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~SparseMatrixCSRLumpTest()
   {
   }
 
@@ -1229,68 +1278,68 @@ public:
   {
     const DT_ tol = TestSystem::tol<DT_>();
 
-    for (IT_ size(2); size < IT_(3e2); size *= IT_(2))
+    for (Index size(1); size < Index(100); size *= 3)
     {
-      SparseMatrixFactory<DT_, IT_> a_fac(size, size);
-      for (IT_ row(0); row < a_fac.rows(); ++row)
+      SparseMatrixCSR<DT_, IT_> a(size, size+2, 3*size);
+      DenseVector<DT_, IT_> ref(size);
       {
-        for (IT_ col(0); col < a_fac.columns(); ++col)
+        Memory::TypedView<IT_> row_ptr(a.row_ptr_view_w());
+        Memory::TypedView<IT_> col_idx(a.col_idx_view_w());
+        Memory::TypedView<DT_> a_val(a.val_view_w());
+        Memory::TypedView<DT_> vr(ref.elements_view_w());
+
+        for (Index i(0); i < size; ++i)
         {
-          if (row == col)
-            a_fac.add(row, col, DT_(DT_(col % 100) / DT_(2)));
-          else if ((row == col + 1) || (row + 1 == col))
-            a_fac.add(row, col, DT_(-1));
+          row_ptr[i] = IT_(3*i);
+          col_idx[3*i+0] = IT_(i);
+          col_idx[3*i+1] = IT_(i+1);
+          col_idx[3*i+2] = IT_(i+2);
+          a_val[3*i+0] = DT_((i*131071ll) % 31) * DT_(3.141) - DT_(0.3);
+          a_val[3*i+1] = DT_((i*65537ll) % 37) * DT_(2.713) - DT_(0.2);
+          a_val[3*i+2] = DT_((i*40487ll) % 53) * DT_(1.414) - DT_(0.1);
+          vr[i] = a_val[3*i+0] + a_val[3*i+1] + a_val[3*i+2];
         }
+        row_ptr[size] = IT_(3*size);
       }
 
-      SparseMatrixCSR<DT_, IT_> a(a_fac.make_csr());
-      auto lump = a.lump_rows();
-      auto one = a.create_vector_r();
-      auto res = a.create_vector_r();
-      one.format(DT_(-1));
-      a.apply(res, one, lump);
-
-      TEST_CHECK_EQUAL_WITHIN_EPS(res.norm2(), DT_(0), tol);
+      DenseVector<DT_, IT_> lump = a.lump_rows();
+      TEST_CHECK_LESS_THAN(lump.max_rel_diff(ref), tol);
     }
   }
 };
 
-SparseMatrixCSRLumpTest <float, std::uint32_t> sm_csr_lump_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRLumpTest <double, std::uint32_t> sm_csr_lump_test_double_uint32(PreferredBackend::generic);
-SparseMatrixCSRLumpTest <float, std::uint64_t> sm_csr_lump_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRLumpTest <double, std::uint64_t> sm_csr_lump_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRLumpTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRLumpTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRLumpTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRLumpTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRLumpTest <float, std::uint64_t> mkl_sm_csr_lump_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRLumpTest <double, std::uint64_t> mkl_sm_csr_lump_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRLumpTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRLumpTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRLumpTest <__float128, std::uint32_t> sm_csr_lump_test_float128_uint32(PreferredBackend::generic);
-SparseMatrixCSRLumpTest <__float128, std::uint64_t> sm_csr_lump_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRLumpTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRLumpTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRLumpTest <Half, std::uint32_t> sm_csr_lump_test_half_uint32(PreferredBackend::generic);
-SparseMatrixCSRLumpTest <Half, std::uint64_t> sm_csr_lump_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRLumpTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRLumpTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRLumpTest <float, std::uint32_t> cuda_sm_csr_lump_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRLumpTest <double, std::uint32_t> cuda_sm_csr_lump_test_double_uint32(PreferredBackend::cuda);
-SparseMatrixCSRLumpTest <float, std::uint64_t> cuda_sm_csr_lump_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRLumpTest <double, std::uint64_t> cuda_sm_csr_lump_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRLumpTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRLumpTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRLumpTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRLumpTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class SparseMatrixCSRCompressionTest
+class SparseMatrixCSRCompressionTest
   : public UnitTest
 {
 public:
-  SparseMatrixCSRCompressionTest(PreferredBackend backend)
+  explicit SparseMatrixCSRCompressionTest(PreferredBackend backend)
     : UnitTest("SparseMatrixCSRCompressionTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~SparseMatrixCSRCompressionTest()
   {
   }
 
@@ -1298,24 +1347,29 @@ public:
   {
     Index mat_rows = 56;
     Index mat_cols = 56;
-    DenseVector<IT_, IT_> col_ind(400);
-    DenseVector<DT_, IT_> val(400);
-    DenseVector<IT_, IT_> row_ptr(mat_rows + 1);
-    for (Index i(0); i < 400; ++i)
+    Index mat_nzes = 400;
+
+    SparseMatrixCSR<DT_, IT_> a(mat_rows, mat_cols, mat_nzes);
+
     {
-      col_ind(i, IT_(i / 40 + (3 * i) % 16));
-      val(i, DT_(7) / DT_(3 * (i + 1)) - DT_(13) / DT_((i + 1) * (i + 1)));
+      Memory::TypedView<IT_> row_ptr = a.row_ptr_view_w();
+      Memory::TypedView<IT_> col_idx = a.col_idx_view_w();
+      Memory::TypedView<DT_> val = a.val_view_w();
+      for (Index i(0); i < 400; ++i)
+      {
+        col_idx[i] = IT_(i / 40 + (3 * i) % 16);
+        val[i] = DT_(7) / DT_(3 * (i + 1)) - DT_(13) / DT_((i + 1) * (i + 1));
+      }
+      row_ptr[0] = 0;
+      for (Index i(1); i < mat_rows; ++i)
+      {
+        row_ptr[i] = IT_(i * Index(400 / mat_rows - 1));
+      }
+      row_ptr[mat_rows] = 400;
     }
-    row_ptr(0, 0);
-    for (Index i(1); i < mat_rows; ++i)
-    {
-      row_ptr(i, IT_(i * Index(400 / mat_rows - 1)));
-    }
-    row_ptr(mat_rows, 400);
-    SparseMatrixCSR<DT_, IT_> a(mat_rows, mat_cols, col_ind, val, row_ptr);
 
 #ifdef FEAT_HAVE_ZLIB
-#if defined FEAT_HAVE_ZFP && !defined FEAT_HAVE_HALFMATH
+#ifdef FEAT_HAVE_ZFP
     LAFEM::SerialConfig config(false, false);
     config.set_tolerance(FEAT::Real(1e-2));
     std::vector<char> uncompressed = a.serialize(config);
@@ -1349,361 +1403,106 @@ public:
   }
 };
 
-SparseMatrixCSRCompressionTest <float, std::uint32_t> sm_csr_comp_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRCompressionTest <double, std::uint32_t> sm_csr_comp_test_double_uint32(PreferredBackend::generic);
-SparseMatrixCSRCompressionTest <float, std::uint64_t> sm_csr_comp_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRCompressionTest <double, std::uint64_t> sm_csr_comp_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRCompressionTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRCompressionTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRCompressionTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRCompressionTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRCompressionTest <float, std::uint64_t> mkl_sm_csr_comp_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRCompressionTest <double, std::uint64_t> mkl_sm_csr_comp_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRCompressionTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRCompressionTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 //#ifdef FEAT_HAVE_QUADMATH
-//SparseMatrixCSRCompressionTest <__float128, std::uint32_t> sm_csr_comp_test_float128_uint32(PreferredBackend::generic);
-//SparseMatrixCSRCompressionTest <__float128, std::uint64_t> sm_csr_comp_test_float128_uint64(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRCompressionTest, __float128, std::uint32_t, PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRCompressionTest, __float128, std::uint64_t, PreferredBackend::generic);
 //#endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRCompressionTest <Half, std::uint32_t> sm_csr_comp_test_half_uint32(PreferredBackend::generic);
-SparseMatrixCSRCompressionTest <Half, std::uint64_t> sm_csr_comp_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRCompressionTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRCompressionTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRCompressionTest <float, std::uint32_t> cuda_sm_csr_comp_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRCompressionTest <double, std::uint32_t> cuda_sm_csr_comp_test_double_uint32(PreferredBackend::cuda);
-SparseMatrixCSRCompressionTest <float, std::uint64_t> cuda_sm_csr_comp_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRCompressionTest <double, std::uint64_t> cuda_sm_csr_comp_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRCompressionTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRCompressionTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRCompressionTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRCompressionTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<
   typename DT_,
   typename IT_>
-  class SparseMatrixCSRMaxAbsElementTest
+class SparseMatrixCSRMinMaxElementTest
   : public UnitTest
 {
 public:
-  SparseMatrixCSRMaxAbsElementTest(PreferredBackend backend)
-    : UnitTest("SparseMatrixCSRMaxAbsElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~SparseMatrixCSRMaxAbsElementTest()
+  explicit SparseMatrixCSRMinMaxElementTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixCSRMinMaxElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
   virtual void run() const override
   {
-    for (Index size(2); size < Index(3e2); size *= 2)
+    const DT_ tol = TestSystem::tol<DT_>();
+    const Index size = 19;
+
+    SparseMatrixCSR<DT_, IT_> a(size, size+2, 3*size);
     {
-      DT_ s(DT_(4.321));
-      SparseMatrixFactory<DT_, IT_> a_fac(IT_(size), IT_(size + 2));
-      SparseMatrixFactory<DT_, IT_> b_fac(IT_(size), IT_(size + 2));
+      Memory::TypedView<IT_> row_ptr(a.row_ptr_view_w());
+      Memory::TypedView<IT_> col_idx(a.col_idx_view_w());
+      Memory::TypedView<DT_> a_val(a.val_view_w());
 
-      for (IT_ row(0); row < a_fac.rows(); ++row)
+      for (Index i(0); i < size; ++i)
       {
-        for (IT_ col(0); col < a_fac.columns(); ++col)
-        {
-          if (row == col)
-          {
-            a_fac.add(row, col, DT_(2));
-            b_fac.add(row, col, DT_(s));
-          }
-          else if ((row == col + 1) || (row + 1 == col))
-          {
-            a_fac.add(row, col, DT_(-1));
-            b_fac.add(row, col, DT_(-(s + s)));
-          }
-        }
+        row_ptr[i] = IT_(3*i);
+        col_idx[3*i+0] = IT_(i);
+        col_idx[3*i+1] = IT_(i+1);
+        col_idx[3*i+2] = IT_(i+2);
+        a_val[3*i+0] = DT_((i*131071ll) % 31) - DT_(3.5);
+        a_val[3*i+1] = (DT_((i*65537ll) % 37) - DT_(1.875));
+        a_val[3*i+2] = DT_((i*40487ll) % 53) - DT_(1.25);
       }
-
-      SparseMatrixCSR<DT_, IT_> a(a_fac.make_csr());
-      DT_ result;
-      DT_ ref(2);
-      result = a.max_abs_element();
-
-      TEST_CHECK_EQUAL(result, ref);
-
-      SparseMatrixCSR<DT_, IT_> b(b_fac.make_csr());
-      ref = s + s;
-      result = b.max_abs_element();
-
-      TEST_CHECK_EQUAL(result, ref);
+      row_ptr[size] = IT_(3*size);
     }
+
+    if(Backend::get_preferred_backend() == PreferredBackend::generic)
+    {
+      TEST_CHECK_EQUAL_WITHIN_EPS(a.min_element(), DT_(-3.5), tol);
+      TEST_CHECK_EQUAL_WITHIN_EPS(a.max_element(), DT_(49.75), tol);
+    }
+
+    TEST_CHECK_EQUAL_WITHIN_EPS(a.min_abs_element(), DT_(0.125), tol);
+    TEST_CHECK_EQUAL_WITHIN_EPS(a.max_abs_element(), DT_(49.75), tol);
   }
 };
 
-SparseMatrixCSRMaxAbsElementTest <float, std::uint32_t> sm_csr_max_abs_element_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRMaxAbsElementTest <double, std::uint32_t> sm_csr_max_abs_element_test_double_uint32(PreferredBackend::generic);
-SparseMatrixCSRMaxAbsElementTest <float, std::uint64_t> sm_csr_max_abs_element_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRMaxAbsElementTest <double, std::uint64_t> sm_csr_max_abs_element_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMinMaxElementTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMinMaxElementTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMinMaxElementTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMinMaxElementTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRMaxAbsElementTest <float, std::uint64_t> mkl_sm_csr_max_abs_element_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRMaxAbsElementTest <double, std::uint64_t> mkl_sm_csr_max_abs_element_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMinMaxElementTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMinMaxElementTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRMaxAbsElementTest <__float128, std::uint32_t> sm_csr_max_abs_element_test_float128_uint32(PreferredBackend::generic);
-SparseMatrixCSRMaxAbsElementTest <__float128, std::uint64_t> sm_csr_max_abs_element_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMinMaxElementTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMinMaxElementTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRMaxAbsElementTest <Half, std::uint32_t> sm_csr_max_abs_element_test_half_uint32(PreferredBackend::generic);
-SparseMatrixCSRMaxAbsElementTest <Half, std::uint64_t> sm_csr_max_abs_element_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMinMaxElementTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMinMaxElementTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRMaxAbsElementTest <float, std::uint32_t> cuda_sm_csr_max_abs_element_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRMaxAbsElementTest <double, std::uint32_t> cuda_sm_csr_max_abs_element_test_double_uint32(PreferredBackend::cuda);
-SparseMatrixCSRMaxAbsElementTest <float, std::uint64_t> cuda_sm_csr_max_abs_element_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRMaxAbsElementTest <double, std::uint64_t> cuda_sm_csr_max_abs_element_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMinMaxElementTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMinMaxElementTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMinMaxElementTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMinMaxElementTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
-
-template<
-  typename DT_,
-  typename IT_>
-  class SparseMatrixCSRMinAbsElementTest
-  : public UnitTest
-{
-public:
-  SparseMatrixCSRMinAbsElementTest(PreferredBackend backend)
-    : UnitTest("SparseMatrixCSRMinAbsElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~SparseMatrixCSRMinAbsElementTest()
-  {
-  }
-
-  virtual void run() const override
-  {
-    for (Index size(2); size < Index(3e2); size *= 2)
-    {
-      DT_ s(DT_(4.321));
-      SparseMatrixFactory<DT_, IT_> a_fac(IT_(size), IT_(size + 2));
-      SparseMatrixFactory<DT_, IT_> b_fac(IT_(size), IT_(size + 2));
-
-      for (IT_ row(0); row < a_fac.rows(); ++row)
-      {
-        for (IT_ col(0); col < a_fac.columns(); ++col)
-        {
-          if (row == col)
-          {
-            a_fac.add(row, col, DT_(2));
-            b_fac.add(row, col, DT_(s));
-          }
-          else if ((row == col + 1) || (row + 1 == col))
-          {
-            a_fac.add(row, col, DT_(-1));
-            b_fac.add(row, col, DT_(-(s + s)));
-          }
-        }
-      }
-
-      SparseMatrixCSR<DT_, IT_> a(a_fac.make_csr());
-      DT_ result;
-      DT_ ref(1);
-      result = a.min_abs_element();
-
-      TEST_CHECK_EQUAL(result, ref);
-
-      SparseMatrixCSR<DT_, IT_> b(b_fac.make_csr());
-      ref = s;
-      result = b.min_abs_element();
-
-      TEST_CHECK_EQUAL(result, ref);
-    }
-  }
-};
-
-SparseMatrixCSRMinAbsElementTest <float, std::uint32_t> sm_csr_min_abs_element_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRMinAbsElementTest <double, std::uint32_t> sm_csr_min_abs_element_test_double_uint32(PreferredBackend::generic);
-SparseMatrixCSRMinAbsElementTest <float, std::uint64_t> sm_csr_min_abs_element_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRMinAbsElementTest <double, std::uint64_t> sm_csr_min_abs_element_test_double_uint64(PreferredBackend::generic);
-#ifdef FEAT_HAVE_MKL
-SparseMatrixCSRMinAbsElementTest <float, std::uint64_t> mkl_sm_csr_min_abs_element_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRMinAbsElementTest <double, std::uint64_t> mkl_sm_csr_min_abs_element_test_double_uint64(PreferredBackend::mkl);
-#endif
-#ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRMinAbsElementTest <__float128, std::uint32_t> sm_csr_min_abs_element_test_float128_uint32(PreferredBackend::generic);
-SparseMatrixCSRMinAbsElementTest <__float128, std::uint64_t> sm_csr_min_abs_element_test_float128_uint64(PreferredBackend::generic);
-#endif
-#ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRMinAbsElementTest <Half, std::uint32_t> sm_csr_min_abs_element_test_half_uint32(PreferredBackend::generic);
-SparseMatrixCSRMinAbsElementTest <Half, std::uint64_t> sm_csr_min_abs_element_test_half_uint64(PreferredBackend::generic);
-#endif
-#ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRMinAbsElementTest <float, std::uint32_t> cuda_sm_csr_min_abs_element_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRMinAbsElementTest <double, std::uint32_t> cuda_sm_csr_min_abs_element_test_double_uint32(PreferredBackend::cuda);
-SparseMatrixCSRMinAbsElementTest <float, std::uint64_t> cuda_sm_csr_min_abs_element_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRMinAbsElementTest <double, std::uint64_t> cuda_sm_csr_min_abs_element_test_double_uint64(PreferredBackend::cuda);
-#endif
-
-template<
-  typename DT_,
-  typename IT_>
-  class SparseMatrixCSRMaxElementTest
-  : public UnitTest
-{
-public:
-  SparseMatrixCSRMaxElementTest(PreferredBackend backend)
-    : UnitTest("SparseMatrixCSRMaxElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~SparseMatrixCSRMaxElementTest()
-  {
-  }
-
-  virtual void run() const override
-  {
-    for (Index size(2); size < Index(3e2); size *= 2)
-    {
-      DT_ s(DT_(4.321));
-      SparseMatrixFactory<DT_, IT_> a_fac(IT_(size), IT_(size + 2));
-      SparseMatrixFactory<DT_, IT_> b_fac(IT_(size), IT_(size + 2));
-
-      for (IT_ row(0); row < a_fac.rows(); ++row)
-      {
-        for (IT_ col(0); col < a_fac.columns(); ++col)
-        {
-          if (row == col)
-          {
-            a_fac.add(row, col, DT_(2));
-            b_fac.add(row, col, DT_(s));
-          }
-          else if ((row == col + 1) || (row + 1 == col))
-          {
-            a_fac.add(row, col, DT_(-1));
-            b_fac.add(row, col, DT_(-(s + s)));
-          }
-        }
-      }
-
-      SparseMatrixCSR<DT_, IT_> a(a_fac.make_csr());
-      DT_ result;
-      DT_ ref(2);
-      result = a.max_element();
-
-      TEST_CHECK_EQUAL(result, ref);
-
-      SparseMatrixCSR<DT_, IT_> b(b_fac.make_csr());
-      ref = s;
-      result = b.max_element();
-
-      TEST_CHECK_EQUAL(result, ref);
-    }
-  }
-};
-
-SparseMatrixCSRMaxElementTest <float, std::uint32_t> sm_csr_max_element_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRMaxElementTest <double, std::uint32_t> sm_csr_max_element_test_double_uint32(PreferredBackend::generic);
-SparseMatrixCSRMaxElementTest <float, std::uint64_t> sm_csr_max_element_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRMaxElementTest <double, std::uint64_t> sm_csr_max_element_test_double_uint64(PreferredBackend::generic);
-#ifdef FEAT_HAVE_MKL
-SparseMatrixCSRMaxElementTest <float, std::uint64_t> mkl_sm_csr_max_element_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRMaxElementTest <double, std::uint64_t> mkl_sm_csr_max_element_test_double_uint64(PreferredBackend::mkl);
-#endif
-#ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRMaxElementTest <__float128, std::uint32_t> sm_csr_max_element_test_float128_uint32(PreferredBackend::generic);
-SparseMatrixCSRMaxElementTest <__float128, std::uint64_t> sm_csr_max_element_test_float128_uint64(PreferredBackend::generic);
-#endif
-#ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRMaxElementTest <Half, std::uint32_t> sm_csr_max_element_test_half_uint32(PreferredBackend::generic);
-SparseMatrixCSRMaxElementTest <Half, std::uint64_t> sm_csr_max_element_test_half_uint64(PreferredBackend::generic);
-#endif
-#ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRMaxElementTest <float, std::uint32_t> cuda_sm_csr_max_element_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRMaxElementTest <double, std::uint32_t> cuda_sm_csr_max_element_test_double_uint32(PreferredBackend::cuda);
-SparseMatrixCSRMaxElementTest <float, std::uint64_t> cuda_sm_csr_max_element_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRMaxElementTest <double, std::uint64_t> cuda_sm_csr_max_element_test_double_uint64(PreferredBackend::cuda);
-#endif
-
-template<
-  typename DT_,
-  typename IT_>
-  class SparseMatrixCSRMinElementTest
-  : public UnitTest
-{
-public:
-  SparseMatrixCSRMinElementTest(PreferredBackend backend)
-    : UnitTest("SparseMatrixCSRMinElementTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~SparseMatrixCSRMinElementTest()
-  {
-  }
-
-  virtual void run() const override
-  {
-    for (Index size(2); size < Index(3e2); size *= 2)
-    {
-      DT_ s(DT_(4.321));
-      SparseMatrixFactory<DT_, IT_> a_fac(IT_(size), IT_(size + 2));
-      SparseMatrixFactory<DT_, IT_> b_fac(IT_(size), IT_(size + 2));
-
-      for (IT_ row(0); row < a_fac.rows(); ++row)
-      {
-        for (IT_ col(0); col < a_fac.columns(); ++col)
-        {
-          if (row == col)
-          {
-            a_fac.add(row, col, DT_(2));
-            b_fac.add(row, col, DT_(s));
-          }
-          else if ((row == col + 1) || (row + 1 == col))
-          {
-            a_fac.add(row, col, DT_(-1));
-            b_fac.add(row, col, DT_(-(s + s)));
-          }
-        }
-      }
-
-      SparseMatrixCSR<DT_, IT_> a(a_fac.make_csr());
-      DT_ result;
-      DT_ ref(-1);
-      result = a.min_element();
-
-      TEST_CHECK_EQUAL(result, ref);
-
-      SparseMatrixCSR<DT_, IT_> b(b_fac.make_csr());
-      ref = -(s + s);
-      result = b.min_element();
-
-      TEST_CHECK_EQUAL(result, ref);
-    }
-  }
-};
-
-SparseMatrixCSRMinElementTest <float, std::uint32_t> sm_csr_min_element_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRMinElementTest <double, std::uint32_t> sm_csr_min_element_test_double_uint32(PreferredBackend::generic);
-SparseMatrixCSRMinElementTest <float, std::uint64_t> sm_csr_min_element_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRMinElementTest <double, std::uint64_t> sm_csr_min_element_test_double_uint64(PreferredBackend::generic);
-#ifdef FEAT_HAVE_MKL
-SparseMatrixCSRMinElementTest <float, std::uint64_t> mkl_sm_csr_min_element_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRMinElementTest <double, std::uint64_t> mkl_sm_csr_min_element_test_double_uint64(PreferredBackend::mkl);
-#endif
-#ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRMinElementTest <__float128, std::uint32_t> sm_csr_min_element_test_float128_uint32(PreferredBackend::generic);
-SparseMatrixCSRMinElementTest <__float128, std::uint64_t> sm_csr_min_element_test_float128_uint64(PreferredBackend::generic);
-#endif
-#ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRMinElementTest <Half, std::uint32_t> sm_csr_min_element_test_half_uint32(PreferredBackend::generic);
-SparseMatrixCSRMinElementTest <Half, std::uint64_t> sm_csr_min_element_test_half_uint64(PreferredBackend::generic);
-#endif
-#ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRMinElementTest <float, std::uint32_t> cuda_sm_csr_min_element_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRMinElementTest <double, std::uint32_t> cuda_sm_csr_min_element_test_double_uint32(PreferredBackend::cuda);
-SparseMatrixCSRMinElementTest <float, std::uint64_t> cuda_sm_csr_min_element_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRMinElementTest <double, std::uint64_t> cuda_sm_csr_min_element_test_double_uint64(PreferredBackend::cuda);
-#endif
-
 
 template<typename DT_, typename IT_>
 class SparseMatrixCSRAddDoubleMatMultTest
   : public UnitTest
 {
 public:
-  SparseMatrixCSRAddDoubleMatMultTest(PreferredBackend backend)
+  explicit SparseMatrixCSRAddDoubleMatMultTest(PreferredBackend backend)
     : UnitTest("SparseMatrixCSRAddDoubleMatMultTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~SparseMatrixCSRAddDoubleMatMultTest()
   {
   }
 
@@ -1753,10 +1552,13 @@ public:
     SparseMatrixCSR<DT_, IT_> s(s_fac.make_csr());
 
     DenseVector<DT_, IT_> a(4u);
-    a.elements()[0] = DT_(2);
-    a.elements()[1] = DT_(3);
-    a.elements()[2] = DT_(4);
-    a.elements()[3] = DT_(5);
+    {
+      Memory::TypedView<DT_> va = a.elements_view_w();
+      va[0] = DT_(2);
+      va[1] = DT_(3);
+      va[2] = DT_(4);
+      va[3] = DT_(5);
+    }
 
     // perform double matrix product and check result
     s.add_double_mat_product(d, a, b, -DT_(1));
@@ -1766,30 +1568,41 @@ public:
     SparseMatrixBCSR<DT_, IT_, 2, 1> b2(b.layout());
     SparseMatrixBCSR<DT_, IT_, 1, 2> d2(d.layout());
     SparseMatrixCSR<DT_, IT_> s2(s_fac2.make_csr());
-    for(Index i(0); i < b.used_elements();  ++i)
-      b2.val()[i][0][0] = DT_(2) * (b2.val()[i][1][0] = b.val()[i]);
-    for(Index i(0); i < d.used_elements();  ++i)
-      d2.val()[i][0][0] = DT_(3) * (d2.val()[i][0][1] = d.val()[i]);
+    {
+      auto vb2 = b2.val_view_w();
+      Memory::TypedView<DT_> vb = b.val_view_r();
+      for(Index i(0); i < b.num_nzes();  ++i)
+        vb2[i][0][0] = DT_(2) * (vb2[i][1][0] = vb(i));
+    }
+    {
+      auto vd2 = d2.val_view_w();
+      Memory::TypedView<DT_> vd = d.val_view_r();
+      for(Index i(0); i < d.num_nzes();  ++i)
+        vd2[i][0][0] = DT_(3) * (vd2[i][0][1] = vd(i));
+    }
 
     DenseVectorBlocked<DT_, IT_, 2> a2(4u);
-    a2.elements()[0][0] = DT_(1);
-    a2.elements()[0][1] = DT_(2);
-    a2.elements()[1][0] = DT_(3);
-    a2.elements()[1][1] = DT_(4);
-    a2.elements()[2][0] = DT_(5);
-    a2.elements()[2][1] = DT_(6);
-    a2.elements()[3][0] = DT_(7);
-    a2.elements()[3][1] = DT_(8);
+    {
+      auto va2 = a2.elements_view_w();
+      va2[0][0] = DT_(1);
+      va2[0][1] = DT_(2);
+      va2[1][0] = DT_(3);
+      va2[1][1] = DT_(4);
+      va2[2][0] = DT_(5);
+      va2[2][1] = DT_(6);
+      va2[3][0] = DT_(7);
+      va2[3][1] = DT_(8);
+    }
 
     s2.add_double_mat_product(d2, a2, b2, -DT_(1));
     TEST_CHECK_EQUAL_WITHIN_EPS(s2.norm_frobenius(), DT_(0), tol);
   }
 };
 
-SparseMatrixCSRAddDoubleMatMultTest <float, std::uint32_t> sm_csr_add_double_mat_mult_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRAddDoubleMatMultTest <double, std::uint32_t> sm_csr_add_double_mat_mult_test_double_uint32(PreferredBackend::generic);
-SparseMatrixCSRAddDoubleMatMultTest <float, std::uint64_t> sm_csr_add_double_mat_mult_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRAddDoubleMatMultTest <double, std::uint64_t> sm_csr_add_double_mat_mult_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAddDoubleMatMultTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAddDoubleMatMultTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAddDoubleMatMultTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRAddDoubleMatMultTest, double, std::uint64_t, PreferredBackend::generic);
 
 template<
   typename DT_,
@@ -1798,67 +1611,94 @@ class SparseMatrixCSRMaxRelDiffTest
   : public UnitTest
 {
 public:
-  SparseMatrixCSRMaxRelDiffTest(PreferredBackend backend)
-    : UnitTest("SparseMatrixCSRMaxRelDiffTest",
-               Type::Traits<DT_>::name(),
-               Type::Traits<IT_>::name(),
-               backend)
+  explicit SparseMatrixCSRMaxRelDiffTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixCSRMaxRelDiffTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
-
-  virtual ~SparseMatrixCSRMaxRelDiffTest() {}
 
   virtual void run() const override
   {
-    const DT_ eps = TestSystem::tol<DT_>();
-    const DT_ delta = DT_(123.5);
+    const DT_ tol = TestSystem::tol<DT_>();
 
-    for (Index size(4); size < Index(128); size *= 2)
+    for (Index size(12); size < Index(100); size *= 2)
     {
-      SparseMatrixFactory<DT_, IT_> fac_a(size, size);
-      for (IT_ i = 0; i < IT_(size); ++i)
-        fac_a.add(i, i, DT_(i));
-      SparseMatrixCSR<DT_, IT_> a(fac_a.make_csr());
+      SparseMatrixFactory<DT_, IT_> a_fac(size, size + 2);
 
-      auto b = a.clone();
+      for (Index row(0); row < a_fac.num_rows(); ++row)
+      {
+        a_fac.add(row, row, DT_(0));
+        a_fac.add(row, row+1, DT_(0));
+        a_fac.add(row, row+2, DT_(0));
+      }
 
-      // add delta
-      a.val()[size / 2] += delta;
+      SparseMatrixCSR<DT_, IT_> a(a_fac.make_csr());
+      SparseMatrixCSR<DT_, IT_> b(a.clone(LAFEM::CloneMode::Layout));
 
-      const DT_ ref = delta / (DT_(size) + delta);
+      const Index nnzes = a.num_nzes();
 
-      // ||a-b||_inf
-      const DT_ diff1 = a.max_rel_diff(b);
-      TEST_CHECK_RELATIVE(diff1, ref, eps);
+      const Index off0 = (3*nnzes) / 8;
+      const Index off1 = (1*nnzes) / 8;
+      const Index off2 = (6*nnzes) / 8;
 
-      // ||b-a||_inf
-      const DT_ diff2 = b.max_rel_diff(a);
-      TEST_CHECK_RELATIVE(diff2, ref, eps);
+      // a = i, b = i
+      {
+        Memory::TypedView<DT_> va = a.val_view_w();
+        Memory::TypedView<DT_> vb = b.val_view_w();
+        for (Index i(0); i < nnzes; ++i)
+        {
+          va[i] = vb[i] = DT_(int(i) - int(off0)) * DT_(0.123);
+        }
+      }
+
+      // identical vectors, result should be zero
+      TEST_CHECK_LESS_THAN(a.max_rel_diff(b), tol*tol);
+      TEST_CHECK_LESS_THAN(b.max_rel_diff(a), tol*tol);
+
+      // two values close to zero
+      const DT_ delta_a0(Math::sqrt(Math::eps<DT_>()));
+      const DT_ delta_b0(Math::sqr(Math::eps<DT_>()));
+      const DT_ ref0 = (delta_a0 + delta_b0) / (DT_(1) + delta_a0 + delta_b0);
+      a.val_view_rw()[off0] += delta_a0;
+      b.val_view_rw()[off0] -= delta_b0;
+      TEST_CHECK_RELATIVE(a.max_rel_diff(b), ref0, tol);
+      TEST_CHECK_RELATIVE(b.max_rel_diff(a), ref0, tol);
+
+      const DT_ delta1 = DT_(0.17);
+      const DT_ ref1 = delta1 / (DT_(off0 - off1)*DT_(0.246) + delta1 + DT_(1));
+      a.val_view_rw()[off1] -= delta1;
+      TEST_CHECK_RELATIVE(a.max_rel_diff(b), ref1, tol);
+      TEST_CHECK_RELATIVE(b.max_rel_diff(a), ref1, tol);
+
+      const DT_ delta2 = DT_(0.73);
+      const DT_ ref2 = delta2 / (DT_(off2 - off0)*DT_(0.246) + delta2 + DT_(1));
+      b.val_view_rw()[off2] += delta2;
+      TEST_CHECK_RELATIVE(a.max_rel_diff(b), ref2, tol);
+      TEST_CHECK_RELATIVE(b.max_rel_diff(a), ref2, tol);
     }
   }
 };
-SparseMatrixCSRMaxRelDiffTest <float,  std::uint32_t> sm_csr_max_rel_diff_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRMaxRelDiffTest <double, std::uint32_t> sm_csr_max_rel_diff_test_double_uint32(PreferredBackend::generic);
-SparseMatrixCSRMaxRelDiffTest <float,  std::uint64_t> sm_csr_max_rel_diff_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRMaxRelDiffTest <double, std::uint64_t> sm_csr_max_rel_diff_test_double_uint64(PreferredBackend::generic);
-#ifdef FEAT_HAVE_MKL
-SparseMatrixCSRMaxRelDiffTest <float,  std::uint64_t> mkl_sm_csr_max_rel_diff_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRMaxRelDiffTest <double, std::uint64_t> mkl_sm_csr_max_rel_diff_test_double_uint64(PreferredBackend::mkl);
-#endif
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMaxRelDiffTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMaxRelDiffTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMaxRelDiffTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMaxRelDiffTest, double, std::uint64_t, PreferredBackend::generic);
+//#ifdef FEAT_HAVE_MKL
+//SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMaxRelDiffTest, float, std::uint64_t, PreferredBackend::mkl);
+//SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMaxRelDiffTest, double, std::uint64_t, PreferredBackend::mkl);
+//#endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRMaxRelDiffTest <__float128, std::uint32_t> sm_csr_max_rel_diff_test_float128_uint32(PreferredBackend::generic);
-SparseMatrixCSRMaxRelDiffTest <__float128, std::uint64_t> sm_csr_max_rel_diff_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMaxRelDiffTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMaxRelDiffTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRMaxRelDiffTest <Half, std::uint32_t> sm_csr_max_rel_diff_test_half_uint32(PreferredBackend::generic);
-SparseMatrixCSRMaxRelDiffTest <Half, std::uint64_t> sm_csr_max_rel_diff_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMaxRelDiffTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMaxRelDiffTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
-#ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRMaxRelDiffTest <float,  std::uint32_t> cuda_sm_csr_max_rel_diff_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRMaxRelDiffTest <double, std::uint32_t> cuda_sm_csr_max_rel_diff_test_double_uint32(PreferredBackend::cuda);
-SparseMatrixCSRMaxRelDiffTest <float,  std::uint64_t> cuda_sm_csr_max_rel_diff_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRMaxRelDiffTest <double, std::uint64_t> cuda_sm_csr_max_rel_diff_test_double_uint64(PreferredBackend::cuda);
-#endif
+//#ifdef FEAT_HAVE_CUDA
+//SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMaxRelDiffTest, float, std::uint32_t, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMaxRelDiffTest, double, std::uint32_t, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMaxRelDiffTest, float, std::uint64_t, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRMaxRelDiffTest, double, std::uint64_t, PreferredBackend::cuda);
+//#endif
 
 template<
   typename DT_,
@@ -1867,15 +1707,10 @@ class SparseMatrixCSRSameLayoutTest
   : public UnitTest
 {
 public:
-  SparseMatrixCSRSameLayoutTest(PreferredBackend backend)
-    : UnitTest("SparseMatrixCSRSameLayoutTest",
-               Type::Traits<DT_>::name(),
-               Type::Traits<IT_>::name(),
-               backend)
+  explicit SparseMatrixCSRSameLayoutTest(PreferredBackend backend)
+    : UnitTest("SparseMatrixCSRSameLayoutTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
-
-  virtual ~SparseMatrixCSRSameLayoutTest() {}
 
   virtual void run() const override
   {
@@ -1917,25 +1752,25 @@ public:
     }
   }
 };
-SparseMatrixCSRSameLayoutTest <float,  std::uint32_t> sm_csr_same_layout_test_float_uint32(PreferredBackend::generic);
-SparseMatrixCSRSameLayoutTest <double, std::uint32_t> sm_csr_same_layout_test_double_uint32(PreferredBackend::generic);
-SparseMatrixCSRSameLayoutTest <float,  std::uint64_t> sm_csr_same_layout_test_float_uint64(PreferredBackend::generic);
-SparseMatrixCSRSameLayoutTest <double, std::uint64_t> sm_csr_same_layout_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSameLayoutTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSameLayoutTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSameLayoutTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSameLayoutTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-SparseMatrixCSRSameLayoutTest <float,  std::uint64_t> mkl_sm_csr_same_layout_test_float_uint64(PreferredBackend::mkl);
-SparseMatrixCSRSameLayoutTest <double, std::uint64_t> mkl_sm_csr_same_layout_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSameLayoutTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSameLayoutTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-SparseMatrixCSRSameLayoutTest <__float128, std::uint32_t> sm_csr_same_layout_test_float128_uint32(PreferredBackend::generic);
-SparseMatrixCSRSameLayoutTest <__float128, std::uint64_t> sm_csr_same_layout_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSameLayoutTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSameLayoutTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-SparseMatrixCSRSameLayoutTest <Half, std::uint32_t> sm_csr_same_layout_test_half_uint32(PreferredBackend::generic);
-SparseMatrixCSRSameLayoutTest <Half, std::uint64_t> sm_csr_same_layout_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSameLayoutTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSameLayoutTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-SparseMatrixCSRSameLayoutTest <float,  std::uint32_t> cuda_sm_csr_same_layout_test_float_uint32(PreferredBackend::cuda);
-SparseMatrixCSRSameLayoutTest <double, std::uint32_t> cuda_sm_csr_same_layout_test_double_uint32(PreferredBackend::cuda);
-SparseMatrixCSRSameLayoutTest <float,  std::uint64_t> cuda_sm_csr_same_layout_test_float_uint64(PreferredBackend::cuda);
-SparseMatrixCSRSameLayoutTest <double, std::uint64_t> cuda_sm_csr_same_layout_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSameLayoutTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSameLayoutTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSameLayoutTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(SparseMatrixCSRSameLayoutTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif

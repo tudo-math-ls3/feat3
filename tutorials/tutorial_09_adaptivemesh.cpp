@@ -482,8 +482,8 @@ namespace Tutorial09
     Geometry::ExportVTK<AdaptiveMeshLayerType> result_exporter(layer);
 
     // add the vertex-projection of our solution and rhs vectors
-    result_exporter.add_vertex_scalar("sol", vertex_sol.elements());
-    result_exporter.add_vertex_scalar("rhs", vertex_rhs.elements());
+    result_exporter.add_vertex_scalar("sol", vertex_sol);
+    result_exporter.add_vertex_scalar("rhs", vertex_rhs);
 
     // finally, write the VTK file
     result_exporter.write(vtk_name);

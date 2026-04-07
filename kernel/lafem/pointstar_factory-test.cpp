@@ -21,12 +21,8 @@ public:
   typedef SparseMatrixCSR<DT_, IT_> MatrixType;
 
 public:
-   PointstarFactoryTest(PreferredBackend backend)
+  explicit PointstarFactoryTest(PreferredBackend backend)
    : UnitTest("PointstarFactoryTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~PointstarFactoryTest()
   {
   }
 
@@ -58,7 +54,7 @@ public:
         w.axpy(ev, -lambda_min);
 
         // check norm of w
-        TEST_CHECK_EQUAL_WITHIN_EPS(w.norm2(), DT_(0), tol);
+        TEST_CHECK_LESS_THAN(w.norm2(), tol);
       }
     }
 
@@ -82,33 +78,33 @@ public:
       w.axpy(ev, -lambda_min);
 
       // check norm of w
-      TEST_CHECK_EQUAL_WITHIN_EPS(w.norm2(), DT_(0), tol);
+      TEST_CHECK_LESS_THAN(w.norm2(), tol);
       //std::cout << m << ": " << stringify_fp_sci(lambda_min,10) << " , " << stringify_fp_sci(w(0)/ev(0),10) << "\n";
     }
   }
 };
 
-PointstarFactoryTest <float, std::uint32_t> pointstar_factory_test_float_uint32(PreferredBackend::generic);
-PointstarFactoryTest <float, std::uint64_t> pointstar_factory_test_float_uint64(PreferredBackend::generic);
-PointstarFactoryTest <double, std::uint32_t> pointstar_factory_test_double_uint32(PreferredBackend::generic);
-PointstarFactoryTest <double, std::uint64_t> pointstar_factory_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(PointstarFactoryTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(PointstarFactoryTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(PointstarFactoryTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(PointstarFactoryTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-PointstarFactoryTest <float, std::uint64_t> mkl_pointstar_factory_test_float_uint64(PreferredBackend::mkl);
-PointstarFactoryTest <double, std::uint64_t> mkl_pointstar_factory_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(PointstarFactoryTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(PointstarFactoryTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-PointstarFactoryTest <__float128, std::uint64_t> pointstar_factory_test_float128_uint64(PreferredBackend::generic);
-PointstarFactoryTest <__float128, std::uint32_t> pointstar_factory_test_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(PointstarFactoryTest, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(PointstarFactoryTest, __float128, std::uint32_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-PointstarFactoryTest <Half, std::uint32_t> pointstar_factory_test_half_uint32(PreferredBackend::generic);
-PointstarFactoryTest <Half, std::uint64_t> pointstar_factory_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(PointstarFactoryTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(PointstarFactoryTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-PointstarFactoryTest <float, std::uint64_t> cuda_pointstar_factory_test_float_uint64(PreferredBackend::cuda);
-PointstarFactoryTest <double, std::uint64_t> cuda_pointstar_factory_test_double_uint64(PreferredBackend::cuda);
-PointstarFactoryTest <float, std::uint32_t> cuda_pointstar_factory_test_float_uint32(PreferredBackend::cuda);
-PointstarFactoryTest <double, std::uint32_t> cuda_pointstar_factory_test_double_uint32(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(PointstarFactoryTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(PointstarFactoryTest, double, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(PointstarFactoryTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(PointstarFactoryTest, double, std::uint32_t, PreferredBackend::cuda);
 #endif
 
 template<
@@ -122,19 +118,14 @@ public:
   typedef SparseMatrixBanded<DT_, IT_> MatrixType;
 
 public:
-   PointstarStructureTest(PreferredBackend backend)
+  explicit PointstarStructureTest(PreferredBackend backend)
    : UnitTest("PointstarStructureTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~PointstarStructureTest()
   {
   }
 
   virtual void run() const override
   {
     const DT_ tol = TestSystem::tol<DT_>();
-
 
     std::vector<IT_> num_of_subintervalls;
     num_of_subintervalls.push_back(2);
@@ -150,12 +141,14 @@ public:
     // generate FD matrix A
     PointstarFactoryFD2<DT_, IT_> factory(num_of_subintervalls, dimensions);
     MatrixType a(factory.matrix_banded());
+    std::cout << a.norm_frobenius() << "\n";
 
     // compute smallest and largest eigenvalues of A
     const DT_ lambda_min(factory.lambda_min());
 
     // generate eigenvector
     const VectorType ev(factory.eigenvector_min());
+    std::cout << ev.norm2() << "\n";
 
     // compute w = A*ev - lambda_min*ev
     VectorType w(ev.size());
@@ -163,8 +156,7 @@ public:
     w.axpy(ev, -lambda_min);
 
     // check norm of w
-    TEST_CHECK_EQUAL_WITHIN_EPS(w.norm2(), DT_(0), tol);
-
+    TEST_CHECK_LESS_THAN(w.norm2(), tol);
 
     std::vector<IT_> num_of_subintervalls2;
     num_of_subintervalls2.push_back(5);
@@ -175,29 +167,29 @@ public:
   }
 };
 
-PointstarStructureTest <float, std::uint32_t> pointstar_structure_test_float_uint32(PreferredBackend::generic);
-PointstarStructureTest <float, std::uint64_t> pointstar_structure_test_float_uint64(PreferredBackend::generic);
-PointstarStructureTest <double, std::uint32_t> pointstar_structure_test_double_uint32(PreferredBackend::generic);
-PointstarStructureTest <double, std::uint64_t> pointstar_structure_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(PointstarStructureTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(PointstarStructureTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(PointstarStructureTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(PointstarStructureTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-PointstarStructureTest <float, std::uint64_t> mkl_pointstar_structure_test_float_uint64(PreferredBackend::mkl);
-PointstarStructureTest <double, std::uint64_t> mkl_pointstar_structure_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(PointstarStructureTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(PointstarStructureTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-PointstarStructureTest <__float128, std::uint64_t> pointstar_structure_test_float128_uint64(PreferredBackend::generic);
-PointstarStructureTest <__float128, std::uint32_t> pointstar_structure_test_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(PointstarStructureTest, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(PointstarStructureTest, __float128, std::uint32_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-PointstarStructureTest <Half, std::uint32_t> pointstar_structure_test_half_uint32(PreferredBackend::generic);
-PointstarStructureTest <Half, std::uint64_t> pointstar_structure_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(PointstarStructureTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(PointstarStructureTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-PointstarStructureTest <float, std::uint64_t> cuda_pointstar_structure_test_float_uint64(PreferredBackend::cuda);
-PointstarStructureTest <double, std::uint64_t> cuda_pointstar_structure_test_double_uint64(PreferredBackend::cuda);
-PointstarStructureTest <float, std::uint32_t> cuda_pointstar_structure_test_float_uint32(PreferredBackend::cuda);
-PointstarStructureTest <double, std::uint32_t> cuda_pointstar_structure_test_double_uint32(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(PointstarStructureTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(PointstarStructureTest, double, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(PointstarStructureTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(PointstarStructureTest, double, std::uint32_t, PreferredBackend::cuda);
 #ifdef FEAT_HAVE_HALFMATH
-PointstarStructureTest <Half, std::uint32_t> cuda_pointstar_structure_test_half_uint32(PreferredBackend::cuda);
-PointstarStructureTest <Half, std::uint64_t> cuda_pointstar_structure_test_half_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(PointstarStructureTest, Half, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(PointstarStructureTest, Half, std::uint64_t, PreferredBackend::cuda);
 #endif
 #endif

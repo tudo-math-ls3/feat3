@@ -471,14 +471,14 @@ struct MeshoptBoundaryApp
 
         // Get vertex target set
         const Geometry::TargetSet& boundary_set = boundary_meshpart->template get_target_set<0>();
-
+        auto vcl = coords_loc.elements_view_rw();
         for(Index i(0); i < boundary_set.get_num_entities(); ++i)
         {
           Index j = boundary_set[i];
           if(todo_boundary[j])
           {
             todo_boundary[j] = false;
-            Tiny::Vector<DataType, MeshType::world_dim, MeshType::world_dim> tmp0(coords_loc(j));
+            Tiny::Vector<DataType, MeshType::world_dim, MeshType::world_dim> tmp0(vcl(j));
             Tiny::Vector<DataType, MeshType::world_dim, MeshType::world_dim> tmp1(tmp0);
 
             tmp1(0) += delta_t * (DataType(1)*(tmp0(0) - midpoint(0))
@@ -486,7 +486,7 @@ struct MeshoptBoundaryApp
             tmp1(1) -= delta_t * (DataType(1)*(tmp1(0) - midpoint(1))
                 + Math::pow(DataType(1)*(tmp0(0) - midpoint(0)),DataType(3) ) );
 
-            coords_loc(j, tmp1);
+            vcl[j] = tmp1;
           }
         }
       }
@@ -502,9 +502,10 @@ struct MeshoptBoundaryApp
 
         // Compute maximum of the mesh velocity
         DataType max_mesh_velocity(0);
+        const auto vml = mesh_velocity.local().elements_view_r();
         for(IT_ i(0); i < mesh_velocity.local().size(); ++i)
         {
-          max_mesh_velocity = Math::max(max_mesh_velocity, (mesh_velocity.local())(i).norm_euclid());
+          max_mesh_velocity = Math::max(max_mesh_velocity, vml(i).norm_euclid());
         }
 
         comm.print("");

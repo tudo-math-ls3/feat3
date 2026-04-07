@@ -70,7 +70,7 @@ class UzawaBFBTTest :
   public UnitTest
 {
 public:
-  UzawaBFBTTest(PreferredBackend backend) :
+  explicit UzawaBFBTTest(PreferredBackend backend) :
     UnitTest("UzawaBFBTTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
@@ -172,7 +172,7 @@ public:
 
     // assemble lumped velocity vector
     VectorVeloType lumped_velo_mass_vec;
-    lumped_velo_mass_vec = VectorVeloType(M_v.rows());
+    lumped_velo_mass_vec = VectorVeloType(M_v.num_rows());
     M_v.lump_rows(lumped_velo_mass_vec);
 
     // invert lumped velocity vector and filter it
@@ -182,7 +182,7 @@ public:
     // assemble structure of L_p
     LAFEM::SparseMatrixCSR<DT_, IT_> L_p;
 
-    FEAT::Adjacency::Graph b_d(Adjacency::RenderType::injectify_sorted, mat_d, mat_b);
+    FEAT::Adjacency::Graph b_d(Adjacency::RenderType::injectify_sorted, mat_d.adjactor(), mat_b.adjactor());
     L_p.convert(b_d);
     L_p.format();
 
@@ -283,22 +283,22 @@ public:
 // bfbf_test_float_uint(PreferredBackend::generic); UzawaBFBTTest<double, unsigned
 // int> bfbf_test_double_uint(PreferredBackend::generic); UzawaBFBTTest<float,
 // unsigned long> bfbf_test_float_ulong(PreferredBackend::generic);
-UzawaBFBTTest<double, std::uint64_t> bfbf_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(UzawaBFBTTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-UzawaBFBTTest<float, std::uint64_t> mkl_bfbf_test_float_uint64(PreferredBackend::mkl);
-UzawaBFBTTest<double, std::uint64_t> mkl_bfbf_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(UzawaBFBTTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(UzawaBFBTTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-UzawaBFBTTest<__float128, std::uint32_t> bfbf_test_float128_uint32(PreferredBackend::generic);
-UzawaBFBTTest<__float128, std::uint64_t> bfbf_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(UzawaBFBTTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(UzawaBFBTTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-UzawaBFBTTest<Half, std::uint32_t> bfbf_test_half_uint32(PreferredBackend::generic);
-UzawaBFBTTest<Half, std::uint64_t> bfbf_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(UzawaBFBTTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(UzawaBFBTTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-UzawaBFBTTest<float, std::uint32_t> cuda_bfbf_test_float_uint32(PreferredBackend::cuda);
-UzawaBFBTTest<double, std::uint32_t> cuda_bfbf_test_double_uint32(PreferredBackend::cuda);
-UzawaBFBTTest<float, std::uint64_t> cuda_bfbf_test_float_uint64(PreferredBackend::cuda);
-UzawaBFBTTest<double, std::uint64_t> cuda_bfbf_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(UzawaBFBTTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(UzawaBFBTTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(UzawaBFBTTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(UzawaBFBTTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif

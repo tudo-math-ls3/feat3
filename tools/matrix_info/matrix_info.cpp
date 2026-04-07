@@ -191,20 +191,20 @@ namespace MatrixInfo
     MatrixType transpo = matrix.transpose();
 
     // get the matrix sizes
-    const Index nrows = matrix.rows();
-    const Index ncols = matrix.columns();
+    const Index nrows = matrix.num_rows();
+    const Index ncols = matrix.num_cols();
     const Index nmin = Math::min(nrows, ncols);
-    const Index nnze = matrix.used_elements();
+    const Index nnze = matrix.num_nzes();
 
     // get the matrix arrays
-    const IndexType* row_ptr = matrix.row_ptr();
-    const IndexType* col_idx = matrix.col_ind();
-    const DataType* mat_data = matrix.val();
+    const Memory::TypedView<IndexType> row_ptr = matrix.row_ptr_view_r();
+    const Memory::TypedView<IndexType> col_idx = matrix.col_idx_view_r();
+    const Memory::TypedView<DataType> mat_data = matrix.val_view_r();
 
     // get the transposed matrix arrays
-    const IndexType* row_ptr_t = transpo.row_ptr();
-    const IndexType* col_idx_t = transpo.col_ind();
-    const DataType* mat_data_t = transpo.val();
+    const Memory::TypedView<IndexType> row_ptr_t = transpo.row_ptr_view_r();
+    const Memory::TypedView<IndexType> col_idx_t = transpo.col_idx_view_r();
+    const Memory::TypedView<DataType> mat_data_t = transpo.val_view_r();
 
     // allocate two vectors
     std::vector<DataType> vsum_row(nrows, DataType(0));

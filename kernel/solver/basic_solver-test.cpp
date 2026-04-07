@@ -25,7 +25,6 @@
 #include <kernel/solver/jacobi_precond.hpp>
 #include <kernel/solver/sor_precond.hpp>
 #include <kernel/solver/ssor_precond.hpp>
-//#include <kernel/solver/spai_precond.hpp>
 #include <kernel/solver/polynomial_precond.hpp>
 #include <kernel/solver/matrix_precond.hpp>
 #include <kernel/solver/pcgnr.hpp>
@@ -52,7 +51,7 @@ public:
   typedef NoneFilter<DataType, IndexType> FilterType;
 
 public:
-  BasicSolverTest(PreferredBackend backend) :
+  explicit BasicSolverTest(PreferredBackend backend) :
     UnitTest("BasicSolverTest", Type::Traits<DataType>::name(), Type::Traits<IndexType>::name(), backend)
   {
   }
@@ -326,28 +325,28 @@ public:
   }
 };
 
-BasicSolverTest <double, std::uint32_t> basic_solver_test_double_uint32(PreferredBackend::generic);
-BasicSolverTest <double, std::uint64_t> basic_solver_test_double_uint64(PreferredBackend::generic);
-//BasicSolverTest<float, unsigned int> basic_solver_test_float_uint(PreferredBackend::generic);
-//BasicSolverTest<float, unsigned long> basic_solver_test_float_ulong(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BasicSolverTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BasicSolverTest, double, std::uint64_t, PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(BasicSolverTest, float, unsigned int, PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(BasicSolverTest, float, unsigned long, PreferredBackend::generic);
 
 #ifdef FEAT_HAVE_MKL
-//BasicSolverTest<float, unsigned long> mkl_basic_solver_test_float_ulong(PreferredBackend::mkl);
-BasicSolverTest <double, std::uint64_t> mkl_basic_solver_test_double_uint64(PreferredBackend::mkl);
+//SPAWN_UNIT_TEST_2T_P(BasicSolverTest, float, unsigned long, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(BasicSolverTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-BasicSolverTest <__float128, std::uint32_t> basic_solver_test_float128_uint32(PreferredBackend::generic);
-BasicSolverTest <__float128, std::uint64_t> basic_solver_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BasicSolverTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BasicSolverTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-//BasicSolverTest<Half, unsigned int> basic_solver_test_half_uint(PreferredBackend::generic);
-//BasicSolverTest<Half, unsigned long> basic_solver_test_half_ulong(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(BasicSolverTest, Half, unsigned int, PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(BasicSolverTest, Half, unsigned long, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-//BasicSolverTest<float, unsigned int> cuda_basic_solver_test_float_uint(PreferredBackend::cuda);
-BasicSolverTest <double, std::uint32_t> cuda_basic_solver_test_double_uint32(PreferredBackend::cuda);
-//BasicSolverTest<float, unsigned long> cuda_basic_solver_test_float_ulong(PreferredBackend::cuda);
-//BasicSolverTest<double, unsigned long> cuda_basic_solver_test_double_ulong(PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_2T_P(BasicSolverTest, float, unsigned int, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(BasicSolverTest, double, std::uint32_t, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_2T_P(BasicSolverTest, float, unsigned long, PreferredBackend::cuda);
+//SPAWN_UNIT_TEST_2T_P(BasicSolverTest, double, unsigned long, PreferredBackend::cuda);
 #endif
 
 /*

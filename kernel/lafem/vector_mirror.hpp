@@ -12,7 +12,14 @@
 #include <kernel/lafem/sparse_vector.hpp>
 #include <kernel/lafem/sparse_vector_blocked.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
-#include <kernel/lafem/arch/mirror.hpp>
+#include <kernel/lafem/arch/mirror_block_gather.hpp>
+#include <kernel/lafem/arch/mirror_block_scatter.hpp>
+#include <kernel/lafem/arch/mirror_dense_gather.hpp>
+#include <kernel/lafem/arch/mirror_dense_scatter.hpp>
+#include <kernel/lafem/arch/mirror_sparse_block_gather.hpp>
+#include <kernel/lafem/arch/mirror_sparse_block_scatter.hpp>
+#include <kernel/lafem/arch/mirror_sparse_gather.hpp>
+#include <kernel/lafem/arch/mirror_sparse_scatter.hpp>
 
 namespace FEAT
 {
@@ -66,14 +73,57 @@ namespace FEAT
       template <typename DataType2_, typename IndexType2_>
       using MirrorTypeByDI = MirrorType<DataType2_, IndexType2_>;
 
-      /// ImageIterator for Adjactor interface implementation
-      typedef IT_* ImageIterator;
+      class Adjactor
+      {
+      private:
+        const VectorMirror& _mirror;
+        const Memory::TypedView<IT_> _idx_view;
+
+      public:
+        /// ImageIterator for Adjactor interface implementation
+        typedef const IT_* ImageIterator;
+
+        explicit Adjactor(const VectorMirror& mirror) :
+          _mirror(mirror),
+          _idx_view(mirror.indices_view_r())
+        {
+        }
+
+        Adjactor(const Adjactor&) = delete;
+        Adjactor& operator=(const Adjactor&) = delete;
+
+        /** \copydoc Adjactor::get_num_nodes_domain() */
+        Index get_num_nodes_domain() const
+        {
+          return _mirror.num_indices();
+        }
+
+        /** \copydoc Adjactor::get_num_nodes_image() */
+        Index get_num_nodes_image() const
+        {
+          return _mirror.size();
+        }
+
+        /** \copydoc Adjactor::image_begin() */
+        ImageIterator image_begin(Index domain_node) const
+        {
+          XASSERTM(domain_node < _mirror.num_indices(), "Domain node index out of range");
+          return &_idx_view.get_r()[domain_node];
+        }
+
+        /** \copydoc Adjactor::image_end() */
+        ImageIterator image_end(Index domain_node) const
+        {
+          XASSERTM(domain_node < _mirror.num_indices(), "Domain node index out of range");
+          return &_idx_view.get_r()[domain_node+1];
+        }
+      }; // class Adjactor
 
     public:
       /// default constructor
-      VectorMirror() :
-        BaseClass(0)
+      VectorMirror()
       {
+        this->_scalar_index.push_back(0); // target vector size
         this->_scalar_index.push_back(0); // number of indices
       }
 
@@ -91,13 +141,13 @@ namespace FEAT
        * The number of indices in the mirror, i.e. the length
        * of the buffers that this mirror can be applied to.
        */
-      explicit VectorMirror(Index size_in, Index num_idx) :
-        BaseClass(size_in)
+      explicit VectorMirror(Index size_in, Index num_idx)
       {
+        this->_scalar_index.push_back(size_in); // target vector size
         this->_scalar_index.push_back(num_idx); // number of indices
         if(num_idx > Index(0))
         {
-          this->_indices.push_back(MemoryPool::template allocate_memory<IndexType>(num_idx));
+          this->_indices.push_back(Memory::Arbiter(num_idx * sizeof(IT_)));
           this->_indices_size.push_back(num_idx);
         }
       }
@@ -130,37 +180,42 @@ namespace FEAT
       static VectorMirror make_identity(Index size_in)
       {
         VectorMirror mir(size_in, size_in);
-        IndexType* idx = mir.indices();
+        Memory::TypedView<IndexType> idx = mir.indices_view_w();
         for(Index i(0); i < size_in; ++i)
           idx[i] = IndexType(i);
         return mir;
       }
 
       /**
-       * \brief Creates and returns an empty mirror
+       * \brief Creates and returns a hollow mirror
        *
        * \param[in] tmpl_vec
        * A \transient reference to a template vector to get the correct size from
        *
-       * \returns The new empty mirror
+       * \returns The new hollow mirror
        */
-      static VectorMirror make_empty(const DenseVector<DT_, IT_>& tmpl_vec)
+      static VectorMirror make_hollow(const DenseVector<DT_, IT_>& tmpl_vec)
       {
         return VectorMirror(tmpl_vec.size(), 0u);
       }
 
       /**
-       * \brief Creates and returns an empty mirror
+       * \brief Creates and returns a hollow mirror
        *
        * \param[in] tmpl_vec
        * A \transient reference to a template vector to get the correct size from
        *
-       * \returns The new empty mirror
+       * \returns The new hollow mirror
        */
       template<int block_size_>
-      static VectorMirror make_empty(const DenseVectorBlocked<DT_, IT_, block_size_>& tmpl_vec)
+      static VectorMirror make_hollow(const DenseVectorBlocked<DT_, IT_, block_size_>& tmpl_vec)
       {
-        return VectorMirror(tmpl_vec.template size<LAFEM::Perspective::native>(), 0u);
+        return VectorMirror(tmpl_vec.size(), 0u);
+      }
+
+      Adjactor adjactor() const
+      {
+        return Adjactor(*this);
       }
 
       /**
@@ -203,6 +258,24 @@ namespace FEAT
         this->assign(other);
       }
 
+      /// Returns the size of this vector, i.e. its number of entries
+      Index size() const
+      {
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(0);
+      }
+
+      /// Checks whether the vector is empty, i.e. if it has size 0
+      bool empty() const
+      {
+        return this->_scalar_index.empty() || (this->_scalar_index.at(0) <= Index(0));
+      }
+
+      /// Checks whether the vector is empty, i.e. if it has no nonzero entries
+      bool hollow() const
+      {
+        return this->_scalar_index.empty() || (this->_scalar_index.at(1) <= Index(0));
+      }
+
       /**
        * \brief Returns the number of indices in the mirror.
        *
@@ -213,30 +286,49 @@ namespace FEAT
         return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(1);
       }
 
-      /**
-       * \brief Checks whether the mirror is empty.
-       *
-       * \returns \c true, if there are no indices in the mirror, otherwise \c false.
-       */
-      bool empty() const
+      Index nonzeros() const
       {
-        return (this->num_indices() == Index(0));
+        return this->num_indices();
       }
 
-      /**
-       * \brief Get a pointer to the non zero indices array.
-       *
-       * \returns Pointer to the indices array.
-       */
-      IT_* indices()
+      /// Returns a reference to the element array arbiter
+      Memory::Arbiter& indices_arbiter()
       {
-        return this->_indices.empty() ? nullptr : this->_indices.at(0);
+        return this->_indices.front();
       }
 
-      /** \copydoc indices() */
-      const IT_* indices() const
+      /// Returns a reference to the element array arbiter
+      const Memory::Arbiter& indices_arbiter() const
       {
-        return this->_indices.empty() ? nullptr : this->_indices.at(0);
+        return this->_indices.front();
+      }
+
+      Memory::TypedView<IT_> indices_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::read));
+      }
+
+      Memory::TypedView<IT_> indices_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::write));
+      }
+
+      Memory::TypedView<IT_> indices_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::read_write));
+      }
+
+      Memory::TypedView<IT_> indices_view(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, acc));
       }
 
       /**
@@ -260,7 +352,7 @@ namespace FEAT
       template<typename DT2_, typename IT2_, int block_size_>
       Index buffer_size(const DenseVectorBlocked<DT2_, IT2_, block_size_>& DOXY(vector)) const
       {
-        return num_indices()*Index(block_size_);
+        return num_indices() * Index(block_size_);
       }
 
       /**
@@ -284,7 +376,7 @@ namespace FEAT
       template<typename DT2_, typename IT2_, int block_size_>
       Index buffer_size(const SparseVectorBlocked<DT2_, IT2_, block_size_>& DOXY(vector)) const
       {
-        return num_indices()*Index(block_size_);
+        return num_indices() * Index(block_size_);
       }
 
       /**
@@ -319,11 +411,11 @@ namespace FEAT
         XASSERT(buffer_offset + this->num_indices() <= buffer.size());
         XASSERTM(this->size() == vector.size(), "size mismatch between mirror and vector");
 
-        if(this->empty())
+        if(this->hollow())
           return;
 
-        LAFEM::Arch::Mirror::gather_dv(
-          buffer_offset, this->num_indices(), this->indices(), buffer.elements(), vector.elements());
+        LAFEM::Arch::MirrorDenseGather::template exec<DT_, IT_>(buffer_offset, this->num_indices(),
+          this->indices_arbiter(), buffer.elements_arbiter(), vector.elements_arbiter());
       }
 
       /**
@@ -350,11 +442,11 @@ namespace FEAT
         XASSERT(buffer_offset + this->num_indices() <= buffer.size());
         XASSERTM(this->size() == vector.size(), "size mismatch between mirror and vector");
 
-        if(this->empty())
+        if(this->hollow())
           return;
 
-        LAFEM::Arch::Mirror::scatter_dv(
-          buffer_offset, this->num_indices(), this->indices(), buffer.elements(), vector.elements(), alpha);
+        LAFEM::Arch::MirrorDenseScatter::template exec<DT_, IT_>(buffer_offset, this->num_indices(),
+          this->indices_arbiter(), buffer.elements_arbiter(), vector.elements_arbiter(), alpha);
       }
 
       /**
@@ -378,12 +470,11 @@ namespace FEAT
         XASSERT(buffer_offset + Index(block_size_)*this->num_indices() <= buffer.size());
         XASSERTM(this->size() == vector.size(), "size mismatch between mirror and vector");
 
-        if(this->empty())
+        if(this->hollow())
           return;
 
-        LAFEM::Arch::Mirror::gather_dvb(
-          Index(block_size_), buffer_offset, this->num_indices(), this->indices(),
-          buffer.elements(), vector.template elements<Perspective::pod>());
+        LAFEM::Arch::MirrorBlockGather::template exec<DT_, IT_, block_size_>(buffer_offset, this->num_indices(),
+          this->indices_arbiter(), buffer.elements_arbiter(), vector.elements_arbiter());
       }
 
       /**
@@ -411,12 +502,11 @@ namespace FEAT
         XASSERT(buffer_offset + Index(block_size_)*this->num_indices() <= buffer.size());
         XASSERTM(this->size() == vector.size(), "size mismatch between mirror and vector");
 
-        if(this->empty())
+        if(this->hollow())
           return;
 
-        LAFEM::Arch::Mirror::scatter_dvb(
-          Index(block_size_), buffer_offset, this->num_indices(), this->indices(),
-          buffer.elements(), vector.template elements<Perspective::pod>(), alpha);
+        LAFEM::Arch::MirrorBlockScatter::template exec<DT_, IT_, block_size_>(buffer_offset, this->num_indices(),
+          this->indices_arbiter(), buffer.elements_arbiter(), vector.elements_arbiter(), alpha);
       }
 
       /**
@@ -439,12 +529,12 @@ namespace FEAT
         XASSERT(buffer_offset + this->num_indices() <= buffer.size());
         XASSERTM(this->size() == vector.size(), "size mismatch between mirror and vector");
 
-        if(this->empty())
+        if(this->hollow())
           return;
 
-        LAFEM::Arch::Mirror::gather_sv(
-          buffer_offset, this->num_indices(), this->indices(), buffer.elements(),
-          vector.used_elements(), vector.elements(), vector.indices());
+        LAFEM::Arch::MirrorSparseGather::template exec<DT_, IT_>(buffer_offset, this->num_indices(),
+          this->indices_arbiter(), buffer.elements_arbiter(),
+          vector.num_nzes(), vector.elements_arbiter(), vector.indices_arbiter());
       }
 
       /**
@@ -471,12 +561,12 @@ namespace FEAT
         XASSERT(buffer_offset + this->num_indices() <= buffer.size());
         XASSERTM(this->size() == vector.size(), "size mismatch between mirror and vector");
 
-        if(this->empty())
+        if(this->hollow())
           return;
 
-        LAFEM::Arch::Mirror::scatter_sv(
-          buffer_offset, this->num_indices(), this->indices(), buffer.elements(),
-          vector.used_elements(), vector.elements(), vector.indices(), alpha);
+        LAFEM::Arch::MirrorSparseScatter::template exec<DT_, IT_>(buffer_offset, this->num_indices(),
+          this->indices_arbiter(), buffer.elements_arbiter(),
+          vector.num_nzes(), vector.elements_arbiter(), vector.indices_arbiter(), alpha);
       }
 
       /**
@@ -500,12 +590,12 @@ namespace FEAT
         XASSERT(buffer_offset + Index(block_size_)*this->num_indices() <= buffer.size());
         XASSERTM(this->size() == vector.size(), "size mismatch between mirror and vector");
 
-        if(this->empty())
+        if(this->hollow())
           return;
 
-        LAFEM::Arch::Mirror::gather_svb(
-          Index(block_size_), buffer_offset, this->num_indices(), this->indices(),buffer.elements(),
-          vector.used_elements(), vector.template elements<Perspective::pod>(), vector.indices());
+        LAFEM::Arch::MirrorSparseBlockGather::template exec<DT_, IT_, block_size_>(buffer_offset,
+          this->num_indices(), this->indices_arbiter(), buffer.elements_arbiter(),
+          vector.num_nzes(), vector.elements_arbiter(), vector.indices_arbiter());
       }
 
       /**
@@ -533,12 +623,12 @@ namespace FEAT
         XASSERT(buffer_offset + Index(block_size_)*this->num_indices() <= buffer.size());
         XASSERTM(this->size() == vector.size(), "size mismatch between mirror and vector");
 
-        if(this->empty())
+        if(this->hollow())
           return;
 
-        LAFEM::Arch::Mirror::scatter_svb(
-          Index(block_size_), buffer_offset, this->num_indices(), this->indices(), buffer.elements(),
-          vector.used_elements(), vector.template elements<Perspective::pod>(), vector.indices(), alpha);
+        LAFEM::Arch::MirrorSparseBlockScatter::template exec<DT_, IT_, block_size_>(buffer_offset,
+          this->num_indices(), this->indices_arbiter(), buffer.elements_arbiter(),
+          vector.num_nzes(), vector.elements_arbiter(), vector.indices_arbiter(), alpha);
       }
 
       /**
@@ -563,19 +653,26 @@ namespace FEAT
        *
        * \returns The size of the input template vector.
        */
-      template<Perspective perspective_, typename DT2_, typename IT2_>
+      template<typename DT2_, typename IT2_>
       Index mask_scatter(const DenseVector<DT2_, IT2_>& vector, std::vector<int>& mask,
         const int value, const Index offset = Index(0)) const
       {
-        XASSERT(Index(mask.size()) >= vector.template size<perspective_>());
+        XASSERT(Index(mask.size()) >= vector.size());
         XASSERT(Index(mask.size()) >= this->size() + offset);
         const Index n = this->num_indices();
-        const IT_* idx = this->indices();
+        const Memory::TypedView<IT_> idx = this->indices_view_r();
 
         for(Index i(0); i < n; ++i)
           mask[offset + idx[i]] = value;
 
-        return vector.template size<perspective_>();
+        return vector.size();
+      }
+
+      template<typename DT2_, typename IT2_>
+      Index mask_scatter_raw(const DenseVector<DT2_, IT2_>& vector, std::vector<int>& mask,
+        const int value, const Index offset = Index(0)) const
+      {
+        return mask_scatter(vector, mask, value, offset);
       }
 
       /**
@@ -600,38 +697,43 @@ namespace FEAT
        *
        * \returns The size of the input template vector.
        */
-      template<Perspective perspective_, typename DT2_, typename IT2_, int block_size_>
+      template<typename DT2_, typename IT2_, int block_size_>
       Index mask_scatter(const DenseVectorBlocked<DT2_, IT2_, block_size_>& vector, std::vector<int>& mask,
         const int value, const Index offset = Index(0)) const
       {
-        XASSERT(Index(mask.size()) >= vector.template size<perspective_>());
+        XASSERT(Index(mask.size()) >= vector.size());
         const Index n = this->num_indices();
-        const IT_* idx = this->indices();
+        const Memory::TypedView<IT_> idx = this->indices_view_r();
 
-        if(perspective_ == LAFEM::Perspective::native)
-        {
           XASSERT(Index(mask.size()) >= this->size() + offset);
           for(Index i(0); i < n; ++i)
             mask[offset + idx[i]] = value;
-        }
-        else // POD
-        {
-          XASSERT(Index(mask.size()) >= Index(block_size_)*this->size() + offset);
-          for(Index i(0); i < n; ++i)
-          {
-            const Index ibs = idx[i] * Index(block_size_);
-            for(int k(0); k < block_size_; ++k)
-              mask[offset + ibs + Index(k)] = value;
-          }
-        }
-        return vector.template size<perspective_>();
+
+        return vector.size();
       }
 
+      template<typename DT2_, typename IT2_, int block_size_>
+      Index mask_scatter_raw(const DenseVectorBlocked<DT2_, IT2_, block_size_>& vector, std::vector<int>& mask,
+        const int value, const Index offset = Index(0)) const
+      {
+        XASSERT(Index(mask.size()) >= vector.size());
+        const Index n = this->num_indices();
+        const Memory::TypedView<IT_> idx = this->indices_view_r();
+
+        XASSERT(Index(mask.size()) >= Index(block_size_)*this->size() + offset);
+        for(Index i(0); i < n; ++i)
+        {
+          const Index ibs = idx[i] * Index(block_size_);
+          for(int k(0); k < block_size_; ++k)
+            mask[offset + ibs + Index(k)] = value;
+        }
+        return vector.size();
+      }
 
       friend std::ostream & operator<< (std::ostream & lhs, const VectorMirror & b)
       {
         Index n = b.num_indices();
-        const IT_* idx = b.indices();
+        const Memory::TypedView<IT_> idx = b.indices_view_r();
 
         lhs << "[";
         for (Index i(0) ; i < n ; ++i)
@@ -641,36 +743,6 @@ namespace FEAT
         lhs << "]";
 
         return lhs;
-      }
-
-      /* ******************************************************************* */
-      /*  A D J A C T O R   I N T E R F A C E   I M P L E M E N T A T I O N  */
-      /* ******************************************************************* */
-    public:
-      /** \copydoc Adjactor::get_num_nodes_domain() */
-      Index get_num_nodes_domain() const
-      {
-        return this->num_indices();
-      }
-
-      /** \copydoc Adjactor::get_num_nodes_image() */
-      Index get_num_nodes_image() const
-      {
-        return this->size();
-      }
-
-      /** \copydoc Adjactor::image_begin() */
-      ImageIterator image_begin(Index domain_node) const
-      {
-        XASSERTM(domain_node < num_indices(), "Domain node index out of range");
-        return &this->_indices.at(0)[domain_node];
-      }
-
-      /** \copydoc Adjactor::image_end() */
-      ImageIterator image_end(Index domain_node) const
-      {
-        XASSERTM(domain_node < num_indices(), "Domain node index out of range");
-        return &this->_indices.at(0)[domain_node+1];
       }
     }; // class VectorMirror<...>
   } // namespace LAFEM

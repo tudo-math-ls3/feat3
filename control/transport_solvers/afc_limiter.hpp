@@ -123,7 +123,6 @@ namespace FEAT
       const Global::Gate<LocalVectorType, typename Intern::MatrixTypeHelper<MatrixType_>::ColMirror>* _col_gate;
       std::shared_ptr<Global::SynchMatrix<LocalMatrixType, typename Intern::MatrixTypeHelper<MatrixType_>::RowMirror>> _synch_matrix_ticket;
       LocalMatrixType _matrix_freq;
-      DataType* val_freq;
 
       bool _matrix_mass_set = false;
       bool _matrix_conv_set = false;
@@ -140,8 +139,6 @@ namespace FEAT
 
       // we need those to iterate over our matrices all the time
       IndexType _num_rows;
-      const IndexType* _row_ptr;
-      const IndexType* _col_ind;
 
       void _set_loc_filter()
       {
@@ -280,20 +277,22 @@ namespace FEAT
         mat_l_plus.format();
         auto mat_stiff_t = _matrix_stiff.local().transpose();
 
-        DataType* val_stiff = _matrix_stiff.local().val();
-        DataType* val_stiff_t = mat_stiff_t.val();
-        DataType* val_plus = mat_l_plus.val();
+        const Memory::TypedView<IndexType> row_ptr_view = _matrix_mass.local().row_ptr_view_r();
+        const Memory::TypedView<IndexType> col_idx_view = _matrix_mass.local().col_idx_view_r();
+        const Memory::TypedView<DataType> val_stiff = _matrix_stiff.local().val_view_r();
+        const Memory::TypedView<DataType> val_stiff_t = mat_stiff_t.val_view_r();
+        Memory::TypedView<DataType> val_plus = mat_l_plus.val_view_rw();
         for(IndexType row = 0; row < _num_rows; ++row)
         {
-          const IndexType start = _row_ptr[row];
-          const IndexType end = _row_ptr[row + 1];
+          const IndexType start = row_ptr_view[row];
+          const IndexType end = row_ptr_view[row + 1];
 
           IndexType diag = end;
           DataType lump = DataType(0);
 
           for(IndexType k = start; k < end; ++k)
           {
-            if(_col_ind[k] == row)
+            if(col_idx_view[k] == row)
               diag = k;
             else
             {
@@ -401,9 +400,7 @@ namespace FEAT
           _matrix_left = _matrix_mass.clone(LAFEM::CloneMode::Layout);
 
         // need those all the time to iterate over matrixes
-        _num_rows = _matrix_mass.local().rows();
-        _row_ptr = _matrix_mass.local().row_ptr();
-        _col_ind = _matrix_mass.local().col_ind();
+        _num_rows = _matrix_mass.local().num_rows();
 
         // we need one to clone our help vectors from
         _vec_mass_lump = _matrix_mass.create_vector_l();
@@ -428,9 +425,6 @@ namespace FEAT
         // sync it to know which matrix entry lives on how many patches
         _synch_matrix_ticket->init(_matrix_freq);
         _synch_matrix_ticket->exec(_matrix_freq);
-
-        // the object we acutally use for the conversion
-        val_freq = _matrix_freq.val();
 
         // solver for implicit time stepping
         if(_theta > 0)
@@ -565,22 +559,27 @@ namespace FEAT
           _matrix_left.local().scale(_matrix_right.local(), _stepsize * _theta);
         _matrix_right.local().scale(_matrix_right.local(), scale_right);
 
-        // add lumped massmatrix
-        LAFEM::DenseVector<IndexType, IndexType> vec_diag_indices(_num_rows);
-        _matrix_right.local().extract_diag_indices(vec_diag_indices);
-
         if(_limiter == 1)
         {
           // we need to add the lmped mass matrix onto the other matrices,
           // therefore we need the vector to be type 0
-          auto vec_mass_lump_tpye_0 = _matrix_mass.lump_rows(false);
-          DataType* val_right = _matrix_right.local().val();
-          DataType* val_left = _matrix_left.local().val();
+          auto vec_mass_lump_type_0 = _matrix_mass.lump_rows(false);
+          const Memory::TypedView<DataType> lump_vec_view(vec_mass_lump_type_0.local().elements_view_r());
+          const Memory::TypedView<IndexType> row_ptr_view(_matrix_right.local().row_ptr_view_r());
+          const Memory::TypedView<IndexType> col_idx_view(_matrix_right.local().col_idx_view_r());
+          Memory::TypedView<DataType> val_right = _matrix_right.local().val_view_rw();
+          Memory::TypedView<DataType> val_left = _matrix_left.local().val_view_rw();
           for(IndexType i = 0; i < _num_rows; ++i)
           {
-            val_right[vec_diag_indices(i)] += vec_mass_lump_tpye_0.local()(i);
-            if(_theta > 0)
-              val_left[vec_diag_indices(i)] += vec_mass_lump_tpye_0.local()(i);
+            for(IndexType j = row_ptr_view[i]; j < row_ptr_view[i+1]; ++j)
+            {
+              if(col_idx_view[j] == i)
+              {
+                val_right[j] += lump_vec_view(i);
+                if(_theta > 0)
+                  val_left[j] += lump_vec_view(i);
+              }
+            }
           }
         }
 
@@ -816,9 +815,10 @@ namespace FEAT
       {
         auto& mat_local = mat.local();
         _synch_matrix_ticket->exec(mat_local);
-        DataType* val = mat_local.val();
-        for(Index i = 0; i < mat_local.used_elements(); ++i)
-          val[i] /= val_freq[i];
+        const Memory::TypedView<DataType> vfreq = _matrix_freq.val_view_r();
+        Memory::TypedView<DataType> val = mat_local.val_view_rw();
+        for(Index i = 0; i < mat_local.num_nzes(); ++i)
+          val[i] /= vfreq[i];
       }
 
       void _setup_lin_solver()
@@ -854,7 +854,6 @@ namespace FEAT
       void _calc_artificial_diffusion()
       {
         _matrix_art_diff.local().format();
-        DataType* val_art_diff = _matrix_art_diff.local().val();
 
         _matrix_right.local().copy(_matrix_conv.local());
         if(_limit_matrix_stiff)
@@ -864,20 +863,23 @@ namespace FEAT
         }
         _matrix_hlp.local().transpose(_matrix_right.local());
 
-        DataType* val = _matrix_right.local().val();
-        DataType* val_t = _matrix_hlp.local().val();
+        const Memory::TypedView<IndexType> row_ptr_view = _matrix_mass.local().row_ptr_view_r();
+        const Memory::TypedView<IndexType> col_idx_view = _matrix_mass.local().col_idx_view_r();
+        const Memory::TypedView<DataType> val = _matrix_right.local().val_view_r();
+        const Memory::TypedView<DataType> val_t = _matrix_hlp.local().val_view_r();
+        Memory::TypedView<DataType> val_art_diff = _matrix_art_diff.local().val_view_rw();
 
         for(IndexType row = 0; row < _num_rows; ++row)
         {
-          const IndexType start = _row_ptr[row];
-          const IndexType end = _row_ptr[row + 1];
+          const IndexType start = row_ptr_view[row];
+          const IndexType end = row_ptr_view[row + 1];
 
           IndexType diag = end;
           DataType lump = DataType(0);
 
           for(IndexType k = start; k < end; ++k)
           {
-            if(_col_ind[k] == row)
+            if(col_idx_view[k] == row)
               diag = k;
             else
             {
@@ -923,21 +925,23 @@ namespace FEAT
 
         vec_u_min.format(); //prob not necessary?
         vec_u_max.format();
-        DataType* vec_u_min_ptr = vec_u_min.elements();
-        DataType* vec_u_max_ptr = vec_u_max.elements();
 
-        DataType* vec_sol_low_ptr = vec_sol_low.elements();
+        const Memory::TypedView<IndexType> row_ptr_view = _matrix_mass.local().row_ptr_view_r();
+        const Memory::TypedView<IndexType> col_idx_view = _matrix_mass.local().col_idx_view_r();
+        const Memory::TypedView<DataType> vec_sol_low_ptr = vec_sol_low.elements_view_r();
+        Memory::TypedView<DataType> vec_u_min_ptr = vec_u_min.elements_view_w();
+        Memory::TypedView<DataType> vec_u_max_ptr = vec_u_max.elements_view_w();
 
         for(IndexType row = 0; row < _num_rows; ++row)
         {
-          const IndexType start = _row_ptr[row];
-          const IndexType end = _row_ptr[row + 1];
-          DataType mi = Math::max(0.0, -(vec_sol_low_ptr[row] - vec_sol_low_ptr[_col_ind[start]]));
-          DataType ma = Math::max(0.0, (vec_sol_low_ptr[row] - vec_sol_low_ptr[_col_ind[start]]));
+          const IndexType start = row_ptr_view[row];
+          const IndexType end = row_ptr_view[row + 1];
+          DataType mi = Math::max(0.0, -(vec_sol_low_ptr[row] - vec_sol_low_ptr[col_idx_view[start]]));
+          DataType ma = Math::max(0.0, (vec_sol_low_ptr[row] - vec_sol_low_ptr[col_idx_view[start]]));
           for (IndexType i = start + 1; i < end; ++i)
           {
-            mi = Math::max(mi, Math::max(0.0, -(vec_sol_low_ptr[row] - vec_sol_low_ptr[_col_ind[i]])));
-            ma = Math::max(ma, Math::max(0.0, (vec_sol_low_ptr[row] - vec_sol_low_ptr[_col_ind[i]])));
+            mi = Math::max(mi, Math::max(0.0, -(vec_sol_low_ptr[row] - vec_sol_low_ptr[col_idx_view[i]])));
+            ma = Math::max(ma, Math::max(0.0, (vec_sol_low_ptr[row] - vec_sol_low_ptr[col_idx_view[i]])));
           }
           vec_u_min_ptr[row] = mi;
           vec_u_max_ptr[row] = ma;
@@ -954,33 +958,46 @@ namespace FEAT
         vec_deriv.scale(vec_deriv, 1.0/_stepsize);
 
         matrix_flux.format();
-        DataType* val_flux = matrix_flux.val();
-
-        DataType* val_mass = _matrix_mass.local().val();
-        DataType* val_art_diff = _matrix_art_diff.local().val();
-
         vec_neg_flux.format();
         vec_pos_flux.format();
-        DataType* ptr_neg_flux = vec_neg_flux.elements();
-        DataType* ptr_pos_flux = vec_pos_flux.elements();
+
+
+        const Memory::TypedView<IndexType> row_ptr_view = _matrix_mass.local().row_ptr_view_r();
+        const Memory::TypedView<IndexType> col_idx_view = _matrix_mass.local().col_idx_view_r();
+        const Memory::TypedView<DataType> val_mass = _matrix_mass.local().val_view_r();
+        const Memory::TypedView<DataType> val_art_diff = _matrix_art_diff.local().val_view_r();
+        const Memory::TypedView<DataType> val_deriv = vec_deriv.elements_view_r();
+        const Memory::TypedView<DataType> val_sol_corr = vec_sol_corr.elements_view_r();
+        const Memory::TypedView<DataType> val_sol_low = vec_sol_low.elements_view_r();
+        Memory::TypedView<DataType> val_neg_flux = vec_neg_flux.elements_view_rw();
+        Memory::TypedView<DataType> val_pos_flux = vec_pos_flux.elements_view_rw();
+        Memory::TypedView<DataType> val_flux = matrix_flux.val_view_r();
 
         for(IndexType i = 0; i < _num_rows; ++i)
         {
-          const IndexType start = _row_ptr[i];
-          const IndexType end = _row_ptr[i+1];
+          const IndexType start = row_ptr_view[i];
+          const IndexType end = row_ptr_view[i+1];
 
           for(IndexType m = start; m < end; ++m)
           {
-            const IndexType j = _col_ind[m];
-            // flux is calculated as in chrstophs matlab code
-            const DataType flux = _stepsize * val_mass[m] * (vec_deriv(j) - vec_deriv(i)) - _stepsize * _theta * val_art_diff[m] * (vec_sol_low(i) - vec_sol_low(j)) - _stepsize * (1.0 - _theta) * val_art_diff[m] * (vec_sol_corr(i) - vec_sol_corr(j));
+            const IndexType j = col_idx_view[m];
+
+            // flux is calculated as in Christophs matlab code
+            const DataType flux = _stepsize * val_mass[m] * (val_deriv(j) - val_deriv(i))
+              - _stepsize * _theta * val_art_diff[m] * (val_sol_low(i) - val_sol_low(j))
+              - _stepsize * (1.0 - _theta) * val_art_diff[m] * (val_sol_corr(i) - val_sol_corr(j));
+
             // prelimiting step
-            flux * (vec_sol_low(i) - vec_sol_low(j)) > 0 ? val_flux[m] = 0 : val_flux[m] = flux;
+            if(flux * (val_sol_low(i) - val_sol_low(j)) > 0)
+              val_flux[m] = 0;
+            else
+              val_flux[m] = flux;
+
             // sum of negative (sum_i!=j max(0, -f_ij)) and positive (sum_i!=j max(0, f_ij)) flux into one node
             if(j != i)
             {
-              ptr_neg_flux[i] += Math::max(0.0, -val_flux[m]);
-              ptr_pos_flux[i] += Math::max(0.0, val_flux[m]);
+              val_neg_flux[i] += Math::max(0.0, -val_flux[m]);
+              val_pos_flux[i] += Math::max(0.0, val_flux[m]);
             }
           }
         }
@@ -995,15 +1012,24 @@ namespace FEAT
         LocalVectorType& vec_bnd_pos = _vec_hlp.at(1).local();
         vec_bnd_pos.format();
 
+        const Memory::TypedView<DataType> val_mass_lump = vec_mass_lump.elements_view_r();
+        const Memory::TypedView<DataType> val_min = vec_min.elements_view_r();
+        const Memory::TypedView<DataType> val_max = vec_max.elements_view_r();
+        const Memory::TypedView<DataType> val_pos_flux = vec_pos_flux.elements_view_r();
+        const Memory::TypedView<DataType> val_neg_flux = vec_neg_flux.elements_view_r();
+
+        Memory::TypedView<DataType> vbn = vec_bnd_neg.elements_view_rw();
+        Memory::TypedView<DataType> vbp = vec_bnd_pos.elements_view_rw();
+
         for(IndexType row = 0; row < _num_rows; ++row)
         {
           // distance from low order solution to local min/max, looks like this because of definition of local min/max
-          DataType Q_p = vec_mass_lump(row) * vec_max(row);
-          DataType Q_m = vec_mass_lump(row) * vec_min(row);
+          DataType Q_p = val_mass_lump(row) * val_max(row);
+          DataType Q_m = val_mass_lump(row) * val_min(row);
 
           // bounds for correction factors
-          vec_bnd_pos(row, Math::min(1.0, Q_p/vec_pos_flux(row)));
-          vec_bnd_neg(row, Math::min(1.0, Q_m/vec_neg_flux(row)));
+          vbp[row] = Math::min(1.0, Q_p/val_pos_flux(row));
+          vbn[row] = Math::min(1.0, Q_m/val_neg_flux(row));
         }
 
         if(_bc_config == 2)
@@ -1011,34 +1037,37 @@ namespace FEAT
           // look for every boundary node and set the pos and neg bound to 1
           // (because then alpha_ij is also one)
           auto& vec_dof_fltr = _filter.local().get_filter_vector();
-          auto* idx_fltr = vec_dof_fltr.indices();
-          for(Index row = 0; row < vec_dof_fltr.used_elements(); ++row)
-            vec_bnd_neg(idx_fltr[row], 1);
+          const Memory::TypedView<IndexType> idx_fltr = vec_dof_fltr.indices_view_r();
+          for(Index row = 0; row < vec_dof_fltr.num_nzes(); ++row)
+            vbn[idx_fltr[row]] = DataType(1);
         }
 
         // calc correction factor and multiply together with unlim fluxes
-        DataType* val_flux = matrix_flux.val();
+        const Memory::TypedView<DataType> val_flux = matrix_flux.val_view_r();
 
         vec_lim_flux.format();
+        Memory::TypedView<DataType> val_lim_flux = vec_lim_flux.elements_view_rw();
 
+        const Memory::TypedView<IndexType> row_ptr_view = _matrix_mass.local().row_ptr_view_r();
+        const Memory::TypedView<IndexType> col_idx_view = _matrix_mass.local().col_idx_view_r();
         for(IndexType i = 0; i < _num_rows; ++i)
         {
-          const IndexType start = _row_ptr[i];
-          const IndexType end = _row_ptr[i+1];
+          const IndexType start = row_ptr_view[i];
+          const IndexType end = row_ptr_view[i+1];
 
           // add up to get flux into one node
           DataType sum = 0;
           for(IndexType m = start; m < end; ++m)
           {
-            const IndexType j = _col_ind[m];
+            const IndexType j = col_idx_view[m];
             if(i == j) continue;
 
             if(val_flux[m] > 0)
-              sum += Math::min(vec_bnd_pos(i), vec_bnd_neg(j)) * val_flux[m];
+              sum += Math::min(vbp(i), vbn(j)) * val_flux[m];
             else if(val_flux[m] < 0)
-              sum += Math::min(vec_bnd_neg(i), vec_bnd_pos(j)) * val_flux[m];
+              sum += Math::min(vbn(i), vbp(j)) * val_flux[m];
           }
-          vec_lim_flux(i, -sum/vec_mass_lump(i));
+          val_lim_flux[i] = -sum/val_mass_lump(i);
         }
       }
 
@@ -1080,22 +1109,23 @@ namespace FEAT
 
         vec_u_min.format(); //prob not necessary?
         vec_u_max.format();
-        DataType* vec_u_min_ptr = vec_u_min.elements();
-        DataType* vec_u_max_ptr = vec_u_max.elements();
 
-        DataType* vec_sol_ptr = vec_sol.elements();
+        const Memory::TypedView<IndexType> row_ptr_view = _matrix_mass.local().row_ptr_view_r();
+        const Memory::TypedView<IndexType> col_idx_view = _matrix_mass.local().col_idx_view_r();
+        const Memory::TypedView<DataType> vec_sol_ptr = vec_sol.elements_view_r();
+        Memory::TypedView<DataType> vec_u_min_ptr = vec_u_min.elements_view_w();
+        Memory::TypedView<DataType> vec_u_max_ptr = vec_u_max.elements_view_w();
 
         for(IndexType row = 0; row < _num_rows; ++row)
         {
-          const IndexType start = _row_ptr[row];
-          const IndexType end = _row_ptr[row + 1];
+          const IndexType start = row_ptr_view[row];
+          const IndexType end = row_ptr_view[row + 1];
 
-          DataType mi = vec_sol_ptr[_col_ind[start]];
-          DataType ma = vec_sol_ptr[_col_ind[start]];
+          DataType mi = vec_sol_ptr[col_idx_view[start]];
+          DataType ma = mi;
           for (IndexType i = start + 1; i < end; ++i)
           {
-            mi = Math::min(mi, vec_sol_ptr[_col_ind[i]]);
-            ma = Math::max(ma, vec_sol_ptr[_col_ind[i]]);
+            Math::minimax(vec_sol_ptr[col_idx_view[i]], mi, ma);
           }
           vec_u_min_ptr[row] = mi;
           vec_u_max_ptr[row] = ma;
@@ -1106,20 +1136,23 @@ namespace FEAT
       void _calc_bar_states(LocalMatrixType& matrix, LocalVectorType& vec_sol)
       {
         matrix.format();
-        DataType* val_mat = matrix.val();
 
-        DataType* val_art_dif = _matrix_art_diff.local().val();
-        DataType* val_conv = _matrix_conv.local().val();
+        const Memory::TypedView<IndexType> row_ptr_view = _matrix_mass.local().row_ptr_view_r();
+        const Memory::TypedView<IndexType> col_idx_view = _matrix_mass.local().col_idx_view_r();
+        const Memory::TypedView<DataType> val_sol = vec_sol.elements_view_w();
+        Memory::TypedView<DataType> val_art_dif = _matrix_art_diff.local().val_view_r();
+        Memory::TypedView<DataType> val_conv = _matrix_conv.local().val_view_r();
+        Memory::TypedView<DataType> val_mat = matrix.val_view_w();
 
         for(IndexType row = 0; row < _num_rows; ++row)
         {
-          const IndexType start = _row_ptr[row];
-          const IndexType end = _row_ptr[row+1];
+          const IndexType start = row_ptr_view[row];
+          const IndexType end = row_ptr_view[row+1];
 
           for(IndexType i = start; i < end; ++i)
           {
-            const IndexType col = _col_ind[i];
-            val_mat[i] = val_art_dif[i] * (vec_sol(col) + vec_sol(row)) - val_conv[i] * (vec_sol(col) - vec_sol(row));
+            const IndexType col = col_idx_view[i];
+            val_mat[i] = val_art_dif[i] * (val_sol(col) + val_sol(row)) - val_conv[i] * (val_sol(col) - val_sol(row));
           }
         }
       }
@@ -1128,33 +1161,43 @@ namespace FEAT
       void _calc_lim_flux_mcl_from_bar_state(LocalVectorType& vec_lim_flux, LocalVectorType& vec_sol, LocalVectorType& vec_deriv, LocalVectorType& vec_min, LocalVectorType& vec_max, LocalMatrixType& matrix_bar_state)
       {
         vec_lim_flux.format();
-        DataType* vec_lim_flux_ptr = vec_lim_flux.elements();
-
-        DataType* val_mass = _matrix_mass.local().val();
-        DataType* val_art_diff = _matrix_art_diff.local().val();
-        DataType* val_bar_state = matrix_bar_state.val();
         _matrix_hlp_t.local() = matrix_bar_state.transpose();
-        DataType* val_bar_state_t = _matrix_hlp_t.local().val();
+
+        const Memory::TypedView<IndexType> row_ptr_view = _matrix_mass.local().row_ptr_view_r();
+        const Memory::TypedView<IndexType> col_idx_view = _matrix_mass.local().col_idx_view_r();
+        const Memory::TypedView<DataType> val_sol = vec_sol.elements_view_r();
+        const Memory::TypedView<DataType> val_deriv = vec_deriv.elements_view_r();
+        const Memory::TypedView<DataType> val_min = vec_min.elements_view_r();
+        const Memory::TypedView<DataType> val_max = vec_max.elements_view_r();
+        Memory::TypedView<DataType> val_mass = _matrix_mass.local().val_view_r();
+        Memory::TypedView<DataType> val_art_diff = _matrix_art_diff.local().val_view_r();
+        Memory::TypedView<DataType> val_bar_state = matrix_bar_state.val_view_r();
+        Memory::TypedView<DataType> val_bar_state_t = _matrix_hlp_t.local().val_view_r();
+        Memory::TypedView<DataType> vec_lim_flux_ptr = vec_lim_flux.elements_view_w();
 
         for(IndexType row = 0; row < _num_rows; ++row)
         {
-          const IndexType start = _row_ptr[row];
-          const IndexType end = _row_ptr[row+1];
+          const IndexType start = row_ptr_view[row];
+          const IndexType end = row_ptr_view[row+1];
 
           DataType sum = 0;
           for(IndexType i = start; i < end; ++i)
           {
-            if( row == _col_ind[i] ) continue;
-            const IndexType col = _col_ind[i];
+            const IndexType col = col_idx_view[i];
+
+            if( row == col )
+              continue;
+
             // the flux between node "row" and "col"
-            const DataType flux = val_art_diff[i] * (vec_sol(row) - vec_sol(col)) + val_mass[i] * (vec_deriv(row) - vec_deriv(col));
+            const DataType flux = val_art_diff[i] * (val_sol(row) - val_sol(col))
+              + val_mass[i] * (val_deriv(row) - val_deriv(col));
             // add prelimiting?
 
             // the limited flux
             if(flux > 0)
-              sum += Math::min(flux, Math::min(2 * val_art_diff[i] * vec_max(row) - val_bar_state[i], val_bar_state_t[i] - 2 * val_art_diff[i] * vec_min(col)));
+              sum += Math::min(flux, Math::min(2 * val_art_diff[i] * val_max(row) - val_bar_state[i], val_bar_state_t[i] - 2 * val_art_diff[i] * val_min(col)));
             else
-              sum += Math::max(flux, Math::max(2 * val_art_diff[i] * vec_min(row) - val_bar_state[i], val_bar_state_t[i] - 2 * val_art_diff[i] * vec_max(col)));
+              sum += Math::max(flux, Math::max(2 * val_art_diff[i] * val_min(row) - val_bar_state[i], val_bar_state_t[i] - 2 * val_art_diff[i] * val_max(col)));
           }
           vec_lim_flux_ptr[row] = sum;
         }
@@ -1171,6 +1214,7 @@ namespace FEAT
         Dist::RequestVector send_reqs, recv_reqs;
         /// send and receive buffers
         std::vector<BufferMain> send_bufs, recv_bufs;
+        std::vector<Memory::TypedView<DataType>> send_views, recv_views;
 
         const std::size_t n = ranks.size();
 
@@ -1179,18 +1223,21 @@ namespace FEAT
         // post receives
         recv_reqs.reserve(n);
         recv_bufs.resize(n);
+        recv_views.resize(n);
         for(std::size_t i(0); i < n; ++i)
         {
           // create buffer vector
           recv_bufs.at(i) = BufferMain(mirrors.at(i).buffer_size(vector));
+          recv_views.at(i) = recv_bufs.at(i).elements_view_w();
 
           // post receive
-          recv_reqs.push_back(comm.irecv(recv_bufs.at(i).elements(), recv_bufs.at(i).size(), ranks.at(i)));
+          recv_reqs.push_back(comm.irecv(recv_views.at(i).get_w(), recv_bufs.at(i).size(), ranks.at(i)));
         }
 
         // post sends
         send_reqs.reserve(n);
         send_bufs.resize(n);
+        send_views.resize(n);
         for(std::size_t i(0); i < n; ++i)
         {
           // create buffer vector
@@ -1198,20 +1245,22 @@ namespace FEAT
 
           // gather from mirror
           mirrors.at(i).gather(send_bufs.at(i), vector);
+          send_views.at(i) = send_bufs.at(i).elements_view_r();
 
           // post send
-          send_reqs.push_back(comm.isend(send_bufs.at(i).elements(), send_bufs.at(i).size(), ranks.at(i)));
+          send_reqs.push_back(comm.isend(send_views.at(i).get_r(), send_bufs.at(i).size(), ranks.at(i)));
         }
 
-        DataType* values = vector.elements();
+        Memory::TypedView<DataType> values = vector.elements_view_rw();
 
         // process all pending receives
         for(std::size_t idx(0u); recv_reqs.wait_any(idx); )
         {
           // get buffer indices and values
           const Index m = recv_bufs.at(idx).size();
-          const IndexType* ind = mirrors.at(idx).indices();
-          const DataType* val = recv_bufs.at(idx).elements();
+          const Memory::TypedView<IndexType> ind = mirrors.at(idx).indices_view_r();
+          //const DataType* val = recv_bufs.at(idx).elements();
+          const Memory::TypedView<DataType>& val = recv_views.at(idx);
           for(Index k(0); k < m; ++k)
             //Math::mini(values(idx[k]), val[k]);
           values[ind[k]] = Math::min(values[ind[k]], val[k]);
@@ -1231,6 +1280,7 @@ namespace FEAT
         Dist::RequestVector send_reqs, recv_reqs;
         /// send and receive buffers
         std::vector<BufferMain> send_bufs, recv_bufs;
+        std::vector<Memory::TypedView<DataType>> send_views, recv_views;
 
         const std::size_t n = ranks.size();
 
@@ -1239,18 +1289,21 @@ namespace FEAT
         // post receives
         recv_reqs.reserve(n);
         recv_bufs.resize(n);
+        recv_views.resize(n);
         for(std::size_t i(0); i < n; ++i)
         {
           // create buffer vector
           recv_bufs.at(i) = BufferMain(mirrors.at(i).buffer_size(vector));
+          recv_views.at(i) = recv_bufs.at(i).elements_view_w();
 
           // post receive
-          recv_reqs.push_back(comm.irecv(recv_bufs.at(i).elements(), recv_bufs.at(i).size(), ranks.at(i)));
+          recv_reqs.push_back(comm.irecv(recv_views.at(i).get_w(), recv_bufs.at(i).size(), ranks.at(i)));
         }
 
         // post sends
         send_reqs.reserve(n);
         send_bufs.resize(n);
+        send_views.resize(n);
         for(std::size_t i(0); i < n; ++i)
         {
           // create buffer vector
@@ -1258,31 +1311,29 @@ namespace FEAT
 
           // gather from mirror
           mirrors.at(i).gather(send_bufs.at(i), vector);
+          send_views.at(i) = send_bufs.at(i).elements_view_r();
 
           // post send
-          send_reqs.push_back(comm.isend(send_bufs.at(i).elements(), send_bufs.at(i).size(), ranks.at(i)));
+          send_reqs.push_back(comm.isend(send_views.at(i).get_r(), send_bufs.at(i).size(), ranks.at(i)));
         }
 
-        DataType* values = vector.elements();
+        Memory::TypedView<DataType> values = vector.elements_view_rw();
 
         // process all pending receives
         for(std::size_t idx(0u); recv_reqs.wait_any(idx); )
         {
           // get buffer indices and values
           const Index m = recv_bufs.at(idx).size();
-          const IndexType* ind = mirrors.at(idx).indices();
-          const DataType* val = recv_bufs.at(idx).elements();
+          const Memory::TypedView<IndexType> ind = mirrors.at(idx).indices_view_r();
+          //const Memory::TypedView<DataType> val = recv_bufs.at(idx).elements_view_r();
+          const Memory::TypedView<DataType>& val = recv_views.at(idx);
           for(Index k(0); k < m; ++k)
-          values[ind[k]] = Math::max(values[ind[k]], val[k]);
+            values[ind[k]] = Math::max(values[ind[k]], val[k]);
         }
 
         // wait for all sends to finish
         send_reqs.wait_all();
       }
-
-
     };
-
-
-  }
-}
+  } // namespace Control
+} // namespace FEAT

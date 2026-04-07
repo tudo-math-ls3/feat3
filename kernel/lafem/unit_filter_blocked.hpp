@@ -11,7 +11,9 @@
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/sparse_vector_blocked.hpp>
-#include <kernel/lafem/arch/unit_filter_blocked.hpp>
+#include <kernel/lafem/arch/unit_filter_block_bcsr.hpp>
+#include <kernel/lafem/arch/unit_filter_block_vec.hpp>
+#include <kernel/lafem/arch/unit_filter_block_weak_bcsr.hpp>
 
 namespace FEAT
 {
@@ -26,7 +28,7 @@ namespace FEAT
      * \tparam IT_
      * Index type, i.e. unsigned int
      *
-     * \tparam BlockSize_
+     * \tparam block_size_
      * Size of the blocks, i.e. 2 for a filter acting on a velocity field in 2d
      *
      * Mostly c&p from UnitFilter
@@ -43,7 +45,7 @@ namespace FEAT
     template<
       typename DT_,
       typename IT_,
-      int BlockSize_>
+      int block_size_>
     class UnitFilterBlocked
     {
     public:
@@ -52,15 +54,15 @@ namespace FEAT
       /// index-type typedef
       typedef IT_ IndexType;
       /// The block size
-      static constexpr int BlockSize = BlockSize_;
+      static constexpr int block_size = block_size_;
       /// Value type
-      typedef Tiny::Vector<DataType, BlockSize> ValueType;
+      typedef Tiny::Vector<DataType, block_size> ValueType;
       /// Our supported vector type
-      typedef DenseVectorBlocked<DataType, IndexType, BlockSize> VectorType;
+      typedef DenseVectorBlocked<DataType, IndexType, block_size> VectorType;
 
       /// Our 'base' class type
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      using FilterType = UnitFilterBlocked<DT2_, IT2_, BlockSize_>;
+      using FilterType = UnitFilterBlocked<DT2_, IT2_, block_size_>;
 
       /// this typedef lets you create a filter with new Datatype and Index types
       template <typename DataType2_, typename IndexType2_>
@@ -69,11 +71,11 @@ namespace FEAT
       static constexpr bool is_global = false;
       static constexpr bool is_local = true;
 
-      static_assert(BlockSize > 1, "BlockSize has to be >= 2 in UnitFilterBlocked!");
+      static_assert(block_size > 1, "block_size has to be >= 2 in UnitFilterBlocked!");
 
     private:
       /// SparseVector, containing all entries of the unit filter
-      SparseVectorBlocked<DataType, IndexType, BlockSize> _sv;
+      SparseVectorBlocked<DataType, IndexType, block_size> _sv;
 
       /// ignore NaNs in filter values
       bool _ignore_nans;
@@ -95,8 +97,8 @@ namespace FEAT
        * \param[in] ingore_nans
        * Specifies whether the filter should ignore NaNs filter values
        */
-      explicit UnitFilterBlocked(Index num_entries, bool ignore_nans = false) :
-        _sv(num_entries),
+      explicit UnitFilterBlocked(Index num_entries, Index num_nonzeros, bool ignore_nans = false) :
+        _sv(num_entries, num_nonzeros),
         _ignore_nans(ignore_nans)
       {
       }
@@ -109,7 +111,7 @@ namespace FEAT
        * \param[in] indices DenseVector containing element indices
        */
       explicit UnitFilterBlocked(Index size_in,
-                                 DenseVectorBlocked<DT_, IT_, BlockSize_> & values,
+                                 DenseVectorBlocked<DT_, IT_, block_size_> & values,
                                  DenseVector<IT_, IT_> & indices, bool ignore_nans = false) :
         _sv(size_in, values, indices),
         _ignore_nans(ignore_nans)
@@ -176,11 +178,11 @@ namespace FEAT
       }
 
       /// \cond internal
-      SparseVectorBlocked<DT_, IT_, BlockSize>& get_filter_vector()
+      SparseVectorBlocked<DT_, IT_, block_size>& get_filter_vector()
       {
         return _sv;
       }
-      const SparseVectorBlocked<DT_, IT_, BlockSize>& get_filter_vector() const
+      const SparseVectorBlocked<DT_, IT_, block_size>& get_filter_vector() const
       {
         return _sv;
       }
@@ -203,58 +205,128 @@ namespace FEAT
         return _ignore_nans;
       }
 
-      /**
-       * \brief Adds one element to the filter
-       *
-       * \param[in] idx Index where to add
-       * \param[in] val Value to add
-       *
-       **/
-      void add(IndexType idx, ValueType val)
-      {
-        _sv(idx, val);
-      }
-
-      /// \returns The total size of the filter.
+      /// Returns the total native size of the filter
       Index size() const
       {
         return _sv.size();
       }
 
-      /// \returns The number of entries in the filter.
-      Index used_elements() const
+      /// Returns the total raw size of the filter
+      Index size_raw() const
       {
-        return _sv.used_elements();
+        return _sv.size_raw();
       }
 
-      /// \returns The index array.
-      IT_* get_indices()
+      /// Returns the number of non-zero entries in the filter
+      Index num_nzes() const
       {
-        return _sv.indices();
+        return _sv.num_nzes();
       }
 
-      /// \returns The index array.
-      const IT_* get_indices() const
+      /// Returns the raw number of non-zero entries in the filter
+      Index num_nzes_raw() const
       {
-        return _sv.indices();
+        return _sv.num_nzes_raw();
       }
 
-      /// \returns The value array.
-      ValueType* get_values()
+      /// Checks whether the size of the filter is zero
+      bool empty() const
       {
-        return _sv.elements();
+        return _sv.empty();
       }
 
-      /// \returns The value array.
-      const ValueType* get_values() const
+      /// Checks whether the filter does not contain any non-zero elements
+      bool hollow() const
       {
-        return _sv.elements();
+        return _sv.hollow();
       }
 
-      /// Permutate internal vector according to the given Permutation
-      void permute(Adjacency::Permutation & perm)
+      /// Returns a reference to the elements memory arbiter
+      Memory::Arbiter& elements_arbiter()
       {
-        _sv.permute(perm);
+        return _sv.elements_arbiter();
+      }
+
+      /// Returns a const reference to the elements memory arbiter
+      const Memory::Arbiter& elements_arbiter() const
+      {
+        return _sv.elements_arbiter();
+      }
+
+      /// Creates a read-only memory view for the elements array for a given memory location
+      Memory::TypedView<ValueType> elements_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        return _sv.elements_view_r(loc);
+      }
+
+      /// Creates a write-only memory view for the elements array for a given memory location
+      Memory::TypedView<ValueType> elements_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        return _sv.elements_view_w(loc);
+      }
+
+      /// Creates a read-write memory view for the elements array for a given memory location
+      Memory::TypedView<ValueType> elements_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        return _sv.elements_view_rw(loc);
+      }
+
+      /**
+       * \brief Creates a memory view for the elements array
+       *
+       * \param[in] loc
+       * The memory location for which the view is to be created
+       *
+       * \param[in] acc
+       * A combination of access rights to grant for the view
+       */
+      Memory::TypedView<ValueType> elements_view(Memory::Location loc, Memory::Access acc)
+      {
+        return _sv.elements_view(loc, acc);
+      }
+
+      /// Returns a reference to the indices memory arbiter
+      Memory::Arbiter& indices_arbiter()
+      {
+        return _sv.indices_arbiter();
+      }
+
+      /// Returns a const reference to the indices memory arbiter
+      const Memory::Arbiter& indices_arbiter() const
+      {
+        return _sv.indices_arbiter();
+      }
+
+      /// Creates a read-only memory view for the indices array for a given memory location
+      Memory::TypedView<IT_> indices_view_r(Memory::Location loc = Memory::Location::main) const
+      {
+        return _sv.indices_view_r(loc);
+      }
+
+      /// Creates a write-only memory view for the indices array for a given memory location
+      Memory::TypedView<IT_> indices_view_w(Memory::Location loc = Memory::Location::main)
+      {
+        return _sv.indices_view_w(loc);
+      }
+
+      /// Creates a read-write memory view for the indices array for a given memory location
+      Memory::TypedView<IT_> indices_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        return _sv.indices_view_rw(loc);
+      }
+
+      /**
+       * \brief Creates a memory view for the indices array
+       *
+       * \param[in] loc
+       * The memory location for which the view is to be created
+       *
+       * \param[in] acc
+       * A combination of access rights to grant for the view
+       */
+      Memory::TypedView<IT_> indices_view(Memory::Location loc, Memory::Access acc)
+      {
+        return _sv.indices_view(loc, acc);
       }
 
 #ifdef DOXYGEN
@@ -264,13 +336,13 @@ namespace FEAT
       /**
        * \brief Applies the filter onto a system matrix.
        *
-       * \tparam BlockWidth_
+       * \tparam block_width_
        * The input matrix' block width
        *
        * \param[in,out] matrix
        * A reference to the matrix to be filtered.
        *
-       * The input matrix has to have a block(ed) structure and its BlockHeight has to agree with the filter's
+       * The input matrix has to have a block(ed) structure and its block_height has to agree with the filter's
        * blocksize.
        *
        */
@@ -281,13 +353,13 @@ namespace FEAT
       /**
        * \brief Filter the non-diagonal row entries
        *
-       * \tparam BlockWidth_
+       * \tparam block_width_
        * The input matrix' block width
        *
        * \param[in,out] matrix
        * A reference to the matrix to be filtered.
        *
-       * The input matrix has to have a block(ed) structure and its BlockHeight has to agree with the filter's
+       * The input matrix has to have a block(ed) structure and its block_height has to agree with the filter's
        * blocksize.
        *
        */
@@ -298,13 +370,13 @@ namespace FEAT
       /**
        * \brief Filter the non-diagonal column entries
        *
-       * \tparam BlockWidth_
+       * \tparam block_width_
        * The input matrix' block width
        *
        * \param[in,out] matrix
        * A reference to the matrix to be filtered.
        *
-       * The input matrix has to have a block(ed) structure and its BlockHeight has to agree with the filter's
+       * The input matrix has to have a block(ed) structure and its block_height has to agree with the filter's
        * blocksize.
        *
        */
@@ -314,34 +386,33 @@ namespace FEAT
 
 #endif
       /// \cond internal
-      template<int BlockWidth_>
-      void filter_mat(SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
+      template<int block_width_>
+      void filter_mat(SparseMatrixBCSR<DT_, IT_, block_size_, block_width_> & matrix) const
       {
-        if(_sv.used_elements() == Index(0))
+        if(_sv.hollow())
           return;
 
-        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix.num_rows(), "Matrix size does not match!");
 
-        Arch::UnitFilterBlocked::filter_unit_mat
-          (matrix.template val<LAFEM::Perspective::pod>(), matrix.row_ptr(), matrix.col_ind(), BlockSize_, BlockWidth_,
-          _sv.template elements<LAFEM::Perspective::pod>(), _sv.indices(), _sv.used_elements(), _ignore_nans);
+        Arch::UnitFilterBlockBCSR::template exec<DT_, IT_, block_size_, block_width_>(matrix.val_arbiter(), matrix.row_ptr_arbiter(),
+          matrix.col_idx_arbiter(), _sv.elements_arbiter(), _sv.indices_arbiter(), _sv.num_nzes(), true, _ignore_nans);
       }
 
-      template<int BlockWidth_>
-      void filter_offdiag_row_mat(SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockWidth_> & matrix) const
+      template<int block_width_>
+      void filter_offdiag_row_mat(SparseMatrixBCSR<DT_, IT_, block_size_, block_width_> & matrix) const
       {
-        if(_sv.used_elements() == Index(0))
+        if(_sv.hollow())
           return;
 
-        XASSERTM(_sv.size() == matrix.rows(), "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix.num_rows(), "Matrix size does not match!");
 
-        Arch::UnitFilterBlocked::filter_offdiag_row_mat
-          (matrix.template val<LAFEM::Perspective::pod>(), matrix.row_ptr(), BlockSize_, BlockWidth_,
-          _sv.template elements<LAFEM::Perspective::pod>(), _sv.indices(), _sv.used_elements(), _ignore_nans);
+        Arch::UnitFilterBlockBCSR::template exec<DT_, IT_, block_size_, block_width_>(
+          matrix.val_arbiter(), matrix.row_ptr_arbiter(), matrix.col_idx_arbiter(),
+          _sv.elements_arbiter(), _sv.indices_arbiter(), _sv.num_nzes(), false, _ignore_nans);
       }
 
-      template<int BlockWidth_>
-      void filter_offdiag_col_mat(SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockWidth_> &) const
+      template<int block_width_>
+      void filter_offdiag_col_mat(SparseMatrixBCSR<DT_, IT_, block_size_, block_width_> &) const
       {
         // nothing to do here
       }
@@ -363,29 +434,23 @@ namespace FEAT
        * \param[in] matrix_m
        * The donor matrix whose rows are to be copied into the system matrix
        */
-      template<int BlockWidth_>
-      void filter_weak_matrix_rows(SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockWidth_> & matrix_a,
-        const SparseMatrixBCSR<DT_, IT_, BlockSize_, BlockWidth_>& matrix_m) const
+      template<int block_width_>
+      void filter_weak_matrix_rows(SparseMatrixBCSR<DT_, IT_, block_size_, block_width_> & matrix_a,
+        const SparseMatrixBCSR<DT_, IT_, block_size_, block_width_>& matrix_m) const
       {
-        if(_sv.used_elements() == Index(0))
+        if(_sv.hollow())
           return;
 
-        if(matrix_a.val() == matrix_m.val())
-        {
-          XABORTM("Matrices are not allowed to hold the same data");
-        }
+        XASSERTM(matrix_a.val_arbiter() != matrix_m.val_arbiter(), "Matrices are not allowed to hold the same data");
 
-        XASSERTM(_sv.size() == matrix_a.rows(), "Matrix size does not match!");
-        XASSERTM(_sv.size() == matrix_m.rows(), "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix_a.num_rows(), "Matrix size does not match!");
+        XASSERTM(_sv.size() == matrix_m.num_rows(), "Matrix size does not match!");
+        XASSERTM(matrix_a.num_cols() == matrix_m.num_cols(), "matrix A and M must share their layout");
+        XASSERTM(matrix_a.num_nzes() == matrix_m.num_nzes(), "matrix A and M must share their layout");
 
-        const IndexType* row_ptr(matrix_a.row_ptr());
-        const IndexType* col_idx(matrix_m.col_ind());
-        XASSERTM(row_ptr == matrix_m.row_ptr(), "matrix A and M must share their layout");
-        XASSERTM(col_idx == matrix_m.col_ind(), "matrix A and M must share their layout");
-
-        Arch::UnitFilterBlocked::filter_weak_matrix_rows
-          (matrix_a.template val<LAFEM::Perspective::pod>(), matrix_m.template val<LAFEM::Perspective::pod>(), row_ptr, BlockSize_, BlockWidth_,
-          _sv.template elements<LAFEM::Perspective::pod>(), _sv.indices(), _sv.used_elements());
+        Arch::UnitFilterBlockWeakBCSR::template exec<DT_, IT_, block_size_, block_width_>(
+          matrix_a.val_arbiter(), matrix_m.val_arbiter(), matrix_a.row_ptr_arbiter(),
+          _sv.elements_arbiter(), _sv.indices_arbiter(), _sv.num_nzes(), _ignore_nans);
       }
 
 
@@ -397,13 +462,13 @@ namespace FEAT
        */
       void filter_rhs(VectorType& vector) const
       {
-        if(_sv.used_elements() == Index(0))
+        if(_sv.hollow())
           return;
 
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
-        Arch::UnitFilterBlocked::filter_rhs
-          (vector.template elements<Perspective::pod>(), BlockSize_, _sv.template elements<Perspective::pod>(),
-          _sv.indices(), _sv.used_elements(), _ignore_nans);
+
+        Arch::UnitFilterBlockVec::template exec<DT_, IT_, block_size_>(vector.elements_arbiter(),
+          _sv.elements_arbiter(), _sv.indices_arbiter(), _sv.num_nzes(), false, _ignore_nans);
       }
 
       /**
@@ -426,13 +491,13 @@ namespace FEAT
        */
       void filter_def(VectorType& vector) const
       {
-        if(_sv.used_elements() == Index(0))
+        if(_sv.hollow())
           return;
 
         XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
-        Arch::UnitFilterBlocked::filter_def
-          (vector.template elements<Perspective::pod>(), BlockSize_, _sv.template elements<Perspective::pod>(),
-          _sv.indices(), _sv.used_elements(), _ignore_nans);
+
+        Arch::UnitFilterBlockVec::template exec<DT_, IT_, block_size_>(vector.elements_arbiter(),
+          _sv.elements_arbiter(), _sv.indices_arbiter(), _sv.num_nzes(), true, _ignore_nans);
       }
 
       /**

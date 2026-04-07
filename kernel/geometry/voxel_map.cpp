@@ -6,6 +6,9 @@
 // includes, FEAT
 #include <kernel/geometry/voxel_map.hpp>
 
+// includes, system
+#include <cstring>
+
 // includes, thirdparty
 #ifdef FEAT_HAVE_ZLIB
 #include <zlib.h>

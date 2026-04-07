@@ -20,12 +20,16 @@ namespace FEAT
      *
      * \todo statistics
      *
+     * \todo make use of cuda-aware MPI
+     *
      * \author Dirk Ribbrock, Peter Zajac
      */
     template <typename VT_, typename VMT_>
     class SynchVectorTicket
     {
     public:
+      /// our data type
+      typedef typename VT_::DataType DataType;
       /// the buffer vector type
       using BufferType = LAFEM::DenseVector<typename VT_::DataType, typename VT_::IndexType>;
 
@@ -44,6 +48,9 @@ namespace FEAT
       Dist::RequestVector _send_reqs, _recv_reqs;
       /// send and receive buffers
       std::vector<BufferType> _send_bufs, _recv_bufs;
+      /// send and receive buffer views
+      std::vector<Memory::TypedView<DataType>> _send_views, _recv_views;
+
 #endif // FEAT_HAVE_MPI || DOXYGEN
 
     public:
@@ -57,7 +64,9 @@ namespace FEAT
         _send_reqs(),
         _recv_reqs(),
         _send_bufs(),
-        _recv_bufs()
+        _recv_bufs(),
+        _send_views(),
+        _recv_views()
 #else
         _finished(true)
 #endif // FEAT_HAVE_MPI || DOXYGEN
@@ -94,20 +103,31 @@ namespace FEAT
         // post receives
         _recv_reqs.reserve(n);
         _recv_bufs.resize(n);
+        _recv_views.resize(n);
         for(std::size_t i(0); i < n; ++i)
         {
+          // skip hollow mirrors
+          if(_mirrors->at(i).hollow())
+            continue;
+
           // create buffer vector in main memory
           _recv_bufs.at(i) = BufferType(_mirrors->at(i).buffer_size(*_target));
 
           // post receive
-          _recv_reqs.push_back(_comm->irecv(_recv_bufs.at(i).elements(), _recv_bufs.at(i).size(), ranks.at(i)));
+          _recv_views.at(i) = _recv_bufs.at(i).elements_view_w();
+          _recv_reqs.push_back(_comm->irecv(_recv_views.at(i).get_w(), _recv_bufs.at(i).size(), ranks.at(i)));
         }
 
         // post sends
         _send_reqs.reserve(n);
         _send_bufs.resize(n);
+        _send_views.resize(n);
         for(std::size_t i(0); i < n; ++i)
         {
+          // skip hollow mirrors
+          if(_mirrors->at(i).hollow())
+            continue;
+
           // create buffer in device memory
           _send_bufs.at(i) = BufferType(_mirrors->at(i).buffer_size(*_target));
 
@@ -115,7 +135,8 @@ namespace FEAT
           _mirrors->at(i).gather(_send_bufs.at(i), *_target);
 
           // post send
-          _send_reqs.push_back(_comm->isend(_send_bufs.at(i).elements(), _send_bufs.at(i).size(), ranks.at(i)));
+          _send_views.at(i) = _send_bufs.at(i).elements_view_r();
+          _send_reqs.push_back(_comm->isend(_send_views.at(i).get_r(), _send_bufs.at(i).size(), ranks.at(i)));
         }
 
         Statistics::add_time_mpi_execute_blas2(ts_start.elapsed_now());
@@ -142,7 +163,9 @@ namespace FEAT
         _send_reqs(std::forward<Dist::RequestVector>(other._send_reqs)),
         _recv_reqs(std::forward<Dist::RequestVector>(other._recv_reqs)),
         _send_bufs(std::forward<std::vector<BufferType>>(other._send_bufs)),
-        _recv_bufs(std::forward<std::vector<BufferType>>(other._recv_bufs))
+        _recv_bufs(std::forward<std::vector<BufferType>>(other._recv_bufs)),
+        _send_views(std::forward<std::vector<Memory::TypedView<DataType>>>(other._send_views)),
+        _recv_views(std::forward<std::vector<Memory::TypedView<DataType>>>(other._recv_views))
       {
         other._finished = true;
         other._comm = nullptr;
@@ -171,6 +194,8 @@ namespace FEAT
         _recv_reqs = std::forward<Dist::RequestVector>(other._recv_reqs);
         _send_bufs = std::forward<std::vector<BufferType>>(other._send_bufs);
         _recv_bufs = std::forward<std::vector<BufferType>>(other._recv_bufs);
+        _send_views = std::forward<std::vector<Memory::TypedView<DataType>>>(other._send_views);
+        _recv_views = std::forward<std::vector<Memory::TypedView<DataType>>>(other._recv_views);
 
         other._finished = true;
         other._comm = nullptr;
@@ -201,6 +226,7 @@ namespace FEAT
         for(std::size_t idx(0u); _recv_reqs.wait_any(idx); )
         {
           // scatter the receive buffer
+          _recv_views.at(idx).release();
           _mirrors->at(idx).scatter_axpy(*_target, _recv_bufs.at(idx));
         }
 

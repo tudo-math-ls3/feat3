@@ -4,8 +4,9 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <test_system/test_system.hpp>
-#include <kernel/util/memory_pool.hpp>
 #include <kernel/runtime.hpp>
+#include <kernel/backend.hpp>
+#include <kernel/util/time_stamp.hpp>
 
 #include <cstring>
 
@@ -20,6 +21,8 @@ int main(int argc, char** argv)
   std::cout << "CTEST_FULL_OUTPUT\n";
 
   int result(EXIT_SUCCESS);
+
+  TimeStamp t_start;
 
   if(argc > 1)
   {
@@ -91,8 +94,10 @@ int main(int argc, char** argv)
         << " [Indexing: "<< (*i)->get_index_name() << "]"
         << "\n";
       Backend::set_preferred_backend((*i)->get_preferred_backend());
+      TimeStamp t1;
       (*i)->run();
-      std::cout << "PASSED\n";
+      TimeStamp t2;
+      std::cout << "PASSED in " << t2.elapsed_string(t1) <<" seconds\n";
       ++tests_passed;
     }
     catch (TestFailedException & e)
@@ -126,6 +131,7 @@ int main(int argc, char** argv)
     i = TestList::instance()->erase(i);
   }
 
+  std::cout << "\n";
   if(result == EXIT_SUCCESS)
   {
     std::cout << "All " << list_size << " tests PASSED!\n";
@@ -135,6 +141,9 @@ int main(int argc, char** argv)
     std::cout << tests_passed << " of " << list_size << " tests PASSED, "
       << tests_failed << " tests FAILED!\n";
   }
+
+  TimeStamp t_end;
+  std::cout << "Total Runtime: " << t_end.elapsed_string(t_start) << " seconds\n";
 
   return result;
 }

@@ -98,8 +98,7 @@ namespace FEAT
               const CSRMatrixData<DT_, IT_>& matrix_data,
               const AssemblyCubatureData<DT_>& cubature,
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
-              const std::vector<int*>& coloring_maps,
-              const std::vector<Index>& coloring_map_sizes,
+              const Adjacency::ColoringDataHandler& coloring_data,
               DT_ alpha
               );
       #endif
@@ -109,8 +108,7 @@ namespace FEAT
               const CSRMatrixData<DT_, IT_>& matrix_data,
               const AssemblyCubatureData<DT_>& cubature,
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
-              const std::vector<int*>& coloring_maps,
-              const std::vector<Index>& coloring_map_sizes,
+              const Adjacency::ColoringDataHandler& coloring_data,
               DT_ alpha
               );
 
@@ -173,8 +171,8 @@ namespace FEAT
       template<typename CubatureFactory_>
       void assemble_matrix1(LAFEM::SparseMatrixCSR<DataType, IndexType>& matrix, const SpaceType& space, const CubatureFactory_& cubature_factory, DataType alpha = DataType(1)) const
       {
-        XASSERTM(matrix.rows() == space.get_num_dofs(), "invalid matrix dimensions");
-        XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_rows() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_cols() == space.get_num_dofs(), "invalid matrix dimensions");
 
         //define cubature
         typedef Cubature::Rule<ShapeType, DataType, DataType> CubatureRuleType;
@@ -185,42 +183,51 @@ namespace FEAT
         typename CubatureRuleType::PointType* cub_pt = cubature.get_points();
         DataType* cub_wg = cubature.get_weights();
 
-        BACKEND_SKELETON_VOID(assemble_matrix1_cuda, assemble_matrix1_generic, assemble_matrix1_generic, matrix, space, cub_pt, cub_wg, num_cubs, alpha)
+        if(Backend::get_preferred_backend() == PreferredBackend::cuda)
+          assemble_matrix1_cuda(matrix, space, cub_pt, cub_wg, num_cubs, alpha);
+        else
+          assemble_matrix1_generic(matrix, space, cub_pt, cub_wg, num_cubs, alpha);
       }
 
 
       void assemble_matrix1_generic(LAFEM::SparseMatrixCSR<DataType, IndexType>& matrix, const SpaceType& space, typename Cubature::Rule<ShapeType, DataType, DataType>::PointType* cub_pt, const DataType* cub_wg, int num_cubs, DataType alpha) const
       {
-        CSRMatrixData<DataType, IndexType> mat_data = {matrix.val(), matrix.row_ptr(), matrix.col_ind(), matrix.rows(), matrix.columns()};
+        Memory::TypedView<DataType> val_view(matrix.val_view_rw());
+        const Memory::TypedView<IndexType> row_ptr_view(matrix.row_ptr_view_r());
+        const Memory::TypedView<IndexType> col_idx_view(matrix.col_idx_view_r());
+        CSRMatrixData<DataType, IndexType> mat_data = {val_view.get_w(), row_ptr_view.get_r(), col_idx_view.get_r(), matrix.num_rows(), matrix.num_cols()};
 
         AssemblyCubatureData<DataType> cub_data = {(void*)cub_pt, cub_wg, num_cubs};
         AssemblyMappingData<DataType, IndexType> mapping_data = mesh_data.get_assembly_field();
 
 
-        VoxelAssembly::Arch::assemble_poisson_csr_host(space, mat_data, cub_data, mapping_data, mesh_data.get_coloring_maps(), mesh_data.get_color_map_sizes(), alpha);
+        VoxelAssembly::Arch::assemble_poisson_csr_host(space, mat_data, cub_data, mapping_data, mesh_data.coloring_data, alpha);
       }
 
       #ifdef FEAT_HAVE_CUDA
       void assemble_matrix1_cuda(LAFEM::SparseMatrixCSR<DataType, IndexType>& matrix, const SpaceType& space, typename Cubature::Rule<ShapeType, DataType, DataType>::PointType* cub_pt, const DataType* cub_wg, int num_cubs, DataType alpha) const
       {
-        VoxelAssembly::CSRMatrixData<DataType, IndexType> mat_data = {matrix.val(), matrix.row_ptr(), matrix.col_ind(), matrix.rows(), matrix.columns()};
+        Memory::TypedView<DataType> val_view(matrix.val_view_rw(Memory::Location::cuda));
+        const Memory::TypedView<IndexType> row_ptr_view(matrix.row_ptr_view_r(Memory::Location::cuda));
+        const Memory::TypedView<IndexType> col_idx_view(matrix.col_idx_view_r(Memory::Location::cuda));
+        CSRMatrixData<DataType, IndexType> mat_data = {val_view.get_w(), row_ptr_view.get_r(), col_idx_view.get_r(), matrix.num_rows(), matrix.num_cols()};
 
         typedef typename Cubature::Rule<ShapeType, DataType, DataType>::PointType CubPointType;
         //initialize all necessary pointer arrays and values //maybe more sense to specify cubature rule and set this to a const mem location?
-        void* cub_pt_device = Util::cuda_malloc(std::size_t(num_cubs) * sizeof(CubPointType));
-        Util::cuda_copy_host_to_device(cub_pt_device, (void*)cub_pt, std::size_t(num_cubs) * sizeof(CubPointType));
+        void* cub_pt_device = Memory::alloc_cuda(std::size_t(num_cubs) * sizeof(CubPointType));
+        Memory::memcopy_main_to_cuda(cub_pt_device, (const void*)cub_pt, std::size_t(num_cubs) * sizeof(CubPointType));
 
-        void* cub_wg_device = Util::cuda_malloc(std::size_t(num_cubs) * sizeof(DataType));
-        Util::cuda_copy_host_to_device(cub_wg_device, (const void*)cub_wg, std::size_t(num_cubs) * sizeof(DataType));
+        void* cub_wg_device = Memory::alloc_cuda(std::size_t(num_cubs) * sizeof(DataType));
+        Memory::memcopy_main_to_cuda(cub_wg_device, (const void*)cub_wg, std::size_t(num_cubs) * sizeof(DataType));
 
         VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_assembly_field();
 
 
-        VoxelAssembly::Arch::assemble_poisson_csr(space, mat_data, d_cub_data, d_mapping_data, mesh_data.get_coloring_maps(), mesh_data.get_color_map_sizes(), alpha);
+        VoxelAssembly::Arch::assemble_poisson_csr(space, mat_data, d_cub_data, d_mapping_data, mesh_data.coloring_data, alpha);
         //free resources
-        Util::cuda_free(cub_wg_device);
-        Util::cuda_free(cub_pt_device);
+        Memory::free_cuda(cub_wg_device);
+        Memory::free_cuda(cub_pt_device);
       }
 
       #else //FEAT_HAVE_CUDA

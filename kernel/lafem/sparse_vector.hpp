@@ -8,17 +8,16 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/util/type_traits.hpp>
-#include <kernel/lafem/container.hpp>
-#include <kernel/lafem/dense_vector.hpp>
 #include <kernel/util/math.hpp>
+#include <kernel/util/statistics.hpp>
+#include <kernel/util/tiny_algebra.hpp>
+#include <kernel/util/type_traits.hpp>
+#include <kernel/util/time_stamp.hpp>
 #include <kernel/adjacency/permutation.hpp>
-#include <kernel/lafem/arch/max_abs_index.hpp>
-#include <kernel/lafem/arch/min_abs_index.hpp>
-#include <kernel/lafem/arch/max_index.hpp>
-#include <kernel/lafem/arch/min_index.hpp>
-#include <kernel/lafem/arch/max_rel_diff.hpp>
-
+#include <kernel/lafem/forward.hpp>
+#include <kernel/lafem/container.hpp>
+#include <kernel/lafem/arch/min_max_value_dense.hpp>
+#include <kernel/lafem/arch/max_rel_diff_dense.hpp>
 
 namespace FEAT
 {
@@ -36,86 +35,41 @@ namespace FEAT
      * _indices[0]: non zero indices \n
      * _scalar_index[0]: container size \n
      * _scalar_index[1]: non zero element count (used elements) \n
-     * _scalar_index[2]: allocated elements \n
-     * _scalar_index[3]: allocation size increment \n
-     * _scalar_index[4]: boolean flag, if container is sorted \n
      *
      * Refer to \ref lafem_design for general usage informations.
      *
-     * \author Dirk Ribbrock
+     * \author Dirk Ribbrock, Peter Zajac
      */
     template <typename DT_, typename IT_ = Index>
     class SparseVector : public Container<DT_, IT_>
     {
-    private:
-      template <typename T1_, typename T2_>
-      static void _insertion_sort(T1_ * key, T2_ * val1, Index size)
-      {
-        T1_ swap_key;
-        T2_ swap1;
-        for (Index i(1), j ; i < size ; ++i)
-        {
-          swap_key = key[i];
-          swap1 = val1[i];
-          j = i;
-          while (j > 0 && key[j-1] > swap_key)
-          {
-            key[j] = key[j-1];
-            val1[j] = val1[j-1];
-            --j;
-          }
-          key[j] = swap_key;
-          val1[j] = swap1;
-        }
-      }
-
-      Index & _used_elements()
-      {
-        return this->_scalar_index.at(1);
-      }
-
-      Index & _allocated_elements()
-      {
-        return this->_scalar_index.at(2);
-      }
-
-      Index & _sorted()
-      {
-        return this->_scalar_index.at(4);
-      }
-
-      bool _remove_element(IT_ ind)
-      {
-        IT_* pindices = this->_indices.at(0);
-        IT_* ptr = std::find(pindices, pindices + _used_elements(), ind);
-        if(ptr == pindices + _used_elements())
-        {
-          return false;
-        }
-        _sorted() = 0;
-        *ptr = std::numeric_limits<IT_>::max();
-        sort();
-        return true;
-      }
-
     public:
       /// Our datatype
       typedef DT_ DataType;
       /// Our indextype
       typedef IT_ IndexType;
 
+    protected:
+      Index & _size()
+      {
+        return this->_scalar_index.at(0);
+      }
+
+      Index & _nonzeros()
+      {
+        return this->_scalar_index.at(1);
+      }
+
+    public:
       /**
        * \brief Constructor
        *
        * Creates an empty non dimensional vector.
        */
-      explicit SparseVector() :
-        Container<DT_, IT_> (0)
+      SparseVector()
       {
         this->_scalar_index.push_back(0);
         this->_scalar_index.push_back(0);
-        this->_scalar_index.push_back(Math::min<Index>(0, 1000));
-        this->_scalar_index.push_back(1);
       }
 
       /**
@@ -125,13 +79,14 @@ namespace FEAT
        *
        * Creates a vector with a given size.
        */
-      explicit SparseVector(Index size_in) :
-        Container<DT_, IT_>(size_in)
+      explicit SparseVector(Index size_in, Index nnze_in)
       {
-        this->_scalar_index.push_back(0);
-        this->_scalar_index.push_back(0);
-        this->_scalar_index.push_back(Math::min<Index>(size_in, 1000));
-        this->_scalar_index.push_back(1);
+        this->_scalar_index.push_back(size_in);
+        this->_scalar_index.push_back(nnze_in);
+        this->_elements.push_back(Memory::Arbiter(sizeof(DT_) * nnze_in));
+        this->_elements_size.push_back(nnze_in);
+        this->_indices.push_back(Memory::Arbiter(sizeof(IT_) * nnze_in));
+        this->_indices_size.push_back(nnze_in);
       }
 
       /**
@@ -145,28 +100,18 @@ namespace FEAT
        * Creates a vector with a given size.
        */
       explicit SparseVector(Index size_in, DenseVector<DT_, IT_> & elements_in,
-                            DenseVector<IT_, IT_> & indices_in, bool is_sorted = true) :
-        Container<DT_, IT_>(size_in)
+        DenseVector<IT_, IT_> & indices_in)
       {
         XASSERT(size_in != Index(0));
         XASSERTM(indices_in.size() == elements_in.size(), "Vector size mismatch!");
 
+        this->_scalar_index.push_back(size_in);
         this->_scalar_index.push_back(elements_in.size());
-        this->_scalar_index.push_back(elements_in.size());
-        this->_scalar_index.push_back(Math::min<Index>(size_in, 1000));
-        this->_scalar_index.push_back(Index(is_sorted));
 
-        this->_elements.push_back(elements_in.elements());
+        this->_elements.push_back(elements_in.elements_arbiter().attach());
         this->_elements_size.push_back(elements_in.size());
-        this->_indices.push_back(indices_in.elements());
+        this->_indices.push_back(indices_in.elements_arbiter().attach());
         this->_indices_size.push_back(indices_in.size());
-
-        for (Index i(0) ; i < this->_elements.size() ; ++i)
-          MemoryPool::increase_memory(this->_elements.at(i));
-        for (Index i(0) ; i < this->_indices.size() ; ++i)
-          MemoryPool::increase_memory(this->_indices.at(i));
-
-        this->sort();
       }
 
       /**
@@ -177,10 +122,9 @@ namespace FEAT
        * Creates a vector from the given byte array.
        */
       template <typename DT2_ = DT_, typename IT2_ = IT_>
-      explicit SparseVector(std::vector<char> input) :
-        Container<DT_, IT_>(0)
+      explicit SparseVector(std::vector<char> input)
       {
-        deserialize<DT2_, IT2_>(input);
+        this->deserialize<DT2_, IT2_>(input);
       }
 
       /**
@@ -203,10 +147,9 @@ namespace FEAT
        *
        * Creates a vector based on the source file.
        */
-      explicit SparseVector(FileMode mode, const String& filename) :
-        Container<DT_, IT_>(0)
+      explicit SparseVector(FileMode mode, const String& filename)
       {
-        read_from(mode, filename);
+        this->read_from(mode, filename);
       }
 
       /**
@@ -217,10 +160,9 @@ namespace FEAT
        *
        * Creates a vector based on the source filestream.
        */
-      explicit SparseVector(FileMode mode, std::istream& file) :
-        Container<DT_, IT_>(0)
+      explicit SparseVector(FileMode mode, std::istream& file)
       {
-        read_from(mode, file);
+        this->read_from(mode, file);
       }
 
       /**
@@ -279,212 +221,156 @@ namespace FEAT
       template <typename DT2_, typename IT2_>
       void convert(const SparseVector<DT2_, IT2_> & other)
       {
-        // clean up previous mess before creating a new vector
-        this->sort();
         this->clone(other);
       }
 
-      /**
-       * \brief Get a pointer to the data array.
-       *
-       * \returns Pointer to the data array.
-       */
-      template <Perspective = Perspective::native>
-      DT_ * elements()
+      /// Returns the native size of the sparse vector
+      Index size() const
+      {
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(0);
+      }
+
+      /// Returns the raw size of the sparse vector
+      Index size_raw() const
+      {
+        return this->size();
+      }
+
+      /// Returns the number of non-zero elements in the sparse vector
+      Index num_nzes() const
+      {
+        return this->_scalar_index.empty() ? Index(0) : this->_scalar_index.at(1);
+      }
+
+      /// Returns the raw number of non-zero elements in the sparse vector
+      Index num_nzes_raw() const
+      {
+        return this->num_nzes();
+      }
+
+      /// Checks whether the size of the sparse vector is zero
+      bool empty() const
+      {
+        return this->_scalar_index.empty() || (this->_scalar_index.at(0) == Index(0));
+      }
+
+      /// Checks whether the sparse vector does not contain any non-zero elements
+      bool hollow() const
+      {
+        return this->_scalar_index.empty() || (this->_scalar_index.at(1) == Index(0));
+      }
+
+      /// Returns a reference to the elements memory arbiter
+      Memory::Arbiter& elements_arbiter()
+      {
+        XASSERT(!this->_elements.empty());
+        return this->_elements.front();
+      }
+
+      /// Returns a const reference to the elements memory arbiter
+      const Memory::Arbiter& elements_arbiter() const
+      {
+        XASSERT(!this->_elements.empty());
+        return this->_elements.front();
+      }
+
+      /// Creates a read-only memory view for the elements array for a given memory location
+      Memory::TypedView<DT_> elements_view_r(Memory::Location loc = Memory::Location::main) const
       {
         if(this->_elements.empty())
-          return nullptr;
-        if (sorted() == 0)
-          const_cast<SparseVector *>(this)->sort();
-        return this->_elements.at(0);
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::read));
       }
 
-      template <Perspective = Perspective::native>
-      DT_ const * elements() const
+      /// Creates a write-only memory view for the elements array for a given memory location
+      Memory::TypedView<DT_> elements_view_w(Memory::Location loc = Memory::Location::main)
       {
         if(this->_elements.empty())
-          return nullptr;
-        if (sorted() == 0)
-          const_cast<SparseVector *>(this)->sort();
-        return this->_elements.at(0);
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::write));
+      }
+
+      /// Creates a read-write memory view for the elements array for a given memory location
+      Memory::TypedView<DT_> elements_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, Memory::Access::read_write));
       }
 
       /**
-       * \brief Get a pointer to the non zero indices array.
+       * \brief Creates a memory view for the elements array
        *
-       * \returns Pointer to the indices array.
+       * \param[in] loc
+       * The memory location for which the view is to be created
+       *
+       * \param[in] acc
+       * A combination of access rights to grant for the view
        */
-      IT_ * indices()
+      Memory::TypedView<DT_> elements_view(Memory::Location loc, Memory::Access acc)
+      {
+        if(this->_elements.empty())
+          return Memory::TypedView<DT_>();
+        return Memory::TypedView<DT_>(this->_elements.at(0).view(loc, acc));
+      }
+
+      /// Returns a reference to the indices memory arbiter
+      Memory::Arbiter& indices_arbiter()
+      {
+        return this->_indices.front();
+      }
+
+      /// Returns a const reference to the indices memory arbiter
+      const Memory::Arbiter& indices_arbiter() const
+      {
+        return this->_indices.front();
+      }
+
+      /// Creates a read-only memory view for the indices array for a given memory location
+      Memory::TypedView<IT_> indices_view_r(Memory::Location loc = Memory::Location::main) const
       {
         if(this->_indices.empty())
-          return nullptr;
-        if (sorted() == 0)
-          const_cast<SparseVector *>(this)->sort();
-        return this->_indices.at(0);
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::read));
       }
 
-      IT_ const * indices() const
+      /// Creates a write-only memory view for the indices array for a given memory location
+      Memory::TypedView<IT_> indices_view_w(Memory::Location loc = Memory::Location::main)
       {
         if(this->_indices.empty())
-          return nullptr;
-        if (sorted() == 0)
-          const_cast<SparseVector *>(this)->sort();
-        return this->_indices.at(0);
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::write));
+      }
+
+      /// Creates a read-write memory view for the indices array for a given memory location
+      Memory::TypedView<IT_> indices_view_rw(Memory::Location loc = Memory::Location::main)
+      {
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, Memory::Access::read_write));
       }
 
       /**
-       * \brief Retrieve specific vector element.
+       * \brief Creates a memory view for the indices array
        *
-       * \param[in] index The index of the vector element.
+       * \param[in] loc
+       * The memory location for which the view is to be created
        *
-       * \returns Specific vector element.
+       * \param[in] acc
+       * A combination of access rights to grant for the view
        */
-      const DT_ operator()(Index index) const
+      Memory::TypedView<IT_> indices_view(Memory::Location loc, Memory::Access acc)
       {
-        ASSERTM(index < this->_scalar_index.at(0), "index exceeds sparse vector size");
-
-        MemoryPool::synchronize();
-
-        if (this->_elements.empty())
-          return DT_(0.);
-
-        if (sorted() == 0)
-          const_cast<SparseVector *>(this)->sort();
-
-        Index i(0);
-        while (i < used_elements())
-        {
-          if (indices()[i] >= index)
-            break;
-          ++i;
-        }
-
-        if (i < used_elements() && indices()[i] == index)
-          return elements()[i];
-        else
-          return DT_(0.);
-      }
-
-
-      /**
-       * \brief Set specific vector element.
-       *
-       * \param[in] index The index of the vector element.
-       * \param[in] val The val to be set.
-       */
-      void operator()(Index index, DT_ val)
-      {
-        ASSERTM(index < this->_scalar_index.at(0), "index exceeds sparse vector size");
-
-        // flag container as not sorted anymore
-        // CAUTION: do not use any method triggering resorting until we are finished
-        _sorted() = 0;
-
-        // vector is empty, no arrays allocated
-        if (this->_elements.empty())
-        {
-          this->_elements.push_back(MemoryPool::template allocate_memory<DT_>(alloc_increment()));
-          this->_elements_size.push_back(alloc_increment());
-          MemoryPool::template set_memory<DT_>(this->_elements.back(), DT_(4711), alloc_increment());
-          this->_indices.push_back(MemoryPool::template allocate_memory<IT_>(alloc_increment()));
-          this->_indices_size.push_back(alloc_increment());
-          MemoryPool::template set_memory<IT_>(this->_indices.back(), IT_(4711), alloc_increment());
-          this->_allocated_elements() = alloc_increment();
-          this->_elements.at(0)[0] = val;
-          this->_indices.at(0)[0] = IT_(index);
-          this->_used_elements() = 1;
-        }
-
-        // append element in already allocated arrays
-        else if(_used_elements() < allocated_elements())
-        {
-          this->_elements.at(0)[this->_used_elements()] = val;
-          this->_indices.at(0)[this->_used_elements()] = IT_(index);
-          ++this->_used_elements();
-        }
-
-        // reallocate arrays, append element
-        else
-        {
-          _allocated_elements() += alloc_increment();
-
-          DT_ * elements_new(MemoryPool::template allocate_memory<DT_>(allocated_elements()));
-          MemoryPool::template set_memory<DT_>(elements_new, DT_(4711), allocated_elements());
-          IT_ * indices_new(MemoryPool::template allocate_memory<IT_>(allocated_elements()));
-          MemoryPool::template set_memory<IT_>(indices_new, IT_(4711), allocated_elements());
-
-          MemoryPool::copy(elements_new, this->_elements.at(0), _used_elements());
-          MemoryPool::copy(indices_new, this->_indices.at(0), _used_elements());
-
-          MemoryPool::release_memory(this->_elements.at(0));
-          MemoryPool::release_memory(this->_indices.at(0));
-
-          this->_elements.at(0) = elements_new;
-          this->_indices.at(0) = indices_new;
-
-          this->_elements.at(0)[this->_used_elements()] = val;
-          this->_indices.at(0)[this->_used_elements()] = IT_(index);
-
-          ++this->_used_elements();
-          this->_elements_size.at(0) = allocated_elements();
-          this->_indices_size.at(0) = allocated_elements();
-        }
-      }
-
-      void sort()
-      {
-        if (sorted() == 0)
-        {
-          //first of all, mark vector as sorted, because otherwise we would call ourselves inifite times
-          // CAUTION: do not use any method triggering resorting until we are finished
-          _sorted() = 1;
-
-          // check if there is anything to be sorted
-          if(_used_elements() == Index(0))
-            return;
-
-          IT_ * pindices = this->_indices.at(0);
-          DT_ * pelements = this->_elements.at(0);
-
-          _insertion_sort(pindices, pelements, _used_elements());
-
-          // find and mark duplicate entries
-          for (Index i(1) ; i < _used_elements() ; ++i)
-          {
-            if (pindices[i-1] == pindices[i])
-            {
-              pindices[i-1] = std::numeric_limits<IT_>::max();
-            }
-          }
-
-          // sort out marked duplicated elements
-          _insertion_sort(pindices, pelements, _used_elements());
-          Index junk(0);
-          while (pindices[_used_elements() - 1 - junk] == std::numeric_limits<IT_>::max() && junk < _used_elements())
-            ++junk;
-          _used_elements() -= junk;
-        }
-      }
-
-      template<typename IndexContainer>
-      bool remove_elements(const IndexContainer& inds)
-      {
-        bool success = true;
-        for(auto i : inds)
-        {
-          success &= _remove_element(IndexType(i));
-        }
-        return success;
-      }
-
-      bool remove_element(IndexType ind)
-      {
-        return  _remove_element(ind);
+        if(this->_indices.empty())
+          return Memory::TypedView<IT_>();
+        return Memory::TypedView<IT_>(this->_indices.at(0).view(loc, acc));
       }
 
       bool element_exists(IndexType ind) const
       {
-        const IT_* pindices = this->_indices.at(0);
+        const Memory::TypedView<IT_> idx_view = this->indices_view_r();
+        const IT_* pindices = idx_view.get_r();
+
         return std::find(pindices, pindices + this->_scalar_index.at(1), ind) != pindices + this->_scalar_index.at(1);
       }
 
@@ -495,12 +381,11 @@ namespace FEAT
        */
       DT_ max_abs_element() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        Index max_abs_index = Arch::MaxAbsIndex::value(this->template elements<Perspective::pod>(), this->template  used_elements<Perspective::pod>());
-        ASSERT(max_abs_index < this->template  used_elements<Perspective::pod>());
-        DT_ result(this->template elements<Perspective::pod>()[max_abs_index]);
-        result = Math::abs(result);
+        DT_ result = Arch::MinMaxValueDense::template exec<DT_>(this->elements_arbiter(), this->num_nzes(), false, true);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -515,12 +400,11 @@ namespace FEAT
        */
       DT_ min_abs_element() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        Index min_abs_index = Arch::MinAbsIndex::value(this->template elements<Perspective::pod>(), this->template  used_elements<Perspective::pod>());
-        ASSERT(min_abs_index < this->template  used_elements<Perspective::pod>());
-        DT_ result(this->template elements<Perspective::pod>()[min_abs_index]);
-        result = Math::abs(result);
+        DT_ result = Arch::MinMaxValueDense::template exec<DT_>(this->elements_arbiter(), this->num_nzes(), true, true);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -535,11 +419,11 @@ namespace FEAT
        */
       DT_ max_element() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        Index max_index = Arch::MaxIndex::value(this->template elements<Perspective::pod>(), this->template  used_elements<Perspective::pod>());
-        ASSERT(max_index < this->template  used_elements<Perspective::pod>());
-        DT_ result(this->template elements<Perspective::pod>()[max_index]);
+        DT_ result = Arch::MinMaxValueDense::template exec<DT_>(this->elements_arbiter(), this->num_nzes(), false, false);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -554,11 +438,11 @@ namespace FEAT
        */
       DT_ min_element() const
       {
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        Index min_index = Arch::MinIndex::value(this->template elements<Perspective::pod>(), this->template  used_elements<Perspective::pod>());
-        ASSERT(min_index < this->template used_elements<Perspective::pod>());
-        DT_ result(this->template elements<Perspective::pod>()[min_index]);
+        DT_ result = Arch::MinMaxValueDense::template exec<DT_>(this->elements_arbiter(), this->num_nzes(), true, false);
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
@@ -574,16 +458,17 @@ namespace FEAT
        */
       DT_ max_rel_diff(const SparseVector & x) const
       {
-        XASSERTM(x.used_elements() == this->used_elements(), "Nonzero count does not match!");
+        XASSERTM(x.num_nzes() == this->num_nzes(), "Nonzero count does not match!");
+        XASSERT(!this->empty());
+
         TimeStamp ts_start;
 
-        DataType max_rel_diff = Arch::MaxRelDiff::value(this->template elements<Perspective::pod>(),
-          x.template elements<Perspective::pod>(), this->template used_elements<Perspective::pod>());
+        DataType result = Arch::MaxRelDiffDense::template exec<DT_>(this->elements_arbiter(), x.elements_arbiter(), this->num_nzes());
 
         TimeStamp ts_stop;
         Statistics::add_time_reduction(ts_stop.elapsed(ts_start));
 
-        return max_rel_diff;
+        return result;
       }
 
 
@@ -644,17 +529,16 @@ namespace FEAT
       {
         switch(mode)
         {
-          case FileMode::fm_binary:
-          case FileMode::fm_sv:
-            this->template _deserialize<double, std::uint64_t>(FileMode::fm_sv, file);
-            break;
-          case FileMode::fm_mtx:
+        case FileMode::fm_binary:
+          [[fallthrough]];
+
+        case FileMode::fm_sv:
+          this->template _deserialize<double, std::uint64_t>(FileMode::fm_sv, file);
+          break;
+
+        case FileMode::fm_mtx:
           {
             this->clear();
-            this->_scalar_index.push_back(0);
-            this->_scalar_index.push_back(0);
-            this->_scalar_index.push_back(Math::min<Index>(0, 1000));
-            this->_scalar_index.push_back(1);
 
             Index rows;
             Index nnz;
@@ -699,11 +583,13 @@ namespace FEAT
               line.erase(0, end);
             }
 
-            DenseVector<IT_, IT_> ind(nnz);
-            DenseVector<DT_, IT_> val(nnz);
+            this->move(SparseVector<DT_, IT_>(rows, nnz));
 
-            IT_ * pind(ind.elements());
-            DT_ * pval(val.elements());
+            Memory::TypedView<IT_> idx_view(this->indices_view_w());
+            Memory::TypedView<DT_> val_view(this->elements_view_w());
+
+            IT_ * pind(idx_view.get_w());
+            DT_ * pval(val_view.get_w());
 
             while(!file.eof())
             {
@@ -735,11 +621,11 @@ namespace FEAT
               ++pval;
               ++pind;
             }
-            this->move(SparseVector<DT_, IT_>(rows, val, ind, false));
-            break;
           }
-          default:
-            XABORTM("Filemode not supported!");
+          break;
+
+        default:
+          XABORTM("Filemode not supported!");
         }
       }
 
@@ -758,8 +644,8 @@ namespace FEAT
         char* buff = nullptr;
         if(mode == FileMode::fm_mtx)
         {
-          buff = new char[LAFEM::FileOutStreamBufferSize];
-          file.rdbuf()->pubsetbuf(buff, LAFEM::FileOutStreamBufferSize);
+          buff = new char[LAFEM::file_out_stream_buffer_size];
+          file.rdbuf()->pubsetbuf(buff, LAFEM::file_out_stream_buffer_size);
         }
         file.open(filename.c_str(), bin);
         if(! file.is_open())
@@ -779,101 +665,60 @@ namespace FEAT
       {
         switch(mode)
         {
-          case FileMode::fm_binary:
-          case FileMode::fm_sv:
-            this->template _serialize<double, std::uint64_t>(FileMode::fm_sv, file);
-            break;
-          case FileMode::fm_mtx:
+        case FileMode::fm_binary:
+          [[fallthrough]];
+
+        case FileMode::fm_sv:
+          this->template _serialize<double, std::uint64_t>(FileMode::fm_sv, file);
+          break;
+
+        case FileMode::fm_mtx:
           {
 
             file << "%%MatrixMarket matrix coordinate real general\n";
-            file << this->size() << " " << 1 << " " << this->used_elements() << "\n";
+            file << this->size() << " " << 1 << " " << this->num_nzes() << "\n";
+            file << std::scientific << std::setprecision(Type::Traits<DT_>::format_precision);
 
-            const Index u_elem(this->used_elements());
-            const IT_ * pind(this->indices());
-            const DT_ * pval(this->elements());
-            for (Index i(0) ; i < u_elem ; ++i, ++pind, ++pval)
+            const Index u_elem(this->num_nzes());
+            const Memory::TypedView<IT_> idx_view = this->indices_view_r();
+            const Memory::TypedView<DT_> val_view = this->elements_view_r();
+            for (Index i(0) ; i < u_elem ; ++i)
             {
-              file << *pind+1 << " " << 1 << " " << stringify_fp_sci(*pval) << "\n";
+              file << (idx_view[i]+1) << " " << 1 << " " << val_view[i] << "\n";
             }
-            break;
           }
-          default:
-            XABORTM("Filemode not supported!");
+          break;
+
+        default:
+          XABORTM("Filemode not supported!");
         }
       }
 
-      /**
-       * \brief Retrieve non zero element count.
-       *
-       * \returns Non zero element count.
-       */
-      template <Perspective = Perspective::native>
-      Index used_elements() const
-      {
-        if(this->_scalar_index.empty())
-          return Index(0);
-        if (sorted() == 0)
-          const_cast<SparseVector *>(this)->sort();
-        return this->_scalar_index.at(1);
-      }
-
-      /**
-       * \brief Retrieve amount of allocated elements.
-       *
-       * \return Allocated element count.
-       */
-      Index allocated_elements() const
-      {
-        if(this->_scalar_index.empty())
-          return Index(0);
-        return this->_scalar_index.at(2);
-      }
-
-      /**
-       * \brief Retrieve allocation incrementation value.
-       *
-       * \return Allocation increment.
-       */
-      Index alloc_increment() const
-      {
-        if(this->_scalar_index.empty())
-          return Index(0);
-        return this->_scalar_index.at(3);
-      }
-
-      /**
-       * \brief Retrieve status of element sorting.
-       *
-       * \return Sorting status.
-       */
-      Index sorted() const
-      {
-        if(this->_scalar_index.empty())
-          return Index(0);
-        return this->_scalar_index.at(4);
-      }
-
-      /// Permutate vector according to the given Permutation
+      /// Permute vector according to the given Permutation
       void permute(Adjacency::Permutation & perm)
       {
         if (perm.size() == 0)
           return;
 
-        XASSERTM(perm.size() == this->size(), "Container size does not match permutation size");
+        std::map<IT_, DT_> xm;
 
-        SparseVector<DT_, IT_> target(this->size());
+        auto ip = perm.inverse();
+        const Index * const inv_pos(ip.get_perm_pos());
 
-        auto inv = perm.inverse();
-        const Index * const inv_pos(inv.get_perm_pos());
-        for (Index i(0) ; i < this->used_elements() ; ++i)
+        Memory::TypedView<DT_> xv(this->elements_view_rw());
+        Memory::TypedView<IT_> xi(this->indices_view_rw());
+        for (Index i(0) ; i < this->num_nzes() ; ++i)
         {
-          const Index col = this->indices()[i];
-          target(inv_pos[col], (*this)(col));
+          xm.emplace(IT_(inv_pos[xi[i]]), xv[i]);
         }
 
-        target.sort();
-        this->move(std::move(target));
+        Index k(0);
+        for(const auto& x : xm)
+        {
+          xi[k] = x.first;
+          xv[k] = x.second;
+          ++k;
+        }
       }
 
       /**
@@ -885,7 +730,6 @@ namespace FEAT
       {
         return "SparseVector";
       }
-
 
       /**
        * \brief Checks whether the layout of this vector is identical to another sparse vector.
@@ -900,24 +744,24 @@ namespace FEAT
       {
         if(this->size() != other.size())
           return false;
-        if(this->used_elements() != other.used_elements())
+        if(this->num_nzes() != other.num_nzes())
           return false;
 
-        Index n = this->used_elements();
-        if(n == Index(0))
-          return true; // both vectors are empty
-
-        const IT_* a = this->indices();
-        const IT_* b = other.indices();
-
-        // shallow copy? (aka same array)
-        if(a == b)
+        if(this->num_nzes() == Index(0))
           return true;
 
+        // check if the indices arbiters are the same
+        if(this->indices_arbiter() == other.indices_arbiter())
+          return true;
+
+        const Memory::TypedView<IT_> idx_a = this->indices_view_r();
+        const Memory::TypedView<IT_> idx_b = other.indices_view_r();
+
         // check all array entries
+        const Index n = this->num_nzes();
         for(Index i(0); i < n; ++i)
         {
-          if(a[i] != b[i])
+          if(idx_a[i] != idx_b[i])
             return false;
         }
 
@@ -926,21 +770,58 @@ namespace FEAT
       }
 
       /**
+       * \brief Prints this vector in human readable format to an output stream
+       *
+       * \param[in] os
+       * The target stream.
+       *
+       * \param[in] print_dense
+       * Specifies whether to print the vector as a dense vector or in a compressed format
+       */
+      void print(std::ostream & os, bool print_dense) const
+      {
+        if(this->empty())
+        {
+          os << "[]";
+          return;
+        }
+        const Memory::TypedView<IT_> idx_view(this->indices_view_r());
+        const Memory::TypedView<DT_> val_view(this->elements_view_r());
+        const Index n = this->size();
+        const Index nze = this->num_nzes();
+        os << "[";
+        Index k = 0;
+        for (Index i(0) ; i < nze ; ++i)
+        {
+          if(print_dense)
+          {
+            for(; k < idx_view[i]; ++k)
+              os << "  " << DT_(0);
+          }
+          else
+            os << "  " << idx_view[i] << ':';
+
+          os << "  " << val_view[i];
+          ++k;
+        }
+        if(print_dense)
+        {
+          for(; k < n; ++k)
+            os << "  " << DT_(0);
+        }
+        os << "]";
+      }
+
+      /**
        * \brief SparseVector streaming operator
        *
-       * \param[in] lhs The target stream.
+       * \param[in] os The target stream.
        * \param[in] b The vector to be streamed.
        */
-      friend std::ostream & operator<< (std::ostream & lhs, const SparseVector & b)
+      friend std::ostream & operator<< (std::ostream & os, const SparseVector & b)
       {
-        lhs << "[";
-        for (Index i(0) ; i < b.size() ; ++i)
-        {
-          lhs << "  " << stringify(b(i));
-        }
-        lhs << "]";
-
-        return lhs;
+        b.print(os, true);
+        return os;
       }
     }; // class SparseVector<...>
 
@@ -950,7 +831,5 @@ namespace FEAT
     extern template class SparseVector<float, std::uint64_t>;
     extern template class SparseVector<double, std::uint64_t>;
 #endif
-
-
   } // namespace LAFEM
 } // namespace FEAT

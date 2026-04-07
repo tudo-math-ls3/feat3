@@ -188,7 +188,7 @@ namespace FEAT::Control
       if(inner_fbm)
         fbm_asm.assemble_interface_filter(filter_interface_fbm, space_velo, this->matrix_a, this->velo_mass_matrix, no_scale);
       else
-        filter_interface_fbm = typename BaseClass::LocalVeloUnitFilter(space_velo.get_num_dofs());
+        filter_interface_fbm = typename BaseClass::LocalVeloUnitFilter(space_velo.get_num_dofs(), Index(0));
 
       // assemble mask vectors on finest level
       if(asm_mask)
@@ -251,18 +251,18 @@ namespace FEAT::Control
 
     void apply_fbm_filter_to_def(LocalVeloVector& vec_def_v, const LocalVeloVector& vec_sol_v, const DataType factor) const
     {
-      if(this->filter_interface_fbm.used_elements() == Index(0))
+      if(this->filter_interface_fbm.num_nzes() == Index(0))
         return;
 
-      auto* vdef = vec_def_v.elements();
-      const auto* vsol = vec_sol_v.elements();
-      const IndexType* fidx = this->filter_interface_fbm.get_indices();
-      const auto* fval = this->filter_interface_fbm.get_values();
-      const IndexType* row_ptr = this->velo_mass_matrix.local().row_ptr();
-      const IndexType* col_idx = this->velo_mass_matrix.local().col_ind();
-      const auto* mval = this->velo_mass_matrix.local().val();
+      auto vdef = vec_def_v.elements_view_rw();
+      const auto vsol = vec_sol_v.elements_view_r();
+      const auto fidx = this->filter_interface_fbm.get_filter_vector().indices_view_r();
+      const auto fval = this->filter_interface_fbm.get_filter_vector().elements_view_r();
+      const auto row_ptr = this->velo_mass_matrix.local().row_ptr_view_r();
+      const auto col_idx = this->velo_mass_matrix.local().col_idx_view_r();
+      const auto mval = this->velo_mass_matrix.local().val_view_r();
 
-      Index n = this->filter_interface_fbm.used_elements();
+      Index n = this->filter_interface_fbm.num_nzes();
       for(Index i(0); i < n; ++i)
       {
         IndexType row = fidx[i];

@@ -17,6 +17,7 @@
 
 // includes, system
 #include <vector>
+#include <algorithm>
 
 namespace FEAT
 {
@@ -191,12 +192,16 @@ namespace FEAT
         const TrafoType_& trafo)
       {
         typedef typename VectorType_::DataType DataType;
+        typedef typename VectorType_::IndexType IndexType;
+        typedef typename VectorType_::ValueType ValueType;
 
-        nu.format(DataType(0));
+        //nu.format(DataType(0));
         // Vertex at facet index set from the parent
-        auto& idx(trafo.get_mesh().template get_index_set<facet_dim,0>());
+        const auto& idx(trafo.get_mesh().template get_index_set<facet_dim,0>());
         // Temporary vector for holding one normal at a time
-        Tiny::Vector<DataType, world_dim> tmp(DataType(0));
+        //Tiny::Vector<DataType, world_dim> tmp(DataType(0));
+
+        std::map<IndexType, ValueType> nu_map;
 
         // create a facet trafo evaluator
         typename TrafoType_::template Evaluator<FacetType, CoordType>::Type facet_evaluator(trafo);
@@ -218,14 +223,33 @@ namespace FEAT
             // Add the local contributions to the vector that is numbered according to the parent
             for(int l(0); l < nvt_loc; ++l)
             {
-              tmp = nu(idx[k][l]) + nu_loc[l]*DataType(orientation[k]*vol);
-              nu(idx[k][l],  tmp);
+              //tmp = nu(idx[k][l]) + nu_loc[l]*DataType(orientation[k]*vol);
+              //nu(idx[k][l],  tmp);
+              auto it = nu_map.find(IndexType(idx[k][l]));
+              if(it != nu_map.end())
+                (it->second) += DataType(orientation[k]*vol) * nu_loc[l];
+              else
+                nu_map.emplace(IndexType(idx[k][l]), DataType(orientation[k]*vol) * nu_loc[l]);
             }
           }
         }
 
+        // create normal vector
+        nu = VectorType_(trafo.get_mesh().get_num_vertices(), nu_map.size());
+        {
+          Memory::TypedView<IndexType> nu_idx = nu.indices_view_w();
+          Memory::TypedView<ValueType> nu_val = nu.elements_view_w();
+          auto it = nu_map.begin();
+          auto it_end = nu_map.end();
+          for(Index i = 0; it != it_end; ++i, ++it)
+          {
+            nu_idx[i] = it->first;
+            nu_val[i] = it->second;
+          }
+        }
+
         //// Normalize nu
-        //for(Index i(0); i < nu.used_elements(); ++i)
+        //for(Index i(0); i < nu.num_nzes(); ++i)
         //{
         //  Index j(nu.indices()[i]);
         //  tmp = nu(j);
@@ -452,7 +476,7 @@ namespace FEAT
         if(filter.get_nu().size() == Index(0))
         {
           filter = LAFEM::SlipFilter<DataType_, IndexType_, world_dim>
-            (space.get_trafo().get_mesh().get_num_entities(0), space.get_num_dofs());
+            (space.get_trafo().get_mesh().get_num_entities(0), space.get_num_dofs(), Index(0));
         }
 
         // Compute orientations if necessary
@@ -503,10 +527,9 @@ namespace FEAT
         const auto& mesh = space.get_trafo().get_mesh();
 
         // Allocate the filter if necessary
-        if(filter.get_nu().size() == Index(0))
+        if(filter.get_nu().empty())
         {
-          filter = LAFEM::SlipFilter<DataType_, IndexType_, world_dim>
-            (mesh.get_num_entities(0), space.get_num_dofs());
+          filter = LAFEM::SlipFilter<DataType_, IndexType_, world_dim>(mesh.get_num_entities(0), space.get_num_dofs(), Index(0));
         }
 
         // Compute orientations if necessary
@@ -521,15 +544,17 @@ namespace FEAT
           filter.get_nu(), _facets.data(), _orientation.data(), space.get_trafo());
 
         // We only have something to do if the filter is not empty after recompute_target_set_holder()
-        if(filter.get_nu().used_elements() > Index(0))
+        if(filter.get_nu().num_nzes() > Index(0))
         {
           Intern::Lagrange2InterpolatorWrapper<SpaceType>::project(
             filter.get_filter_vector(), filter.get_nu(), space, &_target_set_holder);
 
           // re-normalize
-          auto* nu = filter.get_values();
-          for(Index i(0); i < filter.used_elements(); ++i)
-            nu[i].normalize();
+          {
+            auto nu = filter.get_nu().elements_view_rw();
+            for(Index i(0); i < filter.num_nzes(); ++i)
+              nu[i].normalize();
+          }
         }
       }
     }; // class SlipFilterAssembler
@@ -552,6 +577,7 @@ namespace FEAT
           static void project(Vector_& lagrange_2_vector, const Vector_& lagrange_1_vector, const Space_& space, const TSH_* tsh)
           {
             typedef typename Vector_::DataType DataType;
+            typedef typename Vector_::IndexType IndexType;
             typedef typename Vector_::ValueType ValueType;
 
             // define dof assignment
@@ -564,18 +590,28 @@ namespace FEAT
 
             // Vertex at shape index set
             auto& idx(space.get_trafo().get_mesh().template get_index_set<shape_dim_, 0>());
+            const auto l1_idx = lagrange_1_vector.indices_view_r();
+            const auto l1_val = lagrange_1_vector.elements_view_r();
+            const auto* l1_beg = l1_idx.get_r();
+            const auto* l1_end = l1_beg + lagrange_1_vector.num_nzes();
+            LAFEM::SparseVectorFactory<DataType, IndexType, Vector_::block_size> l2_factory(space.get_num_dofs());
 
             // loop over all entities
             if(tsh == nullptr)
             {
               const Index num_shapes = space.get_mesh().get_num_entities(shape_dim_);
+
               for(Index shape(0); shape < num_shapes; ++shape)
               {
                 ValueType tmp(DataType(0));
 
                 // evaluate the "node functional"
                 for(int j(0); j < idx.get_num_indices(); ++j)
-                  tmp += lagrange_1_vector(idx(shape, j));
+                {
+                  auto it = std::lower_bound(l1_beg, l1_end, idx(shape, j));
+                  XASSERTM(it != l1_end, "vertex index not found in Lagrange-1 nu vector");
+                  tmp += l1_val[Index(it - l1_beg)];
+                }
 
                 tmp *= DataType(1)/DataType(idx.get_num_indices());
                 tmp.normalize();
@@ -585,7 +621,7 @@ namespace FEAT
 
                 // loop over all contributions
                 Index dof_index(dof_assign.get_index(0));
-                lagrange_2_vector(dof_index, tmp);
+                l2_factory.add(dof_index, tmp);
 
                 // finish
                 dof_assign.finish();
@@ -604,7 +640,11 @@ namespace FEAT
 
                 // evaluate the "node functional"
                 for(int j(0); j < idx.get_num_indices(); ++j)
-                  tmp += lagrange_1_vector(idx(ts[shape], j));
+                {
+                  auto it = std::lower_bound(l1_beg, l1_end, idx(ts[shape], j));
+                  XASSERTM(it != l1_end, "vertex index not found in Lagrange-1 nu vector");
+                  tmp += l1_val[Index(it - l1_beg)];
+                }
 
                 tmp *= DataType(1)/DataType(idx.get_num_indices());
                 tmp.normalize();
@@ -614,12 +654,14 @@ namespace FEAT
 
                 // loop over all contributions
                 Index dof_index(dof_assign.get_index(0));
-                lagrange_2_vector(dof_index, tmp);
+                l2_factory.add(dof_index, tmp);
 
                 // finish
                 dof_assign.finish();
               }
             }
+
+            lagrange_2_vector = l2_factory.make_svb();
           }
       };
 
@@ -631,11 +673,18 @@ namespace FEAT
           static void project(Vector_& lagrange_2_vector, const Vector_& lagrange_1_vector, const Space_& space, const TSH_* tsh)
           {
             typedef typename Vector_::DataType DataType;
-            typedef typename Vector_::ValueType ValueType;
+            typedef typename Vector_::IndexType IndexType;
+            //typedef typename Vector_::ValueType ValueType;
 
             // define dof assignment
             typedef typename Space_::template DofAssignment<0, DataType>::Type DofAssignType;
             DofAssignType dof_assign(space);
+
+            const auto l1_idx = lagrange_1_vector.indices_view_r();
+            const auto l1_val = lagrange_1_vector.elements_view_r();
+            const IndexType* l1_beg = l1_idx.get_r();
+            const IndexType* l1_end = l1_beg + lagrange_1_vector.num_nzes();
+            LAFEM::SparseVectorFactory<DataType, IndexType, Vector_::block_size> l2_factory(space.get_num_dofs());
 
             if(tsh == nullptr)
             {
@@ -650,8 +699,9 @@ namespace FEAT
                 Index dof_index(dof_assign.get_index(0));
 
                 // evaluate the "node functional"
-                ValueType tmp(lagrange_1_vector(vert));
-                lagrange_2_vector(dof_index, tmp);
+                auto it = std::lower_bound(l1_beg, l1_end, vert);
+                XASSERTM(it != l1_end, "vertex index not found in Lagrange-1 nu vector");
+                l2_factory.add(dof_index, l1_val[Index(it - l1_beg)]);
 
                 // finish
                 dof_assign.finish();
@@ -671,13 +721,15 @@ namespace FEAT
                 Index dof_index(dof_assign.get_index(0));
 
                 // evaluate the "node functional"
-                ValueType tmp(lagrange_1_vector(ts[vert]));
-                lagrange_2_vector(dof_index, tmp);
+                auto it = std::lower_bound(l1_beg, l1_end, ts[vert]);
+                XASSERTM(it != l1_end, "vertex index not found in Lagrange-1 nu vector");
+                l2_factory.add(dof_index, l1_val[Index(it - l1_beg)]);
 
                 // finish
                 dof_assign.finish();
               }
             }
+            lagrange_2_vector = l2_factory.make_svb();
           }
       };
 

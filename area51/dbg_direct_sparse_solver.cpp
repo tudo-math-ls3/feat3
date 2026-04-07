@@ -672,8 +672,8 @@ namespace Tutorial06
       Geometry::ExportVTK<MeshType> exporter(mesh);
 
       // Add the vertex-projection of our (local) solution and rhs vectors
-      exporter.add_vertex_scalar("sol", vec_sol_local.elements());
-      exporter.add_vertex_scalar("rhs", vec_rhs_local.elements());
+      exporter.add_vertex_scalar("sol", vec_sol_local);
+      exporter.add_vertex_scalar("rhs", vec_rhs_local);
 
       // Finally, write the VTK files by calling the "write" function of the exporter and pass the
       // communicator as a second argument:

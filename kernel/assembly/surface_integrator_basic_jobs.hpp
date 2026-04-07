@@ -410,7 +410,7 @@ namespace FEAT::Assembly
 
         BaseClass::_assemble();
 
-        this->vector(this->_cur_surface_index, face_val*scatter_alpha);
+        this->vector.elements_view_rw()[this->_cur_surface_index] = face_val*scatter_alpha;
       }
 
       void _integrate(DataType weight, [[maybe_unused]] IndexType point_idx)

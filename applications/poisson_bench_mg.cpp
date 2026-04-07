@@ -381,9 +381,9 @@ namespace PoissonDirichlet
 
       stats.counts[i][Counts::num_ranks] = Index(domain.at(i).layer().comm().size());
       stats.counts[i][Counts::num_elems] = domain.at(i)->get_mesh().get_num_elements();
-      stats.counts[i][Counts::num_dofs_g] = system_levels.at(i)->matrix_sys.rows();
-      stats.counts[i][Counts::num_dofs_l] = system_levels.at(i)->matrix_sys.local().rows();
-      stats.counts[i][Counts::num_nze] = system_levels.at(i)->matrix_sys.local().used_elements();
+      stats.counts[i][Counts::num_dofs_g] = system_levels.at(i)->matrix_sys.num_rows();
+      stats.counts[i][Counts::num_dofs_l] = system_levels.at(i)->matrix_sys.local().num_rows();
+      stats.counts[i][Counts::num_nze] = system_levels.at(i)->matrix_sys.local().num_nzes();
       stats.counts[i][Counts::bytes_system] = system_levels.at(i)->bytes();
       stats.counts[i][Counts::elems_mirror] = 0;
       auto& sys_mirrors =  system_levels.at(i)->gate_sys._mirrors;

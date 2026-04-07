@@ -40,14 +40,20 @@ void run([[maybe_unused]] SimpleArgParser& args)
 
   // generate FE matrix A
   SparseMatrixCSR<DT_, IT_> mat(PointstarStructureFE::template value<DT_>(1, num_of_nodes));
-  for (Index i(0) ; i < mat.get_elements_size().at(0) ; ++i)
-    mat.val()[i] = DT_((i%5) + 1);
+  {
+    Memory::TypedView<DT_> vv(mat.val_view_w());
+    for (Index i(0) ; i < mat.get_elements_size().at(0) ; ++i)
+      vv[i] = DT_((i%5) + 1);
+  }
 
   DenseVector<DataType, IndexType> rhs = mat.create_vector_r();
   std::cout << "Run bench " << (synch_ ? String("Synched") : String("Unsynched")) << "\n";
-  std::cout<<"vector size: "<< rhs.size() <<" used elements: "<< mat.used_elements()<<"\n";
-  for (Index i (0) ; i < rhs.size() ; ++i)
-    rhs(i, DT_(i%100) / DT_(100));
+  std::cout<<"vector size: "<< rhs.size() <<" used elements: "<< mat.num_nzes()<<"\n";
+  {
+    Memory::TypedView<DT_> vr(rhs.elements_view_w());
+    for (Index i (0) ; i < rhs.size() ; ++i)
+      vr[i] = DT_(i%100) / DT_(100);
+  }
   DenseVector<DT_, IT_> sol = mat.create_vector_r();
   sol.format(DT_(4711));
 
@@ -56,13 +62,13 @@ void run([[maybe_unused]] SimpleArgParser& args)
   // implicit transfer to device mem
   mat.apply(sol, rhs);
 
-  double flops(double(mat.used_elements()));
+  double flops(double(mat.num_nzes()));
   flops *= 2;
   flops *= double(num_inner_loop);
 
-  double bytes(double(mat.used_elements()));
+  double bytes(double(mat.num_nzes()));
   bytes *= double(sizeof(DT_));
-  bytes += double(mat.used_elements() * sizeof(IT_));
+  bytes += double(mat.num_nzes() * sizeof(IT_));
   bytes += double(rhs.size() * sizeof(DT_));
 
   bytes *= double(num_inner_loop);
@@ -80,16 +86,16 @@ void run([[maybe_unused]] SimpleArgParser& args)
   else
   {
     auto func = [&] () {
-      Runtime::SyncGuard sync_guard;
       for(Index i = 0; i < num_inner_loop; ++i)
       {
         mat.apply(sol, rhs);
       }
+      Runtime::synchronize_devices();
     };
     run_bench(func, flops, bytes);
   }
 
-  MemoryPool::synchronize();
+  Runtime::synchronize_devices();
   std::cout<<"control norm: "<<double(sol.norm2())<<"\n";
   #endif
 }

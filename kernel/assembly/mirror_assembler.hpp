@@ -164,7 +164,8 @@ namespace FEAT
         // fill mirror indices
         if(count > Index(0))
         {
-          Intern::DofMirrorHelpWrapper<Space_, MeshPart_>::fill(vec_mirror.indices(), space, mesh_part);
+          Memory::TypedView<IndexType_> idx_view(vec_mirror.indices_view_w());
+          Intern::DofMirrorHelpWrapper<Space_, MeshPart_>::fill(idx_view.get_w(), space, mesh_part);
         }
       }
 

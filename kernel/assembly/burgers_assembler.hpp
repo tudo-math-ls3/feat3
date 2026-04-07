@@ -130,8 +130,8 @@ namespace FEAT
         ) const
       {
         // validate matrix and vector dimensions
-        XASSERTM(matrix.rows() == space.get_num_dofs(), "invalid matrix dimensions");
-        XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_rows() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_cols() == space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
         typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
@@ -466,8 +466,8 @@ namespace FEAT
         ) const
       {
         // validate matrix and vector dimensions
-        XASSERTM(matrix.rows() == space.get_num_dofs(), "invalid matrix dimensions");
-        XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_rows() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_cols() == space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
 
         typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_> VectorType;
@@ -962,7 +962,7 @@ namespace FEAT
        */
       void set_sd_v_norm(const LAFEM::DenseVectorBlocked<DataType_, IndexType_, dim_>& convect)
       {
-        const auto* vals = convect.elements();
+        const auto vals = convect.elements_view_r();
         DataType_ r = DataType(0);
         for(Index i(0); i < convect.size(); ++i)
           r = Math::max(r, vals[i].norm_euclid());

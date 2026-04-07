@@ -7,11 +7,10 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/backend.hpp>
-#include <kernel/util/memory_pool.hpp>
 #include <kernel/voxel_assembly/voxel_assembly_common.hpp>
 #include <kernel/voxel_assembly/helper/cell_to_dof_helper.hpp>
 #include <kernel/util/tiny_algebra.hpp>
-#include <kernel/adjacency/coloring.hpp>
+#include <kernel/adjacency/coloring_data_handler.hpp>
 #include <kernel/util/time_stamp.hpp>
 #include <kernel/util/stop_watch.hpp>
 
@@ -49,19 +48,21 @@ namespace FEAT
       static constexpr int dim = SpaceType::world_dim;
     protected:
       /// Array mapping each cell index to ALL its local dofs in correct numbering.
-      IndexType* _cell_to_dof;
+      Memory::Arbiter _cell_to_dof;
       /// Array mapping each _cell_to_dof entry to it locally sorted position.
-      IndexType* _cell_to_dof_sorter;
+      Memory::Arbiter _cell_to_dof_sorter;
       /// Size of cell to dof array
       Index _cell_to_dof_size;
 
       /// Array of node coordinates.
-      Tiny::Vector<DataType, dim>* _nodes;
+      Memory::Arbiter _nodes;
       /// Size of node array
       Index _nodes_size;
 
-      /// Datahanlder for the coloring data.
+    public:
+      /// Datahandler for the coloring data.
       Adjacency::ColoringDataHandler coloring_data;
+
     public:
       double time_off_load_mesh, time_off_load_color;
       double time_init_mesh, time_init_color;
@@ -69,53 +70,7 @@ namespace FEAT
     public:
       inline AssemblyMappingData<DataType, IndexType> get_assembly_field() const
       {
-        return AssemblyMappingData<DataType, IndexType>{_cell_to_dof, _cell_to_dof_sorter, _cell_to_dof_size,
-                                    (void*)_nodes, _nodes_size};
-      }
-
-      Index get_num_colors() const
-      {
-        return coloring_data.get_num_colors();
-      }
-
-      int* get_color_map(Index k)
-      {
-        return coloring_data.get_color_map(k);
-      }
-
-      const int* get_color_map(Index k) const
-      {
-        return coloring_data.get_color_map(k);
-      }
-
-      std::vector<int*>& get_coloring_maps()
-      {
-        return coloring_data.get_coloring_maps();
-      }
-
-      const std::vector<int*>& get_coloring_maps() const
-      {
-        return coloring_data.get_coloring_maps();
-      }
-
-      Index get_color_map_size(Index k) const
-      {
-        return coloring_data.get_color_size(k);
-      }
-
-      std::vector<Index>& get_color_map_sizes()
-      {
-        return coloring_data.get_color_sizes();
-      }
-
-      const std::vector<Index>& get_color_map_sizes() const
-      {
-        return coloring_data.get_color_sizes();
-      }
-
-      Index get_max_color_size() const
-      {
-        return coloring_data.get_max_color_size();
+        return AssemblyMappingData<DataType, IndexType>{_cell_to_dof, _cell_to_dof_sorter, _cell_to_dof_size, _nodes, _nodes_size};
       }
 
     protected:
@@ -137,20 +92,25 @@ namespace FEAT
 
       bool _test_coloring() const
       {
-        const auto& _coloring_maps = coloring_data.get_coloring_maps();
+        //const auto& _coloring_maps = coloring_data.get_coloring_maps();
+        const Memory::TypedView<int> coloring_view = coloring_data.color_map_view(Memory::Location::main, Memory::Access::read);
+        const Memory::TypedView<IndexType> cell_to_dof_view(_cell_to_dof.view(Memory::Location::main, Memory::Access::read));
+        const auto& _coloring_map_offsets = coloring_data.get_color_offsets();
         const auto& _coloring_map_sizes = coloring_data.get_color_sizes();
-        for(int i = 0; i < int(_coloring_maps.size()); ++i)
+        for(std::size_t i = 0; i < _coloring_map_sizes.size(); ++i)
         {
-          for(int l = 0; l < int(_coloring_map_sizes.at(std::size_t(i))); ++l)
+          for(std::size_t l = 0; l < _coloring_map_sizes.at(i); ++l)
           {
-            int cell_a = _coloring_maps[std::size_t(i)][std::size_t(l)];
-            const IndexType* a_b = &_cell_to_dof[std::size_t(cell_a*SpaceType::DofMappingType::dof_count)];
-            const IndexType* a_e = &_cell_to_dof[std::size_t(cell_a*SpaceType::DofMappingType::dof_count)] + SpaceType::DofMappingType::dof_count;
-            for(int j = l+1; j < int(_coloring_map_sizes[std::size_t(i)]); ++j)
+            //int cell_a = _coloring_maps[std::size_t(i)][std::size_t(l)];
+            int cell_a = coloring_view[_coloring_map_offsets[i] + l];
+            const IndexType* a_b = &cell_to_dof_view[std::size_t(cell_a*SpaceType::DofMappingType::dof_count)];
+            const IndexType* a_e = a_b + SpaceType::DofMappingType::dof_count;
+            for(std::size_t j = l+1; j < _coloring_map_sizes[i]; ++j)
             {
-              int cell_b = _coloring_maps[std::size_t(i)][std::size_t(j)];
-              const IndexType* b_b = &_cell_to_dof[std::size_t(cell_b*SpaceType::DofMappingType::dof_count)];
-              const IndexType* b_e = &_cell_to_dof[std::size_t(cell_b*SpaceType::DofMappingType::dof_count)] + SpaceType::DofMappingType::dof_count;
+              //int cell_b = _coloring_maps[std::size_t(i)][std::size_t(j)];
+              int cell_b = coloring_view[_coloring_map_offsets[i] + j];
+              const IndexType* b_b = &cell_to_dof_view[std::size_t(cell_b*SpaceType::DofMappingType::dof_count)];
+              const IndexType* b_e = b_b + SpaceType::DofMappingType::dof_count;
 
               if(_contains_common_element(a_b, a_e, b_b, b_e))
               {
@@ -170,9 +130,18 @@ namespace FEAT
             }
           }
 
-          for(int j = i+1; j < int(_coloring_maps.size()); ++j)
+          for(std::size_t j = i+1; j < _coloring_map_sizes.size(); ++j)
           {
-            if(_contains_common_element(_coloring_maps.at(std::size_t(i)), _coloring_maps.at(std::size_t(i))+_coloring_map_sizes.at(std::size_t(i)), _coloring_maps.at(std::size_t(j)), _coloring_maps.at(std::size_t(j))+_coloring_map_sizes.at(std::size_t(j))))
+            //if(_contains_common_element(
+            //  _coloring_maps.at(std::size_t(i)),
+            //  _coloring_maps.at(std::size_t(i))+_coloring_map_sizes.at(std::size_t(i)),
+            //  _coloring_maps.at(std::size_t(j)),
+            //  _coloring_maps.at(std::size_t(j))+_coloring_map_sizes.at(std::size_t(j))))
+            const int* cvi = &coloring_view.get_r()[_coloring_map_offsets[i]];
+            const int* cvj = &coloring_view.get_r()[_coloring_map_offsets[j]];
+            if(_contains_common_element(
+              cvi, cvi + _coloring_map_sizes.at(i),
+              cvj, cvj + _coloring_map_sizes.at(j)))
             {
               std::cout << "Colors contain common element!\n";
               XABORTM("I think you have misunderstood colors.");
@@ -211,10 +180,10 @@ namespace FEAT
 
       template<typename ColoringType_>
       explicit LagrangeDataHandler(const SpaceType& space, const ColoringType_& coloring, int hint = -1) :
-      _cell_to_dof(nullptr),
-      _cell_to_dof_sorter(nullptr),
+      _cell_to_dof(),
+      _cell_to_dof_sorter(),
       _cell_to_dof_size(Index(0)),
-      _nodes(nullptr),
+      _nodes(),
       _nodes_size(Index(0)),
       time_off_load_mesh(0.),
       time_off_load_color(0.),
@@ -231,18 +200,24 @@ namespace FEAT
           ASSERTM(space.get_mesh().get_num_entities(dim) == coloring.size(), "Coloring and space do not fit!");
         }
         _nodes_size = space.get_mesh().get_vertex_set().get_num_vertices();
-        _nodes = MemoryPool::allocate_memory<Tiny::Vector<DataType, dim>>(_nodes_size);
+        _nodes = Memory::Arbiter(sizeof(Tiny::Vector<DataType, dim>) * _nodes_size);
         // copy the internal nodes array
         const auto* vertex_begin = (const typename SpaceType::MeshType::VertexSetType::CoordType*)space.get_mesh().get_vertex_set().begin();
-        std::transform(vertex_begin, vertex_begin + _nodes_size*Index(dim), (DataType*)_nodes, [](const auto& a) ->DataType {return DataType(a);});
+        std::transform(vertex_begin, vertex_begin + _nodes_size*Index(dim),
+          _nodes.template typed_view<DataType>(Memory::Location::main, Memory::Access::write).get_w(),
+          [](const auto& a) ->DataType {return DataType(a);});
 
         // define our _cell_to_dof
         _cell_to_dof_size = space.get_mesh().get_num_entities(dim) * SpaceType::DofMappingType::dof_count;
-        _cell_to_dof = MemoryPool::allocate_memory<IndexType>(_cell_to_dof_size);
-        _cell_to_dof_sorter = MemoryPool::allocate_memory<IndexType>(_cell_to_dof_size);
+        _cell_to_dof = Memory::Arbiter(sizeof(IndexType) * std::size_t(_cell_to_dof_size));
+        _cell_to_dof_sorter = Memory::Arbiter(sizeof(IndexType) * std::size_t(_cell_to_dof_size));
         // for this iterate through our target_sets and parse them in
-        VoxelAssembly::fill_cell_to_dof(_cell_to_dof, space);
-        VoxelAssembly::fill_sorter(_cell_to_dof_sorter, _cell_to_dof, space);
+        {
+          Memory::TypedView<IndexType> ctdv(_cell_to_dof.view(Memory::Location::main, Memory::Access::write));
+          Memory::TypedView<IndexType> ctdsv(_cell_to_dof_sorter.view(Memory::Location::main, Memory::Access::write));
+          VoxelAssembly::fill_cell_to_dof(ctdv.get_w(), space);
+          VoxelAssembly::fill_sorter(ctdsv.get_w(), ctdv.get_r(), space);
+        }
         TimeStamp stamp2;
         time_init_mesh = stamp2.elapsed(stamp1);
 
@@ -266,10 +241,10 @@ namespace FEAT
       LagrangeDataHandler& operator=(const LagrangeDataHandler&) = delete;
 
       LagrangeDataHandler(LagrangeDataHandler&& other) noexcept :
-      _cell_to_dof(other._cell_to_dof),
-      _cell_to_dof_sorter(other._cell_to_dof_sorter),
+      _cell_to_dof(std::move(other._cell_to_dof)),
+      _cell_to_dof_sorter(std::move(other._cell_to_dof_sorter)),
       _cell_to_dof_size(other._cell_to_dof_size),
-      _nodes(other._nodes),
+      _nodes(std::move(other._nodes)),
       _nodes_size(other._nodes_size),
       coloring_data(std::move(other.coloring_data)),
       time_off_load_mesh(other.time_off_load_mesh),
@@ -277,9 +252,6 @@ namespace FEAT
       time_init_mesh(other.time_init_mesh),
       time_init_color(other.time_init_color)
       {
-        MemoryPool::increase_memory(_cell_to_dof);
-        MemoryPool::increase_memory(_cell_to_dof_sorter);
-        MemoryPool::increase_memory(_nodes);
       }
 
       LagrangeDataHandler& operator=(LagrangeDataHandler&& other) noexcept
@@ -291,26 +263,15 @@ namespace FEAT
         time_init_mesh = other.time_init_mesh;
         time_init_color = other.time_init_color;
         coloring_data = std::move(other.coloring_data);
-        MemoryPool::release_memory(_nodes);
-        MemoryPool::release_memory(_cell_to_dof_sorter);
-        MemoryPool::release_memory(_cell_to_dof);
-        _cell_to_dof = other._cell_to_dof;
-        _cell_to_dof_sorter = other._cell_to_dof_sorter;
+        _cell_to_dof = std::move(other._cell_to_dof);
+        _cell_to_dof_sorter = std::move(other._cell_to_dof_sorter);
         _cell_to_dof_size = other._cell_to_dof_size;
-        _nodes = other._nodes;
+        _nodes = std::move(other._nodes);
         _nodes_size = other._nodes_size;
-        MemoryPool::increase_memory(_cell_to_dof);
-        MemoryPool::increase_memory(_cell_to_dof_sorter);
-        MemoryPool::increase_memory(_nodes);
         return *this;
       }
 
-      ~LagrangeDataHandler()
-      {
-        MemoryPool::release_memory(_nodes);
-        MemoryPool::release_memory(_cell_to_dof_sorter);
-        MemoryPool::release_memory(_cell_to_dof);
-      }
+      ~LagrangeDataHandler() = default;
     }; //class GPUDataHandler
   }
 }

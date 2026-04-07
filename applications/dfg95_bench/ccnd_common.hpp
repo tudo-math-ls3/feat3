@@ -794,8 +794,8 @@ namespace DFG95
 
     // get the vector arrays
     const Index n = vec_def_v.size();
-    const auto* vdef = vec_def_v.elements();
-    const auto* vchr = vec_char.elements();
+    const auto vdef = vec_def_v.elements_view_r();
+    const auto vchr = vec_char.elements_view_r();
     for(Index i(0); i < n; ++i)
     {
       frc.axpy(vchr[i], vdef[i]);

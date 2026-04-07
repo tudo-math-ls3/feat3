@@ -100,7 +100,7 @@ namespace FEAT
     /**
      * \brief Returns the next number in the stream.
      *
-     * This function returns the next unsigned 32-bit integer in the random number stream and advances the
+     * This function returns the next unsigned 64-bit integer in the random number stream and advances the
      * stream.
      */
     uint64_t next()

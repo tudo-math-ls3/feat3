@@ -115,7 +115,7 @@ namespace FBMTest
         FaceVector_& face_vector;
         /// the vector that is to be integrated
         const FEVector_& vector;
-        static constexpr int fe_dim = FEVector_::BlockSize;
+        static constexpr int fe_dim = FEVector_::block_size;
         /// the cubature rule used for integration
         typename BaseClass::CubatureRuleType cubature_rule;
         /// the local vector to be assembled
@@ -169,7 +169,7 @@ namespace FBMTest
           } // continue with next cubature point
 
           // scatter our face value
-          face_vector(this->trafo_facet_eval.get_cell_index(), (DataType(1) / this->trafo_facet_eval.volume()) * loc_face_val);
+          face_vector.elements_view_rw()[this->trafo_facet_eval.get_cell_index()] = (DataType(1) / this->trafo_facet_eval.volume()) * loc_face_val;
         }
 
         /// \brief Scatters the local assembly.
@@ -252,7 +252,7 @@ namespace FBMTest
         FaceVector_& face_vector;
         /// the vector that is to be integrated
         const FEVector_& vector;
-        static constexpr int fe_dim = FEVector_::BlockSize;
+        static constexpr int fe_dim = FEVector_::block_size;
         /// the cubature rule used for integration
         typename BaseClass::CubatureRuleType cubature_rule;
         /// the local vector to be assembled
@@ -308,7 +308,7 @@ namespace FBMTest
             Tiny::axpy(loc_face_val, normal_grad, cubature_rule.get_weight(k)*this->trafo_facet_data.jac_det);
           } // continue with next cubature point
           // scatter our face value
-          face_vector(this->trafo_facet_eval.get_cell_index(), (DataType(1) / this->trafo_facet_eval.volume()) * loc_face_val);
+          face_vector.elements_view_rw()[this->trafo_facet_eval.get_cell_index()] = (DataType(1) / this->trafo_facet_eval.volume()) * loc_face_val;
         }
 
         /// \brief Scatters the local assembly.
@@ -414,7 +414,7 @@ namespace FBMTest
 
           BaseClass::_assemble();
 
-          this->vector(this->_cur_surface_index, (DataType(1) / this->_face_volume) * face_val);
+          this->vector.elements_view_rw()[this->_cur_surface_index] = (DataType(1) / this->_face_volume) * face_val;
         }
 
         void _integrate(DataType weight, [[maybe_unused]] IndexType point_idx)
@@ -497,7 +497,7 @@ namespace FBMTest
 
           BaseClass::_assemble();
 
-          this->vector(this->_cur_surface_index, (DataType(1) / this->_face_volume) * face_val);
+          this->vector.elements_view_rw()[this->_cur_surface_index] = (DataType(1) / this->_face_volume) * face_val;
         }
 
         void _integrate(DataType weight, [[maybe_unused]] IndexType point_idx)
@@ -764,7 +764,7 @@ namespace FBMTest
             this->_prepare_cell(this->_cell_helper[k]);
             this->_assemble_cell(domain_point_idx);
           }
-          this->vector(this->_cur_surface_index, face_val*scatter_alpha);
+          this->vector.elements_view_rw()[this->_cur_surface_index] = face_val*scatter_alpha;
 
 
         }
@@ -965,7 +965,7 @@ namespace FBMTest
             this->_prepare_cell(this->_cell_helper[k]);
             this->_assemble_cell(domain_point_idx);
           }
-          this->vector(this->_cur_surface_index, face_val*scatter_alpha);
+          this->vector.elements_view_rw()[this->_cur_surface_index] = face_val*scatter_alpha;
 
 
         }
@@ -1493,11 +1493,15 @@ namespace FBMTest
         const auto& filter_vec_velo = system.front()->filter_interface_fbm.get_filter_vector();
         LAFEM::DenseVectorBlocked<DataType, IndexType, dim> filter_vec(filter_vec_velo.size());
         filter_vec.format(-1);
-        for(Index k = 0; k < filter_vec_velo.used_elements(); ++k)
+        auto fv_vec = filter_vec.elements_view_w();
+        const auto fvv_val = filter_vec_velo.elements_view_r();
+        const auto fvv_idx = filter_vec_velo.indices_view_r();
+        for(Index k = 0; k < filter_vec_velo.num_nzes(); ++k)
         {
-          filter_vec(filter_vec_velo.indices()[k], filter_vec_velo.elements()[k]);
+          fv_vec[fvv_idx[k]] = fvv_val[k];
         }
 
+        fv_vec.release();
         vtk_export.add_vertex_vector("Debug: interface_filter_v", filter_vec);
 
       }
@@ -1505,11 +1509,14 @@ namespace FBMTest
         const auto& filter_vec_velo = system.front()->get_local_velo_unit_filter_seq().find_or_add("fbm").get_filter_vector();
         LAFEM::DenseVectorBlocked<DataType, IndexType, dim> filter_vec(filter_vec_velo.size());
         filter_vec.format(-1);
-        for(Index k = 0; k < filter_vec_velo.used_elements(); ++k)
+        auto fv_vec = filter_vec.elements_view_w();
+        const auto fvv_val = filter_vec_velo.elements_view_r();
+        const auto fvv_idx = filter_vec_velo.indices_view_r();
+        for(Index k = 0; k < filter_vec_velo.num_nzes(); ++k)
         {
-          filter_vec(filter_vec_velo.indices()[k], filter_vec_velo.elements()[k]);
+          fv_vec[fvv_idx[k]] = fvv_val[k];
         }
-
+        fv_vec.release();
         vtk_export.add_vertex_vector("Debug: fbm_filter_v", filter_vec);
 
       }
@@ -1548,11 +1555,12 @@ namespace FBMTest
 
       FEAT::Assembly::SurfaceIntegrator<TrafoType, FaceShapeType> surf_integrator(domain.front()->trafo, Cubature::DynamicFactory(cubature_face_int));
       std::array<Tiny::Vector<DataType, dim>, num_verts> face_verts;
+      auto vv = verts.elements_view_r();
       for(Index k = 0; k < verts.size(); k += num_verts)
       {
         for(Index l = 0; l < num_verts; ++l)
         {
-          face_verts[l] = verts(k+l);
+          face_verts[l] = vv(k+l);
         }
         surf_integrator.add_face_vertices(face_verts);
       }
@@ -1589,9 +1597,9 @@ namespace FBMTest
             mask_vector.format();
             {
               const auto& loc_fbm_filter_vec = system.front()->get_local_velo_unit_filter_seq().find_or_add("fbm").get_filter_vector();
-              const auto& index_array = loc_fbm_filter_vec.indices();
-              auto* mask_elem = mask_vector.elements();
-              for(Index k = 0; k < loc_fbm_filter_vec.used_elements(); ++k)
+              const auto index_array = loc_fbm_filter_vec.indices_view_r();
+              auto mask_elem = mask_vector.elements_view_rw();
+              for(Index k = 0; k < loc_fbm_filter_vec.num_nzes(); ++k)
               {
                 mask_elem[index_array[k]] = DataType(1);
               }
@@ -1622,8 +1630,7 @@ namespace FBMTest
     all_face_val.format();
 
     {
-      comm.reduce(face_val.template elements<FEAT::LAFEM::Perspective::pod>(), all_face_val.template elements<FEAT::LAFEM::Perspective::pod>(),
-                   face_val.template size<FEAT::LAFEM::Perspective::pod>(), Dist::op_sum, 0);
+      comm.reduce(face_val.elements_view_raw_w().get_w(), all_face_val.elements_view_raw_rw().get_w(), face_val.size_raw(), Dist::op_sum, 0);
     }
 
     if(comm.rank() == 0)
@@ -1797,6 +1804,7 @@ namespace FBMTest
       // get our mapping face to vertices
       const auto& vertex_set = domain.front()->get_mesh().get_vertex_set();
       part_vertices = FEAT::LAFEM::DenseVectorBlocked<DataType, IndexType, dim>(target_set.get_num_entities()*Index(face_to_vert.get_num_indices()));
+      auto pv = part_vertices.elements_view_w();
       for(Index k = 0; k < target_set.get_num_entities(); ++k)
       {
         const Index cur_face = target_set[k];
@@ -1804,7 +1812,7 @@ namespace FBMTest
         const auto& loc_face_set = face_to_vert[cur_face];
         for(Index l = 0; l < Index(face_to_vert.get_num_indices()); ++l)
         {
-          part_vertices(k*Index(face_to_vert.get_num_indices()) + l, vertex_set[loc_face_set[int(l)]]);
+          pv[k*Index(face_to_vert.get_num_indices()) + l] = vertex_set[loc_face_set[int(l)]];
         }
       }
 
@@ -1831,9 +1839,11 @@ namespace FBMTest
 
       vec_face = LAFEM::DenseVectorBlocked<DataType, IndexType, dim>(target_set.get_num_entities());
       vec_face.format();
+      auto vf = vec_face.elements_view_w();
+      auto vfwm = vec_face_whole_mesh.elements_view_r();
       for(Index k = 0; k < target_set.get_num_entities(); ++k)
       {
-        vec_face(k, vec_face_whole_mesh(target_set[k]));
+        vf[k] = vfwm(target_set[k]);
       }
     }
 
@@ -1867,10 +1877,10 @@ namespace FBMTest
       std::vector<DataType> vtx_send_buffer(vec_face.size()*Index(dim*(1+face_to_vert.get_num_indices())));
 
       // fill our buffer array, first face_values, then our vertices
-      const DataType* vtx_val = part_vertices.template elements<LAFEM::Perspective::pod>();
-      const DataType* face_val = vec_face.template elements<LAFEM::Perspective::pod>();
-      DataType* gvtx_val = global_part_vertices.template elements<LAFEM::Perspective::pod>();
-      DataType* gface_val = global_vec_face.template elements<LAFEM::Perspective::pod>();
+      const Memory::TypedView<DataType> vtx_val = part_vertices.elements_view_raw_r();
+      const Memory::TypedView<DataType> face_val = vec_face.elements_view_raw_r();
+      Memory::TypedView<DataType> gvtx_val = global_part_vertices.elements_view_raw_rw();
+      Memory::TypedView<DataType> gface_val = global_vec_face.elements_view_raw_rw();
       for(Index k = 0; k < vec_face.size()*dim; ++k)
       {
         vtx_send_buffer[k] = face_val[k];

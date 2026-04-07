@@ -8,12 +8,12 @@
 #include <kernel/backend.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/util/random.hpp>
-#include <kernel/util/cuda_util.hpp>
-#include <kernel/util/memory_pool.hpp>
+#include <kernel/util/memory_aux.hpp>
 #include <kernel/util/stop_watch.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 
 #include <iostream>
+#include <cstring>
 
 #ifdef FEAT_HAVE_OMP
 #include <omp.h>
@@ -295,12 +295,12 @@ int main(int argc, char** argv)
 
 #ifdef FEAT_HAVE_CUDA
 
-  u64* a = (u64*)Util::cuda_malloc(buffer_size);
-  u64* b = (u64*)Util::cuda_malloc(buffer_size);
+  u64* a = (u64*)Memory::alloc_cuda(buffer_size);
+  u64* b = (u64*)Memory::alloc_cuda(buffer_size);
 
   // format memory to ensure that all pages are allocated
-  Util::cuda_set_memory(a, u64(1), num_entries);
-  Util::cuda_set_memory(b, u64(2), num_entries);
+  Memory::format_cuda(a, u64(1), num_entries);
+  Memory::format_cuda(b, u64(2), num_entries);
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -313,8 +313,8 @@ int main(int argc, char** argv)
   watch_cuda_h2dcpy.start();
   for(u64 k = 0u; k < repeat_count; ++k)
   {
-    Util::cuda_copy_host_to_device(a, x, buffer_size);
-    Util::cuda_synchronize();
+    Memory::memcopy_main_to_cuda(a, x, buffer_size);
+    Runtime::synchronize_devices();
   }
   comm.barrier();
   watch_cuda_h2dcpy.stop();
@@ -332,8 +332,8 @@ int main(int argc, char** argv)
   watch_cuda_d2dcpy.start();
   for(u64 k = 0u; k < repeat_count; ++k)
   {
-    Util::cuda_copy_device_to_device(b, a, buffer_size);
-    Util::cuda_synchronize();
+    Memory::memcopy_cuda(b, a, buffer_size);
+    Runtime::synchronize_devices();
   }
   comm.barrier();
   watch_cuda_d2dcpy.stop();
@@ -351,8 +351,8 @@ int main(int argc, char** argv)
   watch_cuda_d2hcpy.start();
   for(u64 k = 0u; k < repeat_count; ++k)
   {
-    Util::cuda_copy_device_to_host(y, b, buffer_size);
-    Util::cuda_synchronize();
+    Memory::memcopy_cuda_to_main(y, b, buffer_size);
+    Runtime::synchronize_devices();
   }
   comm.barrier();
   watch_cuda_d2hcpy.stop();
@@ -379,6 +379,7 @@ int main(int argc, char** argv)
     vec_x.format(DataType(k));
     vec_y.format(DataType(k));
   }
+  Runtime::synchronize_devices();
   comm.barrier();
   watch_cuda_dv_format.stop();
 
@@ -397,6 +398,7 @@ int main(int argc, char** argv)
   {
     vec_y.copy(vec_x);
   }
+  Runtime::synchronize_devices();
   comm.barrier();
   watch_cuda_dv_copy.stop();
 
@@ -406,8 +408,8 @@ int main(int argc, char** argv)
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  Util::cuda_free(b);
-  Util::cuda_free(a);
+  Memory::free_cuda(b);
+  Memory::free_cuda(a);
 
 #endif // FEAT_HAVE_CUDA
 

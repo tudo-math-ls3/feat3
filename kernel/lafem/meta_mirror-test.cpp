@@ -35,19 +35,15 @@ public:
   typedef PowerMirror<ScalarMirror, 2> PowerMirror2;
   typedef TupleMirror<PowerMirror2, ScalarMirror> MetaMirror;
 
-  MetaMirrorTest(PreferredBackend backend) :
+  explicit MetaMirrorTest(PreferredBackend backend) :
     UnitTest("MetaMirrorTest", Type::Traits<DataType>::name(), Type::Traits<IndexType>::name(), backend)
-  {
-  }
-
-  virtual ~MetaMirrorTest()
   {
   }
 
   static ScalarMirror gen_mirror_x(IndexType m)
   {
     ScalarMirror mir(m*m, m);
-    IndexType* ci(mir.indices());
+    Memory::TypedView<IndexType> ci(mir.indices_view_w());
     IndexType m2(m*(m-1));
     for(IndexType i(0); i < m; ++i)
       ci[i] = m2+i;
@@ -57,7 +53,7 @@ public:
   static ScalarMirror gen_mirror_y(IndexType m)
   {
     ScalarMirror mir(m*m, m);
-    IndexType* ci(mir.indices());
+    Memory::TypedView<IndexType> ci(mir.indices_view_w());
     for(IndexType i(0); i < m; ++i)
       ci[i] = i;
     return mir;
@@ -87,15 +83,23 @@ public:
     // create reference synced vectors
     MetaVector sync_x(vec_x.clone());
     MetaVector sync_y(vec_y.clone());
-    for(Index i(0); i < m; ++i)
     {
-      Index k(n-m+i);
-      sync_x.template at<0>().template at<0>()(k, DataType_(0));
-      sync_y.template at<0>().template at<0>()(i, DataType_(0));
-      sync_x.template at<0>().template at<1>()(k, DataType_(3));
-      sync_y.template at<0>().template at<1>()(i, DataType_(3));
-      sync_x.template at<1>()(k, DataType_(1));
-      sync_y.template at<1>()(i, DataType_(1));
+      Memory::TypedView<DataType> vx00 = sync_x.template at<0>().template at<0>().elements_view_rw();
+      Memory::TypedView<DataType> vy00 = sync_y.template at<0>().template at<0>().elements_view_rw();
+      Memory::TypedView<DataType> vx01 = sync_x.template at<0>().template at<1>().elements_view_rw();
+      Memory::TypedView<DataType> vy01 = sync_y.template at<0>().template at<1>().elements_view_rw();
+      Memory::TypedView<DataType> vx1 = sync_x.template at<1>().elements_view_rw();
+      Memory::TypedView<DataType> vy1 = sync_y.template at<1>().elements_view_rw();
+      for(Index i(0); i < m; ++i)
+      {
+        Index k(n-m+i);
+        vx00[k] = DataType_(0);
+        vy00[i] = DataType_(0);
+        vx01[k] = DataType_(3);
+        vy01[i] = DataType_(3);
+        vx1[k] = DataType_(1);
+        vy1[i] = DataType_(1);
+      }
     }
 
     // create two buffer-vectors
@@ -110,35 +114,31 @@ public:
     mirror_x.scatter_axpy(vec_x, buf_y);
     mirror_y.scatter_axpy(vec_y, buf_x);
 
-    // compute difference to reference
-    vec_x.axpy(sync_x, -DataType(1));
-    vec_y.axpy(sync_y, -DataType(1));
-
-    // check difference norm
-    TEST_CHECK_EQUAL_WITHIN_EPS(vec_x.norm2(), DataType_(0), tol);
-    TEST_CHECK_EQUAL_WITHIN_EPS(vec_y.norm2(), DataType_(0), tol);
+    // check against reference
+    TEST_CHECK_LESS_THAN(vec_x.max_rel_diff(sync_x), tol);
+    TEST_CHECK_LESS_THAN(vec_y.max_rel_diff(sync_y), tol);
   }
 };
 
-MetaMirrorTest <float, std::uint64_t> meta_mirror_test_generic_float_uint64(PreferredBackend::generic);
-MetaMirrorTest <double, std::uint64_t> meta_mirror_test_generic_double_uint64(PreferredBackend::generic);
-MetaMirrorTest <float, std::uint32_t> meta_mirror_test_generic_float_uint32(PreferredBackend::generic);
-MetaMirrorTest<double, std::uint32_t> meta_mirror_test_generic_double_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MetaMirrorTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MetaMirrorTest, double, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MetaMirrorTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MetaMirrorTest, double, std::uint32_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MetaMirrorTest <float, std::uint64_t> mkl_meta_mirror_test_float_uint64(PreferredBackend::mkl);
-MetaMirrorTest <double, std::uint64_t> mkl_cmeta_mirror_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(MetaMirrorTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(MetaMirrorTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MetaMirrorTest <__float128, std::uint64_t> meta_mirror_test_float128_uint64(PreferredBackend::generic);
-MetaMirrorTest <__float128, std::uint32_t> meta_mirror_test_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MetaMirrorTest, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MetaMirrorTest, __float128, std::uint32_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MetaMirrorTest <Half, std::uint32_t> meta_mirror_test_half_uint32(PreferredBackend::generic);
-MetaMirrorTest <Half, std::uint64_t> meta_mirror_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MetaMirrorTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MetaMirrorTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MetaMirrorTest <float, std::uint64_t> cuda_meta_mirror_test_float_uint64(PreferredBackend::cuda);
-MetaMirrorTest <double, std::uint64_t> cuda_meta_mirror_test_double_uint64(PreferredBackend::cuda);
-MetaMirrorTest <float, std::uint32_t> cuda_meta_mirror_test_float_uint32(PreferredBackend::cuda);
-MetaMirrorTest <double, std::uint32_t> cuda_meta_mirror_test_double_uint32(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MetaMirrorTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MetaMirrorTest, double, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MetaMirrorTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MetaMirrorTest, double, std::uint32_t, PreferredBackend::cuda);
 #endif

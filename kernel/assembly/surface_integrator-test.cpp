@@ -3,7 +3,6 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
-
 #include <kernel/base_header.hpp>
 #include <kernel/runtime.hpp>
 #include <kernel/space/lagrange2/element.hpp>
@@ -20,12 +19,8 @@
 #include <kernel/assembly/surface_integrator.hpp>
 #include <kernel/assembly/surface_integrator_basic_jobs.hpp>
 
-
-
 using namespace FEAT;
 using namespace FEAT::TestSystem;
-
-
 
 template<typename DataType_, typename IndexType_>
 class SurfaceIntegratorTest :
@@ -36,12 +31,8 @@ public:
   typedef IndexType_ IndexType;
 
 public:
-  SurfaceIntegratorTest(PreferredBackend backend) :
+  explicit SurfaceIntegratorTest(PreferredBackend backend) :
     UnitTest("SurfaceIntegratorTest", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
-  {
-  }
-
-  virtual ~SurfaceIntegratorTest()
   {
   }
 
@@ -112,6 +103,7 @@ public:
     const Index surface_num = indx.size();
 
     LAFEM::DenseVector<DataType, IndexType> vec_face(surface_num);
+    vec_face.format();
 
     Assembly::SurfaceIntegrator<TrafoType, Shape::Simplex<2>> surf_int(trafo, cubature);
     surf_int.set_vertices(vtx);
@@ -124,19 +116,18 @@ public:
 
     surf_int.assemble(surface_int_job);
 
+    Memory::TypedView<DataType> vf = vec_face.elements_view_r();
     for(Index k = 0; k < surface_num; ++k)
     {
       DataType ref_res = calc_simple_analytic_simplex_3d(Tiny::Vector<DataType, 3>{vtx[indx[k][0]][0], vtx[indx[k][0]][1], vtx[indx[k][0]][2]},
         Tiny::Vector<DataType, 3>{vtx[indx[k][1]][0], vtx[indx[k][1]][1], vtx[indx[k][1]][2]},
         Tiny::Vector<DataType, 3>{vtx[indx[k][2]][0], vtx[indx[k][2]][1], vtx[indx[k][2]][2]});
-      TEST_CHECK_EQUAL_WITHIN_EPS(vec_face(k), ref_res, eps);
+      TEST_CHECK_EQUAL_WITHIN_EPS(vf(k), ref_res, eps);
     }
-
   }
-
 };
 
-SurfaceIntegratorTest<float, std::uint32_t> surface_integrator_test_float_uint32(PreferredBackend::generic);
-SurfaceIntegratorTest<double, std::uint32_t> surface_integrator_test_double_uint32(PreferredBackend::generic);
-SurfaceIntegratorTest<float, std::uint64_t> surface_integrator_test_float_uint64(PreferredBackend::generic);
-SurfaceIntegratorTest<double, std::uint64_t> surface_integrator_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SurfaceIntegratorTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SurfaceIntegratorTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SurfaceIntegratorTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(SurfaceIntegratorTest, double, std::uint64_t, PreferredBackend::generic);

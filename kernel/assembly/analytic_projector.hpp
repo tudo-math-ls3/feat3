@@ -10,6 +10,7 @@
 #include <kernel/analytic/function.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include <kernel/trafo/base.hpp>
+#include <kernel/util/memory_arbiter.hpp>
 
 namespace FEAT
 {
@@ -46,6 +47,7 @@ namespace FEAT
 
         // get our data and value types
         typedef typename VectorOut_::DataType DataType;
+        typedef typename VectorOut_::ValueType ValueType;
 
         // get the mesh
         const MeshType& mesh(trafo.get_mesh());
@@ -66,11 +68,14 @@ namespace FEAT
         // create a function evaluator
         typename Function_::template Evaluator<EvalTraits> func_eval(function);
 
+        // get a view for the vector
+        Memory::TypedView<ValueType> vec_view(vector.elements_view_w());
+
         // loop over all cells of the mesh
         for(Index i(0); i < num_verts; ++i)
         {
           // compute and store function value
-          vector(i, func_eval.value(vtx[i]));
+          vec_view[i] = func_eval.value(vtx[i]);
 
           // continue with next vertex
         }
@@ -183,6 +188,9 @@ namespace FEAT
         // create a function evaluator
         typename Function_::template Evaluator<FuncEvalTraits> func_eval(function);
 
+        // get a view for the vector
+        Memory::TypedView<ValueType> vec_view(vector.elements_view_w());
+
         // loop over all cells of the mesh
         for(Index cell(0); cell < num_cells; ++cell)
         {
@@ -214,7 +222,7 @@ namespace FEAT
           }
 
           // set contribution
-          vector(cell, (DataType(1) / area) * value);
+          vec_view[cell] = (DataType(1) / area) * value;
 
           // finish trafo evaluator
           trafo_eval.finish();

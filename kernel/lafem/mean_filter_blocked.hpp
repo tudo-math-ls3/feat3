@@ -16,12 +16,12 @@ namespace FEAT
     *
     * \author Pia Ritter
     */
-    template<typename DT_, typename IT_, int BlockSize_>
+    template<typename DT_, typename IT_, int block_size_>
     class MeanFilterBlocked
     {
     public:
       /// vector-type typedef
-      typedef DenseVectorBlocked<DT_, IT_, BlockSize_> VectorType;
+      typedef DenseVectorBlocked<DT_, IT_, block_size_> VectorType;
       /// data-type typedef
       typedef typename VectorType::DataType DataType;
       /// index-type typedef
@@ -30,12 +30,12 @@ namespace FEAT
       typedef typename VectorType::ValueType ValueType;
 
       /// Our 'base' class type
-      template <typename DT2_ = DT_, typename IT2_ = IT_, int BlockSize2_ = BlockSize_>
-      using FilterType = MeanFilterBlocked<DT2_, IT2_, BlockSize2_>;
+      template <typename DT2_ = DT_, typename IT2_ = IT_, int block_size2_ = block_size_>
+      using FilterType = MeanFilterBlocked<DT2_, IT2_, block_size2_>;
 
       /// this typedef lets you create a filter with different Data and Index types
-      template <typename DataType2_, typename IndexType2_, int BS2_>
-      using FilterTypeByDI = FilterType<DataType2_, IndexType2_, BS2_>;
+      template <typename DataType2_, typename IndexType2_, int block_size2_>
+      using FilterTypeByDI = FilterType<DataType2_, IndexType2_, block_size2_>;
 
     protected:
       /// primal weighting vector
@@ -151,8 +151,8 @@ namespace FEAT
       }
 
       /// Conversion method
-      template<typename DT2_, typename IT2_, int BlockSize2_>
-      void convert(const MeanFilterBlocked<DT2_, IT2_, BlockSize2_>& other)
+      template<typename DT2_, typename IT2_, int block_size2_>
+      void convert(const MeanFilterBlocked<DT2_, IT2_, block_size2_>& other)
       {
         _vec_prim.convert(other.get_vec_prim());
         _vec_dual.convert(other.get_vec_dual());

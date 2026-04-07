@@ -64,9 +64,9 @@ namespace FEAT
         /// Type for the system matrix
         typedef MatrixType_<DT_, IT_, MeshType::world_dim, MeshType::world_dim> MatrixType;
         /// Blockheight of the system matrix
-        static constexpr int BlockHeight = MatrixType::BlockHeight;
+        static constexpr int block_height = MatrixType::block_height;
         /// Blockwidth of the system matrix
-        static constexpr int BlockWidth = MatrixType::BlockWidth;
+        static constexpr int block_width = MatrixType::block_width;
 
         /// Our 'base' class type
         template <typename DT2_ = DT_, typename IT2_ = IT_>
@@ -242,7 +242,8 @@ namespace FEAT
          */
         virtual void add_to_vtk_exporter(Geometry::ExportVTK<MeshType>& exporter) const override
         {
-          exporter.add_cell_scalar("lambda", this->_lambda.elements());
+          Memory::TypedView<DT_> v = this->_lambda.elements_view_r();
+          exporter.add_cell_scalar("lambda", v.get_r());
         }
 
         /**
@@ -277,9 +278,12 @@ namespace FEAT
          */
         virtual void prepare(VectorTypeR& vec_state, FilterType& filter)
         {
-          for(Index cell(0); cell < this->get_mesh()->get_num_entities(MeshType::shape_dim); ++cell)
           {
-            _lambda(cell, DataType(_trafo.template compute_vol<typename MeshType::ShapeType>(cell)));
+            Memory::TypedView<DT_> vl = _lambda.elements_view_w();
+            for(Index cell(0); cell < this->get_mesh()->get_num_entities(MeshType::shape_dim); ++cell)
+            {
+              vl[cell] = DataType(_trafo.template compute_vol<typename MeshType::ShapeType>(cell));
+            }
           }
 
           auto& dirichlet_filters = filter.template at<1>();
@@ -430,11 +434,12 @@ namespace FEAT
           lambda_min = Math::huge<CoordType>();
           lambda_max = CoordType(0);
 
+          Memory::TypedView<DT_> vl = this->_lambda.elements_view_r();
           for(Index cell(0); cell < this->get_mesh()->get_num_entities(ShapeType::dimension); ++cell)
           {
-            size_defect += Math::abs(this->_trafo.template compute_vol<ShapeType, CoordType>(cell)/vol - this->_lambda(cell));
-            lambda_min = Math::min(lambda_min, CoordType(this->_lambda(cell)));
-            lambda_max = Math::max(lambda_max, CoordType(this->_lambda(cell)));
+            size_defect += Math::abs(this->_trafo.template compute_vol<ShapeType, CoordType>(cell)/vol - vl(cell));
+            lambda_min = Math::min(lambda_min, CoordType(vl(cell)));
+            lambda_max = Math::max(lambda_max, CoordType(vl(cell)));
           }
 
           vol_min /= vol;

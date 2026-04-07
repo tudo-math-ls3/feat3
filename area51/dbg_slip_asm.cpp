@@ -83,14 +83,14 @@ namespace DbgSlipAsm
       slip_asm.add_mesh_part(*part);
       slip_asm.assemble(filter, space);
 
-      const auto* filter_idx = filter.get_indices();
-      const auto* filter_val = filter.get_values();
-      const auto* vector_val = vector.elements();
-      auto* vecfil_val = vec_fil.elements();
+      const auto filter_idx = filter.get_filter_vector().indices_view_r();
+      const auto filter_val = filter.get_filter_vector().elements_view_r();
+      const auto vector_val = vector.elements_view_r();
+      auto vecfil_val = vec_fil.elements_view_rw();
 
       std::vector<DataType> vdot(vector.size(), 0.0);
       DataType rsum(0.0), rmax(0.0);
-      for(Index i(0); i < filter.used_elements(); ++i)
+      for(Index i(0); i < filter.num_nzes(); ++i)
       {
         DataType t = Math::abs(Tiny::dot(vector_val[filter_idx[i]], filter_val[i]));
         rsum += t;
@@ -98,8 +98,8 @@ namespace DbgSlipAsm
         vecfil_val[filter_idx[i]] = filter_val[i];
         vdot[filter_idx[i]] = t;
       }
-      DataType rmean = rsum / DataType(filter.used_elements());
-      std::cout << lvl << ": " << stringify(filter.used_elements()).pad_front(5) << " of " << stringify(filter.size()).pad_front(7) << ": ";
+      DataType rmean = rsum / DataType(filter.num_nzes());
+      std::cout << lvl << ": " << stringify(filter.num_nzes()).pad_front(5) << " of " << stringify(filter.size()).pad_front(7) << ": ";
       //std::cout << stringify_fp_fix(rmax, 5, 7) << " / " << stringify_fp_fix(rmean, 5, 7);
       std::cout << stringify_fp_sci(rmax, 5, 10) << " / " << stringify_fp_sci(rmean, 5, 10);
       if(prev_max > 0.0)
@@ -185,15 +185,15 @@ namespace DbgSlipAsm
       slip_asm.add_mesh_part(*part);
       slip_asm.assemble(filter, space);
 
-      const auto* filter_idx = filter.get_indices();
-      const auto* filter_val = filter.get_values();
-      const auto* vector_val = vector.elements();
-      auto* vecfil_val = vec_fil.elements();
+      const auto filter_idx = filter.get_filter_vector().indices_view_r();
+      const auto filter_val = filter.get_filter_vector().elements_view_r();
+      const auto vector_val = vector.elements_view_r();
+      auto vecfil_val = vec_fil.elements_view_rw();
 
       std::vector<DataType> vdot(vector.size(), 0.0);
 
       DataType rsum(0.0), rmax(0.0);
-      for(Index i(0); i < filter.used_elements(); ++i)
+      for(Index i(0); i < filter.num_nzes(); ++i)
       {
         DataType t = Math::abs(Tiny::dot(vector_val[filter_idx[i]], filter_val[i]));
         rsum += t;
@@ -201,8 +201,8 @@ namespace DbgSlipAsm
         vecfil_val[filter_idx[i]] = filter_val[i];
         vdot[filter_idx[i]] = t;
       }
-      DataType rmean = rsum / DataType(filter.used_elements());
-      std::cout << lvl << ": " << stringify(filter.used_elements()).pad_front(5) << " of " << stringify(filter.size()).pad_front(7) << ": ";
+      DataType rmean = rsum / DataType(filter.num_nzes());
+      std::cout << lvl << ": " << stringify(filter.num_nzes()).pad_front(5) << " of " << stringify(filter.size()).pad_front(7) << ": ";
       //std::cout << stringify_fp_fix(rmax, 5, 7) << " / " << stringify_fp_fix(rmean, 5, 7);
       std::cout << stringify_fp_sci(rmax, 5, 10) << " / " << stringify_fp_sci(rmean, 5, 10);
       if(prev_max > 0.0)

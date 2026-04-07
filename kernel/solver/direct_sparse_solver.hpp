@@ -708,22 +708,22 @@ namespace FEAT
           if(_preferred_backend == PreferredBackend::cuda)
           {
             // Ok, try to create a cuDSS core then
-            if(!_create_core_cudss())
-            {
-              // Nope, apparently, cuDSS is not available
-              throw DSSBackendNotFoundException(DSSBackend::cudss);
-            }
+            if(_create_core_cudss())
+              return;
+
+            // Nope, apparently, cuDSS is not available
+            throw DSSBackendNotFoundException(DSSBackend::cudss);
           }
 
           // Next, let's see if the user wanted a MKL-based solver
           if(_preferred_backend == PreferredBackend::mkl)
           {
             // Ok, try to create a MKL-DSS core then
-            if(!_create_core_mkldss())
-            {
-              // Nope, apparently, MKL-DSS is not available
-              throw DSSBackendNotFoundException(DSSBackend::mkldss);
-            }
+            if(_create_core_mkldss())
+              return;
+
+            // Nope, apparently, MKL-DSS is not available
+            throw DSSBackendNotFoundException(DSSBackend::mkldss);
           }
 
           // Now we're left with the generic case, in which we may choose any backend we see fit

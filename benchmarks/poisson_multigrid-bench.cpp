@@ -697,9 +697,9 @@ namespace PoissonMultigridBench
 
       stats.counts[i][Counts::num_ranks] = Index(domain.at(i).layer().comm().size());
       stats.counts[i][Counts::num_elems] = domain.at(i)->get_mesh().get_num_elements();
-      stats.counts[i][Counts::num_dofs_g] = system.at(i)->matrix_sys.rows();
-      stats.counts[i][Counts::num_dofs_l] = system.at(i)->matrix_sys.local().rows();
-      stats.counts[i][Counts::num_nze] = system.at(i)->matrix_sys.local().used_elements();
+      stats.counts[i][Counts::num_dofs_g] = system.at(i)->matrix_sys.num_rows();
+      stats.counts[i][Counts::num_dofs_l] = system.at(i)->matrix_sys.local().num_rows();
+      stats.counts[i][Counts::num_nze] = system.at(i)->matrix_sys.local().num_nzes();
       stats.counts[i][Counts::bytes_system] = system.at(i)->bytes();
       stats.counts[i][Counts::elems_mirror] = 0;
       auto& sys_mirrors =  system.at(i)->gate_sys._mirrors;
@@ -766,7 +766,7 @@ namespace PoissonMultigridBench
     for (Index i(0); i < num_levels; ++i)
     {
       const SystemLevelType& lvl = *system.at(i);
-      const std::size_t lvl_dofs = lvl.matrix_sys.local().rows();
+      const std::size_t lvl_dofs = lvl.matrix_sys.local().num_rows();
 
       if((i+1) < domain.size_virtual())
       {
@@ -796,7 +796,7 @@ namespace PoissonMultigridBench
     auto solver = Solver::new_pcg(the_system_level.matrix_sys, the_system_level.filter_sys, mgv);
 
     // PCG: 3 Vectors
-    stats.counts.front()[Counts::bytes_solver] += 3ull * the_system_level.matrix_sys.local().rows() * sizeof(DataType);
+    stats.counts.front()[Counts::bytes_solver] += 3ull * the_system_level.matrix_sys.local().num_rows() * sizeof(DataType);
 
     // set tolerance
     solver->set_plot_name("PCG-Multigrid-Jacobi");

@@ -10,6 +10,7 @@
 #include <kernel/geometry/conformal_mesh.hpp>
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/space/lagrange2/element.hpp>
+#include <kernel/util/memory_arbiter.hpp>
 
 #ifdef FEAT_HAVE_OMP
 #include "omp.h"
@@ -58,13 +59,16 @@ namespace FEAT
     struct AssemblyMappingData
     {
       /// The cell to dof, where cell_to_dof[i],..., cell_to_dof[i+cell_dofs-1] are the dofs of one cell
-      const IT_* cell_to_dof;
+      //const IT_* cell_to_dof;
+      const Memory::Arbiter& cell_to_dof;
       /// Array of sortingindices of cell_to_dof
-      const IT_* cell_to_dof_sorter;
+      //const IT_* cell_to_dof_sorter;
+      const Memory::Arbiter& cell_to_dof_sorter;
       /// The number of cells
       Index cell_num;
       /// An array of the nodes fitting to the cell_to_dof mapping
-      const void* nodes;
+      //const void* nodes;
+      const Memory::Arbiter& nodes;
       /// The number of nodes
       Index node_size;
     };

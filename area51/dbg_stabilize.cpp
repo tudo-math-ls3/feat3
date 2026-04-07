@@ -267,7 +267,7 @@ namespace Andicore
     VectorType vec_sol_3 = matrix.create_vector_r();
     VectorType vec_rhs = matrix.create_vector_l();
 
-    BlockedVectorType vec_conv(matrix.rows());
+    BlockedVectorType vec_conv(matrix.num_rows());
     Assembly::Interpolator::project(vec_conv, conv_function, space);
 
     vec_sol_1.format();
@@ -369,10 +369,10 @@ namespace Andicore
 
       Geometry::ExportVTK<MeshType> exporter(mesh);
       exporter.add_vertex_vector("conv", vec_conv);
-      exporter.add_vertex_scalar("sol_1", vec_sol_1.elements());
-      exporter.add_vertex_scalar("sol_2", vec_sol_2.elements());
-      exporter.add_vertex_scalar("sol_3", vec_sol_3.elements());
-      exporter.add_vertex_scalar("rhs", vec_rhs.elements());
+      exporter.add_vertex_scalar("sol_1", vec_sol_1);
+      exporter.add_vertex_scalar("sol_2", vec_sol_2);
+      exporter.add_vertex_scalar("sol_3", vec_sol_3);
+      exporter.add_vertex_scalar("rhs", vec_rhs);
       exporter.write(vtk_name);
     }
 

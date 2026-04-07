@@ -131,6 +131,7 @@ namespace FEAT
         // allocate weight vector
         VectorType weight(num_dofs, DataType(0));
 
+        {
         // create vector scatter-axpy
         typename VectorType::ScatterAxpy scatter_axpy(vector);
 
@@ -220,9 +221,11 @@ namespace FEAT
           dof_mapping.finish();
         }
 
+        }
+
         // finally, scale the vector by the weights
-        DataType* vx(vector.elements());
-        DataType* wx(weight.elements());
+        Memory::TypedView<DataType> vx(vector.elements_view_rw());
+        const Memory::TypedView<DataType> wx(weight.elements_view_r());
         for(Index i(0); i < num_dofs; ++i)
         {
           if(wx[i] > DataType(0))

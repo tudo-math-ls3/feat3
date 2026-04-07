@@ -6,7 +6,8 @@ set(KERNEL_LIBRARY_FILES
   dist.cpp
   dist_file_io.cpp
   hash.cpp
-  memory_pool.cpp
+  memory_arbiter.cpp
+  memory_aux_main.cpp
   pack.cpp
   property_map.cpp
   statistics.cpp
@@ -83,6 +84,7 @@ endif ()
 if (FEAT_HAVE_CUDA)
   add_library(feat-kernel-util-cuda STATIC
     cuda_util.cu
+    memory_aux_cuda.cu
   )
   target_link_libraries(feat-kernel-util-cuda
   PUBLIC
@@ -102,6 +104,7 @@ set(test_list
   arg_parser-test
   binary_stream-test
   math-test
+  memory_arbiter-test
   memory_usage-test
   meta_math-test
   pack-test

@@ -43,23 +43,23 @@ set(test_list
   mean_filter-test
   mean_filter_blocked-test
   meta_filter-test
-  meta_matrix-apply-test
-  meta_matrix-io-test
+  meta_matrix_apply-test
+  meta_matrix_convert-test
+  meta_matrix_io-test
   meta_mirror-test
-  meta_to_scalar-test
-  meta_vector-axpy-test
-  meta_vector-comp_prod-test
-  meta_vector-comp_invert-test
-  meta_vector-dot-norm2-test
-  meta_vector-io-test
-  meta_vector-scale-test
+  meta_vector_axpy-test
+  meta_vector_comp_invert-test
+  meta_vector_comp_prod-test
+  meta_vector_convert-test
+  meta_vector_dot_norm2-test
+  meta_vector_io-test
+  meta_vector_scale-test
   pointstar_factory-test
   slip_filter-test
-  sparse_matrix_conversion-test
   sparse_matrix_banded-test
-  sparse_matrix_csr-test
-  sparse_matrix_cscr-test
   sparse_matrix_bcsr-test
+  sparse_matrix_cscr-test
+  sparse_matrix_csr-test
   sparse_matrix_factory-test
   sparse_vector-test
   sparse_vector_blocked-test

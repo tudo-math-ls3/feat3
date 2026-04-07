@@ -69,25 +69,6 @@ namespace FEAT
     };
 
     /**
-     * Supported perspective modes.
-     *
-     * This enumerated type is necessary to specify the treatment of
-     * blocked datatypes like
-     * - SparseMatrixBCSR
-     * - SparseVectorBlocked
-     * - DenseVectorBlocked
-     *
-     * whether each block is treated as one entry (native perspective)
-     * or each entry of a block is treated as its own (raw/pod perspective).
-     *
-     */
-    enum class Perspective
-    {
-      native = 0, /**< each block is treated as one entry */
-      pod /**< each entry of a block is treated as one entry on its own (formerly known as 'raw') */
-    };
-
-    /**
      * Supported Compression modes.
      *
      */
@@ -121,6 +102,6 @@ namespace FEAT
 
     // Has to be a multiple of 4096 due to clang restrains
     /// OutStreamBufferSize
-    constexpr std::size_t FileOutStreamBufferSize = 16777216u;
+    constexpr std::size_t file_out_stream_buffer_size = 16777216u;
   } // namespace LAFEM
 } // namespace FEAT

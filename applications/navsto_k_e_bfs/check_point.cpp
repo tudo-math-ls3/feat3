@@ -74,9 +74,12 @@ namespace Turb
 
     // set up and write info vector
     LAFEM::DenseVector<DataType, IndexType> vcp_info(Index(3));
-    vcp_info(Index(0), time_stepping.cur_time);
-    vcp_info(Index(1), time_stepping.delta_t);
-    vcp_info(Index(2), DataType(time_stepping.time_step));
+    {
+      Memory::TypedView<DataType> vcp(vcp_info.elements_view_w());
+      vcp[0] = time_stepping.cur_time;
+      vcp[1] = time_stepping.delta_t;
+      vcp[2] = DataType(time_stepping.time_step);
+    }
     check_ctrl.add_object("{{info}}", vcp_info);
 
     // add Stokes vectors
@@ -123,9 +126,15 @@ namespace Turb
 
     // extract old checkpoint info
     XASSERTM(vcp_info.size() == Index(3), "invalid info vector size");
-    DataType cp_cur_time = vcp_info(Index(0));
-    DataType cp_delta_t  = vcp_info(Index(1));
-    Index cp_time_step   = Index(vcp_info(Index(2)));
+    DataType cp_cur_time = DataType(0);
+    DataType cp_delta_t  = DataType(0);
+    Index cp_time_step   = IndexType(0);
+    {
+      Memory::TypedView<DataType> vcp(vcp_info.elements_view_w());
+      cp_cur_time  = vcp(Index(0));
+      cp_delta_t   = vcp(Index(1));
+      cp_time_step = Index(vcp(Index(2)));
+    }
 
     // choose the restart time based on parameters
     time_stepping.delta_t = cp_delta_t;

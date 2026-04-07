@@ -3188,8 +3188,8 @@ namespace FEAT
         ) const
       {
         // validate matrix and vector dimensions
-        XASSERTM(matrix.rows() == space.get_num_dofs(), "invalid matrix dimensions");
-        XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_rows() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_cols() == space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(convect.size() == space.get_num_dofs(), "invalid vector size");
         XASSERTM(tensor2.size() == space.get_num_dofs(), "invalid vector size");
         XASSERTM(tensor4.size() == space.get_num_dofs(), "invalid vector size");

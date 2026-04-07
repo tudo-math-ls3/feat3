@@ -148,27 +148,27 @@ namespace FEAT
         const LAFEM::SparseMatrixCSR<DT_, IT_>& matrix) const
       {
         XASSERT(buffer.entries_per_nonzero() == Index(1));
-        XASSERT(buffer.rows() == this->_row_mirror.num_indices());
-        XASSERT(buffer.columns() == this->_col_mirror.num_indices());
-        XASSERT(matrix.rows() == this->_row_mirror.size());
-        XASSERT(matrix.columns() == this->_col_mirror.size());
+        XASSERT(buffer.num_rows() == this->_row_mirror.num_indices());
+        XASSERT(buffer.num_cols() == this->_col_mirror.num_indices());
+        XASSERT(matrix.num_rows() == this->_row_mirror.size());
+        XASSERT(matrix.num_cols() == this->_col_mirror.size());
 
         // fetch system matrix arrays
-        const IT_* row_ptr_a(matrix.row_ptr());
-        const IT_* col_idx_a(matrix.col_ind());
-        const DT_* val_a(matrix.val());
+        const Memory::TypedView<IT_> row_ptr_a(matrix.row_ptr_view_r());
+        const Memory::TypedView<IT_> col_idx_a(matrix.col_idx_view_r());
+        const Memory::TypedView<DT_> val_a(matrix.val_view_r());
 
         // fetch buffer arrays
-        const IT_* row_ptr_b(buffer.row_ptr());
-        const IT_* col_idx_b(buffer.col_ind());
-        DT_* val_b(buffer.val());
+        const Memory::TypedView<IT_> row_ptr_b(buffer.row_ptr_view_r());
+        const Memory::TypedView<IT_> col_idx_b(buffer.col_idx_view_r());
+        Memory::TypedView<DT_> val_b(buffer.val_view_w());
 
         // fetch row/column mirror indices
-        const IT_* mir_idx_r(this->_row_mirror.indices());
-        const IT_* mir_idx_c(this->_col_mirror.indices());
+        const Memory::TypedView<IT_> mir_idx_r(this->_row_mirror.indices_view_r());
+        const Memory::TypedView<IT_> mir_idx_c(this->_col_mirror.indices_view_r());
 
         // loop over all buffer matrix rows
-        for(IT_ i(0); i < IT_(buffer.rows()); ++i)
+        for(IT_ i(0); i < IT_(buffer.num_rows()); ++i)
         {
           // get the row-index
           const IT_ ridx = mir_idx_r[i];
@@ -213,27 +213,27 @@ namespace FEAT
         const DT_ alpha = DT_(1)) const
       {
         XASSERT(buffer.entries_per_nonzero() == Index(1));
-        XASSERT(buffer.rows() == this->_row_mirror.num_indices());
-        XASSERT(buffer.columns() == this->_col_mirror.num_indices());
-        XASSERT(matrix.rows() == this->_row_mirror.size());
-        XASSERT(matrix.columns() == this->_col_mirror.size());
+        XASSERT(buffer.num_rows() == this->_row_mirror.num_indices());
+        XASSERT(buffer.num_cols() == this->_col_mirror.num_indices());
+        XASSERT(matrix.num_rows() == this->_row_mirror.size());
+        XASSERT(matrix.num_cols() == this->_col_mirror.size());
 
         // fetch system matrix arrays
-        const IT_* row_ptr_a(matrix.row_ptr());
-        const IT_* col_idx_a(matrix.col_ind());
-        DT_* val_a(matrix.val());
+        const Memory::TypedView<IT_> row_ptr_a(matrix.row_ptr_view_r());
+        const Memory::TypedView<IT_> col_idx_a(matrix.col_idx_view_r());
+        Memory::TypedView<DT_> val_a(matrix.val_view_rw());
 
         // fetch buffer arrays
-        const IT_* row_ptr_b(buffer.row_ptr());
-        const IT_* col_idx_b(buffer.col_ind());
-        const DT_* val_b(buffer.val());
+        const Memory::TypedView<IT_> row_ptr_b(buffer.row_ptr_view_r());
+        const Memory::TypedView<IT_> col_idx_b(buffer.col_idx_view_r());
+        const Memory::TypedView<DT_> val_b(buffer.val_view_r());
 
         // fetch row/column mirror indices
-        const IT_* mir_idx_r(this->_row_mirror.indices());
-        const IT_* mir_idx_c(this->_col_mirror.indices());
+        const Memory::TypedView<IT_> mir_idx_r(this->_row_mirror.indices_view_r());
+        const Memory::TypedView<IT_> mir_idx_c(this->_col_mirror.indices_view_r());
 
         // loop over all buffer matrix rows
-        for(IT_ i(0); i < IT_(buffer.rows()); ++i)
+        for(IT_ i(0); i < IT_(buffer.num_rows()); ++i)
         {
           // get the row-index
           const IT_ ridx = mir_idx_r[i];
@@ -272,29 +272,29 @@ namespace FEAT
         const LAFEM::SparseMatrixBCSR<DT_, IT_, bw_, bh_>& matrix) const
       {
         XASSERT(buffer.entries_per_nonzero() == Index(bw_*bh_));
-        XASSERT(buffer.rows() == this->_row_mirror.num_indices());
-        XASSERT(buffer.columns() == this->_col_mirror.num_indices());
-        XASSERT(matrix.rows() == this->_row_mirror.size());
-        XASSERT(matrix.columns() == this->_col_mirror.size());
+        XASSERT(buffer.num_rows() == this->_row_mirror.num_indices());
+        XASSERT(buffer.num_cols() == this->_col_mirror.num_indices());
+        XASSERT(matrix.num_rows() == this->_row_mirror.size());
+        XASSERT(matrix.num_cols() == this->_col_mirror.size());
 
         typedef Tiny::Matrix<DT_, bw_, bh_> ValueType;
 
         // fetch system matrix arrays
-        const IT_* row_ptr_a(matrix.row_ptr());
-        const IT_* col_idx_a(matrix.col_ind());
-        const ValueType* val_a(matrix.val());
+        const Memory::TypedView<IT_> row_ptr_a(matrix.row_ptr_view_r());
+        const Memory::TypedView<IT_> col_idx_a(matrix.col_idx_view_r());
+        const Memory::TypedView<ValueType> val_a(matrix.val_view_r());
 
         // fetch buffer arrays
-        const IT_* row_ptr_b(buffer.row_ptr());
-        const IT_* col_idx_b(buffer.col_ind());
-        ValueType* val_b = reinterpret_cast<ValueType*>(buffer.val());
+        const Memory::TypedView<IT_> row_ptr_b(buffer.row_ptr_view_r());
+        const Memory::TypedView<IT_> col_idx_b(buffer.col_idx_view_r());
+        Memory::TypedView<ValueType> val_b(std::forward<Memory::View&&>(buffer.val_view_w()));
 
         // fetch row/column mirror indices
-        const IT_* mir_idx_r(this->_row_mirror.indices());
-        const IT_* mir_idx_c(this->_col_mirror.indices());
+        const Memory::TypedView<IT_> mir_idx_r(this->_row_mirror.indices_view_r());
+        const Memory::TypedView<IT_> mir_idx_c(this->_col_mirror.indices_view_r());
 
         // loop over all buffer matrix rows
-        for(IT_ i(0); i < IT_(buffer.rows()); ++i)
+        for(IT_ i(0); i < IT_(buffer.num_rows()); ++i)
         {
           // get the row-index
           const IT_ ridx = mir_idx_r[i];
@@ -340,29 +340,29 @@ namespace FEAT
         const DT_ alpha = DT_(1)) const
       {
         XASSERT(buffer.entries_per_nonzero() == Index(bw_*bh_));
-        XASSERT(buffer.rows() == this->_row_mirror.num_indices());
-        XASSERT(buffer.columns() == this->_col_mirror.num_indices());
-        XASSERT(matrix.rows() == this->_row_mirror.size());
-        XASSERT(matrix.columns() == this->_col_mirror.size());
+        XASSERT(buffer.num_rows() == this->_row_mirror.num_indices());
+        XASSERT(buffer.num_cols() == this->_col_mirror.num_indices());
+        XASSERT(matrix.num_rows() == this->_row_mirror.size());
+        XASSERT(matrix.num_cols() == this->_col_mirror.size());
 
         typedef Tiny::Matrix<DT_, bw_, bh_> ValueType;
 
         // fetch system matrix arrays
-        const IT_* row_ptr_a(matrix.row_ptr());
-        const IT_* col_idx_a(matrix.col_ind());
-        ValueType* val_a(matrix.val());
+        const Memory::TypedView<IT_> row_ptr_a(matrix.row_ptr_view_r());
+        const Memory::TypedView<IT_> col_idx_a(matrix.col_idx_view_r());
+        Memory::TypedView<ValueType> val_a(matrix.val_view_w());
 
         // fetch buffer arrays
-        const IT_* row_ptr_b(buffer.row_ptr());
-        const IT_* col_idx_b(buffer.col_ind());
-        const ValueType* val_b = reinterpret_cast<const ValueType*>(buffer.val());
+        const Memory::TypedView<IT_> row_ptr_b(buffer.row_ptr_view_r());
+        const Memory::TypedView<IT_> col_idx_b(buffer.col_idx_view_r());
+        const Memory::TypedView<ValueType> val_b(std::forward<Memory::View&&>(buffer.val_view_r()));
 
         // fetch row/column mirror indices
-        const IT_* mir_idx_r(this->_row_mirror.indices());
-        const IT_* mir_idx_c(this->_col_mirror.indices());
+        const Memory::TypedView<IT_> mir_idx_r(this->_row_mirror.indices_view_r());
+        const Memory::TypedView<IT_> mir_idx_c(this->_col_mirror.indices_view_r());
 
         // loop over all buffer matrix rows
-        for(IT_ i(0); i < IT_(buffer.rows()); ++i)
+        for(IT_ i(0); i < IT_(buffer.num_rows()); ++i)
         {
           // get the row-index
           const IT_ ridx = mir_idx_r[i];
@@ -410,23 +410,23 @@ namespace FEAT
 
         // fetch row mirror arrays
         const IndexType* row_ptr_a(row_mir_mat.row_ptr());
-        const IndexType* col_idx_a(row_mir_mat.col_ind());
+        const IndexType* col_idx_a(row_mir_mat.col_idx());
         const DataType* av(row_mir_mat.val());
 
         // fetch col mirror arrays
         const IndexType* row_ptr_b(col_mir_mat.row_ptr());
-        const IndexType* col_idx_b(col_mir_mat.col_ind());
+        const IndexType* col_idx_b(col_mir_mat.col_idx());
         const DataType* bv(col_mir_mat.val());
 
         // fetch system matrix arrays
-        const Iy_ num_rows_y(Iy_(matrix.rows()));
+        const Iy_ num_rows_y(Iy_(matrix.num_rows()));
         const Iy_ num_of_offsets_y(Iy_(matrix.num_of_offsets()));
         const Iy_* offsets_y(matrix.offsets());
         const Ty_* yv(matrix.val());
 
         // fetch buffer arrays
         const Ix_* row_ptr_x(buffer.row_ptr());
-        const Ix_* col_idx_x(buffer.col_ind());
+        const Ix_* col_idx_x(buffer.col_idx());
         Tx_* xv(buffer.val());
 
         // In the following, we have to compute:
@@ -438,7 +438,7 @@ namespace FEAT
         // B is the col-mirror gather matrix
 
         // loop over all buffer rows (X)
-        Index nrows_buf(buffer.rows());
+        Index nrows_buf(buffer.num_rows());
         for(Index irow_x(0); irow_x < nrows_buf; ++irow_x)
         {
           Index irow_a(irow_x); // row of a := row of x
@@ -521,23 +521,23 @@ namespace FEAT
 
         // fetch row-mirror arrays
         const IndexType* row_ptr_a(row_mir_mat.row_ptr());
-        const IndexType* col_idx_a(row_mir_mat.col_ind());
+        const IndexType* col_idx_a(row_mir_mat.col_idx());
         const DataType* av(row_mir_mat.val());
 
         // fetch col-mirror arrays
         const IndexType* row_ptr_b(col_mir_mat.row_ptr());
-        const IndexType* col_idx_b(col_mir_mat.col_ind());
+        const IndexType* col_idx_b(col_mir_mat.col_idx());
         const DataType* bv(col_mir_mat.val());
 
         // fetch system matrix arrays
-        const Iy_ num_rows_y(Iy_(matrix.rows()));
+        const Iy_ num_rows_y(Iy_(matrix.num_rows()));
         const Iy_ num_of_offsets_y(Iy_(matrix.num_of_offsets()));
         const Iy_* offsets_y(matrix.offsets());
         Ty_* yv(matrix.val());
 
         // fetch buffer arrays
         const Ix_* row_ptr_x(buffer.row_ptr());
-        const Ix_* col_idx_x(buffer.col_ind());
+        const Ix_* col_idx_x(buffer.col_idx());
         const Tx_* xv(buffer.val());
 
         // In the following, we have to compute:
@@ -549,7 +549,7 @@ namespace FEAT
         // B is the col-mirror scatter matrix
 
         // loop over all system matrix rows (Y)
-        Index nrows_sys(matrix.rows());
+        Index nrows_sys(matrix.num_rows());
         for(Index irow_y(0); irow_y < nrows_sys; ++irow_y)
         {
           Index irow_a(irow_y); // row of a := row of y
@@ -627,15 +627,15 @@ namespace FEAT
 
         // render the matrix structure to a graph to obtain
         // the celebrated ptr/idx array pair
-        Adjacency::Graph mat_graph(Adjacency::RenderType::injectify, tmpl_mat);
+        Adjacency::Graph mat_graph(Adjacency::RenderType::injectify, typename MT_::Adjactor(tmpl_mat));
         const Index* dom_ptr = mat_graph.get_domain_ptr();
         const Index* img_idx = mat_graph.get_image_idx();
 
         // get row/column mirror indices
         const Index nrows = _row_mirror.num_indices();
         const Index ncols = _col_mirror.num_indices();
-        const auto* cidx = _col_mirror.indices();
-        const auto* ridx = _row_mirror.indices();
+        const Memory::TypedView<IT_> cidx = _col_mirror.indices_view_r();
+        const Memory::TypedView<IT_> ridx = _row_mirror.indices_view_r();
 
         // build map of column mirror indices
         std::map<Index,Index> col_map;

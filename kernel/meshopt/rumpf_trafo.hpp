@@ -222,10 +222,12 @@ namespace FEAT
         {
           DataType_ exponent = DataType_(1)/DataType_(MeshType::world_dim);
 
+          Memory::TypedView<DataType_> vh = h_.elements_view_w();
+          const Memory::TypedView<DataType_> vl = lambda_.elements_view_r();
           for(Index cell(0); cell < h_.size(); ++cell)
           {
             // For hypercubes, h is half the refence cell's edge length
-            h_(cell, DataType(0.5)*Math::pow(lambda_(cell)*sum_det_,exponent));
+            vh[cell] = DataType(0.5)*Math::pow(vl(cell)*sum_det_,exponent);
           }
         }
 
@@ -241,12 +243,13 @@ namespace FEAT
           const auto& idx = mesh_.template get_index_set<ShapeType::dimension,0>();
 
           DataType sum_det(0);
+          const auto vc = coords_.elements_view_r();
           for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = coords_(idx(cell,j));
+              x[j] = vc(idx(cell,j));
             }
 
             sum_det += compute_det(x);
@@ -269,21 +272,22 @@ namespace FEAT
           Tx local_grad(DataType_(0));
 
           grad_.format();
+          auto vg = grad_.elements_view_rw();
+          const auto vc = coords_.elements_view_r();
 
           for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = coords_(idx(cell,j));
+              x[j] = vc(idx(cell,j));
             }
 
             compute_grad_det(local_grad, x);
 
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              Index i(idx(cell, j));
-              grad_(i, grad_(i) + local_grad[j]);
+              vg[idx(cell, j)] += local_grad[j];
             }
 
           }
@@ -397,10 +401,12 @@ namespace FEAT
         {
           DataType_ exponent = DataType_(1)/DataType_(MeshType::world_dim);
 
+          Memory::TypedView<DataType> vh = h_.elements_view_w();
+          const Memory::TypedView<DataType> vl = lambda_.elements_view_r();
           for(Index cell(0); cell < h_.size(); ++cell)
           {
             // For hypercubes, h is half the refence cell's edge length
-            h_(cell, DataType(0.5)*Math::pow(lambda_(cell)*sum_det_,exponent));
+            vh[cell] = DataType(0.5)*Math::pow(vl(cell)*sum_det_,exponent);
           }
         }
 
@@ -416,12 +422,13 @@ namespace FEAT
           const auto& idx = mesh_.template get_index_set<ShapeType::dimension,0>();
 
           DataType sum_det(0);
+          const auto vc = coords_.elements_view_r();
           for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = coords_(idx(cell,j));
+              x[j] = vc(idx(cell,j));
             }
 
             sum_det += compute_det(x);
@@ -444,21 +451,22 @@ namespace FEAT
           Tx local_grad(DataType_(0));
 
           grad_.format();
+          auto vg = grad_.elements_view_rw();
+          const auto vc = coords_.elements_view_r();
 
           for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = coords_(idx(cell,j));
+              x[j] = vc(idx(cell,j));
             }
 
             compute_grad_det(local_grad, x);
 
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              Index i(idx(cell, j));
-              grad_(i, grad_(i) + local_grad[j]);
+              vg[idx(cell, j)] += local_grad[j];
             }
 
           }
@@ -545,9 +553,12 @@ namespace FEAT
         {
           DataType_ exponent = DataType_(1)/DataType_(MeshType::world_dim);
 
+          Memory::TypedView<DataType_> vh = h_.elements_view_w();
+          const Memory::TypedView<DataType_> vl = lambda_.elements_view_r();
+
           for(Index cell(0); cell < h_.size(); ++cell)
           {
-            h_(cell, Math::pow(lambda_(cell)*sum_det_,exponent));
+            vh[cell] = Math::pow(vl(cell)*sum_det_,exponent);
           }
         }
 
@@ -563,12 +574,13 @@ namespace FEAT
           const auto& idx = mesh_.template get_index_set<ShapeType::dimension,0>();
 
           DataType sum_det(0);
+          const auto vc = coords_.elements_view_r();
           for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = coords_(idx(cell,j));
+              x[j] = vc(idx(cell,j));
             }
 
             sum_det += compute_det(x);
@@ -591,21 +603,21 @@ namespace FEAT
           Tx local_grad(DataType_(0));
 
           grad_.format();
+          auto vg = grad_.elements_view_rw();
+          const auto vc = coords_.elements_view_r();
 
           for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
-              x[j] = coords_(idx(cell,j));
+              x[j] = vc(idx(cell,j));
 
             compute_grad_det(local_grad, x);
 
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              Index i(idx(cell, j));
-              grad_(i, grad_(i) + local_grad[j]);
+              vg[idx(cell, j)] += local_grad[j];
             }
-
           }
         } // compute_grad_sum_det
 
@@ -703,9 +715,11 @@ namespace FEAT
         {
           DataType_ exponent = DataType_(1)/DataType_(MeshType::world_dim);
 
+          Memory::TypedView<DataType_> vh = h_.elements_view_w();
+          const Memory::TypedView<DataType_> vl = lambda_.elements_view_r();
           for(Index cell(0); cell < h_.size(); ++cell)
           {
-            h_(cell, Math::pow(lambda_(cell)*sum_det_,exponent));
+            vh[cell] = Math::pow(vl(cell)*sum_det_,exponent);
           }
         }
 
@@ -721,12 +735,13 @@ namespace FEAT
           const auto& idx = mesh_.template get_index_set<ShapeType::dimension,0>();
 
           DataType sum_det(0);
+          const auto vc = coords_.elements_view_r();
           for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = coords_(idx(cell,j));
+              x[j] = vc(idx(cell,j));
             }
 
             sum_det += compute_det(x);
@@ -750,20 +765,22 @@ namespace FEAT
 
           grad_.format();
 
+          auto vg = grad_.elements_view_rw();
+          const auto vc = coords_.elements_view_r();
+
           for(Index cell(0); cell < mesh_.get_num_entities(ShapeType::dimension); ++cell)
           {
             // Get local coordinates
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              x[j] = coords_(idx(cell,j));
+              x[j] = vc(idx(cell,j));
             }
 
             compute_grad_det(local_grad, x);
 
             for(int j(0); j < Shape::FaceTraits<ShapeType,0>::count; ++j)
             {
-              Index i(idx(cell, j));
-              grad_(i, grad_(i) + local_grad[j]);
+              vg[idx(cell, j)] += local_grad[j];
             }
 
           }

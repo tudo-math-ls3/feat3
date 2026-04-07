@@ -135,18 +135,18 @@ namespace Turb
       LocalScalarVectorType vector2(domain.front()->space_velo.get_num_dofs());
       Assembly::FEInterpolator<SpaceVeloType, SpaceTypeQ1>::interpolate(
           vector2, vector, domain.front()->space_velo, domain.front()->space_turb);
-      exporter->add_vertex_scalar(name, vector2.elements());
+      exporter->add_vertex_scalar(name, vector2);
     }
     else
     {
-      exporter->add_vertex_scalar(name, vector.elements());
+      exporter->add_vertex_scalar(name, vector);
     }
   }
 
   void VtkWriter::add_lagrange2_vector(const LocalScalarVectorType& vector, const String& name)
   {
     // lagrange-2 dofs are lagrange-1 dofs on refined mesh, so we don't need to check whether we refined here
-    exporter->add_vertex_scalar(name, vector.elements());
+    exporter->add_vertex_scalar(name, vector);
   }
 
   void VtkWriter::add_lagrange1_vector(const LocalFieldVectorType& vector, const String& name)
@@ -181,16 +181,19 @@ namespace Turb
 
       // interpolate vector; each value is spread to a constant block of the same constant value
       LocalScalarVectorType vector2(n*bs);
+      const auto v1 = vector.elements_view_r();
+      auto v2 = vector2.elements_view_w();
       for(Index i(0), j(0); i < n; ++i)
       {
         for(Index k(0); k < bs; ++j, ++k)
-          vector2(j, vector(i));
+          v2[j] = v1(i);
       }
-      exporter->add_cell_scalar(name, vector2.elements());
+      v2.release();
+      exporter->add_cell_scalar(name, vector2);
     }
     else
     {
-      exporter->add_cell_scalar(name, vector.elements());
+      exporter->add_cell_scalar(name, vector);
     }
   }
 
@@ -236,6 +239,8 @@ namespace Turb
       // create matrix scatter-axpy
       typename LocalScalarVectorType::GatherAxpy gather_axpy(vector);
 
+      Memory::TypedView<DataType> v2(vector2.elements_view_w());
+
       // loop over all elements
       for(Index ielem(0), i(0); ielem < num_elems; ++ielem)
       {
@@ -274,7 +279,7 @@ namespace Turb
             value += local_vector[j] * space_data.phi[j].value;
 
           // save value
-          vector2(i, value);
+          v2[i] = value;
         }
 
         // finish evaluators
@@ -282,11 +287,12 @@ namespace Turb
         trafo_eval.finish();
       }
 
-      exporter->add_cell_scalar(name, vector2.elements());
+      v2.release();
+      exporter->add_cell_scalar(name, vector2);
     }
     else
     {
-      exporter->add_cell_scalar(name, vector.elements());
+      exporter->add_cell_scalar(name, vector);
     }
   }
 

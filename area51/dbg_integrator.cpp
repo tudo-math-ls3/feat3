@@ -169,8 +169,8 @@ namespace Tutorial01
       std::cout << "Time 2: " << watch_2.elapsed_string().pad_front(10) << "\n";
 
       DataType vmax = 0.0;
-      auto* val = matrix_b.val();
-      for(Index i(0); i < matrix.used_elements(); ++i)
+      const auto val = matrix_b.val_view_r();
+      for(Index i(0); i < matrix.num_nzes(); ++i)
         vmax = Math::max(vmax, Math::abs(val[i].norm_frobenius_sqr()));
       vmax = Math::sqrt(vmax);
 
@@ -179,8 +179,8 @@ namespace Tutorial01
     }
 
     DataType vmax = 0.0;
-    DataType* val = matrix.val();
-    for(Index i(0); i < matrix.used_elements(); ++i)
+    const auto val = matrix.val_view_r();
+    for(Index i(0); i < matrix.num_nzes(); ++i)
       vmax = Math::max(vmax, Math::abs(val[i]));
 
     std::cout << "MAX-ERR = " << stringify_fp_sci(vmax) << "\n";

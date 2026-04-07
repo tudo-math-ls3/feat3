@@ -302,6 +302,10 @@ namespace FEAT
         // loop over all mirrors
         for(std::size_t i(0); i < _mirrors.size(); ++i)
         {
+          // skip empty mirrors
+          if(_mirrors.at(i).hollow())
+            continue;
+
           // sum up number of ranks per frequency entry, listed in different mirrors
           auto temp = _mirrors.at(i).create_buffer(_freqs);
           temp.format(DataType(1));
@@ -315,42 +319,44 @@ namespace FEAT
       }
 
       /**
-       * \brief Returns the number of local DOFs
+       * \brief Returns the number of native local DOFs
        *
-       * \tparam perspective_
-       * Specifies whether to compute the native or POD DOF count
-       *
-       * \returns The number of local DOFS; either in native or POD size
+       * \returns The number of native local DOFS
        */
-      template<LAFEM::Perspective perspective_ = LAFEM::Perspective::native>
       Index get_num_local_dofs() const
       {
-        return _freqs.template size<perspective_>();
+        return _freqs.size();
       }
 
       /**
-      * \brief Returns the number of global DOFs
-      *
-      * \tparam perspective_
-      * Specifies whether to compute the native or POD DOF count
-      *
-      * \attention This function is collective, i.e. it must be called by all processes participating
-      * in the gate's communicator, otherwise the application will deadlock.
-      *
-      * \returns The number of global DOFS; either in native or POD size
-      */
-      template<LAFEM::Perspective perspective_ = LAFEM::Perspective::native>
+       * \brief Returns the number of raw local DOFs
+       *
+       * \returns The number of raw local DOFS
+       */
+      Index get_num_local_dofs_raw() const
+      {
+        return _freqs.size_raw();
+      }
+
+      /**
+       * \brief Returns the number of native global DOFs
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
+       *
+       * \returns The number of native global DOFS
+       */
       Index get_num_global_dofs() const
       {
         XASSERT(this->_comm != nullptr);
         if(this->_comm->size() <= 1)
-          return this->template get_num_local_dofs<perspective_>();
+          return this->get_num_local_dofs();
 
         // get my rank
         const int my_rank = this->_comm->rank();
 
         // get local number of DOFs
-        const Index loc_dofs = this->template get_num_local_dofs<perspective_>();
+        const Index loc_dofs = this->get_num_local_dofs();
 
         // create a local mask vector and format it to 1
         std::vector<int> mask(std::size_t(loc_dofs), 1);
@@ -359,7 +365,50 @@ namespace FEAT
         for(std::size_t i(0); i < _mirrors.size(); ++i)
         {
           if(this->_ranks.at(i) < my_rank)
-            this->_mirrors.at(i).template mask_scatter<perspective_>(this->_freqs, mask, 0);
+            this->_mirrors.at(i).mask_scatter(this->_freqs, mask, 0);
+        }
+
+        // count the number of DOFs that are still 1 and thus not owned by a lower rank neighbor
+        Index owned_dofs(0u);
+        for(const auto& k : mask)
+          owned_dofs += Index(k);
+
+        // now sum up the number of owned DOFs over all processes
+        Index global_dofs(0u);
+        this->_comm->allreduce(&owned_dofs, &global_dofs, std::size_t(1), Dist::op_sum);
+
+        // done!
+        return global_dofs;
+      }
+
+      /**
+      * \brief Returns the number of raw global DOFs
+      *
+      * \attention This function is collective, i.e. it must be called by all processes participating
+      * in the gate's communicator, otherwise the application will deadlock.
+      *
+      * \returns The number of raw global DOFS
+      */
+      Index get_num_global_dofs_raw() const
+      {
+        XASSERT(this->_comm != nullptr);
+        if(this->_comm->size() <= 1)
+          return this->get_num_local_dofs_raw();
+
+        // get my rank
+        const int my_rank = this->_comm->rank();
+
+        // get local number of DOFs
+        const Index loc_dofs = this->get_num_local_dofs_raw();
+
+        // create a local mask vector and format it to 1
+        std::vector<int> mask(std::size_t(loc_dofs), 1);
+
+        // set all DOFs, which are shared with a lower rank neighbor, to 0
+        for(std::size_t i(0); i < _mirrors.size(); ++i)
+        {
+          if(this->_ranks.at(i) < my_rank)
+            this->_mirrors.at(i).mask_scatter_raw(this->_freqs, mask, 0);
         }
 
         // count the number of DOFs that are still 1 and thus not owned by a lower rank neighbor

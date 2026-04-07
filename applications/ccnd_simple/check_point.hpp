@@ -108,7 +108,7 @@ namespace CCNDSimple
      * \param[in] time_stepping
      * The time stepping object that represents the current time step.
      */
-    virtual bool write_registerd(const TimeStepping& time_stepping);
+    virtual bool write_registered(const TimeStepping& time_stepping);
 
     /**
      * \brief Restarts the simulation from a previously saved checkpoint; if desired

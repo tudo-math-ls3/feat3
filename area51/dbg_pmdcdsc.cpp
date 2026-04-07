@@ -360,14 +360,14 @@ namespace PoissonMixed
 
       matrix_pmdcdsc.adp_compute_counts(glob_dof_offset, glob_dof_count, owned_dof_count, owned_num_nzes, global_num_nzes);
       LAFEM::SparseMatrixCSR<DataType, IndexType> matrix_s(owned_dof_count, glob_dof_count, owned_num_nzes);
-      matrix_pmdcdsc.adp_upload_symbolic(matrix_s.row_ptr(), matrix_s.col_ind(), glob_dof_offset);
-      matrix_pmdcdsc.adp_upload_numeric(matrix_s.val(), matrix_s.row_ptr(), matrix_s.col_ind());
+      matrix_pmdcdsc.adp_upload_symbolic(matrix_s.row_ptr_view_w().get_w(), matrix_s.col_idx_view_w().get_w(), glob_dof_offset);
+      matrix_pmdcdsc.adp_upload_numeric(matrix_s.val_view_w().get_w(), matrix_s.row_ptr_view_r().get_r(), matrix_s.col_idx_view_r().get_r());
 
       // validate sorting of column indices
       {
-        const IndexType* row_ptr_s = matrix_s.row_ptr();
-        const IndexType* col_idx_s = matrix_s.col_ind();
-        for(Index i = 0; i < matrix_s.rows(); ++i)
+        const Memory::TypedView<IndexType> row_ptr_s = matrix_s.row_ptr_view_r();
+        const Memory::TypedView<IndexType> col_idx_s = matrix_s.col_idx_view_r();
+        for(Index i = 0; i < matrix_s.num_rows(); ++i)
         {
           for(IndexType j(row_ptr_s[i]); j + 1 < row_ptr_s[i + 1]; ++j)
           {
@@ -381,7 +381,7 @@ namespace PoissonMixed
 
       std::vector<int> all_glob_dof_offset((std::size_t)comm.size());
       std::vector<int> all_glob_dof_counts((std::size_t)comm.size());
-      int my_nod = int(matrix_s.rows());
+      int my_nod = int(matrix_s.num_rows());
       int my_off = int(glob_dof_offset);
 
       // allgather offsets + counts
@@ -410,7 +410,7 @@ namespace PoissonMixed
         //matrix_pmdcdsc.apply(vdef_1, vsol_1, vec_rhs, -DataType(1));
         //matrix_pmdcdsc.get_local_schur_matrix().apply(vdef_1.local(), vsol_1.local(), vec_rhs.local(), -1.0);
 
-        comm.allgatherv(vsol_2.local().elements(), (std::size_t)my_nod, vec_x.elements(),
+        comm.allgatherv(vsol_2.local().elements_view_r().get_r(), (std::size_t)my_nod, vec_x.elements_view_w().get_w(),
           all_glob_dof_counts.data(), all_glob_dof_offset.data());
         //matrix_s.apply(vdef_2.local(), vec_x, vec_rhs.local(), -DataType(1));
         matrix_s.apply(vdef_2.local(), vec_x);
@@ -499,12 +499,12 @@ namespace PoissonMixed
       Assembly::DiscreteVertexProjector::project(vtx_rhs, vec_rhs.local(), the_domain_level.space_pres);
 
       // write velocity
-      exporter.add_vertex_scalar("sol_1", vtx_sol_1.elements());
-      exporter.add_vertex_scalar("sol_2", vtx_sol_2.elements());
-      exporter.add_vertex_scalar("rhs", vtx_rhs.elements());
+      exporter.add_vertex_scalar("sol_1", vtx_sol_1);
+      exporter.add_vertex_scalar("sol_2", vtx_sol_2);
+      exporter.add_vertex_scalar("rhs", vtx_rhs);
 
       // finally, write the VTK file
-      comm.print("Writing "+vtk_name);
+      comm.print("Writing " + vtk_name);
       exporter.write(vtk_name, comm);
     }
   }

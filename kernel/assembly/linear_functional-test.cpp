@@ -31,7 +31,7 @@ class LinearFunctionalTest :
   typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
 
 public:
-  LinearFunctionalTest(PreferredBackend backend) :
+  explicit LinearFunctionalTest(PreferredBackend backend) :
     UnitTest("LinearFunctionalTest", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
@@ -93,16 +93,18 @@ public:
     const Geometry::IndexSet<4>& index_set(mesh.get_index_set<2, 0>());
 
     // loop over all quads
+    Memory::TypedView<DataType_> vv2 = vector2.elements_view_rw();
     for (Index i(0); i < num_quads; ++i)
     {
       for (int j(0); j < 4; ++j)
-        vector2(index_set[i][j], vector2(index_set[i][j]) + weight);
+        vv2[index_set[i][j]] += weight;
     }
 
     // loop over all vertices
+    Memory::TypedView<DataType_> vv = vector.elements_view_r();
     for (Index i(0); i < num_verts; ++i)
     {
-      TEST_CHECK_EQUAL_WITHIN_EPS(vector(i), vector2(i), eps);
+      TEST_CHECK_EQUAL_WITHIN_EPS(vv(i), vv2(i), eps);
     }
   }
 
@@ -144,6 +146,7 @@ public:
     const DataType_ pi = Math::pi<DataType_>();
 
     // loop over all quads
+    Memory::TypedView<DataType_> vv = vector.elements_view_r();
     for (Index i(0); i < num_quads; ++i)
     {
       // get quad dimensions
@@ -157,30 +160,30 @@ public:
       DataType_ s = ((Math::cos(pi * x0) - Math::cos(pi * x1)) * (Math::cos(pi * y0) - Math::cos(pi * y1))) / (pi * pi);
 
       // validate vector data
-      TEST_CHECK_EQUAL_WITHIN_EPS(vector(i), s, eps);
+      TEST_CHECK_EQUAL_WITHIN_EPS(vv(i), s, eps);
     }
   }
 };
 
-LinearFunctionalTest <float, std::uint32_t> linear_functional_test_float_uint32(PreferredBackend::generic);
-LinearFunctionalTest <double, std::uint32_t> linear_functional_test_double_uint32(PreferredBackend::generic);
-LinearFunctionalTest <float, std::uint64_t> linear_functional_test_float_uint64(PreferredBackend::generic);
-LinearFunctionalTest <double, std::uint64_t> linear_functional_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(LinearFunctionalTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(LinearFunctionalTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(LinearFunctionalTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(LinearFunctionalTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-LinearFunctionalTest <float, std::uint64_t> mkl_linear_functional_test_float_uint64(PreferredBackend::mkl);
-LinearFunctionalTest <double, std::uint64_t> mkl_linear_functional_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(LinearFunctionalTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(LinearFunctionalTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-LinearFunctionalTest <__float128, std::uint32_t> linear_functional_test_float128_uint32(PreferredBackend::generic);
-LinearFunctionalTest <__float128, std::uint64_t> linear_functional_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(LinearFunctionalTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(LinearFunctionalTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-LinearFunctionalTest <Half, std::uint32_t> linear_functional_test_half_uint32(PreferredBackend::generic);
-LinearFunctionalTest <Half, std::uint64_t> linear_functional_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(LinearFunctionalTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(LinearFunctionalTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-LinearFunctionalTest <float, std::uint32_t> cuda_linear_functional_test_float_uint32(PreferredBackend::cuda);
-LinearFunctionalTest <double, std::uint32_t> cuda_linear_functional_test_double_uint32(PreferredBackend::cuda);
-LinearFunctionalTest <float, std::uint64_t> cuda_linear_functional_test_float_uint64(PreferredBackend::cuda);
-LinearFunctionalTest <double, std::uint64_t> cuda_linear_functional_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(LinearFunctionalTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(LinearFunctionalTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(LinearFunctionalTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(LinearFunctionalTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif

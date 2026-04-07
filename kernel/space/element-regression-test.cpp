@@ -387,7 +387,7 @@ namespace ElementRegression
       Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
 
       // create an empty filter
-      FilterType filter(space.get_num_dofs());
+      FilterType filter(space.get_num_dofs(), Index(0));
 
       // create three vectors
       VectorType vec_sol(matrix.create_vector_r());

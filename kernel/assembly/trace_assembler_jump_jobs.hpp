@@ -693,8 +693,8 @@ namespace FEAT
       const typename Matrix_::DataType jacdet_power = typename Matrix_::DataType(2))
     {
       XASSERTM(trace_asm.get_trafo() == space.get_trafo(), "trace assembler and space have different trafos");
-      XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix column count");
-      XASSERTM(matrix.rows() == space.get_num_dofs(), "invalid matrix row count");
+      XASSERTM(matrix.num_cols() == space.get_num_dofs(), "invalid matrix column count");
+      XASSERTM(matrix.num_rows() == space.get_num_dofs(), "invalid matrix row count");
 
       TraceAssemblyJumpStabilizationMatrixJob<Matrix_, Space_> job(matrix, space, cubature,
         gamma, jacdet_scale, jacdet_power);
@@ -809,8 +809,8 @@ namespace FEAT
       const typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
     {
       XASSERTM(trace_asm.get_trafo() == space.get_trafo(), "trace assembler and space have different trafos");
-      XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix column count");
-      XASSERTM(matrix.rows() == space.get_num_dofs(), "invalid matrix row count");
+      XASSERTM(matrix.num_cols() == space.get_num_dofs(), "invalid matrix column count");
+      XASSERTM(matrix.num_rows() == space.get_num_dofs(), "invalid matrix row count");
 
       TraceAssemblyJumpMassMatrixJob<Matrix_, Space_> job(matrix, space, cubature, alpha);
       trace_asm.assemble(job);

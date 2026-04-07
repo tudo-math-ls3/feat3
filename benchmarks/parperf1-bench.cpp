@@ -71,6 +71,10 @@
 #include <omp.h>
 #endif
 
+#ifdef FEAT_HAVE_MKL
+#include <mkl.h>
+#endif
+
 using namespace FEAT;
 
 /*void dump_matrix(Index lx, Index ly)
@@ -111,7 +115,7 @@ template<typename DT_, typename IT_>
 LAFEM::VectorMirror<DT_, IT_> create_mirror(Index n, Index k, Index i, Index o)
 {
   LAFEM::VectorMirror<DT_, IT_> mir(n, k);
-  IT_* idx = mir.indices();
+  Memory::TypedView<IT_> idx = mir.indices_view_w();
   FEAT_PRAGMA_OMP(parallel for)
   for(Index x = 0; x < k; ++x)
     idx[x] = IT_(o + i*x);
@@ -169,9 +173,9 @@ LAFEM::SparseMatrixCSR<DT_, IT_> create_matrix(Index lx, Index ly)
 
   LAFEM::SparseMatrixCSR<DT_, IT_> matrix(num_dofs_l, num_dofs_l, num_nze_l);
 
-  IT_* row_ptr = matrix.row_ptr();
-  IT_* col_idx = matrix.col_ind();
-  DT_* val = matrix.val();
+  Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_w();
+  Memory::TypedView<IT_> col_idx = matrix.col_idx_view_w();
+  Memory::TypedView<DT_> val = matrix.val_view_w();
 
   row_ptr[0u] = 0u;
 
@@ -291,7 +295,7 @@ LAFEM::DenseVector<DT_, IT_> create_vector_init(int rank, Index mx, Index my, In
 {
   LAFEM::DenseVector<DT_, IT_> vector((lx+1u)*(ly+1u));
 
-  DT_* val = vector.elements();
+  Memory::TypedView<DT_> val = vector.elements_view_w();
 
   const Index jy = Index(rank) / mx;
   const Index jx = Index(rank) % mx;
@@ -680,14 +684,6 @@ int run(const Dist::Comm& comm, const Index mx, const Index my, const Index nx, 
   // set backend
   Backend::set_preferred_backend(preferred_backend);
 
-  // get vector and matrix arrays for raw implementation
-  DataType* val_x = vec_x.elements();
-  DataType* val_t = vec_t.elements();
-  const DataType* val_f = vec_f.elements();
-  const DataType* val_a = matrix.val();
-  const IndexType* row_ptr = matrix.row_ptr();
-  const IndexType* col_idx = matrix.col_ind();
-
   // compute Euclid/Frobenius norms of matrices and vectors; this is primarily done to ensure that
   // all the memory is touched on the selected backend before the actual power iteration loop starts
   // note that these norms depend on the process grid size, so they vary for different numbers of
@@ -745,6 +741,9 @@ int run(const Dist::Comm& comm, const Index mx, const Index my, const Index nx, 
   comm.print("\nRunning power iteration for at least " + stringify(min_runtime) + " seconds, please be patient...");
   comm.print_flush();
 
+  // do we need to synchronize the device?
+  bool sync_devices = (selected_backend == SelectedBackend::cuda);
+
   // power iteration loop
   do
   {
@@ -757,6 +756,11 @@ int run(const Dist::Comm& comm, const Index mx, const Index my, const Index nx, 
     DataType loc_norm = DataType(0);
     if(selected_backend == SelectedBackend::none)
     {
+      const Memory::TypedView<DataType> view_f = vec_f.elements_view_r();
+      const Memory::TypedView<DataType> view_x = vec_x.elements_view_r();
+      const DataType* val_f = view_f.get_r();
+      const DataType* val_x = view_x.get_r();
+
       FEAT_PRAGMA_OMP(parallel)
       {
         LIKWID_MARKER_START("VecTriDot");
@@ -783,6 +787,9 @@ int run(const Dist::Comm& comm, const Index mx, const Index my, const Index nx, 
       LIKWID_NVMARKER_STOP("NV_VecTriDot");
     }
 
+    if(sync_devices)
+      Runtime::synchronize_devices();
+
     // --------------------------------------------------------------------------------------------
     // STEP 2: sum local norms to obtain global norm of x
     // --------------------------------------------------------------------------------------------
@@ -792,14 +799,23 @@ int run(const Dist::Comm& comm, const Index mx, const Index my, const Index nx, 
     // sum dot up via gate and compute euclid norm
     DataType glob_norm = Math::sqrt(gate.sum(loc_norm));
 
+    if(sync_devices)
+      Runtime::synchronize_devices();
+
     // --------------------------------------------------------------------------------------------
     // STEP 3: normalize x by scaling it by its inverse norm: t := x/|x|
     // --------------------------------------------------------------------------------------------
+
     stamp_3.stamp();
 
     // normalize x as t
     if(selected_backend == SelectedBackend::none)
     {
+      const Memory::TypedView<DataType> view_x = vec_x.elements_view_r();
+      Memory::TypedView<DataType> view_t = vec_t.elements_view_r();
+      const DataType* val_x = view_x.get_r();
+      DataType* val_t = view_t.get_w();
+
       const DataType s = DataType(1) / glob_norm;
       FEAT_PRAGMA_OMP(parallel)
       {
@@ -827,6 +843,9 @@ int run(const Dist::Comm& comm, const Index mx, const Index my, const Index nx, 
       LIKWID_NVMARKER_STOP("NV_VecScale");
     }
 
+    if(sync_devices)
+      Runtime::synchronize_devices();
+
     // --------------------------------------------------------------------------------------------
     // STEP 4: compute local matrix-vector product x := A*t
     // --------------------------------------------------------------------------------------------
@@ -835,6 +854,16 @@ int run(const Dist::Comm& comm, const Index mx, const Index my, const Index nx, 
     // perform matrix-vector product x := A*t
     if(selected_backend == SelectedBackend::none)
     {
+      Memory::TypedView<DataType> view_x = vec_x.elements_view_w();
+      const Memory::TypedView<DataType> view_t = vec_t.elements_view_r();
+      const Memory::TypedView<DataType> view_a = matrix.val_view_r();
+      const Memory::TypedView<IndexType> view_row_ptr = matrix.row_ptr_view_r();
+      const Memory::TypedView<IndexType> view_col_idx = matrix.col_idx_view_r();
+      DataType* val_x = view_x.get_w();
+      const DataType* val_t = view_t.get_r();
+      const DataType* val_a = view_a.get_r();
+      const IndexType* row_ptr = view_row_ptr.get_r();
+      const IndexType* col_idx = view_col_idx.get_r();
       FEAT_PRAGMA_OMP(parallel)
       {
         LIKWID_MARKER_START("MatVecMult");
@@ -864,6 +893,9 @@ int run(const Dist::Comm& comm, const Index mx, const Index my, const Index nx, 
       LIKWID_NVMARKER_STOP("NV_MatVecMult");
     }
 
+    if(sync_devices)
+      Runtime::synchronize_devices();
+
     // --------------------------------------------------------------------------------------------
     // STEP 5: synchronize vector x as type-0 vector to obtain type-1 vector
     // --------------------------------------------------------------------------------------------
@@ -871,6 +903,9 @@ int run(const Dist::Comm& comm, const Index mx, const Index my, const Index nx, 
 
     /// synchronize type-0 vector x (aka "halo exchange")
     gate.sync_0(vec_x);
+
+    if(sync_devices)
+      Runtime::synchronize_devices();
 
     stamp_end.stamp();
 

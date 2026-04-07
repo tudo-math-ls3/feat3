@@ -316,7 +316,7 @@ namespace FEAT
             }
 
             msg += String("DoF").pad_back(pad_width, '.') + String(": ")
-              + stringify(_system_levels.front()->global_functional.columns()) + String("\n");
+              + stringify(_system_levels.front()->global_functional.num_cols()) + String("\n");
 
             try
             {

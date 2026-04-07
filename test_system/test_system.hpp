@@ -455,7 +455,7 @@ namespace FEAT
 /// checks if a < b
 #define TEST_CHECK_LESS_THAN(a, b) \
   do { \
-    CHECK_INTERNAL((a) < (b), this->_id + "\n" +  "Expected '" #a "' to be less than \n'" + FEAT::stringify(b) + "'\nbut got\n'" + FEAT::stringify(a) + "'")\
+    CHECK_INTERNAL((a) < (b), this->_id + "\n" +  "Expected '" #a "' to be less than '" + FEAT::stringify(b) + "' but got '" + FEAT::stringify(a) + "'")\
   } while (false)
 
 /// runs the given test with pre- and postprocessing
@@ -469,3 +469,40 @@ namespace FEAT
       throw; } \
     post; \
   } while (false)
+
+
+/// spawns a unit test of class c with 0 template parameters and no constructor arguments
+#define SPAWN_UNIT_TEST_0T(c,...) static c FEAT_CONCAT(unit_test_, __COUNTER__)
+
+/// spawns a unit test of class c with 1 template parameters and no constructor arguments
+#define SPAWN_UNIT_TEST_1T(c,t1) static c<t1> FEAT_CONCAT(unit_test_, __COUNTER__)
+
+/// spawns a unit test of class c with 2 template parameters and no constructor arguments
+#define SPAWN_UNIT_TEST_2T(c,t1,t2) static c<t1,t2> FEAT_CONCAT(unit_test_, __COUNTER__)
+
+/// spawns a unit test of class c with 3 template parameters and no constructor arguments
+#define SPAWN_UNIT_TEST_3T(c,t1,t2,t3) static c<t1,t2,t3> FEAT_CONCAT(unit_test_, __COUNTER__)
+
+/// spawns a unit test of class c with 4 template parameters and no constructor arguments
+#define SPAWN_UNIT_TEST_4T(c,t1,t2,t3,t4) static c<t1,t2,t3,t4> FEAT_CONCAT(unit_test_, __COUNTER__)
+
+/// spawns a unit test of class c with 5 template parameters and no constructor arguments
+#define SPAWN_UNIT_TEST_5T(c,t1,t2,t3,t4,t5) static c<t1,t2,t3,t4,t5> FEAT_CONCAT(unit_test_, __COUNTER__)
+
+/// spawns a unit test of class c with 0 template parameters and a variadic number of constructor arguments
+#define SPAWN_UNIT_TEST_0T_P(c,...) static c FEAT_CONCAT(unit_test_, __COUNTER__)(__VA_ARGS__)
+
+/// spawns a unit test of class c with 1 template parameter and a variadic number of constructor arguments
+#define SPAWN_UNIT_TEST_1T_P(c,t1,...) static c<t1> FEAT_CONCAT(unit_test_, __COUNTER__)(__VA_ARGS__)
+
+/// spawns a unit test of class c with 2 template parameters and a variadic number of constructor arguments
+#define SPAWN_UNIT_TEST_2T_P(c,t1,t2,...) static c<t1,t2> FEAT_CONCAT(unit_test_, __COUNTER__)(__VA_ARGS__)
+
+/// spawns a unit test of class c with 3 template parameters and a variadic number of constructor arguments
+#define SPAWN_UNIT_TEST_3T_P(c,t1,t2,t3,...) static c<t1,t2,t3> FEAT_CONCAT(unit_test_, __COUNTER__)(__VA_ARGS__)
+
+/// spawns a unit test of class c with 4 template parameters and a variadic number of constructor arguments
+#define SPAWN_UNIT_TEST_4T_P(c,t1,t2,t3,t4,...) static c<t1,t2,t3,t4> FEAT_CONCAT(unit_test_, __COUNTER__)(__VA_ARGS__)
+
+/// spawns a unit test of class c with 5 template parameters and a variadic number of constructor arguments
+#define SPAWN_UNIT_TEST_5T_P(c,t1,t2,t3,t4,t5,...) static c<t1,t2,t3,t4,t5> FEAT_CONCAT(unit_test_, __COUNTER__)(__VA_ARGS__)

@@ -379,7 +379,7 @@ namespace FEAT
           typedef typename LocalFunctional::DirichletFilterSequence LocalDirichletFilterSequence;
 
           /// Mirrors for system vectors
-          //typedef LAFEM::VectorMirrorBlocked<DT_, IT_, LocalFunctional::BlockHeight> SystemMirror;
+          //typedef LAFEM::VectorMirrorBlocked<DT_, IT_, LocalFunctional::block_height> SystemMirror;
           typedef LAFEM::VectorMirror<DT_, IT_> SystemMirror;
           /// Gates for the system
           typedef Global::Gate<LocalSystemVectorR, SystemMirror> SystemGate;
@@ -544,27 +544,26 @@ namespace FEAT
                 // Get the filter vector
                 auto& slip_filter_vector = it.second.get_filter_vector();
 
-                if(slip_filter_vector.used_elements() > 0)
+                if(slip_filter_vector.num_nzes() > 0)
                 {
                   // Temporary DenseVector for syncing
                   LocalSystemVectorL tmp(slip_filter_vector.size());
-                  auto* tmp_elements = tmp.template elements<LAFEM::Perspective::native>();
-                  auto* sfv_elements = slip_filter_vector.template elements<LAFEM::Perspective::native>();
+                  auto tmp_elements = tmp.elements_view_rw();
+                  const auto sfv_indices = slip_filter_vector.indices_view_r();
+                  auto sfv_elements = slip_filter_vector.elements_view_rw();
 
                   // Copy sparse filter vector contents to DenseVector
-                  for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
+                  for(Index isparse(0); isparse < slip_filter_vector.num_nzes(); ++isparse)
                   {
-                    Index idense(slip_filter_vector.indices()[isparse]);
-                    tmp_elements[idense] = sfv_elements[isparse];
+                    tmp_elements[sfv_indices(isparse)] = sfv_elements[isparse];
                   }
 
                   gate_sys.sync_0(tmp);
 
                   // Copy sparse filter vector contents to DenseVector
-                  for(Index isparse(0); isparse < slip_filter_vector.used_elements(); ++isparse)
+                  for(Index isparse(0); isparse < slip_filter_vector.num_nzes(); ++isparse)
                   {
-                    Index idense(slip_filter_vector.indices()[isparse]);
-                    sfv_elements[isparse] = tmp_elements[idense];
+                    sfv_elements[isparse] = tmp_elements[sfv_indices(isparse)];
                   }
                 }
                 else

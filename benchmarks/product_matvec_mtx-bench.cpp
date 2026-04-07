@@ -4,6 +4,7 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/base_header.hpp>
+#include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/pointstar_factory.hpp>
@@ -53,16 +54,16 @@ void run(const MatrixType_& matrix, PreferredBackend backend)
   vec_rhs.format();
   vec_sol.format();
 
-  Index used_elements(matrix.template used_elements<Perspective::pod>());
+  Index num_nzes(matrix.num_nzes_raw());
 
-  for (Index i (0) ; i < vec_rhs.size() ; ++i)
   {
-    decltype(vec_rhs(i)) temp{DataType(i%100) / DataType(100)};
-    vec_rhs(i, temp);
+    auto vr = vec_rhs.elements_view_w();
+    for (Index i (0) ; i < vec_rhs.size() ; ++i)
+      vr[i] = DataType(i%100) / DataType(100);
   }
 
 
-  double flops = double(used_elements);
+  double flops = double(num_nzes);
   flops *= 2;
 
   double bytes = double(matrix.bytes()) + 2 * double(vec_rhs.bytes());
@@ -125,7 +126,7 @@ int main(int argc, char ** argv)
   // read in mtx file
   LAFEM::SparseMatrixCSR<DataType, IndexType> in_matrix(LAFEM::FileMode::fm_mtx, mtx_file);
 
-  std::printf("Num threads %i, Dataype %s, IndexType %s, backend %s, real rows %i, real cols %i \n", omp_get_max_threads(), fp_string, ix_string, backend_string.data(), int(in_matrix.rows()), int(in_matrix.columns()));
+  std::printf("Num threads %i, Dataype %s, IndexType %s, backend %s, real rows %i, real cols %i \n", omp_get_max_threads(), fp_string, ix_string, backend_string.data(), int(in_matrix.num_rows()), int(in_matrix.num_cols()));
   if(height == 1 && width == 1)
     std::printf("Plain CRS: Block Height: %i,  Block Widht: %i \n", height, width);
   else

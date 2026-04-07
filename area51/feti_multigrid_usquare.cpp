@@ -505,14 +505,14 @@ namespace FETI{
         return 0.;
     }
 
-    DataType* get_sol_elements()
+    const LocalVectorType& get_vec_sol() const
     {
-      return _vec_sol.elements();
+      return _vec_sol;
     }
 
-    DataType* get_rhs_elements()
+    const LocalVectorType& get_vec_rhs() const
     {
-      return _vec_rhs.elements();
+      return _vec_rhs;
     }
 
     //this function solves for K input = rhs, whereby rhs is the locally assembled member variable rhs
@@ -589,10 +589,13 @@ namespace FETI{
       const IndexType local_size = _mirror_dofs.at(neighbor_index +1) - start_size;
       LocalVectorType tmp(local_size);
       tmp.format();
+      auto tv = tmp.elements_view_w();
+      auto vv = input.elements_view_r();
       for(IndexType i(0); i < local_size; ++i)
       {
-        tmp(i, input(start_size +i));
+        tv[i] = vv(start_size + i);
       }
+      tv.release();
       return tmp;
     }
 
@@ -690,10 +693,12 @@ namespace FETI{
     {
       IndexType n = (_gate_ranks_max_size +1);
       BufferMain buff(2*n);
+      auto vb = buff.elements_view_w();
       if(!_floating)
       {
-        buff(0, DataType(_rank));
-        buff(n, 1.);
+        vb[0] = DataType(_rank);
+        vb[n] = 1.;
+        vb.release();
         return buff;
       }
 
@@ -709,12 +714,13 @@ namespace FETI{
         //in case of trivial R the entry coupling with the neighbor is just the number of dofs on the shared
         //interface
         DataType scalar = DataType(_mirror_dofs[i+1] - _mirror_dofs[i]);
-        buff(i - counter, DataType(neighbour));
-        buff(i - counter + n, -scalar);
+        vb[i - counter] = DataType(neighbour);
+        vb[i - counter + n] = -scalar;
       }
       //here the entry is just the number of dofs of the local interface
-      buff(_gate_ranks_size - counter, DataType(_rank));
-      buff(_gate_ranks_size - counter + n, DataType(_mirror_dofs.back()));
+      vb[_gate_ranks_size - counter] = DataType(_rank);
+      vb[_gate_ranks_size - counter + n] = DataType(_mirror_dofs.back());
+      vb.release();
       return buff;
 
     }
@@ -733,6 +739,7 @@ namespace FETI{
       Dist::RequestVector send_reqs, recv_reqs;
       /// send and receive buffers
       std::vector<BufferMain> send_bufs, recv_bufs;
+      std::vector<Memory::TypedView<DataType>> send_views(n), recv_views(n);
 
       // post receives
       recv_reqs.reserve(n);
@@ -745,7 +752,8 @@ namespace FETI{
         //buffer size right?
 
         // post receive
-        recv_reqs.push_back(_comm->irecv(recv_bufs.at(i).elements(), recv_bufs.at(i).size(), _gate_ranks.at(i)));
+        recv_views.at(i) = recv_bufs.at(i).elements_view_w();
+        recv_reqs.push_back(_comm->irecv(recv_views.at(i).get_w(), recv_bufs.at(i).size(), _gate_ranks.at(i)));
       }
 
       // post sends
@@ -760,13 +768,15 @@ namespace FETI{
         // gather from mirror
         _gate_mirrors.at(i).gather(send_bufs.at(i), input);
         // post send
-        send_reqs.push_back(_comm->isend(send_bufs.at(i).elements(), send_bufs.at(i).size(), _gate_ranks.at(i)));
+        send_views.at(i) = send_bufs.at(i).elements_view_r();
+        send_reqs.push_back(_comm->isend(send_views.at(i).get_r(), send_bufs.at(i).size(), _gate_ranks.at(i)));
       }
 
       // process all pending receives
       for(std::size_t idx(0u); recv_reqs.wait_any(idx); )
       {
         XASSERTM(_gate_signs.at(idx) != 0, "Gate signs are not correctly initialized!");
+        recv_views.at(idx).release();
 
         //process recv_bufs depending on gate_signs
         if(_gate_signs[idx]*sign > 0)
@@ -805,6 +815,7 @@ namespace FETI{
       Dist::RequestVector send_reqs, recv_reqs;
       /// send and receive buffers
       std::vector<BufferMain> send_bufs, recv_bufs;
+      std::vector<Memory::TypedView<DataType>> send_views(n), recv_views(n);
 
       // post receives
       recv_reqs.reserve(n);
@@ -816,7 +827,8 @@ namespace FETI{
         recv_bufs.at(i) = BufferMain(vec.at(i).size());
 
         // post receive
-        recv_reqs.push_back(_comm->irecv(recv_bufs.at(i).elements(), recv_bufs.at(i).size(), _gate_ranks.at(i)));
+        recv_views.at(i) = recv_bufs.at(i).elements_view_w();
+        recv_reqs.push_back(_comm->irecv(recv_views.at(i).get_w(), recv_bufs.at(i).size(), _gate_ranks.at(i)));
       }
 
       // post sends
@@ -829,7 +841,8 @@ namespace FETI{
         send_bufs.at(i).copy(vec.at(i));
 
         // post send
-        send_reqs.push_back(_comm->isend(send_bufs.at(i).elements(), send_bufs.at(i).size(), _gate_ranks.at(i)));
+        send_views.at(i) = send_bufs.at(i).elements_view_r();
+        send_reqs.push_back(_comm->isend(send_views.at(i).get_r(), send_bufs.at(i).size(), _gate_ranks.at(i)));
       }
       //the tolerance that should be met... hardcoded because lazy
       const DataType tol_eps = 1e-15;
@@ -837,13 +850,14 @@ namespace FETI{
       // process all pending receives
       for(std::size_t idx(0u); recv_reqs.wait_any(idx); )
       {
-
+        const auto vi = vec.at(idx).elements_view_r();
         XASSERTM(recv_bufs.at(idx).size() == vec.at(idx).size(), "Sizes do not match!");
         for(IndexType i(0); i < recv_bufs.at(idx).size(); ++i)
         {
-          XASSERTM(Math::abs(recv_bufs.at(idx)(i) - vec.at(idx)(i)) < tol_eps , "Values not the same on process"
-           + stringify(_comm->rank()) + "Value in recv: " + stringify(recv_bufs.at(idx)(i))
-           + " Value in vec: " + stringify(vec.at(idx)(i)));
+          XASSERTM(Math::abs(recv_views.at(idx)(i) - vi(i)) < tol_eps , "Values not the same on process"
+          //XASSERTM(Math::abs(recv_bufs.at(idx)(i) - vec.at(idx)(i)) < tol_eps , "Values not the same on process"
+           + stringify(_comm->rank()) + "Value in recv: " + stringify(recv_views.at(idx)(i))
+           + " Value in vec: " + stringify(vi(i)));
         }
       }
 
@@ -894,10 +908,11 @@ namespace FETI{
       //just add up sum(input[i]) * gate_signs[i], as we take R = (1,...,1)^T
       for(IndexType i{0}; i < _gate_ranks_size; ++i)
       {
+        const auto vi = input[i].elements_view_r();
         DataType tmp{0};
         for(IndexType j{0}; j < input[i].size(); ++j)
         {
-          tmp += input[i](j);
+          tmp += vi(j);
         }
         dot += _gate_signs[i]*tmp;
       }
@@ -1045,8 +1060,8 @@ namespace FETI{
     void apply_BR_columns(LocalVectorType& output, const LocalVectorType& input) const
     {
       //test if vectors have right size_t
-      XASSERTM(input.size() == BR_columns.columns(), "Output vector does not have the right size!");
-      XASSERTM(output.size() == BR_columns.rows(), "Output vector does not have the right size!");
+      XASSERTM(input.size() == BR_columns.num_cols(), "Output vector does not have the right size!");
+      XASSERTM(output.size() == BR_columns.num_rows(), "Output vector does not have the right size!");
       BR_columns.apply(output, input);
     }
 
@@ -1055,7 +1070,7 @@ namespace FETI{
     void global_Q_apply(DataType local_scalar) const
     {
       //post the request
-      _comm->gather(&local_scalar, std::size_t(1), right_side_buffer.elements(), std::size_t(1), 0);
+      _comm->gather(&local_scalar, std::size_t(1), right_side_buffer.elements_view_w().get_w(), std::size_t(1), 0);
 
       //apply Q on right_side on rank 0
       if(_comm->rank() == 0)
@@ -1063,7 +1078,7 @@ namespace FETI{
         Q_factorized->apply(right_side, right_side_buffer);
       }
       //now broadcast right_side to all processes
-      _comm->bcast(right_side.elements(), right_side.size(), 0);
+      _comm->bcast(right_side.elements_view_rw().get_w(), right_side.size(), 0);
     }
 
     //this function gathers the Q_matrix onto our rank 0 prozess by locally assembling the rows
@@ -1079,12 +1094,16 @@ namespace FETI{
       BufferMain recv_buf;
 
       //now we will allocate a buffer of size  2*n * _comm.size() on our core prozess 0
+      Memory::TypedView<double> rbv;
+      double* rbp = nullptr;
       if(_comm->rank() == 0)
       {
         recv_buf = BufferMain(2*n*(IndexType(_comm->size())));
+        rbv = recv_buf.elements_view_w();
+        rbp = rbv.get_w();
       }
       //now post the igather request
-      _comm->gather(send_buf.elements(), std::size_t(2*n), recv_buf.elements(), std::size_t(2*n), 0);
+      _comm->gather(send_buf.elements_view_r().get_r(), std::size_t(2*n), rbp, std::size_t(2*n), 0);
       if(verbose)
         _comm->print("Construct Q on rank 0...");
       //now construct Q on rank 0, the other prozesses could be send to sleep
@@ -1100,9 +1119,9 @@ namespace FETI{
           //thereby, the data is orgenized in two n size chunks, holding index and data off the Q_row entries
           for(IndexType j(0); j < n; ++j)
           {
-            factory.add(i, IndexType(recv_buf(i*2*n + j)), recv_buf(i*2*n + n + j));
+            factory.add(i, IndexType(rbv(i*2*n + j)), rbv(i*2*n + n + j));
             //if we read in the diagonal element, we stop, as rest of the data is junk
-            if(IndexType(recv_buf(i*2*n + j)) == i)
+            if(IndexType(rbv(i*2*n + j)) == i)
               break;
           }
         }
@@ -1164,7 +1183,7 @@ namespace FETI{
       global_Q_apply(tmp_scalar);
 
       //return the value connected to this rank...
-      return right_side(IndexType(_comm->rank()));
+      return right_side.elements_view_r()(IndexType(_comm->rank()));
     }
 
 
@@ -2142,8 +2161,8 @@ namespace FETI{
     Geometry::ExportVTK<MeshType> exporter(mesh);
 
     // Add the vertex-projection of our (local) solution and rhs vectors
-    exporter.add_vertex_scalar("sol", local_sys.get_sol_elements());
-    exporter.add_vertex_scalar("rhs", local_sys.get_rhs_elements());
+    exporter.add_vertex_scalar("sol", local_sys.get_vec_sol());
+    exporter.add_vertex_scalar("rhs", local_sys.get_vec_rhs());
 
     // Finally, write the VTK files by calling the "write" function of the exporter and pass the
     // communicator as a second argument:

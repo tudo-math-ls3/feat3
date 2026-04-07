@@ -81,7 +81,7 @@ namespace FEAT
           _volume = _vec_freq.triple_dot(_vec_prim, _vec_dual);
           _comm->allreduce(&_volume, &_volume, std::size_t(1), Dist::op_sum);
         }
-        else
+        else if(!_vec_prim.empty())
           _volume = _vec_prim.dot(_vec_dual);
 
         //XASSERTM(_volume > Math::eps<DataType>(), "domain volume must not be zero");

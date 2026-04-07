@@ -25,12 +25,8 @@ class MatrixMultTest
   typedef DenseVector<DT_, IT_> VectorType;
 
 public:
-  MatrixMultTest(PreferredBackend backend)
+  explicit MatrixMultTest(PreferredBackend backend)
     : UnitTest("MatrixMultTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~MatrixMultTest()
   {
   }
 
@@ -44,27 +40,27 @@ public:
 
     VectorType vec_work = y.create_vector_l();
     vec_work.format();
-    DT_* _work = vec_work.elements();
+    Memory::TypedView<DT_> _work = vec_work.elements_view_rw();
 
     // fetch row mirror arrays
-    const IT_* row_ptr_a(row_mir_mat.row_ptr());
-    const IT_* col_idx_a(row_mir_mat.col_ind());
-    const DT_* av(row_mir_mat.val());
+    const Memory::TypedView<IT_> row_ptr_a(row_mir_mat.row_ptr_view_r());
+    const Memory::TypedView<IT_> col_idx_a(row_mir_mat.col_idx_view_r());
+    const Memory::TypedView<DT_> av(row_mir_mat.val_view_r());
 
     // fetch col mirror arrays
-    const IT_* row_ptr_b(col_mir_mat.row_ptr());
-    const IT_* col_idx_b(col_mir_mat.col_ind());
-    const DT_* bv(col_mir_mat.val());
+    const Memory::TypedView<IT_> row_ptr_b(col_mir_mat.row_ptr_view_r());
+    const Memory::TypedView<IT_> col_idx_b(col_mir_mat.col_idx_view_r());
+    const Memory::TypedView<DT_> bv(col_mir_mat.val_view_r());
 
     // fetch system matrix arrays
-    const IT_* row_ptr_y(y.row_ptr());
-    const IT_* col_idx_y(y.col_ind());
-    const DT_* yv(y.val());
+    const Memory::TypedView<IT_> row_ptr_y(y.row_ptr_view_r());
+    const Memory::TypedView<IT_> col_idx_y(y.col_idx_view_r());
+    const Memory::TypedView<DT_> yv(y.val_view_r());
 
     // fetch buffer arrays
-    const IT_* row_ptr_x(x.row_ptr());
-    const IT_* col_idx_x(x.col_ind());
-    DT_* xv(x.val());
+    const Memory::TypedView<IT_> row_ptr_x(x.row_ptr_view_r());
+    const Memory::TypedView<IT_> col_idx_x(x.col_idx_view_r());
+    Memory::TypedView<DT_> xv(x.val_view_w());
 
     // In the following, we have to compute:
     //    X := A * Z := A * Y * B^T,
@@ -75,7 +71,7 @@ public:
     // B is the col-mirror gather matrix
 
     // loop over all buffer rows (X)
-    for(Index irow_x(0); irow_x < x.rows(); ++irow_x)
+    for(Index irow_x(0); irow_x < x.num_rows(); ++irow_x)
     {
       Index irow_a(irow_x); // row of a := row of x
 
@@ -126,30 +122,26 @@ public:
     }
   }
 
-
   virtual void run() const override
   {
     const DT_ tol = TestSystem::tol<DT_>();
 
     // create 3 matrices a,b and d
-    LAFEM::PointstarFactoryFD<DT_, IT_> psf(17, 2);
+    LAFEM::PointstarFactoryFD<DT_, IT_> psf(3, 2);
     MatrixType a = psf.matrix_csr();
-    MatrixType b = a.clone();
-    MatrixType d = a.clone();
+    MatrixType b = a.clone(LAFEM::CloneMode::Layout);
+    MatrixType d = a.clone(LAFEM::CloneMode::Layout);
 
     // fill a, b and d with random values
     Random rng;
     std::cout << "RNG Seed: " << rng.get_seed() << "\n";
-    for(Index i(0); i < a.used_elements(); ++i)
-    {
-      a.val()[i] = DT_(rng(0.0, 1.0));
-      b.val()[i] = DT_(rng(0.0, 1.0));
-      d.val()[i] = DT_(rng(0.0, 1.0));
-    }
+    a.format(rng, DT_(0.0), DT_(1.0));
+    b.format(rng, DT_(0.0), DT_(1.0));
+    d.format(rng, DT_(0.0), DT_(1.0));
 
     // create matrix structure for X = D*A*B
-    Adjacency::Graph graph_da(Adjacency::RenderType::injectify, d, a);
-    Adjacency::Graph graph_dab(Adjacency::RenderType::injectify_sorted, graph_da, b);
+    Adjacency::Graph graph_da(Adjacency::RenderType::injectify, d.adjactor(), a.adjactor());
+    Adjacency::Graph graph_dab(Adjacency::RenderType::injectify_sorted, graph_da, b.adjactor());
     MatrixType x(graph_dab);
 
     // compute reference: X = D*A*B
@@ -159,31 +151,31 @@ public:
     x.add_double_mat_product(d, a, b, -DT_(1));
 
     // check norm
-    TEST_CHECK_EQUAL_WITHIN_EPS(x.norm_frobenius(), DT_(0), tol);
+    TEST_CHECK_LESS_THAN(x.norm_frobenius(), tol);
   }
 };
 
-MatrixMultTest <float, std::uint32_t> matrix_mult_test_float_uint32(PreferredBackend::generic);
-MatrixMultTest <double, std::uint32_t> matrix_mult_test_double_uint32(PreferredBackend::generic);
-MatrixMultTest <float, std::uint64_t> matrix_mult_test_float_uint64(PreferredBackend::generic);
-MatrixMultTest <double, std::uint64_t> matrix_mult_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MatrixMultTest <float, std::uint64_t> mkl_matrix_mult_test_float_uint64(PreferredBackend::mkl);
-MatrixMultTest <double, std::uint64_t> mkl_matrix_mult_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MatrixMultTest <__float128, std::uint64_t> matrix_mult_test_float128_uint64(PreferredBackend::generic);
-MatrixMultTest <__float128, std::uint32_t> matrix_mult_test_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest, __float128, std::uint32_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MatrixMultTest <Half, std::uint32_t> matrix_mult_test_half_uint32(PreferredBackend::generic);
-MatrixMultTest <Half, std::uint64_t> matrix_mult_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MatrixMultTest <float, std::uint64_t> cuda_matrix_mult_test_float_uint64(PreferredBackend::cuda);
-MatrixMultTest <double, std::uint64_t> cuda_matrix_mult_test_double_uint64(PreferredBackend::cuda);
-MatrixMultTest <float, std::uint32_t> cuda_matrix_mult_test_float_uint32(PreferredBackend::cuda);
-MatrixMultTest <double, std::uint32_t> cuda_matrix_mult_test_double_uint32(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest, double, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest, double, std::uint32_t, PreferredBackend::cuda);
 #endif
 
 template<
@@ -196,14 +188,11 @@ class MatrixMultTest2
   typedef DenseVector<DT_, IT_> VectorType;
 
 public:
-  MatrixMultTest2(PreferredBackend backend)
+  explicit MatrixMultTest2(PreferredBackend backend)
     : UnitTest("MatrixMultTest2", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
 
-  virtual ~MatrixMultTest2()
-  {
-  }
   virtual void run() const override
   {
     const DT_ tol = TestSystem::tol<DT_>();
@@ -236,7 +225,7 @@ public:
 
 
     //create matrix adjacency structure for X=D*B
-    Adjacency::Graph graph_db(Adjacency::RenderType::injectify_sorted, d, b);
+    Adjacency::Graph graph_db(Adjacency::RenderType::injectify_sorted, d.adjactor(), b.adjactor());
     MatrixType x(graph_db);
     x.format();
 
@@ -250,9 +239,9 @@ public:
 
 
     // pointer on the arrays of the CSR matrix x
-    IT_* row_ptr = x.row_ptr();
-    IT_* col_ind = x.col_ind();
-    DT_* val = x.val();
+    const Memory::TypedView<IT_> row_ptr = x.row_ptr_view_r();
+    const Memory::TypedView<IT_> col_ind = x.col_idx_view_r();
+    const Memory::TypedView<DT_> val = x.val_view_r();
 
     // check if x is implemented correct
     for (IT_ i(0); i < 8; ++i)
@@ -261,30 +250,28 @@ public:
       TEST_CHECK_EQUAL(col_ind_ref[i],col_ind[i]);
       TEST_CHECK_EQUAL(row_ptr_ref[i], row_ptr[i]);
     }
-
-
   }
 };
 
-MatrixMultTest2 <float, std::uint32_t> matrix_mult_test2_float_uint32(PreferredBackend::generic);
-MatrixMultTest2 <double, std::uint32_t> matrix_mult_test2_double_uint32(PreferredBackend::generic);
-MatrixMultTest2 <float, std::uint64_t> matrix_mult_test2_float_uint64(PreferredBackend::generic);
-MatrixMultTest2 <double, std::uint64_t> matrix_mult_test2_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest2, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest2, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest2, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest2, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MatrixMultTest2 <float, std::uint64_t> mkl_matrix_mult_test2_float_uint64(PreferredBackend::mkl);
-MatrixMultTest2 <double, std::uint64_t> mkl_matrix_mult_test2_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest2, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest2, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MatrixMultTest2 <__float128, std::uint64_t> matrix_mult_test2_float128_uint64(PreferredBackend::generic);
-MatrixMultTest2 <__float128, std::uint32_t> matrix_mult_test2_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest2, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest2, __float128, std::uint32_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MatrixMultTest2 <Half, std::uint32_t> matrix_mult_test2_half_uint32(PreferredBackend::generic);
-MatrixMultTest2 <Half, std::uint64_t> matrix_mult_test2_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest2, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest2, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MatrixMultTest2 <float, std::uint64_t> cuda_matrix_mult_test2_float_uint64(PreferredBackend::cuda);
-MatrixMultTest2 <double, std::uint64_t> cuda_matrix_mult_test2_double_uint64(PreferredBackend::cuda);
-MatrixMultTest2 <float, std::uint32_t> cuda_matrix_mult_test2_float_uint32(PreferredBackend::cuda);
-MatrixMultTest2 <double, std::uint32_t> cuda_matrix_mult_test2_double_uint32(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest2, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest2, double, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest2, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MatrixMultTest2, double, std::uint32_t, PreferredBackend::cuda);
 #endif

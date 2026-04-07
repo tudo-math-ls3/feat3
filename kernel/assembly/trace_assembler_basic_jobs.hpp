@@ -1181,8 +1181,8 @@ namespace FEAT
       const typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
     {
       XASSERTM(trace_asm.get_trafo() == space.get_trafo(), "trace assembler and space have different trafos");
-      XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix column count");
-      XASSERTM(matrix.rows() == space.get_num_dofs(), "invalid matrix row count");
+      XASSERTM(matrix.num_cols() == space.get_num_dofs(), "invalid matrix column count");
+      XASSERTM(matrix.num_rows() == space.get_num_dofs(), "invalid matrix row count");
 
       TraceAssemblyBilinearOperatorMatrixJob1<BilOp_, Matrix_, Space_> job(
         bilinear_operator, matrix, space, cubature, alpha);
@@ -1344,8 +1344,8 @@ namespace FEAT
     {
       XASSERTM(trace_asm.get_trafo() == test_space.get_trafo(), "trace assembler and test space have different trafos");
       XASSERTM(trace_asm.get_trafo() == trial_space.get_trafo(), "trace assembler and trial space have different trafos");
-      XASSERTM(matrix.columns() == trial_space.get_num_dofs(), "invalid matrix column count");
-      XASSERTM(matrix.rows() == test_space.get_num_dofs(), "invalid matrix row count");
+      XASSERTM(matrix.num_cols() == trial_space.get_num_dofs(), "invalid matrix column count");
+      XASSERTM(matrix.num_rows() == test_space.get_num_dofs(), "invalid matrix row count");
 
       TraceAssemblyBilinearOperatorMatrixJob2<BilOp_, Matrix_, TestSpace_, TrialSpace_> job(
         bilinear_operator, matrix, test_space, trial_space, cubature, alpha);

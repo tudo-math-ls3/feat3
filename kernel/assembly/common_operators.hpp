@@ -114,9 +114,9 @@ namespace FEAT
       {
       public:
         /// Every block is a dimension x dimension matrix
-        static constexpr int BlockHeight = dimension_;
+        static constexpr int block_height = dimension_;
         /// Every block is a dimension x dimension matrix
-        static constexpr int BlockWidth = dimension_;
+        static constexpr int block_width = dimension_;
 
         static constexpr TrafoTags trafo_config = TrafoTags::none;
         static constexpr SpaceTags test_config = SpaceTags::grad;
@@ -450,9 +450,9 @@ namespace FEAT
       {
       public:
         /// Every block is a dimension x dimension matrix
-        static constexpr int BlockHeight = dimension_;
+        static constexpr int block_height = dimension_;
         /// Every block is a dimension x dimension matrix
-        static constexpr int BlockWidth = dimension_;
+        static constexpr int block_width = dimension_;
 
         static constexpr TrafoTags trafo_config = TrafoTags::none;
         static constexpr SpaceTags test_config = SpaceTags::value;
@@ -951,9 +951,9 @@ namespace FEAT
       {
       public:
         /// Every block is a dimension x dimension matrix
-        static constexpr int BlockHeight = dimension_;
+        static constexpr int block_height = dimension_;
         /// Every block is a dimension x dimension matrix
-        static constexpr int BlockWidth = dimension_;
+        static constexpr int block_width = dimension_;
 
         static constexpr TrafoTags trafo_config = TrafoTags::none;
         static constexpr SpaceTags test_config = SpaceTags::grad;
@@ -1057,8 +1057,8 @@ namespace FEAT
         public BilinearOperator
       {
       public:
-        static constexpr int BlockHeight = dimension_;
-        static constexpr int BlockWidth = dimension_;
+        static constexpr int block_height = dimension_;
+        static constexpr int block_width = dimension_;
 
         static constexpr TrafoTags trafo_config = TrafoTags::normal;
         static constexpr SpaceTags test_config = SpaceTags::value;
@@ -1126,8 +1126,8 @@ namespace FEAT
         public BilinearOperator
       {
       public:
-        static constexpr int BlockHeight = dimension_;
-        static constexpr int BlockWidth = dimension_;
+        static constexpr int block_height = dimension_;
+        static constexpr int block_width = dimension_;
 
         static constexpr TrafoTags trafo_config = TrafoTags::normal;
         static constexpr SpaceTags test_config = SpaceTags::value;
@@ -1185,8 +1185,8 @@ namespace FEAT
         public BilinearOperator
       {
       public:
-        static constexpr int BlockHeight = dimension_;
-        static constexpr int BlockWidth = 1;
+        static constexpr int block_height = dimension_;
+        static constexpr int block_width = 1;
 
         static constexpr TrafoTags trafo_config = TrafoTags::none;
         static constexpr SpaceTags test_config = SpaceTags::value;
@@ -1236,8 +1236,8 @@ namespace FEAT
         public BilinearOperator
       {
       public:
-        static constexpr int BlockHeight = dimension_;
-        static constexpr int BlockWidth = 1;
+        static constexpr int block_height = dimension_;
+        static constexpr int block_width = 1;
 
         static constexpr TrafoTags trafo_config = TrafoTags::none;
         static constexpr SpaceTags test_config = SpaceTags::grad;
@@ -1300,8 +1300,8 @@ namespace FEAT
         public Assembly::BilinearOperator
       {
       public:
-        static constexpr int BlockHeight = dim_;
-        static constexpr int BlockWidth = nsc_;
+        static constexpr int block_height = dim_;
+        static constexpr int block_width = nsc_;
 
         static constexpr TrafoTags trafo_config = TrafoTags::none;
         static constexpr SpaceTags test_config = SpaceTags::value;
@@ -1466,8 +1466,8 @@ namespace FEAT
         public Assembly::BilinearOperator
       {
       public:
-        static constexpr int BlockHeight = nsc_;
-        static constexpr int BlockWidth = dim_;
+        static constexpr int block_height = nsc_;
+        static constexpr int block_width = dim_;
 
         static constexpr TrafoTags trafo_config = TrafoTags::none;
         static constexpr SpaceTags test_config = SpaceTags::value;

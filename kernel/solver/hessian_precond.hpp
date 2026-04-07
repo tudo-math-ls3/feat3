@@ -125,7 +125,7 @@ namespace FEAT
           Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
           Statistics::add_solver_expression(std::make_shared<ExpressionCallPrecond>(this->name(), _op.name()));
 
-          vec_cor(0, _inv_hessian*vec_def(0));
+          vec_cor.elements_view_rw()[0] = _inv_hessian*vec_def.elements_view_r()(0);
           this->_filter.filter_cor(vec_cor);
 
           Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 1));
@@ -295,7 +295,7 @@ namespace FEAT
           Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
           Statistics::add_solver_expression(std::make_shared<ExpressionCallPrecond>(this->name(), _op.name()));
 
-          vec_cor(0, _inv_hessian*vec_def(0));
+          vec_cor.elements_view_rw()[0] = _inv_hessian*vec_def.elements_view_r()(0);
           this->_filter.filter_cor(vec_cor);
 
           Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::success, 1));

@@ -102,6 +102,9 @@ namespace FEAT
       /// this type is of floating class
       typedef FloatingClass TypeClass;
 
+      /// number of digits to write for scientific format
+      static constexpr int format_precision = 7;
+
       /// returns a string identifying the datatype
       static String name()
       {
@@ -135,6 +138,9 @@ namespace FEAT
 
       /// this type is of floating class
       typedef FloatingClass TypeClass;
+
+      /// number of digits to write for scientific format
+      static constexpr int format_precision = 16;
 
       /// returns a string identifying the datatype
       static String name()
@@ -170,6 +176,9 @@ namespace FEAT
       /// this type is of floating class
       typedef FloatingClass TypeClass;
 
+      /// number of digits to write for scientific format
+      static constexpr int format_precision = 16;
+
       /// returns a string identifying the datatype
       static String name()
       {
@@ -203,6 +212,9 @@ namespace FEAT
 
       /// this type is of integral class
       typedef IntegralClass TypeClass;
+
+      /// number of digits to write for scientific format
+      static constexpr int format_precision = 0;
 
       /// returns a string identifying the datatype
       static String name()
@@ -238,6 +250,9 @@ namespace FEAT
       /// this type is of integral class
       typedef IntegralClass TypeClass;
 
+      /// number of digits to write for scientific format
+      static constexpr int format_precision = 0;
+
       /// returns a string identifying the datatype
       static String name()
       {
@@ -271,6 +286,9 @@ namespace FEAT
 
       /// this type is of integral class
       typedef IntegralClass TypeClass;
+
+      /// number of digits to write for scientific format
+      static constexpr int format_precision = 0;
 
       /// returns a string identifying the datatype
       static String name()
@@ -306,6 +324,9 @@ namespace FEAT
       /// this type is of integral class
       typedef IntegralClass TypeClass;
 
+      /// number of digits to write for scientific format
+      static constexpr int format_precision = 0;
+
       /// returns a string identifying the datatype
       static String name()
       {
@@ -339,6 +360,9 @@ namespace FEAT
 
       /// this type is of integral class
       typedef IntegralClass TypeClass;
+
+      /// number of digits to write for scientific format
+      static constexpr int format_precision = 0;
 
       /// returns a string identifying the datatype
       static String name()
@@ -374,6 +398,9 @@ namespace FEAT
       /// this type is of integral class
       typedef IntegralClass TypeClass;
 
+      /// number of digits to write for scientific format
+      static constexpr int format_precision = 0;
+
       /// returns a string identifying the datatype
       static String name()
       {
@@ -407,6 +434,9 @@ namespace FEAT
 
       /// this type is of integral class
       typedef IntegralClass TypeClass;
+
+      /// number of digits to write for scientific format
+      static constexpr int format_precision = 0;
 
       /// returns a string identifying the datatype
       static String name()
@@ -442,6 +472,9 @@ namespace FEAT
       /// this type is of integral class
       typedef IntegralClass TypeClass;
 
+      /// number of digits to write for scientific format
+      static constexpr int format_precision = 0;
+
       /// returns a string identifying the datatype
       static String name()
       {
@@ -475,6 +508,9 @@ namespace FEAT
 
       /// this type is of integral class
       typedef IntegralClass TypeClass;
+
+      /// number of digits to write for scientific format
+      static constexpr int format_precision = 0;
 
       /// returns a string identifying the datatype
       static String name()
@@ -510,6 +546,9 @@ namespace FEAT
       /// this type is of integral class
       typedef IntegralClass TypeClass;
 
+      /// number of digits to write for scientific format
+      static constexpr int format_precision = 0;
+
       /// returns a string identifying the datatype
       static String name()
       {
@@ -544,6 +583,9 @@ namespace FEAT
       /// this type is of boolean class
       typedef BooleanClass TypeClass;
 
+      /// number of digits to write for scientific format
+      static constexpr int format_precision = 0;
+
       /// returns a string identifying the datatype
       static String name()
       {
@@ -577,6 +619,9 @@ namespace FEAT
 
       /// this type is of floating class
       typedef FloatingClass TypeClass;
+
+      /// number of digits to write for scientific format
+      static constexpr int format_precision = 34;
 
       /// returns a string identifying the datatype
       static String name()
@@ -613,6 +658,9 @@ namespace FEAT
       /// this type is of floating class
       typedef FloatingClass TypeClass;
 
+      /// number of digits to write for scientific format
+      static constexpr int format_precision = 4;
+
       /// returns a string identifying the datatype
       static String name()
       {
@@ -647,6 +695,9 @@ namespace FEAT
 
       /// this type is of floating class
       typedef FloatingClass TypeClass;
+
+      /// number of digits to write for scientific format
+      static constexpr int format_precision = 0;
 
       /// returns a string identifying the datatype
       static String name()

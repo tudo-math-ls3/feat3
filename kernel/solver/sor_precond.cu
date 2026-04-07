@@ -5,9 +5,8 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-
 #include <kernel/util/exception.hpp>
-#include <kernel/util/memory_pool.hpp>
+#include <kernel/util/memory_aux.hpp>
 #include <kernel/util/cuda_util.hpp>
 
 #include <vector>
@@ -132,7 +131,7 @@ namespace FEAT
         if (status != CUSPARSE_STATUS_SUCCESS)
           throw InternalError(__func__, __FILE__, __LINE__, "cusparseCreateColorInfo failed with status code: " + stringify(status));
 
-        int * d_coloring = (int*)Util::cuda_malloc(m * sizeof(int));
+        int * d_coloring = (int*)Memory::alloc_cuda(m * sizeof(int));
         double one(1.0);
 
         cusparseMatDescr_t descr_M = 0;
@@ -151,8 +150,8 @@ namespace FEAT
 
         //std::cout<<"pre colors: "<<ncolors<<" rows: "<<m<<std::endl;
         int * coloring = new int[m];
-        Util::cuda_copy_device_to_host(coloring, d_coloring, m * sizeof(int));
-        Util::cuda_free(d_coloring);
+        Memory::memcopy_cuda_to_main(coloring, d_coloring, m * sizeof(int));
+        Memory::free_cuda(d_coloring);
 
         //decrement from non existing colors
         for (int color(0) ; color < ncolors ; ++color)
@@ -191,7 +190,6 @@ namespace FEAT
         //std::cout<<"colors: "<<ncolors<<" rows: "<<m<<std::endl;
 
         // count rows per color
-        //rows_per_color = MemoryPool::template allocate_memory<int>(ncolors);
         rows_per_color = new int[ncolors];
         for (int i(0) ; i < ncolors ; ++i)
         {
@@ -202,7 +200,7 @@ namespace FEAT
           rows_per_color[coloring[i]] += 1;
         }
 
-        int * colors_ascending = MemoryPool::template allocate_memory<int>(ncolors);
+        int* colors_ascending = new int[ncolors];
         //vector of pair<rows, color>
         std::vector<std::pair<int, int>> temp;
         for (int i(0) ; i < ncolors ; ++i)
@@ -233,10 +231,10 @@ namespace FEAT
         }
         std::cout<<std::endl;*/
 
-        int * host_irp = MemoryPool::template allocate_memory<int>(m);
-        int * host_crp = MemoryPool::template allocate_memory<int>(2*m);
-        int * host_row_ptr = MemoryPool::template allocate_memory<int>(m+1);
-        Util::cuda_copy_device_to_host(host_row_ptr, csrRowPtr, (m+1) * sizeof(int));
+        int * host_irp = new int[m];
+        int * host_crp = new int[2*m];
+        int * host_row_ptr = new int[m+1];
+        Memory::memcopy_cuda_to_main(host_row_ptr, csrRowPtr, (m+1) * sizeof(int));
 
         //iterate over all colors, by ascending row count
         int crp_i(0); //index into host_crp
@@ -256,21 +254,21 @@ namespace FEAT
           }
         }
 
-        MemoryPool::release_memory(host_row_ptr);
+        delete [] host_row_ptr;
 
-        inverse_row_ptr = (int*)Util::cuda_malloc(m * sizeof(int));
-        Util::cuda_copy_host_to_device(inverse_row_ptr, host_irp, m * sizeof(int));
+        inverse_row_ptr = (int*)Memory::alloc_cuda(m * sizeof(int));
+        Memory::memcopy_main_to_cuda(inverse_row_ptr, host_irp, m * sizeof(int));
 
-        colored_row_ptr = (int*)Util::cuda_malloc(2 * m * sizeof(int));
-        Util::cuda_copy_host_to_device(colored_row_ptr, host_crp, 2 * m * sizeof(int));
+        colored_row_ptr = (int*)Memory::alloc_cuda(2 * m * sizeof(int));
+        Memory::memcopy_main_to_cuda(colored_row_ptr, host_crp, 2 * m * sizeof(int));
 
         delete[] coloring;
-        MemoryPool::release_memory(colors_ascending);
-        MemoryPool::release_memory(host_irp);
-        MemoryPool::release_memory(host_crp);
+        delete [] colors_ascending;
+        delete [] host_irp;
+        delete [] host_crp;
 
         cudaDeviceSynchronize();
-#ifdef FEAT_DEBUG_MODE
+#ifdef DEBUG
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -279,13 +277,12 @@ namespace FEAT
 
       void cuda_sor_done_symbolic(int * colored_row_ptr, int * rows_per_color, int * inverse_row_ptr)
       {
-        Util::cuda_free(colored_row_ptr);
-        Util::cuda_free(inverse_row_ptr);
-        //MemoryPool::release_memory(rows_per_color);
-        delete[] rows_per_color;
+        Memory::free_cuda(colored_row_ptr);
+        Memory::free_cuda(inverse_row_ptr);
+        delete [] rows_per_color;
 
         cudaDeviceSynchronize();
-#ifdef FEAT_DEBUG_MODE
+#ifdef DEBUG
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -311,7 +308,7 @@ namespace FEAT
         }
 
         cudaDeviceSynchronize();
-#ifdef FEAT_DEBUG_MODE
+#ifdef DEBUG
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -340,7 +337,7 @@ namespace FEAT
         }
 
         cudaDeviceSynchronize();
-#ifdef FEAT_DEBUG_MODE
+#ifdef DEBUG
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));

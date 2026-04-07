@@ -16,6 +16,7 @@
 #include <kernel/util/dist_file_io.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/util/exception.hpp>
+#include <kernel/util/memory_arbiter.hpp>
 #include <kernel/util/pack.hpp>
 #include <kernel/util/string.hpp>
 #include <kernel/util/tiny_algebra.hpp>
@@ -469,6 +470,36 @@ namespace FEAT::Geometry
     }
 
     /**
+    * \brief Adds a scalar vertex variable to the exporter.
+    *
+    * \param[in] name
+    * The name of the variable to be exported.
+    *
+    * \param[in] v
+    * A \transient reference to the vector containing the scalar values in the mesh vertices.
+    *
+    * \param[in] scaling_factor
+    * A scaling factor applied to each datapoint.
+    *
+    * \note
+    * This function creates a (deep) copy of the data array, so the \p data array
+    * can be deleted or overwritten after the return of this function.
+    */
+    template<typename Vector_>
+    void add_vertex_scalar(const String& name, const Vector_& v, double scaling_factor = 1.0,
+      typename Vector_::ValueType* = nullptr) // SFINAE
+    {
+      XASSERTM(this->_num_verts <= v.size(), "invalid number of vector elements!");
+      const Memory::TypedView<typename Vector_::ValueType> vx(v.elements_view_r());
+      std::vector<double> d(_num_verts);
+      for(Index i(0); i < _num_verts; ++i)
+      {
+        d[i] = scaling_factor * double(vx[i]);
+      }
+      _vertex_scalars.emplace_back(name, std::move(d));
+    }
+
+    /**
       * \brief Adds a vector-field vertex variable to the exporter.
       *
       * This functions adds a 1D, 2D or 3D vector-field variable to the exporter.
@@ -549,9 +580,11 @@ namespace FEAT::Geometry
       * This function creates a (deep) copy of the vector data.
       */
     template<typename VectorType_>
-    void add_vertex_vector(const String& name, const VectorType_& v, double scaling_factor = 1.0)
+    void add_vertex_vector(const String& name, const VectorType_& v, double scaling_factor = 1.0,
+      typename VectorType_::ValueType* = nullptr) // SFINAE
     {
       std::vector<double> d(3 * _num_verts);
+      const auto v_view = v.elements_view_r();
 
       for(Index i(0); i < _num_verts; ++i)
       {
@@ -560,9 +593,9 @@ namespace FEAT::Geometry
           d[(Index(3) * i) + j] = double(0);
         }
 
-        for(int j(0); j < v.BlockSize; ++j)
+        for(int j(0); j < v.block_size; ++j)
         {
-          d[(Index(3) * i) + Index(j)] = scaling_factor * double(v(i)[j]);
+          d[(Index(3) * i) + Index(j)] = scaling_factor * double(v_view(i)[j]);
         }
       }
       _vertex_vectors.emplace_back(name, std::move(d));
@@ -633,6 +666,36 @@ namespace FEAT::Geometry
       for(Index i(0); i < _num_cells; ++i)
       {
         d[i] = scaling_factor * double(data[i]);
+      }
+      _cell_scalars.emplace_back(name, std::move(d));
+    }
+
+    /**
+     * \brief Adds a scalar cell variable to the exporter.
+     *
+     * \param[in] name
+     * The name of the variable to be exported.
+     *
+     * \param[in] v
+     * A \transient reference to the vector containing the field values in the mesh cell.
+     *
+     * \param[in] scaling_factor
+     * A scaling factor applied to each datapoint.
+     *
+     * \note
+     * This function creates a (deep) copy of the data array, so the \p data array
+     * can be deleted or overwritten after the return of this function.
+     */
+    template<typename Vector_>
+    void add_cell_scalar(const String& name, const Vector_& v, double scaling_factor = 1.0,
+      typename Vector_::ValueType* = nullptr) // SFINAE
+    {
+      XASSERTM(this->_num_cells <= v.size(), "invalid number of vector elements!");
+      const Memory::TypedView<typename Vector_::ValueType> vx(v.elements_view_r());
+      std::vector<double> d(_num_cells);
+      for(Index i(0); i < _num_cells; ++i)
+      {
+        d[i] = scaling_factor * double(vx[i]);
       }
       _cell_scalars.emplace_back(name, std::move(d));
     }
@@ -718,9 +781,11 @@ namespace FEAT::Geometry
       * This function creates a (deep) copy of the vector data.
       */
     template<typename VectorType_>
-    void add_cell_vector(const String& name, const VectorType_& v, double scaling_factor = 1.0)
+    void add_cell_vector(const String& name, const VectorType_& v, double scaling_factor = 1.0,
+      typename VectorType_::ValueType* = nullptr) // SFINAE
     {
       std::vector<double> d(3 * _num_cells);
+      const auto v_view = v.elements_view_r();
 
       for(Index i(0); i < _num_cells; ++i)
       {
@@ -729,9 +794,9 @@ namespace FEAT::Geometry
           d[(Index(3) * i) + j] = double(0);
         }
 
-        for(int j(0); j < v.BlockSize; ++j)
+        for(int j(0); j < v.block_size; ++j)
         {
-          d[(Index(3) * i) + Index(j)] = scaling_factor * double(v(i)[j]);
+          d[(Index(3) * i) + Index(j)] = scaling_factor * double(v_view(i)[j]);
         }
       }
       _cell_vectors.emplace_back(name, std::move(d));

@@ -256,10 +256,15 @@ namespace FEAT
       }
 
       /// Returns the total size of this tuple-vector.
-      template <Perspective perspective_ = Perspective::native>
       Index size() const
       {
-        return _first.template size<perspective_>() + _rest.template size<perspective_>();
+        return _first.size() + _rest.size();
+      }
+
+      /// Returns the total size of this tuple-vector.
+      Index size_raw() const
+      {
+        return _first.size_raw() + _rest.size_raw();
       }
 
       /// Returns the number of blocks in this tuple-vector.
@@ -413,25 +418,24 @@ namespace FEAT
        *
        * \return The largest relative difference.
        */
-      template <typename First2_, typename... Rest2_>
-      DataType max_rel_diff(const TupleVector<First2_, Rest2_...>& x) const
+      DataType max_rel_diff(const TupleVector& x) const
       {
         return Math::max(first().max_rel_diff(x.first()), rest().max_rel_diff(x.rest()));
       }
 
       /// \cond internal
-      /// Writes the vector-entries in an allocated array
-      void set_vec(DataType * const pval_set) const
+      /// Extracts the values of this vector
+      Index get_values(DataType * const pval_set) const
       {
-        this->first().set_vec(pval_set);
-        this->rest().set_vec(pval_set + this->first().template size<Perspective::pod>());
+        Index n = this->first().get_values(pval_set);
+        return this->rest().get_values(pval_set + n) + n;
       }
 
-      /// Writes data of an array in the vector
-      void set_vec_inv(const DataType * const pval_set)
+      /// Overwrites the values of this vector
+      Index set_values(const DataType * const pval_set)
       {
-        this->first().set_vec_inv(pval_set);
-        this->rest().set_vec_inv(pval_set + this->first().template size<Perspective::pod>());
+        Index n = this->first().set_values(pval_set);
+        return this->rest().set_values(pval_set + n) + n;
       }
       /// \endcond
 
@@ -453,6 +457,19 @@ namespace FEAT
       std::size_t bytes() const
       {
         return _first.bytes() + _rest.bytes();
+      }
+
+      /**
+       * \brief Checks if the structural layout of this vector matches that of another vector.
+       * This excludes comparison of the actual data values.
+       *
+       * \param[in] x The vector to compare this vector to
+       *
+       * \returns true if the layouts match, false otherwise.
+       */
+      bool same_layout(const TupleVector& x) const
+      {
+        return _first.same_layout(x._first) && _rest.same_layout(x._rest);
       }
 
       /**
@@ -688,10 +705,16 @@ namespace FEAT
         return _first.set_checkpoint_data(data, config);
       }
 
-      template <Perspective perspective_ = Perspective::native>
+      /// Returns the total size of this tuple-vector.
       Index size() const
       {
-        return _first.template size<perspective_>();
+        return _first.size();
+      }
+
+      /// Returns the total size of this tuple-vector.
+      Index size_raw() const
+      {
+        return _first.size_raw();
       }
 
       /// Returns the number of blocks in this tuple-vector.
@@ -806,26 +829,19 @@ namespace FEAT
         return first().min_element();
       }
 
-      const typename First_::DataType operator()(Index index) const
+      DataType max_rel_diff(const TupleVector& x) const
       {
-        ASSERT(index < size());
-        return first()(index);
+        return first().max_rel_diff(x.first());
       }
 
-      void operator()(Index index, typename First_::DataType value)
+      Index get_values(DataType * const pval_set) const
       {
-        ASSERT(index < size());
-        first()(index, value);
+        return this->first().get_values(pval_set);
       }
 
-      void set_vec(DataType * const pval_set) const
+      Index set_values(const DataType * const pval_set)
       {
-        this->first().set_vec(pval_set);
-      }
-
-      void set_vec_inv(const DataType * const pval_set)
-      {
-        this->first().set_vec_inv(pval_set);
+        return this->first().set_values(pval_set);
       }
 
       /**
@@ -845,6 +861,11 @@ namespace FEAT
       std::size_t bytes() const
       {
         return _first.bytes();
+      }
+
+      bool same_layout(const TupleVector& x) const
+      {
+        return _first.same_layout(x._first);
       }
 
       /**

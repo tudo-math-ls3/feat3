@@ -59,7 +59,7 @@ namespace MatrixCond
 
   public:
     explicit MatrixATA(const MatrixType& mat_a, const MatrixType& mat_at) :
-      _mat_a(mat_a), _mat_at(mat_at), _vec_tmp(mat_a.rows())
+      _mat_a(mat_a), _mat_at(mat_at), _vec_tmp(mat_a.num_rows())
     {
     }
 
@@ -73,14 +73,14 @@ namespace MatrixCond
       return _mat_a.create_vector_r();
     }
 
-    Index rows() const
+    Index num_rows() const
     {
-      return _mat_at.rows();
+      return _mat_at.num_rows();
     }
 
-    Index columns() const
+    Index num_cols() const
     {
-      return _mat_a.columns();
+      return _mat_a.num_cols();
     }
 
     void apply(VectorType& r, const VectorType& x) const
@@ -232,15 +232,15 @@ namespace MatrixCond
     bool calc_ata_diag(VectorType& vdiag, const MatrixType& matrix, const MatrixType& transpo)
     {
       // compute inverse main diagonal of A^T * A
-      vdiag = VectorType(matrix.columns(), DataType(0));
-      DataType* vdi = vdiag.elements();
+      vdiag = VectorType(matrix.num_cols(), DataType(0));
+      Memory::TypedView<DataType> vdi = vdiag.elements_view_rw();
 
       // fetch the transposed matrix arrays
-      const IndexType* row_ptr_t = transpo.row_ptr();
-      const DataType* data_t = transpo.val();
+      const Memory::TypedView<IndexType> row_ptr_t = transpo.row_ptr_view_r();
+      const Memory::TypedView<DataType> data_t = transpo.val_view_r();
 
       DataType dmin(1E+99), dmax(0.0);
-      for(Index i(0); i < transpo.rows(); ++i)
+      for(Index i(0); i < transpo.num_rows(); ++i)
       {
         for(Index j(row_ptr_t[i]); j < row_ptr_t[i+1]; ++j)
         {
@@ -258,7 +258,7 @@ namespace MatrixCond
       }
 
       // invert diagonal entries
-      for(Index i(0); i < transpo.rows(); ++i)
+      for(Index i(0); i < transpo.num_rows(); ++i)
       {
         vdi[i] = DataType(1) / vdi[i];
       }
@@ -560,7 +560,7 @@ namespace MatrixCond
       std::cout << "\n";
 
       // create initial vector
-      VectorType vec_svmax(matrix.rows(), DataType(1));
+      VectorType vec_svmax(matrix.num_rows(), DataType(1));
 
       // read initial vector
       if(read_svmax_vec)
@@ -598,7 +598,7 @@ namespace MatrixCond
       std::cout << "\n";
 
       // create initial vector
-      VectorType vec_svmin(matrix.rows(), DataType(1));
+      VectorType vec_svmin(matrix.num_rows(), DataType(1));
 
       // read initial vector
       if(read_svmin_vec)

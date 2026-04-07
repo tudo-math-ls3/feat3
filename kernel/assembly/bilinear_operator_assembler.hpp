@@ -61,8 +61,8 @@ namespace FEAT
         typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
       {
         // validate matrix dimensions
-        XASSERTM(matrix.rows() == test_space.get_num_dofs(), "invalid matrix dimensions");
-        XASSERTM(matrix.columns() == trial_space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_rows() == test_space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_cols() == trial_space.get_num_dofs(), "invalid matrix dimensions");
 
         // matrix type
         typedef Matrix_ MatrixType;
@@ -230,8 +230,8 @@ namespace FEAT
         typename Matrix_::DataType alpha = typename Matrix_::DataType(1))
       {
         // validate matrix dimensions
-        XASSERTM(matrix.rows() == space.get_num_dofs(), "invalid matrix dimensions");
-        XASSERTM(matrix.columns() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_rows() == space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_cols() == space.get_num_dofs(), "invalid matrix dimensions");
 
         // matrix type
         typedef Matrix_ MatrixType;

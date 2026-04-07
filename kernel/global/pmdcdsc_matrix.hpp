@@ -438,7 +438,7 @@ namespace FEAT
           watch_init_sym_matrix_loc.start();
 
           // compose structures of D and B
-          Adjacency::Graph graph_s(Adjacency::RenderType::injectify_sorted, _matrix_d.local(), _matrix_b.local());
+          Adjacency::Graph graph_s(Adjacency::RenderType::injectify_sorted, _matrix_d.local().adjactor(), _matrix_b.local().adjactor());
           // create the matrix layout of S
           _matrix_s = LocalMatrixTypeS(graph_s);
 
@@ -576,7 +576,7 @@ namespace FEAT
           watch_init_sym_neighbor_s.start();
 
           // D*M^T = (M*B)^T
-          Adjacency::Graph graph_dm(Adjacency::RenderType::injectify_transpose, gate_v->_mirrors.at(i), this->_matrix_b.local());
+          Adjacency::Graph graph_dm(Adjacency::RenderType::injectify_transpose, gate_v->_mirrors.at(i).adjactor(), this->_matrix_b.local().adjactor());
 
           // S = (D*M^T) * B'
           Adjacency::Graph graph_s(Adjacency::RenderType::injectify_sorted, graph_dm, this->_neighbor_graphs.at(i));
@@ -626,12 +626,14 @@ namespace FEAT
         // send/receive buffers and requests
         std::vector<BufferVectorType> recv_bufs(num_neighs), send_bufs(num_neighs);
         Dist::RequestVector recv_reqs(num_neighs), send_reqs(num_neighs);
+        std::vector<Memory::TypedView<DataType>> recv_views(num_neighs), send_views(num_neighs);
 
         // allocate receive buffer matrices B' and post receives
         for(std::size_t i(0); i < num_neighs; ++i)
         {
           recv_bufs.at(i) = BufferVectorType(Index(dim) * this->_neighbor_graphs.at(i).get_num_indices());
-          recv_reqs[i] = comm.irecv(recv_bufs.at(i).elements(), recv_bufs.at(i).size(), this->_ranks.at(i));
+          recv_views[i] = recv_bufs.at(i).elements_view_w();
+          recv_reqs[i] = comm.irecv(recv_views[i].get_w(), recv_bufs.at(i).size(), this->_ranks.at(i));
         }
 
         // extract reduced matrix data and post send
@@ -639,8 +641,9 @@ namespace FEAT
         {
           watch_init_num_gather_b.start();
           send_bufs.at(i) = _gather_b(this->_data_mirrors.at(i), this->_matrix_b.local());
+          send_views[i] = send_bufs.at(i).elements_view_r();
           watch_init_num_gather_b.stop();
-          send_reqs[i] = comm.isend(send_bufs.at(i).elements(), send_bufs.at(i).size(), this->_ranks.at(i));
+          send_reqs[i] = comm.isend(send_views[i].get_r(), send_bufs.at(i).size(), this->_ranks.at(i));
         }
 
         // pre-multiply D*A and store in transposed form, i.e. CSC rather than CSR
@@ -652,6 +655,7 @@ namespace FEAT
         for(std::size_t i(0u); recv_reqs.wait_any(i); )
         {
           watch_init_num_neighbor_s.start();
+          recv_views[i].release();
           this->_neighbor_matrices.at(i).format();
           _asm_neighbor_schur_matrix(this->_neighbor_matrices.at(i), this->_matrix_da,
             this->_matrix_b.get_row_gate()->_mirrors.at(i), this->_neighbor_graphs.at(i), recv_bufs.at(i));
@@ -702,12 +706,12 @@ namespace FEAT
       {
         // initialize values for serial case
         global_dof_offset = Index(0);
-        global_dof_count = owned_dof_count = _matrix_s.rows();
+        global_dof_count = owned_dof_count = _matrix_s.num_rows();
 
         // compute number of non-zero entries
-        owned_num_nzes = _matrix_s.used_elements();
+        owned_num_nzes = _matrix_s.num_nzes();
         for(const auto& x : _neighbor_matrices)
-          owned_num_nzes += x.used_elements();
+          owned_num_nzes += x.num_nzes();
         global_num_nzes = owned_num_nzes;
 
         // compute our global DOF offset and count
@@ -753,10 +757,10 @@ namespace FEAT
         if(_ranks.empty())
         {
           // simply copy our local matrix S
-          const Index n = _matrix_s.rows();
-          const Index m = _matrix_s.used_elements();
-          const IndexType* row_ptr_s = _matrix_s.row_ptr();
-          const IndexType* col_idx_s = _matrix_s.col_ind();
+          const Index n = _matrix_s.num_rows();
+          const Index m = _matrix_s.num_nzes();
+          const Memory::TypedView<IndexType> row_ptr_s = _matrix_s.row_ptr_view_r();
+          const Memory::TypedView<IndexType> col_idx_s = _matrix_s.col_idx_view_r();
 
           FEAT_PRAGMA_OMP(parallel for)
           for(Index i = 0; i <= n; ++i)
@@ -801,7 +805,7 @@ namespace FEAT
         for(std::size_t i(0); i < num_neighs; ++i)
         {
           const Index num_idx = _pres_mirrors.at(i).num_indices();
-          const IndexType* pidx = _pres_mirrors.at(i).indices();
+          const Memory::TypedView<IndexType> pidx = _pres_mirrors.at(i).indices_view_r();
           send_dofs.at(i).resize(num_idx);
           IndexType* sidx = send_dofs.at(i).data();
           for(Index k(0); k < num_idx; ++k)
@@ -810,9 +814,9 @@ namespace FEAT
         }
 
         // get local matrix stuff
-        const Index num_rows = _matrix_s.rows();
-        const IndexType* row_ptr_s = _matrix_s.row_ptr();
-        const IndexType* col_idx_s = _matrix_s.col_ind();
+        const Index num_rows = _matrix_s.num_rows();
+        const Memory::TypedView<IndexType> row_ptr_s = _matrix_s.row_ptr_view_r();
+        const Memory::TypedView<IndexType> col_idx_s = _matrix_s.col_idx_view_r();
 
         // compute number of non-zeros per row and total
         std::vector<IndexType> row_aux(num_rows, IndexType(0));
@@ -821,9 +825,9 @@ namespace FEAT
 
         for(const auto& x : _neighbor_matrices)
         {
-          const Index used_rows = x.used_rows();
-          const IndexType* row_ptr_x = x.row_ptr();
-          const IndexType* row_idx_x = x.row_numbers();
+          const Index used_rows = x.num_nonzero_rows();
+          const Memory::TypedView<IndexType> row_ptr_x = x.row_ptr_view_r();
+          const Memory::TypedView<IndexType> row_idx_x = x.row_idx_view_r();
           for(Index i(0); i < used_rows; ++i)
             row_aux[row_idx_x[i]] += (row_ptr_x[i+1] - row_ptr_x[i]);
         }
@@ -860,10 +864,10 @@ namespace FEAT
         for(auto it = neigh_map_l.begin(); it != neigh_map_l.end(); ++it)
         {
           std::size_t ineigh = it->second;
-          const Index used_rows = _neighbor_matrices.at(ineigh).used_rows();
-          const IndexType* row_ptr_x = _neighbor_matrices.at(ineigh).row_ptr();
-          const IndexType* row_idx_x = _neighbor_matrices.at(ineigh).row_numbers();
-          const IndexType* col_idx_x = _neighbor_matrices.at(ineigh).col_ind();
+          const Index used_rows = _neighbor_matrices.at(ineigh).num_nonzero_rows();
+          const Memory::TypedView<IndexType> row_ptr_x = _neighbor_matrices.at(ineigh).row_ptr_view_r();
+          const Memory::TypedView<IndexType> row_idx_x = _neighbor_matrices.at(ineigh).row_idx_view_r();
+          const Memory::TypedView<IndexType> col_idx_x = _neighbor_matrices.at(ineigh).col_idx_view_r();
           const IndexType* dof_idx_x = recv_dofs.at(ineigh).data();
           for(Index i(0); i < used_rows; ++i)
           {
@@ -886,10 +890,10 @@ namespace FEAT
         for(auto it = neigh_map_h.begin(); it != neigh_map_h.end(); ++it)
         {
           std::size_t ineigh = it->second;
-          const Index used_rows = _neighbor_matrices.at(ineigh).used_rows();
-          const IndexType* row_ptr_x = _neighbor_matrices.at(ineigh).row_ptr();
-          const IndexType* row_idx_x = _neighbor_matrices.at(ineigh).row_numbers();
-          const IndexType* col_idx_x = _neighbor_matrices.at(ineigh).col_ind();
+          const Index used_rows = _neighbor_matrices.at(ineigh).num_nonzero_rows();
+          const Memory::TypedView<IndexType> row_ptr_x = _neighbor_matrices.at(ineigh).row_ptr_view_r();
+          const Memory::TypedView<IndexType> row_idx_x = _neighbor_matrices.at(ineigh).row_idx_view_r();
+          const Memory::TypedView<IndexType> col_idx_x = _neighbor_matrices.at(ineigh).col_idx_view_r();
           const IndexType* dof_idx_x = recv_dofs.at(ineigh).data();
           for(Index i(0); i < used_rows; ++i)
           {
@@ -935,8 +939,8 @@ namespace FEAT
         // no neighbors?
         if(_ranks.empty())
         {
-          const Index num_nzes = _matrix_s.used_elements();
-          const DataType* val_s = _matrix_s.val();
+          const Index num_nzes = _matrix_s.num_nzes();
+          const Memory::TypedView<DataType> val_s = _matrix_s.val_view_r();
 
           FEAT_PRAGMA_OMP(parallel for)
             for(Index i = 0; i < num_nzes; ++i)
@@ -946,11 +950,11 @@ namespace FEAT
         }
 
         // get number of local DOFs
-        const Index num_rows = _matrix_s.rows();
+        const Index num_rows = _matrix_s.num_rows();
 
         // get row pointer arrays
-        const IndexType* row_ptr_s = _matrix_s.row_ptr();
-        const DataType* val_s = _matrix_s.val();
+        const Memory::TypedView<IndexType> row_ptr_s = _matrix_s.row_ptr_view_r();
+        const Memory::TypedView<DataType> val_s = _matrix_s.val_view_r();
 
         // make a copy of the row pointer
         std::vector<IndexType> row_aux(num_rows);
@@ -976,10 +980,10 @@ namespace FEAT
         for(auto it = neigh_map_l.begin(); it != neigh_map_l.end(); ++it)
         {
           std::size_t ineigh = it->second;
-          const Index used_rows = _neighbor_matrices.at(ineigh).used_rows();
-          const IndexType* row_ptr_x = _neighbor_matrices.at(ineigh).row_ptr();
-          const IndexType* row_idx_x = _neighbor_matrices.at(ineigh).row_numbers();
-          const DataType* val_x = _neighbor_matrices.at(ineigh).val();
+          const Index used_rows = _neighbor_matrices.at(ineigh).num_nonzero_rows();
+          const Memory::TypedView<IndexType> row_ptr_x = _neighbor_matrices.at(ineigh).row_ptr_view_r();
+          const Memory::TypedView<IndexType> row_idx_x = _neighbor_matrices.at(ineigh).row_idx_view_r();
+          const Memory::TypedView<DataType> val_x = _neighbor_matrices.at(ineigh).val_view_r();
           for(Index i(0); i < used_rows; ++i)
           {
             IndexType& k = row_aux[row_idx_x[i]];
@@ -1001,10 +1005,10 @@ namespace FEAT
         for(auto it = neigh_map_h.begin(); it != neigh_map_h.end(); ++it)
         {
           std::size_t ineigh = it->second;
-          const Index used_rows = _neighbor_matrices.at(ineigh).used_rows();
-          const IndexType* row_ptr_x = _neighbor_matrices.at(ineigh).row_ptr();
-          const IndexType* row_idx_x = _neighbor_matrices.at(ineigh).row_numbers();
-          const DataType* val_x = _neighbor_matrices.at(ineigh).val();
+          const Index used_rows = _neighbor_matrices.at(ineigh).num_nonzero_rows();
+          const Memory::TypedView<IndexType> row_ptr_x = _neighbor_matrices.at(ineigh).row_ptr_view_r();
+          const Memory::TypedView<IndexType> row_idx_x = _neighbor_matrices.at(ineigh).row_idx_view_r();
+          const Memory::TypedView<DataType> val_x = _neighbor_matrices.at(ineigh).val_view_r();
           for(Index i(0); i < used_rows; ++i)
           {
             IndexType& k = row_aux[row_idx_x[i]];
@@ -1064,9 +1068,9 @@ namespace FEAT
       static void _asm_pres_mirror(MirrorTypeP& mirror_p, const MirrorTypeV& mirror_v, const LocalMatrixTypeB& matrix_b)
       {
         const Index num_dof_mir_v = mirror_v.num_indices();
-        const IndexType* velo_idx = mirror_v.indices();
-        const IndexType* row_ptr = matrix_b.row_ptr();
-        const IndexType* col_idx = matrix_b.col_ind();
+        const Memory::TypedView<IndexType> velo_idx = mirror_v.indices_view_r();
+        const Memory::TypedView<IndexType> row_ptr = matrix_b.row_ptr_view_r();
+        const Memory::TypedView<IndexType> col_idx = matrix_b.col_idx_view_r();
 
         // loop over all rows of B, which are indexed in the velocity mirror,
         // and add all column indices (pressure DOFs) into the pressure DOF set
@@ -1079,8 +1083,9 @@ namespace FEAT
         }
 
         // convert DOF set into a mirror
-        mirror_p = MirrorTypeP(matrix_b.columns(), Index(dof_set.size()));
-        IndexType* pidx = mirror_p.indices();
+        mirror_p = MirrorTypeP(matrix_b.num_cols(), Index(dof_set.size()));
+        Memory::TypedView<IndexType> idx_v = mirror_p.indices_view_w();
+        IndexType* pidx = idx_v.get_w();
         for(auto it = dof_set.begin(); it != dof_set.end(); ++it, ++pidx)
           *pidx = *it;
       }
@@ -1105,10 +1110,10 @@ namespace FEAT
       {
         const Index num_dof_mir_v = mirror_v.num_indices();
         const Index num_dof_mir_p = mirror_p.num_indices();
-        const IndexType* velo_idx = mirror_v.indices();
-        const IndexType* pres_idx = mirror_p.indices();
-        const IndexType* row_ptr = matrix_b.row_ptr();
-        const IndexType* col_idx = matrix_b.col_ind();
+        const Memory::TypedView<IndexType> velo_idx = mirror_v.indices_view_r();
+        const Memory::TypedView<IndexType> pres_idx = mirror_p.indices_view_r();
+        const Memory::TypedView<IndexType> row_ptr = matrix_b.row_ptr_view_r();
+        const Memory::TypedView<IndexType> col_idx = matrix_b.col_idx_view_r();
 
         // count number of non-zeros in indexed rows of B = non-zeros in B'
         Index num_red_nzes = Index(0);
@@ -1178,16 +1183,16 @@ namespace FEAT
         const LocalMatrixTypeB& matrix_b, const Adjacency::Graph& graph)
       {
         const Index num_dof_mir_v = mirror_v.num_indices();
-        const IndexType* velo_idx = mirror_v.indices();
-        const IndexType* pres_idx = mirror_p.indices();
-        const IndexType* row_ptr = matrix_b.row_ptr();
-        const IndexType* col_idx = matrix_b.col_ind();
+        const Memory::TypedView<IndexType> velo_idx = mirror_v.indices_view_r();
+        const Memory::TypedView<IndexType> pres_idx = mirror_p.indices_view_r();
+        const Memory::TypedView<IndexType> row_ptr = matrix_b.row_ptr_view_r();
+        const Memory::TypedView<IndexType> col_idx = matrix_b.col_idx_view_r();
         const Index* dom_ptr = graph.get_domain_ptr();
         const Index* img_idx = graph.get_image_idx();
 
         // allocate mirror for data array of B'
-        MirrorTypeP data_mirror(matrix_b.used_elements(), graph.get_num_indices());
-        IndexType* dat_idx = data_mirror.indices();
+        MirrorTypeP data_mirror(matrix_b.num_nzes(), graph.get_num_indices());
+        Memory::TypedView<IndexType> dat_idx = data_mirror.indices_view_w();
 
         // loop over all rows of B' again
         for(Index i(0); i < num_dof_mir_v; ++i)
@@ -1237,11 +1242,11 @@ namespace FEAT
       static BufferVectorType _gather_b(const MirrorTypeP& data_mirror, const LocalMatrixTypeB& matrix_b)
       {
         const Index num_idx = data_mirror.num_indices();
-        const IndexType* idx = data_mirror.indices();
-        const ValueTypeB* mat_val = matrix_b.val();
+        const Memory::TypedView<IndexType> idx = data_mirror.indices_view_r();
+        const Memory::TypedView<ValueTypeB> mat_val = matrix_b.val_view_r();
 
         BufferVectorType buf(Index(dim)*num_idx);
-        ValueTypeB* buf_val = reinterpret_cast<ValueTypeB*>(buf.elements());
+        Memory::TypedView<ValueTypeB> buf_val(std::forward<Memory::View&&>(buf.elements_view_w()));
 
         for(Index i(0); i < num_idx; ++i)
         {
@@ -1299,16 +1304,16 @@ namespace FEAT
        */
       static void _premult_da(LocalMatrixTypeB& mat_da, const LocalMatrixTypeD& mat_d, const LocalVectorTypeV& mat_a)
       {
-        const Index num_rows = mat_d.rows();
-        const Index num_cols = mat_d.columns();
+        const Index num_rows = mat_d.num_rows();
+        const Index num_cols = mat_d.num_cols();
 
-        const IndexType* row_ptr = mat_d.row_ptr();
-        const IndexType* col_idx = mat_d.col_ind();
-        const IndexType* row_ptr_da = mat_da.row_ptr();
+        const Memory::TypedView<IndexType> row_ptr = mat_d.row_ptr_view_r();
+        const Memory::TypedView<IndexType> col_idx = mat_d.col_idx_view_r();
+        const Memory::TypedView<IndexType> row_ptr_da = mat_da.row_ptr_view_r();
 
-        ValueTypeB* val_da = mat_da.val();
-        const ValueTypeD* val_d = mat_d.val();
-        const ValueTypeA* val_a = mat_a.elements();
+        Memory::TypedView<ValueTypeB> val_da = mat_da.val_view_w();
+        const Memory::TypedView<ValueTypeD> val_d = mat_d.val_view_r();
+        const Memory::TypedView<ValueTypeA>val_a = mat_a.elements_view_r();
 
         // create a temporary copy of the row-pointer of D^T
         std::vector<Index> ptr(num_cols);
@@ -1341,25 +1346,25 @@ namespace FEAT
         // Note: this is a modified version of SparseMatrixCSR::add_double_mat_product for BCSR multiplicands
 
         // validate matrix dimensions
-        XASSERT(s.rows() == d.rows());
-        XASSERT(d.columns() == a.size());
-        XASSERT(a.size() == b.rows());
-        XASSERT(b.columns() == s.columns());
+        XASSERT(s.num_rows() == d.num_rows());
+        XASSERT(d.num_cols() == a.size());
+        XASSERT(a.size() == b.num_rows());
+        XASSERT(b.num_cols() == s.num_cols());
 
         // fetch matrix arrays:
-        DataType* data_s = s.val();
-        const ValueTypeD* data_d = d.val();
-        const ValueTypeA* data_a = a.elements();
-        const ValueTypeB* data_b = b.val();
-        const IndexType* row_ptr_s = s.row_ptr();
-        const IndexType* col_idx_s = s.col_ind();
-        const IndexType* row_ptr_d = d.row_ptr();
-        const IndexType* col_idx_d = d.col_ind();
-        const IndexType* row_ptr_b = b.row_ptr();
-        const IndexType* col_idx_b = b.col_ind();
+        Memory::TypedView<DataType> data_s = s.val_view_rw();
+        const Memory::TypedView<ValueTypeD> data_d = d.val_view_r();
+        const Memory::TypedView<ValueTypeA> data_a = a.elements_view_r();
+        const Memory::TypedView<ValueTypeB> data_b = b.val_view_r();
+        const Memory::TypedView<IndexType> row_ptr_s = s.row_ptr_view_r();
+        const Memory::TypedView<IndexType> col_idx_s = s.col_idx_view_r();
+        const Memory::TypedView<IndexType> row_ptr_d = d.row_ptr_view_r();
+        const Memory::TypedView<IndexType> col_idx_d = d.col_idx_view_r();
+        const Memory::TypedView<IndexType> row_ptr_b = b.row_ptr_view_r();
+        const Memory::TypedView<IndexType> col_idx_b = b.col_idx_view_r();
 
         // loop over all rows of D and S, resp.
-        for(IndexType i(0); i < IndexType(s.rows()); ++i)
+        for(IndexType i(0); i < IndexType(s.num_rows()); ++i)
         {
           // loop over all non-zeros D_ik in row i of D
           for(IndexType ik(row_ptr_d[i]); ik  < row_ptr_d[i+1]; ++ik)
@@ -1407,29 +1412,29 @@ namespace FEAT
         const MirrorTypeV& mirror_v, const Adjacency::Graph& graph_b, const BufferVectorType& buffer_b)
       {
         // validate matrix dimensions
-        XASSERT(s.rows() == da.columns());
-        XASSERT(da.rows() == mirror_v.size());
+        XASSERT(s.num_rows() == da.num_cols());
+        XASSERT(da.num_rows() == mirror_v.size());
         XASSERT(graph_b.get_num_nodes_domain() == mirror_v.num_indices());
-        XASSERT(graph_b.get_num_nodes_image() == s.columns());
-        XASSERT(mirror_v.size() == da.rows());
+        XASSERT(graph_b.get_num_nodes_image() == s.num_cols());
+        XASSERT(mirror_v.size() == da.num_rows());
 
         // fetch matrix arrays:
-        DataType* data_s = s.val();
-        const IndexType* row_ptr_s = s.row_ptr();
-        const IndexType* row_idx_s = s.row_numbers();
-        const IndexType* col_idx_s = s.col_ind();
-        const Index used_rows_s = s.used_rows();
+        Memory::TypedView<DataType>data_s = s.val_view_rw();
+        const Memory::TypedView<IndexType> row_ptr_s = s.row_ptr_view_r();
+        const Memory::TypedView<IndexType> row_idx_s = s.row_idx_view_r();
+        const Memory::TypedView<IndexType> col_idx_s = s.col_idx_view_r();
+        const Index used_rows_s = s.num_nonzero_rows();
 
         // we use CSR for (D*A)^T here, which is effectively a CSC storage of (D*A),
         // thus rows and columns swap their meaning here
-        const ValueTypeB* data_da = da.val();
-        const IndexType* col_ptr_da = da.row_ptr();
-        const IndexType* row_idx_da = da.col_ind();
+        const Memory::TypedView<ValueTypeB> data_da = da.val_view_r();
+        const Memory::TypedView<IndexType> col_ptr_da = da.row_ptr_view_r();
+        const Memory::TypedView<IndexType> row_idx_da = da.col_idx_view_r();
 
         const Index num_mir_idx = mirror_v.num_indices();
-        const IndexType* mir_idx = mirror_v.indices();
+        const Memory::TypedView<IndexType> mir_idx = mirror_v.indices_view_r();
 
-        const ValueTypeB* data_b = reinterpret_cast<const ValueTypeB*>(buffer_b.elements());
+        const Memory::TypedView<ValueTypeB> data_b(std::forward<Memory::View&&>(buffer_b.elements_view_r()));
         const Index* dom_ptr_b = graph_b.get_domain_ptr();
         const Index* img_idx_b = graph_b.get_image_idx();
 
@@ -1517,12 +1522,14 @@ namespace FEAT
         // send/receive buffers and requests
         std::vector<BufferVectorType> recv_bufs(num_neighs), send_bufs(num_neighs);
         Dist::RequestVector recv_reqs(num_neighs), send_reqs(num_neighs);
+        std::vector<Memory::TypedView<DataType>> recv_views(num_neighs), send_views(num_neighs);
 
         // allocate receive buffer vectors and post receives
         for(std::size_t i(0); i < num_neighs; ++i)
         {
-          recv_bufs.at(i) = BufferVectorType(this->_neighbor_matrices.at(i).columns());
-          recv_reqs[i] = comm.irecv(recv_bufs.at(i).elements(), recv_bufs.at(i).size(), this->_ranks.at(i));
+          recv_bufs.at(i) = BufferVectorType(this->_neighbor_matrices.at(i).num_cols());
+          recv_views[i] = recv_bufs.at(i).elements_view_w();
+          recv_reqs[i] = comm.irecv(recv_views[i].get_w(), recv_bufs.at(i).size(), this->_ranks.at(i));
         }
 
         // extract pressure dofs and post sends
@@ -1530,7 +1537,8 @@ namespace FEAT
         {
           send_bufs.at(i) = BufferVectorType(this->_pres_mirrors.at(i).num_indices());
           this->_pres_mirrors.at(i).gather(send_bufs.at(i), x);
-          send_reqs[i] = comm.isend(send_bufs.at(i).elements(), send_bufs.at(i).size(), this->_ranks.at(i));
+          send_views[i] = send_bufs.at(i).elements_view_w();
+          send_reqs[i] = comm.isend(send_views[i].get_r(), send_bufs.at(i).size(), this->_ranks.at(i));
         }
 
         // multiply by local schur matrix
@@ -1545,6 +1553,7 @@ namespace FEAT
         for(std::size_t i(0u); recv_reqs.wait_any(i); )
         {
           watch_apply_neighbor_s.start();
+          recv_views[i].release();
           this->_neighbor_matrices.at(i).apply(r, recv_bufs.at(i), r, (only_Ax ? DataType(1) : alpha));
           watch_apply_neighbor_s.stop();
         }

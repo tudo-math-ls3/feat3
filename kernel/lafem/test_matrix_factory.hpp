@@ -163,8 +163,8 @@ namespace FEAT
       *
       * \param[in] flags
       */
-      template<typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-      void create(SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& matrix, Index nrows, Index ncols, Index nnze, TestMatrixFlags flags)
+      template<typename DT_, typename IT_, int block_height_, int block_width_>
+      void create(SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& matrix, Index nrows, Index ncols, Index nnze, TestMatrixFlags flags)
       {
         if(flags * (TestMatrixFlags::non_negative) && flags * (TestMatrixFlags::diagonal_dominant))
         {
@@ -271,10 +271,10 @@ namespace FEAT
       * \param[in] nnze
       * The desired number of non-zero entries in the matrix.
       */
-      template<typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-      void _create_generic_struct(SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& matrix, Index nrows, Index ncols, Index nnze)
+      template<typename DT_, typename IT_, int block_height_, int block_width_>
+      void _create_generic_struct(SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& matrix, Index nrows, Index ncols, Index nnze)
       {
-        matrix = SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>(_create_generic_struct(nrows, ncols, nnze));
+        matrix = SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>(_create_generic_struct(nrows, ncols, nnze));
       }
 
       /**
@@ -337,11 +337,11 @@ namespace FEAT
       * \note The matrix as well as the blocks have to be square
       * There might be nnze +-1 entries
       */
-      template<typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-      void _create_symmetric_struct(SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& matrix, Index nrows, Index ncols, Index nnze)
+      template<typename DT_, typename IT_, int block_height_, int block_width_>
+      void _create_symmetric_struct(SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& matrix, Index nrows, Index ncols, Index nnze)
       {
-        XASSERT(BlockWidth_ == BlockHeight_);
-        matrix = SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>(_create_symmetric_struct(nrows, ncols, nnze));
+        XASSERT(block_width_ == block_height_);
+        matrix = SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>(_create_symmetric_struct(nrows, ncols, nnze));
       }
 
       /**
@@ -406,11 +406,11 @@ namespace FEAT
       *
       * \note the matrix as well as the blocks have to be square
       */
-      template<typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-      void _create_non_empty_diag_struct(SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& matrix, Index nrows, Index ncols, Index nnze)
+      template<typename DT_, typename IT_, int block_height_, int block_width_>
+      void _create_non_empty_diag_struct(SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& matrix, Index nrows, Index ncols, Index nnze)
       {
-        XASSERT(BlockWidth_ == BlockHeight_);
-        matrix = SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>(_create_non_empty_diag_struct(nrows, ncols, nnze));
+        XASSERT(block_width_ == block_height_);
+        matrix = SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>(_create_non_empty_diag_struct(nrows, ncols, nnze));
       }
 
       /**
@@ -423,8 +423,8 @@ namespace FEAT
       template<typename DT_, typename IT_>
       void _fill_generic_values(SparseMatrixCSR<DT_, IT_>& matrix)
       {
-        DT_* values = matrix.val();
-        const Index nnze = matrix.used_elements();
+        Memory::TypedView<DT_> values = matrix.val_view_w();
+        const Index nnze = matrix.num_nzes();
         for(Index i(0); i < nnze; ++i)
           values[i] = rng(-DT_(1), DT_(1));
       }
@@ -436,14 +436,14 @@ namespace FEAT
       * The sparse matrix object (in BCSR format) whose non-zero values will be filled
       * with randomly generated values.
       */
-      template<typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-      void _fill_generic_values(SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& matrix)
+      template<typename DT_, typename IT_, int block_height_, int block_width_>
+      void _fill_generic_values(SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& matrix)
       {
-        auto * values = matrix.val();
-        const Index nnze = matrix.used_elements();
+        Memory::TypedView<Tiny::Matrix<DT_, block_height_, block_width_>> values = matrix.val_view_w();
+        const Index nnze = matrix.num_nzes();
         for(Index i(0); i < nnze; ++i)
-          for(int j(0); j < BlockHeight_; ++j)
-            for(int k(0); k< BlockWidth_; ++k)
+          for(int j(0); j < block_height_; ++j)
+            for(int k(0); k< block_width_; ++k)
               values[i][j][k] = rng(-DT_(1), DT_(1));
       }
 
@@ -457,8 +457,8 @@ namespace FEAT
       template<typename DT_, typename IT_>
       void _fill_non_negative_values(SparseMatrixCSR<DT_, IT_>& matrix)
       {
-        DT_* values = matrix.val();
-        const Index nnze = matrix.used_elements();
+        Memory::TypedView<DT_> values = matrix.val_view_w();
+        const Index nnze = matrix.num_nzes();
         for(Index i(0); i < nnze; ++i)
           values[i] = rng(DT_(0), DT_(1));
       }
@@ -470,14 +470,14 @@ namespace FEAT
       * The sparse matrix object (in BCSR format) whose non-zero values will be filled
       * with randomly generated values.
       */
-      template<typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-      void _fill_non_negative_values(SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& matrix)
+      template<typename DT_, typename IT_, int block_height_, int block_width_>
+      void _fill_non_negative_values(SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& matrix)
       {
-        auto* values = matrix.val();
-        const Index nnze = matrix.used_elements();
+        Memory::TypedView<Tiny::Matrix<DT_, block_height_, block_width_>> values = matrix.val_view_w();
+        const Index nnze = matrix.num_nzes();
         for(Index i(0); i < nnze; ++i)
-          for(int j(0); j < BlockHeight_; ++j)
-            for(int k(0); k< BlockWidth_; ++k)
+          for(int j(0); j < block_height_; ++j)
+            for(int k(0); k< block_width_; ++k)
               values[i][j][k] = rng(DT_(0), DT_(1));
       }
 
@@ -494,10 +494,10 @@ namespace FEAT
       template<typename DT_, typename IT_>
       void _make_symmetric_values(SparseMatrixCSR<DT_, IT_>& matrix)
       {
-        DT_* values = matrix.val();
-        const Index nrows = matrix.rows();
-        const IT_ * col_idx = matrix.col_ind();
-        const IT_ * row_ptr = matrix.row_ptr();
+        Memory::TypedView<DT_> values = matrix.val_view_w();
+        const Index nrows = matrix.num_rows();
+        const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
+        const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
 
         for (Index i = 0; i < nrows; ++i)
         {
@@ -531,13 +531,13 @@ namespace FEAT
       * \note
       * The matrix as well as the blocks have to be square
       */
-      template<typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-      void _make_symmetric_values(SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& matrix)
+      template<typename DT_, typename IT_, int block_height_, int block_width_>
+      void _make_symmetric_values(SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& matrix)
       {
-        auto* values = matrix.val();
-        const IT_* col_idx = matrix.col_ind();
-        const IT_* row_ptr = matrix.row_ptr();
-        const Index nrows = matrix.rows();
+        Memory::TypedView<Tiny::Matrix<DT_, block_height_, block_width_>> values = matrix.val_view_w();
+        const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
+        const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+        const Index nrows = matrix.num_rows();
 
         for (Index i = 0; i < nrows; ++i) {
           for (IT_ j = row_ptr[i]; j < row_ptr[i + 1]; ++j) {
@@ -550,9 +550,9 @@ namespace FEAT
               {
                 if (col_idx[k] == i)
                 {
-                  for (int l = 0; l < BlockHeight_; ++l)
+                  for (int l = 0; l < block_height_; ++l)
                   {
-                    for (int m = 0; m < BlockWidth_; ++m)
+                    for (int m = 0; m < block_width_; ++m)
                     {
                       values[k][m][l] = values[j][l][m];
                     }
@@ -578,10 +578,10 @@ namespace FEAT
       template<typename DT_, typename IT_>
       void _make_non_zero_diag(SparseMatrixCSR<DT_, IT_>& matrix)
       {
-        DT_* values = matrix.val();
-        const IT_* col_idx = matrix.col_ind();
-        const IT_* row_ptr = matrix.row_ptr();
-        const Index nrows = matrix.rows();
+        Memory::TypedView<DT_> values = matrix.val_view_w();
+        const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
+        const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+        const Index nrows = matrix.num_rows();
 
         for(Index i = 0; i < nrows; ++i)
         {
@@ -606,13 +606,13 @@ namespace FEAT
       * \note
       * The matrix as well as the blocks have to be square
       */
-      template<typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-      void _make_non_zero_diag(SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& matrix)
+      template<typename DT_, typename IT_, int block_height_, int block_width_>
+      void _make_non_zero_diag(SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& matrix)
       {
-        auto* values = matrix.val();
-        const IT_* col_idx = matrix.col_ind();
-        const IT_* row_ptr = matrix.row_ptr();
-        const Index nrows = matrix.rows();
+        Memory::TypedView<Tiny::Matrix<DT_, block_height_, block_width_>> values = matrix.val_view_w();
+        const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
+        const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+        const Index nrows = matrix.num_rows();
 
         for(Index i = 0; i < nrows; ++i)
         {
@@ -620,7 +620,7 @@ namespace FEAT
           {
             if(col_idx[j] == i)  // Check if this is a diagonal element
             {
-              for(int l(0); l < BlockHeight_; ++l)
+              for(int l(0); l < block_height_; ++l)
                 values[j][l][l] = rng(DT_(0.1), DT_(1));
               break;
             }
@@ -641,10 +641,10 @@ namespace FEAT
       template<typename DT_, typename IT_>
       void _make_diagonal_dominant(SparseMatrixCSR<DT_, IT_>& matrix)
       {
-        DT_* values = matrix.val();
-        const IT_* col_idx = matrix.col_ind();
-        const IT_* row_ptr = matrix.row_ptr();
-        const Index nrows = matrix.rows();
+        Memory::TypedView<DT_> values = matrix.val_view_w();
+        const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
+        const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+        const Index nrows = matrix.num_rows();
 
         for(Index i = 0; i < nrows; ++i)
         {
@@ -678,13 +678,13 @@ namespace FEAT
       * \note
       * The matrix as well as the blocks have to be square
       */
-      template<typename DT_, typename IT_, int BlockHeight_, int BlockWidth_>
-      void _make_diagonal_dominant(SparseMatrixBCSR<DT_, IT_, BlockHeight_, BlockWidth_>& matrix)
+      template<typename DT_, typename IT_, int block_height_, int block_width_>
+      void _make_diagonal_dominant(SparseMatrixBCSR<DT_, IT_, block_height_, block_width_>& matrix)
       {
-        auto* values = matrix.val();
-        const IT_* col_idx = matrix.col_ind();
-        const IT_* row_ptr = matrix.row_ptr();
-        const Index nrows = matrix.rows();
+        Memory::TypedView<Tiny::Matrix<DT_, block_height_, block_width_>> values = matrix.val_view_w();
+        const Memory::TypedView<IT_> col_idx = matrix.col_idx_view_r();
+        const Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_r();
+        const Index nrows = matrix.num_rows();
 
         for(Index i = 0; i < nrows; ++i)
         {
@@ -693,9 +693,9 @@ namespace FEAT
           {
             if(col_idx[j] != i) // Skip the diagonal element
             {
-              for(int k(0); k < BlockWidth_; ++k)
+              for(int k(0); k < block_width_; ++k)
               {
-                for(int l(0); l < BlockHeight_; ++l)
+                for(int l(0); l < block_height_; ++l)
                 {
                   off_diagonal += std::abs(values[j][k][l]);
                 }
@@ -703,9 +703,9 @@ namespace FEAT
             }
             else
             {
-              for(int k(0); k < BlockWidth_; ++k)
+              for(int k(0); k < block_width_; ++k)
               {
-                for(int l(0); l < BlockHeight_; ++l)
+                for(int l(0); l < block_height_; ++l)
                 {
                   if(k != l)
                     off_diagonal += std::abs(values[j][k][l]);
@@ -718,7 +718,7 @@ namespace FEAT
           {
             if(col_idx[j] == i) // Check if this is the diagonal element
             {
-              for(int k(0); k < BlockWidth_; ++k)
+              for(int k(0); k < block_width_; ++k)
                 values[j][k][k] = off_diagonal + rng(DT_(0.1), DT_(1)); // Set diagonal value and ensure it's greater than the sum of off-diagonal elements
               break;
             }

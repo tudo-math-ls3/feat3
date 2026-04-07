@@ -144,6 +144,7 @@ namespace FEAT
         _dvec_m    = DVector(_krylov_dim);
         _dvec_dm   = DVector(_krylov_dim);
         _dvec_c    = DVector(_krylov_dim);
+        _dmat_M.format();
 
         _vec_q   = this->_system_matrix.create_vector_r();
         _vec_r   = _vec_q.clone(LAFEM::CloneMode::Layout);
@@ -254,7 +255,7 @@ namespace FEAT
         for (Index l(0); l<_krylov_dim; ++l)
           _vec_P.at(l).format(rng, DataType(0), DataType(1));
 
-        //orthonormalize vector set P (modified Gram-Schmidt)
+        // orthonormalize vector set P (modified Gram-Schmidt)
         for (Index j(0); j<_krylov_dim; ++j)
         {
           for (Index i(0); i<j; ++i)
@@ -265,9 +266,6 @@ namespace FEAT
         }
         _shadow_space_setup = true;
       }
-
-
-
 
       virtual Status _apply_intern(VectorType& vec_sol, const VectorType& DOXY(vec_rhs))
       {
@@ -322,16 +320,23 @@ namespace FEAT
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
             return status;
           }
+
           // update k-th column of M
-          for (Index l(0); l <  _krylov_dim; ++l)
-            _dmat_M(l,k, _vec_P.at(l).dot(_vec_dR.at(k)) );
+          {
+            Memory::TypedView<DataType> dM = _dmat_M.elements_view_rw();
+            for (Index l(0); l <  _krylov_dim; ++l)
+              dM[l*_krylov_dim+k] = _vec_P.at(l).dot(_vec_dR.at(k));
+          }
 
         }
 
         Index oldest(0);
         //calculate m
-        for (Index l(0); l<  _krylov_dim; ++l)
-          _dvec_m(l, _vec_P.at(l).dot(_vec_r) );
+        {
+          Memory::TypedView<DataType> dm = _dvec_m.elements_view_w();
+          for (Index l(0); l<  _krylov_dim; ++l)
+            dm[l] = _vec_P.at(l).dot(_vec_r);
+        }
 
         first_iter.destroy();
         // outer loop
@@ -346,9 +351,12 @@ namespace FEAT
             _dmat_Minv = _dmat_M.inverse();
             _dmat_Minv.apply(_dvec_c, _dvec_m);
 
-            _vec_q.scale(_vec_dR.at(0), -_dvec_c(0) );
-            for (Index l(1); l < _krylov_dim; ++l)
-              _vec_q.axpy(_vec_dR.at(l), -_dvec_c(l));
+            {
+              const Memory::TypedView<DataType> dc = _dvec_c.elements_view_r();
+              _vec_q.scale(_vec_dR.at(0), -dc(0));
+              for (Index l(1); l < _krylov_dim; ++l)
+                _vec_q.axpy(_vec_dR.at(l), -dc(l));
+            }
 
             _vec_v.copy(_vec_q);
             _vec_v.axpy(_vec_r);
@@ -368,12 +376,15 @@ namespace FEAT
               _vec_dR.at(oldest).axpy(_vec_t, -om);
 
               //dX(oldest)=-dX*c+om*v
-              _vec_dX.at(oldest).scale(_vec_dX.at(oldest), -_dvec_c(oldest));
-              for (Index l(0); l < oldest; ++l)
-                _vec_dX.at(oldest).axpy(_vec_dX.at(l), -_dvec_c(l));
-              for (Index l(oldest+1); l < _krylov_dim; ++l)
-                _vec_dX.at(oldest).axpy(_vec_dX.at(l), -_dvec_c(l));
-              _vec_dX.at(oldest).axpy(_vec_v, om);
+              {
+                const Memory::TypedView<DataType> dc = _dvec_c.elements_view_r();
+                _vec_dX.at(oldest).scale(_vec_dX.at(oldest), -dc(oldest));
+                for (Index l(0); l < oldest; ++l)
+                  _vec_dX.at(oldest).axpy(_vec_dX.at(l), -dc(l));
+                for (Index l(oldest+1); l < _krylov_dim; ++l)
+                  _vec_dX.at(oldest).axpy(_vec_dX.at(l), -dc(l));
+                _vec_dX.at(oldest).axpy(_vec_v, om);
+              }
 
               matrix.apply(_vec_t, _vec_dX.at(oldest));
               filter.filter_def(_vec_t);
@@ -381,12 +392,15 @@ namespace FEAT
             else
             {
               //dX(oldest)=-dX*c+om*v
-              _vec_dX.at(oldest).scale(_vec_dX.at(oldest), -_dvec_c(oldest));
-              for (Index l(0); l < oldest; ++l)
-                _vec_dX.at(oldest).axpy(_vec_dX.at(l), -_dvec_c(l));
-              for (Index l(oldest+1); l < _krylov_dim; ++l)
-                _vec_dX.at(oldest).axpy(_vec_dX.at(l), -_dvec_c(l));
-              _vec_dX.at(oldest).axpy(_vec_v, om);
+              {
+                const Memory::TypedView<DataType> dc = _dvec_c.elements_view_r();
+                _vec_dX.at(oldest).scale(_vec_dX.at(oldest), -dc(oldest));
+                for (Index l(0); l < oldest; ++l)
+                  _vec_dX.at(oldest).axpy(_vec_dX.at(l), -dc(l));
+                for (Index l(oldest+1); l < _krylov_dim; ++l)
+                  _vec_dX.at(oldest).axpy(_vec_dX.at(l), -dc(l));
+                _vec_dX.at(oldest).axpy(_vec_v, om);
+              }
 
               matrix.apply( _vec_dR.at(oldest), _vec_dX.at(oldest));
               filter.filter_def(_vec_dR.at(oldest));
@@ -409,10 +423,13 @@ namespace FEAT
             if (status != Status::progress)
               break;
 
-            for (Index l(0); l <  _krylov_dim; ++l)
             {
-              _dvec_dm(l, _vec_P.at(l).dot(_vec_dR.at(oldest)) );
-              _dmat_M( l, oldest, _dvec_dm(l));
+              Memory::TypedView<DataType> dM = _dmat_M.elements_view_rw();
+              Memory::TypedView<DataType> dm = _dvec_dm.elements_view_w();
+              for (Index l(0); l <  _krylov_dim; ++l)
+              {
+                dM[l*_krylov_dim+oldest] = dm[l] = _vec_P.at(l).dot(_vec_dR.at(oldest));
+              }
             }
             _dvec_m.axpy(_dvec_dm);
             oldest = (oldest+1) % _krylov_dim;

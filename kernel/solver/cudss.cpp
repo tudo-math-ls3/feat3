@@ -6,7 +6,6 @@
 #include <kernel/base_header.hpp>
 
 #ifdef FEAT_HAVE_CUDSS
-#include <kernel/util/memory_pool.hpp>
 #include <kernel/util/cuda_util.hpp>
 #include <kernel/solver/cudss.hpp>
 
@@ -26,8 +25,9 @@ namespace FEAT
         cudssMatrix_t matrix;
         cudssMatrix_t vec_sol;
         cudssMatrix_t vec_rhs;
-        std::uint32_t* row_ptr;
-        std::uint32_t* col_idx;
+        Memory::Arbiter row_ptr;
+        Memory::Arbiter col_idx;
+        //Memory::Arbiter mat_val;
       };
     } // namespace Intern
 
@@ -70,28 +70,27 @@ namespace FEAT
         throw SolverException("CUDSS: cudssConfigSet() for 'CUDSS_CONFIG_REORDERING_ALG' failed!");
 
       // get the index arrays of the matrix
-      const Index neq = _system_matrix.rows();
-      const Index nze = _system_matrix.used_elements();
-      const Index* a_row_ptr = _system_matrix.row_ptr();
-      const Index* a_col_idx = _system_matrix.col_ind();
-      std::uint32_t* row_ptr = nullptr;
-      std::uint32_t* col_idx = nullptr;
+      const Index neq = _system_matrix.num_rows();
+      const Index nze = _system_matrix.num_nzes();
 
       // convert indices to 32 bit if necessary
       if constexpr (sizeof(Index) == 4u)
       {
-        row_ptr = reinterpret_cast<std::uint32_t*>(const_cast<Index*>(_system_matrix.row_ptr()));
-        col_idx = reinterpret_cast<std::uint32_t*>(const_cast<Index*>(_system_matrix.col_ind()));
+        core.row_ptr = _system_matrix.row_ptr_arbiter().attach();
+        core.col_idx = _system_matrix.col_idx_arbiter().attach();
       }
       else
       {
-        row_ptr = core.row_ptr = MemoryPool::allocate_memory<std::uint32_t>(neq+1u);
-        col_idx = core.col_idx = MemoryPool::allocate_memory<std::uint32_t>(nze);
-        for(Index i(0); i <= neq; ++i)
-          core.row_ptr[i] = std::uint32_t(a_row_ptr[i]);
-        for(Index i(0); i < nze; ++i)
-          core.col_idx[i] = std::uint32_t(a_col_idx[i]);
+        core.row_ptr = Memory::Arbiter(std::size_t(4u*(neq+1u)));
+        core.col_idx = Memory::Arbiter(std::size_t(4u*nze));
+        core.row_ptr.template convert<std::uint32_t, Index>(_system_matrix.row_ptr_arbiter(), Memory::Location::main);
+        core.col_idx.template convert<std::uint32_t, Index>(_system_matrix.col_idx_arbiter(), Memory::Location::main);
       }
+
+      // get device pointers
+      const Memory::TypedView<std::uint32_t> row_ptr_view(core.row_ptr.view(Memory::Location::cuda));
+      const Memory::TypedView<std::uint32_t> col_idx_view(core.col_idx.view(Memory::Location::cuda));
+      const Memory::TypedView<double> val_view(_system_matrix.val_view_r(Memory::Location::cuda));
 
       // set matrix data
       ret = cudssMatrixCreateCsr(
@@ -99,10 +98,10 @@ namespace FEAT
         std::int64_t(neq),
         std::int64_t(neq),
         std::int64_t(nze),
-        row_ptr,
+        const_cast<std::uint32_t*>(row_ptr_view.get_r()),
         nullptr,
-        col_idx,
-        const_cast<double*>(_system_matrix.val()),
+        const_cast<std::uint32_t*>(col_idx_view.get_r()),
+        const_cast<double*>(val_view.get_r()),
         CUDA_R_32I,
         CUDA_R_64F,
         CUDSS_MTYPE_GENERAL,
@@ -165,16 +164,8 @@ namespace FEAT
       cudssMatrixDestroy(core.vec_rhs);
       cudssMatrixDestroy(core.matrix);
 
-      if(core.col_idx)
-      {
-        MemoryPool::release_memory(core.col_idx);
-        core.col_idx = nullptr;
-      }
-      if(core.row_ptr)
-      {
-        MemoryPool::release_memory(core.row_ptr);
-        core.row_ptr = nullptr;
-      }
+      core.col_idx.release();
+      core.row_ptr.release();
 
       // wait until CUDA is done
       Util::cuda_synchronize();
@@ -185,6 +176,9 @@ namespace FEAT
       BaseClass::init_numeric();
 
       Intern::CUDSSCore& core = *reinterpret_cast<Intern::CUDSSCore*>(_cudss_core);
+
+      // get a cuda view of the numeric data to ensure that its uploaded to device memory
+      const Memory::TypedView<double> val_view(_system_matrix.val_view_r(Memory::Location::cuda));
 
       // perform numeric factorization
       cudssStatus_t ret = cudssExecute(
@@ -197,6 +191,8 @@ namespace FEAT
         core.vec_rhs);
       if(ret != CUDSS_STATUS_SUCCESS)
         throw SolverException("CUDSS: cudssExecute() for phase 'CUDSS_PHASE_FACTORIZATION' failed!");
+
+      val_view.release();
 
       // wait until CUDA is done
       Util::cuda_synchronize();
@@ -214,13 +210,16 @@ namespace FEAT
 
       cudssStatus_t ret = CUDSS_STATUS_INTERNAL_ERROR;
 
+      Memory::TypedView<double> sol_view(vec_sol.elements_view_w(Memory::Location::cuda));
+      Memory::TypedView<double> rhs_view(vec_rhs.elements_view_r(Memory::Location::cuda));
+
       // set solution vector data array
-      ret = cudssMatrixSetValues(core.vec_sol, vec_sol.elements());
+      ret = cudssMatrixSetValues(core.vec_sol, sol_view.get_w());
       if(ret != CUDSS_STATUS_SUCCESS)
         throw SolverException("CUDSS: cudssMatrixSetValues() failed for vec_sol!");
 
       // set rhs vector data array
-      cudssMatrixSetValues(core.vec_rhs, const_cast<double*>(vec_rhs.elements()));
+      cudssMatrixSetValues(core.vec_rhs, const_cast<double*>(rhs_view.get_r()));
       if(ret != CUDSS_STATUS_SUCCESS)
         throw SolverException("CUDSS: cudssMatrixSetValues() failed for vec_rhs!");
 

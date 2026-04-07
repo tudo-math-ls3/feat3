@@ -78,8 +78,8 @@ namespace FEAT
         XASSERTM(&target_space.get_trafo() == &source_space.get_trafo(), "source and target space must be defined on the same trafo");
 
         // validate matrix and vector dimensions
-        XASSERTM(matrix.rows() == target_space.get_num_dofs(), "invalid matrix dimensions");
-        XASSERTM(matrix.columns() == source_space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_rows() == target_space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_cols() == source_space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(vector.size() == target_space.get_num_dofs(), "invalid vector size");
 
         typedef typename Matrix_::DataType DataType;

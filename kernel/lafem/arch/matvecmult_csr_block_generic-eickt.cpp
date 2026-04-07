@@ -1,0 +1,28 @@
+// FEAT3: Finite Element Analysis Toolbox, Version 3
+// Copyright (C) 2010 by Stefan Turek & the FEAT group
+// FEAT3 is released under the GNU General Public License version 3,
+// see the file 'copyright.txt' in the top level directory for details.
+
+// includes, FEAT
+#include <kernel/base_header.hpp>
+#include <kernel/lafem/arch/matvecmult_csr_block.hpp>
+
+namespace FEAT::LAFEM::Arch
+{
+  template void MatVecMultCSRBlock::exec_generic_impl<float, std::uint32_t, 1>(Tiny::Vector<float,1> *, const float, const Tiny::Vector<float,1> * const, const Tiny::Vector<float,1> * const, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index, const bool);
+  template void MatVecMultCSRBlock::exec_generic_impl<float, std::uint64_t, 1>(Tiny::Vector<float,1> *, const float, const Tiny::Vector<float,1> * const, const Tiny::Vector<float,1> * const, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const bool);
+  template void MatVecMultCSRBlock::exec_generic_impl<float, std::uint32_t, 2>(Tiny::Vector<float,2> *, const float, const Tiny::Vector<float,2> * const, const Tiny::Vector<float,2> * const, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index, const bool);
+  template void MatVecMultCSRBlock::exec_generic_impl<float, std::uint64_t, 2>(Tiny::Vector<float,2> *, const float, const Tiny::Vector<float,2> * const, const Tiny::Vector<float,2> * const, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const bool);
+  template void MatVecMultCSRBlock::exec_generic_impl<float, std::uint32_t, 3>(Tiny::Vector<float,3> *, const float, const Tiny::Vector<float,3> * const, const Tiny::Vector<float,3> * const, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index, const bool);
+  template void MatVecMultCSRBlock::exec_generic_impl<float, std::uint64_t, 3>(Tiny::Vector<float,3> *, const float, const Tiny::Vector<float,3> * const, const Tiny::Vector<float,3> * const, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const bool);
+  template void MatVecMultCSRBlock::exec_generic_impl<float, std::uint32_t, 4>(Tiny::Vector<float,4> *, const float, const Tiny::Vector<float,4> * const, const Tiny::Vector<float,4> * const, const float * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index, const bool);
+  template void MatVecMultCSRBlock::exec_generic_impl<float, std::uint64_t, 4>(Tiny::Vector<float,4> *, const float, const Tiny::Vector<float,4> * const, const Tiny::Vector<float,4> * const, const float * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const bool);
+  template void MatVecMultCSRBlock::exec_generic_impl<double, std::uint32_t, 1>(Tiny::Vector<double,1> *, const double, const Tiny::Vector<double,1> * const, const Tiny::Vector<double,1> * const, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index, const bool);
+  template void MatVecMultCSRBlock::exec_generic_impl<double, std::uint64_t, 1>(Tiny::Vector<double,1> *, const double, const Tiny::Vector<double,1> * const, const Tiny::Vector<double,1> * const, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const bool);
+  template void MatVecMultCSRBlock::exec_generic_impl<double, std::uint32_t, 2>(Tiny::Vector<double,2> *, const double, const Tiny::Vector<double,2> * const, const Tiny::Vector<double,2> * const, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index, const bool);
+  template void MatVecMultCSRBlock::exec_generic_impl<double, std::uint64_t, 2>(Tiny::Vector<double,2> *, const double, const Tiny::Vector<double,2> * const, const Tiny::Vector<double,2> * const, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const bool);
+  template void MatVecMultCSRBlock::exec_generic_impl<double, std::uint32_t, 3>(Tiny::Vector<double,3> *, const double, const Tiny::Vector<double,3> * const, const Tiny::Vector<double,3> * const, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index, const bool);
+  template void MatVecMultCSRBlock::exec_generic_impl<double, std::uint64_t, 3>(Tiny::Vector<double,3> *, const double, const Tiny::Vector<double,3> * const, const Tiny::Vector<double,3> * const, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const bool);
+  template void MatVecMultCSRBlock::exec_generic_impl<double, std::uint32_t, 4>(Tiny::Vector<double,4> *, const double, const Tiny::Vector<double,4> * const, const Tiny::Vector<double,4> * const, const double * const, const std::uint32_t * const, const std::uint32_t * const, const Index, const Index, const Index, const bool);
+  template void MatVecMultCSRBlock::exec_generic_impl<double, std::uint64_t, 4>(Tiny::Vector<double,4> *, const double, const Tiny::Vector<double,4> * const, const Tiny::Vector<double,4> * const, const double * const, const std::uint64_t * const, const std::uint64_t * const, const Index, const Index, const Index, const bool);
+} // namespace FEAT::LAFEM::Arch

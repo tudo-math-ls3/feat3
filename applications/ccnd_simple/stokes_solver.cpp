@@ -248,9 +248,9 @@ namespace CCNDSimple
       LAFEM::SparseVector<DataType, IndexType>& vec_char = filter_char.get_filter_vector();
 
       // compute dot product of char vector and defect vector
-      const auto* velo_def = vec_def.local().first().elements();
-      const IndexType* idx = vec_char.indices();
-      for(Index i(0); i < vec_char.used_elements(); ++i)
+      const auto velo_def = vec_def.local().first().elements_view_r();
+      const auto idx = vec_char.indices_view_r();
+      for(Index i(0); i < vec_char.num_nzes(); ++i)
         body_forces += velo_def[idx[i]];
     }
 

@@ -445,11 +445,17 @@ void run_k_epsilon_model(
   if(params.problem == "dirichlet")
   {
     // compute u_tau, k_wall and e_wall according to eq (18)
-    for(Index i = 0; i < k_wall.local().size(); ++i)
     {
-      u_tau = Math::max(Math::pow(params.C_mu, 0.25) * Math::sqrt(vec_sol_k.local()(i)), vec_stokes_sol.local().first()(i).norm_euclid()/11.06);
-      k_wall.local()(i, pow(u_tau, 2.0) / Math::sqrt(params.C_mu));
-      e_wall.local()(i, pow(u_tau, 3.0) / (0.41 * wall_distance));
+      const Memory::TypedView<Tiny::Vector<DataType, dim>> u_view(vec_stokes_sol.local().first().elements_view_r());
+      const Memory::TypedView<DataType> k_view(vec_sol_k.local().elements_view_r());
+      Memory::TypedView<DataType> k_wall_view(k_wall.local().elements_view_w());
+      Memory::TypedView<DataType> e_wall_view(e_wall.local().elements_view_w());
+      for(Index i = 0; i < k_wall.local().size(); ++i)
+      {
+        u_tau = Math::max(Math::pow(params.C_mu, 0.25) * Math::sqrt(k_view(i)), u_view(i).norm_euclid()/11.06);
+        k_wall_view[i] = Math::pow(u_tau, 2.0) / Math::sqrt(params.C_mu);
+        e_wall_view[i] = Math::pow(u_tau, 3.0) / (0.41 * wall_distance);
+      }
     }
 
     // assemble wall filter
@@ -466,11 +472,18 @@ void run_k_epsilon_model(
     {
       const FEAT::Geometry::TargetSet& vertices_bnd_l = mesh_node->find_mesh_part("bnd:l")->get_target_set<0>();
 
+      const Memory::TypedView<DataType> left_wall_val_k_view(left_wall_val_k.local().elements_view_r());
+      const Memory::TypedView<DataType> left_wall_val_e_view(left_wall_val_e.local().elements_view_r());
+
+      LAFEM::SparseVectorFactory<DataType, IndexType> svf_k(filter_k_wall.local().get_filter_vector());
+      LAFEM::SparseVectorFactory<DataType, IndexType> svf_e(filter_e_wall.local().get_filter_vector());
       for(Index i = 0; i < vertices_bnd_l.get_num_entities(); ++i)
       {
-        filter_k_wall.local().add(vertices_bnd_l[i], left_wall_val_k.local()(vertices_bnd_l[i]));
-        filter_e_wall.local().add(vertices_bnd_l[i], left_wall_val_e.local()(vertices_bnd_l[i]));
+        svf_k.add(vertices_bnd_l[i], left_wall_val_k_view(vertices_bnd_l[i]));
+        svf_e.add(vertices_bnd_l[i], left_wall_val_e_view(vertices_bnd_l[i]));
       }
+      filter_k_wall.local().get_filter_vector() = svf_k.make_sv();
+      filter_e_wall.local().get_filter_vector() = svf_e.make_sv();
     }
 
     // export k_wall and e_wall vector to make sure boundary values are enforced
@@ -898,11 +911,17 @@ void run_k_epsilon_model(
           filter_e_wall.local().clear();
 
           // compute u_tau, k_wall and e_wall values according to eq (18)
-          for(Index i = 0; i < k_wall.local().size(); ++i)
           {
-            u_tau = Math::max(Math::pow(params.C_mu, 0.25) * Math::sqrt(vec_sol_k.local()(i)), vec_stokes_sol.local().first()(i).norm_euclid()/11.06);
-            k_wall.local()(i, pow(u_tau, 2.0) / Math::sqrt(params.C_mu));
-            e_wall.local()(i, pow(u_tau, 3.0) / (0.41 * wall_distance));
+            const Memory::TypedView<Tiny::Vector<DataType, dim>> u_view(vec_stokes_sol.local().first().elements_view_r());
+            const Memory::TypedView<DataType> k_view(vec_sol_k.local().elements_view_r());
+            Memory::TypedView<DataType> k_wall_view(k_wall.local().elements_view_w());
+            Memory::TypedView<DataType> e_wall_view(e_wall.local().elements_view_w());
+            for(Index i = 0; i < k_wall.local().size(); ++i)
+            {
+              u_tau = Math::max(Math::pow(params.C_mu, 0.25) * Math::sqrt(k_view(i)), u_view(i).norm_euclid()/11.06);
+              k_wall_view[i] = Math::pow(u_tau, 2.0) / Math::sqrt(params.C_mu);
+              e_wall_view[i] = Math::pow(u_tau, 3.0) / (0.41 * wall_distance);
+            }
           }
 
           // assemble wall filter
@@ -922,11 +941,18 @@ void run_k_epsilon_model(
           {
             const FEAT::Geometry::TargetSet& vertices_bnd_l = mesh_node->find_mesh_part("bnd:l")->get_target_set<0>();
 
+            const Memory::TypedView<DataType> left_wall_val_k_view(left_wall_val_k.local().elements_view_r());
+            const Memory::TypedView<DataType> left_wall_val_e_view(left_wall_val_e.local().elements_view_r());
+
+            LAFEM::SparseVectorFactory<DataType, IndexType> svf_k(filter_k_wall.local().get_filter_vector());
+            LAFEM::SparseVectorFactory<DataType, IndexType> svf_e(filter_e_wall.local().get_filter_vector());
             for(Index i = 0; i < vertices_bnd_l.get_num_entities(); ++i)
             {
-              filter_k_wall.local().add(vertices_bnd_l[i], left_wall_val_k.local()(vertices_bnd_l[i]));
-              filter_e_wall.local().add(vertices_bnd_l[i], left_wall_val_e.local()(vertices_bnd_l[i]));
+              svf_k.add(vertices_bnd_l[i], left_wall_val_k_view(vertices_bnd_l[i]));
+              svf_e.add(vertices_bnd_l[i], left_wall_val_e_view(vertices_bnd_l[i]));
             }
+            filter_k_wall.local().get_filter_vector() = svf_k.make_sv();
+            filter_e_wall.local().get_filter_vector() = svf_e.make_sv();
           }
 
           // update filter for limiter
@@ -1186,46 +1212,48 @@ void run_k_epsilon_model(
         // Set values of e, k to 1e-10 if they become negative
         /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        DataType* data_ptr_e = vec_sol_e.local().elements();
-        DataType* data_ptr_k = vec_sol_k.local().elements();
-        DataType* data_ptr_nu = nu_vec.local().elements();
-        DataType* data_ptr_gamma = vec_gamma.local().elements();
         IndexType data_size = vec_sol_e.local().size();
         DataType l_star;
         count_e = 0;
         count_k = 0;
         count_nu = 0;
 
-        for (IndexType i = 0; i < data_size; ++i)
         {
-          // Set e positive
-          if (data_ptr_e[i] < 1e-10)
+          Memory::TypedView<DataType> data_ptr_e = vec_sol_e.local().elements_view_rw();
+          Memory::TypedView<DataType> data_ptr_k = vec_sol_k.local().elements_view_rw();
+          Memory::TypedView<DataType> data_ptr_nu = nu_vec.local().elements_view_w();
+          Memory::TypedView<DataType> data_ptr_gamma = vec_gamma.local().elements_view_w();
+          for (IndexType i = 0; i < data_size; ++i)
           {
-            data_ptr_e[i] = 1e-10;
-            ++count_e;
-          }
+            // Set e positive
+            if (data_ptr_e[i] < 1e-10)
+            {
+              data_ptr_e[i] = 1e-10;
+              ++count_e;
+            }
 
-          // Set k positive
-          if (data_ptr_k[i] < 1e-10)
-          {
-            data_ptr_k[i] = 1e-10;
-            ++count_k;
-          }
+            // Set k positive
+            if (data_ptr_k[i] < 1e-10)
+            {
+              data_ptr_k[i] = 1e-10;
+              ++count_k;
+            }
 
-          // Compute nu_T according to eq (8)
-          if (params.C_mu * data_ptr_k[i] * Math::sqrt(data_ptr_k[i]) < data_ptr_e[i] * bnd_info.get_l_max())
-          {
-            l_star = params.C_mu * data_ptr_k[i] * Math::sqrt(data_ptr_k[i]) / data_ptr_e[i];
-          }
-          else
-          {
-            l_star = bnd_info.get_l_max();
-            ++count_nu;
-          }
-          data_ptr_nu[i] = Math::max(params.nu_min, l_star * Math::sqrt(data_ptr_k[i]));
+            // Compute nu_T according to eq (8)
+            if (params.C_mu * data_ptr_k[i] * Math::sqrt(data_ptr_k[i]) < data_ptr_e[i] * bnd_info.get_l_max())
+            {
+              l_star = params.C_mu * data_ptr_k[i] * Math::sqrt(data_ptr_k[i]) / data_ptr_e[i];
+            }
+            else
+            {
+              l_star = bnd_info.get_l_max();
+              ++count_nu;
+            }
+            data_ptr_nu[i] = Math::max(params.nu_min, l_star * Math::sqrt(data_ptr_k[i]));
 
-          // Compute gamma according to eq (9)
-          data_ptr_gamma[i] = (params.C_mu * data_ptr_k[i] / data_ptr_nu[i]);
+            // Compute gamma according to eq (9)
+            data_ptr_gamma[i] = (params.C_mu * data_ptr_k[i] / data_ptr_nu[i]);
+          }
         }
 
         global_count_e = 0;

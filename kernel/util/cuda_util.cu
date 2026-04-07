@@ -69,61 +69,10 @@ void FEAT::Util::cuda_set_device(const int device)
 
 void FEAT::Util::cuda_check_last_error()
 {
-  if(Runtime::SyncGuard::enable_synchronize())
-    cudaDeviceSynchronize();
+  cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
-}
-
-void * FEAT::Util::cuda_get_device_pointer(void * host)
-{
-  void * device(nullptr);
-  if (cudaSuccess != cudaHostGetDevicePointer((void**)&device, host, 0))
-    throw InternalError(__func__, __FILE__, __LINE__, "cudaHostGetDevicePointer failed!");
-  return device;
-}
-
-void * FEAT::Util::cuda_malloc_managed(const Index bytes)
-{
-  void * memory(nullptr);
-  if (bytes == 0)
-    return memory;
-
-  auto status = cudaMallocManaged((void**)&memory, bytes);
-  if (status != cudaSuccess)
-    throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_malloc_managed allocation error\n" + stringify(cudaGetErrorString(status)));
-  if (memory == nullptr)
-    throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_malloc_managed allocation error (null pointer returned)");
-  return memory;
-}
-
-void * FEAT::Util::cuda_malloc(const Index bytes)
-{
-  void * memory(nullptr);
-  if(bytes == 0)
-    return memory;
-
-  auto status = cudaMalloc((void**)&memory, bytes);
-  if (status != cudaSuccess)
-    throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_malloc allocation error\n" + stringify(cudaGetErrorString(status)));
-  if (memory == nullptr)
-    throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_malloc allocation error (null pointer returned)");
-  return memory;
-}
-
-void * FEAT::Util::cuda_malloc_host(const Index bytes)
-{
-  void * memory(nullptr);
-  if(bytes == 0)
-    return memory;
-
-  auto status = cudaMallocHost((void**)&memory, bytes);
-  if (status != cudaSuccess)
-    throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_malloc allocation error\n" + stringify(cudaGetErrorString(status)));
-  if (memory == nullptr)
-    throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_malloc allocation error (null pointer returned)");
-  return memory;
 }
 
 void * FEAT::Util::cuda_get_static_memory(const Index bytes)
@@ -153,26 +102,6 @@ void FEAT::Util::cuda_free_static_memory()
   Intern::cuda_workspace = nullptr;
 }
 
-void FEAT::Util::cuda_free(void * address)
-{
-  if (address == nullptr)
-    return;
-
-  auto status = cudaFree(address);
-  if (cudaSuccess != status)
-    throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_free: cudaFree failed!\n" + stringify(cudaGetErrorString(status)));
-}
-
-void FEAT::Util::cuda_free_host(void * address)
-{
-  if (address == nullptr)
-    return;
-
-  auto status = cudaFreeHost(address);
-  if (cudaSuccess != status)
-    throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_free_host: cudaFreeHost failed!\n" + stringify(cudaGetErrorString(status)));
-}
-
 void FEAT::Util::cuda_initialize(int rank, int /*ranks_per_node*/, int /*ranks_per_uma*/, int gpus_per_node)
 {
   /// \todo enable non cuda ranks and ensure balance of ranks per numa section
@@ -180,10 +109,10 @@ void FEAT::Util::cuda_initialize(int rank, int /*ranks_per_node*/, int /*ranks_p
   if (cudaSuccess != cudaSetDevice(cuda_device_number))
     throw InternalError(__func__, __FILE__, __LINE__, "cudaSetDevice failed!");
 
-  int mm_support = 0;
-  if (cudaSuccess != cudaDeviceGetAttribute(&mm_support, cudaDevAttrManagedMemory, cuda_device_number))
-    throw InternalError(__func__, __FILE__, __LINE__, "cudaGetAttribute failed!");
-  XASSERTM(mm_support == 1, "selected cuda device does not support managed memory!");
+  //int mm_support = 0;
+  //if (cudaSuccess != cudaDeviceGetAttribute(&mm_support, cudaDevAttrManagedMemory, cuda_device_number))
+  //  throw InternalError(__func__, __FILE__, __LINE__, "cudaGetAttribute failed!");
+  //XASSERTM(mm_support == 1, "selected cuda device does not support managed memory!");
 
   if (CUBLAS_STATUS_SUCCESS != cublasCreate(&Util::Intern::cublas_handle))
     throw InternalError(__func__, __FILE__, __LINE__, "cublasCreate failed!");
@@ -233,12 +162,9 @@ void FEAT::Util::cuda_finalize()
 
 void FEAT::Util::cuda_synchronize()
 {
-  if(Runtime::SyncGuard::enable_synchronize())
-  {
-    auto status = cudaDeviceSynchronize();
-    if (status != cudaSuccess)
-      throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceSynchronize failed: " + stringify(cudaGetErrorString(status)));
-  }
+  auto status = cudaDeviceSynchronize();
+  if (status != cudaSuccess)
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceSynchronize failed: " + stringify(cudaGetErrorString(status)));
 }
 
 void FEAT::Util::cuda_force_synchronize()
@@ -253,34 +179,6 @@ void FEAT::Util::cuda_reset_device()
   auto status = cudaDeviceReset();
   if (status != cudaSuccess)
     throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceReset failed: " + stringify(cudaGetErrorString(status)));
-}
-
-void FEAT::Util::cuda_copy(void * dest, const void * src, const Index bytes)
-{
-  auto status = cudaMemcpy(dest, src, bytes, cudaMemcpyDefault);
-  if (status != cudaSuccess)
-    throw InternalError(__func__, __FILE__, __LINE__, "cudaMemcpy failed: " + stringify(cudaGetErrorString(status)));
-}
-
-void FEAT::Util::cuda_copy_host_to_device(void * dest, const void * src, const Index bytes)
-{
-  auto status = cudaMemcpy(dest, src, bytes, cudaMemcpyHostToDevice);
-  if (status != cudaSuccess)
-    throw InternalError(__func__, __FILE__, __LINE__, "cudaMemcpy failed: " + stringify(cudaGetErrorString(status)));
-}
-
-void FEAT::Util::cuda_copy_device_to_host(void * dest, const void * src, const Index bytes)
-{
-  auto status = cudaMemcpy(dest, src, bytes, cudaMemcpyDeviceToHost);
-  if (status != cudaSuccess)
-    throw InternalError(__func__, __FILE__, __LINE__, "cudaMemcpy failed: " + stringify(cudaGetErrorString(status)));
-}
-
-void FEAT::Util::cuda_copy_device_to_device(void * dest, const void * src, const Index bytes)
-{
-  auto status = cudaMemcpy(dest, src, bytes, cudaMemcpyDeviceToDevice);
-  if (status != cudaSuccess)
-    throw InternalError(__func__, __FILE__, __LINE__, "cudaMemcpy failed: " + stringify(cudaGetErrorString(status)));
 }
 
 void FEAT::Util::cuda_set_blocksize(Index misc, Index reduction, Index spmv, Index axpy, Index scalar_assembly, Index blocked_assembly)
@@ -305,73 +203,6 @@ void FEAT::Util::cuda_reset_algos()
     Util::Intern::cublas_lt_algo_matmat_initialized[i] = false;
   }
 }
-
-template <typename DT_>
-void FEAT::Util::cuda_set_memory(DT_ * address, const DT_ val, const Index count)
-{
-  Index blocksize = FEAT::Util::cuda_blocksize_misc;
-  dim3 grid;
-  dim3 block;
-  block.x = (unsigned)blocksize;
-  grid.x = (unsigned)ceil((count)/(double)(block.x));
-  FEAT::Util::Intern::cuda_set_memory<<<grid, block>>>(address, val, count);
-
-  cudaDeviceSynchronize();
-#ifdef FEAT_DEBUG_MODE
-  cudaError_t last_error(cudaGetLastError());
-  if (cudaSuccess != last_error)
-    throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_set_memory failed!\n" + stringify(cudaGetErrorString(last_error)));
-#endif
-}
-#ifdef FEAT_HAVE_HALFMATH
-template void FEAT::Util::cuda_set_memory(Half * , const Half, const Index);
-#endif
-template void FEAT::Util::cuda_set_memory(float * , const float, const Index);
-template void FEAT::Util::cuda_set_memory(double * , const double, const Index);
-template void FEAT::Util::cuda_set_memory(unsigned int * , const unsigned int, const Index);
-template void FEAT::Util::cuda_set_memory(unsigned long * , const unsigned long, const Index);
-template void FEAT::Util::cuda_set_memory(unsigned long long * , const unsigned long long, const Index);
-template void FEAT::Util::cuda_set_memory(int * , const int, const Index);
-template void FEAT::Util::cuda_set_memory(long * , const long, const Index);
-template void FEAT::Util::cuda_set_memory(long long * , const long long, const Index);
-
-template <typename DT1_, typename DT2_>
-void FEAT::Util::cuda_convert(DT1_ * dest, const DT2_ * src, const Index count)
-{
-  Index blocksize = FEAT::Util::cuda_blocksize_misc;
-  dim3 grid;
-  dim3 block;
-  block.x = (unsigned)blocksize;
-  grid.x = (unsigned)ceil((count)/(double)(block.x));
-  FEAT::Util::Intern::cuda_convert<<<grid, block>>>(dest, src, count);
-
-  cudaDeviceSynchronize();
-#ifdef FEAT_DEBUG
-  cudaError_t last_error(cudaGetLastError());
-  if (cudaSuccess != last_error)
-    throw InternalError(__func__, __FILE__, __LINE__, "Util::cuda_convert failed!\n" + stringify(cudaGetErrorString(last_error)));
-#endif
-}
-#ifdef FEAT_HAVE_HALFMATH
-template void FEAT::Util::cuda_convert<Half, float>(Half *, const float *, const Index);
-template void FEAT::Util::cuda_convert<float, Half>(float *, const Half *, const Index);
-template void FEAT::Util::cuda_convert<Half, double>(Half *, const double *, const Index);
-template void FEAT::Util::cuda_convert<double, Half>(double *, const Half *, const Index);
-#endif
-template void FEAT::Util::cuda_convert<float, double>(float *, const double *, const Index);
-template void FEAT::Util::cuda_convert<double, float>(double *, const float *, const Index);
-template void FEAT::Util::cuda_convert<unsigned int, unsigned long>(unsigned int *, const unsigned long *, const Index);
-template void FEAT::Util::cuda_convert<unsigned int, unsigned long long>(unsigned int *, const unsigned long long *, const Index);
-template void FEAT::Util::cuda_convert<unsigned long, unsigned int>(unsigned long *, const unsigned int *, const Index);
-template void FEAT::Util::cuda_convert<unsigned long, unsigned long long>(unsigned long *, const unsigned long long *, const Index);
-template void FEAT::Util::cuda_convert<unsigned long long, unsigned int>(unsigned long long *, const unsigned int *, const Index);
-template void FEAT::Util::cuda_convert<unsigned long long, unsigned long>(unsigned long long *, const unsigned long *, const Index);
-template void FEAT::Util::cuda_convert<unsigned int, double>(unsigned int *, const double *, const Index);
-template void FEAT::Util::cuda_convert<unsigned long, double>(unsigned long *, const double *, const Index);
-template void FEAT::Util::cuda_convert<unsigned int, float>(unsigned int *, const float *, const Index);
-template void FEAT::Util::cuda_convert<unsigned long, float>(unsigned long *, const float *, const Index);
-// For msvc only
-template void FEAT::Util::cuda_convert<unsigned long long, double>(unsigned long long*, const double*, const Index);
 
 int FEAT::Util::cuda_get_device_count()
 {

@@ -146,18 +146,18 @@ namespace FEAT
         virtual void mesh_to_buffer()
         {
           const typename MeshType::VertexSetType& vertex_set = get_mesh()->get_vertex_set();
-
+          auto vcb = _coords_buffer.elements_view_w();
           for(Index i(0); i < get_mesh()->get_num_entities(0); ++i)
-            _coords_buffer(i, vertex_set[i]);
+            vcb[i] = vertex_set[i];
         }
 
         /// \brief Sets the coordinates in the underlying mesh to _coords_buffer.
         virtual void buffer_to_mesh()
         {
           typename MeshType::VertexSetType& vertex_set = get_mesh()->get_vertex_set();
-
+          auto vcb = _coords_buffer.elements_view_r();
           for(Index i(0); i < get_mesh()->get_num_entities(0); ++i)
-            vertex_set[i] = _coords_buffer(i);
+            vertex_set[i] = vcb(i);
         }
 
         /**

@@ -125,8 +125,8 @@ namespace FEAT
         const Cubature::DynamicFactory& cubature_factory)
       {
         // validate matrix and vector dimensions
-        XASSERTM(matrix.rows() == fine_space.get_num_dofs(), "invalid matrix dimensions");
-        XASSERTM(matrix.columns() == coarse_space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_rows() == fine_space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_cols() == coarse_space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(vector.size() == fine_space.get_num_dofs(), "invalid vector size");
 
         typedef typename Matrix_::DataType DataType;
@@ -512,8 +512,8 @@ namespace FEAT
         const Cubature::DynamicFactory& cubature_factory)
       {
         // validate matrix and vector dimensions
-        XASSERTM(matrix.rows() == coarse_space.get_num_dofs(), "invalid matrix dimensions");
-        XASSERTM(matrix.columns() == fine_space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_rows() == coarse_space.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_cols() == fine_space.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(vector.size() == coarse_space.get_num_dofs(), "invalid vector size");
 
         typedef typename Matrix_::DataType DataType;
@@ -881,8 +881,8 @@ namespace FEAT
         const String& cubature_name)
       {
         // validate matrix and vector dimensions
-        XASSERTM(matrix.rows() == space_target.get_num_dofs(), "invalid matrix dimensions");
-        XASSERTM(matrix.columns() == space_source.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_rows() == space_target.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_cols() == space_source.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(vector.size() == space_target.get_num_dofs(), "invalid vector size");
 
         typedef typename Matrix_::DataType DataType;

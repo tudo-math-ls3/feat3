@@ -42,15 +42,15 @@ namespace DbgBurgersAsm
 
   DataType diff_max(const BlockedMatrixType& a, const BlockedMatrixType& b)
   {
-    const auto* val_a = a.val();
-    const auto* val_b = b.val();
+    const auto val_a = a.val_view_r();
+    const auto val_b = b.val_view_r();
 
     DataType r = DataType(0);
-    for(Index k(0); k < a.used_elements(); ++k)
+    for(Index k(0); k < a.num_nzes(); ++k)
     {
       auto x = (val_a[k] - val_b[k]);
-      for(int i(0); i < a.BlockHeight; ++i)
-        for(int j(0); j < a.BlockWidth; ++j)
+      for(int i(0); i < a.block_height; ++i)
+        for(int j(0); j < a.block_width; ++j)
           r = Math::max(r, Math::abs(x(i,j)));
     }
     return r;
@@ -58,14 +58,14 @@ namespace DbgBurgersAsm
 
   DataType diff_max(const BlockedVectorType& a, const BlockedVectorType& b)
   {
-    const auto* val_a = a.elements();
-    const auto* val_b = b.elements();
+    const auto val_a = a.elements_view_r();
+    const auto val_b = b.elements_view_r();
 
     DataType r = DataType(0);
-    for(Index k(0); k < a.used_elements(); ++k)
+    for(Index k(0); k < a.size(); ++k)
     {
       auto x = (val_a[k] - val_b[k]);
-      for(int i(0); i < a.BlockSize; ++i)
+      for(int i(0); i < a.block_size; ++i)
         r = Math::max(r, Math::abs(x[i]));
     }
     return r;
@@ -73,11 +73,11 @@ namespace DbgBurgersAsm
 
   DataType diff_max(const ScalarMatrixType& a, const ScalarMatrixType& b)
   {
-    const auto* val_a = a.val();
-    const auto* val_b = b.val();
+    const auto val_a = a.val_view_r();
+    const auto val_b = b.val_view_r();
 
     DataType r = DataType(0);
-    for(Index k(0); k < a.used_elements(); ++k)
+    for(Index k(0); k < a.num_nzes(); ++k)
     {
       r = Math::max(r, Math::abs(val_a[k] - val_b[k]));
     }
@@ -86,11 +86,11 @@ namespace DbgBurgersAsm
 
   DataType diff_max(const ScalarVectorType& a, const ScalarVectorType& b)
   {
-    const auto* val_a = a.elements();
-    const auto* val_b = b.elements();
+    const auto val_a = a.elements_view_r();
+    const auto val_b = b.elements_view_r();
 
     DataType r = DataType(0);
-    for(Index k(0); k < a.used_elements(); ++k)
+    for(Index k(0); k < a.size(); ++k)
     {
       r = Math::max(r, Math::abs(val_a[k] - val_b[k]));
     }
@@ -106,7 +106,8 @@ namespace DbgBurgersAsm
 
     // create domain assembler
     Assembly::DomainAssembler<TrafoType> domain_asm(trafo);
-    domain_asm.compile_all_elements(0u, Assembly::ThreadingStrategy::single);
+    //domain_asm.compile_all_elements(0u, Assembly::ThreadingStrategy::single);
+    domain_asm.compile_all_elements();
 
     BlockedMatrixType bmatrix_1, bmatrix_2;
     ScalarMatrixType smatrix_1, smatrix_2;

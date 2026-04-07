@@ -40,10 +40,6 @@ public:
   {
   }
 
-  virtual ~GridTransferTipTest()
-  {
-  }
-
   virtual void run() const override
   {
     // create coarse mesh
@@ -97,10 +93,10 @@ public:
 
     // initialize to coarse-mesh identity matrix "I_c"
     {
-      const IndexType num_rows = IndexType(rip_matrix.rows());
-      const IndexType* row_ptr = rip_matrix.row_ptr();
-      const IndexType* col_idx = rip_matrix.col_ind();
-      DataType* vals = rip_matrix.val();
+      const IndexType num_rows = IndexType(rip_matrix.num_rows());
+      const Memory::TypedView<IndexType> row_ptr = rip_matrix.row_ptr_view_r();
+      const Memory::TypedView<IndexType> col_idx = rip_matrix.col_idx_view_r();
+      Memory::TypedView<DataType> vals = rip_matrix.val_view_w();
       for(IndexType i(0); i < num_rows; ++i)
         for(IndexType j(row_ptr[i]); j < row_ptr[i+1]; ++j)
           vals[j] = DataType(col_idx[j] == i ? 1 : 0);
@@ -111,130 +107,130 @@ public:
     rip_matrix.add_double_mat_product(trunc_matrix, vec_id, prol_matrix, -DataType(1), true);
 
     // the resulting matrix should now be the null matrix
-    TEST_CHECK_EQUAL_WITHIN_EPS(Math::sqr(rip_matrix.norm_frobenius()), DataType(0), eps);
+    TEST_CHECK_LESS_THAN(Math::sqr(rip_matrix.norm_frobenius()), eps);
   }
 }; // GridTransferTipTest<...>
 
 // Lagrange-1 element
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, std::uint32_t> grid_transfer_truncate_test_hy1_lagrange1_double_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, std::uint32_t> grid_transfer_truncate_test_hy2_lagrange1_float_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, std::uint32_t> grid_transfer_truncate_test_hy3_lagrange1_double_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, std::uint32_t> grid_transfer_truncate_test_sx2_lagrange1_double_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, std::uint32_t> grid_transfer_truncate_test_sx3_lagrange1_float_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, std::uint32_t, PreferredBackend::generic);
 
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, std::uint64_t> grid_transfer_truncate_test_hy1_lagrange1_double_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, std::uint64_t> grid_transfer_truncate_test_hy2_lagrange1_float_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, std::uint64_t> grid_transfer_truncate_test_hy3_lagrange1_double_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, std::uint64_t> grid_transfer_truncate_test_sx2_lagrange1_double_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, std::uint64_t> grid_transfer_truncate_test_sx3_lagrange1_float_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, std::uint64_t, PreferredBackend::generic);
 
 // Lagrange-2 element
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, std::uint32_t> grid_transfer_truncate_test_hy1_lagrange2_double_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, std::uint32_t> grid_transfer_truncate_test_hy2_lagrange2_double_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, std::uint32_t> grid_transfer_truncate_test_hy3_lagrange2_float_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, std::uint32_t> grid_transfer_truncate_test_sx2_lagrange2_float_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, std::uint32_t> grid_transfer_truncate_test_sx3_lagrange2_double_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, std::uint32_t, PreferredBackend::generic);
 
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, std::uint64_t> grid_transfer_truncate_test_hy1_lagrange2_double_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, std::uint64_t> grid_transfer_truncate_test_hy2_lagrange2_double_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, std::uint64_t> grid_transfer_truncate_test_hy3_lagrange2_float_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, std::uint64_t> grid_transfer_truncate_test_sx2_lagrange2_float_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, std::uint64_t> grid_transfer_truncate_test_sx3_lagrange2_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
 // Lagrange-1 element
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, std::uint64_t> mkl_grid_transfer_truncate_test_hy1_lagrange1_double_uint64(PreferredBackend::mkl);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, std::uint64_t> mkl_grid_transfer_truncate_test_hy2_lagrange1_float_uint64(PreferredBackend::mkl);
-GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, std::uint64_t> mkl_grid_transfer_truncate_test_hy3_lagrange1_double_uint64(PreferredBackend::mkl);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, std::uint64_t> mkl_grid_transfer_truncate_test_sx2_lagrange1_double_uint64(PreferredBackend::mkl);
-GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, std::uint64_t> mkl_grid_transfer_truncate_test_sx3_lagrange1_float_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, std::uint64_t, PreferredBackend::mkl);
 // Lagrange-2 element
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, std::uint64_t> mkl_grid_transfer_truncate_test_hy1_lagrange2_double_uint64(PreferredBackend::mkl);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, std::uint64_t> mkl_grid_transfer_truncate_test_hy2_lagrange2_double_uint64(PreferredBackend::mkl);
-GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, std::uint64_t> mkl_grid_transfer_truncate_test_hy3_lagrange2_float_uint64(PreferredBackend::mkl);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, std::uint64_t> mkl_grid_transfer_truncate_test_sx2_lagrange2_float_uint64(PreferredBackend::mkl);
-GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, std::uint64_t> mkl_grid_transfer_truncate_test_sx3_lagrange2_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
 // Lagrange-1 element
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, __float128, std::uint32_t> grid_transfer_truncate_test_hy1_lagrange1_float128_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, __float128, std::uint32_t> grid_transfer_truncate_test_hy2_lagrange1_float128_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, __float128, std::uint32_t> grid_transfer_truncate_test_hy3_lagrange1_float128_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, __float128, std::uint32_t> grid_transfer_truncate_test_sx2_lagrange1_float128_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, __float128, std::uint32_t> grid_transfer_truncate_test_sx3_lagrange1_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange1::Element, 4, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange1::Element, 2, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange1::Element, 1, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange1::Element, 2, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange1::Element, 1, __float128, std::uint32_t, PreferredBackend::generic);
 
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, __float128, std::uint64_t> grid_transfer_truncate_test_hy1_lagrange1_float128_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, __float128, std::uint64_t> grid_transfer_truncate_test_hy2_lagrange1_float128_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, __float128, std::uint64_t> grid_transfer_truncate_test_hy3_lagrange1_float128_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, __float128, std::uint64_t> grid_transfer_truncate_test_sx2_lagrange1_float128_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, __float128, std::uint64_t> grid_transfer_truncate_test_sx3_lagrange1_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange1::Element, 4, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange1::Element, 2, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange1::Element, 1, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange1::Element, 2, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange1::Element, 1, __float128, std::uint64_t, PreferredBackend::generic);
 // Lagrange-2 element
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, __float128, std::uint32_t> grid_transfer_truncate_test_hy1_lagrange2_float128_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, __float128, std::uint32_t> grid_transfer_truncate_test_hy2_lagrange2_float128_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, __float128, std::uint32_t> grid_transfer_truncate_test_hy3_lagrange2_float128_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, __float128, std::uint32_t> grid_transfer_truncate_test_sx2_lagrange2_float128_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, __float128, std::uint32_t> grid_transfer_truncate_test_sx3_lagrange2_float128_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange2::Element, 4, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange2::Element, 2, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange2::Element, 1, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange2::Element, 2, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange2::Element, 1, __float128, std::uint32_t, PreferredBackend::generic);
 
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, __float128, std::uint64_t> grid_transfer_truncate_test_hy1_lagrange2_float128_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, __float128, std::uint64_t> grid_transfer_truncate_test_hy2_lagrange2_float128_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, __float128, std::uint64_t> grid_transfer_truncate_test_hy3_lagrange2_float128_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, __float128, std::uint64_t> grid_transfer_truncate_test_sx2_lagrange2_float128_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, __float128, std::uint64_t> grid_transfer_truncate_test_sx3_lagrange2_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange2::Element, 4, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange2::Element, 2, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange2::Element, 1, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange2::Element, 2, __float128, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange2::Element, 1, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
 // Lagrange-1 element
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, Half, std::uint32_t> grid_transfer_truncate_test_hy1_lagrange1_half_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, Half, std::uint32_t> grid_transfer_truncate_test_hy2_lagrange1_half_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, Half, std::uint32_t> grid_transfer_truncate_test_hy3_lagrange1_half_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, Half, std::uint32_t> grid_transfer_truncate_test_sx2_lagrange1_half_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange1::Element, 4, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange1::Element, 2, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange1::Element, 1, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange1::Element, 2, Half, std::uint32_t, PreferredBackend::generic);
 // Disabled: Inversion of mass-matrix in GridTransfer::assemble_prolongation produces matrix of NaNs
-//GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, Half, std::uint32_t> grid_transfer_truncate_test_sx3_lagrange1_half_uint32(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange1::Element, 1, Half, std::uint32_t, PreferredBackend::generic);
 
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, Half, std::uint64_t> grid_transfer_truncate_test_hy1_lagrange1_half_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, Half, std::uint64_t> grid_transfer_truncate_test_hy2_lagrange1_half_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, Half, std::uint64_t> grid_transfer_truncate_test_hy3_lagrange1_half_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, Half, std::uint64_t> grid_transfer_truncate_test_sx2_lagrange1_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange1::Element, 4, Half, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange1::Element, 2, Half, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange1::Element, 1, Half, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange1::Element, 2, Half, std::uint64_t, PreferredBackend::generic);
 // Disabled: Inversion of mass-matrix in GridTransfer::assemble_prolongation produces matrix of NaNs
-//GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, Half, std::uint64_t> grid_transfer_truncate_test_sx3_lagrange1_half_uint64(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange1::Element, 1, Half, std::uint64_t, PreferredBackend::generic);
 // Lagrange-2 element
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, Half, std::uint32_t> grid_transfer_truncate_test_hy1_lagrange2_half_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, Half, std::uint32_t> grid_transfer_truncate_test_hy2_lagrange2_half_uint32(PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange2::Element, 4, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange2::Element, 2, Half, std::uint32_t, PreferredBackend::generic);
 // Disabled: eps too sharp
-//GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, Half, std::uint32_t> grid_transfer_truncate_test_hy3_lagrange2_half_uint32(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, Half, std::uint32_t> grid_transfer_truncate_test_sx2_lagrange2_half_uint32(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange2::Element, 1, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange2::Element, 2, Half, std::uint32_t, PreferredBackend::generic);
 // Disabled: Inversion of mass-matrix in GridTransfer::assemble_prolongation produces matrix of NaNs
-//GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, Half, std::uint32_t> grid_transfer_truncate_test_sx3_lagrange2_half_uint32(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange2::Element, 1, Half, std::uint32_t, PreferredBackend::generic);
 
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, Half, std::uint64_t> grid_transfer_truncate_test_hy1_lagrange2_half_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, Half, std::uint64_t> grid_transfer_truncate_test_hy2_lagrange2_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange2::Element, 4, Half, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange2::Element, 2, Half, std::uint64_t, PreferredBackend::generic);
 // Disabled: eps too sharp
-//GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, Half, std::uint64_t> grid_transfer_truncate_test_hy3_lagrange2_half_uint64(PreferredBackend::generic);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, Half, std::uint64_t> grid_transfer_truncate_test_sx2_lagrange2_half_uint64(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange2::Element, 1, Half, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange2::Element, 2, Half, std::uint64_t, PreferredBackend::generic);
 // Disabled: Inversion of mass-matrix in GridTransfer::assemble_prolongation produces matrix of NaNs
-//GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, Half, std::uint64_t> grid_transfer_truncate_test_sx3_lagrange2_half_uint64(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange2::Element, 1, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
 // Lagrange-1 element
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, std::uint32_t> cuda_grid_transfer_truncate_test_hy1_lagrange1_double_uint32(PreferredBackend::cuda);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, std::uint32_t> cuda_grid_transfer_truncate_test_hy2_lagrange1_float_uint32(PreferredBackend::cuda);
-GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, std::uint32_t> cuda_grid_transfer_truncate_test_hy3_lagrange1_double_uint32(PreferredBackend::cuda);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, std::uint32_t> cuda_grid_transfer_truncate_test_sx2_lagrange1_double_uint32(PreferredBackend::cuda);
-GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, std::uint32_t> cuda_grid_transfer_truncate_test_sx3_lagrange1_float_uint32(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, std::uint32_t, PreferredBackend::cuda);
 
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, std::uint64_t> cuda_grid_transfer_truncate_test_hy1_lagrange1_double_uint64(PreferredBackend::cuda);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, std::uint64_t> cuda_grid_transfer_truncate_test_hy2_lagrange1_float_uint64(PreferredBackend::cuda);
-GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, std::uint64_t> cuda_grid_transfer_truncate_test_hy3_lagrange1_double_uint64(PreferredBackend::cuda);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, std::uint64_t> cuda_grid_transfer_truncate_test_sx2_lagrange1_double_uint64(PreferredBackend::cuda);
-GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, std::uint64_t> cuda_grid_transfer_truncate_test_sx3_lagrange1_float_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange1::Element, 4, double, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange1::Element, 2, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange1::Element, 1, double, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange1::Element, 2, double, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange1::Element, 1, float, std::uint64_t, PreferredBackend::cuda);
 // Lagrange-2 element
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, std::uint32_t> cuda_grid_transfer_truncate_test_hy1_lagrange2_double_uint32(PreferredBackend::cuda);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, std::uint32_t> cuda_grid_transfer_truncate_test_hy2_lagrange2_double_uint32(PreferredBackend::cuda);
-GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, std::uint32_t> cuda_grid_transfer_truncate_test_hy3_lagrange2_float_uint32(PreferredBackend::cuda);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, std::uint32_t> cuda_grid_transfer_truncate_test_sx2_lagrange2_float_uint32(PreferredBackend::cuda);
-GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, std::uint32_t> cuda_grid_transfer_truncate_test_sx3_lagrange2_double_uint32(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, std::uint32_t, PreferredBackend::cuda);
 
-GridTransferTipTest <Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, std::uint64_t> cuda_grid_transfer_truncate_test_hy1_lagrange2_double_uint64(PreferredBackend::cuda);
-GridTransferTipTest <Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, std::uint64_t> cuda_grid_transfer_truncate_test_hy2_lagrange2_double_uint64(PreferredBackend::cuda);
-GridTransferTipTest <Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, std::uint64_t> cuda_grid_transfer_truncate_test_hy3_lagrange2_float_uint64(PreferredBackend::cuda);
-GridTransferTipTest <Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, std::uint64_t> cuda_grid_transfer_truncate_test_sx2_lagrange2_float_uint64(PreferredBackend::cuda);
-GridTransferTipTest <Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, std::uint64_t> cuda_grid_transfer_truncate_test_sx3_lagrange2_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<1>, Space::Lagrange2::Element, 4, double, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<2>, Space::Lagrange2::Element, 2, double, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Hypercube<3>, Space::Lagrange2::Element, 1, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<2>, Space::Lagrange2::Element, 2, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_5T_P(GridTransferTipTest, Shape::Simplex<3>, Space::Lagrange2::Element, 1, double, std::uint64_t, PreferredBackend::cuda);
 #endif

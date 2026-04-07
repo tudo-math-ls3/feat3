@@ -34,7 +34,7 @@ public:
   typedef LAFEM::DenseVectorBlocked<DataType, IndexType, dim> BlockedVectorType;
 
 
-  ErrorComputerTest(PreferredBackend backend) :
+  explicit ErrorComputerTest(PreferredBackend backend) :
     UnitTest("ErrorComputerTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
   {
   }
@@ -89,10 +89,13 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(result_base.value, results_cell.integral_info.value, val_tol);
 
       DataType summed_h0{DataType(0)};
-      for(std::size_t i = 0; i < results_cell.vec.size(); ++i)
       {
-        auto loc_vec = results_cell.vec(i);
-        summed_h0 += loc_vec;
+        auto rcv = results_cell.vec.elements_view_r();
+        for(std::size_t i = 0; i < results_cell.vec.size(); ++i)
+        {
+          auto loc_vec = rcv(i);
+          summed_h0 += loc_vec;
+        }
       }
 
       TEST_CHECK_EQUAL_WITHIN_EPS(result_base.norm_h0_sqr, summed_h0, val_tol);
@@ -111,12 +114,15 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(result_base.value, results_cell.integral_info.value, val_tol);
 
       DataType summed_h0{DataType(0)}, summed_h1{DataType(0)}, summed_h2{DataType(0)};
-      for(std::size_t i = 0; i < results_cell.vec.size(); ++i)
       {
-        auto loc_vec = results_cell.vec(i);
-        summed_h0 += loc_vec[0];
-        summed_h1 += loc_vec[1];
-        summed_h2 += loc_vec[2];
+        auto rcv = results_cell.vec.elements_view_r();
+        for(std::size_t i = 0; i < results_cell.vec.size(); ++i)
+        {
+          auto loc_vec = rcv(i);
+          summed_h0 += loc_vec[0];
+          summed_h1 += loc_vec[1];
+          summed_h2 += loc_vec[2];
+        }
       }
 
       TEST_CHECK_EQUAL_WITHIN_EPS(result_base.norm_h0_sqr, summed_h0, val_tol);
@@ -137,10 +143,13 @@ public:
       TEST_CHECK_EQUAL_WITHIN_EPS(result_base.value[0], results_cell.integral_info.value[0], val_tol);
 
       DataType summed_h0{DataType(0)};
-      for(std::size_t i = 0; i < results_cell.vec.size(); ++i)
       {
-        auto loc_vec = results_cell.vec(i);
-        summed_h0 += loc_vec;
+        auto rcv = results_cell.vec.elements_view_r();
+        for(std::size_t i = 0; i < results_cell.vec.size(); ++i)
+        {
+          auto loc_vec = rcv(i);
+          summed_h0 += loc_vec;
+        }
       }
 
       TEST_CHECK_EQUAL_WITHIN_EPS(result_base.norm_h0_sqr, summed_h0, val_tol);
@@ -175,7 +184,7 @@ public:
   }
 }; // class DiscreteEvaluatorTest<...>
 
-ErrorComputerTest <double, std::uint32_t> discrete_evaluator_test_main_double_uint32(PreferredBackend::generic);
-ErrorComputerTest <float, std::uint32_t> discrete_evaluator_test_main_float_uint32(PreferredBackend::generic);
-ErrorComputerTest <double, std::uint64_t> discrete_evaluator_test_main_double_uint64(PreferredBackend::generic);
-ErrorComputerTest <float, std::uint64_t> discrete_evaluator_test_main_float_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(ErrorComputerTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(ErrorComputerTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(ErrorComputerTest, double, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(ErrorComputerTest, float, std::uint64_t, PreferredBackend::generic);

@@ -175,6 +175,9 @@ namespace FEAT
         return IT_(_perm_pos.at(std::size_t(i)));
       }
 
+      /// Checks whether the permutation is the identity permutation
+      bool is_identity() const;
+
       /// Computes the swap-position vector from the permutation-position vector.
       void calc_swap_from_perm();
 

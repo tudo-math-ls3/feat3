@@ -8,7 +8,7 @@
 
 #include <kernel/base_header.hpp>
 #include <kernel/backend.hpp>
-#include <kernel/adjacency/coloring.hpp>
+#include <kernel/adjacency/coloring_data_handler.hpp>
 #include <kernel/lafem/null_matrix.hpp>
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
@@ -183,8 +183,8 @@ namespace FEAT
        */
       template<typename DT_, typename IT_, int n_>
       void assemble_vanka_device(const Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
-        Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& vanka_wrap, const std::vector<Index*>& d_macro_dofs,
-        const std::vector<Index*>& d_dof_macros, int* d_macro_mask, const std::vector<Index>& max_degree_dofs,
+        Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& vanka_wrap, const std::vector<Memory::Arbiter>& d_macro_dofs,
+        const std::vector<Memory::Arbiter>& d_dof_macros, Memory::Arbiter& d_macro_mask, const std::vector<Index>& max_degree_dofs,
         const std::vector<Index>& max_degree_macros, const Adjacency::ColoringDataHandler& coloring_data,
         Index num_macros, Index stride, DT_ omega, DT_ eps, bool skip_singular, bool uniform_macros);
 
@@ -259,8 +259,8 @@ namespace FEAT
        */
       template<typename DT_, typename IT_, int n_>
       void assemble_vanka_device_batched(const Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& mat_wrap,
-        Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& vanka_wrap, const std::vector<Index*>& d_macro_dofs,
-        const std::vector<Index*>& d_dof_macros, int* d_macro_mask, const std::vector<Index>& max_degree_dofs,
+        Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& vanka_wrap, const std::vector<Memory::Arbiter>& d_macro_dofs,
+        const std::vector<Memory::Arbiter>& d_dof_macros, Memory::Arbiter& d_macro_mask, const std::vector<Index>& max_degree_dofs,
         const std::vector<Index>& max_degree_macros, const Adjacency::ColoringDataHandler& coloring_data,
         Index num_macros, Index stride, Index actual_matrix_size, DT_ omega, bool skip_singular);
     }
@@ -324,11 +324,11 @@ namespace FEAT
       /// coloring
       Adjacency::ColoringDataHandler _coloring_data;
       /// vector of graph arrays
-      std::vector<Index*> _d_macro_dofs, _d_dof_macros;
+      std::vector<Memory::Arbiter> _d_macro_dofs, _d_dof_macros; // of Index
       /// size data
       std::vector<Index> _max_degree_dofs, _max_degree_macros;
       /// array of macro mask
-      int* _d_macro_mask;
+      Memory::Arbiter _d_macro_mask; // of int
       /// flag whether we should allocate additional device pointer
       bool _allocate_device = false;
 
@@ -363,48 +363,57 @@ namespace FEAT
             malloc_size = this->_macro_dofs[i].get_num_nodes_domain() * _max_degree_dofs[i] * sizeof(Index);
           else
             malloc_size = this->_macro_dofs[i].get_num_nodes_domain() * (_max_degree_dofs[i]+1) * sizeof(Index);
-          _d_macro_dofs[i] = (Index*)Util::cuda_malloc_managed(malloc_size);
+          _d_macro_dofs[i] = Memory::Arbiter(malloc_size);
           // prepare tmp array
           {
-            Index* tmp_alias = _d_macro_dofs[i];
+            Memory::TypedView<Index> dmd_view(_d_macro_dofs[i].view(Memory::Location::main, Memory::Access::write));
+            Index* tmp_alias = dmd_view.get_w();
             const Index* dom_ptr = this->_macro_dofs[i].get_domain_ptr();
             const Index* img_ptr = this->_macro_dofs[i].get_image_idx();
             for(Index k = 0; k < this->_macro_dofs[i].get_num_nodes_domain(); ++k)
             {
               if constexpr(macro_type_ == FEAT::Intern::VankaMacroPolicy::uniformMacros)
               {
-                std::memcpy(tmp_alias + k*_max_degree_dofs[i], img_ptr + dom_ptr[k], _max_degree_dofs[i]*sizeof(Index));
+                Memory::memcopy_main(tmp_alias + k*_max_degree_dofs[i], img_ptr + dom_ptr[k], _max_degree_dofs[i]*sizeof(Index));
               }
               else
               {
                 const Index loc_size = dom_ptr[k+1] - dom_ptr[k];
                 tmp_alias[k*(_max_degree_dofs[i]+1)] = loc_size;
-                std::memcpy(tmp_alias + k*(_max_degree_dofs[i]+1) + 1, img_ptr + dom_ptr[k], loc_size*sizeof(Index));
-                std::memset(tmp_alias + k*(_max_degree_dofs[i]+1) + loc_size + 1, ~int(0), (_max_degree_dofs[i] - loc_size)*sizeof(Index));
+                Memory::memcopy_main(tmp_alias + k*(_max_degree_dofs[i]+1) + 1, img_ptr + dom_ptr[k], loc_size*sizeof(Index));
+                Memory::memset_main(tmp_alias + k*(_max_degree_dofs[i]+1) + loc_size + 1, ~int(0), (_max_degree_dofs[i] - loc_size)*sizeof(Index));
               }
             }
           }
           malloc_size = this->_dof_macros[i].get_num_nodes_domain()*(_max_degree_macros[i]+1)*sizeof(Index);
-          _d_dof_macros[i] = (Index*)Util::cuda_malloc_managed(malloc_size);
+          _d_dof_macros[i] = Memory::Arbiter(malloc_size);
           {
-            Index* tmp_alias = _d_dof_macros[i];
+            Memory::TypedView<Index> ddm_view(_d_dof_macros[i].view(Memory::Location::main, Memory::Access::write));
+            Index* tmp_alias = ddm_view.get_w();
             const Index* dom_ptr = this->_dof_macros[i].get_domain_ptr();
             const Index* img_ptr = this->_dof_macros[i].get_image_idx();
             for(Index k = 0; k < this->_dof_macros[i].get_num_nodes_domain(); ++k)
             {
               const Index loc_size = dom_ptr[k+1] - dom_ptr[k];
               tmp_alias[k*(_max_degree_macros[i]+1)] = loc_size;
-              std::memcpy(tmp_alias + k*(_max_degree_macros[i]+1) + 1, img_ptr + dom_ptr[k], loc_size*sizeof(Index));
-              std::memset(tmp_alias + k*(_max_degree_macros[i]+1) + loc_size + 1, ~int(0), (_max_degree_macros[i] - loc_size)*sizeof(Index));
+              Memory::memcopy_main(tmp_alias + k*(_max_degree_macros[i]+1) + 1, img_ptr + dom_ptr[k], loc_size*sizeof(Index));
+              Memory::memset_main(tmp_alias + k*(_max_degree_macros[i]+1) + loc_size + 1, ~int(0), (_max_degree_macros[i] - loc_size)*sizeof(Index));
             }
           }
         }
         {
           if(this->_skip_singular)
           {
-            _d_macro_mask = (int*)Util::cuda_malloc_managed(this->_macro_mask.size()*sizeof(int));
-            Util::cuda_set_memory(_d_macro_mask, 0, this->_macro_mask.size());
+            _d_macro_mask = Memory::Arbiter(this->_macro_mask.size()*sizeof(int),
+              Memory::Location::main, Memory::Init::format_to_zero);
           }
+          else
+          {
+            // we need to create an empty arbiter so that we can create a view
+            // to it in the kernel wrapper functions; otherwise we would need to
+            // perform a lot more if-else there...
+            _d_macro_mask = Memory::Arbiter(0u);
+        }
         }
       #endif
       }
@@ -412,17 +421,9 @@ namespace FEAT
       /// \brief Frees device pointers
       void _free_device()
       {
-      #ifdef FEAT_HAVE_CUDA
-        Util::cuda_free(_d_macro_mask);
-        _d_macro_mask = nullptr;
-        for(std::size_t i = 0; i < _d_macro_dofs.size(); ++i)
-        {
-          Util::cuda_free((void*)(_d_macro_dofs[i]));
-          Util::cuda_free((void*)(_d_dof_macros[i]));
-        }
+        _d_macro_mask.release();
         _d_dof_macros.clear();
         _d_macro_dofs.clear();
-      #endif
       }
 
       /**
@@ -484,7 +485,6 @@ namespace FEAT
           // TODO: stride always actual local matrix size?
           Arch::assemble_vanka_device_batched(mat_wrap, vanka_wrap, _d_macro_dofs, _d_dof_macros, _d_macro_mask, _max_degree_dofs, _max_degree_macros, _coloring_data, num_macros, stride, stride, this->_omega, this->_skip_singular);
         }
-
       }
       #endif
 
@@ -519,7 +519,7 @@ namespace FEAT
         _coloring_data(),
         _d_macro_dofs(),
         _d_dof_macros(),
-        _d_macro_mask(nullptr)
+        _d_macro_mask()
       {
         _coloring_data.fill_color(coloring);
         #ifdef FEAT_HAVE_CUDA
@@ -644,12 +644,21 @@ namespace FEAT
         const Index num_macros = Index(this->_macro_dofs.front().get_num_nodes_domain());
         const Index stride = Intern::AmaVankaCore::calc_stride(this->_vanka, this->_macro_dofs);
         this->_vanka.format();
-        //gather matrix wrappers
-        auto matrix_wrapper = Solver::Intern::get_meta_matrix_wrapper(this->_matrix);
-        // std::cout << matrix_wrapper.print();
-        auto vanka_wrapper = Solver::Intern::get_meta_matrix_wrapper(this->_vanka);
-        BACKEND_SKELETON_VOID(_init_numeric_cuda, _init_numeric_generic, _init_numeric_generic, matrix_wrapper, vanka_wrapper, num_macros, stride, eps)
 
+#if defined(FEAT_HAVE_CUDA) || defined(DOXYGEN)
+        if(Backend::get_preferred_backend() == PreferredBackend::cuda)
+        {
+          auto matrix_wrapper = Solver::Intern::get_meta_matrix_wrapper(this->_matrix, Memory::Location::cuda);
+          auto vanka_wrapper = Solver::Intern::get_meta_matrix_wrapper(this->_vanka, Memory::Location::cuda);
+          _init_numeric_cuda(matrix_wrapper, vanka_wrapper, num_macros, stride, eps);
+        }
+        else
+#endif
+        {
+          auto matrix_wrapper = Solver::Intern::get_meta_matrix_wrapper(this->_matrix, Memory::Location::main);
+          auto vanka_wrapper = Solver::Intern::get_meta_matrix_wrapper(this->_vanka, Memory::Location::main);
+          _init_numeric_generic(matrix_wrapper, vanka_wrapper, num_macros, stride, eps);
+        }
         this->watch_init_numeric.stop();
       }
 

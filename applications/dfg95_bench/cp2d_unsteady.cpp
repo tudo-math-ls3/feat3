@@ -698,23 +698,23 @@ namespace NavierStokesCP2D
     comm.allreduce(&cells_fine_local, &cells_fine_max, std::size_t(1), Dist::op_max);
     comm.allreduce(&cells_fine_local, &cells_fine_min, std::size_t(1), Dist::op_min);
 
-    Index dofs_coarse_local = system_levels.back()->matrix_a.local().columns() + system_levels.back()->matrix_b.local().columns();
+    Index dofs_coarse_local = system_levels.back()->matrix_a.local().num_cols() + system_levels.back()->matrix_b.local().num_cols();
     Index dofs_coarse_max;
     Index dofs_coarse_min;
     comm.allreduce(&dofs_coarse_local, &dofs_coarse_max, std::size_t(1), Dist::op_max);
     comm.allreduce(&dofs_coarse_local, &dofs_coarse_min, std::size_t(1), Dist::op_min);
-    Index dofs_fine_local = system_levels.front()->matrix_a.local().columns() + system_levels.front()->matrix_b.local().columns();
+    Index dofs_fine_local = system_levels.front()->matrix_a.local().num_cols() + system_levels.front()->matrix_b.local().num_cols();
     Index dofs_fine_max;
     Index dofs_fine_min;
     comm.allreduce(&dofs_fine_local, &dofs_fine_max, std::size_t(1), Dist::op_max);
     comm.allreduce(&dofs_fine_local, &dofs_fine_min, std::size_t(1), Dist::op_min);
 
-    Index nzes_coarse_local = system_levels.back()->matrix_a.local().used_elements() + system_levels.back()->lumped_mass_velo.local().size();
+    Index nzes_coarse_local = system_levels.back()->matrix_a.local().num_nzes() + system_levels.back()->lumped_mass_velo.local().size();
     Index nzes_coarse_max;
     Index nzes_coarse_min;
     comm.allreduce(&nzes_coarse_local, &nzes_coarse_max, std::size_t(1), Dist::op_max);
     comm.allreduce(&nzes_coarse_local, &nzes_coarse_min, std::size_t(1), Dist::op_min);
-    Index nzes_fine_local = system_levels.front()->matrix_a.local().used_elements() + system_levels.back()->lumped_mass_velo.local().size();
+    Index nzes_fine_local = system_levels.front()->matrix_a.local().num_nzes() + system_levels.back()->lumped_mass_velo.local().size();
     Index nzes_fine_max;
     Index nzes_fine_min;
     comm.allreduce(&nzes_fine_local, &nzes_fine_max, std::size_t(1), Dist::op_max);
@@ -906,7 +906,7 @@ namespace NavierStokesCP2D
       fil_loc_v.filter_cor(system_levels.at(i)->inverse_lumped_mass_velo.local());
 
       // filter matrix block A if available
-      if(system_levels.at(i)->local_matrix_a_filtered.rows() > Index(0))
+      if(system_levels.at(i)->local_matrix_a_filtered.num_rows() > Index(0))
         fil_loc_v.filter_mat(system_levels.at(i)->local_matrix_a_filtered);
 
       // perform numeric initialization of Schur-complement matrix
@@ -1529,7 +1529,7 @@ namespace NavierStokesCP2D
         Assembly::DiscreteCellProjector::project(vtx_p, vec_sol_p.local(), the_domain_level.space_pres, cub);
 
         // write pressure
-        vtk.add_cell_scalar("p", vtx_p.elements());
+        vtk.add_cell_scalar("p", vtx_p);
 
         // compute and write time-derivatives
         GlobalVeloVector vec_der_v = vec_sol_v.clone();
@@ -1541,7 +1541,7 @@ namespace NavierStokesCP2D
         Assembly::DiscreteCellProjector::project(vtx_der_p, vec_der_p.local(), the_domain_level.space_pres, cub);
 
         vtk.add_vertex_vector("v_dt", vec_der_v.local());
-        vtk.add_cell_scalar("p_dt", vtx_der_p.elements());
+        vtk.add_cell_scalar("p_dt", vtx_der_p);
 
         // export
         vtk.write(vtk_path, comm);

@@ -5,9 +5,9 @@
 
 // includes, FEAT
 #include <kernel/base_header.hpp>
-
 #include <kernel/util/exception.hpp>
-#include <kernel/util/memory_pool.hpp>
+#include <kernel/util/memory_aux.hpp>
+#include <kernel/util/cuda_util.hpp>
 
 #include "cusparse_v2.h"
 
@@ -68,13 +68,13 @@ namespace FEAT
         int nnz;
       };
 
-      void * cuda_ilu_init_symbolic(int m, int nnz, double * csrVal, int * csrRowPtr, int * csrColInd)
+      void * cuda_ilu_init_symbolic(int m, int nnz, double * csrVal, const int * csrRowPtr, const int * csrColInd)
       {
         CudaIluSolveInfo * info = new CudaIluSolveInfo;
         info->m = m;
         info->nnz = nnz;
 
-        info->z = (double*)Util::cuda_malloc(m * sizeof(double));
+        info->z = (double*)Memory::alloc_cuda(m * sizeof(double));
 
 
         cusparseStatus_t status;
@@ -93,9 +93,9 @@ namespace FEAT
         //assertion if int is 32 bits
         static_assert(sizeof(int) == 4u, "ERROR: Size of int is not 32 bits");
         cusparseCreateCsr(&(info->descr_L), info->m, info->m, info->nnz,
-                                      csrRowPtr, csrColInd, csrVal,
-                                      CUSPARSE_INDEX_32I, CUSPARSE_INDEX_32I,   //use typedef somewhere? Since this goes wrong, if int is something other than 32 bits...
-                                      CUSPARSE_INDEX_BASE_ZERO, CUDA_R_64F);     //Also variable size in theroy...
+          const_cast<int*>(csrRowPtr), const_cast<int*>(csrColInd), csrVal,
+          CUSPARSE_INDEX_32I, CUSPARSE_INDEX_32I,   //use typedef somewhere? Since this goes wrong, if int is something other than 32 bits...
+          CUSPARSE_INDEX_BASE_ZERO, CUDA_R_64F);     //Also variable size in theory...
         //set attributes
         {
           cusparseFillMode_t fillmode = CUSPARSE_FILL_MODE_LOWER;
@@ -113,9 +113,9 @@ namespace FEAT
         cusparseSetMatDiagType(info->descr_U, CUSPARSE_DIAG_TYPE_NON_UNIT);
 #else
         cusparseCreateCsr(&(info->descr_U), info->m, info->m, info->nnz,
-                                      csrRowPtr, csrColInd, csrVal,
-                                      CUSPARSE_INDEX_32I, CUSPARSE_INDEX_32I,
-                                      CUSPARSE_INDEX_BASE_ZERO, CUDA_R_64F);
+          const_cast<int*>(csrRowPtr), const_cast<int*>(csrColInd), csrVal,
+          CUSPARSE_INDEX_32I, CUSPARSE_INDEX_32I,
+          CUSPARSE_INDEX_BASE_ZERO, CUDA_R_64F);
         {
           cusparseFillMode_t fillmode = CUSPARSE_FILL_MODE_UPPER;
           cusparseDiagType_t diagtype = CUSPARSE_DIAG_TYPE_NON_UNIT;
@@ -167,7 +167,7 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "cusparseSpSV_bufferSize failed with status code: " + stringify(status));
 #endif
         info->pBufferSize = max(info->pBufferSize_M, int(max(info->pBufferSize_L, info->pBufferSize_U)));
-        info->pBuffer = Util::cuda_malloc(info->pBufferSize_M);
+        info->pBuffer = Memory::alloc_cuda(info->pBufferSize_M);
 
         status = cusparseDcsrilu02_analysis(Util::Intern::cusparse_handle, m, nnz, info->descr_M,
                 csrVal, csrRowPtr, csrColInd, info->info_M,
@@ -204,7 +204,7 @@ namespace FEAT
 #endif
 
         cudaDeviceSynchronize();
-#ifdef FEAT_DEBUG_MODE
+#ifdef DEBUG
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -213,7 +213,7 @@ namespace FEAT
         return (void*)info;
       }
 
-      void cuda_ilu_init_numeric(double * csrVal, int * csrRowPtr, int * csrColInd, void * vinfo)
+      void cuda_ilu_init_numeric(double * csrVal, const int * csrRowPtr, const int * csrColInd, void * vinfo)
       {
         CudaIluSolveInfo * info = (CudaIluSolveInfo *) vinfo;
 
@@ -228,7 +228,7 @@ namespace FEAT
         }
       }
 
-      int cuda_ilu_apply(double * y, const double * x, double * csrVal, int * csrRowPtr, int * csrColInd, void * vinfo)
+      int cuda_ilu_apply(double * y, const double * x, const double * csrVal, const int * csrRowPtr, const int * csrColInd, void * vinfo)
       {
         CudaIluSolveInfo * info = (CudaIluSolveInfo *) vinfo;
         const double alpha = 1.;
@@ -282,7 +282,7 @@ namespace FEAT
 #endif
 
         cudaDeviceSynchronize();
-#ifdef FEAT_DEBUG_MODE
+#ifdef DEBUG
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -295,8 +295,8 @@ namespace FEAT
       {
         CudaIluSolveInfo * info = (CudaIluSolveInfo *) vinfo;
 
-        Util::cuda_free(info->z);
-        Util::cuda_free(info->pBuffer);
+        Memory::free_cuda(info->z);
+        Memory::free_cuda(info->pBuffer);
         cusparseDestroyMatDescr(info->descr_M);
 #if CUSPARSE_VER_MAJOR < 12
         cusparseDestroyMatDescr(info->descr_L);
@@ -339,9 +339,9 @@ namespace FEAT
         int blocksize;
       };
 
-      void * cuda_ilub_init_symbolic(int m, int nnz, double * csrVal, int * csrRowPtr, int * csrColInd, const int blocksize)
+      void * cuda_ilub_init_symbolic(int m, int nnz, double * csrVal, const int * csrRowPtr, const int * csrColInd, const int blocksize)
       {
-        double * z = (double*)Util::cuda_malloc(m * blocksize * sizeof(double));
+        double * z = (double*)Memory::alloc_cuda(m * blocksize * sizeof(double));
 
         cusparseMatDescr_t descr_M = 0;
         cusparseMatDescr_t descr_L = 0;
@@ -393,7 +393,7 @@ namespace FEAT
 
         pBufferSize = max(pBufferSize_M, max(pBufferSize_L, pBufferSize_U));
 
-        pBuffer = Util::cuda_malloc(pBufferSize);
+        pBuffer = Memory::alloc_cuda(pBufferSize);
 
         status = cusparseDbsrilu02_analysis(Util::Intern::cusparse_handle, dir, m, nnz, descr_M,
                 csrVal, csrRowPtr, csrColInd, blocksize, info_M,
@@ -417,7 +417,7 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "cusparsebsrv2_analysis failed with status code: " + stringify(status));
 
         cudaDeviceSynchronize();
-#ifdef FEAT_DEBUG_MODE
+#ifdef DEBUG
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -445,7 +445,7 @@ namespace FEAT
         return (void*)info;
       }
 
-      void cuda_ilub_init_numeric(double * csrVal, int * csrRowPtr, int * csrColInd, void * vinfo)
+      void cuda_ilub_init_numeric(double * csrVal, const int * csrRowPtr, const int * csrColInd, void * vinfo)
       {
         CudaIluBSolveInfo * info = (CudaIluBSolveInfo *) vinfo;
 
@@ -461,7 +461,7 @@ namespace FEAT
         }
       }
 
-      int cuda_ilub_apply(double * y, const double * x, double * csrVal, int * csrRowPtr, int * csrColInd, void * vinfo)
+      int cuda_ilub_apply(double * y, const double * x, const double * csrVal, const int * csrRowPtr, const int * csrColInd, void * vinfo)
       {
         CudaIluBSolveInfo * info = (CudaIluBSolveInfo *) vinfo;
         const double alpha = 1.;
@@ -479,7 +479,7 @@ namespace FEAT
           throw InternalError(__func__, __FILE__, __LINE__, "cusparsebsrsv2_solve failed with status code: " + stringify(status));
 
         cudaDeviceSynchronize();
-#ifdef FEAT_DEBUG_MODE
+#ifdef DEBUG
         cudaError_t last_error(cudaGetLastError());
         if (cudaSuccess != last_error)
           throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -492,8 +492,8 @@ namespace FEAT
       {
         CudaIluBSolveInfo * info = (CudaIluBSolveInfo *) vinfo;
 
-        Util::cuda_free(info->z);
-        Util::cuda_free(info->pBuffer);
+        Memory::free_cuda(info->z);
+        Memory::free_cuda(info->pBuffer);
         cusparseDestroyMatDescr(info->descr_M);
         cusparseDestroyMatDescr(info->descr_L);
         cusparseDestroyMatDescr(info->descr_U);

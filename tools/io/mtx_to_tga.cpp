@@ -26,6 +26,6 @@ int main(int argc, char ** argv)
   String output(argv[2]);
 
   SparseMatrixCSR<double> matrix(FileMode::fm_mtx, input);
-  ExportTGA::write(output, matrix);
+  ExportTGA::write(output, matrix.adjactor());
   return 0;
 }

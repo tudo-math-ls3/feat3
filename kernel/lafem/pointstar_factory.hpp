@@ -94,16 +94,18 @@ namespace FEAT
 
         // create vector
         DenseVector<DataType_, IndexType_> vector(neq, DataType_(1));
-        DataType_* v = vector.elements();
 
         // compute x scaling factor
         const DataType_ xsf = DataType_(Math::pi<DataType_>()) / DataType_(_m+1);
 
-        for(Index i(0); i < neq; ++i)
         {
-          for(Index quo(1); quo < neq; quo *= _m)
+          Memory::TypedView<DataType_> v = vector.elements_view_rw();
+          for(Index i(0); i < neq; ++i)
           {
-            v[i] *= Math::sin(xsf * DataType_(((i / quo) % _m) + Index(1)));
+            for(Index quo(1); quo < neq; quo *= _m)
+            {
+              v[i] *= Math::sin(xsf * DataType_(((i / quo) % _m) + Index(1)));
+            }
           }
         }
 
@@ -129,18 +131,20 @@ namespace FEAT
 
         // create vector
         DenseVector<DataType_, IndexType_> vector(neq, DataType_(1));
-        DataType_* v = vector.elements();
 
         // compute x scaling factor
         const DataType_ xsf = DataType_(1) / DataType_(_m+1);
 
-        for(Index i(0); i < neq; ++i)
         {
-          for(Index quo(1); quo < neq; quo *= _m)
+          Memory::TypedView<DataType_> v = vector.elements_view_rw();
+          for(Index i(0); i < neq; ++i)
           {
-            // compute coordinate x in (0,1)
-            DataType_ x(xsf * DataType_(((i / quo) % _m) + Index(1)));
-            v[i] *= DataType_(4) * x * (DataType_(1) - x);
+            for(Index quo(1); quo < neq; quo *= _m)
+            {
+              // compute coordinate x in (0,1)
+              DataType_ x(xsf * DataType_(((i / quo) % _m) + Index(1)));
+              v[i] *= DataType_(4) * x * (DataType_(1) - x);
+            }
           }
         }
 
@@ -152,7 +156,7 @@ namespace FEAT
     /**
      * \brief Finite-Differences pointstar matrix factory.
      *
-     * This class generates a CSR poinstar matrices in Finite-Differences style.
+     * This class generates a CSR pointstar matrices in Finite-Differences style.
      * Moreover, this class can compute the largest and smallest eigenvalue of the
      * corresponding matrix as well as the eigenvector with respect to the smallest
      * eigenvalue.
@@ -215,19 +219,24 @@ namespace FEAT
         DenseVector<DataType_, IndexType_> vec_data(nnze);
 
         // get data
-        data = vec_data.elements();
+        Memory::TypedView<DataType_> data_view = vec_data.elements_view_w();
+        data = data_view.get_w();
 
         // get epr
-        epr = vec_epr.elements();
+        Memory::TypedView<IndexType_> epr_view = vec_epr.elements_view_rw();
+        epr = epr_view.get_w();
 
         // get dor
-        dor = vec_dor.elements();
+        Memory::TypedView<IndexType_> dor_view = vec_dor.elements_view_rw();
+        dor = dor_view.get_w();
 
         // get ior
-        ior = vec_row_ptr.elements();
+        Memory::TypedView<IndexType_> row_ptr_view = vec_row_ptr.elements_view_w();
+        ior = row_ptr_view.get_w();
 
         // get column indices
-        col_idx = vec_col_idx.elements();
+        Memory::TypedView<IndexType_> col_idx_view = vec_col_idx.elements_view_w();
+        col_idx = col_idx_view.get_w();
 
         /* In this step we will recursively calculate the number of non-zero
          * elements in a row (= epr), and the number of non-zero elements left of
@@ -369,8 +378,14 @@ namespace FEAT
           rpb = rps;
         }
 
+        col_idx_view.release();
+        row_ptr_view.release();
+        dor_view.release();
+        epr_view.release();
+        data_view.release();
+
         // return the matrix
-        return SparseMatrixCSR<DataType_, IndexType_>(neq, neq, vec_col_idx, vec_data, vec_row_ptr);
+        return SparseMatrixCSR<DataType_, IndexType_>(neq, neq, vec_row_ptr, vec_col_idx, vec_data);
       }
 
       /**
@@ -471,19 +486,24 @@ namespace FEAT
         DenseVector<DataType_, IndexType_> vec_data(nnze);
 
         // get data
-        data = vec_data.elements();
+        Memory::TypedView<DataType_> data_view = vec_data.elements_view_w();
+        data = data_view.get_w();
 
         // get epr
-        epr = vec_epr.elements();
+        Memory::TypedView<IndexType_> epr_view = vec_epr.elements_view_rw();
+        epr = epr_view.get_w();
 
         // get dor
-        dor = vec_dor.elements();
+        Memory::TypedView<IndexType_> dor_view = vec_dor.elements_view_rw();
+        dor = dor_view.get_w();
 
         // get ior
-        ior = vec_row_ptr.elements();
+        Memory::TypedView<IndexType_> row_ptr_view = vec_row_ptr.elements_view_w();
+        ior = row_ptr_view.get_w();
 
         // get column indices
-        col_idx = vec_col_idx.elements();
+        Memory::TypedView<IndexType_> col_idx_view = vec_col_idx.elements_view_rw();
+        col_idx = col_idx_view.get_w();
 
         /* In this step we will recursively calculate the number of non-zero
          * elements in a row (= epr), and the number of non-zero elements left of
@@ -642,8 +662,14 @@ namespace FEAT
         for(i = 0; i < nnze; ++i)
           col_idx[i] -= IndexType_(neq);
 
+        col_idx_view.release();
+        row_ptr_view.release();
+        dor_view.release();
+        epr_view.release();
+        data_view.release();
+
         // return the matrix
-        return SparseMatrixCSR<DataType_, IndexType_>(neq, neq, vec_col_idx, vec_data, vec_row_ptr);
+        return SparseMatrixCSR<DataType_, IndexType_>(neq, neq, vec_row_ptr, vec_col_idx, vec_data);
       }
 
       /**
@@ -662,9 +688,9 @@ namespace FEAT
 
         // get matrix arrays
         const IndexType_ m = IndexType_(this->_m);
-        const IndexType_* row_ptr = matrix.row_ptr();
-        const IndexType_* col_idx = matrix.col_ind();
-        DataType_* val = matrix.val();
+        const Memory::TypedView<IndexType_> row_ptr = matrix.row_ptr_view_r();
+        const Memory::TypedView<IndexType_> col_idx = matrix.col_idx_view_r();
+        Memory::TypedView<DataType_> val = matrix.val_view_rw();
 
         // process first vertex line
         {
@@ -1014,8 +1040,8 @@ namespace FEAT
          * Create matrix-structure
          */
         SparseMatrixBanded<DataType_, IndexType_> matrix(PointstarStructureFD::value<DataType_, IndexType_>(this->_num_of_subintervalls));
-        const IndexType_ neq(IndexType_(matrix.rows()));
-        DataType_ * const pval(matrix.val());
+        const IndexType_ neq(IndexType_(matrix.num_rows()));
+        Memory::TypedView<DataType_> pval(matrix.val_view_w());
 
         /**
          * Fill matrix
@@ -1059,6 +1085,8 @@ namespace FEAT
             }
           }
         }
+
+        pval.release();
 
         // return the matrix
         return matrix;
@@ -1128,7 +1156,7 @@ namespace FEAT
 
         // create vector
         DenseVector<DataType_, IndexType_> vector(size, DataType_(1));
-        DataType_* v = vector.elements();
+        Memory::TypedView<DataType_> v = vector.elements_view_rw();
 
         for(Index i(0); i < size; ++i)
         {
@@ -1139,6 +1167,7 @@ namespace FEAT
             v[i] *= Math::sin(xsf * DataType_(((i / quo) % (pnos[j + 1] - 1)) + Index(1)));
           }
         }
+        v.release();
 
         // return vector
         return vector;
@@ -1168,7 +1197,7 @@ namespace FEAT
 
         // create vector
         DenseVector<DataType_, IndexType_> vector(size, DataType_(1));
-        DataType_* v = vector.elements();
+        Memory::TypedView<DataType_> v = vector.elements_view_rw();
 
         for(Index i(0); i < size; ++i)
         {
@@ -1183,6 +1212,7 @@ namespace FEAT
             v[i] *= DataType_(4) * x * (DataType_(1) - x);
           }
         }
+        v.release();
 
         // return vector
         return vector;

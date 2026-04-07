@@ -6,7 +6,6 @@
 #pragma once
 
 #include <kernel/base_header.hpp>
-//#include <kernel/archs.hpp>
 #include <kernel/lafem/dense_vector.hpp>
 #include <kernel/lafem/power_vector.hpp>
 #include <kernel/lafem/tuple_vector.hpp>

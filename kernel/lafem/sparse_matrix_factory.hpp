@@ -23,7 +23,7 @@ namespace FEAT
      * \brief Factory for SparseMatrix construction.
      *
      * The purpose of this class is to make implementing CSR matrices very simple.\n
-     * The data is stored in a map and can be transfered to a CSR matrix.
+     * The data is stored in a map and can be transferred to a CSR matrix.
      *
      * \tparam DT_
      * The data type to be used for the sparse matrix.
@@ -57,7 +57,7 @@ namespace FEAT
       explicit SparseMatrixFactory(Index num_rows, Index num_cols) :
         _num_row(num_rows), _num_col(num_cols)
       {
-        XASSERTM(num_rows <= Index(max_size), "User tried to generate a Matrix with more than 100000 rows!");
+        XASSERTM(num_rows <= Index(max_size), "User tried to generate a Matrix with more than 100000 num_rows!");
         XASSERTM(num_cols <= Index(max_size), "User tried to generate a Matrix with more than 100000 colums!");
       }
 
@@ -80,7 +80,7 @@ namespace FEAT
        *
        * \returns Number of matrix columns.
        */
-      Index columns() const
+      Index num_cols() const
       {
         return _num_col;
       }
@@ -89,26 +89,17 @@ namespace FEAT
        *
        * \returns Number of matrix rows.
        */
-      Index rows() const
+      Index num_rows() const
       {
         return _num_row;
       }
-      /**
-       * \brief Returns product of number columns and number rows.
-       *
-       * \returns Number of possible matrix entries.
-       */
-      Index size() const
-      {
-        return _num_col*_num_row;
-      }
 
       /**
-       * \brief Returns number of used elements.
+       * \brief Returns number of non-zero entries.
        *
-       * \returns  Number of  used elements.
+       * \returns  Number of non-zero entries.
        */
-      Index used_elements() const
+      Index num_nzes() const
       {
         return Index(memory.size());
       }
@@ -123,9 +114,9 @@ namespace FEAT
         //Creates CSR matrix with dimensions and number of NNZ of map.
         FEAT::LAFEM::SparseMatrixCSR<DT_, IT_ > matrix(_num_row, _num_col, Index( memory.size()));
         // pointer on the empty arrays of the CSR matrix structure
-        IT_* row_ptr = matrix.row_ptr();
-        IT_* col_ind = matrix.col_ind();
-        DT_* val = matrix.val();
+        Memory::TypedView<IT_> row_ptr = matrix.row_ptr_view_w();
+        Memory::TypedView<IT_> col_idx = matrix.col_idx_view_w();
+        Memory::TypedView<DT_> val = matrix.val_view_w();
 
         row_ptr[0] = IT_(0);
         // numberNotZero elements
@@ -140,13 +131,13 @@ namespace FEAT
           // extract column and row from the map key
           IT_ col = it->first % max_size;
           IT_ row = (it->first - col) / max_size;
-          // make sure the row pointer is valid even if there exist preceeding empty rows in the matrix
+          // make sure the row pointer is valid even if there exist preceding empty rows in the matrix
           while (_row_cur <row )
           {
             row_ptr[++_row_cur] = _nnz;
           }
           val[_nnz] = it->second;
-          col_ind[_nnz] = col;
+          col_idx[_nnz] = col;
           ++_nnz;
         }
         // make sure that the row pointer is valid even if there are empty rows at the end of the matrix
@@ -165,7 +156,7 @@ namespace FEAT
 
         for (IT_ i = 0; i < _nzv; ++i)
         {
-          std::cout << col_ind[i] << "  ";
+          std::cout << col_idx[i] << "  ";
         }
         std::cout << "  \nRow Pointers:";
         for (IT_ i = 0; i < _num_row + 1; ++i)

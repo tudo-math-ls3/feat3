@@ -94,7 +94,7 @@ public:
 
   const DataType tol;
 
-  JumpStabilTest(PreferredBackend backend) :
+  explicit JumpStabilTest(PreferredBackend backend) :
     UnitTest("JumpStabilTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend),
     tol(TestSystem::tol<DT_>())
   {
@@ -206,5 +206,5 @@ public:
   }
 }; // class JumpStabilTest
 
-JumpStabilTest <double, std::uint32_t> jump_stabil_test_double_uint32(PreferredBackend::generic);
-JumpStabilTest <double, std::uint64_t> jump_stabil_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(JumpStabilTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(JumpStabilTest, double, std::uint64_t, PreferredBackend::generic);

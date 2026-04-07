@@ -36,12 +36,8 @@ class MatrixMirrorBufferTest
   : public UnitTest
 {
 public:
-  MatrixMirrorBufferTest(PreferredBackend backend)
+  explicit MatrixMirrorBufferTest(PreferredBackend backend)
     : UnitTest("MatrixMirrorBufferTest", Type::Traits<DT_>::name(), Type::Traits<IT_>::name(), backend)
-  {
-  }
-
-  virtual ~MatrixMirrorBufferTest()
   {
   }
 
@@ -50,42 +46,42 @@ public:
     MatrixMirrorBuffer<DT_, IT_> zero1;
 
     MatrixMirrorBuffer<DT_, IT_> a(10, 11, 30, 5);
-    TEST_CHECK_EQUAL(a.rows(), 10ul);
-    TEST_CHECK_EQUAL(a.columns(), 11ul);
-    TEST_CHECK_EQUAL(a.used_elements(), 30ul);
+    TEST_CHECK_EQUAL(a.num_rows(), 10ul);
+    TEST_CHECK_EQUAL(a.num_cols(), 11ul);
+    TEST_CHECK_EQUAL(a.num_nzes(), 30ul);
     TEST_CHECK_EQUAL(a.entries_per_nonzero(), 5ul);
 
     MatrixMirrorBuffer<DT_, IT_> b;
     b.convert(a);
-    TEST_CHECK_EQUAL(b.val(), a.val());
-    TEST_CHECK_EQUAL(b.col_ind(), a.col_ind());
-    TEST_CHECK_EQUAL(b.row_ptr(), a.row_ptr());
+    TEST_CHECK_EQUAL(b.val_arbiter(), a.val_arbiter());
+    TEST_CHECK_EQUAL(b.col_idx_arbiter(), a.col_idx_arbiter());
+    TEST_CHECK_EQUAL(b.row_ptr_arbiter(), a.row_ptr_arbiter());
 
     auto c = a.clone();
-    TEST_CHECK_NOT_EQUAL(c.val(), a.val());
-    TEST_CHECK_EQUAL(c.col_ind(), a.col_ind());
-    TEST_CHECK_EQUAL(c.row_ptr(), a.row_ptr());
+    TEST_CHECK_NOT_EQUAL(c.val_arbiter(), a.val_arbiter());
+    TEST_CHECK_EQUAL(c.col_idx_arbiter(), a.col_idx_arbiter());
+    TEST_CHECK_EQUAL(c.row_ptr_arbiter(), a.row_ptr_arbiter());
   }
 };
-MatrixMirrorBufferTest <float, std::uint32_t> cpu_matrix_mirror_buffer_test_float_uint32(PreferredBackend::generic);
-MatrixMirrorBufferTest <double, std::uint32_t> cpu_matrix_mirror_buffer_test_double_uint32(PreferredBackend::generic);
-MatrixMirrorBufferTest <float, std::uint64_t> cpu_matrix_mirror_buffer_test_float_uint64(PreferredBackend::generic);
-MatrixMirrorBufferTest <double, std::uint64_t> cpu_matrix_mirror_buffer_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMirrorBufferTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMirrorBufferTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMirrorBufferTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMirrorBufferTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-MatrixMirrorBufferTest <float, std::uint64_t> mkl_matrix_mirror_buffer_test_float_uint64(PreferredBackend::mkl);
-MatrixMirrorBufferTest <double, std::uint64_t> mkl_matrix_mirror_buffer_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(MatrixMirrorBufferTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(MatrixMirrorBufferTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-MatrixMirrorBufferTest <__float128, std::uint32_t> matrix_mirror_buffer_test_float128_uint32(PreferredBackend::generic);
-MatrixMirrorBufferTest <__float128, std::uint64_t> matrix_mirror_buffer_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMirrorBufferTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMirrorBufferTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-MatrixMirrorBufferTest <Half, std::uint32_t> matrix_mirror_buffer_test_half_uint32(PreferredBackend::generic);
-MatrixMirrorBufferTest <Half, std::uint64_t> matrix_mirror_buffer_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMirrorBufferTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(MatrixMirrorBufferTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-MatrixMirrorBufferTest <float, std::uint32_t> cuda_matrix_mirror_buffer_test_float_uint32(PreferredBackend::cuda);
-MatrixMirrorBufferTest <double, std::uint32_t> cuda_matrix_mirror_buffer_test_double_uint32(PreferredBackend::cuda);
-MatrixMirrorBufferTest <float, std::uint64_t> cuda_matrix_mirror_buffer_test_float_uint64(PreferredBackend::cuda);
-MatrixMirrorBufferTest <double, std::uint64_t> cuda_matrix_mirror_buffer_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MatrixMirrorBufferTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MatrixMirrorBufferTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MatrixMirrorBufferTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(MatrixMirrorBufferTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif

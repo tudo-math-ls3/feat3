@@ -76,8 +76,8 @@ namespace FEAT
       )
       {
         // validate matrix and vector dimensions
-        XASSERTM(matrix.rows() == space_s.get_num_dofs(), "invalid matrix dimensions");
-        XASSERTM(matrix.columns() == space_s.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_rows() == space_s.get_num_dofs(), "invalid matrix dimensions");
+        XASSERTM(matrix.num_cols() == space_s.get_num_dofs(), "invalid matrix dimensions");
         XASSERTM(convect.size() == space_v.get_num_dofs(), "invalid vector size");
 
         typedef LAFEM::DenseVectorBlocked<DT_, IT_, dim_> VectorType;

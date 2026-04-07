@@ -243,7 +243,7 @@ namespace FEAT
         gate_velo.convert(other.gate_velo);
         gate_pres.convert(other.gate_pres);
         Asm::build_gate_tuple(this->gate_sys, this->gate_velo, this->gate_pres);
-        this->gate_scalar_velo.convert(this->gate_velo, LocalScalarVector(this->gate_velo.get_freqs().template size<LAFEM::Perspective::native>()));
+        this->gate_scalar_velo.convert(this->gate_velo, LocalScalarVector(this->gate_velo.get_freqs().size()));
 
         coarse_muxer_velo.convert(other.coarse_muxer_velo);
         coarse_muxer_pres.convert(other.coarse_muxer_pres);

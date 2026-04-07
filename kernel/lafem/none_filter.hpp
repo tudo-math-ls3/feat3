@@ -134,7 +134,7 @@ namespace FEAT
     template<
       typename DataType_,
       typename IndexType_,
-      int BlockSize_
+      int block_size_
     >
     class NoneFilterBlocked
     {
@@ -144,18 +144,18 @@ namespace FEAT
       /// index-type typedef
       typedef IndexType_ IndexType;
 
-      static constexpr int BlockSize = BlockSize_;
+      static constexpr int block_size = block_size_;
 
       /// our supported vector type
-      typedef DenseVectorBlocked<DataType, IndexType, BlockSize> VectorType;
+      typedef DenseVectorBlocked<DataType, IndexType, block_size> VectorType;
 
       /// Our 'base' class type
-      template <typename DT2_ = DataType_, typename IT2_ = IndexType_, int BS_ = BlockSize_>
+      template <typename DT2_ = DataType_, typename IT2_ = IndexType_, int BS_ = block_size_>
       using FilterType = NoneFilterBlocked<DT2_, IT2_, BS_>;
 
       /// this typedef lets you create a filter with different Data and Index types
-      template <typename DataType2_, typename IndexType2_, int BlockSize2_>
-      using FilterTypeByDI = FilterType<DataType2_, IndexType2_, BlockSize2_>;
+      template <typename DataType2_, typename IndexType2_, int block_size2_>
+      using FilterTypeByDI = FilterType<DataType2_, IndexType2_, block_size2_>;
 
       /// \brief Creates a (empty) clone of itself
       NoneFilterBlocked clone(CloneMode /*clone_mode*/ = CloneMode::Deep) const
@@ -170,7 +170,7 @@ namespace FEAT
       }
 
       template<typename DT2_, typename IT2_>
-      void convert(const NoneFilterBlocked<DT2_, IT2_, BlockSize>&)
+      void convert(const NoneFilterBlocked<DT2_, IT2_, block_size>&)
       {
       }
 

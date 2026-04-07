@@ -9,6 +9,7 @@
 #if defined(FEAT_HAVE_HYPRE)
 
 #include <kernel/lafem/pointstar_factory.hpp>
+#include <kernel/lafem/sparse_vector_factory.hpp>
 #include <kernel/global/gate.hpp>
 #include <kernel/global/matrix.hpp>
 #include <kernel/global/vector.hpp>
@@ -60,14 +61,14 @@ public:
   static MirrorType create_mirror_0(const int n, const int k)
   {
     MirrorType mirror((Index)n, 1);
-    mirror.indices()[0] = Index(k);
+    mirror.indices_view_w()[0] = Index(k);
     return mirror;
   }
 
   static MirrorType create_mirror_1(const int n, const int m, const int o, const int p)
   {
     MirrorType mirror((Index)n, (Index)m);
-    IndexType* idx = mirror.indices();
+    Memory::TypedView<IndexType> idx = mirror.indices_view_w();
     for(int i(0); i < m; ++i)
       idx[Index(i)] = Index(o + i * p);
     return mirror;
@@ -139,16 +140,16 @@ public:
 
   static LocalFilterType create_filter(const int m, const std::vector<MirrorType>& bnds)
   {
-    LocalFilterType filter((Index)(m*m));
+    LAFEM::SparseVectorFactory<DataType, IndexType> svf((Index)(m*m));
 
     for(const auto& mir : bnds)
     {
       const Index n = mir.num_indices();
-      const IndexType* idx = mir.indices();
+      const Memory::TypedView<IndexType> idx = mir.indices_view_r();
       for(Index i(0); i < n; ++i)
-        filter.add(idx[i], DT_(0));
+        svf.add(idx(i), DT_(0));
     }
-    return filter;
+    return LocalFilterType(svf.make_sv());
   }
 
   virtual void run() const override

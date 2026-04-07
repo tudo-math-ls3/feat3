@@ -32,8 +32,8 @@ void run(PreferredBackend backend)
   LAFEM::PointstarFactoryFE<DT_, IT_> factory(Index(2000));
   LAFEM::SparseMatrixCSR<DT_, IT_> matrix = factory.matrix_csr();
 
-  std::cout << "NumDofs..: " << matrix.rows() << "\n";
-  std::cout << "NumNZEs..: " << matrix.used_elements() << "\n";
+  std::cout << "NumDofs..: " << matrix.num_rows() << "\n";
+  std::cout << "NumNZEs..: " << matrix.num_nzes() << "\n";
 
   // create vectors
   LAFEM::DenseVector<DT_, IT_> vec_ref = factory.vector_q2_bubble();
@@ -69,8 +69,8 @@ void run(PreferredBackend backend)
   vec_ref.axpy(vec_sol, -DT_(1));
   DT_ err = vec_ref.norm2();
 
-  const unsigned long long n   = matrix.rows();
-  const unsigned long long nze = matrix.used_elements();
+  const unsigned long long n   = matrix.num_rows();
+  const unsigned long long nze = matrix.num_nzes();
   const unsigned long long k   = solver->get_num_iter();
 
   // compute FLOP/s and BYTE/s

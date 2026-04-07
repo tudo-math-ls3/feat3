@@ -44,7 +44,7 @@ class BilinearOperatorTest :
   typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
 
 public:
-  BilinearOperatorTest(PreferredBackend backend) :
+  explicit BilinearOperatorTest(PreferredBackend backend) :
     UnitTest("BilinearOperatorTest", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
@@ -97,8 +97,11 @@ public:
     VectorType x(my_space.get_num_dofs(), DataType_(0));
     // This factor is there so that the l2-norm of x does not get too big
     DataType_ fac(DataType_(1)/DataType_(my_space.get_num_dofs()));
+    {
+      Memory::TypedView<DataType_> vx(x.elements_view_w());
     for(Index i(0); i < x.size(); ++i)
-      x(i, fac*(DataType_(2)*DataType_(i) - Math::sqrt(DataType_(i))));
+        vx[i] = fac*(DataType_(2)*DataType_(i) - Math::sqrt(DataType_(i)));
+    }
 
     // Compute reference solution by assembling the matrix and multiplying x to it
     Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix, my_operator, my_space, cubature_factory);
@@ -149,8 +152,11 @@ public:
     VectorType x(my_trial_space.get_num_dofs(), DataType_(0));
     // This factor is there so that the l2-norm of x does not get too big
     DataType_ fac(DataType_(1)/DataType_(my_trial_space.get_num_dofs()));
+    {
+      Memory::TypedView<DataType_> vx(x.elements_view_w());
     for(Index i(0); i < x.size(); ++i)
-      x(i, fac*(DataType_(2)*DataType_(i) - Math::sqrt(DataType_(i))));
+        vx[i] = fac*(DataType_(2)*DataType_(i) - Math::sqrt(DataType_(i)));
+    }
 
     // Our bilinear operator
     OperatorType_ my_operator;
@@ -214,12 +220,12 @@ public:
     LAFEM::SparseMatrixCSR<DataType_, IndexType_> tmp_matrix;
     tmp_matrix.convert(matrix);
     // fetch the matrix arrays
-    DataType_* data = tmp_matrix.val();
+    const Memory::TypedView<DataType_> data = tmp_matrix.val_view_r();
 
     const DataType_ v = DataType_(1) / DataType_(mesh.get_num_entities(2));
 
     // loop over all matrix rows
-    for(Index i(0); i < tmp_matrix.rows(); ++i)
+    for(Index i(0); i < tmp_matrix.num_rows(); ++i)
     {
       // validate entry
       TEST_CHECK_EQUAL_WITHIN_EPS(data[i], v, eps);
@@ -261,10 +267,11 @@ public:
 
     // create a temporary array to count the number of quads adjacent to a vertex
     LAFEM::DenseVector<Index> qatv(num_verts, Index(0));
+    Memory::TypedView<Index> vqatv(qatv.elements_view_rw());
     for(Index i(0); i < num_quads; ++i)
     {
       for(int j(0); j < 4; ++j)
-        qatv(vatq(i,j), qatv(vatq(i,j)) + 1);
+        ++vqatv[vatq(i,j)];
     }
 
     // create a dof-mapping
@@ -294,10 +301,10 @@ public:
       // loop over all 4x4 entries
       for(int i(0); i < 4; ++i)
       {
-        Index nvi = qatv(vatq(cell,i));
+        Index nvi = vqatv(vatq(cell,i));
         for(int j(0); j < 4; ++j)
         {
-          Index nvj = qatv(vatq(cell,j));
+          Index nvj = vqatv(vatq(cell,j));
           if(i == j)
           {
             // main diagonal entry
@@ -331,29 +338,29 @@ public:
 
 };
 
-BilinearOperatorTest <float, std::uint32_t> bilinear_operator_test_float_uint32(PreferredBackend::generic);
-BilinearOperatorTest <float, std::uint64_t> bilinear_operator_test_float_uint64(PreferredBackend::generic);
-BilinearOperatorTest <double, std::uint32_t> bilinear_operator_test_double_uint32(PreferredBackend::generic);
-BilinearOperatorTest <double, std::uint64_t> bilinear_operator_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BilinearOperatorTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BilinearOperatorTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BilinearOperatorTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BilinearOperatorTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-BilinearOperatorTest <float, std::uint64_t> mkl_bilinear_operator_test_float_uint64(PreferredBackend::mkl);
-BilinearOperatorTest <double, std::uint64_t> mkl_bilinear_operator_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(BilinearOperatorTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(BilinearOperatorTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-BilinearOperatorTest <__float128, std::uint32_t> bilinear_operator_test_float128_uint32(PreferredBackend::generic);
-BilinearOperatorTest <__float128, std::uint64_t> bilinear_operator_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BilinearOperatorTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BilinearOperatorTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
 // Disabled: Produces nans
-//BilinearOperatorTest <Half, std::uint32_t> bilinear_operator_test_half_uint32(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(BilinearOperatorTest, Half, std::uint32_t, PreferredBackend::generic);
 // Disabled: Produces nans
-//BilinearOperatorTest <Half, std::uint64_t> bilinear_operator_test_half_uint64(PreferredBackend::generic);
+//SPAWN_UNIT_TEST_2T_P(BilinearOperatorTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-BilinearOperatorTest <float, std::uint32_t> cuda_bilinear_operator_test_float_uint32(PreferredBackend::cuda);
-BilinearOperatorTest <double, std::uint32_t> cuda_bilinear_operator_test_double_uint32(PreferredBackend::cuda);
-BilinearOperatorTest <float, std::uint64_t> cuda_bilinear_operator_test_float_uint64(PreferredBackend::cuda);
-BilinearOperatorTest <double, std::uint64_t> cuda_bilinear_operator_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(BilinearOperatorTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(BilinearOperatorTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(BilinearOperatorTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(BilinearOperatorTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif
 
 template<typename DataType_, typename IndexType_>
@@ -371,7 +378,7 @@ class BandedBilinearOperatorTest :
   typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
 
 public:
-  BandedBilinearOperatorTest(PreferredBackend backend) :
+  explicit BandedBilinearOperatorTest(PreferredBackend backend) :
     UnitTest("BandedBilinearOperatorTest", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
   {
   }
@@ -433,11 +440,11 @@ public:
     Assembly::BilinearOperatorAssembler::assemble_matrix1(matrix, operat, space, cubature_factory);
 
     // fetch the matrix diagonal
-    DataType_* data = matrix.val();
+    const Memory::TypedView<DataType_> data = matrix.val_view_r();
     const DataType_ v = DataType_(1) / DataType_(mesh.get_num_entities(2));
 
     // loop over all matrix rows
-    for(Index i(0); i < matrix.rows(); ++i)
+    for(Index i(0); i < matrix.num_rows(); ++i)
     {
       // validate entry
       TEST_CHECK_EQUAL_WITHIN_EPS(data[i], v, eps);
@@ -480,11 +487,12 @@ public:
     const auto& vatq(mesh.template get_index_set<2,0>());
 
     // create a temporary array to count the number of quads adjacent to a vertex
-    LAFEM::DenseVector<Index> qatv(num_verts, Index(0));
+    LAFEM::DenseVector<Index, Index> qatv(num_verts, Index(0));
+    Memory::TypedView<Index> vqatv = qatv.elements_view_rw();
     for(Index i(0); i < num_quads; ++i)
     {
       for(int j(0); j < 4; ++j)
-        qatv(vatq(i,j), qatv(vatq(i,j)) + 1);
+        ++vqatv[vatq(i,j)];
     }
 
     // create a dof-mapping
@@ -514,10 +522,10 @@ public:
       // loop over all 4x4 entries
       for(int i(0); i < 4; ++i)
       {
-        Index nvi = qatv(vatq(cell,i));
+        Index nvi = vqatv(vatq(cell,i));
         for(int j(0); j < 4; ++j)
         {
-          Index nvj = qatv(vatq(cell,j));
+          Index nvj = vqatv(vatq(cell,j));
           if(i == j)
           {
             // main diagonal entry
@@ -550,25 +558,25 @@ public:
   }
 };
 
-BandedBilinearOperatorTest <float, std::uint32_t> banded_bilinear_operator_test_float_uint32(PreferredBackend::generic);
-BandedBilinearOperatorTest <float, std::uint64_t> banded_bilinear_operator_test_float_uint64(PreferredBackend::generic);
-BandedBilinearOperatorTest <double, std::uint32_t> banded_bilinear_operator_test_double_uint32(PreferredBackend::generic);
-BandedBilinearOperatorTest <double, std::uint64_t> banded_bilinear_operator_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BandedBilinearOperatorTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BandedBilinearOperatorTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BandedBilinearOperatorTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BandedBilinearOperatorTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-BandedBilinearOperatorTest <float, std::uint64_t> mkl_banded_bilinear_operator_test_float_uint64(PreferredBackend::mkl);
-BandedBilinearOperatorTest <double, std::uint64_t> mkl_banded_bilinear_operator_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(BandedBilinearOperatorTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(BandedBilinearOperatorTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-BandedBilinearOperatorTest <__float128, std::uint32_t> banded_bilinear_operator_test_float128_uint32(PreferredBackend::generic);
-BandedBilinearOperatorTest <__float128, std::uint64_t> banded_bilinear_operator_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BandedBilinearOperatorTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BandedBilinearOperatorTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-BandedBilinearOperatorTest <Half, std::uint32_t> banded_bilinear_operator_test_half_uint32(PreferredBackend::generic);
-BandedBilinearOperatorTest <Half, std::uint64_t> banded_bilinear_operator_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BandedBilinearOperatorTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(BandedBilinearOperatorTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-BandedBilinearOperatorTest <float, std::uint32_t> cuda_banded_bilinear_operator_test_float_uint32(PreferredBackend::cuda);
-BandedBilinearOperatorTest <double, std::uint32_t> cuda_banded_bilinear_operator_test_double_uint32(PreferredBackend::cuda);
-BandedBilinearOperatorTest <float, std::uint64_t> cuda_banded_bilinear_operator_test_float_uint64(PreferredBackend::cuda);
-BandedBilinearOperatorTest <double, std::uint64_t> cuda_banded_bilinear_operator_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(BandedBilinearOperatorTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(BandedBilinearOperatorTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(BandedBilinearOperatorTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(BandedBilinearOperatorTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif

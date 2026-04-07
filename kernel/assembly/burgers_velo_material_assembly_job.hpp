@@ -173,7 +173,7 @@ namespace FEAT
       template<typename IndexType_, int conv_dim_>
       static DataType calc_sd_v_norm(const LAFEM::DenseVectorBlocked<DataType_, IndexType_, conv_dim_>& convect)
       {
-        const auto* vals = convect.elements();
+        const auto vals = convect.elements_view_r();
         DataType_ r = DataType_(0);
         for(Index i(0); i < convect.size(); ++i)
           r = Math::max(r, vals[i].norm_euclid());
@@ -266,7 +266,7 @@ namespace FEAT
       static constexpr int shape_dim = SpaceType::shape_dim;
 
       /// the convection vector dimension
-      static constexpr int conv_dim = ConvVectorType::BlockSize;
+      static constexpr int conv_dim = ConvVectorType::block_size;
 
       /// our assembly traits
       typedef AsmTraits1<DataType, SpaceType, TrafoTags::jac_det, SpaceTags::value|SpaceTags::grad> AsmTraits;
@@ -670,13 +670,13 @@ namespace FEAT
               // test function loop
               for(int i(0); i < this->num_local_dofs; ++i)
               {
-                Tiny::Vector<DataType, BaseClass::ConvVectorType::BlockSize> du_grad_phi;
+                Tiny::Vector<DataType, BaseClass::ConvVectorType::block_size> du_grad_phi;
                 du_grad_phi.set_mat_vec_mult(this->strain_rate_tensor_2, this->space_data.phi[i].grad);
 
                 // trial function loop
                 for(int j(0); j < this->num_local_dofs; ++j)
                 {
-                  Tiny::Vector<DataType, BaseClass::ConvVectorType::BlockSize> du_grad_psi;
+                  Tiny::Vector<DataType, BaseClass::ConvVectorType::block_size> du_grad_psi;
                   du_grad_psi.set_mat_vec_mult(this->strain_rate_tensor_2, this->space_data.phi[j].grad);
                   // add outer product of grad(phi) and grad(psi)
                   local_matrix[i][j].add_outer_product(du_grad_phi, du_grad_psi, fac * weight);
@@ -831,10 +831,10 @@ namespace FEAT
       typedef BurgersVeloMaterialAssemblyJobBase<DataType, Space_, ViscoFunc_, ViscoDerFunc_, ConvVector_> BaseClass;
 
       // no nonsense, please
-      static_assert(Matrix_::BlockHeight == Matrix_::BlockWidth, "only square matrix blocks are supported here");
+      static_assert(Matrix_::block_height == Matrix_::block_width, "only square matrix blocks are supported here");
 
       /// the block size
-      static constexpr int block_size = Matrix_::BlockHeight;
+      static constexpr int block_size = Matrix_::block_height;
 
       /// the matrix to be assembled
       MatrixType& matrix;
@@ -930,7 +930,7 @@ namespace FEAT
       typedef BurgersVeloMaterialAssemblyJobBase<DataType, Space_, ViscoFunc_, ViscoDerFunc_, ConvVector_> BaseClass;
 
       /// the block size
-      static constexpr int block_size = VectorType::BlockSize;
+      static constexpr int block_size = VectorType::block_size;
 
       /// the matrix to be assembled
       VectorType& vector;
@@ -982,7 +982,7 @@ namespace FEAT
         /// scatters the local matrix
         void scatter()
         {
-          auto* val_vec = vector.elements();
+          auto val_vec = vector.elements_view_rw();
           for(int loc_i = 0; loc_i < this->dof_mapping.get_num_local_dofs(); ++loc_i)
           {
             const Index cur_i = this->dof_mapping.get_index(loc_i);
@@ -1027,7 +1027,7 @@ namespace FEAT
       typedef BurgersVeloMaterialAssemblyJobBase<DataType, Space_, ViscFunc_, ViscDerFunc_, ConvVector_> BaseClass;
 
       /// the block size
-      static constexpr int block_size = Vector_::BlockSize;
+      static constexpr int block_size = Vector_::block_size;
 
       /// the RHS vector to be assembled
       VectorType& vector_rhs;

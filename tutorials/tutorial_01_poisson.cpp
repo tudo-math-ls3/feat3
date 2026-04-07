@@ -547,8 +547,8 @@ namespace Tutorial01
     Geometry::ExportVTK<MeshType> exporter(mesh);
 
     // add the vertex-projection of our solution and rhs vectors
-    exporter.add_vertex_scalar("sol", vertex_sol.elements());
-    exporter.add_vertex_scalar("rhs", vertex_rhs.elements());
+    exporter.add_vertex_scalar("sol", vertex_sol);
+    exporter.add_vertex_scalar("rhs", vertex_rhs);
 
     // finally, write the VTK file
     exporter.write(vtk_name);

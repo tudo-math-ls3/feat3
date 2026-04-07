@@ -386,7 +386,7 @@ namespace FEAT
 
         // gather to parent sibling
         DataType* dummy = nullptr;
-        _sibling_comm->gather(parent_buffer.elements(), _buffer_size, dummy, std::size_t(0), _parent_rank);
+        _sibling_comm->gather(parent_buffer.elements_view_w().get_w(), _buffer_size, dummy, std::size_t(0), _parent_rank);
       }
 
       /**
@@ -423,7 +423,7 @@ namespace FEAT
         BufferType child_buffers(_buffer_size * num_children);
 
         // gather from siblings
-        _sibling_comm->gather(parent_buffer.elements(), _buffer_size, child_buffers.elements(), _buffer_size, _parent_rank);
+        _sibling_comm->gather(parent_buffer.elements_view_r().get_r(), _buffer_size, child_buffers.elements_view_w().get_w(), _buffer_size, _parent_rank);
 
         // format target vector
         vec_trg.format();
@@ -457,7 +457,7 @@ namespace FEAT
 
         // receive scatter from parent sibling
         DataType* dummy = nullptr;
-        _sibling_comm->scatter(dummy, std::size_t(0), parent_buffer.elements(), _buffer_size, _parent_rank);
+        _sibling_comm->scatter(dummy, std::size_t(0), parent_buffer.elements_view_w().get_w(), _buffer_size, _parent_rank);
 
         // scatter into target vector
         vec_trg.format();
@@ -503,7 +503,7 @@ namespace FEAT
         BufferType parent_buffer(_buffer_size);
 
         // scatter to siblings
-        _sibling_comm->scatter(child_buffers.elements(), _buffer_size, parent_buffer.elements(), _buffer_size, _parent_rank);
+        _sibling_comm->scatter(child_buffers.elements_view_r().get_r(), _buffer_size, parent_buffer.elements_view_w().get_w(), _buffer_size, _parent_rank);
 
         // scatter into target vector
         vec_trg.format();

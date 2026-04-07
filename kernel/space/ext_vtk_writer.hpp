@@ -199,6 +199,8 @@ namespace FEAT
         typedef typename VectorType_::ValueType ValueType;
         Tiny::Vector<ValueType, SpaceEval::max_local_dofs> loc_vec;
 
+        const Memory::TypedView<ValueType> vv(v.elements_view_r());
+
         DofMappingType dof_map(space);
         TrafoEval trafo_eval(_trafo);
         SpaceEval space_eval(space);
@@ -215,7 +217,7 @@ namespace FEAT
           dof_map.prepare(cell);
           for(int i(0); i < dof_map.get_num_local_dofs(); ++i)
           {
-            loc_vec[i] = v(dof_map.get_index(i));
+            loc_vec[i] = vv(dof_map.get_index(i));
           }
           dof_map.finish();
 

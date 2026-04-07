@@ -252,11 +252,26 @@ namespace FEAT
        *
        * \returns The number of entries
        */
-      template<LAFEM::Perspective perspective_ = LAFEM::Perspective::pod>
       Index size() const
       {
         ASSERTM(_gate, "Gate is not set!");
-        return _gate->template get_num_global_dofs<perspective_>();
+        return _gate->get_num_global_dofs();
+      }
+
+      /**
+       * \brief Returns the total number of entries in this distributed vector
+       *
+       * \warning In parallel, this requires communication and is very expensive, so use sparingly!
+       *
+       * \attention This function is collective, i.e. it must be called by all processes participating
+       * in the gate's communicator, otherwise the application will deadlock.
+       *
+       * \returns The number of entries
+       */
+      Index size_raw() const
+      {
+        ASSERTM(_gate, "Gate is not set!");
+        return _gate->get_num_global_dofs_raw();
       }
 
       /**

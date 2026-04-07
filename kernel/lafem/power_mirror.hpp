@@ -36,11 +36,18 @@ namespace FEAT
         {
           return sm.buffer_size(pv.first()) + PowerMirrorHelper<i_-1>::buffer_size(sm, pv.rest());
         }
-        template<Perspective perspective_, typename SM_, typename Pv_>
+        template<typename SM_, typename Pv_>
         static Index mask_scatter(const SM_& sm, const Pv_& pv, std::vector<int>& mask, const int value, const Index offset)
         {
-          Index nf = sm.template mask_scatter<perspective_>(pv.first(), mask, value, offset);
-          Index nr = PowerMirrorHelper<i_-1>::template mask_scatter<perspective_>(sm, pv.rest(), mask, value, offset + nf);
+          Index nf = sm.mask_scatter(pv.first(), mask, value, offset);
+          Index nr = PowerMirrorHelper<i_-1>::mask_scatter(sm, pv.rest(), mask, value, offset + nf);
+          return nf + nr;
+        }
+        template<typename SM_, typename Pv_>
+        static Index mask_scatter_raw(const SM_& sm, const Pv_& pv, std::vector<int>& mask, const int value, const Index offset)
+        {
+          Index nf = sm.mask_scatter_raw(pv.first(), mask, value, offset);
+          Index nr = PowerMirrorHelper<i_-1>::mask_scatter_raw(sm, pv.rest(), mask, value, offset + nf);
           return nf + nr;
         }
       };
@@ -63,10 +70,15 @@ namespace FEAT
         {
           return sm.buffer_size(pv.first());
         }
-        template<Perspective perspective_, typename SM_, typename Pv_>
+        template<typename SM_, typename Pv_>
         static Index mask_scatter(const SM_& sm, const Pv_& pv, std::vector<int>& mask, const int value, const Index offset)
         {
-          return sm.template mask_scatter<perspective_>(pv.first(), mask, value, offset);
+          return sm.mask_scatter(pv.first(), mask, value, offset);
+        }
+        template<typename SM_, typename Pv_>
+        static Index mask_scatter_raw(const SM_& sm, const Pv_& pv, std::vector<int>& mask, const int value, const Index offset)
+        {
+          return sm.mask_scatter_raw(pv.first(), mask, value, offset);
         }
       };
     } // namespace Intern
@@ -174,9 +186,9 @@ namespace FEAT
        * \returns The new empty mirror
        */
       template<typename SubVector_>
-      static PowerMirror make_empty(const PowerVector<SubVector_, count_>& tmpl_vec)
+      static PowerMirror make_hollow(const PowerVector<SubVector_, count_>& tmpl_vec)
       {
-        return PowerMirror(SubMirrorType::make_empty(tmpl_vec.first()));
+        return PowerMirror(SubMirrorType::make_hollow(tmpl_vec.first()));
       }
 
       /// \brief Returns the total amount of bytes allocated.
@@ -188,11 +200,21 @@ namespace FEAT
       /**
        * \brief Checks whether the mirror is empty.
        *
-       * \returns \c true, if there are no indices in the mirror, otherwise \c false.
+       * \returns \c true, if the mirror has a size of 0, otherwise \c false.
        */
       bool empty() const
       {
         return this->_sub_mirror.empty();
+      }
+
+      /**
+       * \brief Checks whether the mirror is hollow.
+       *
+       * \returns \c true, if there are no indices in the mirror, otherwise \c false.
+       */
+      bool hollow() const
+      {
+        return this->_sub_mirror.hollow();
       }
 
       /**
@@ -287,13 +309,20 @@ namespace FEAT
       }
 
       /** \copydoc VectorMirror::mask_scatter() */
-      template<Perspective perspective_, typename Tv_>
+      template<typename Tv_>
       Index mask_scatter(const LAFEM::PowerVector<Tv_, count_>& vector, std::vector<int>& mask,
         const int value, const Index offset = Index(0)) const
       {
-        return Intern::PowerMirrorHelper<count_>::template mask_scatter<perspective_>(_sub_mirror, vector, mask, value, offset);
+        return Intern::PowerMirrorHelper<count_>::mask_scatter(_sub_mirror, vector, mask, value, offset);
       }
 
+      /** \copydoc VectorMirror::mask_scatter_raw() */
+      template<typename Tv_>
+      Index mask_scatter_raw(const LAFEM::PowerVector<Tv_, count_>& vector, std::vector<int>& mask,
+        const int value, const Index offset = Index(0)) const
+      {
+        return Intern::PowerMirrorHelper<count_>::mask_scatter_raw(_sub_mirror, vector, mask, value, offset);
+      }
     }; // class PowerMirror<...>
   } // namespace LAFEM
 } // namespace FEAT

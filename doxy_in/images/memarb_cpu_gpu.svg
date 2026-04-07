@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="125.265mm"
+   height="65.264999mm"
+   viewBox="0 0 125.265 65.265"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.4.2 (f4327f4, 2025-05-13)"
+   sodipodi:docname="memarb_cpu_gpu.svg"
+   inkscape:export-filename="memarb_cpu_gpu2.svg"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="true"
+     inkscape:zoom="1.8756314"
+     inkscape:cx="208.46313"
+     inkscape:cy="87.970376"
+     inkscape:window-width="1920"
+     inkscape:window-height="1009"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       id="grid1"
+       units="mm"
+       originx="-19.867501"
+       originy="-79.867501"
+       spacingx="0.99999998"
+       spacingy="1"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       enabled="true"
+       visible="true" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Ebene 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-19.8675,-79.867493)">
+    <rect
+       style="fill:#c0c0c0;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+       id="rect4"
+       width="50"
+       height="65"
+       x="95"
+       y="79.999992"
+       ry="0.6226849" />
+    <text
+       xml:space="preserve"
+       style="font-size:7.05556px;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+       x="120"
+       y="89.999992"
+       id="text3-82-1"><tspan
+         sodipodi:role="line"
+         id="tspan3-4-1"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke-width:0.265"
+         x="120"
+         y="89.999992">accelerator</tspan></text>
+    <rect
+       style="fill:#c0c0c0;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+       id="rect3"
+       width="50"
+       height="65"
+       x="20"
+       y="79.999992" />
+    <text
+       xml:space="preserve"
+       style="font-size:7.05556px;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.264999;-inkscape-font-specification:Arial;font-family:Arial;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
+       x="45"
+       y="89.999992"
+       id="text3-82"><tspan
+         sodipodi:role="line"
+         id="tspan3-4"
+         style="font-size:7.05556px;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke-width:0.265;-inkscape-font-specification:Arial;font-family:Arial;font-weight:normal;font-style:normal;font-stretch:normal;font-variant:normal"
+         x="45"
+         y="89.999992">host system</tspan></text>
+    <rect
+       style="fill:#ff8bff;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+       id="rect1"
+       width="40"
+       height="15"
+       x="25"
+       y="95" />
+    <rect
+       style="fill:#00ff00;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+       id="rect2"
+       width="40"
+       height="15"
+       x="25"
+       y="124.99999" />
+    <text
+       xml:space="preserve"
+       style="font-size:7.05556px;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+       x="45"
+       y="105"
+       id="text3"><tspan
+         sodipodi:role="line"
+         id="tspan3"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke-width:0.265"
+         x="45"
+         y="105">CPU</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:7.05556px;line-height:0.8;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+       x="45"
+       y="132"
+       id="text3-8"><tspan
+         sodipodi:role="line"
+         id="tspan3-2"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;line-height:0.8;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke-width:0.265"
+         x="45"
+         y="132">host</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;line-height:0.8;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke-width:0.265"
+         x="45"
+         y="137.72612"
+         id="tspan4">memory</tspan></text>
+    <rect
+       style="fill:#ffa000;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+       id="rect1-7"
+       width="40"
+       height="15"
+       x="100"
+       y="95" />
+    <rect
+       style="fill:#00c400;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+       id="rect2-1"
+       width="40"
+       height="15"
+       x="100"
+       y="124.99998" />
+    <text
+       xml:space="preserve"
+       style="font-size:7.05556px;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+       x="120"
+       y="105"
+       id="text3-1"><tspan
+         sodipodi:role="line"
+         id="tspan3-5"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke-width:0.265"
+         x="120"
+         y="105">GPU</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:7.05556px;line-height:0.8;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+       x="120"
+       y="132"
+       id="text3-8-3"><tspan
+         sodipodi:role="line"
+         id="tspan3-2-2"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;line-height:0.8;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke-width:0.265"
+         x="120"
+         y="132">device</tspan><tspan
+         sodipodi:role="line"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.05556px;line-height:0.8;font-family:Arial;-inkscape-font-specification:Arial;text-align:center;text-anchor:middle;fill:#ffffff;fill-opacity:1;stroke-width:0.265"
+         x="120"
+         y="137.72612"
+         id="tspan4-2">memory</tspan></text>
+    <path
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+       d="m 120,110.52917 -3,2.99999 h 2 v 8.00001 h -2 l 3,3 3,-3 h -2 v -8.00001 h 2 z"
+       id="path4-7"
+       sodipodi:nodetypes="ccccccccccc" />
+    <path
+       style="fill:#ff0000;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+       d="m 45.000001,110.52917 -3,2.99999 h 2 v 8.00001 h -2 l 3,3 3,-3 h -2 v -8.00001 h 2 z"
+       id="path4-7-2"
+       sodipodi:nodetypes="ccccccccccc" />
+    <path
+       style="fill:#00a0ff;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+       d="M 99.500007,102.5 96.500018,99.499993 V 101.5 H 68.500002 v -2.000007 l -3,3.000007 3,3 v -2 h 28.000016 v 2 z"
+       id="path4-7-2-3"
+       sodipodi:nodetypes="ccccccccccc" />
+    <text
+       xml:space="preserve"
+       style="font-size:7.05556px;text-align:center;writing-mode:lr-tb;direction:ltr;text-anchor:middle;fill:#00a0ff;fill-opacity:1;stroke:#000000;stroke-width:0.264999"
+       x="82"
+       y="110"
+       id="text3-4"><tspan
+         sodipodi:role="line"
+         id="tspan3-1"
+         style="font-size:7.05556px;text-align:center;text-anchor:middle;fill:#00a0ff;fill-opacity:1;stroke-width:0.265"
+         x="82"
+         y="110">PCIe</tspan></text>
+  </g>
+</svg>

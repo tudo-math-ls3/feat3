@@ -268,7 +268,7 @@ void test_poiseuille(int level, bool defo, Solver::VankaType vtype)
     << numer_time << " "
     << solve_time << " "
     << stringify(vanka->data_size()).pad_front(10)
-    << stringify(matrix.used_elements()).pad_front(10)
+    << stringify(matrix.num_nzes()).pad_front(10)
     << "\n";
 }
 

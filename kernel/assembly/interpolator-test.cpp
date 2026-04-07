@@ -43,12 +43,8 @@ class InterpolatorTest :
   typedef Space::Lagrange1::Element<QuadTrafo> QuadSpaceQ1;
 
 public:
-  InterpolatorTest(PreferredBackend backend) :
+  explicit InterpolatorTest(PreferredBackend backend) :
     UnitTest("InterpolatorTest", Type::Traits<DataType_>::name(), Type::Traits<IndexType_>::name(), backend)
-  {
-  }
-
-  virtual ~InterpolatorTest()
   {
   }
 
@@ -96,6 +92,7 @@ public:
     const typename QuadMesh::VertexSetType& vertex_set(mesh.get_vertex_set());
 
     // loop over all vertices
+    Memory::TypedView<DataType_> vv = vector.elements_view_r();
     for (Index i(0); i < num_verts; ++i)
     {
       // compute sine-bubble value in vertex position
@@ -103,7 +100,7 @@ public:
         ::eval(DataType_(vertex_set[i][0]), DataType_(vertex_set[i][1]));
 
       // validate vector data
-      TEST_CHECK_EQUAL_WITHIN_EPS(vector(i), s, eps);
+      TEST_CHECK_EQUAL_WITHIN_EPS(vv(i), s, eps);
     }
   }
 
@@ -138,6 +135,7 @@ public:
     const Geometry::IndexSet<4>& index_set(mesh.get_index_set<2, 0>());
 
     // loop over all quads
+    Memory::TypedView<DataType_> vv = vector.elements_view_r();
     for (Index i(0); i < num_quads; ++i)
     {
       // compute quad center
@@ -152,30 +150,30 @@ public:
       DataType_ s = Analytic::Common::SineBubbleStatic<DataType_>::eval(DataType_(0.25) * x, DataType_(0.25) * y);
 
       // validate vector data
-      TEST_CHECK_EQUAL_WITHIN_EPS(vector(i), s, eps);
+      TEST_CHECK_EQUAL_WITHIN_EPS(vv(i), s, eps);
     }
   }
 };
 
-InterpolatorTest <float, std::uint32_t> interpolator_test_float_uint32(PreferredBackend::generic);
-InterpolatorTest <double, std::uint32_t> interpolator_test_double_uint32(PreferredBackend::generic);
-InterpolatorTest <float, std::uint64_t> interpolator_test_float_uint64(PreferredBackend::generic);
-InterpolatorTest <double, std::uint64_t> interpolator_test_double_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(InterpolatorTest, float, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(InterpolatorTest, double, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(InterpolatorTest, float, std::uint64_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(InterpolatorTest, double, std::uint64_t, PreferredBackend::generic);
 #ifdef FEAT_HAVE_MKL
-InterpolatorTest <float, std::uint64_t> mkl_interpolator_test_float_uint64(PreferredBackend::mkl);
-InterpolatorTest <double, std::uint64_t> mkl_interpolator_test_double_uint64(PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(InterpolatorTest, float, std::uint64_t, PreferredBackend::mkl);
+SPAWN_UNIT_TEST_2T_P(InterpolatorTest, double, std::uint64_t, PreferredBackend::mkl);
 #endif
 #ifdef FEAT_HAVE_QUADMATH
-InterpolatorTest <__float128, std::uint32_t> interpolator_test_float128_uint32(PreferredBackend::generic);
-InterpolatorTest <__float128, std::uint64_t> interpolator_test_float128_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(InterpolatorTest, __float128, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(InterpolatorTest, __float128, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_HALFMATH
-InterpolatorTest <Half, std::uint32_t> interpolator_test_half_uint32(PreferredBackend::generic);
-InterpolatorTest <Half, std::uint64_t> interpolator_test_half_uint64(PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(InterpolatorTest, Half, std::uint32_t, PreferredBackend::generic);
+SPAWN_UNIT_TEST_2T_P(InterpolatorTest, Half, std::uint64_t, PreferredBackend::generic);
 #endif
 #ifdef FEAT_HAVE_CUDA
-InterpolatorTest <float, std::uint32_t> cuda_interpolator_test_float_uint32(PreferredBackend::cuda);
-InterpolatorTest <double, std::uint32_t> cuda_interpolator_test_double_uint32(PreferredBackend::cuda);
-InterpolatorTest <float, std::uint64_t> cuda_interpolator_test_float_uint64(PreferredBackend::cuda);
-InterpolatorTest <double, std::uint64_t> cuda_interpolator_test_double_uint64(PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(InterpolatorTest, float, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(InterpolatorTest, double, std::uint32_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(InterpolatorTest, float, std::uint64_t, PreferredBackend::cuda);
+SPAWN_UNIT_TEST_2T_P(InterpolatorTest, double, std::uint64_t, PreferredBackend::cuda);
 #endif

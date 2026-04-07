@@ -10,7 +10,7 @@
 #include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/lafem/dense_vector_blocked.hpp>
 #include <kernel/lafem/sparse_vector_blocked.hpp>
-#include <kernel/lafem/arch/slip_filter.hpp>
+#include <kernel/lafem/arch/slip_filter_block.hpp>
 
 namespace FEAT
 {
@@ -25,7 +25,7 @@ namespace FEAT
      * \tparam IT_
      * Index type, i.e. unsigned int
      *
-     * \tparam BlockSize_
+     * \tparam block_size_
      * Size of the blocks, i.e. 2 for a filter acting on a velocity field in 2d
      *
      * An application of this filter sets a given vector component, i.e. it sets the normal component of a given
@@ -62,7 +62,7 @@ namespace FEAT
     template<
       typename DT_,
       typename IT_,
-      int BlockSize_>
+      int block_size_>
     class SlipFilter
     {
       public:
@@ -71,35 +71,35 @@ namespace FEAT
         /// index-type typedef
         typedef IT_ IndexType;
         /// The block size
-        static constexpr int BlockSize = BlockSize_;
+        static constexpr int block_size = block_size_;
         /// Value type
-        typedef Tiny::Vector<DataType, BlockSize> ValueType;
+        typedef Tiny::Vector<DataType, block_size> ValueType;
         /// Our supported vector type
-        typedef DenseVectorBlocked<DT_, IT_, BlockSize_> VectorType;
+        typedef DenseVectorBlocked<DT_, IT_, block_size_> VectorType;
 
         /// Our 'base' class type
         template <typename DT2_ = DT_, typename IT2_ = IT_>
-        using FilterType = SlipFilter<DT2_, IT2_, BlockSize_>;
+        using FilterType = SlipFilter<DT2_, IT2_, block_size_>;
 
         /// For creating filter with different DT, IT
         template <typename DT2_ = DT_, typename IT2_ = IT_>
         using FilterTypeByDI = FilterType<DT2_, IT2_>;
 
-        static_assert(BlockSize > 1, "BlockSize has to be >= 2 in SlipFilter!");
+        static_assert(block_size > 1, "block_size has to be >= 2 in SlipFilter!");
 
       private:
         /// This will contain the pointwise outer unit normal in all vertices
-        SparseVectorBlocked<DT_, IT_, BlockSize_> _nu;
+        SparseVectorBlocked<DT_, IT_, block_size_> _nu;
         /// This will contain the data for filtering
-        SparseVectorBlocked<DT_, IT_, BlockSize_> _sv;
+        SparseVectorBlocked<DT_, IT_, block_size_> _sv;
 
       public:
         /// default constructor
         SlipFilter() :
           _nu(),
           _sv()
-          {
-          }
+        {
+        }
 
         /**
          * \brief Constructor.
@@ -111,18 +111,18 @@ namespace FEAT
          * Number of DoFs that will be filtered.
          *
          */
-        explicit SlipFilter(Index num_vertices, Index num_dofs) :
-          _nu(num_vertices),
-          _sv(num_dofs)
-          {
-          }
+        explicit SlipFilter(Index num_vertices, Index num_dofs, Index num_nzes) :
+          _nu(num_vertices, num_nzes),
+          _sv(num_dofs, num_nzes)
+        {
+        }
 
         /// move-ctor
         SlipFilter(SlipFilter && other) :
           _nu(std::move(other._nu)),
           _sv(std::move(other._sv))
-          {
-          }
+        {
+        }
 
         /// move-assignment operator
         SlipFilter & operator=(SlipFilter && other)
@@ -177,76 +177,59 @@ namespace FEAT
         }
 
         /// \cond internal
-        SparseVectorBlocked<DT_, IT_, BlockSize>& get_filter_vector()
+        SparseVectorBlocked<DT_, IT_, block_size>& get_filter_vector()
         {
           return _sv;
         }
-        const SparseVectorBlocked<DT_, IT_, BlockSize>& get_filter_vector() const
+        const SparseVectorBlocked<DT_, IT_, block_size>& get_filter_vector() const
         {
           return _sv;
         }
 
-        SparseVectorBlocked<DT_, IT_, BlockSize>& get_nu()
+        SparseVectorBlocked<DT_, IT_, block_size>& get_nu()
         {
           return _nu;
         }
-        const SparseVectorBlocked<DT_, IT_, BlockSize>& get_nu() const
+        const SparseVectorBlocked<DT_, IT_, block_size>& get_nu() const
         {
           return _nu;
         }
         /// \endcond
 
-        /**
-         * \brief Adds one element to the filter
-         *
-         * \param[in] idx Index where to add
-         * \param[in] val Value to add
-         *
-         **/
-        void add(IndexType idx, ValueType val)
-        {
-          _sv(idx, val);
-        }
-
-        /// \returns The total size of the filter.
+        /// Returns the total native size of the filter
         Index size() const
         {
           return _sv.size();
         }
 
-        /// \returns The number of entries in the filter.
-        Index used_elements() const
+        /// Returns the total raw size of the filter
+        Index size_raw() const
         {
-          return _sv.used_elements();
+          return _sv.size_raw();
         }
 
-        /// \returns The index array.
-        IT_* get_indices()
+        /// Returns the number of non-zero entries in the filter
+        Index num_nzes() const
         {
-          return _sv.indices();
+          return _sv.num_nzes();
         }
 
-        /// \returns The index array.
-        const IT_* get_indices() const
+        /// Returns the raw number of non-zero entries in the filter
+        Index num_nzes_raw() const
         {
-          return _sv.indices();
+          return _sv.num_nzes_raw();
         }
 
-        /// \returns The value array.
-        ValueType* get_values()
-        {
-          return _sv.elements();
-        }
-
-        /// \returns The value array.
-        const ValueType* get_values() const
-        {
-          return _sv.elements();
-        }
-
+        /// Checks whether the size of the filter is zero
         bool empty() const
         {
-          return _sv.used_elements() <= Index(0);
+          return _sv.empty();
+        }
+
+        /// Checks whether the filter does not contain any non-zero elements
+        bool hollow() const
+        {
+          return _sv.hollow();
         }
 
         /**
@@ -257,12 +240,15 @@ namespace FEAT
          */
         void filter_rhs(VectorType& vector) const
         {
-          if(_sv.empty())
+          if(empty())
             return;
           XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
-          if(_sv.used_elements() > Index(0))
-            Arch::SlipFilter::template filter_rhs<BlockSize_>
-              (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements());
+
+          if(!hollow())
+          {
+            Arch::SlipFilterBlock::template exec<DT_, IT_, block_size_>(
+              vector.elements_arbiter(), _sv.elements_arbiter(), _sv.indices_arbiter(), _sv.num_nzes());
+          }
         }
 
         /**
@@ -273,8 +259,6 @@ namespace FEAT
          */
         void filter_sol(VectorType& vector) const
         {
-          if(_sv.empty())
-            return;
           // same as rhs
           filter_rhs(vector);
         }
@@ -287,12 +271,8 @@ namespace FEAT
          */
         void filter_def(VectorType& vector) const
         {
-          if(_sv.empty())
-            return;
-          XASSERTM(_sv.size() == vector.size(), "Vector size does not match!");
-          if(_sv.used_elements() > Index(0))
-            Arch::SlipFilter::template filter_def<BlockSize_>
-              (vector.template elements<Perspective::pod>(), _sv.template elements<Perspective::pod>(), _sv.indices(), _sv.used_elements() );
+          // same as rhs
+          filter_rhs(vector);
         }
 
         /**
@@ -303,8 +283,8 @@ namespace FEAT
          */
         void filter_cor(VectorType& vector) const
         {
-          // same as def
-          filter_def(vector);
+          // same as rhs
+          filter_rhs(vector);
         }
     }; // class SlipFilter<...>
   } // namespace LAFEM

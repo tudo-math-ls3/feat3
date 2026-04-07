@@ -19,6 +19,7 @@
 #include <kernel/analytic/common.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/domain_assembler.hpp>
+#include <kernel/assembly/domain_assembler_basic_jobs.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/common_functionals.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
@@ -86,7 +87,9 @@ namespace Tutorial01
     {
       Assembly::DomainAssembler<TrafoType> integrator(trafo);
 
-      integrator.compile_all_elements(cores, Assembly::ThreadingStrategy::layered);
+      integrator.set_threading_strategy(Assembly::ThreadingStrategy::layered);
+      integrator.set_max_worker_threads(cores);
+      integrator.compile_all_elements();
 
       dump_1 = integrator.dump();
 
@@ -99,7 +102,7 @@ namespace Tutorial01
       std::cout << "Time 2: " << watch_2.elapsed_string().pad_front(10) << "\n";
 
       watch_3.start();
-      integrator.assemble_master2(laplace_job);
+      // integrator.assemble_master2(laplace_job); //???
       watch_3.stop();
       std::cout << "Time 3: " << watch_3.elapsed_string().pad_front(10) << "\n";
 
@@ -115,7 +118,9 @@ namespace Tutorial01
     {
       Assembly::DomainAssembler<TrafoType> integrator(trafo);
 
-      integrator.compile_all_elements(cores, Assembly::ThreadingStrategy::colored);
+      integrator.set_threading_strategy(Assembly::ThreadingStrategy::colored);
+      integrator.set_max_worker_threads(cores);
+      integrator.compile_all_elements();
 
       dump_2 = integrator.dump();
 
@@ -128,7 +133,7 @@ namespace Tutorial01
       std::cout << "Time 5: " << watch_5.elapsed_string().pad_front(10) << "\n";
 
       watch_6.start();
-      integrator.assemble_master2(laplace_job);
+      // integrator.assemble_master2(laplace_job); //???
       watch_6.stop();
       std::cout << "Time 6: " << watch_6.elapsed_string().pad_front(10) << "\n";
 
@@ -138,11 +143,7 @@ namespace Tutorial01
       std::cout << "Time 7: " << watch_7.elapsed_string().pad_front(10) << "\n";
     }
 
-    DataType vmax = 0.0;
-    DataType* val = matrix.val();
-    for(Index i(0); i < matrix.used_elements(); ++i)
-      vmax = Math::max(vmax, Math::abs(val[i]));
-
+    DataType vmax = matrix.max_abs_element();
     std::cout << "MAX-ERR = " << stringify_fp_sci(vmax) << "\n";
 
     //std::cout << dump_1 << "\n\n";;
@@ -175,9 +176,9 @@ namespace Tutorial01
     Geometry::MeshFileReader mesh_reader;
     mesh_reader.add_mesh_files(filenames);
 
-    Geometry::MeshAtlas<MeshType> altas;
+    Geometry::MeshAtlas<MeshType> atlas;
     auto root_node = Geometry::RootMeshNode<MeshType>::make_unique(nullptr, &atlas);
-    mesh_reader.parse(*root_node, altas);
+    mesh_reader.parse(*root_node, atlas);
 
     for(Index i(0); i < level; ++i)
       root_node = root_node->refine_unique();
