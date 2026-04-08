@@ -1495,8 +1495,8 @@ class ThirdPartyParMETIS(ThirdPartyPackage):
   def __init__(self):
     super().__init__()
     self.name = "ParMETIS"
-    self.version = "4.0.3.1_aio"
-    self.date = "2025-04-29"
+    self.version = "4.0.3.2"
+    self.date = "2026-04-7"
     self.file = "ParMETIS-" + self.version + ".zip"
     self.dir = self.name + "-" + self.version
     self.trunk = "."
@@ -1528,26 +1528,26 @@ class ThirdPartyParMETIS(ThirdPartyPackage):
   def patch(self):
     print("\nPatching " + self.name + " " + self.version + " sources...")
     # remove some outdated MS-specific preprocessor mumbo-jumbo
-    self.patch_file(os.path.join("GKlib", "gk_arch.h"), [
+    self.patch_file(os.path.join("GKlib", "include", "gk_arch.h"), [
       [35, '#include "gk_ms_stdint.h"', '  #include <stdint.h>'],
       [36, '#include "gk_ms_inttypes.h"', '  #include <inttypes.h>'],
       [60, '', '#ifdef __MSC__\n#define __thread __declspec(thread)\n#endif'],
       [66, '#ifndef INFINITY', '#if 0']
     ])
     # patch some broken pointer casts
-    self.patch_file(os.path.join("GKlib", "gkregex.c"), [
-      [5089, 'postorder (elem, mark_opt_subexp, (void *) (long) elem->token.opr.idx);',
+    self.patch_file(os.path.join("GKlib", "src", "gkregex.c"), [
+      [5092, 'postorder (elem, mark_opt_subexp, (void *) (long) elem->token.opr.idx);',
          '    postorder (elem, mark_opt_subexp, (void *) (intptr_t) elem->token.opr.idx);'],
-      [6301, 'int idx = (int) (long) extra;', '  int idx = (int) (intptr_t) extra;']
+      [6304, 'int idx = (int) (long) extra;', '  int idx = (int) (intptr_t) extra;']
     ])
     # patch POSIX file read
-    self.patch_file(os.path.join("GKlib", "io.c"), [
+    self.patch_file(os.path.join("GKlib", "src", "io.c"), [
       [18, '', '#include <io.h>'],
       [63, 'if ((rsize = read(fd, buf, tsize)) == -1)', 'if ((rsize = _read(fd, buf, tsize)) == -1)'],
       [84, 'if ((size = write(fd, buf, tsize)) == -1)', 'if ((size = _write(fd, buf, tsize)) == -1)']
     ])
     # set index and real types
-    self.patch_file(os.path.join("metis", "include", "metis.h"), [
+    self.patch_file(os.path.join("METIS", "include", "metis.h"), [
       [33, '//#define IDXTYPEWIDTH 32', '#define IDXTYPEWIDTH 64'],
       [43, '//#define REALTYPEWIDTH 32', '#define REALTYPEWIDTH 64'],
       [75, '#define INT32_MIN    ((int32_t)_I32_MIN)', '//#define INT32_MIN    ((int32_t)_I32_MIN)'],
@@ -1560,39 +1560,39 @@ class ThirdPartyParMETIS(ThirdPartyPackage):
     if not self.prepare():
       return
     print("\nBuilding " + self.name + " " + self.version + " GKlib sources...")
-    self.extflags = ' /I"./' + os.path.join(self.dir, "GKlib") + '"'
+    self.extflags = ' /I"./' + os.path.join(self.dir, "GKlib", "include") + '"'
     self.cxxflags = self.baseflags + self.modeflags + self.extflags + self.outflags
-    self.compile_c("GKlib/win32/adapt")
-    self.compile_c("GKlib/b64")
-    self.compile_c("GKlib/blas")
-    self.compile_c("GKlib/cache")
-    self.compile_c("GKlib/csr")
-    self.compile_c("GKlib/error")
-    self.compile_c("GKlib/evaluate")
-    self.compile_c("GKlib/fkvkselect")
-    self.compile_c("GKlib/fs")
-    self.compile_c("GKlib/getopt")
-    self.compile_c("GKlib/gkregex")
-    self.compile_c("GKlib/gk_util")
-    self.compile_c("GKlib/graph")
-    self.compile_c("GKlib/htable")
-    self.compile_c("GKlib/io")
-    self.compile_c("GKlib/itemsets")
-    self.compile_c("GKlib/mcore")
-    self.compile_c("GKlib/memory")
-    self.compile_c("GKlib/pqueue")
-    self.compile_c("GKlib/random")
-    self.compile_c("GKlib/rw")
-    self.compile_c("GKlib/seq")
-    self.compile_c("GKlib/sort")
-    self.compile_c("GKlib/string")
-    self.compile_c("GKlib/timers")
-    self.compile_c("GKlib/tokenizer")
+    self.compile_c("GKlib/src/win32/adapt")
+    self.compile_c("GKlib/src/b64")
+    self.compile_c("GKlib/src/blas")
+    self.compile_c("GKlib/src/cache")
+    self.compile_c("GKlib/src/csr")
+    self.compile_c("GKlib/src/error")
+    self.compile_c("GKlib/src/evaluate")
+    self.compile_c("GKlib/src/fkvkselect")
+    self.compile_c("GKlib/src/fs")
+    self.compile_c("GKlib/src/getopt")
+    self.compile_c("GKlib/src/gkregex")
+    self.compile_c("GKlib/src/gk_util")
+    self.compile_c("GKlib/src/graph")
+    self.compile_c("GKlib/src/htable")
+    self.compile_c("GKlib/src/io")
+    self.compile_c("GKlib/src/itemsets")
+    self.compile_c("GKlib/src/mcore")
+    self.compile_c("GKlib/src/memory")
+    self.compile_c("GKlib/src/pqueue")
+    self.compile_c("GKlib/src/random")
+    self.compile_c("GKlib/src/rw")
+    self.compile_c("GKlib/src/seq")
+    self.compile_c("GKlib/src/sort")
+    self.compile_c("GKlib/src/string")
+    self.compile_c("GKlib/src/timers")
+    self.compile_c("GKlib/src/tokenizer")
 
     print("\nBuilding " + self.name + " " + self.version + " METIS sources...")
-    self.extflags  = ' /I"./' + os.path.join(self.dir, "metis", "include") + '"'
-    self.extflags += ' /I"./' + os.path.join(self.dir, "metis", "libmetis") + '"'
-    self.extflags += ' /I"./' + os.path.join(self.dir, "GKlib") + '"'
+    self.extflags  = ' /I"./' + os.path.join(self.dir, "METIS", "include") + '"'
+    self.extflags += ' /I"./' + os.path.join(self.dir, "METIS", "libmetis") + '"'
+    self.extflags += ' /I"./' + os.path.join(self.dir, "GKlib", "include") + '"'
     self.cxxflags = self.baseflags + self.modeflags + self.extflags + self.outflags
     self.compile_c("METIS/libmetis/auxapi")
     self.compile_c("METIS/libmetis/balance")
@@ -1634,50 +1634,50 @@ class ThirdPartyParMETIS(ThirdPartyPackage):
     self.extflags  = ' /I"' + os.path.join(path_mpi, "Include") + '"'
     self.extflags += ' /I"./' + os.path.join(self.dir, "include") + '"'
     self.extflags += ' /I"./' + os.path.join(self.dir, "libparmetis") + '"'
-    self.extflags += ' /I"./' + os.path.join(self.dir, "metis", "include") + '"'
-    self.extflags += ' /I"./' + os.path.join(self.dir, "metis", "libmetis") + '"'
-    self.extflags += ' /I"./' + os.path.join(self.dir, "GKlib") + '"'
+    self.extflags += ' /I"./' + os.path.join(self.dir, "METIS", "include") + '"'
+    self.extflags += ' /I"./' + os.path.join(self.dir, "METIS", "libmetis") + '"'
+    self.extflags += ' /I"./' + os.path.join(self.dir, "GKlib", "include") + '"'
     self.cxxflags = self.baseflags + self.modeflags + self.extflags + self.outflags
-    self.compile_c("libparmetis/akwayfm")
-    self.compile_c("libparmetis/ametis")
-    self.compile_c("libparmetis/balancemylink")
-    self.compile_c("libparmetis/comm")
-    self.compile_c("libparmetis/csrmatch")
-    self.compile_c("libparmetis/ctrl")
-    self.compile_c("libparmetis/debug")
-    self.compile_c("libparmetis/diffutil")
-    self.compile_c("libparmetis/frename")
-    self.compile_c("libparmetis/gklib")
-    self.compile_c("libparmetis/gkmetis")
-    self.compile_c("libparmetis/gkmpi")
-    self.compile_c("libparmetis/graph")
-    self.compile_c("libparmetis/initbalance")
-    self.compile_c("libparmetis/initmsection")
-    self.compile_c("libparmetis/initpart")
-    self.compile_c("libparmetis/kmetis")
-    self.compile_c("libparmetis/kwayrefine")
-    self.compile_c("libparmetis/match")
-    self.compile_c("libparmetis/mdiffusion")
-    self.compile_c("libparmetis/mesh")
-    self.compile_c("libparmetis/mmetis")
-    self.compile_c("libparmetis/move")
-    self.compile_c("libparmetis/msetup")
-    self.compile_c("libparmetis/node_refine")
-    self.compile_c("libparmetis/ometis")
-    self.compile_c("libparmetis/pspases")
-    self.compile_c("libparmetis/redomylink")
-    self.compile_c("libparmetis/remap")
-    self.compile_c("libparmetis/renumber")
-    self.compile_c("libparmetis/rmetis")
-    self.compile_c("libparmetis/selectq")
-    self.compile_c("libparmetis/serial")
-    self.compile_c("libparmetis/stat")
-    self.compile_c("libparmetis/timer")
-    self.compile_c("libparmetis/util")
-    self.compile_c("libparmetis/wave")
-    self.compile_c("libparmetis/weird")
-    self.compile_c("libparmetis/wspace")
-    self.compile_c("libparmetis/xyzpart")
+    self.compile_c("ParMETIS/libparmetis/akwayfm")
+    self.compile_c("ParMETIS/libparmetis/ametis")
+    self.compile_c("ParMETIS/libparmetis/balancemylink")
+    self.compile_c("ParMETIS/libparmetis/comm")
+    self.compile_c("ParMETIS/libparmetis/csrmatch")
+    self.compile_c("ParMETIS/libparmetis/ctrl")
+    self.compile_c("ParMETIS/libparmetis/debug")
+    self.compile_c("ParMETIS/libparmetis/diffutil")
+    self.compile_c("ParMETIS/libparmetis/frename")
+    self.compile_c("ParMETIS/libparmetis/gklib")
+    self.compile_c("ParMETIS/libparmetis/gkmetis")
+    self.compile_c("ParMETIS/libparmetis/gkmpi")
+    self.compile_c("ParMETIS/libparmetis/graph")
+    self.compile_c("ParMETIS/libparmetis/initbalance")
+    self.compile_c("ParMETIS/libparmetis/initmsection")
+    self.compile_c("ParMETIS/libparmetis/initpart")
+    self.compile_c("ParMETIS/libparmetis/kmetis")
+    self.compile_c("ParMETIS/libparmetis/kwayrefine")
+    self.compile_c("ParMETIS/libparmetis/match")
+    self.compile_c("ParMETIS/libparmetis/mdiffusion")
+    self.compile_c("ParMETIS/libparmetis/mesh")
+    self.compile_c("ParMETIS/libparmetis/mmetis")
+    self.compile_c("ParMETIS/libparmetis/move")
+    self.compile_c("ParMETIS/libparmetis/msetup")
+    self.compile_c("ParMETIS/libparmetis/node_refine")
+    self.compile_c("ParMETIS/libparmetis/ometis")
+    self.compile_c("ParMETIS/libparmetis/pspases")
+    self.compile_c("ParMETIS/libparmetis/redomylink")
+    self.compile_c("ParMETIS/libparmetis/remap")
+    self.compile_c("ParMETIS/libparmetis/renumber")
+    self.compile_c("ParMETIS/libparmetis/rmetis")
+    self.compile_c("ParMETIS/libparmetis/selectq")
+    self.compile_c("ParMETIS/libparmetis/serial")
+    self.compile_c("ParMETIS/libparmetis/stat")
+    self.compile_c("ParMETIS/libparmetis/timer")
+    self.compile_c("ParMETIS/libparmetis/util")
+    self.compile_c("ParMETIS/libparmetis/wave")
+    self.compile_c("ParMETIS/libparmetis/weird")
+    self.compile_c("ParMETIS/libparmetis/wspace")
+    self.compile_c("ParMETIS/libparmetis/xyzpart")
     self.link()
 
 packages["parmetis"] = ThirdPartyParMETIS()

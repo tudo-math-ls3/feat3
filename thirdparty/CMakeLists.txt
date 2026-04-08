@@ -244,8 +244,8 @@ if(FEAT_HAVE_PARMETIS)
   feat_get_tpl(
     PACKAGE_NAME parmetis
     VERSION 4.0.3
-    URL https://github.com/tudo-math-ls3/ParMETIS/archive/refs/tags/v4.0.3.2.zip
-    URL_HASH MD5=91d1adb8e721530c55bd3a1f688ba795
+    URL https://github.com/tudo-math-ls3/ParMETIS/archive/refs/tags/v4.0.3.3.zip
+    URL_HASH MD5=42e3d1db6e4ba1284e33808101317af2
     PATCH_COMMAND_WINDOWS python ${CMAKE_CURRENT_LIST_DIR}/patches/parmetis_win.py .
     CONFIG
     SYSTEM
