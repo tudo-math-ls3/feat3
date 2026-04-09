@@ -10,6 +10,7 @@
 #include <ios>
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/dist.hpp>
 #include <limits>
 #ifndef __CUDA_ARCH__
 #include <kernel/util/math.hpp>
@@ -1218,6 +1219,14 @@ namespace FEAT
       }
 
       /**
+       * \brief Returns a Typemap for sending vectors via MPI
+       */
+      static Dist::Typemap typemap()
+      {
+        return Dist::Typemap{}.add_entry<T_>(0, s_);
+      }
+
+      /**
        * \brief Tiny::Vector streaming operator
        *
        * \param[in] lhs The target stream.
@@ -2368,6 +2377,14 @@ namespace FEAT
       }
 
       /**
+       * \brief Returns a Typemap for sending matrices via MPI
+       */
+      static Dist::Typemap typemap()
+      {
+        return Dist::Typemap{}.add_entry<RowType>(0, sm_);
+      }
+
+      /**
        * \brief Tiny::Matrix streaming operator
        *
        * \param[in] lhs The target stream.
@@ -2962,6 +2979,14 @@ namespace FEAT
       CUDA_HOST_DEVICE static Tensor3 null()
       {
         return Tensor3(DataType(0));
+      }
+
+      /**
+       * \brief Returns a Typemap for sending Tensor3 via MPI
+       */
+      static Dist::Typemap typemap()
+      {
+        return Dist::Typemap{}.add_entry<PlaneType>(0, sl_);
       }
     }; // class Tensor3<...>
 

@@ -13,6 +13,11 @@
 #include <kernel/util/type_traits.hpp>
 
 // includes, system
+#include <algorithm>
+#include <mutex>
+#include <type_traits>
+#include <typeindex>
+#include <unordered_map>
 #include <vector>
 #include <sstream>
 
@@ -193,6 +198,299 @@ namespace FEAT
      * A reference to the <c>dt_*</c> Datatype object representing the type \c T_.
      */
     template<typename T_> const Datatype& autotype();
+
+
+    /**
+     * \brief MPI typemap description
+     *
+     * A typemap is a sequence of datatypes and displacements.
+     * MPI uses these typemaps to send and receive datatypes
+     * that are more general than the basic types MPI offers per
+     * default.
+     *
+     * This class is deliberately MPI-agnostic, so that types
+     * can offer Typemaps of themselves without having to check
+     * if MPI is available.
+     *
+     * \code
+     * struct Foo
+     * {
+     *   Index i;
+     *   Real r[8];
+     * };
+     *
+     * Typemap foo_typemap = Typemap{}.add_entry<Index>(offsetof(Foo, i)).add_entry<Real>(offsetof(Foo, r), 8);
+     * \endcode
+     *
+     * \see \cite MPI31 Section 4.1, page 83
+     */
+    class Typemap
+    {
+      /// Type registry is allowed to access _blocklengths, _displacements, and _types.
+      friend class TypeRegistry;
+
+      /// Blocklengths for each entry
+      std::vector<int> _blocklengths;
+      /// Displacements for each entry
+      std::vector<std::size_t> _displacements;
+      /// Types for each entry
+      std::vector<Dist::Datatype> _types;
+
+    public:
+      /// Constructor
+      Typemap() = default;
+
+      /**
+       * \brief Add a member to this typemap
+       *
+       * \tparam T_ The type of the member
+       *
+       * \param[in] displacement The offset of the member from the start of its type, in bytes
+       * \param[in] blocklength Repeat-count for this member, e.g. for defining arrays
+       *
+       * \note
+       * Use the offsetof macro to determine the displacements for each member of the type
+       * you want to define a typemap for.
+       *
+       * \note
+       * This overload determines the members MPI-datatype on its own.
+       */
+      template<typename T_>
+      Typemap& add_entry(std::size_t displacement, int blocklength = 1)
+      {
+        return add_entry(displacement, Dist::autotype<T_>(), blocklength);
+      }
+
+      /**
+       * \brief Add a member to this typemap
+       *
+       * \param[in] displacement The offset of the member from the start of its type, in bytes
+       * \param[in] type A reference to the datatype of the member
+       * \param[in] blocklength Repeat-count for this member, e.g. for defining arrays
+       *
+       * \note
+       * Use the offsetof macro to determine the displacements for each member of the type
+       * you want to define a typemap for.
+       *
+       * \warning
+       * Ensure that the type of the member and the Datatype passed to this function match!
+       */
+      Typemap& add_entry(std::size_t displacement, const Dist::Datatype& type, int blocklength = 1)
+      {
+        XASSERT(blocklength > 0);
+
+        _blocklengths.push_back(blocklength);
+        _displacements.push_back(displacement);
+        _types.push_back(type);
+
+        return *this;
+      }
+
+      /// Returns the number of entries in this typemap
+      std::size_t count() const noexcept
+      {
+        return _blocklengths.size();
+      }
+    }; // class Typemap
+
+    /**
+     * \brief Mapping from types to Typemaps
+     *
+     * \tparam T_ Type to get typemap of
+     *
+     * This is the default definition, which tries
+     * to retrieve the Typemap from a static member
+     * function of T_ with signature
+     * \code
+     * static Typemap typemap();
+     * \endcode
+     *
+     * You can specialize this struct to provide
+     * Typemaps for types which either can not have
+     * member functions, e.g. enums, or foreign types.
+     */
+    template<typename T_>
+    struct TypeDescription
+    {
+      /// Produce a Typemap for T_
+      static Typemap typemap()
+      {
+        return T_::typemap();
+      }
+    };
+
+    /**
+     * \brief Singleton for managing derived Datatypes
+     *
+     * This TypeRegistry singleton creates and stores derived MPI datatypes.
+     * Datatypes are created lazily the first time they are required.
+     *
+     * Due to the lack of reflection in C++, C++ types need to provide a Typemap
+     * for themselves via the TypeDescription trait.
+     *
+     * \see Typemap
+     * \see TypeDescription
+     */
+    class TypeRegistry //NOLINT
+    {
+      /// Mapping of C++ types to Datatypes
+      std::unordered_map<std::type_index, Datatype> _types;
+
+      // NOTE(mmuegge): A recursive mutex is required here
+      // because get_type might call itself if the typemap
+      // for a type requires creating other types first.
+      // Creating a Datatype for Tiny::Matrix for example
+      // triggers creation of a Tiny::Vector Datatype first.
+
+      /// Mutex against concurrent access
+      std::recursive_mutex _mutex;
+
+#ifndef FEAT_HAVE_MPI
+      // In non-MPI builds Datatypes contain an id, rather than
+      // a handle. We assign ids starting at 1024.
+      int next_mock_id = 1024;
+#endif
+
+      // Constructor is hidden to ensure this class is a singleton
+      /// Constructor
+      TypeRegistry() = default;
+
+    public:
+      /// Deleted copy constructor
+      TypeRegistry(const TypeRegistry& other) = delete;
+      /// Deleted move constructor
+      TypeRegistry(TypeRegistry&& other) = delete;
+
+      /// Deleted copy-assignment operator
+      void operator=(const TypeRegistry& other) = delete;
+      /// Deleted move-assignment operator
+      void operator=(TypeRegistry&& other) = delete;
+
+      /// Singleton accessor
+      static TypeRegistry& instance() noexcept
+      {
+        static TypeRegistry instance;
+        return instance;
+      }
+
+#ifdef FEAT_HAVE_MPI
+      /// Retrieve Datatype for type T_
+      template<typename T_>
+      const Datatype& get_type()
+      {
+        // NOTE(mmuegge): The offsetof macro is only defined for "standard layout types".
+        // Any other way to take offsets is probably highly compiler dependent or UB.
+        static_assert(std::is_standard_layout_v<T_>, "MPI typemaps require standard-layout types!");
+
+        std::scoped_lock<std::recursive_mutex> lock(_mutex);
+
+        const std::type_index idx(typeid(T_));
+
+        const auto it = _types.find(idx);
+        if(it == _types.end())
+        {
+          // Type does not exist yet. Create it.
+          const Typemap desc = TypeDescription<T_>::typemap();
+
+          XASSERTM(desc.count() > 0, "TypeRegistry::get_type: empty typemap!");
+
+          // Unpack wrapped mpi types
+          std::vector<MPI_Datatype> mpi_types;
+          mpi_types.reserve(desc.count());
+          std::transform(
+            desc._types.begin(),
+            desc._types.end(),
+            std::back_inserter(mpi_types),
+            [](const Datatype& d) { return d.dt; });
+
+          // Cast displacements to correct type
+          std::vector<MPI_Aint> displacements;
+          displacements.reserve(desc.count());
+          std::transform(
+            desc._displacements.begin(),
+            desc._displacements.end(),
+            std::back_inserter(displacements),
+            [](const std::size_t d) { return static_cast<MPI_Aint>(d); });
+
+          // Create temporary type
+          MPI_Datatype tmptype;
+          MPI_Type_create_struct(static_cast<int>(desc.count()), desc._blocklengths.data(), displacements.data(), mpi_types.data(), &tmptype);
+
+          // The temporary might be smaller than the actual type T_, because there might be padding at the end of T_.
+          // That would lead to issues when sending multiple T_s.
+          // Resize the type to include padding.
+          MPI_Datatype newtype;
+          MPI_Type_create_resized(tmptype, 0, sizeof(T_), &newtype);
+
+          // Commit type
+          MPI_Type_commit(&newtype);
+
+          // Free temporary type
+          MPI_Type_free(&tmptype);
+
+          // Store type for later
+          const auto [iter, _] = _types.try_emplace(idx, Datatype(newtype, sizeof(T_)));
+
+          return iter->second;
+        }
+        else
+        {
+          return it->second;
+        }
+      }
+
+      /**
+       * \brief Frees all commited Datatypes
+       */
+      void free()
+      {
+        std::scoped_lock<std::recursive_mutex> lock(_mutex);
+
+        for(auto& [_, dt] : _types)
+        {
+          MPI_Type_free(&dt.dt);
+        }
+        _types.clear();
+      }
+#else
+      /// Retrieve Datatype for type T_
+      template<typename T_>
+      const Datatype& get_type()
+      {
+        std::scoped_lock<std::recursive_mutex> lock(_mutex);
+
+        const std::type_index idx(typeid(T_));
+
+        auto it = _types.find(idx);
+        if(it == _types.end())
+        {
+          const auto [iter, _] = _types.try_emplace(idx, Datatype(next_mock_id++, sizeof(T_)));
+          return iter->second;
+        }
+        else
+        {
+          return it->second;
+        }
+
+        return _types.at(idx);
+      }
+
+      /**
+       * \brief Frees all commited Datatypes
+       */
+      void free()
+      {
+        std::scoped_lock<std::recursive_mutex> lock(_mutex);
+        _types.clear();
+      }
+#endif
+    };
+
+    template<typename T_>
+    const Datatype& autotype()
+    {
+      return TypeRegistry::instance().get_type<T_>();
+    }
 
     /// \cond internal
     template<> inline const Datatype& autotype<char>()              {return dt_char;}

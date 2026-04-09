@@ -163,6 +163,8 @@ namespace FEAT
       MPI_Type_free(&dt_half.dt);
 #endif // FEAT_HAVE_HALFMATH
 
+      TypeRegistry::instance().free();
+
       // finalize MPI
       int already_finalized(0);
       ::MPI_Finalized(&already_finalized);
@@ -883,7 +885,7 @@ namespace FEAT
 
     void finalize()
     {
-      // nothing to do here
+      TypeRegistry::instance().free();
     }
 
     // datatypes
