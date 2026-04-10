@@ -19,6 +19,7 @@
 #include <kernel/geometry/parti_iterative.hpp>
 #include <kernel/geometry/parti_parmetis.hpp>
 #include <kernel/geometry/parti_zoltan.hpp>
+#include <kernel/geometry/parti_scotch.hpp>
 
 #include <control/domain/domain_control.hpp>
 
@@ -143,6 +144,8 @@ namespace FEAT
         bool _allow_parti_naive;
         /// allow Zoltan partitioner?
         bool _allow_parti_zoltan;
+        /// allow scotch partitioner?
+        bool _allow_parti_scotch;
 
         /// support multi-layered hierarchy?
         bool _support_multi_layered;
@@ -181,6 +184,7 @@ namespace FEAT
           _allow_parti_genetic(false), // this one is exotic
           _allow_parti_naive(true),
           _allow_parti_zoltan(false),
+          _allow_parti_scotch(false),
           _support_multi_layered(support_multi_layered),
           _desired_levels(),
           _required_elems_per_rank(1),
@@ -736,6 +740,7 @@ namespace FEAT
         {
           _allow_parti_metis = _allow_parti_naive = false;
           _allow_parti_genetic = _allow_parti_zoltan = false;
+          _allow_parti_scotch = false;
         }
 
         /**
@@ -756,6 +761,8 @@ namespace FEAT
             return _allow_parti_naive = true;
           else if(type.compare_no_case("zoltan") == 0)
             return _allow_parti_zoltan = true;
+          else if((type.compare_no_case("scotch") == 0) || (type.compare_no_case("ptscotch") == 0))
+            return _allow_parti_scotch = true;
           else
             return false;
         }
@@ -1334,6 +1341,8 @@ namespace FEAT
             return true;
           if(this->_apply_parti_zoltan(ancestor, base_mesh_node, weights))
             return true;
+          if(this->_apply_parti_scotch(ancestor, base_mesh_node, weights))
+            return true;
           if(this->_apply_parti_genetic(ancestor, base_mesh_node, weights))
             return true;
           if(this->_apply_parti_naive(ancestor, base_mesh_node, weights))
@@ -1449,6 +1458,58 @@ namespace FEAT
           (void)weights;
           return false;
 #endif // FEAT_HAVE_PARMETIS
+        }
+
+        /**
+         * \brief Applies the SCOTCH partitioner onto the base-mesh.
+         *
+         * \param[inout] ancestor
+         * The ancestor object for this layer.
+         *
+         * \param[in] base_mesh_node
+         * The base-mesh node that is to be partitioned.
+         *
+         * \param[in] weights
+         * A vector containing the distribution weights for each element. May be empty if all elements are to be weighted equally.
+         *
+         * \returns
+         * \c true, if SCOTCH was applied successfully, otherwise \c false.
+         */
+        bool _apply_parti_scotch(Ancestor& ancestor, const MeshNodeType& base_mesh_node, const std::vector<WeightType>& weights)
+        {
+#ifdef FEAT_HAVE_SCOTCH
+          // is this even allowed?
+          if(!this->_allow_parti_scotch)
+            return false;
+
+          // create partitioner on the corresponding progeny communicator
+          Geometry::PartiScotch partitioner(ancestor.progeny_comm);
+
+          // get the corresponding adjacency graph for partitioning
+          constexpr int shape_dim = MeshNodeType::MeshType::ShapeType::dimension;
+          const auto& faces_at_elem = base_mesh_node.get_mesh()->template get_index_set<shape_dim, 0>();
+
+          // call the partitioner
+          if(!partitioner.execute(faces_at_elem, Index(ancestor.num_parts), weights))
+            return false;
+
+          // create partition graph
+          ancestor.parti_graph = partitioner.build_elems_at_rank();
+
+          // set info string
+          ancestor.parti_info = String("Applied Scotch partitioner");
+
+          // partitioning found
+          ancestor.parti_found = true;
+
+          // okay
+          return true;
+#else
+          (void)ancestor;
+          (void)base_mesh_node;
+          (void)weights;
+          return false;
+#endif
         }
 
         /**

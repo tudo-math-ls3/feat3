@@ -314,6 +314,7 @@ description = (
   "  - 'metis':        enable METIS and ParMETIS TPLs\n"
   "  - 'mumps'         enable MUMPS TPL\n"
   "  - 'pmp':          enable PMP TPL\n"
+  "  - 'scotch':       enable SCOTCH TPL\n"
   "  - 'superlu':      enable SuperLU_Dist TPL (requires MPI)\n"
   "  - 'triangle':     enable triangle TPL\n"
   "  - 'trilinos':     link against pre-built Trilinos library\n"
@@ -547,6 +548,9 @@ if "metis" in buildid and "mpi" not in buildid:
 
 if "parmetis" in buildid and "mpi" not in buildid:
   error("Tag 'parmetis' requires tag 'mpi'")
+
+if "scotch" in buildid and "mpi" not in buildid:
+  error("Tag 'scotch' requires tag 'mpi'")
 
 if "mumps" in buildid and "mpi" not in buildid:
   error("Tag 'mumps' requires tag 'mpi'")
@@ -895,6 +899,8 @@ for token in buildid:
     config.cache_entry("FEAT_HAVE_MUMPS", "ON", "BOOL")
   elif token == "pmp":
     config.cache_entry("FEAT_HAVE_PMP", "ON", "BOOL")
+  elif token == "scotch":
+    config.cache_entry("FEAT_HAVE_SCOTCH", "ON", "BOOL")
   elif token == "superlu":
     config.cache_entry("FEAT_HAVE_SUPERLU_DIST", "ON", "BOOL")
   elif token == "triangle":

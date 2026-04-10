@@ -331,6 +331,11 @@ void Runtime::initialize(int& argc, char**& argv)
 #else
         std::cout << "FEAT_HAVE_SUITESPARSE.........: no\n";
 #endif
+#ifdef FEAT_HAVE_SCOTCH
+        std::cout << "FEAT_HAVE_SCOTCH..............: yes\n";
+#else
+        std::cout << "FEAT_HAVE_SCOTCH..............: no\n";
+#endif
 #ifdef FEAT_HAVE_SUPERLU_DIST
         std::cout << "FEAT_HAVE_SUPERLU_DIST........: yes\n";
 #else

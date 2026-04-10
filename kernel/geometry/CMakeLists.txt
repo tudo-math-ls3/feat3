@@ -9,6 +9,7 @@ set(kernel-geometry-list
   meshhexer.cpp
   parti_parmetis.cpp
   parti_zoltan.cpp
+  parti_scotch.cpp
   voxel_map.cpp
 )
 
@@ -37,6 +38,11 @@ endif(FEAT_HAVE_PARMETIS)
 if(FEAT_HAVE_ZOLTAN)
   find_package(zoltan 3.901 REQUIRED)
   target_link_libraries(feat-kernel-geometry PRIVATE Zoltan::Zoltan)
+endif()
+
+if(FEAT_HAVE_SCOTCH)
+  find_package(SCOTCH 7.0.11 REQUIRED)
+  target_link_libraries(feat-kernel-geometry PRIVATE SCOTCH::ptscotch SCOTCH::ptscotcherr)
 endif()
 
 if(FEAT_HAVE_FPARSER)
@@ -99,6 +105,10 @@ set(test_list
   parsed_hit_test_factory-test
   template_builder-test
 )
+
+if(FEAT_HAVE_SCOTCH)
+  list(APPEND test_list parti_scotch-test)
+endif()
 
 include(FEATKernelTests)
 add_feat_kernel_tests(TESTS test_list TARGET geometry_tests LINK_AGAINST "feat-kernel-geometry-test-aux")

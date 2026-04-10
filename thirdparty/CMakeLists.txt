@@ -265,6 +265,44 @@ if(FEAT_HAVE_PMP)
   )
 endif()
 
+option(FEAT_HAVE_SCOTCH "Enable scotch" OFF)
+if(FEAT_HAVE_SCOTCH)
+  feat_get_tpl(
+    PACKAGE_NAME SCOTCH
+    VERSION 7.0.11
+    URL https://gitlab.inria.fr/scotch/scotch/-/archive/v7.0.11/scotch-v7.0.11.zip
+    URL_HASH MD5=6aa3f25cd8f7fed86e860135b2511a83
+    EXCLUDE_FROM_ALL
+    SYSTEM
+  )
+
+  if(NOT SCOTCH_FOUND)
+    # Stop option() from unsetting already defined variables
+    set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+
+    set(BUILD_PTSCOTCH ON)
+    set(BUILD_FORTRAN OFF)
+    set(THREADS OFF)
+    set(MPI_THREAD_MULTIPLE OFF)
+    set(BUILD_LIBESMUMPS OFF)
+    set(BUILD_LIBSCOTCHMETIS OFF)
+
+    set(USE_ZLIB ${FEAT_HAVE_ZLIB})
+    set(USE_LZMA OFF)
+    set(USE_BZ2 OFF)
+
+    set(ENABLE_TESTS OFF)
+
+    if(FEAT_INDEX_U32)
+      set(INTSIZE 32)
+      set(IDXSIZE 32)
+    else()
+      set(INTSIZE 64)
+      set(IDXSIZE 64)
+    endif()
+  endif()
+endif()
+
 option(FEAT_HAVE_SUPERLU_DIST "Enable SuperLU (dist)" OFF)
 if(FEAT_HAVE_SUPERLU_DIST)
   feat_get_tpl(

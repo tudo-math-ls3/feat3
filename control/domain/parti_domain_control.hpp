@@ -33,7 +33,7 @@ namespace FEAT
         args.support("parti-type", "<types...>\n"
           "Specifies which partitioner types are allowed to be used.\n"
           "May contain the following types:\n"
-          "2level extern genetic metis naive zoltan"
+          "2level extern genetic metis naive scotch zoltan"
         );
         args.support("parti-extern-name", "<names...>\n"
           "Specifies the names of the allowed extern partitions."
