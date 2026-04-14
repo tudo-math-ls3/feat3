@@ -8,7 +8,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 // This application implements a monolithic unsteady incompressible Navier-Stokes solver coupled with the
 // k-epsilon turbulence model according to "On the implementation of the k − epsilon turbulence model in
-// incompressible ﬂow solvers based on a ﬁnite element discretization" by Kuzmin and Mierka \cite{kuzmin2007implementation}.
+// incompressible ﬂow solvers based on a finite element discretization" by Kuzmin and Mierka \cite{kuzmin2007implementation}.
 //
 // The simulation is pre-configured to automatically run the backward-facing step benchmark (backfacestep.xml)
 // on refinement level 2. The target Reynolds number is 47625, with a fixed inflow velocity of 1.0.
