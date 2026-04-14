@@ -312,7 +312,7 @@ namespace FEAT::Geometry
         // vert is zeroed before this is called
         for(int j(0); j < vertex_set.num_coords; j++)
         {
-          vert[j] = float(vertex_set[i][j]);
+          vert[j] = float(vertex_set[vertex_target_set[i]][j]);
         }
       };
 

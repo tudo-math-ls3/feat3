@@ -448,7 +448,7 @@ namespace FEAT
      * A \transient reference to the mesh for which a boundary mesh-part is to be created.
      *
      * \returns
-     * A mesh-part containing all entities for which lie on the mesh boundary
+     * A mesh-part containing all entities which lie on the mesh boundary
      */
     template<typename MeshNode_>
     MeshPart<typename MeshNode_::MeshType> make_boundary_meshpart(const MeshNode_& node, const Dist::Comm& comm)
