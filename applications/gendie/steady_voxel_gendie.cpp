@@ -889,7 +889,6 @@ namespace Gendie
     //next up, create our defect system level, which does not require any mesh hirarchy, but at least the B matrices assembled
     std::shared_ptr<SystemLevel<SystemDataType, SystemIndexType>> system_level(new SystemLevel<SystemDataType, SystemIndexType>());
     system_level->assemble_gates(domain.front());
-    system_level->assemble_pres_struct(domain.front()->space_pres);
     system_level->assemble_grad_div_matrices(domain.front()->domain_asm, domain.front()->space_velo, domain.front()->space_pres, param_holder.cubature_b);
 
     // TODO: mass matrix really required?
