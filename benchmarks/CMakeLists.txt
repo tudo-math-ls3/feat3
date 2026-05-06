@@ -12,6 +12,7 @@ set(benchmarks
   dot_product-bench
   io_bench
   mixedprec_multigrid-bench
+  mpi_ops-bench
   multiprec_hierarch-bench
   parperf1-bench
   parperf2-bench
