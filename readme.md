@@ -51,12 +51,12 @@ work properly with at least the following C++ compilers:
 * GNU g++ compiler, version 7.0 or newer
 * Intel C/C++ compiler, version 19.0 or newer
 * Intel oneAPI DPC++/C++ compiler, version 2021 or newer
-* Clang LLVM compiler, version 8.0 or newer
-* Microsoft Visual C++ 2019 compiler or newer
+* Clang LLVM compiler, version 19.0 or newer
+* Microsoft Visual C++ 2022 compiler or newer
 
 In addition to a modern C++ compiler, you also need the following tools to set up the build system
 of FEAT3:
-* CMake version 3.18.0 or newer
+* CMake version 3.28.0 or newer
 * Python version 3.7 or newer
 * gnumake or ninja or some other build system supported by CMake
 
@@ -90,7 +90,7 @@ may also contain the tags for the additional features that you want to enable, e
 To obtain a list of all supported build-id tags, including the tags for the compiler that you want
 to use, as well as all other additional options supported by the configure script, simply call
 
-    ~/feat3.git/configure help
+    ~/feat3.git/configure --help
 
 Git-Commit Hooks
 ----------------
