@@ -93,7 +93,7 @@ void bench_send_receive(Dist::Comm& comm, SimpleArgParser& args)
 
   //std::vector<double> time_min, time_max, time_avg, size_buf;
 
-  for(int step = 0; step < num_steps; ++step)
+  for(Index step = 0; step < num_steps; ++step)
   {
     if(my_rank == 0)
     {
@@ -108,7 +108,7 @@ void bench_send_receive(Dist::Comm& comm, SimpleArgParser& args)
     comm.barrier();
     TimeStamp stamp_t1;
 
-    for(int rep = 0; rep < num_repeats; ++rep)
+    for(Index rep = 0; rep < num_repeats; ++rep)
     {
       for(std::size_t i(0); i < nn; ++i)
       {
@@ -211,7 +211,7 @@ void bench_broadcast(Dist::Comm& comm, SimpleArgParser& args)
 
   std::size_t step_buf_size = 1;
 
-  for(int step = 0; step < num_steps; ++step)
+  for(Index step = 0; step < num_steps; ++step)
   {
     if(my_rank == 0)
     {
@@ -224,7 +224,7 @@ void bench_broadcast(Dist::Comm& comm, SimpleArgParser& args)
     comm.barrier();
     TimeStamp stamp_t1;
 
-    for(int rep = 0; rep < num_repeats; ++rep)
+    for(Index rep = 0; rep < num_repeats; ++rep)
     {
       comm.bcast(buffer.data(), step_buf_size, Dist::dt_byte, 0);
     }
@@ -317,7 +317,7 @@ void bench_reduce(Dist::Comm& comm, SimpleArgParser& args)
 
   Dist::Operation op_bxor(MPI_BXOR);
 
-  for(int step = 0; step < num_steps; ++step)
+  for(Index step = 0; step < num_steps; ++step)
   {
     if(my_rank == 0)
     {
@@ -330,7 +330,7 @@ void bench_reduce(Dist::Comm& comm, SimpleArgParser& args)
     comm.barrier();
     TimeStamp stamp_t1;
 
-    for(int rep = 0; rep < num_repeats; ++rep)
+    for(Index rep = 0; rep < num_repeats; ++rep)
     {
       comm.reduce(buffer.data(), buffer.data(), step_buf_size, Dist::dt_byte, op_bxor, 0);
     }
@@ -428,7 +428,7 @@ void bench_gather(Dist::Comm& comm, SimpleArgParser& args)
 
   std::size_t step_buf_size = 1;
 
-  for(int step = 0; step < num_steps; ++step)
+  for(Index step = 0; step < num_steps; ++step)
   {
     if(my_rank == 0)
     {
@@ -441,7 +441,7 @@ void bench_gather(Dist::Comm& comm, SimpleArgParser& args)
     comm.barrier();
     TimeStamp stamp_t1;
 
-    for(int rep = 0; rep < num_repeats; ++rep)
+    for(Index rep = 0; rep < num_repeats; ++rep)
     {
       comm.gather(send_buffer.data(), step_buf_size, recv_buffer.data(), step_buf_size, 0);
     }
@@ -539,7 +539,7 @@ void bench_scatter(Dist::Comm& comm, SimpleArgParser& args)
 
   std::size_t step_buf_size = 1;
 
-  for(int step = 0; step < num_steps; ++step)
+  for(Index step = 0; step < num_steps; ++step)
   {
     if(my_rank == 0)
     {
@@ -552,7 +552,7 @@ void bench_scatter(Dist::Comm& comm, SimpleArgParser& args)
     comm.barrier();
     TimeStamp stamp_t1;
 
-    for(int rep = 0; rep < num_repeats; ++rep)
+    for(Index rep = 0; rep < num_repeats; ++rep)
     {
       comm.scatter(send_buffer.data(), step_buf_size, recv_buffer.data(), step_buf_size, 0);
     }
