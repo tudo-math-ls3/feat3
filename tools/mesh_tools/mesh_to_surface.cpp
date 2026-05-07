@@ -69,10 +69,10 @@ int main(int argc, char** argv)
   const auto shapetype = reader.get_shape_type();
   switch(shapetype)
   {
-    case FEAT::Geometry::MeshFileReader::ShapeType::simplex:
+    case FEAT::Geometry::ParsedShapeType::simplex:
       write_out<FEAT::Shape::Simplex<3>>(reader, off_file);
       break;
-    case FEAT::Geometry::MeshFileReader::ShapeType::hypercube:
+    case FEAT::Geometry::ParsedShapeType::hypercube:
       write_out<FEAT::Shape::Hypercube<3>>(reader, off_file);
       break;
     default:

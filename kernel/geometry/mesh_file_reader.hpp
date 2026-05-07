@@ -5,19 +5,20 @@
 
 #pragma once
 
-#include <kernel/geometry/conformal_mesh.hpp>
-#include <kernel/geometry/mesh_atlas.hpp>
-#include <kernel/geometry/mesh_part.hpp>
-#include <kernel/geometry/mesh_node.hpp>
+#include <kernel/adjacency/dynamic_graph.hpp>
 #include <kernel/geometry/atlas/bezier.hpp>
 #include <kernel/geometry/atlas/circle.hpp>
 #include <kernel/geometry/atlas/extrude.hpp>
-#include <kernel/geometry/atlas/surface_mesh.hpp>
 #include <kernel/geometry/atlas/sphere.hpp>
-#include <kernel/adjacency/dynamic_graph.hpp>
+#include <kernel/geometry/atlas/surface_mesh.hpp>
+#include <kernel/geometry/conformal_mesh.hpp>
+#include <kernel/geometry/io_common.hpp>
+#include <kernel/geometry/mesh_atlas.hpp>
+#include <kernel/geometry/mesh_node.hpp>
+#include <kernel/geometry/mesh_part.hpp>
+#include <kernel/util/dist_file_io.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/xml_scanner.hpp>
-#include <kernel/util/dist_file_io.hpp>
 
 #include <deque>
 #include <vector>
@@ -1322,27 +1323,6 @@ namespace FEAT
      */
     class MeshFileReader
     {
-    public:
-      /// mesh type enumeration
-      enum class MeshType
-      {
-        /// unknown mesh type
-        unknown = 0,
-        /// conformal mesh type
-        conformal
-      };
-
-      /// shape type enumeration
-      enum class ShapeType
-      {
-        /// unknown shape type
-        unknown = 0,
-        /// simplex shape type
-        simplex,
-        /// hypercube shape type
-        hypercube
-      };
-
     protected:
       /// Our internally managed streams
       std::deque<std::shared_ptr<std::stringstream>> _streams;
@@ -1352,11 +1332,10 @@ namespace FEAT
       bool _have_root_markup;
       /// The parsed mesh type
       String _mesh_type_string;
-
       // Split up mesh type
-      MeshType _mesh_type;
+      ParsedMeshType _mesh_type;
       // Split up shape type
-      ShapeType _shape_type;
+      ParsedShapeType _shape_type;
       // Mesh shape dimension
       int _shape_dim;
       // Mesh world dimension
@@ -1367,8 +1346,8 @@ namespace FEAT
       explicit MeshFileReader() :
         _have_root_markup(false),
         _mesh_type_string(),
-        _mesh_type(MeshType::unknown),
-        _shape_type(ShapeType::unknown),
+        _mesh_type(ParsedMeshType::unknown),
+        _shape_type(ParsedShapeType::unknown),
         _shape_dim(0),
         _world_dim(0)
       {
@@ -1383,8 +1362,8 @@ namespace FEAT
       explicit MeshFileReader(std::istream& is) :
         _have_root_markup(false),
         _mesh_type_string(),
-        _mesh_type(MeshType::unknown),
-        _shape_type(ShapeType::unknown),
+        _mesh_type(ParsedMeshType::unknown),
+        _shape_type(ParsedShapeType::unknown),
         _shape_dim(0),
         _world_dim(0)
       {
@@ -1536,7 +1515,7 @@ namespace FEAT
        * \returns
        * The mesh-type from the root markup node.
        */
-      MeshType get_mesh_type() const
+      ParsedMeshType get_mesh_type() const
       {
         return _mesh_type;
       }
@@ -1551,7 +1530,7 @@ namespace FEAT
        * \returns
        * The shape-type from the root markup node.
        */
-      ShapeType get_shape_type() const
+      ParsedShapeType get_shape_type() const
       {
         return _shape_type;
       }
@@ -1642,15 +1621,15 @@ namespace FEAT
 
               // check mesh type
               if(mts.at(0) == "conformal")
-                _mesh_type = MeshType::conformal;
+                _mesh_type = ParsedMeshType::conformal;
               else
                 scanner.throw_grammar("Invalid 'mesh' attribute mesh type");
 
               // check shape type
               if(mts.at(1) == "simplex")
-                _shape_type = ShapeType::simplex;
+                _shape_type = ParsedShapeType::simplex;
               else if(mts.at(1) == "hypercube")
-                _shape_type = ShapeType::hypercube;
+                _shape_type = ParsedShapeType::hypercube;
               else
                 scanner.throw_grammar("Invalid 'mesh' attribute shape type");
 

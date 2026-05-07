@@ -81,6 +81,7 @@ set(test_list
   adaptive_refinement-test
   boundary_factory-test
   cgal-test
+  gmsh_reader-test
   hit_test_factory-test
   index_calculator-test
   mesh_node-test-conf-quad
