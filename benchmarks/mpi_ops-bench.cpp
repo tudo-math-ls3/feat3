@@ -31,6 +31,8 @@ void bench_send_receive(Dist::Comm& comm, SimpleArgParser& args)
   Index num_steps = 5;
   Index num_repeats = 3;
 
+  args.parse("all", max_size_mb, num_steps, num_repeats);
+
   if(args.parse("sendrecv", max_size_mb, num_steps, num_repeats) < 0)
   {
     comm.print("ERROR: invalid argument for --sendrecv");
@@ -179,6 +181,8 @@ void bench_broadcast(Dist::Comm& comm, SimpleArgParser& args)
   Index num_steps = 5;
   Index num_repeats = 3;
 
+  args.parse("all", max_size_mb, num_steps, num_repeats);
+
   if(args.parse("broadcast", max_size_mb, num_steps, num_repeats) < 0)
   {
     comm.print("ERROR: invalid argument for --broadcast");
@@ -283,6 +287,8 @@ void bench_reduce(Dist::Comm& comm, SimpleArgParser& args)
   Index num_steps = 5;
   Index num_repeats = 3;
 
+  args.parse("all", max_size_mb, num_steps, num_repeats);
+
   if(args.parse("reduce", max_size_mb, num_steps, num_repeats) < 0)
   {
     comm.print("ERROR: invalid argument for --reduce");
@@ -385,9 +391,11 @@ void bench_gather(Dist::Comm& comm, SimpleArgParser& args)
   const int num_ranks = comm.size();
   const int my_rank = comm.rank();
 
-  Index max_size_mb = 64; // in MB
+  Index max_size_mb = 128; // in MB
   Index num_steps = 5;
   Index num_repeats = 3;
+
+  args.parse("all", max_size_mb, num_steps, num_repeats);
 
   if(args.parse("gather", max_size_mb, num_steps, num_repeats) < 0)
   {
@@ -398,8 +406,8 @@ void bench_gather(Dist::Comm& comm, SimpleArgParser& args)
   TimeStamp stamp_1;
 
   // create and format buffers to perform first touch of memory
-  const std::size_t send_buf_size = std::size_t(max_size_mb) * 1024u*1024;
-  const std::size_t recv_buf_size = send_buf_size * std::size_t(num_ranks);
+  const std::size_t recv_buf_size = std::size_t(max_size_mb) * 1024u*1024;
+  const std::size_t send_buf_size = recv_buf_size / std::size_t(num_ranks);
   std::vector<char> send_buffer(send_buf_size), recv_buffer;
   Memory::memset_random_main(send_buffer.data(), send_buf_size, my_rank+1);
   if(my_rank == 0)
@@ -496,9 +504,11 @@ void bench_scatter(Dist::Comm& comm, SimpleArgParser& args)
   const int num_ranks = comm.size();
   const int my_rank = comm.rank();
 
-  Index max_size_mb = 64; // in MB
+  Index max_size_mb = 128; // in MB
   Index num_steps = 5;
   Index num_repeats = 3;
+
+  args.parse("all", max_size_mb, num_steps, num_repeats);
 
   if(args.parse("scatter", max_size_mb, num_steps, num_repeats) < 0)
   {
@@ -509,8 +519,8 @@ void bench_scatter(Dist::Comm& comm, SimpleArgParser& args)
   TimeStamp stamp_1;
 
   // create and format buffers to perform first touch of memory
-  const std::size_t recv_buf_size = std::size_t(max_size_mb) * 1024u*1024;
-  const std::size_t send_buf_size = recv_buf_size * std::size_t(num_ranks);
+  const std::size_t send_buf_size = std::size_t(max_size_mb) * 1024u*1024;
+  const std::size_t recv_buf_size = send_buf_size / std::size_t(num_ranks);
   std::vector<char> recv_buffer(recv_buf_size), send_buffer;
   Memory::memset_random_main(recv_buffer.data(), recv_buf_size, my_rank+1);
   if(my_rank == 0)
@@ -607,6 +617,7 @@ int main(int argc, char** argv)
   Dist::Comm comm(Dist::Comm::world());
 
   SimpleArgParser args(argc, argv);
+  args.support("all", "<max_mem> [<num_steps>] [<repeat>]\n");
   args.support("sendrecv", "<max_mem> [<num_steps>] [<repeat>]\n");
   args.support("broadcast", "<max_mem> [<num_steps>] [<repeat>]\n");
   args.support("reduce", "<max_mem> [<num_steps>] [<repeat>]\n");
