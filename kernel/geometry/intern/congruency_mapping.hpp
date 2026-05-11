@@ -161,11 +161,11 @@ namespace FEAT
           // 0---1      0---2
           //
           // X          X
-          // 2'1.   --> 0'1.
-          // X-0-X      X-2-X
+          // 1'0.   --> 2'0.
+          // X-2-X      X-1-X
           //
-          // swap edge 0 and 2
-          std::swap(idx[0], idx[2]);
+          // swap edge 1 and 2
+          std::swap(idx[1], idx[2]);
         }
       };
 
