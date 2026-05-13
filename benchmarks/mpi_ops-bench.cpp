@@ -28,7 +28,7 @@ void bench_send_receive(Dist::Comm& comm, SimpleArgParser& args)
     ++dir_rank;
 
   Index max_size_mb = 1024; // in MB
-  Index num_steps = 3;
+  Index num_steps = 5;
   Index num_repeats = 3;
 
   args.parse("all", max_size_mb, num_steps, num_repeats);
@@ -93,7 +93,7 @@ void bench_send_receive(Dist::Comm& comm, SimpleArgParser& args)
 
   std::size_t step_buf_size = 1;
 
-  //std::vector<double> time_min, time_max, time_avg, size_buf;
+  std::vector<double> time_avg, time_max;
 
   for(Index step = 0; step <= num_steps; ++step)
   {
@@ -142,6 +142,8 @@ void bench_send_receive(Dist::Comm& comm, SimpleArgParser& args)
     //time_min.push_back(t_min);
     //time_max.push_back(t_max);
     //time_avg.push_back(t_avg);
+    time_avg.push_back(t_avg);
+    time_max.push_back(t_max);
 
     if(my_rank == 0)
     {
@@ -165,7 +167,13 @@ void bench_send_receive(Dist::Comm& comm, SimpleArgParser& args)
   TimeStamp stamp_3;
   if(my_rank == 0)
   {
-    std::cout << "\nBenchmark Runtime: " << stamp_3.elapsed_string(stamp_0) << "\n";
+    std::cout << "\n>>> MAX:";
+    for(double t : time_max)
+      std::cout << "\t" << stringify_fp_fix(t, 6);
+    std::cout << "\n>>> AVG:";
+    for(double t : time_avg)
+      std::cout << "\t" << stringify_fp_fix(t, 6);
+    std::cout << "\n\nBenchmark Runtime: " << stamp_3.elapsed_string(stamp_0) << "\n";
     std::cout.flush();
   }
 }
@@ -178,7 +186,7 @@ void bench_broadcast(Dist::Comm& comm, SimpleArgParser& args)
   const int my_rank = comm.rank();
 
   Index max_size_mb = 128; // in MB
-  Index num_steps = 3;
+  Index num_steps = 5;
   Index num_repeats = 3;
 
   args.parse("all", max_size_mb, num_steps, num_repeats);
@@ -215,6 +223,8 @@ void bench_broadcast(Dist::Comm& comm, SimpleArgParser& args)
 
   std::size_t step_buf_size = 1;
 
+  std::vector<double> time_avg, time_max;
+
   for(Index step = 0; step <= num_steps; ++step)
   {
     if(my_rank == 0)
@@ -247,6 +257,8 @@ void bench_broadcast(Dist::Comm& comm, SimpleArgParser& args)
     t_min /= double(num_repeats);
     t_max /= double(num_repeats);
     t_avg /= double(num_repeats) * double(num_ranks);
+    time_avg.push_back(t_avg);
+    time_max.push_back(t_max);
 
     if(my_rank == 0)
     {
@@ -271,7 +283,13 @@ void bench_broadcast(Dist::Comm& comm, SimpleArgParser& args)
   TimeStamp stamp_3;
   if(my_rank == 0)
   {
-    std::cout << "\nBenchmark Runtime: " << stamp_3.elapsed_string(stamp_0) << "\n";
+    std::cout << "\n>>> MAX:";
+    for(double t : time_max)
+      std::cout << "\t" << stringify_fp_fix(t, 6);
+    std::cout << "\n>>> AVG:";
+    for(double t : time_avg)
+      std::cout << "\t" << stringify_fp_fix(t, 6);
+    std::cout << "\n\nBenchmark Runtime: " << stamp_3.elapsed_string(stamp_0) << "\n";
     std::cout.flush();
   }
 }
@@ -284,7 +302,7 @@ void bench_reduce(Dist::Comm& comm, SimpleArgParser& args)
   const int my_rank = comm.rank();
 
   Index max_size_mb = 128; // in MB
-  Index num_steps = 3;
+  Index num_steps = 5;
   Index num_repeats = 3;
 
   args.parse("all", max_size_mb, num_steps, num_repeats);
@@ -323,6 +341,8 @@ void bench_reduce(Dist::Comm& comm, SimpleArgParser& args)
 
   Dist::Operation op_bxor(MPI_BXOR);
 
+  std::vector<double> time_avg, time_max;
+
   for(Index step = 0; step <= num_steps; ++step)
   {
     if(my_rank == 0)
@@ -355,6 +375,8 @@ void bench_reduce(Dist::Comm& comm, SimpleArgParser& args)
     t_min /= double(num_repeats);
     t_max /= double(num_repeats);
     t_avg /= double(num_repeats) * double(num_ranks);
+    time_avg.push_back(t_avg);
+    time_max.push_back(t_max);
 
     if(my_rank == 0)
     {
@@ -379,7 +401,13 @@ void bench_reduce(Dist::Comm& comm, SimpleArgParser& args)
   TimeStamp stamp_3;
   if(my_rank == 0)
   {
-    std::cout << "\nBenchmark Runtime: " << stamp_3.elapsed_string(stamp_0) << "\n";
+    std::cout << "\n>>> MAX:";
+    for(double t : time_max)
+      std::cout << "\t" << stringify_fp_fix(t, 6);
+    std::cout << "\n>>> AVG:";
+    for(double t : time_avg)
+      std::cout << "\t" << stringify_fp_fix(t, 6);
+    std::cout << "\n\nBenchmark Runtime: " << stamp_3.elapsed_string(stamp_0) << "\n";
     std::cout.flush();
   }
 }
@@ -392,7 +420,7 @@ void bench_gather(Dist::Comm& comm, SimpleArgParser& args)
   const int my_rank = comm.rank();
 
   Index max_size_mb = 128; // in MB
-  Index num_steps = 3;
+  Index num_steps = 5;
   Index num_repeats = 3;
 
   args.parse("all", max_size_mb, num_steps, num_repeats);
@@ -436,6 +464,8 @@ void bench_gather(Dist::Comm& comm, SimpleArgParser& args)
 
   std::size_t step_buf_size = 1;
 
+  std::vector<double> time_avg, time_max;
+
   for(Index step = 0; step <= num_steps; ++step)
   {
     if(my_rank == 0)
@@ -468,6 +498,8 @@ void bench_gather(Dist::Comm& comm, SimpleArgParser& args)
     t_min /= double(num_repeats);
     t_max /= double(num_repeats);
     t_avg /= double(num_repeats) * double(num_ranks);
+    time_avg.push_back(t_avg);
+    time_max.push_back(t_max);
 
     if(my_rank == 0)
     {
@@ -492,7 +524,13 @@ void bench_gather(Dist::Comm& comm, SimpleArgParser& args)
   TimeStamp stamp_3;
   if(my_rank == 0)
   {
-    std::cout << "\nBenchmark Runtime: " << stamp_3.elapsed_string(stamp_0) << "\n";
+    std::cout << "\n>>> MAX:";
+    for(double t : time_max)
+      std::cout << "\t" << stringify_fp_fix(t, 6);
+    std::cout << "\n>>> AVG:";
+    for(double t : time_avg)
+      std::cout << "\t" << stringify_fp_fix(t, 6);
+    std::cout << "\n\nBenchmark Runtime: " << stamp_3.elapsed_string(stamp_0) << "\n";
     std::cout.flush();
   }
 }
@@ -505,7 +543,7 @@ void bench_scatter(Dist::Comm& comm, SimpleArgParser& args)
   const int my_rank = comm.rank();
 
   Index max_size_mb = 128; // in MB
-  Index num_steps = 3;
+  Index num_steps = 4;
   Index num_repeats = 3;
 
   args.parse("all", max_size_mb, num_steps, num_repeats);
@@ -549,6 +587,8 @@ void bench_scatter(Dist::Comm& comm, SimpleArgParser& args)
 
   std::size_t step_buf_size = 1;
 
+  std::vector<double> time_avg, time_max;
+
   for(Index step = 0; step <= num_steps; ++step)
   {
     if(my_rank == 0)
@@ -581,6 +621,8 @@ void bench_scatter(Dist::Comm& comm, SimpleArgParser& args)
     t_min /= double(num_repeats);
     t_max /= double(num_repeats);
     t_avg /= double(num_repeats) * double(num_ranks);
+    time_avg.push_back(t_avg);
+    time_max.push_back(t_max);
 
     if(my_rank == 0)
     {
@@ -605,7 +647,13 @@ void bench_scatter(Dist::Comm& comm, SimpleArgParser& args)
   TimeStamp stamp_3;
   if(my_rank == 0)
   {
-    std::cout << "\nBenchmark Runtime: " << stamp_3.elapsed_string(stamp_0) << "\n";
+    std::cout << "\n>>> MAX:";
+    for(double t : time_max)
+      std::cout << "\t" << stringify_fp_fix(t, 6);
+    std::cout << "\n>>> AVG:";
+    for(double t : time_avg)
+      std::cout << "\t" << stringify_fp_fix(t, 6);
+    std::cout << "\n\nBenchmark Runtime: " << stamp_3.elapsed_string(stamp_0) << "\n";
     std::cout.flush();
   }
 }
