@@ -28,7 +28,7 @@ void bench_send_receive(Dist::Comm& comm, SimpleArgParser& args)
     ++dir_rank;
 
   Index max_size_mb = 1024; // in MB
-  Index num_steps = 5;
+  Index num_steps = 3;
   Index num_repeats = 3;
 
   args.parse("all", max_size_mb, num_steps, num_repeats);
@@ -95,7 +95,7 @@ void bench_send_receive(Dist::Comm& comm, SimpleArgParser& args)
 
   //std::vector<double> time_min, time_max, time_avg, size_buf;
 
-  for(Index step = 0; step < num_steps; ++step)
+  for(Index step = 0; step <= num_steps; ++step)
   {
     if(my_rank == 0)
     {
@@ -124,7 +124,7 @@ void bench_send_receive(Dist::Comm& comm, SimpleArgParser& args)
       send_reqs.wait_all();
     }
 
-    comm.barrier();
+    //comm.barrier();
     TimeStamp stamp_t2;
 
     const double t = stamp_t2.elapsed(stamp_t1);
@@ -178,7 +178,7 @@ void bench_broadcast(Dist::Comm& comm, SimpleArgParser& args)
   const int my_rank = comm.rank();
 
   Index max_size_mb = 128; // in MB
-  Index num_steps = 5;
+  Index num_steps = 3;
   Index num_repeats = 3;
 
   args.parse("all", max_size_mb, num_steps, num_repeats);
@@ -215,7 +215,7 @@ void bench_broadcast(Dist::Comm& comm, SimpleArgParser& args)
 
   std::size_t step_buf_size = 1;
 
-  for(Index step = 0; step < num_steps; ++step)
+  for(Index step = 0; step <= num_steps; ++step)
   {
     if(my_rank == 0)
     {
@@ -233,7 +233,7 @@ void bench_broadcast(Dist::Comm& comm, SimpleArgParser& args)
       comm.bcast(buffer.data(), step_buf_size, Dist::dt_byte, 0);
     }
 
-    comm.barrier();
+    //comm.barrier();
     TimeStamp stamp_t2;
 
     const double t = stamp_t2.elapsed(stamp_t1);
@@ -284,7 +284,7 @@ void bench_reduce(Dist::Comm& comm, SimpleArgParser& args)
   const int my_rank = comm.rank();
 
   Index max_size_mb = 128; // in MB
-  Index num_steps = 5;
+  Index num_steps = 3;
   Index num_repeats = 3;
 
   args.parse("all", max_size_mb, num_steps, num_repeats);
@@ -323,7 +323,7 @@ void bench_reduce(Dist::Comm& comm, SimpleArgParser& args)
 
   Dist::Operation op_bxor(MPI_BXOR);
 
-  for(Index step = 0; step < num_steps; ++step)
+  for(Index step = 0; step <= num_steps; ++step)
   {
     if(my_rank == 0)
     {
@@ -341,7 +341,7 @@ void bench_reduce(Dist::Comm& comm, SimpleArgParser& args)
       comm.reduce(buffer.data(), buffer.data(), step_buf_size, Dist::dt_byte, op_bxor, 0);
     }
 
-    comm.barrier();
+    //comm.barrier();
     TimeStamp stamp_t2;
 
     const double t = stamp_t2.elapsed(stamp_t1);
@@ -392,7 +392,7 @@ void bench_gather(Dist::Comm& comm, SimpleArgParser& args)
   const int my_rank = comm.rank();
 
   Index max_size_mb = 128; // in MB
-  Index num_steps = 5;
+  Index num_steps = 3;
   Index num_repeats = 3;
 
   args.parse("all", max_size_mb, num_steps, num_repeats);
@@ -436,7 +436,7 @@ void bench_gather(Dist::Comm& comm, SimpleArgParser& args)
 
   std::size_t step_buf_size = 1;
 
-  for(Index step = 0; step < num_steps; ++step)
+  for(Index step = 0; step <= num_steps; ++step)
   {
     if(my_rank == 0)
     {
@@ -454,7 +454,7 @@ void bench_gather(Dist::Comm& comm, SimpleArgParser& args)
       comm.gather(send_buffer.data(), step_buf_size, recv_buffer.data(), step_buf_size, 0);
     }
 
-    comm.barrier();
+    //comm.barrier();
     TimeStamp stamp_t2;
 
     const double t = stamp_t2.elapsed(stamp_t1);
@@ -505,7 +505,7 @@ void bench_scatter(Dist::Comm& comm, SimpleArgParser& args)
   const int my_rank = comm.rank();
 
   Index max_size_mb = 128; // in MB
-  Index num_steps = 5;
+  Index num_steps = 3;
   Index num_repeats = 3;
 
   args.parse("all", max_size_mb, num_steps, num_repeats);
@@ -549,7 +549,7 @@ void bench_scatter(Dist::Comm& comm, SimpleArgParser& args)
 
   std::size_t step_buf_size = 1;
 
-  for(Index step = 0; step < num_steps; ++step)
+  for(Index step = 0; step <= num_steps; ++step)
   {
     if(my_rank == 0)
     {
@@ -567,7 +567,7 @@ void bench_scatter(Dist::Comm& comm, SimpleArgParser& args)
       comm.scatter(send_buffer.data(), step_buf_size, recv_buffer.data(), step_buf_size, 0);
     }
 
-    comm.barrier();
+    //comm.barrier();
     TimeStamp stamp_t2;
 
     const double t = stamp_t2.elapsed(stamp_t1);
