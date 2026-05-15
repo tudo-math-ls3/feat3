@@ -153,7 +153,10 @@ int main(int argc, char** argv)
 
     // Create the material using the property map
     std::vector<Material<double>> materials;
-    parse_materials(materials, prop_map->get_sub_section("problem_params")->get_sub_section("list_materials"));
+    {
+      String info;
+      parse_materials(materials, prop_map->get_sub_section("problem_params")->get_sub_section("list_materials"), info);
+    }
 
     for(auto& mat : materials)
     {

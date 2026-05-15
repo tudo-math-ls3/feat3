@@ -5,9 +5,9 @@
 
 #pragma once
 #include <kernel/runtime.hpp>
+#include <kernel/util/arg_parser.hpp>
 #include <kernel/util/property_map.hpp>
 #include <kernel/voxel_assembly/voxel_assembly_common.hpp>
-#include "parsing_helper.hpp"
 
 
 #include <array>
@@ -74,6 +74,165 @@ namespace Gendie
     return os << "Unkown Model";
   }
 
+  namespace Intern
+  {
+    inline bool try_parse_temperature_option(const String& option, TemperatureModelType& in_type)
+    {
+      if(option.compare_no_case("isotherm") == 0)
+      {
+        in_type = TemperatureModelType::isotherm;
+        return true;
+      }
+      else if(option.compare_no_case("tbts") == 0)
+      {
+        in_type = TemperatureModelType::tbts;
+        return true;
+      }
+      else if(option.compare_no_case("etb") == 0)
+      {
+        in_type = TemperatureModelType::etb;
+        return true;
+      }
+      else if(option.compare_no_case("c1c2") == 0)
+      {
+        in_type = TemperatureModelType::c1c2;
+        return true;
+      }
+      return false;
+    }
+
+    static bool is_temperature_model(const String& option)
+    {
+      TemperatureModelType type = TemperatureModelType::isotherm;
+      return try_parse_temperature_option(option, type);
+    }
+
+    inline bool try_parse_material(const String& material_string, MaterialType& mat_type)
+    {
+      if(material_string.compare_no_case("carreau") == 0)
+      {
+        mat_type = MaterialType::carreau;
+        return true;
+      }
+      else if(material_string.compare_no_case("carreau_yasuda") == 0)
+      {
+        mat_type = MaterialType::carreau_yasuda;
+        return true;
+      }
+      else if(material_string.compare_no_case("abc_model") == 0)
+      {
+        mat_type = MaterialType::abc_model;
+        return true;
+      }
+      else if(material_string.compare_no_case("powerlaw") == 0)
+      {
+        mat_type = MaterialType::power_law;
+        return true;
+      }
+      else if(material_string.compare_no_case("bingham") == 0)
+      {
+        mat_type = MaterialType::bingham;
+        return true;
+      }
+      return false;
+    }
+
+    static inline bool is_viscosity_model(const String& option)
+    {
+      MaterialType type = MaterialType::carreau;
+      return try_parse_material(option, type);
+    }
+
+    static inline bool is_tbts(const String& option)
+    {
+      return option.compare_no_case("tbts") == 0;
+    }
+
+    static inline bool is_tbts_or_c1c2(const String& option)
+    {
+      return option.compare_no_case("tbts") == 0 || option.compare_no_case("c1c2") == 0;
+    }
+
+    static inline bool needs_viscosity_value_c(const String& option)
+    {
+      return option.compare_no_case("carreau") == 0 || option.compare_no_case("carreau_yasuda") == 0 || option.compare_no_case("abc_model") == 0 || option.compare_no_case("bingham") == 0;
+    }
+
+    static inline bool needs_viscosity_value_d(const String& option)
+    {
+      return option.compare_no_case("carreau_yasuda") == 0;
+    }
+
+    template<typename DT_>
+    struct MaterialSectionBaseParser : public ArgParser
+    {
+      using ArgParser::parameter;
+      Parameter<DT_> density = parameter(DT_(0))
+                                .property("density")
+                                .required()
+                                .name("Density");
+
+      Parameter<DT_> temperature_reference_temperature = parameter(DT_(0))
+                                                          .property("temperature_model/reference_temperature")
+                                                          .name("Reference Temperature");
+      Parameter<DT_> temperature_value_a = parameter(DT_(0))
+                                            .property("temperature_model/value_a")
+                                            .name("Temperature Value A");
+      Parameter<String> temperature_model = parameter(String(""))
+                                              .property("temperature_model/model")
+                                              .required()
+                                              .name("Temperature Model")
+                                              .help_string("Valid options are: isotherm, tbts, c1c2 (later maybe: melt_tbts, etb)")
+                                              .validator(is_temperature_model)
+                                              .needs_if(temperature_value_a, is_tbts)
+                                              .needs_if(temperature_reference_temperature, is_tbts_or_c1c2);
+
+      Parameter<String> viscosity_model = parameter(String(""))
+                                            .property("viscosity_model/model")
+                                            .required()
+                                            .name("Viscosity Model")
+                                            .help_string("Valid options are: carreau, carreau_yasuda, abc_model, powerlaw, bingham")
+                                            .validator(is_viscosity_model);
+
+      TemperatureModelType temperature_type() const
+      {
+        TemperatureModelType tmp = TemperatureModelType::isotherm;
+        const bool success = try_parse_temperature_option(*temperature_model, tmp);
+        XASSERTM(success, "Could not parse temperature model");
+        return tmp;
+      }
+    };
+
+    template<typename DT_>
+    struct MaterialSectionParser : public ArgParser
+    {
+      using ArgParser::parameter;
+      Parameter<DT_> viscosity_value_a = parameter(DT_(0))
+                                           .property("viscosity_model/value_a")
+                                           .name("Viscosity Model Value A")
+                                           .required();
+      Parameter<DT_> viscosity_value_b = parameter(DT_(0))
+                                           .property("viscosity_model/value_b")
+                                           .name("Viscosity Model Value B")
+                                           .required();
+      Parameter<DT_> viscosity_value_c = parameter(DT_(0))
+                                           .property("viscosity_model/value_c")
+                                           .name("Viscosity Model Value C");
+      Parameter<DT_> viscosity_value_d = parameter(DT_(0))
+                                           .property("viscosity_model/value_d")
+                                           .name("Viscosity Model Value D");
+      Parameter<String> viscosity_model = parameter(String(""))
+                                            .property("viscosity_model/model")
+                                            .required()
+                                            .name("Viscosity Model")
+                                            .help_string("Valid options are: carreau (A B C), carreau_yasuda (A B C D), abc_model (A B C), powerlaw (A B), bingham (A B C)")
+                                            .validator(is_viscosity_model)
+                                            .needs_if(viscosity_value_c, needs_viscosity_value_c)
+                                            .needs_if(viscosity_value_d, needs_viscosity_value_d);
+    };
+
+  }
+
   template<typename DT_>
   struct ViscoModelBase
   {
@@ -123,6 +282,7 @@ namespace Gendie
 
     MaterialType get_type() const {return type;}
     std::array<DT_, data_len> get_data() const {return data;}
+
     virtual String format_string(std::size_t padlen = std::size_t(30), const char pc = '.') const
     {
       String s;
@@ -265,19 +425,23 @@ namespace Gendie
       this->type = MaterialType::carreau;
     }
 
-    ViscosityDataCarreauModel(const PropertyMap* prop)
+    ViscosityDataCarreauModel(const FEAT::PropertyMap& config)
+     : BaseClass()
     {
       this->type = MaterialType::carreau;
+      Intern::MaterialSectionParser<DataType> parser;
+      if(!parser.parse(config))
       {
-        DataType a,b,c;
-        PARSE_PROP_OPTION(prop, "value_a", a, false);
-        PARSE_PROP_OPTION(prop, "value_b", b, false);
-        PARSE_PROP_OPTION(prop, "value_c", c, false);
-        this->data[0] = a;
-        this->data[1] = b;
-        this->data[2] = -c+DataType(1);
-        this->data[3] = DataType(1);
+        for(const auto& err : parser.errors())
+        {
+          std::cerr << err << "\n";
+        }
+        XABORTM("Could not parse material");
       }
+      this->data[0] = *parser.viscosity_value_a;
+      this->data[1] = *parser.viscosity_value_b;
+      this->data[2] = DataType(1) - *parser.viscosity_value_c;
+      this->data[3] = DataType(1);
     }
 
     ViscosityDataCarreauModel() = default;
@@ -295,6 +459,8 @@ namespace Gendie
       s += String("Exponent n").pad_back(padlen, pc) + ": " + stringify_fp_fix(-this->data[2]+DataType(1), this->prec, this->width);
       return s;
     }
+
+
   };
 
   template<typename DT_>
@@ -313,23 +479,31 @@ namespace Gendie
       this->type = MaterialType::carreau_yasuda;
     }
 
+    ViscosityDataCarreauYasudaModel(const FEAT::PropertyMap& config)
+     : BaseClass()
+    {
+      this->type = MaterialType::carreau_yasuda;
+      Intern::MaterialSectionParser<DataType> parser;
+      if(!parser.parse(config))
+      {
+        for(const auto& err : parser.errors())
+        {
+          std::cerr << err << "\n";
+        }
+        XABORTM("Could not parse material");
+      }
+      this->data[0] = *parser.viscosity_value_a;
+      this->data[1] = *parser.viscosity_value_b;
+      this->data[2] = *parser.viscosity_value_c;
+      this->data[3] = *parser.viscosity_value_d;
+    }
+
     ViscosityDataCarreauYasudaModel() = default;
     ViscosityDataCarreauYasudaModel(const ViscosityDataCarreauYasudaModel&) = delete;
     ViscosityDataCarreauYasudaModel& operator=(const ViscosityDataCarreauYasudaModel&) = delete;
     ViscosityDataCarreauYasudaModel(ViscosityDataCarreauYasudaModel&&) = default;
     ViscosityDataCarreauYasudaModel& operator=(ViscosityDataCarreauYasudaModel&&) = default;
     virtual ~ViscosityDataCarreauYasudaModel(){}
-
-    ViscosityDataCarreauYasudaModel(const PropertyMap* prop)
-    {
-      this->type = MaterialType::carreau_yasuda;
-      {
-        PARSE_PROP_OPTION(prop, "value_a", this->data[0], false);
-        PARSE_PROP_OPTION(prop, "value_b", this->data[1], false);
-        PARSE_PROP_OPTION(prop, "value_c", this->data[2], false);
-        PARSE_PROP_OPTION(prop, "value_d", this->data[3], false);
-      }
-    }
 
     virtual String format_string(std::size_t padlen = std::size_t(30), const char pc = '.') const override
     {
@@ -343,7 +517,7 @@ namespace Gendie
   };
 
   template<typename DT_>
-  struct PseudoPowerLawCarreauModel : public CarreauModelBase<DT_>
+  struct ViscosityDataPseudoPowerLawModel : public CarreauModelBase<DT_>
   {
     typedef DT_ DataType;
     typedef CarreauModelBase<DT_> BaseClass;
@@ -360,31 +534,37 @@ namespace Gendie
     // data[2] -> exponent
 
     template<typename... T>
-    PseudoPowerLawCarreauModel(T... data) : BaseClass(data...){
+    ViscosityDataPseudoPowerLawModel(T... data) : BaseClass(data...){
       this->type = MaterialType::carreau;
     }
 
-    PseudoPowerLawCarreauModel(const PropertyMap* prop)
+    ViscosityDataPseudoPowerLawModel(const PropertyMap& config)
     {
       this->type = MaterialType::pseudo_power_law;
       {
-        DataType a,b;
-        PARSE_PROP_OPTION(prop, "value_a", a, false);
-        PARSE_PROP_OPTION(prop, "value_b", b, false);
-        const DataType clipp_val_exp = FEAT::Math::pow(clipping_value, b-DataType(1));
-        this->data[0] = a*clipp_val_exp;
+        Intern::MaterialSectionParser<DataType> parser;
+        if(!parser.parse(config))
+        {
+          for(const auto& err : parser.errors())
+          {
+            std::cerr << err << "\n";
+          }
+          XABORTM("Could not parse material");
+        }
+        const DataType clipp_val_exp = FEAT::Math::pow(clipping_value, *parser.viscosity_value_b-DataType(1));
+        this->data[0] = *parser.viscosity_value_a * clipp_val_exp;
         this->data[1] = DataType(1)/clipping_value;
-        this->data[2] = b;
+        this->data[2] = *parser.viscosity_value_b;
         this->data[3] = DataType(1);
       }
     }
 
-    PseudoPowerLawCarreauModel() = default;
-    PseudoPowerLawCarreauModel(const PseudoPowerLawCarreauModel&) = delete;
-    PseudoPowerLawCarreauModel& operator=(const PseudoPowerLawCarreauModel&) = delete;
-    PseudoPowerLawCarreauModel(PseudoPowerLawCarreauModel&&) = default;
-    PseudoPowerLawCarreauModel& operator=(PseudoPowerLawCarreauModel&&) = default;
-    virtual ~PseudoPowerLawCarreauModel(){}
+    ViscosityDataPseudoPowerLawModel() = default;
+    ViscosityDataPseudoPowerLawModel(const ViscosityDataPseudoPowerLawModel&) = delete;
+    ViscosityDataPseudoPowerLawModel& operator=(const ViscosityDataPseudoPowerLawModel&) = delete;
+    ViscosityDataPseudoPowerLawModel(ViscosityDataPseudoPowerLawModel&&) = default;
+    ViscosityDataPseudoPowerLawModel& operator=(ViscosityDataPseudoPowerLawModel&&) = default;
+    virtual ~ViscosityDataPseudoPowerLawModel(){}
 
     using BaseClass::clamp_shearrate;
 
@@ -503,6 +683,25 @@ namespace Gendie
       this->type = MaterialType::power_law;
     }
 
+    ViscosityDataPowerLawModel(const FEAT::PropertyMap& config)
+     : BaseClass()
+    {
+      this->type = MaterialType::power_law;
+      Intern::MaterialSectionParser<DataType> parser;
+      if(!parser.parse(config))
+      {
+        for(const auto& err : parser.errors())
+        {
+          std::cerr << err << "\n";
+        }
+        XABORTM("Could not parse material");
+      }
+      this->data[0] = *parser.viscosity_value_a;
+      this->data[1] = *parser.viscosity_value_b;
+      this->data[2] = DataType(0);
+      this->data[3] = DataType(0);
+    }
+
     ViscosityDataPowerLawModel() = default;
     ViscosityDataPowerLawModel(const ViscosityDataPowerLawModel&) = delete;
     ViscosityDataPowerLawModel& operator=(const ViscosityDataPowerLawModel&) = delete;
@@ -550,23 +749,6 @@ namespace Gendie
       }
     }
 
-    ViscosityDataPowerLawModel(const PropertyMap* prop)
-    {
-      this->type = MaterialType::power_law;
-      {
-        PARSE_PROP_OPTION(prop, "value_a", this->data[0], false);
-        PARSE_PROP_OPTION(prop, "value_b", this->data[1], false);
-      }
-    }
-
-    virtual String format_string(std::size_t padlen = std::size_t(30), const char pc = '.') const override
-    {
-      String s = BaseClass::format_string(padlen, pc) + "\n";
-      s += String("Mu_0").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->data[0], this->prec, this->width) + "\n";
-      s += String("Powerlaw Exponent").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->data[1], this->prec, this->width);
-      return s;
-    }
-
     ViscoFuncT<float> get_visc_func(float mesh_scale) const override
     {
       return _get_visc_func(mesh_scale);
@@ -610,6 +792,13 @@ namespace Gendie
     }
   #endif
 
+    virtual String format_string(std::size_t padlen = std::size_t(30), const char pc = '.') const override
+    {
+      String s = BaseClass::format_string(padlen, pc) + "\n";
+      s += String("Mu_0").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->data[0], this->prec, this->width) + "\n";
+      s += String("Powerlaw Exponent").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->data[1], this->prec, this->width);
+      return s;
+    }
   };
 
   template<typename DT_>
@@ -618,13 +807,32 @@ namespace Gendie
     typedef DT_ DataType;
     typedef CarreauModelBase<DT_> BaseClass;
     // context
-    // data[0] -> mu_0
-    // data[1] -> reci
-    // data[2] -> exponent
+    // data[0] -> A
+    // data[1] -> B
+    // data[2] -> C
 
     template<typename... T>
     ViscosityDataABCModel(T... data) : BaseClass(data...){
       this->type = MaterialType::abc_model;
+    }
+
+    ViscosityDataABCModel(const FEAT::PropertyMap& config)
+     : BaseClass()
+    {
+      this->type = MaterialType::abc_model;
+      Intern::MaterialSectionParser<DataType> parser;
+      if(!parser.parse(config))
+      {
+        for(const auto& err : parser.errors())
+        {
+          std::cerr << err << "\n";
+        }
+        XABORTM("Could not parse material");
+      }
+      this->data[0] = *parser.viscosity_value_a;
+      this->data[1] = *parser.viscosity_value_b;
+      this->data[2] = *parser.viscosity_value_c + DataType(1);
+      this->data[3] = DataType(1);
     }
 
     ViscosityDataABCModel() = default;
@@ -633,21 +841,6 @@ namespace Gendie
     ViscosityDataABCModel(ViscosityDataABCModel&&) = default;
     ViscosityDataABCModel& operator=(ViscosityDataABCModel&&) = default;
     virtual ~ViscosityDataABCModel(){}
-
-    ViscosityDataABCModel(const PropertyMap* prop)
-    {
-      this->type = MaterialType::abc_model;
-      {
-        DataType a,b,c;
-        PARSE_PROP_OPTION(prop, "value_a", a, false);
-        PARSE_PROP_OPTION(prop, "value_b", b, false);
-        PARSE_PROP_OPTION(prop, "value_c", c, false);
-        this->data[0] = a;
-        this->data[1] = b;
-        this->data[2] = c+DataType(1);
-        this->data[3] = DataType(1);
-      }
-    }
 
     virtual String format_string(std::size_t padlen = std::size_t(30), const char pc = '.') const override
     {
@@ -669,21 +862,31 @@ namespace Gendie
     using BaseClass::clamp_shearrate;
     // context
     // data[0] -> mu_0
-    // data[1] -> powerlaw exponent
+    // data[1] -> b
+    // data[2] -> dynamic viscosity
 
     template<typename... T>
     ViscosityDataBinghamModel(T... data) : BaseClass(data...){
       this->type = MaterialType::power_law;
     }
 
-    ViscosityDataBinghamModel(const PropertyMap* prop)
+    ViscosityDataBinghamModel(const FEAT::PropertyMap& config)
+     : BaseClass()
     {
       this->type = MaterialType::bingham;
+      Intern::MaterialSectionParser<DataType> parser;
+      if(!parser.parse(config))
       {
-        PARSE_PROP_OPTION(prop, "value_a", this->data[0], false);
-        PARSE_PROP_OPTION(prop, "value_b", this->data[1], false);
-        PARSE_PROP_OPTION(prop, "value_c", this->data[2], false);
+        for(const auto& err : parser.errors())
+        {
+          std::cerr << err << "\n";
+        }
+        XABORTM("Could not parse material");
       }
+      this->data[0] = *parser.viscosity_value_a;
+      this->data[1] = *parser.viscosity_value_b;
+      this->data[2] = *parser.viscosity_value_c;
+      this->data[3] = DataType(0);
     }
 
     ViscosityDataBinghamModel() = default;
@@ -733,15 +936,6 @@ namespace Gendie
       }
     }
 
-    virtual String format_string(std::size_t padlen = std::size_t(30), const char pc = '.') const override
-    {
-      String s = BaseClass::format_string(padlen, pc) + "\n";
-      s += String("Mu_0").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->data[0], this->prec, this->width) + "\n";
-      s += String("b").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->data[1], this->prec, this->width);
-      s += String("Dynamic viscosity").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->data[2], this->prec, this->width);
-      return s;
-    }
-
     ViscoFuncT<float> get_visc_func(float mesh_scale) const override
     {
       return _get_visc_func(mesh_scale);
@@ -785,114 +979,54 @@ namespace Gendie
     }
   #endif
 
+    virtual String format_string(std::size_t padlen = std::size_t(30), const char pc = '.') const override
+    {
+      String s = BaseClass::format_string(padlen, pc) + "\n";
+      s += String("Mu_0").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->data[0], this->prec, this->width) + "\n";
+      s += String("b").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->data[1], this->prec, this->width);
+      s += String("Dynamic viscosity").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->data[2], this->prec, this->width);
+      return s;
+    }
+
   };
 
   namespace Intern
   {
-    bool parse_temperature_option(const std::pair<String, bool>& option, TemperatureModelType& in_type)
-    {
-      if(!option.second)
-        return false;
-      if(option.first.compare_no_case("isotherm") == 0)
-      {
-        in_type = TemperatureModelType::isotherm;
-        return true;
-      }
-      else if(option.first.compare_no_case("tbts") == 0)
-      {
-        in_type = TemperatureModelType::tbts;
-        return true;
-      }
-      else if(option.first.compare_no_case("etb") == 0)
-      {
-        in_type = TemperatureModelType::etb;
-        return true;
-      }
-      else if(option.first.compare_no_case("c1c2") == 0)
-      {
-        in_type = TemperatureModelType::c1c2;
-        return true;
-      }
-      XABORTM("No known temperature type " + option.first);
-      return false;
-    }
-
-    bool parse_material_option(const std::pair<String, bool>& option, MaterialType& in_type)
-    {
-      if(!option.second)
-        return false;
-      if(option.first.compare_no_case("carreau") == 0)
-      {
-        in_type = MaterialType::carreau;
-        return true;
-      }
-      else if ((option.first.compare_no_case("carreau_yasuda") == 0) || (option.first.compare_no_case("yasuda") == 0))
-      {
-        in_type = MaterialType::carreau_yasuda;
-        return true;
-      }
-      else if(option.first.compare_no_case("abc_model") == 0)
-      {
-        in_type = MaterialType::abc_model;
-        return true;
-      }
-      else if(option.first.compare_no_case("powerlaw") == 0)
-      {
-        in_type = MaterialType::pseudo_power_law;
-        return true;
-      }
-      else if(option.first.compare_no_case("pseudo_powerlaw") == 0)
-      {
-        in_type = MaterialType::pseudo_power_law;
-        return true;
-      }
-      else if(option.first.compare_no_case("bingham") == 0)
-      {
-        in_type = MaterialType::bingham;
-        return true;
-      }
-      XABORTM("No known model type: " + option.first);
-      return false;
-    }
-
     template<typename DT_>
-    std::unique_ptr<ViscoModelBase<DT_>> create_viscosity_model(const FEAT::PropertyMap* prop)
+    std::unique_ptr<ViscoModelBase<DT_>> create_viscosity_model(const FEAT::PropertyMap& config)
     {
       typedef DT_ DataType;
-      MaterialType model_type(MaterialType::carreau);
-      std::unique_ptr<ViscoModelBase<DT_>> ptr;
-      parse_material_option(prop->get_entry("model"), model_type);
+      MaterialSectionBaseParser<DT_> base_parser;
+      if(!base_parser.parse(config))
+      {
+        for(const auto& err : base_parser.errors())
+        {
+          std::cerr << err << "\n";
+        }
+        XABORTM("Parsing of Visco Mat went wrong");
+      }
+      Gendie::MaterialType model_type = Gendie::MaterialType::carreau;
+      if(!try_parse_material(*base_parser.viscosity_model, model_type))
+      {
+        XABORTM(String("Unkown MaterialType ") + *base_parser.viscosity_model);
+      }
       switch(model_type)
       {
         case Gendie::MaterialType::abc_model:
-        {
-          return std::make_unique<ViscosityDataABCModel<DataType>>(prop);
-        }
+          return std::make_unique<ViscosityDataABCModel<DataType>>(config);
         case Gendie::MaterialType::carreau:
-        {
-          return std::make_unique<ViscosityDataCarreauModel<DataType>>(prop);
-        }
+          return std::make_unique<ViscosityDataCarreauModel<DataType>>(config);
         case Gendie::MaterialType::carreau_yasuda:
-        {
-          return std::make_unique<ViscosityDataCarreauYasudaModel<DataType>>(prop);
-        }
+          return std::make_unique<ViscosityDataCarreauYasudaModel<DataType>>(config);
         case Gendie::MaterialType::power_law:
-        {
-          return std::make_unique<ViscosityDataPowerLawModel<DataType>>(prop);
-        }
+          // return std::make_unique<ViscosityDataPowerLawModel<DataType>>(config); // reroute to pseudo powerlaw
         case Gendie::MaterialType::pseudo_power_law:
-        {
-          return std::make_unique<PseudoPowerLawCarreauModel<DataType>>(prop);
-        }
+          return std::make_unique<ViscosityDataPseudoPowerLawModel<DataType>>(config);
         case Gendie::MaterialType::bingham:
-        {
-          return std::make_unique<ViscosityDataBinghamModel<DataType>>(prop);
-        }
-        default:
-        {
-          XABORTM("Not implemented " + prop->get_entry("model").first + " yet");
-        }
+          return std::make_unique<ViscosityDataBinghamModel<DataType>>(config);
       }
+      XABORTM("Unsupported viscosity model");
+      return nullptr;
     }
   }
 
@@ -912,107 +1046,6 @@ namespace Gendie
 
   protected:
     static constexpr std::size_t padlen = std::size_t(30);
-
-    void _fill_temperature_model(const FEAT::PropertyMap* prop, TemperatureModelType& tmp, std::array<DataType, data_size_temp>& arr)
-    {
-      if(!Intern::parse_temperature_option(prop->get_entry("model"), tmp))
-      {
-        XABORTM("Could not parse the temperature model");
-        return;
-      }
-      switch(tmp)
-      {
-        case Gendie::TemperatureModelType::isotherm:
-        {
-          {
-            // TODO: Necessary to parse anything?
-            // DataType ref_tmp(DataType(0));
-            // PARSE_PROP_OPTION(prop, "reference_temperature", ref_tmp, false);
-            // XASSERTM(ref_tmp > DataType(-273.15), "Temperature lower than absolute zero");
-            arr[0]=DataType(0);
-            arr[1]=DataType(0);
-            arr[2]=DataType(0);
-            arr[3]=DataType(0);
-          }
-          return;
-        }
-        case Gendie::TemperatureModelType::tbts:
-        {
-          // tmp[0] = TB,  tmp[1] = TS, tmp[2] = C1,  tmp[3] = C2
-          {
-            DataType TB(DataType(0));
-            PARSE_PROP_OPTION(prop, "reference_temperature", TB, false);
-            XASSERTM(TB > DataType(-273.15), "Constant parameter value_a gre");
-            arr[0]=TB;
-          }
-          {
-            DataType TS(DataType(0));
-            PARSE_PROP_OPTION(prop, "value_a", TS, false);
-            XASSERTM(TS > DataType(-273.15), "Constant parameter value_a gre");
-            arr[1]=TS;
-          }
-          {
-            DataType C1(DataType(8.86));
-            arr[2]=C1;
-          }
-          {
-            DataType C2(DataType(101.6));
-            arr[3]=C2;
-          }
-          return;
-        }
-        case Gendie::TemperatureModelType::c1c2:
-        {
-          // tmp[0] = TB,  tmp[1] = TS, tmp[2] = C1,  tmp[3] = C2
-          {
-            DataType TB(DataType(0));
-            PARSE_PROP_OPTION(prop, "reference_temperature", TB, false);
-            XASSERTM(TB > DataType(-273.15), "Constant parameter value_a gre");
-            arr[0]=TB;
-          }
-          {
-            DataType TS(arr[1]);
-            arr[1]=TS;
-          }
-          {
-            DataType C1(DataType(8.86));
-            arr[2]=C1;
-          }
-          {
-            DataType C2(DataType(101.6));
-            arr[3]=C2;
-          }
-          return;
-        }
-        case Gendie::TemperatureModelType::etb:
-        {
-          // arr[0] = TB (reference temperature), arr[1] = E (activation energy)
-          // R is the universal gas constant
-          {
-            DataType TB(DataType(0));
-            PARSE_PROP_OPTION(prop, "reference_temperature", TB, false);
-            XASSERTM(TB > DataType(-273.15), "Reference temperature must be greater than absolute zero");
-            arr[0]=TB;
-          }
-          {
-            DataType E(DataType(0));
-            PARSE_PROP_OPTION(prop, "value_a", E, false);
-            XASSERTM(E > DataType(0), "Activation energy E must be positive");
-            arr[1]=E;
-          }
-          return;
-        }
-        default:
-        {
-          XABORTM("Not implemented " + prop->get_entry("model").first + " yet");
-        }
-      }
-    }
-
-    void _fill_viscosity_model(const FEAT::PropertyMap* prop)
-    {
-      this->_visc_mat_p = Intern::create_viscosity_model<DataType>(prop);
-    }
 
     DataType _get_pseudo_at(DataType temp) const
     {
@@ -1071,24 +1104,37 @@ namespace Gendie
     Material& operator=(Material&&) = default;
     ~Material() = default;
 
-
-    /**
-     * \brief ctor using a property map to parse the agruments
-     *
-     * \param[in] prop Property map with the following build
-     *                 density: float
-     *                 /temperature_model
-     *                    model: String
-     *                    ... temperature model parameters
-     *                 /viscosity_model
-     *                    model: String
-     *                    ... viscosity model parameters
-     */
-    Material(const FEAT::PropertyMap* prop)
+    Material(const PropertyMap& config)
     {
-      PARSE_PROP_OPTION(prop, "density", _density, false);
-      _fill_temperature_model(prop->get_sub_section("temperature_model"), _temp_type, _temp_mat_data);
-      _fill_viscosity_model(prop->get_sub_section("viscosity_model"));
+      Intern::MaterialSectionBaseParser<DataType> parser;
+      if(!parser.parse(config))
+      {
+        for(const auto& err : parser.errors())
+        {
+          std::cerr << err << "\n";
+        }
+        XABORTM("Could not parse base material");
+      }
+      _density = *parser.density;
+      _temp_type = parser.temperature_type();
+      switch(_temp_type)
+      {
+        case Gendie::TemperatureModelType::isotherm:
+          _temp_mat_data = {DataType(0), DataType(0), DataType(0), DataType(0)};
+          break;
+        case Gendie::TemperatureModelType::tbts:
+          _temp_mat_data = {*parser.temperature_reference_temperature, *parser.temperature_value_a, DataType(8.86), DataType(101.6)};
+          break;
+        case Gendie::TemperatureModelType::c1c2:
+          _temp_mat_data = {*parser.temperature_reference_temperature, DataType(0), DataType(8.86), DataType(101.6)};
+          break;
+        case Gendie::TemperatureModelType::etb:
+          _temp_mat_data = {*parser.temperature_reference_temperature, *parser.temperature_value_a, DataType(0), DataType(0)};
+          break;
+        default:
+          XABORTM("Unsupported temperature model");
+      }
+      _visc_mat_p = Intern::create_viscosity_model<DataType>(config);
     }
 
     /**
@@ -1160,14 +1206,40 @@ namespace Gendie
       s += _visc_mat_p->format_string(padlen, pc);
 
       return s;
-
     }
+
   }; //class Material<DT_>
 
+  enum class MaterialParserError : std::uint8_t
+  {
+    success = 0,
+    no_material_config = 1,
+    no_materials = 2,
+    invalid_material = 3
+  };
+
+  static inline const char* parse_error(MaterialParserError t)
+  {
+    switch(t)
+    {
+      case MaterialParserError::success:
+        return "Success";
+      case MaterialParserError::no_material_config:
+        return "No Material Config Found";
+      case MaterialParserError::no_materials:
+        return "No Material Entry found in config";
+      case MaterialParserError::invalid_material:
+        return "Failed to parse material entry";
+    }
+    return "Unknown";
+  }
+
   template<typename DT_>
-  inline void parse_materials(std::vector<Material<DT_>>& materials, const PropertyMap* mat_config)
+  MaterialParserError parse_materials(std::vector<Material<DT_>>& materials, const FEAT::PropertyMap* mat_config, String& material_info)
   {
     XASSERTM(mat_config, "No material config list found");
+    if(!mat_config)
+      return MaterialParserError::no_material_config;
     std::size_t i = 0u;
     while(true)
     {
@@ -1175,10 +1247,13 @@ namespace Gendie
       if(cur_mat == nullptr)
       {
         XASSERTM(i > 0u, "Did not querry any materials!");
-        break;
+        return i > 0u ? MaterialParserError::success : MaterialParserError::no_materials;
       }
-      materials.emplace_back(cur_mat);
+      materials.emplace_back(*cur_mat);
+      material_info += materials.back().format_string(int(i));
       ++i;
     }
+
+    return MaterialParserError::success;
   }
 }

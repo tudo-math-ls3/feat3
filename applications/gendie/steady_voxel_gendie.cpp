@@ -2,6 +2,7 @@
 #include <exception>
 #include <iostream>
 
+#include "applications/gendie/parsing_helper.hpp"
 #include "gendie_common.hpp"
 
 
@@ -38,250 +39,121 @@ namespace Gendie
   static constexpr std::size_t pad_len = 30u;
   static constexpr char pad_char = '.';
 
-  // class parsing and holding parameters used by our functions
-  struct ParameterHolder
+  struct ParameterHolder : public ArgParser
   {
-    String surface_meshfile;
-    String base_meshfile_names;
-    String cubature_a = "gauss-legendre:5";
-    String cubature_b = "gauss-legendre:3";
-    String cubature_m = "gauss-legendre:3";
-    String cubature_postproc = "gauss-legendre:5";
-    String level_string;
-    String min_gap;
-    String vtk_filename;
-    String vtk_name;
-    Tiny::Vector<SystemIndexType, dim> mesh_bb_num_cells;
-    Tiny::Vector<SystemDataType, dim> mesh_bb_min, mesh_bb_max;
-    SystemDataType resolution = SystemDataType(1);
-    SystemDataType mesh_unit_scale = SystemDataType(1E+3);
-    SystemDataType velo_scaling_factor = SystemDataType(1)/SystemDataType(1E+3);
-    SystemDataType visc_scaling_factor = SystemDataType(1);
-    SystemDataType pres_scaling_factor = SystemDataType(1)/SystemDataType(1E+5);
-
-
-
-
-    bool use_base_mesh = false;
-    bool assemble_q2_filter = false;
-    bool want_vtk = false;
-    bool refine_vtk = false;
-    bool use_true_vtk_name = false;
-    bool vtk_debug = false;
-    bool measure_cgal_size = true;
-    bool cheap_weights = true;
-    bool always_flush_print = false;
-    bool exact_deslagging = false;
-
-    ParameterHolder() = default;
-
-    ParameterHolder(const PropertyMap* config, const Logger* logger)
+    struct MeshDef
     {
+      Tiny::Vector<SystemIndexType, dim> num_cells;
+      Tiny::Vector<SystemDataType, dim> min;
+      Tiny::Vector<SystemDataType, dim> max;
+
+      friend std::ostream& operator<<(std::ostream& s, const MeshDef& d)
       {
-        if(const PropertyMap* problem_config = config->get_sub_section("problem_params"))
-        {
-          // parse off file
-          std::pair<String, bool> off_string = problem_config->query("surface_mesh_filename");
-          XASSERTM(off_string.second && !off_string.first.empty(), "Could not parse surface mesh file");
-          //only first off file is parsed for now
-          surface_meshfile = off_string.first.split_by_whitespaces().front();
-        }
-        else
-        {
-          XABORTM("Could not find problem_params section");
-        }
-
+        s << "MeshDef{ num_cells: " << d.num_cells << ", min: " << d.min << ", max: " << d.max << " }";
+        return s;
       }
+    };
 
-      // get the problem setup section
-      if(auto* base_config = config->get_sub_section("problem-setup"))
-      {
-        {
-          std::pair<String, bool> lvl_string_ = base_config->query("level");
-          if(!lvl_string_.second)
-          {
-            logger->print("You must provide a level field inside the problem-setup section!", PrintLevel::error);
-            Runtime::abort();
-          }
-          level_string = lvl_string_.first;
-          // TODO: somewhere at this point, we would need to set the base splitte if required
+    Parameter<String> surface_meshfile = parameter(String(""))
+                                                        .property("problem_params/surface_mesh_filename")
+                                                        .required()
+                                                        .validator([](const auto& v) { return !v.empty(); });
+    Parameter<std::deque<String>> base_meshfile_names = parameter(std::deque<String>{})
+                                                          .property("problem-setup/base-mesh");
+    Parameter<String> cubature_a = parameter(String("gauss-legendre:5")).name("cubature_a");
+    Parameter<String> cubature_b = parameter(String("gauss-legendre:3")).name("cubature_b");
+    Parameter<String> cubature_m = parameter(String("gauss-legendre:3")).name("cubature_m");
+    Parameter<String> cubature_postproc = parameter(String("gauss-legendre:5")).name("cubature_postproc");
+    Parameter<String> level_string = parameter(String("")).property("problem-setup/level").required();
+    Parameter<String> voxel_map_file = parameter(String("")).property("problem-setup/voxel-map");
+    Parameter<Real> min_gap = parameter(Real(0)).property("special-problem-definition/min-gap");
+    Parameter<String> vtk_filename = parameter(String("gendie_material")).property("postproc-params/vtk");
+    Parameter<MeshDef> mesh_def = parameter(MeshDef{})
+                                    .property("problem-setup/background-mesh")
+                                    .parser(
+                                      [](const String& s)
+                                      {
+                                        MeshDef def;
+                                        std::istringstream stream(s);
 
-        }
+                                        for(int i(0); i < dim; i++)
+                                        {
+                                          stream >> def.min(i);
+                                        }
+                                        for(int i(0); i < dim; i++)
+                                        {
+                                          stream >> def.max(i);
+                                        }
+                                        for(int i(0); i < dim; i++)
+                                        {
+                                          stream >> def.num_cells(i);
+                                        }
 
-        if(Gendie::check_for_config_option(base_config->query("use-base-mesh")))
-        {
-          resolution = SystemDataType(1);
-          use_base_mesh = true;
-          std::pair<String, bool> base_mesh_string = base_config->query("base-mesh");
-          XASSERTM(base_mesh_string.second, "You must provide a mesh field inside the problem-setup section!");
-          base_meshfile_names = base_mesh_string.first;
+                                        return def;
+                                      })
+                                    .validator(
+                                      [](const auto& d)
+                                      {
+                                        bool result = true;
+                                        for(int i(0); i < dim; i++)
+                                        {
+                                          result &= d.min(i) < d.max(i);
+                                        }
+                                        return result;
+                                      });
 
-          XASSERTM(!base_meshfile_names.empty(), "Could not parse base mesh file name");
-        }
-        else
-        {
-          use_base_mesh = false;
-          // parse base mesh boundingbox
-          std::pair<String, bool> mesh_string = base_config->query("background-mesh");
-          XASSERTM(mesh_string.second, "You must provide parameters for the background mesh!\n"
-                            "Xmin Ymin [Zmin] Xmax Ymax [Zmax] n_x n_y [n_z]");
-          std::deque<String> tmp_msh_string = mesh_string.first.split_by_whitespaces();
-          if(tmp_msh_string.size() != Index(3*dim))
-          {
-            logger->print(String("Number of parameters for background-mesh does not fit to dimension!\n")
-                      + String("Number of provided arguments: " + stringify(tmp_msh_string.size()) + " Number of expected arguments: "
-                      + stringify(Index(3*dim))), PrintLevel::error);
-          }
-          //first parse the min parameters
-          for(int i = 0; i < dim; ++i)
-          {
-            if(!tmp_msh_string.at(std::size_t(i)).parse(mesh_bb_min[i]))
-            {
-              logger->print("Could not parse " + stringify(i) + "th Parameter of BB min parameter!", PrintLevel::error);
-              Runtime::abort();
-            }
-          }
-          for(int i = 0; i < dim; ++i)
-          {
-            if(!tmp_msh_string.at(std::size_t(i+dim)).parse(mesh_bb_max[i]))
-            {
-              logger->print("Could not parse " + stringify(i) + "th Parameter of BB max parameter!", PrintLevel::error);
-              Runtime::abort();
-            }
-          }
-          for(int i = 0; i < dim; ++i)
-          {
-            if(!tmp_msh_string.at(std::size_t(i+2*dim)).parse(mesh_bb_num_cells[i]))
-            {
-              logger->print("Could not parse " + stringify(i) + "th Parameter of BB num cells parameter!", PrintLevel::error);
-              Runtime::abort();
-            }
-          }
-          // calculate an approximate resolution
-          resolution = Math::Limits<SystemDataType>::max();
-          for(int i = 0; i < dim; ++i)
-          {
-            resolution = Math::min(resolution, Math::abs((mesh_bb_max[i]-mesh_bb_min[i])/ SystemDataType(mesh_bb_num_cells[i])));
-          }
+    Parameter<bool> use_base_mesh = parameter(false)
+                                      .property("problem-setup/use-base-mesh")
+                                      .needs_if(base_meshfile_names, [](const auto& b) { return b; })
+                                      .needs_if(mesh_def, [](const auto& b) { return !b; });
+    Parameter<SystemDataType> mesh_unit_scale = parameter(SystemDataType(1E+3)).property("problem-setup/mesh-unit-factor");//.name("Setup: Mesh Unit Factor");
+    Parameter<SystemDataType> velo_scaling_factor = parameter(SystemDataType(1E-3)).property("postproc-params/velo-scale");//.name("Postproc: Velocity Scaling Factor");
+    Parameter<SystemDataType> visc_scaling_factor = parameter(SystemDataType(1)).property("postproc-params/visc-scale");//.name("Postproc: Viscosity Scaling Factor");
+    Parameter<SystemDataType> pres_scaling_factor = parameter(SystemDataType(1E-5)).property("postproc-params/pres-scale");//.name("Postproc: Pressure Scaling Factor");
+    // Parameter<bool> meshpart_by_cgal_wrapper = parameter(false).property("problem-setup/meshpart-by-cgal-wrapper");
+    Parameter<bool> assemble_q2_filter = parameter(false).property("special-problem-definition/use-q2-fbm");
+    Parameter<bool> refine_vtk = parameter(false).property("postproc-params/refine-vtk");
+    Parameter<bool> use_true_vtk_name = parameter(false).property("postproc-params/vtk-use-true-name");
+    Parameter<bool> vtk_debug = parameter(false).property("postproc-params/vtk-debug-data");
+    Parameter<bool> measure_cgal_size = parameter(true).property("postproc-params/skip_cgal_meaure");
+    Parameter<String> mesh_hierarchy_vtk = parameter(String("")).property("postproc-params/mesh-hierarchy-vtk");
 
-          cheap_weights = Gendie::check_for_config_option(base_config->query("cheap-weights"), true);
-          // TODO: This should not be on by default
-          always_flush_print = Gendie::check_for_config_option(base_config->query("always-flush-print"), false);
+    Derived<bool> want_vtk = Derived(false);
+    Derived<String> vtk_name;
+    Parameter<bool> cheap_weights = parameter(true).property("problem-setup/cheap-weights");
+    Parameter<bool> always_flush_print = parameter(false).property("problem-setup/always-flush-print");
+    Parameter<bool> exact_deslagging = parameter(false).property("problem-setup/exact-deslagging");
 
-          exact_deslagging = Gendie::check_for_config_option(base_config->query("exact-deslagging"), false);
-        }
+    Derived<SystemDataType> resolution;                 // Pseudo derived
 
-        // refine resolution parameter depending on level
-        resolution *= Math::pow(SystemDataType(2), -SystemDataType(std::stoi(level_string.split_by_whitespaces().front())));
-
-        {
-          // use_voxel_map = false;
-          // parse resolution, if available
-          const auto* spec_problem_def = config->get_sub_section("special-problem-definition");
-          if(!spec_problem_def)
-          {
-            logger->print("No special problem definition section found", PrintLevel::warning);
-          }
-          if(spec_problem_def && Gendie::check_for_config_option(spec_problem_def->query("min-gap")))
-          {
-            min_gap = spec_problem_def->query("min-gap").first;
-            auto parse_ok = spec_problem_def->parse_entry("min-gap", resolution);
-            XASSERTM(parse_ok, "Could not parse min-gap");
-          }
-        }
-        if(const auto* spec_problem_def = config->get_sub_section("special-problem-definition"))
-          assemble_q2_filter = Gendie::check_for_config_option(spec_problem_def->query("use-q2-fbm"));
-
-        if(!base_config->parse_entry("mesh-unit-factor", mesh_unit_scale))
-        {
-          logger->print("Could not parse mesh-unit-factor", PrintLevel::error);
-          Runtime::abort();
-        }
-
-        velo_scaling_factor = SystemDataType(1)/mesh_unit_scale;
-        visc_scaling_factor = SystemDataType(1E-3)*mesh_unit_scale;
-        pres_scaling_factor = SystemDataType(1E-8)*mesh_unit_scale;
-      }
-
-
-      if(const auto* postproc_config = config->get_sub_section("postproc-params"))
-      {
-        measure_cgal_size = !Gendie::check_for_config_option(postproc_config->query("skip_cgal_meaure"));
-        refine_vtk = Gendie::check_for_config_option(postproc_config->query("refine-vtk"));
-        want_vtk = Gendie::check_for_config_option(postproc_config->query("vtk"));
-        if(!want_vtk)
-        {
-          logger->print("Vtk output not requested!", PrintLevel::warning);
-          return;
-        }
-        std::pair<FEAT::String, bool> vtk_filename_query = postproc_config->query("vtk");
-        if(want_vtk && vtk_filename_query.first.compare_no_case("true") != 0)
-        {
-          vtk_filename = vtk_filename_query.first;
-        }
-        use_true_vtk_name = Gendie::check_for_config_option(postproc_config->query("vtk-use-true-name"));
-
-        vtk_debug = Gendie::check_for_config_option(postproc_config->query("vtk-debug-data"));
-        // build VTK name
-        vtk_name = vtk_filename;
-        if(vtk_filename.empty())
-        {
-          vtk_name = "gendie_material";
-          vtk_name += "-lvl" + level_string.split_by_whitespaces().front();
-          vtk_name += "-n" + stringify(logger->comm.size());
-        }
-        else if(!use_true_vtk_name)
-        {
-          vtk_name += "_level_" + level_string.split_by_whitespaces().front();
-        }
-      }
-      else
-      {
-        logger->print("No postproc-params section found!", PrintLevel::warning);
-      }
-
-    }
-
-    String format_string() const
+    void post_parse() override
     {
-      String output;
-      output += String("Surface Mesh File").pad_back(pad_len, pad_char) + ": " + surface_meshfile + "\n";
-      output += String("Use Base Mesh").pad_back(pad_len, pad_char) + ": " + (use_base_mesh ? String("yes"):String("no")) + "\n";
-      if(use_base_mesh)
+      if(!*use_base_mesh)
       {
-        output += String("Base Mesh Files").pad_back(pad_len, pad_char) + ": " +base_meshfile_names + "\n";
+        SystemDataType r = Math::Limits<SystemDataType>::max();
+        for(int i = 0; i < dim; ++i)
+        {
+          r = Math::min(r, Math::abs((mesh_def->max[i]-mesh_def->min[i])/ SystemDataType(mesh_def->num_cells[i])));
+        }
+        r *= Math::pow(SystemDataType(2), -SystemDataType(std::stoi(level_string->split_by_whitespaces().front())));
+        resolution = r;
       }
-      else
+      // -- postproc-params
+      vtk_name = *vtk_filename;
+      if(vtk_name->empty())
       {
-        output += String("Background Mesh Num Cells").pad_back(pad_len, pad_char) + ": " + "[" + stringify(mesh_bb_num_cells[0]) + ", " + stringify(mesh_bb_num_cells[1]) + ", " + stringify(mesh_bb_num_cells[2]) + "]\n";
+        vtk_name = String("gendie_material") + String("-lvl") + level_string->split_by_whitespaces().front();
       }
-      output += String("Background Mesh BB").pad_back(pad_len, pad_char) + ": " + "[" + stringify(mesh_bb_min[0]) + ", " + stringify(mesh_bb_max[0])
-                      + "], [" + stringify(mesh_bb_min[1]) + ", " + stringify(mesh_bb_max[1]) + "], [" + stringify(mesh_bb_min[2]) + ", " + stringify(mesh_bb_max[2]) + "]\n";
-      output += String("MinGap").pad_back(pad_len, pad_char) + ": " + min_gap + "\n";
-      output += String("Cheap weight calculation").pad_back(pad_len, pad_char) + ": " + (cheap_weights ? String("yes") : String("no")) + "\n";
-      output += String("Flush Print").pad_back(pad_len, pad_char) + ": " + (always_flush_print ? String("yes") : String("no")) + "\n";
-      output += String("Exact Deslagging").pad_back(pad_len, pad_char) + ": " + (exact_deslagging ? String("yes") : String("no")) + "\n";
-      output += String("Cubature Matrix a").pad_back(pad_len, pad_char) + ": " + cubature_a + "\n";
-      output += String("Cubature Matrix b").pad_back(pad_len, pad_char) + ": " + cubature_b + "\n";
-      output += String("Cubature Matrix m").pad_back(pad_len, pad_char) + ": " + cubature_m + "\n";
-      output += String("Cubature Postproc").pad_back(pad_len, pad_char) + ": " + cubature_postproc + "\n";
-      output += String("Use q2 fbm").pad_back(pad_len, pad_char) + ": " + (assemble_q2_filter ? String("yes"):String("no")) + "\n";
-      output += String("Mesh Unit Scale").pad_back(pad_len, pad_char) + ": " + stringify_fp_sci(mesh_unit_scale, 2) + "\n";
-      output += String("Write VTK").pad_back(pad_len, pad_char) + ": " + (want_vtk ? String("yes"):String("no")) + "\n";
-      output += String("Vtk file path").pad_back(pad_len, pad_char) + ": " + vtk_filename + "\n";
-      output += String("Vtk name").pad_back(pad_len, pad_char) + ": " + vtk_name + "\n";
-      output += String("Refine VTK").pad_back(pad_len, pad_char) + ": " + (refine_vtk ? String("yes"):String("no")) + "\n";
-      output += String("Debug VTK").pad_back(pad_len, pad_char) + ": " + (vtk_debug ? String("yes"):String("no")) + "\n";
-      output += String("Velo Scaling Factor").pad_back(pad_len, pad_char) + ": " + stringify_fp_sci(velo_scaling_factor, 2) + "\n";
-      output += String("Visco Scaling Factor").pad_back(pad_len, pad_char) + ": " + stringify_fp_sci(visc_scaling_factor, 2) + "\n";
-      output += String("Pressure Scaling Factor").pad_back(pad_len, pad_char) + ": " + stringify_fp_sci(pres_scaling_factor, 2) + "\n";
-
-      return output;
-
+      else if(!*use_true_vtk_name)
+      {
+        vtk_name = *vtk_filename + "_level_" + level_string->split_by_whitespaces().front();
+      }
+      if(vtk_filename && Gendie::check_option_off(*vtk_filename))
+      {
+        want_vtk = true;
+      }
     }
-
-
-  }; // class ParameterHolder
+  };
 
   template<typename ParamHolder_>
   void create_voxel_domain(PartitionControl<DomainLevel>& domain, const SimpleArgParser& /*args*/, const PropertyMap* config, ParamHolder_& param_holder, const Logger* logger)
@@ -302,14 +174,14 @@ namespace Gendie
 
     // setup domain
     {
-      domain.set_desired_levels(param_holder.level_string.split_by_whitespaces());
+      domain.set_desired_levels(param_holder.level_string->split_by_whitespaces());
     }
 
     logger->print("Creating mesh");
 
-    if(param_holder.use_base_mesh)
+    if(*param_holder.use_base_mesh)
     {
-      std::deque<String> mesh_file_names = param_holder.base_meshfile_names.split_by_whitespaces();
+      std::deque<String> mesh_file_names = *param_holder.base_meshfile_names;
 
       XASSERTM(!mesh_file_names.empty(), "Could not parse base mesh file name");
 
@@ -321,20 +193,18 @@ namespace Gendie
       String mesh_file_type = mesh_reader.get_meshtype_string();
       XASSERTM(mesh_file_type == "conformal:hypercube:3:3", "Meshfile type has to be of conformal:hypercube:3:3");
       domain.set_base_mesh(mesh_reader.parse(domain.get_atlas()));
-      param_holder.mesh_bb_min = domain.get_bounding_box_min();
-      param_holder.mesh_bb_max = domain.get_bounding_box_max();
     }
     else
     {
       // so now we can create our background mesh
-      domain.create_base_mesh_3d(param_holder.mesh_bb_num_cells[0], param_holder.mesh_bb_num_cells[1], param_holder.mesh_bb_num_cells[2], param_holder.mesh_bb_min[0],
-                                param_holder.mesh_bb_max[0], param_holder.mesh_bb_min[1], param_holder.mesh_bb_max[1], param_holder.mesh_bb_min[2], param_holder.mesh_bb_max[2]);
+      domain.create_base_mesh_3d(param_holder.mesh_def->num_cells[0], param_holder.mesh_def->num_cells[1], param_holder.mesh_def->num_cells[2], param_holder.mesh_def->min[0],
+                                param_holder.mesh_def->max[0], param_holder.mesh_def->min[1], param_holder.mesh_def->max[1], param_holder.mesh_def->min[2], param_holder.mesh_def->max[2]);
     }
 
     logger->print("Setting CGAL Wrapper");
-    auto deslagging_predicate = std::make_unique<DeslaggingPredicateType>(domain.comm(), param_holder.surface_meshfile, Geometry::CGALFileMode::fm_off);
-    deslagging_predicate->get_cgal_wrapper().set_expensive_intersection(param_holder.exact_deslagging);
-    deslagging_predicate->cheap_weight_calculation(param_holder.cheap_weights);
+    auto deslagging_predicate = std::make_unique<DeslaggingPredicateType>(domain.comm(), *param_holder.surface_meshfile, Geometry::CGALFileMode::fm_off);
+    deslagging_predicate->get_cgal_wrapper().set_expensive_intersection(*param_holder.exact_deslagging);
+    deslagging_predicate->cheap_weight_calculation(*param_holder.cheap_weights);
 
     domain.set_deslagging_predicate(std::move(deslagging_predicate));
     domain.keep_deslagging_predicate();
@@ -391,7 +261,7 @@ namespace Gendie
     for(Index i(0); i < domain.size_physical(); ++i)
     {
       Geometry::RootMeshNode<MeshType>& mesh_node = *domain.at(i)->get_mesh_node();
-      if(param_holder.use_base_mesh)
+      if(*param_holder.use_base_mesh)
         mesh_node.remove_all_mesh_parts();
       // create mesh-part from chart by using a hit-test factory
       std::vector<std::pair<String, std::unique_ptr<MeshPartType>>> bnd_inflows;
@@ -467,7 +337,7 @@ namespace Gendie
           // inflow
           loc_unit_asm_inflow.add_mesh_part(*mesh_part);
           // directly assembly onto the inflow filter
-          loc_unit_asm_inflow.assemble(filter_v_inflow, cur_dom.space_velo, inflow_boundaries.at(std::size_t(id)).get_diri_inflow_function(materials, param_holder.mesh_unit_scale));
+          loc_unit_asm_inflow.assemble(filter_v_inflow, cur_dom.space_velo, inflow_boundaries.at(std::size_t(id)).get_diri_inflow_function(materials, *param_holder.mesh_unit_scale));
         }
         else if((name != "bnd:n") && (!name.starts_with("bnd:out")) && ((name_lower.replace_all(String("outflow"), String("")) == 0u)))
         {
@@ -481,7 +351,7 @@ namespace Gendie
     // assemble fbm filter
     {
       auto& fbm_asm = *cur_dom.fbm_assembler;
-      system_level.assemble_fbm_filters(fbm_asm, cur_dom.space_velo, cur_dom.space_pres, assemble_mask, param_holder.assemble_q2_filter, false);
+      system_level.assemble_fbm_filters(fbm_asm, cur_dom.space_velo, cur_dom.space_pres, assemble_mask, *param_holder.assemble_q2_filter, false);
     }
 
     // compile system filter
@@ -491,7 +361,7 @@ namespace Gendie
   template<typename SystemLevel_, typename DomainLevel_, typename ScalarVector_, typename ParamHolder_>
   void write_vtk(const typename SystemLevel_::GlobalSystemVector& vec_sol, const typename SystemLevel_::GlobalSystemVector& vec_rhs, const DomainLevel_& domain, SystemLevel_& system_level, const ScalarVector_& vec_shearrate, const ScalarVector_& vec_viscosity, const ParamHolder_& param_holder, const Logger* logger)
   {
-    if(!param_holder.want_vtk)
+    if(!*param_holder.want_vtk)
     {
       logger->print("Vtk output not requested!", PrintLevel::warning);
       return;
@@ -501,7 +371,7 @@ namespace Gendie
     std::unique_ptr<MeshType> refined_mesh;
     // get the mesh for the VTK output
     const MeshType* mesh = &domain.front()->get_mesh();
-    if(param_holder.refine_vtk)
+    if(*param_holder.refine_vtk)
     {
       logger->print("Write out refined mesh", PrintLevel::info);
       Geometry::StandardRefinery<MeshType> refinery(domain.front()->get_mesh());
@@ -513,28 +383,28 @@ namespace Gendie
     Geometry::ExportVTK<MeshType> exporter(*mesh);
 
     // write velocity
-    exporter.add_vertex_vector("Velocity [m/s]", vec_sol.local().template at<0>(), param_holder.velo_scaling_factor);
-    if(param_holder.vtk_debug)
+    exporter.add_vertex_vector("Velocity [m/s]", vec_sol.local().template at<0>(), *param_holder.velo_scaling_factor);
+    if(*param_holder.vtk_debug)
     {
       auto vec_copyt = vec_sol.clone(LAFEM::CloneMode::Deep);
       vec_copyt.format(-1.5);
       system_level.filter_sys.filter_sol(vec_copyt);
       exporter.add_vertex_vector("Velocity testdebug", vec_copyt.local().template at<0>());
     }
-    if(param_holder.vtk_debug)
+    if(*param_holder.vtk_debug)
       exporter.add_vertex_vector("Debug: rhs_v", vec_rhs.local().template at<0>());
     if(vec_viscosity.local().size() == vec_sol.local().template at<0>().size())
     {
-      exporter.add_vertex_scalar("Viscosity [Pa s]", vec_viscosity.local(), param_holder.visc_scaling_factor);
+      exporter.add_vertex_scalar("Viscosity [Pa s]", vec_viscosity.local(), *param_holder.visc_scaling_factor);
       exporter.add_vertex_scalar("NormShearRate [1/s]", vec_shearrate.local());
     }
 
 
-    if(!param_holder.surface_meshfile.empty())
+    if(!param_holder.surface_meshfile->empty())
     {
       // parse off file
       //only first off file is parsed for now
-      const String& surface_mesh_file = param_holder.surface_meshfile;
+      const String& surface_mesh_file = *param_holder.surface_meshfile;
       logger->print(String("CGAL mesh file for vtk").pad_back(pad_len, pad_char) + ": " + surface_mesh_file);
       //get filestream
       LAFEM::DenseVector<SystemDataType, Index> vec_dist(vec_sol.local().template at<0>().size());
@@ -559,7 +429,7 @@ namespace Gendie
       //and now interpolate
       Assembly::Interpolator::project(vec_dist, dist_func, domain.front()->space_velo);
       // double metre_scaling_factor{1}; //for now hradcoded here...
-      exporter.add_vertex_scalar("Shell", vec_dist, param_holder.velo_scaling_factor);
+      exporter.add_vertex_scalar("Shell", vec_dist, *param_holder.velo_scaling_factor);
     }
     else
     {
@@ -580,19 +450,19 @@ namespace Gendie
     }
 
     // write pressure
-    exporter.add_cell_scalar("Pressure [bar]", vtx_p, param_holder.pres_scaling_factor);
-    if(param_holder.vtk_debug)
+    exporter.add_cell_scalar("Pressure [bar]", vtx_p, *param_holder.pres_scaling_factor);
+    if(*param_holder.vtk_debug)
       exporter.add_cell_scalar("Debug: rhs_p", vtx_q);
 
-    const bool use_q2_fbm = param_holder.assemble_q2_filter;
+    const bool use_q2_fbm = *param_holder.assemble_q2_filter;
 
     // write FBM masks if
     if(refined_mesh)
     {
-      if(param_holder.vtk_debug && use_q2_fbm)
+      if(*param_holder.vtk_debug && use_q2_fbm)
         exporter.add_vertex_scalar("Debug: fbm_mask_v", system_level.fbm_mask_velo.data());
 
-      if(param_holder.vtk_debug && use_q2_fbm)
+      if(*param_holder.vtk_debug && use_q2_fbm)
       {
         const auto& filter_vec_velo = system_level.get_local_velo_unit_filter_seq().find_or_add("fbm");
         LAFEM::DenseVectorBlocked<SystemDataType, SystemIndexType, dim> filter_vec(filter_vec_velo.size());
@@ -602,7 +472,7 @@ namespace Gendie
         exporter.add_vertex_vector("Debug: fbm_filter_v", filter_vec);
       }
 
-      if(param_holder.vtk_debug)
+      if(*param_holder.vtk_debug)
       {
         const auto& filter_vec_velo = system_level.get_local_velo_unit_filter_seq().find_or_add("noflow");
         LAFEM::DenseVectorBlocked<SystemDataType, SystemIndexType, dim> filter_vec(filter_vec_velo.size());
@@ -612,7 +482,7 @@ namespace Gendie
         exporter.add_vertex_vector("Debug: noflow_filter_v", filter_vec);
       }
 
-      if(param_holder.vtk_debug && (system_level.filter_interface_fbm.get_filter_vector().num_nzes() > 0))
+      if(*param_holder.vtk_debug && (system_level.filter_interface_fbm.get_filter_vector().num_nzes() > 0))
       {
         const auto& filter_vec_velo = system_level.filter_interface_fbm;
         LAFEM::DenseVectorBlocked<SystemDataType, SystemIndexType, dim> filter_vec(filter_vec_velo.size());
@@ -622,7 +492,7 @@ namespace Gendie
         exporter.add_vertex_vector("Debug: interface_filter_v", filter_vec);
       }
 
-      if(param_holder.vtk_debug)
+      if(*param_holder.vtk_debug)
       {
         const auto& filter_vec_velo = system_level.get_local_velo_unit_filter_seq().find_or_add("inflow");
         LAFEM::DenseVectorBlocked<SystemDataType, SystemIndexType, dim> filter_vec(filter_vec_velo.size());
@@ -639,12 +509,12 @@ namespace Gendie
       for(int i : mask_p)
         for(int k(0); k < nc; ++k)
           mask_p_ref.push_back(i);
-      if(param_holder.vtk_debug)
+      if(*param_holder.vtk_debug)
         exporter.add_cell_scalar("Debug: fbm_mask_p", mask_p_ref.data());
     }
     else
     {
-      if(param_holder.vtk_debug)
+      if(*param_holder.vtk_debug)
       {
         exporter.add_vertex_scalar("Debug: fbm_mask_v", domain.front()->fbm_assembler->get_fbm_mask_vector(0).data());
         exporter.add_cell_scalar("Debug: fbm_mask_p", domain.front()->fbm_assembler->get_fbm_mask_vector(dim).data());
@@ -652,7 +522,7 @@ namespace Gendie
     }
 
     // finally, write the VTK file
-    exporter.write(param_holder.vtk_name, domain.comm());
+    exporter.write(*param_holder.vtk_name, domain.comm());
 
   }
 
@@ -733,9 +603,18 @@ namespace Gendie
 
     logger.print("Parsing Parameters...", PrintLevel::info);
     logger.flush_print();
+
     // wrapper class for our parameters
-    ParameterHolder param_holder(config.get(), &logger);
-    logger.always_flush = param_holder.always_flush_print;
+    ParameterHolder param_holder;
+    if(!param_holder.parse(*config))
+    {
+      for(const String& s : param_holder.errors())
+      {
+        logger.print(s, error);
+      }
+    }
+    logger.print(param_holder.display(), print_level::info);
+    logger.always_flush = *param_holder.always_flush_print;
 
     /*----------------------------------------------------------------------------------------------*/
     /*------------------------- Domain and System Setup --------------------------------------------*/
@@ -756,7 +635,7 @@ namespace Gendie
     {
       create_voxel_domain(domain, args, config.get(), param_holder, &logger);
 
-      if(param_holder.measure_cgal_size)
+      if(*param_holder.measure_cgal_size)
       {
         std::size_t bytes_sum, bytes_min, bytes_max;
         bytes_sum = bytes_min = bytes_max = dynamic_cast<DeslaggingPredicateType&>(domain.get_deslagging_predicate()).get_cgal_wrapper().bytes();
@@ -766,25 +645,30 @@ namespace Gendie
         logger.print(format_submemory_mm_t_kb("CGAL Size", bytes_sum, bytes_min, bytes_max, pad_len), PrintLevel::info);
       }
 
+      logger.print(String("Reading materials and inflow boundaries"), info);
+      String material_info, inflow_info;
       if(const PropertyMap* problem_config = config->get_sub_section("problem_params"))
       {
-        parse_materials(materials, problem_config->get_sub_section("list_materials"));
-        parse_inflow_boundaries(inflow_boundaries, problem_config->get_sub_section("list_inflows"), materials, domain);
+        auto mat_parse = parse_materials(materials, problem_config->get_sub_section("list_materials"), material_info);
+        if(mat_parse != MaterialParserError::success)
+        {
+          logger.print(String("Material parsing went wrong with: ") + parse_error(mat_parse), error);
+          Runtime::abort();
+        }
+        auto inflow_parse = parse_inflow_boundaries(inflow_boundaries, problem_config->get_sub_section("list_inflows"), materials, domain, inflow_info);
+        if(inflow_parse != InflowParserError::success)
+        {
+          logger.print(String("Inflow parsing went wrong with") + parse_error(inflow_parse), error);
+          Runtime::abort();
+        }
       }
       else
       {
         logger.print("Could not query problem_params section", PrintLevel::error);
         Runtime::abort();
       }
-      //print material and inflow information
-      for(std::size_t i = 0; i < materials.size(); ++i)
-      {
-        logger.print(materials[i].format_string(int(i)), PrintLevel::info);
-      }
-      for(const auto& in : inflow_boundaries)
-      {
-        logger.print(in.format_string(), PrintLevel::info);
-      }
+      logger.print(material_info, PrintLevel::info);
+      logger.print(inflow_info, PrintLevel::info);
       logger.print("Create Boundaries", PrintLevel::info);
       // finally, create boundaries
       create_boundaries(domain, inflow_boundaries, param_holder, &logger);
@@ -818,17 +702,19 @@ namespace Gendie
       // at this point, our domain is compiled, so print chosen levels
       logger.print(String("Desired levels").pad_back(pad_len, pad_char) + ": " + domain.format_desired_levels(), PrintLevel::info);
       logger.print(String("Chosen levels").pad_back(pad_len, pad_char) + ": " + domain.format_chosen_levels(), PrintLevel::info);
-      //print our config
-      logger.print(param_holder.format_string(), PrintLevel::info);
+      // print config
+      logger.print(param_holder.display());
       //flush output
       logger.flush_print();
     }
 
     watch_create_domain.stop();
 
-    if(Gendie::check_for_config_option(config->query("postproc-params/mesh-hirarchy-vtk")))
+    // TODO fix this as well
+    // if(Gendie::check_for_config_option(config->query("postproc-params/mesh-hirarchy-vtk")))
+    if(param_holder.mesh_hierarchy_vtk)
     {
-      const String& mesh_hirarchy_vtk = config->query("postproc-params/mesh-hirarchy-vtk").first;
+      const String& mesh_hirarchy_vtk = *param_holder.mesh_hierarchy_vtk; // config->query("postproc-params/mesh-hirarchy-vtk").first;
       logger.print("Writing Mesh hirarchy output to '" + mesh_hirarchy_vtk + "_<LEVEL>.pvtu'", PrintLevel::info);
       //todo: write out refinement hirarchy with mesh parts
       for(std::size_t i = 0; i < std::size_t(domain.size_physical()); ++i)
@@ -898,12 +784,12 @@ namespace Gendie
     //next up, create our defect system level, which does not require any mesh hirarchy, but at least the B matrices assembled
     std::shared_ptr<SystemLevel<SystemDataType, SystemIndexType>> system_level(new SystemLevel<SystemDataType, SystemIndexType>());
     system_level->assemble_gates(domain.front());
-    system_level->assemble_grad_div_matrices(domain.front()->domain_asm, domain.front()->space_velo, domain.front()->space_pres, param_holder.cubature_b);
+    system_level->assemble_grad_div_matrices(domain.front()->domain_asm, domain.front()->space_velo, domain.front()->space_pres, *param_holder.cubature_b);
 
     // TODO: mass matrix really required?
     system_level->assemble_velo_struct(domain.front()->space_velo);
-    system_level->assemble_velocity_laplace_matrix(domain.front()->domain_asm, domain.front()->space_velo, materials.front().get_viscosity_model()->get_data()[0], true, param_holder.cubature_m);
-    system_level->assemble_velocity_mass_matrix(domain.front()->domain_asm, domain.front()->space_velo, param_holder.cubature_m);
+    system_level->assemble_velocity_laplace_matrix(domain.front()->domain_asm, domain.front()->space_velo, materials.front().get_viscosity_model()->get_data()[0], true, *param_holder.cubature_m);
+    system_level->assemble_velocity_mass_matrix(domain.front()->domain_asm, domain.front()->space_velo, *param_holder.cubature_m);
 
     //and compile the system matrix
     system_level->compile_system_matrix();
@@ -952,10 +838,21 @@ namespace Gendie
     logger.print("Create Solver", PrintLevel::info);
     // now we can construct our solver
     watch_create_solver.start();
-    SteadyFlowSolverFactory flow_solver_factory(domain, system_level, inflow_boundaries, materials, config->query_section("solver-params"), true, param_holder);
+    const PropertyMap* solver_config = config->query_section("solver-params");
+    XASSERTM(solver_config, "No solver config section");
+    Intern::SolverParser<SystemDataType> solver_parser;
+    if(!solver_parser.parse(*solver_config))
+    {
+      for(const auto& err: solver_parser.errors())
+      {
+        logger.print(err, error);
+      }
+      XABORTM("Could not parse solver section");
+    }
+    SteadyFlowSolverFactory flow_solver_factory(domain, system_level, inflow_boundaries, materials, solver_config, true, param_holder);
+    auto solver_type = flow_solver_factory.parse_solver_type(*solver_parser.nl_solver);
+    auto flow_solver = flow_solver_factory.create(solver_type, &logger);
     watch_create_solver.stop();
-    auto solver_type = flow_solver_factory.parse_solver_type(config->query("solver-params/nl-solver", String("alpine")));
-    decltype(flow_solver_factory.create(solver_type, &logger)) flow_solver;
 
     if(materials.front().get_viscosity_model()->get_type() != MaterialType::pseudo_power_law)
     {
@@ -1051,7 +948,7 @@ namespace Gendie
     FEAT::Global::Vector<FEAT::LAFEM::DenseVector<SystemDataType, SystemIndexType>, FEAT::LAFEM::VectorMirror<SystemDataType, SystemIndexType>> vec_shearrate{&system_level->gate_scalar_velo}, vec_viscosity{&system_level->gate_scalar_velo};
     // and now, postprocessing, todo: refactor velo analyzer
     watch_analyze_sol.start();
-    if(param_holder.want_vtk)
+    if(*param_holder.want_vtk)
     {
       vec_shearrate.local() = FEAT::LAFEM::DenseVector<SystemDataType, SystemIndexType>(domain.front()->space_velo.get_num_dofs());
       vec_shearrate.format();
@@ -1059,9 +956,9 @@ namespace Gendie
         SystemLevel<SystemDataType, SystemIndexType>::GlobalVeloVector sol_velo(&system_level->gate_velo, vec_sol.local().first().clone(FEAT::LAFEM::CloneMode::Shallow));
         auto mass_vec = system_level->velo_mass_matrix.lump_rows(true);
         mass_vec.local().component_invert(mass_vec.local());
-        Gendie::assemble_shear_vector(domain.front()->domain_asm, vec_shearrate.local(), sol_velo, mass_vec.local(), domain.front()->space_velo, param_holder.cubature_postproc);
+        Gendie::assemble_shear_vector(domain.front()->domain_asm, vec_shearrate.local(), sol_velo, mass_vec.local(), domain.front()->space_velo, *param_holder.cubature_postproc);
       }
-      auto visco_func = materials.front().get_visc_func(param_holder.mesh_unit_scale);
+      auto visco_func = materials.front().get_visc_func(*param_holder.mesh_unit_scale);
       vec_viscosity.local() = FEAT::LAFEM::DenseVector<SystemDataType, SystemIndexType>(domain.front()->space_velo.get_num_dofs());
       vec_viscosity.format();
 
@@ -1085,7 +982,7 @@ namespace Gendie
     watch_analyze_sol.stop();
 
     watch_write_out.start();
-    if(param_holder.want_vtk)
+    if(*param_holder.want_vtk)
       write_vtk(vec_sol, vec_rhs, domain, *system_level, vec_shearrate, vec_viscosity, param_holder, &logger);
     watch_write_out.stop();
 

@@ -6,6 +6,7 @@
 
 #include <kernel/solver/base.hpp>
 #include <kernel/solver/iterative.hpp>
+#include <kernel/util/arg_parser.hpp>
 #include <kernel/util/property_map.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/util/stop_watch.hpp>
@@ -14,7 +15,7 @@
 #include "logger.hpp"
 #include "format_helper.hpp"
 #include "template_helper.hpp"
-#include "parsing_helper.hpp"
+#include "steady_stokes_solver.hpp"
 
 #include <memory>
 
@@ -223,30 +224,19 @@ namespace Gendie
     /// \copydoc cast()
     const Derived_& cast() const {return static_cast<const Derived_&>(*this);}
 
-    bool _parse(const FEAT::PropertyMap* prop)
+    bool _parse(const Intern::SolverParser<DefectDataType>& parser)
     {
-      bool success = true;
-      {
-        if(prop == nullptr)
-        {
-          if(_logger)
-            _logger->print("Propertymap is null!", PrintLevel::error);
-          return false;
-        }
-
-        success &= prop->parse_entry("min-nl-iter", _min_nonlin_iter);
-        success &= prop->parse_entry("max-nl-iter", _max_nonlin_iter);
-        success &= prop->parse_entry("nl-tol-abs", _tol_abs);
-        success &= prop->parse_entry("nl-tol-rel", _tol_rel);
-        success &= prop->parse_entry("nl-tol-low-abs", _tol_low_abs);
-        success &= prop->parse_entry("nl-stagrate", _stag_rate);
-        success &= prop->parse_entry("fixed-ls-tol", _fixed_ls_tol);
-        success &= prop->parse_entry("max-stagnations", _max_stagnations);
-        _solve_stokes = Gendie::check_for_config_option(prop->query("init-with-stokes"));
-        _recalc_interface_scaling = Gendie::check_for_config_option(prop->query("reinit-fbm-interface-filter"));
-      }
-
-      return success;
+      _min_nonlin_iter = *parser.min_nl_iter;
+      _max_nonlin_iter = *parser.max_nl_iter;
+      _tol_abs = *parser.nl_tol_abs;
+      _tol_rel = *parser.nl_tol_rel;
+      _tol_low_abs = *parser.nl_tol_low_abs;
+      _stag_rate = *parser.nl_stagrate;
+      _fixed_ls_tol = *parser.fixed_ls_tol;
+      _max_stagnations = *parser.max_stagnations;
+      _solve_stokes = *parser.init_with_stokes;
+      _recalc_interface_scaling = *parser.reinit_fbm_interface_filter;
+      return true;
     }
 
     FEAT::String _format_string() const
@@ -775,7 +765,16 @@ namespace Gendie
 
     virtual bool parse(const FEAT::PropertyMap* prop) override final
     {
-      return this->cast()._parse(prop);
+      if(prop == nullptr)
+      {
+        if(_logger)
+          _logger->print("Propertymap is null!", error);
+        return false;
+      }
+      Intern::SolverParser<DefectDataType> parser;
+      if(!parser.parse(*prop))
+        return false;
+      return this->cast()._parse(parser);
     }
 
     virtual FEAT::String format_string() const override final
@@ -915,14 +914,10 @@ namespace Gendie
 
   protected:
 
-    bool _parse(const FEAT::PropertyMap* prop)
+    bool _parse(const Intern::SolverParser<DefectDataType>& parser)
     {
-      bool success = BaseClass::_parse(prop);
-      if(!prop)
-        return success;
-      success &= prop->parse_entry("min-picard-steps", min_picard_steps);
-      // {
-      // }
+      bool success = BaseClass::_parse(parser);
+      min_picard_steps = *parser.min_picard_steps;
       return success;
     }
 
@@ -1094,17 +1089,17 @@ namespace Gendie
 
   protected:
 
-    bool _parse(const FEAT::PropertyMap* prop)
+    bool _parse(const Intern::SolverParser<DefectDataType>& parser)
     {
-      bool success = BaseClass::_parse(prop);
+      bool success = BaseClass::_parse(parser);
 
-      adp_step_size = Gendie::check_for_config_option(prop->query("adaptive-step-size"), true);
-      success &= prop->parse_entry("pseudo-ts-size", time_step_size);
-      success &= prop->parse_entry("adapt-factor", adaptive_factor);
-      success &= prop->parse_entry("stability-tol", stable_rel_tolerance);
-      success &= prop->parse_entry("stability-sample-size", sample_size);
-      success &= prop->parse_entry("max-stagnations", max_stagnations);
-      success &= prop->parse_entry("stagnation-increase", stag_increase);
+      adp_step_size = *parser.adaptive_step_size;
+      time_step_size = *parser.pseudo_ts_size;
+      adaptive_factor = *parser.adapt_factor;
+      stable_rel_tolerance = *parser.stability_tol;
+      sample_size = *parser.stability_sample_size;
+      max_stagnations = *parser.max_stagnations;
+      stag_increase = *parser.stagnation_increase;
 
       return success;
     }
@@ -1333,14 +1328,10 @@ namespace Gendie
 
   protected:
 
-    bool _parse(const FEAT::PropertyMap* prop)
+    bool _parse(const Intern::SolverParser<DefectDataType>& parser)
     {
-      bool success = BaseClass::_parse(prop);
-      if(!prop)
-        return success;
-      success &= prop->parse_entry("min-picard-steps", min_picard_steps);
-      // {
-      // }
+      bool success = BaseClass::_parse(parser);
+      min_picard_steps = *parser.min_picard_steps;
       return success;
     }
 

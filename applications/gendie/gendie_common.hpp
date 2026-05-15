@@ -7,7 +7,7 @@
 #include <kernel/backend.hpp>
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/string.hpp>
-#include <kernel/util/simple_arg_parser.hpp>
+#include <kernel/util/arg_parser.hpp>
 #include <kernel/util/time_stamp.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/util/stop_watch.hpp>
@@ -34,6 +34,7 @@
 #include <kernel/assembly/stokes_fbm_assembler.hpp>
 
 #include <control/domain/parti_domain_control.hpp>
+#include <control/domain/domain_helper.hpp>
 #include <control/stokes_blocked.hpp>
 #include <control/checkpoint_control.hpp>
 #include <control/statistics.hpp>
@@ -233,13 +234,13 @@ namespace Gendie
       typedef SystemLevelBase<SolverDataType_, typename SystemLevel_::IndexType> SolverLevel;
       const String cubature_transfer(_cubature_transfer);
       // parse this from config
-      const String& cubature_matrix_a = _param_holder.cubature_a;
-      const String& cubature_matrix_m = _param_holder.cubature_m;
-      const String& cubature_matrix_b = _param_holder.cubature_b;
-      bool use_q2_fbm = _param_holder.assemble_q2_filter;
+      const String& cubature_matrix_a = *_param_holder.cubature_a;
+      const String& cubature_matrix_m = *_param_holder.cubature_m;
+      const String& cubature_matrix_b = *_param_holder.cubature_b;
+      bool use_q2_fbm = *_param_holder.assemble_q2_filter;
       bool use_coarse_fbm = true;
       std::size_t min_q2_fbm_level = ~std::size_t(0);
-      BaseDataType mesh_unit_scale = _param_holder.mesh_unit_scale;
+      BaseDataType mesh_unit_scale = *_param_holder.mesh_unit_scale;
 
       //clear levels
       this->_clear_levels();
@@ -536,8 +537,8 @@ namespace Gendie
        _config(config),
        _system_assembled(system_assembled)
       {
-        const String& cubature_matrix_a = param_holder.cubature_a;
-        SystemDataType mesh_unit_scale = param_holder.mesh_unit_scale;
+        const String& cubature_matrix_a = *param_holder.cubature_a;
+        SystemDataType mesh_unit_scale = *param_holder.mesh_unit_scale;
         _defect_asm = std::make_shared<CarreauSingleMatDefectFlowAssembler<Domain_, SystemLevel_>>(_domain, _system_level, _config, _materials.front(), _inflow_bounds.front().get_temperature(), mesh_unit_scale);
         _defect_asm->set_cubature(cubature_matrix_a);
         _system_asm = std::make_shared<CarreauSingleMatSystemFlowAssembler<Domain_>>(_domain, _config, _materials.front(), _inflow_bounds.front().get_temperature(), mesh_unit_scale);

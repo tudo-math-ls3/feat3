@@ -7,6 +7,7 @@
 
 #include <kernel/runtime.hpp>
 #include <kernel/analytic/lambda_function.hpp>
+#include <kernel/util/arg_parser.hpp>
 #include <kernel/util/string.hpp>
 #include <kernel/util/property_map.hpp>
 #include <kernel/util/tiny_algebra.hpp>
@@ -101,66 +102,146 @@ namespace Gendie
       return point - orth_dist * normal;
     }
 
-    bool parse_inflow_option(const std::pair<String, bool>& option, InflowType& in_type)
+    bool try_parse_inflow_option(const String& option, InflowType& in_type)
     {
-      if((!option.second) || option.first.empty() || (option.first.compare_no_case("best") == 0) || (option.first.compare_no_case("default") == 0))
+      if(option.empty() || (option.compare_no_case("best") == 0) || (option.compare_no_case("default") == 0))
       {
         in_type = InflowType::best;
         return true;
       }
-      if((option.first.compare_no_case("constant") == 0))
+      if((option.compare_no_case("constant") == 0))
       {
         in_type = InflowType::constant;
         return true;
       }
-      else if (option.first.compare_no_case("parabolic") == 0)
+      else if (option.compare_no_case("parabolic") == 0)
       {
        in_type = InflowType::parabolic;
        return true;
       }
-      else if(option.first.compare_no_case("curved_flat") == 0)
+      else if(option.compare_no_case("curved_flat") == 0)
       {
         in_type = InflowType::curved_flat;
         return true;
       }
-      XABORTM("No known inflow type");
       return false;
     }
 
-    bool parse_inflow_geometry(const std::pair<String, bool>& option, InflowGeometry& in_type)
+    bool try_parse_inflow_geometry(const String& option, InflowGeometry& in_type)
     {
-      if(!option.second)
-        return false;
-      if(option.first.empty())
-        XABORTM("No inflow geometry given");
-      if(option.first.compare_no_case("circle") == 0)
+      if(option.compare_no_case("circle") == 0)
       {
         in_type = InflowGeometry::circle;
         return true;
       }
-      else if (option.first.compare_no_case("ellipse") == 0)
+      else if (option.compare_no_case("ellipse") == 0)
       {
        in_type = InflowGeometry::ellipse;
        return true;
       }
-      else if (option.first.compare_no_case("ring") == 0)
+      else if (option.compare_no_case("ring") == 0)
       {
        in_type = InflowGeometry::ring;
        return true;
       }
-      else if (option.first.compare_no_case("rectangle") == 0)
+      else if (option.compare_no_case("rectangle") == 0)
       {
        in_type = InflowGeometry::rectangle;
        return true;
       }
-      else if (option.first.compare_no_case("curved_rectangle") == 0)
+      else if (option.compare_no_case("curved_rectangle") == 0)
       {
        in_type = InflowGeometry::curved_rectangle;
        return true;
       }
-      XABORTM("No known inflow type" + option.first);
       return false;
     }
+
+    static bool is_inflow_profile(const String& s)
+    {
+      InflowType type = InflowType::best;
+      return try_parse_inflow_option(s, type);
+    }
+
+    static bool is_inflow_geometry(const String& s)
+    {
+      InflowGeometry type = InflowGeometry::unkown;
+      return try_parse_inflow_geometry(s, type);
+    }
+
+    static bool is_circle(const String& s)
+    {
+      return s.compare_no_case("circle") == 0;
+    }
+
+    static bool is_rectangle(const String& s)
+    {
+      return s.compare_no_case("rectangle") == 0 || s.compare_no_case("curved_rectangle") == 0;
+    }
+
+    static bool is_ring(const String& s)
+    {
+      return s.compare_no_case("ring") == 0;
+    }
+
+    static bool is_ellipse(const String& s)
+    {
+      return s.compare_no_case("ellipse") == 0;
+    }
+
+    template<typename DT_>
+    struct InflowGeometryParser : public ArgParser
+    {
+      Parameter<DT_> throughput = parameter(DT_(0.0)).required().property("throughput");
+      Parameter<DT_> temperature = parameter(DT_(300.0)).property("temperature");
+      Parameter<Index> material_id = parameter(Index(0)).required().property("material_id");
+      Parameter<String> inflow_profile = parameter(String("BEST"))
+                                              .property("inflow_params/profile")
+                                              .name("Inflow profile type")
+                                              .help_string("Valid options are: BEST, DEFAULT, CONSTANT, PARABOLIC, CURVED_FLAT")
+                                              .validator(is_inflow_profile);
+      Parameter<String> center = parameter(String("")).property("inflow_params/center").required();
+      // Parameter<String> face_normal = parameter(String("")).property("inflow_params/face_normal");
+      Parameter<String> flow_normal = parameter(String("")).property("inflow_params/flow_normal").required();
+      Parameter<bool> projection_warning = parameter(false).property("inflow_params/projection_warning");
+      Parameter<DT_> radius = parameter(DT_(0.0)).property("inflow_params/radius");
+      Parameter<String> midpoint_a = parameter(String("")).property("inflow_params/midpoint_a");
+      Parameter<String> midpoint_b = parameter(String("")).property("inflow_params/midpoint_b");
+      Parameter<DT_> outer_radius = parameter(DT_(0.0)).property("inflow_params/outer_radius");
+      Parameter<DT_> inner_radius = parameter(DT_(0.0)).property("inflow_params/inner_radius");
+      Parameter<DT_> radius_major = parameter(DT_(0.0)).property("inflow_params/radius_major");
+      Parameter<DT_> radius_minor = parameter(DT_(0.0)).property("inflow_params/radius_minor");
+      Parameter<String> inflow_type = parameter(String(""))
+                                              .property("inflow_params/type")
+                                              .required()
+                                              .name("Inflow geometry type")
+                                              .help_string("Valid options are: CIRCLE, ELLIPSE, RING, RECTANGLE, CURVED_RECTANGLE")
+                                              .validator(is_inflow_geometry)
+                                              .needs_if(radius, is_circle)
+                                              .needs_if(midpoint_a, is_rectangle)
+                                              .needs_if(midpoint_b, is_rectangle)
+                                              .needs_if(outer_radius, is_ring)
+                                              .needs_if(inner_radius, is_ring)
+                                              .needs_if(radius_major, is_ellipse)
+                                              .needs_if(radius_minor, is_ellipse);
+      // Parameter<String> test_point = parameter(String("")).property("inflow_params/test_point");
+
+      InflowGeometry geometry_type() const
+      {
+        InflowGeometry tmp = InflowGeometry::unkown;
+        const bool success = try_parse_inflow_geometry(*inflow_type, tmp);
+        XASSERTM(success, "Could not parse inflow geometry");
+        return tmp;
+      }
+
+      InflowType profile_type() const
+      {
+        InflowType tmp = InflowType::best;
+        const bool success = try_parse_inflow_option(*inflow_profile, tmp);
+        XASSERTM(success, "Could not parse inflow profile");
+        return tmp;
+      }
+    };
   } // namespace Intern
 
   template<typename MeshType_, typename DT_>
@@ -221,27 +302,14 @@ namespace Gendie
     }
   public:
 
-    InflowGeometryHandler(const FEAT::PropertyMap* prop, const VecType& bb_min, const VecType& bb_max, int id, InflowType inflow_type_ = InflowType::best, InflowGeometry in_geo = InflowGeometry::unkown) : inflow_geometry(in_geo), inflow_type(inflow_type_), flow_id(id), projection_warning(false)
+    InflowGeometryHandler(const Intern::InflowGeometryParser<DataType>& parser, const VecType& bb_min,
+                          const VecType& bb_max, int id, InflowType inflow_type_ = InflowType::best,
+                          InflowGeometry in_geo = InflowGeometry::unkown)
+    : inflow_geometry(in_geo), inflow_type(inflow_type_), flow_id(id), projection_warning(*parser.projection_warning)
     {
-      {
-        auto [val, success] = prop->query("center");
-        XASSERTM(success, "Could not parse center: ");
-        center = _parse_vector(val);
-      }
-      // { //note face_normal can be safely ignored
-      //   auto [val, success] = prop->query("face_normal");
-      //   XASSERTM(success, "Could not parse face normal");
-      //   face_normal = _parse_vector(val);
-      // }
-      {
-        auto [val, success] = prop->query("flow_normal");
-        XASSERTM(success, "Could not parse flow normal");
-        flow_normal = _parse_vector(val);
-        flow_normal.normalize();
-      }
-      {
-        projection_warning = Gendie::check_for_config_option(prop->query("projection_warning"), false);
-      }
+      center = _parse_vector(*parser.center);
+      flow_normal = _parse_vector(*parser.flow_normal);
+      flow_normal.normalize();
       {
         // by which factor we shift our center into normal direction
         DataType linear_factor = Math::Limits<DataType>::max();
@@ -251,7 +319,6 @@ namespace Gendie
           const VecType& lot_p = vecs[0];
           const VecType& span1 = vecs[1];
           const VecType& span2 = vecs[2];
-          //first of all, check if normal is linear independent to plane by calculating the cross product
           {
             VecType orto;
             Tiny::cross(orto, span1, span2);
@@ -259,7 +326,6 @@ namespace Gendie
             if(Math::abs(Tiny::dot(orto, flow_normal)) <= Math::pow(Math::eps<DataType>(), DataType(0.8)))
               continue;
           }
-          // now construct our linear system to be solved
           Tiny::Matrix<DataType, 3, 3> A{{-flow_normal[0], span1[0], span2[0]},
                                          {-flow_normal[1], span1[1], span2[1]},
                                          {-flow_normal[2], span1[2], span2[2]}};
@@ -267,18 +333,12 @@ namespace Gendie
           Tiny::Matrix<DataType, 3, 3> A_inv;
           A_inv.set_inverse(A);
           VecType sol = A_inv * rhs;
-
-          // first entry is our new factor for projection, if it is absolutly smaller
           linear_factor = Math::abs(sol[0]) < Math::abs(linear_factor) ? sol[0] : linear_factor;
-
         }
-        // print warning if the linear_factor is larger than 1%
         if(this->projection_warning && Math::abs(linear_factor) >= DataType(0.01))
           std::printf("WARNING: Projection factor %f larger than 0.01\n", double(linear_factor));
-        // and now project
         center = center + linear_factor * flow_normal;
       }
-      // precalculate the distance of the 'aufpunkt'
       d_plane = Tiny::dot(center, flow_normal);
     }
 
@@ -288,33 +348,6 @@ namespace Gendie
 
     virtual DirichletBoundaryFunc get_dirichlet_boundary_function(DataType throughput, const Material<DataType>& mat, const DataType) const = 0;
 
-    virtual String format_string(std::size_t padlen = std::size_t(30), const char pc = '.') const
-    {
-      String s;
-      s += String("Inflow Geometry").pad_back(padlen, pc) + ": " + stringify(inflow_geometry) + "\n";
-      s += String("Inflow Type").pad_back(padlen, pc) + ": " + stringify(inflow_type) + "\n";
-      if constexpr(dim==3)
-      {
-        s += String("Inflow center").pad_back(padlen, pc) + ": [" + stringify_fp_fix(center[0], prec, width)
-                      + ", " + stringify_fp_fix(center[1], prec, width) + ", " + stringify_fp_fix(center[2], prec, width) + "]\n";
-        s += String("Inflow normal").pad_back(padlen, pc) + ": [" + stringify_fp_fix(flow_normal[0], prec, width)
-                      + ", " + stringify_fp_fix(flow_normal[1], prec, width) + ", " + stringify_fp_fix(flow_normal[2], prec, width) + "]\n";
-        // s += String("Inflow bounds").pad_back(padlen, pc) + ": [" + stringify_fp_fix(bounds[0], prec, width)
-        //               + ", " + stringify_fp_fix(bounds[1], prec, width) + ", " + stringify_fp_fix(bounds[2], prec, width) + "]\n";
-      }
-      else
-      {
-        s += String("Inflow center").pad_back(padlen, pc) + ": [" + stringify_fp_fix(center[0], prec, width)
-                      + ", " + stringify_fp_fix(center[1], prec, width) + "]\n";
-        s += String("Inflow normal").pad_back(padlen, pc) + ": [" + stringify_fp_fix(flow_normal[0], prec, width)
-                      + ", " + stringify_fp_fix(flow_normal[1], prec, width) + "]\n";
-        // s += String("Inflow bounds").pad_back(padlen, pc) + ": [" + stringify_fp_fix(bounds[0], prec, width)
-        //               + ", " + stringify_fp_fix(bounds[1], prec, width) + "]\n";
-      }
-      s += String("Inflow plane distance").pad_back(padlen, pc) + ": " + stringify_fp_fix(d_plane, prec, width);
-
-      return s;
-    }
   }; // class InflowGeometryHandler
 
   template<typename MeshType_, typename DT_ = typename MeshType_::DataType>
@@ -329,7 +362,7 @@ namespace Gendie
     typedef typename BaseClass::DirichletBoundaryFunc DirichletBoundaryFunc;
     static constexpr int dim = BaseClass::dim;
     virtual ~UnknownGeo(){}
-    explicit UnknownGeo(const FEAT::PropertyMap* prop, const VecType& bb_min, const VecType& bb_max, int id) : BaseClass(prop, bb_min, bb_max, id) {}
+    explicit UnknownGeo(const Intern::InflowGeometryParser<DataType>& parser, const VecType& bb_min, const VecType& bb_max, int id) : BaseClass(parser, bb_min, bb_max, id) {}
     auto get_hit_test_function(DT_) const
     {
       return [](const VecType&){return false;};
@@ -351,10 +384,6 @@ namespace Gendie
       return DirichletBoundaryFunc([](auto a){return decltype(a)::null();});
     }
 
-    virtual String format_string(std::size_t , const char) const override
-    {
-      return String("Unknown\n");
-    }
   }; // class UnknownGeo
 
   template<typename MeshType_, typename DT_ = typename MeshType_::DataType>
@@ -373,13 +402,11 @@ namespace Gendie
 
     virtual ~Circle(){}
 
-    explicit Circle(const FEAT::PropertyMap* prop, const VecType& bb_min, const VecType& bb_max, int id, InflowType in_type = InflowType::curved_flat, DataType rel = DataType(0.8))
-    : BaseClass(prop, bb_min, bb_max, id, in_type, InflowGeometry::circle),
-      radius(DataType(0)),
-      inner_radius(DataType(0))
+    explicit Circle(const Intern::InflowGeometryParser<DataType>& parser, const VecType& bb_min, const VecType& bb_max, int id, InflowType in_type = InflowType::curved_flat, DataType rel = DataType(0.8))
+    : BaseClass(parser, bb_min, bb_max, id, in_type, InflowGeometry::circle),
+      radius(*parser.radius),
+      inner_radius(radius * rel)
     {
-      PARSE_PROP_OPTION(prop, "radius", radius, false);
-      inner_radius = radius * rel;
     }
 
     auto get_hit_test_function(DataType tolerance = DataType(1E-6)) const
@@ -453,13 +480,6 @@ namespace Gendie
       }
     }
 
-    virtual String format_string(std::size_t padlen = std::size_t(30), const char pc = '.') const override
-    {
-      String s = BaseClass::format_string(padlen, pc) + "\n";
-      s += String("Inflow Radius").pad_back(padlen, pc) + ": " + stringify_fp_fix(radius, this->prec, this->width) + "\n";
-      s += String("Inflow Inner-Radius").pad_back(padlen, pc) + ": " + stringify_fp_fix(inner_radius, this->prec, this->width);
-      return s;
-    }
   }; // class Circle
 
   template<typename MeshType_, typename DT_ = typename MeshType_::DataType>
@@ -479,23 +499,15 @@ namespace Gendie
 
     virtual ~Rectangle(){}
 
-    explicit Rectangle(const FEAT::PropertyMap* prop, const VecType& bb_min, const VecType& bb_max, int id, InflowType in_type = InflowType::parabolic)
-    : BaseClass(prop, bb_min, bb_max, id, in_type, InflowGeometry::rectangle),
+    explicit Rectangle(const Intern::InflowGeometryParser<DataType>& parser, const VecType& bb_min, const VecType& bb_max, int id, InflowType in_type = InflowType::parabolic)
+    : BaseClass(parser, bb_min, bb_max, id, in_type, InflowGeometry::rectangle),
       a(),
       b()
     {
-      {
-        auto [val, success] = prop->query("midpoint_a"); //placeholder for boundary name
-        XASSERTM(success, "Could not parse midpoint_a: ");
-        a = this->_parse_vector(val);
-        a = Intern::project_vector(a, this->flow_normal, this->d_plane);
-      }
-      {
-        auto [val, success] = prop->query("midpoint_b"); //placeholder for boundary name
-        XASSERTM(success, "Could not parse midpoint_b: ");
-        b = this->_parse_vector(val);
-        b = Intern::project_vector(b, this->flow_normal, this->d_plane);
-      }
+      a = this->_parse_vector(*parser.midpoint_a);
+      a = Intern::project_vector(a, this->flow_normal, this->d_plane);
+      b = this->_parse_vector(*parser.midpoint_b);
+      b = Intern::project_vector(b, this->flow_normal, this->d_plane);
     }
 
     auto get_hit_test_function(DataType tolerance = DataType(1E-6)) const
@@ -559,13 +571,6 @@ namespace Gendie
       }
     }
 
-    virtual String format_string(std::size_t padlen = std::size_t(30), const char pc = '.') const override
-    {
-      String s = BaseClass::format_string(padlen, pc) + "\n";
-      s += String("Inflow Midpoint A").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->a, this->prec, this->width) + "\n";
-      s += String("Inflow Midpoint B").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->b, this->prec, this->width) + "\n";
-      return s;
-    }
   }; // class Rectangle
 
   template<typename MeshType_, typename DT_ = typename MeshType_::DataType>
@@ -584,8 +589,8 @@ namespace Gendie
 
     virtual ~CurvedRectangle(){}
 
-    explicit CurvedRectangle(const FEAT::PropertyMap* prop, const VecType& bb_min, const VecType& bb_max, int id, InflowType in_type = InflowType::parabolic)
-    : BaseClass(prop, bb_min, bb_max, id, in_type),
+    explicit CurvedRectangle(const Intern::InflowGeometryParser<DataType>& parser, const VecType& bb_min, const VecType& bb_max, int id, InflowType in_type = InflowType::parabolic)
+    : BaseClass(parser, bb_min, bb_max, id, in_type),
      radius((this->b - this->center).norm_euclid())
     {
       this->inflow_geometry = InflowGeometry::curved_rectangle;
@@ -655,12 +660,6 @@ namespace Gendie
       }
     }
 
-    virtual String format_string(std::size_t padlen = std::size_t(30), const char pc = '.') const override
-    {
-      String s = BaseClass::format_string(padlen, pc) + "\n";
-      s += String("Inflow Radius").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->radius, this->prec, this->width) + "\n";
-      return s;
-    }
   }; // class CurvedRectangle
 
   template<typename MeshType_, typename DT_ = typename MeshType_::DataType>
@@ -679,13 +678,11 @@ namespace Gendie
 
     virtual ~Ellipse(){}
 
-    explicit Ellipse(const FEAT::PropertyMap* prop, const VecType& bb_min, const VecType& bb_max, int id, InflowType in_type = InflowType::parabolic)
-    : BaseClass(prop, bb_min, bb_max, id, in_type, InflowGeometry::rectangle),
-      radius_major(DataType(0)),
-      radius_minor(DataType(0))
+    explicit Ellipse(const Intern::InflowGeometryParser<DataType>& parser, const VecType& bb_min, const VecType& bb_max, int id, InflowType in_type = InflowType::parabolic)
+    : BaseClass(parser, bb_min, bb_max, id, in_type, InflowGeometry::ellipse),
+      radius_major(*parser.radius_major),
+      radius_minor(*parser.radius_minor)
     {
-      PARSE_PROP_OPTION(prop, "radius_major", radius_major, false);
-      PARSE_PROP_OPTION(prop, "radius_minor", radius_minor, false);
     }
 
     auto get_hit_test_function(DataType tolerance = DataType(1E-6)) const
@@ -741,13 +738,6 @@ namespace Gendie
       }
     }
 
-    virtual String format_string(std::size_t padlen = std::size_t(30), const char pc = '.') const override
-    {
-      String s = BaseClass::format_string(padlen, pc) + "\n";
-      s += String("Inflow Radius Major").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->radius_major, this->prec, this->width) + "\n";
-      s += String("Inflow Radius Minor").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->radius_minor, this->prec, this->width) + "\n";
-      return s;
-    }
   }; // class Ellipse
 
   template<typename MeshType_, typename DT_ = typename MeshType_::DataType>
@@ -768,13 +758,11 @@ namespace Gendie
 
     virtual ~Ring(){}
 
-    explicit Ring(const FEAT::PropertyMap* prop, const VecType& bb_min, const VecType& bb_max, int id, InflowType in_type = InflowType::parabolic)
-    : BaseClass(prop, bb_min, bb_max, id, in_type, InflowGeometry::ring),
-      radius_outer(DataType(0)),
-      radius_inner(DataType(0))
+    explicit Ring(const Intern::InflowGeometryParser<DataType>& parser, const VecType& bb_min, const VecType& bb_max, int id, InflowType in_type = InflowType::parabolic)
+    : BaseClass(parser, bb_min, bb_max, id, in_type, InflowGeometry::ring),
+      radius_outer(*parser.outer_radius),
+      radius_inner(*parser.inner_radius)
     {
-      PARSE_PROP_OPTION(prop, "outer_radius", radius_outer, false);
-      PARSE_PROP_OPTION(prop, "inner_radius", radius_inner, false);
       XASSERTM(this->radius_outer > this->radius_inner, "Outer radius must be larger than inner one");
     }
 
@@ -828,43 +816,33 @@ namespace Gendie
       }
     }
 
-    virtual String format_string(std::size_t padlen = std::size_t(30), const char pc = '.') const override
-    {
-      String s = BaseClass::format_string(padlen, pc) + "\n";
-      s += String("Inflow Outer Radius").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->radius_outer, this->prec, this->width) + "\n";
-      s += String("Inflow Inner Radius").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->radius_inner, this->prec, this->width) + "\n";
-      return s;
-    }
   }; // class Rectangle
 
   template<typename MeshType_, typename DT_ = typename MeshType_::DataType>
-  std::unique_ptr<InflowGeometryHandler<MeshType_, DT_>> create_geo_handler(const PropertyMap* prop, const Tiny::Vector<DT_, 3>& bb_min, const Tiny::Vector<DT_, 3>& bb_max, int id, InflowType in_type)
+  std::unique_ptr<InflowGeometryHandler<MeshType_, DT_>> create_geo_handler(const Intern::InflowGeometryParser<DT_>& parser, const Tiny::Vector<DT_, 3>& bb_min, const Tiny::Vector<DT_, 3>& bb_max, int id, InflowType in_type)
   {
-    InflowGeometry inflow_type = InflowGeometry::unkown;
-    if(!Intern::parse_inflow_geometry(prop->get_entry("type"), inflow_type))
-      XABORTM("Something went wrong while parsing inflow_type");
-    switch(inflow_type)
+    switch(parser.geometry_type())
     {
       case Gendie::InflowGeometry::circle:
       {
-        return std::make_unique<Circle<MeshType_, DT_>>(prop, bb_min, bb_max, id, in_type);
+        return std::make_unique<Circle<MeshType_, DT_>>(parser, bb_min, bb_max, id, in_type);
       }
       case Gendie::InflowGeometry::rectangle:
       {
-        return std::make_unique<Rectangle<MeshType_, DT_>>(prop, bb_min, bb_max, id, in_type);
+        return std::make_unique<Rectangle<MeshType_, DT_>>(parser, bb_min, bb_max, id, in_type);
       }
       case Gendie::InflowGeometry::curved_rectangle:
       {
-        return std::make_unique<CurvedRectangle<MeshType_, DT_>>(prop, bb_min, bb_max, id, in_type);
+        return std::make_unique<CurvedRectangle<MeshType_, DT_>>(parser, bb_min, bb_max, id, in_type);
       }
       case Gendie::InflowGeometry::ring:
       {
-        return std::make_unique<Ring<MeshType_, DT_>>(prop, bb_min, bb_max, id, in_type);
+        return std::make_unique<Ring<MeshType_, DT_>>(parser, bb_min, bb_max, id, in_type);
       }
       case Gendie::InflowGeometry::ellipse:
       {
         XABORTM("ERROR: Ellipse definition not complete!");
-        return std::make_unique<Ellipse<MeshType_, DT_>>(prop, bb_min, bb_max, id, in_type);
+        return std::make_unique<Ellipse<MeshType_, DT_>>(parser, bb_min, bb_max, id, in_type);
       }
       case Gendie::InflowGeometry::unkown:
       {
@@ -873,11 +851,11 @@ namespace Gendie
       }
       default:
       {
-        XABORTM("Not Implemented " + stringify(inflow_type) + " yet");
+        XABORTM("Not Implemented " + stringify(parser.geometry_type()) + " yet");
         break;
       }
     }
-    return std::make_unique<UnknownGeo<MeshType_, DT_>>(prop, bb_min, bb_max, id);
+    return std::make_unique<UnknownGeo<MeshType_, DT_>>(parser, bb_min, bb_max, id);
   }
 
 
@@ -901,6 +879,16 @@ namespace Gendie
     InflowGeometry _inflow_geometry;
     InflowType _inflow_type;
     static constexpr std::size_t padlen = std::size_t(30);
+
+    void _init_from_parser(const Intern::InflowGeometryParser<DataType>& parser, const Tiny::Vector<DataType, 3>& bb_min, const Tiny::Vector<DataType, 3>& bb_max, int id)
+    {
+      _throughput = *parser.throughput;
+      _material_id = *parser.material_id;
+      _temperature = *parser.temperature;
+      _inflow_geometry = parser.geometry_type();
+      _inflow_type = parser.profile_type();
+      _geo_handler = create_geo_handler<MeshType, DataType>(parser, bb_min, bb_max, id, _inflow_type);
+    }
 
   public:
     /**
@@ -929,21 +917,21 @@ namespace Gendie
         _temperature(DataType(300)),
         _inflow_type(inflow_type)
     {
-      PARSE_PROP_OPTION(inflow_property, "throughput", _throughput, false);
-      PARSE_PROP_OPTION(inflow_property, "material_id", _material_id, false);
-      //TODO: for now ignore if not parsable
-      PARSE_PROP_OPTION(inflow_property, "temperature", _temperature, true);
-
-      //get sub property map
-      const PropertyMap* sub_prop = inflow_property->get_sub_section("inflow_params");
-      XASSERTM(sub_prop, "Could not find inflow params section");
-
-      XASSERTM(Intern::parse_inflow_geometry(sub_prop->query("type"), _inflow_geometry), "Could not parse inflow option");
-      XASSERTM(Intern::parse_inflow_option(sub_prop->query("profile"), _inflow_type), "Could not parse inflow profile option");
-      _geo_handler = create_geo_handler<MeshType, DataType>(sub_prop, bb_min, bb_max, id, _inflow_type);
+      Intern::InflowGeometryParser<DataType> parser;
+      XASSERTM(inflow_property != nullptr, "Inflow property map is nullptr");
+      XASSERTM(parser.parse(*inflow_property), "Could not parse inflow section");
+      _init_from_parser(parser, bb_min, bb_max, id);
     }
 
-    //provide other means of init
+    InflowBoundary(const Intern::InflowGeometryParser<DataType>& parser, const Tiny::Vector<DataType, 3>& bb_min, const Tiny::Vector<DataType, 3>& bb_max, int id)
+      : _material_id(~Index(0)),
+        _throughput(DataType(0)),
+        _temperature(DataType(300)),
+        _inflow_geometry(InflowGeometry::unkown),
+        _inflow_type(InflowType::best)
+    {
+      _init_from_parser(parser, bb_min, bb_max, id);
+    }
 
     /**
      * \brief Creates a meshpart defined on the given mesh
@@ -980,20 +968,6 @@ namespace Gendie
       return _geo_handler->get_dirichlet_boundary_function(this->_throughput, materials.at(_material_id), mesh_unit_scale);
     }
 
-    String format_string() const
-    {
-      String s;
-      const char pc = '.';
-
-      s = "Inflow " + get_bnd_name() + " parameters:\n";
-      s += String("Material ID").pad_back(padlen, pc) + ": " + stringify(_material_id) + "\n";
-      s += String("Throughput").pad_back(padlen, pc) + ": " + stringify_fp_fix(_throughput, 3, 10) + " kg/h\n";
-      s += String("Temperature").pad_back(padlen, pc) + ": " + stringify_fp_fix(_temperature, 3, 10) + " C\n";
-      s += _geo_handler->format_string();
-
-      return s;
-    }
-
     DataType get_temperature() const
     {
       return _temperature;
@@ -1004,5 +978,119 @@ namespace Gendie
       return _throughput;
     }
   };
+
+  enum class InflowParserError : std::uint8_t
+  {
+    success = 0,
+    no_inflow_config = 1,
+    material_id_not_found = 2,
+    invalid_inflow = 3
+  };
+
+  static inline const char* parse_error(InflowParserError t)
+  {
+    switch(t)
+    {
+      case Gendie::InflowParserError::success:
+        return "Success";
+      case Gendie::InflowParserError::no_inflow_config:
+        return "No Inflow Config Found";
+      case Gendie::InflowParserError::material_id_not_found:
+        return "Material id not found in materials";
+      case Gendie::InflowParserError::invalid_inflow:
+        return "Failed to parse inflow entry";
+    }
+    return "Unknown";
+  }
+
+  template<typename InflowBound_, typename DT_, typename Domain_>
+  Gendie::InflowParserError parse_inflow_boundaries(std::vector<InflowBound_>& inflow_boundaries, const FEAT::PropertyMap* inflow_list_config, const std::vector<Material<DT_>>& materials,
+                              const Domain_& domain, String& inflow_info)
+  {
+    XASSERTM(inflow_list_config, "Inflow config not found");
+    if(!inflow_list_config)
+      return Gendie::InflowParserError::no_inflow_config;
+
+    const auto bb_pair = FEAT::Control::Domain::DomainGlobalBoundingBoxHelper<Domain_>::calculate_global_boundingbox(domain, Index(0));
+    // get boundingboxes from our voxel domain
+    const auto& mesh_bb_min = bb_pair.first;
+    const auto& mesh_bb_max = bb_pair.second;
+
+    inflow_boundaries.clear();
+
+    for(auto it = inflow_list_config->begin_section(); it != inflow_list_config->end_section(); ++it)
+    {
+      int id = -1;
+      it->first.parse(id);
+      Intern::InflowGeometryParser<DT_> parser;
+      if(!parser.parse(*it->second))
+        return InflowParserError::invalid_inflow;
+      if(*parser.material_id >= materials.size())
+        return InflowParserError::material_id_not_found;
+      inflow_boundaries.emplace_back(parser, mesh_bb_min, mesh_bb_max, id);
+      inflow_info+="Inflow " + inflow_boundaries[id].get_bnd_name()  + " parameters:\n";
+      inflow_info+=parser.display();
+    }
+
+    return InflowParserError::success;
+  }
+
+
+  template<typename Domain_, typename InflowBound_, int bnd_axis_ = 2>
+  static inline void create_boundaries(Domain_& domain, const std::vector<InflowBound_>& inflow_boundaries,
+                                       const char wall_name[] = "bnd:wall", const char out_name[] = "bnd:outflow")
+  {
+    typedef typename InflowBound_::DataType DataType_;
+    typedef typename Domain_::LevelType::MeshType MeshType_;
+    typedef typename Domain_::LevelType::PartType MeshPartType_;
+
+    const auto bb_pair = FEAT::Control::Domain::DomainGlobalBoundingBoxHelper<Domain_>::calculate_global_boundingbox(domain, Index(0));
+    // get boundingboxes from our voxel domain
+    // const auto& mesh_bb_min = bb_pair.first;
+    const auto& mesh_bb_max = bb_pair.second;
+
+    const DataType_ tol_adp = FEAT::Math::pow(DataType_(2), -DataType_(domain.get_desired_level_max()));
+
+    const DataType_ bnd_max = mesh_bb_max[bnd_axis_]- DataType_(0.001) * tol_adp;
+    auto hit_r = [bnd_max](auto p) {return p[bnd_axis_] > bnd_max;};
+
+    // create boundary meshparts on each level
+    for(Index i(0); i < domain.size_physical(); ++i)
+    {
+      auto& mesh_node = *domain.at(i)->get_mesh_node();
+      // if(param_holder.use_base_mesh)
+      mesh_node.remove_all_mesh_parts();
+      // create mesh-part from chart by using a hit-test factory
+      std::vector<std::pair<FEAT::String, std::unique_ptr<MeshPartType_>>> bnd_inflows;
+      bnd_inflows.reserve(inflow_boundaries.size());
+      for(const auto& b : inflow_boundaries)
+      {
+        //TODO: tolerance adaptive to mesh size?
+        bnd_inflows.push_back(std::make_pair(b.get_bnd_name(), b.create_mesh_part(domain.at(i)->get_mesh(), DataType_(1E-2) * tol_adp)));
+      }
+      Geometry::HitTestFactory<decltype(hit_r), MeshType_> factory_outflow(hit_r, domain.at(i)->get_mesh());
+
+      // auto bnd_inflow = factory_inflow.make_unique();
+      auto bnd_outflow = factory_outflow.make_unique();
+
+      FEAT::Geometry::GlobalMaskedBoundaryFactory<MeshType_> boundary_factory(*mesh_node.get_mesh());
+      // boundary_factory.add_mask_meshpart(*bnd_inflow);
+      for(auto& [a,b] : bnd_inflows)
+      {
+        boundary_factory.add_mask_meshpart(*b);
+      }
+
+      boundary_factory.add_mask_meshpart(*bnd_outflow);
+      for(const auto& v : mesh_node.get_halo_map())
+        boundary_factory.add_halo(v.first,*v.second);
+      boundary_factory.compile(domain.at(i).layer().comm());
+      mesh_node.add_mesh_part(wall_name, boundary_factory.make_unique());
+      for(auto& [a,b] : bnd_inflows)
+      {
+        mesh_node.add_mesh_part(a, std::move(b));
+      }
+      mesh_node.add_mesh_part(out_name, std::move(bnd_outflow));
+    }
+  }
 
 }

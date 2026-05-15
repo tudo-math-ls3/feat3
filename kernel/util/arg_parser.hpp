@@ -551,7 +551,7 @@ namespace FEAT
     /// Accessor for derived value
     const T_* operator->() const
     {
-      return _value;
+      return &_value;
     }
 
     /**
