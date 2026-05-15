@@ -43,6 +43,23 @@ namespace Gendie
       return !(option.empty() || (option.compare_no_case("false") == 0) || (option.compare_no_case("off") == 0) || (option.compare_no_case("0") == 0));
     }
 
+    inline bool is_backend(const FEAT::String& option)
+    {
+      return (option.compare_no_case("cuda") == 0) || (option.compare_no_case("mkl") == 0) || (option.compare_no_case("generic") == 0);
+    }
+
+    inline FEAT::PreferredBackend backend_from_string(const FEAT::String& option)
+    {
+      if(option.compare_no_case("cuda") == 0)
+        return FEAT::PreferredBackend::cuda;
+      if(option.compare_no_case("mkl") == 0)
+        return FEAT::PreferredBackend::mkl;
+      if(option.compare_no_case("generic") == 0)
+        return FEAT::PreferredBackend::generic;
+      XABORTM("Unknown backend " + option);
+      return FEAT::PreferredBackend::generic;
+    }
+
     inline bool is_direct_solver(const FEAT::String& option)
     {
       return (option.compare_no_case("umfpack") == 0) || (option.compare_no_case("mumps") == 0) || (option.compare_no_case("ilu") == 0) || (option.compare_no_case("klu") == 0);
