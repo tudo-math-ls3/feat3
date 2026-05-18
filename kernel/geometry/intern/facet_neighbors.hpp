@@ -9,7 +9,7 @@
 #include <kernel/util/assertion.hpp>
 #include <kernel/util/exception.hpp>
 #include <kernel/util/string.hpp>
-
+#include <array>
 namespace FEAT
 {
   namespace Geometry
@@ -49,17 +49,8 @@ namespace FEAT
 
           // A facet is shared by exactly 2 cells if it is interiour, and is present in exactly one cell if it is at
           // the boundary
-          typedef Index SharedBy[2];
-          std::vector<Index> shared_by_vec(size_t(2)*num_facets);
-          auto shared_by = reinterpret_cast<SharedBy*>(shared_by_vec.data());
-
-          // ~Index(0) is the marker for "no neighbor"
-          FEAT_PRAGMA_OMP(parallel for)
-          for(Index l = 0; l < num_facets; ++l)
-          {
-            shared_by[l][0] = ~Index(0);
-            shared_by[l][1] = ~Index(0);
-          }
+          constexpr Index unset = ~Index(0);
+          std::vector<std::array<Index, 2>> shared_by (num_facets, {unset, unset} );
 
           // For each facet, find the cells sharing it
           for(Index k = 0; k < num_cells; ++k)
@@ -69,9 +60,9 @@ namespace FEAT
               // Index of the facet
               Index l(facet_idx[k][j]);
 
-              if(shared_by[l][0] == ~Index(0))
+              if(shared_by[l][0] == unset)
                 shared_by[l][0] = k;
-              else if(shared_by[l][1] == ~Index(0))
+              else if(shared_by[l][1] == unset)
                 shared_by[l][1] = k;
               else
                 XABORTM("Facet "+stringify(l)+" is shared by cells "+stringify(shared_by[l][0])+", "+stringify(shared_by[l][1])+" and again by "+stringify(k));

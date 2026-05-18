@@ -345,14 +345,14 @@ namespace FEAT
       ImageIterator image_begin(Index domain_node) const
       {
         ASSERT(domain_node < get_num_entities());
-        return reinterpret_cast<const Index*>(&_indices.data()[domain_node]);
+        return std::begin(_indices[domain_node].indices);
       }
 
       /** \copydoc Adjacency::Adjactor::image_end() */
       ImageIterator image_end(Index domain_node) const
       {
         ASSERT(domain_node < get_num_entities());
-        return reinterpret_cast<const Index*>(&_indices.data()[domain_node+1]);
+        return std::end(_indices[domain_node].indices);
       }
     }; // class IndexSet<...>
 

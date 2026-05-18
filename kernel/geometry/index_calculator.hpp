@@ -10,7 +10,7 @@
 #include <kernel/geometry/intern/face_index_mapping.hpp>
 #include <kernel/geometry/index_set.hpp>
 #include <kernel/util/exception.hpp>
-
+#include <kernel/util/assertion.hpp>
 // includes, system
 #include <set>
 #include <vector>
@@ -232,7 +232,13 @@ namespace FEAT
             // The RepSet is an std::set and its elements cannot be modified as this might screw up the ordering.
             // As we specifically abuse the 0th entry in each set element for saving an index and exclude that
             // from the comparison operator, it is ok to cast away the const qualifier and modify the 0th entry.
-            const_cast<IndexVector&>(*it)[0] = cur_id;
+            //const_cast<IndexVector&>(*it)[0] = cur_id;
+
+            //"Safer" version: unlink node, change it and relink it with hint (O(1))
+            auto hint = std::next(it);
+            auto mod_el = _rep_set_vec[i].extract(it);
+            mod_el.value()[0] = cur_id;
+            it = _rep_set_vec[i].insert(hint, std::move(mod_el));
           }
         }
 
@@ -426,10 +432,11 @@ namespace FEAT
           RisbHelper<Shape_, face_dim_, cell_dim_ - 1>::compute(ish, idx_tree);
 
           // create an index calculator
-          IndexCalculator<CellType, face_dim_>::compute(
+          bool success = IndexCalculator<CellType, face_dim_>::compute(
             idx_tree,
             ish.template get_index_set<cell_dim_, 0>(),
             ish.template get_index_set<cell_dim_, face_dim_>());
+          XASSERT(success);
         }
       };
 
