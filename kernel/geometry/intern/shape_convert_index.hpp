@@ -486,157 +486,112 @@ namespace FEAT
             IndexTupleType& t_34 = index_set_out[offset + 36*i + 34];
             IndexTupleType& t_35 = index_set_out[offset + 36*i + 35];
 
+            const auto x = ioc + i;
+            const auto v_0 = iov + v_c[0];
+            const auto v_1 = iov + v_c[1];
+            const auto v_2 = iov + v_c[2];
+            const auto v_3 = iov + v_c[3];
+            const auto v_4 = iov + v_c[4];
+            const auto v_5 = iov + v_c[5];
+            const auto v_6 = iov + v_c[6];
+            const auto v_7 = iov + v_c[7];
+            const auto q_0 = ioq + q_c[0];
+            const auto q_1 = ioq + q_c[1];
+            const auto q_2 = ioq + q_c[2];
+            const auto q_3 = ioq + q_c[3];
+            const auto q_4 = ioq + q_c[4];
+            const auto q_5 = ioq + q_c[5];
+
+            //Unrolling leads to compiler bug with GCC 15 and AVX
+            for (Index j = 0; j < 36; ++j)
+              index_set_out[offset + 36*i +j][0] = x; //t_j[0] = x; j=0,...,35
+
             // coarse edge triangles
-            t_0[0] = ioc + i; // X
-            t_0[1] = iov + v_c[0]; // v_0
-            t_0[2] = iov + v_c[1]; // v_1
-
-            t_1[0] = ioc + i; // X
-            t_1[1] = iov + v_c[3]; // v_3
-            t_1[2] = iov + v_c[2]; // v_2
-
-            t_2[0] = ioc + i; // X
-            t_2[1] = iov + v_c[4]; // v_4
-            t_2[2] = iov + v_c[5]; // v_5
-
-            t_3[0] = ioc + i; // X
-            t_3[1] = iov + v_c[7]; // v_7
-            t_3[2] = iov + v_c[6]; // v_6
-
-            t_4[0] = ioc + i; // X
-            t_4[1] = iov + v_c[2]; // v_2
-            t_4[2] = iov + v_c[0]; // v_0
-
-            t_5[0] = ioc + i; // X
-            t_5[1] = iov + v_c[1]; // v_1
-            t_5[2] = iov + v_c[3]; // v_3
-
-            t_6[0] = ioc + i; // X
-            t_6[1] = iov + v_c[6]; // v_6
-            t_6[2] = iov + v_c[4]; // v_4
-
-            t_7[0] = ioc + i; // X
-            t_7[1] = iov + v_c[5]; // v_5
-            t_7[2] = iov + v_c[7]; // v_7
-
-            t_8[0] = ioc + i; // X
-            t_8[1] = iov + v_c[4]; // v_4
-            t_8[2] = iov + v_c[0]; // v_0
-
-            t_9[0] = ioc + i; // X
-            t_9[1] = iov + v_c[1]; // v_1
-            t_9[2] = iov + v_c[5]; // v_5
-
-            t_10[0] = ioc + i; // X
-            t_10[1] = iov + v_c[6]; // v_6
-            t_10[2] = iov + v_c[2]; // v_2
-
-            t_11[0] = ioc + i; // X
-            t_11[1] = iov + v_c[3]; // v_3
-            t_11[2] = iov + v_c[7]; // v_7
+            t_0[1]  = v_0;
+            t_0[2]  = v_1;
+            t_1[1]  = v_3;
+            t_1[2]  = v_2;
+            t_2[1]  = v_4;
+            t_2[2]  = v_5;
+            t_3[1]  = v_7;
+            t_3[2]  = v_6;
+            t_4[1]  = v_2;
+            t_4[2]  = v_0;
+            t_5[1]  = v_1;
+            t_5[2]  = v_3;
+            t_6[1]  = v_6;
+            t_6[2]  = v_4;
+            t_7[1]  = v_5;
+            t_7[2]  = v_7;
+            t_8[1]  = v_4;
+            t_8[2]  = v_0;
+            t_9[1]  = v_1;
+            t_9[2]  = v_5;
+            t_10[1] = v_6;
+            t_10[2] = v_2;
+            t_11[1] = v_3;
+            t_11[2] = v_7;
 
             // face triangles
             // face 0
-            t_12[0] = ioc + i; // X
-            t_12[1] = ioq + q_c[0]; // q_0
-            t_12[2] = iov + v_c[0]; // v_0
-
-            t_13[0] = ioc + i; // X
-            t_13[1] = ioq + q_c[0]; // q_0
-            t_13[2] = iov + v_c[1]; // v_1
-
-            t_14[0] = ioc + i; // X
-            t_14[1] = ioq + q_c[0]; // q_0
-            t_14[2] = iov + v_c[2]; // v_2
-
-            t_15[0] = ioc + i; // X
-            t_15[1] = ioq + q_c[0]; // q_0
-            t_15[2] = iov + v_c[3]; // v_3
+            t_12[1] = q_0;
+            t_12[2] = v_0;
+            t_13[1] = q_0;
+            t_13[2] = v_1;
+            t_14[1] = q_0;
+            t_14[2] = v_2;
+            t_15[1] = q_0;
+            t_15[2] = v_3;
 
             // face 1
-            t_16[0] = ioc + i; // X
-            t_16[1] = ioq + q_c[1]; // q_1
-            t_16[2] = iov + v_c[4]; // v_4
-
-            t_17[0] = ioc + i; // X
-            t_17[1] = ioq + q_c[1]; // q_1
-            t_17[2] = iov + v_c[5]; // v_5
-
-            t_18[0] = ioc + i; // X
-            t_18[1] = ioq + q_c[1]; // q_1
-            t_18[2] = iov + v_c[6]; // v_6
-
-            t_19[0] = ioc + i; // X
-            t_19[1] = ioq + q_c[1]; // q_1
-            t_19[2] = iov + v_c[7]; // v_7
+            t_16[1] = q_1;
+            t_16[2] = v_4;
+            t_17[1] = q_1;
+            t_17[2] = v_5;
+            t_18[1] = q_1;
+            t_18[2] = v_6;
+            t_19[1] = q_1;
+            t_19[2] = v_7;
 
             // face 2
-            t_20[0] = ioc + i; // X
-            t_20[1] = ioq + q_c[2]; // q_2
-            t_20[2] = iov + v_c[0]; // v_0
-
-            t_21[0] = ioc + i; // X
-            t_21[1] = ioq + q_c[2]; // q_2
-            t_21[2] = iov + v_c[1]; // v_1
-
-            t_22[0] = ioc + i; // X
-            t_22[1] = ioq + q_c[2]; // q_2
-            t_22[2] = iov + v_c[4]; // v_4
-
-            t_23[0] = ioc + i; // X
-            t_23[1] = ioq + q_c[2]; // q_2
-            t_23[2] = iov + v_c[5]; // v_5
+            t_20[1] = q_2;
+            t_20[2] = v_0;
+            t_21[1] = q_2;
+            t_21[2] = v_1;
+            t_22[1] = q_2;
+            t_22[2] = v_4;
+            t_23[1] = q_2;
+            t_23[2] = v_5;
 
             // face 3
-            t_24[0] = ioc + i; // X
-            t_24[1] = ioq + q_c[3]; // q_3
-            t_24[2] = iov + v_c[2]; // v_2
-
-            t_25[0] = ioc + i; // X
-            t_25[1] = ioq + q_c[3]; // q_3
-            t_25[2] = iov + v_c[3]; // v_3
-
-            t_26[0] = ioc + i; // X
-            t_26[1] = ioq + q_c[3]; // q_3
-            t_26[2] = iov + v_c[6]; // v_6
-
-            t_27[0] = ioc + i; // X
-            t_27[1] = ioq + q_c[3]; // q_3
-            t_27[2] = iov + v_c[7]; // v_7
+            t_24[1] = q_3;
+            t_24[2] = v_2;
+            t_25[1] = q_3;
+            t_25[2] = v_3;
+            t_26[1] = q_3;
+            t_26[2] = v_6;
+            t_27[1] = q_3;
+            t_27[2] = v_7;
 
             // face 4
-            t_28[0] = ioc + i; // X
-            t_28[1] = ioq + q_c[4]; // q_4
-            t_28[2] = iov + v_c[0]; // v_0
-
-            t_29[0] = ioc + i; // X
-            t_29[1] = ioq + q_c[4]; // q_4
-            t_29[2] = iov + v_c[2]; // v_2
-
-            t_30[0] = ioc + i; // X
-            t_30[1] = ioq + q_c[4]; // q_4
-            t_30[2] = iov + v_c[4]; // v_4
-
-            t_31[0] = ioc + i; // X
-            t_31[1] = ioq + q_c[4]; // q_4
-            t_31[2] = iov + v_c[6]; // v_6
+            t_28[1] = q_4;
+            t_28[2] = v_0;
+            t_29[1] = q_4;
+            t_29[2] = v_2;
+            t_30[1] = q_4;
+            t_30[2] = v_4;
+            t_31[1] = q_4;
+            t_31[2] = v_6;
 
             // face 5
-            t_32[0] = ioc + i; // X
-            t_32[1] = ioq + q_c[5]; // q_5
-            t_32[2] = iov + v_c[1]; // v_1
-
-            t_33[0] = ioc + i; // X
-            t_33[1] = ioq + q_c[5]; // q_5
-            t_33[2] = iov + v_c[3]; // v_3
-
-            t_34[0] = ioc + i; // X
-            t_34[1] = ioq + q_c[5]; // q_5
-            t_34[2] = iov + v_c[5]; // v_5
-
-            t_35[0] = ioc + i; // X
-            t_35[1] = ioq + q_c[5]; // q_5
-            t_35[2] = iov + v_c[7]; // v_7
+            t_32[1] = q_5;
+            t_32[2] = v_1;
+            t_33[1] = q_5;
+            t_33[2] = v_3;
+            t_34[1] = q_5;
+            t_34[2] = v_5;
+            t_35[1] = q_5;
+            t_35[2] = v_7;
 
           }
 
