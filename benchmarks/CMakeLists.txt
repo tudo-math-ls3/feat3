@@ -7,6 +7,7 @@ set(benchmarks
   axpy-bench
   bandwidth-bench
   block_product_matvec-bench
+  cluster_multigrid-bench
   cuda_synch_bench
   meshperm_assembly-bench
   dot_product-bench
