@@ -617,6 +617,7 @@ namespace ClusterMultigridBench
 
     comm.print(String(100u, '#'));
     comm.print("Dist Comm World Size: " + stringify(comm.size()));
+    comm.print_flush();
 
     int multigrid_iters = 3;
     args.parse("iters", multigrid_iters);
@@ -672,6 +673,7 @@ namespace ClusterMultigridBench
     comm.print("Partitioner Info....: " + domain.get_chosen_parti_info());
     comm.print("Multigrid Iterations: " + stringify(multigrid_iters));
     comm.print("Assembly Type.......: " + String(std_assembly ? "standard" : "turbo"));
+    comm.print_flush();
 
     // create benchmark statistics
     SystemStats sys_stats(domain.size_virtual());
@@ -956,6 +958,8 @@ namespace ClusterMultigridBench
       // release solver
       multigrid->done();
 
+      comm.print_flush();
+
       // next solver level
     }
 
@@ -1002,10 +1006,12 @@ namespace ClusterMultigridBench
       comm.print(s);
     }
     comm.print("");
+    comm.print_flush();
 
     comm.print(sys_stats.summary());
     comm.print(vec_mg_v_stats.front().summary("Multigrid V-Cycle", sys_stats.counts[0][Counts::num_dofs_g]));
     comm.print(vec_mg_f_stats.front().summary("Multigrid F-Cycle", sys_stats.counts[0][Counts::num_dofs_g]));
+    comm.print_flush();
 
     if(args.check("ext-stats") >= 0)
     {
