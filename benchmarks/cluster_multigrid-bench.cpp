@@ -564,7 +564,7 @@ namespace ClusterMultigridBench
     //std::cout << s;
   }
 
-  void main(int argc, char** argv)
+  void main(int argc, char** argv, double init_time)
   {
     Dist::Comm comm(Dist::Comm::world());
 
@@ -1047,12 +1047,17 @@ namespace ClusterMultigridBench
 
     TimeStamp stamp_end;
     comm.print("\nTotal Runtime: "  + stamp_end.elapsed_string(stamp_start));
+    comm.print("Init  Runtime: " + stringify_fp_fix(init_time, 3));
+    comm.print_flush();
   }
 } // namespace ClusterMultigridBench
 
 int main(int argc, char** argv)
 {
+  FEAT::TimeStamp stamp_1;
   FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
-  ClusterMultigridBench::main(argc, argv);
+  FEAT::TimeStamp stamp_2;
+  ClusterMultigridBench::main(argc, argv, stamp_2.elapsed(stamp_1));
+
   return 0;
 }
