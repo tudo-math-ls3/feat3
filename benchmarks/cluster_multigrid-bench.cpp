@@ -564,7 +564,7 @@ namespace ClusterMultigridBench
     //std::cout << s;
   }
 
-  void main(int argc, char** argv, double init_time)
+  void main(int argc, char** argv, const double init_time)
   {
     Dist::Comm comm(Dist::Comm::world());
 
@@ -626,6 +626,10 @@ namespace ClusterMultigridBench
     int solve_levels = 3;
     args.parse("solve", solve_levels);
 
+    StopWatch watch_domain;
+
+    watch_domain.start();
+
     // create domain control
     Control::Domain::PartiDomainControl<DomainLevelType> domain(comm, true);
     if(!domain.parse_args(args))
@@ -663,6 +667,8 @@ namespace ClusterMultigridBench
     // get the number of slices on the fine mesh
     Index fine_mesh_num_slices = base_mesh_num_slices << (domain.get_chosen_levels().front().first);
 
+    watch_domain.stop();
+
     // print partitioning info
     //          12345678901234567890
     comm.print("Base Mesh Dimensions: " + stringify(base_mesh_num_slices) + "^2 = " +
@@ -674,6 +680,8 @@ namespace ClusterMultigridBench
     comm.print("Partitioner Info....: " + domain.get_chosen_parti_info());
     comm.print("Multigrid Iterations: " + stringify(multigrid_iters));
     comm.print("Assembly Type.......: " + String(std_assembly ? "standard" : "turbo"));
+    comm.print("Runtime Init Time...: " + stringify_fp_fix(init_time, 3));
+    comm.print("Domain Creation Time: " + watch_domain.elapsed_string());
     comm.print_flush();
 
     // create benchmark statistics
@@ -1047,7 +1055,6 @@ namespace ClusterMultigridBench
 
     TimeStamp stamp_end;
     comm.print("\nTotal Runtime: "  + stamp_end.elapsed_string(stamp_start));
-    comm.print("Init  Runtime: " + stringify_fp_fix(init_time, 3));
     comm.print_flush();
   }
 } // namespace ClusterMultigridBench
@@ -1057,6 +1064,7 @@ int main(int argc, char** argv)
   FEAT::TimeStamp stamp_1;
   FEAT::Runtime::ScopeGuard runtime_scope_guard(argc, argv);
   FEAT::TimeStamp stamp_2;
+
   ClusterMultigridBench::main(argc, argv, stamp_2.elapsed(stamp_1));
 
   return 0;
