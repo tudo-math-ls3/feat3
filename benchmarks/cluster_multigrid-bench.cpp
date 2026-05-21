@@ -614,12 +614,13 @@ namespace ClusterMultigridBench
     }
 
     const bool std_assembly = (args.check("std-assembly") >= 0);
+    //const bool ext_stats = (args.check("ext-stats") >= 0);
 
     comm.print(String(100u, '#'));
     comm.print("Dist Comm World Size: " + stringify(comm.size()));
     comm.print_flush();
 
-    int multigrid_iters = 3;
+    Index multigrid_iters = 3;
     args.parse("iters", multigrid_iters);
 
     int solve_levels = 3;
@@ -867,7 +868,16 @@ namespace ClusterMultigridBench
 
       // format solution vector
       vec_sol.format();
-      vec_rhs.format(DataType(1) / DataType(1ll << level_index));
+      vec_rhs.format(DataType(1) / DataType(1ull << (2*level_index)));
+      /*{
+        vec_rhs.format();
+        Analytic::Common::ConstantFunction<2> one_func(1.0);
+        Assembly::assemble_force_function_vector(the_domain_level.domain_asm, vec_rhs.local(),
+          one_func, the_domain_level.space, "gauss-legendre:2");
+        vec_rhs.sync_0();
+      }*/
+
+      //comm.print("RHS = " + stringify_fp_sci(vec_rhs.max_abs_element()));
 
       // and filter it
       the_system_level.filter_sys.filter_sol(vec_sol);
@@ -878,34 +888,44 @@ namespace ClusterMultigridBench
       // create multigrid solver
       auto multigrid = Solver::new_multigrid(multigrid_hierarchy, Solver::MultiGridCycle::V, ilv);
 
-      // initialize
-      multigrid->init();
+      // create PCG solver
+      auto solver = Solver::new_pcg(the_system_level.matrix_sys, the_system_level.filter_sys, multigrid);
 
-      Statistics::reset();
+      solver->set_plot_mode(Solver::PlotMode::none);
+      solver->set_tol_rel(1E-32);
+      solver->force_defect_norm_calc(true);
+
+      // initialize
+      solver->init();
 
       comm.print("\nWarming up...");
 
+      solver->set_min_iter(1);
+      solver->set_max_iter(1);
+
       // warmup solve
-      multigrid->apply(vec_sol, vec_rhs);
+      solver->apply(vec_sol, vec_rhs);
 
       comm.print("\nBenchmarking V-Cycle...");
-      multigrid_hierarchy->reset_timings();
 
+      Statistics::reset();
+      multigrid_hierarchy->reset_timings();
       multigrid->set_cycle(Solver::MultiGridCycle::V);
+      solver->set_min_iter(multigrid_iters);
+      solver->set_max_iter(multigrid_iters);
+      vec_sol.format();
 
       TimeStamp st_v1;
 
       // benchmarking solve
-      for(int k = 0; k < multigrid_iters; ++k)
-      {
-        multigrid->apply(vec_sol, vec_rhs);
-      }
+      solver->apply(vec_sol, vec_rhs);
 
       TimeStamp st_v2;
 
       double solve_time_v = st_v2.elapsed(st_v1);
       solver_toe_v += solve_time_v;
       comm.print("Solve Apply Time: " + stringify_fp_fix(solve_time_v, 6));
+      comm.print(solver->get_summary());
 
       // set multigrid timings
       mg_v_stats.times[0][SolverTimes::gmg_apply] = solve_time_v;
@@ -922,23 +942,30 @@ namespace ClusterMultigridBench
           mg_v_stats.times.at(i)[SolverTimes::gmg_coarse];
       }
 
-      comm.print("\nBenchmarking F-Cycle...");
-      multigrid_hierarchy->reset_timings();
+      //if(ext_stats)
+      //{
+      //  comm.print(FEAT::Statistics::get_formatted_solver_internals());
+      //}
 
+      comm.print("\nBenchmarking F-Cycle...");
+
+      Statistics::reset();
+      multigrid_hierarchy->reset_timings();
       multigrid->set_cycle(Solver::MultiGridCycle::F);
+      solver->set_min_iter(multigrid_iters);
+      solver->set_max_iter(multigrid_iters);
+      vec_sol.format();
 
       TimeStamp st_f1;
 
       // benchmarking solve
-      for(int k = 0; k < multigrid_iters; ++k)
-      {
-        multigrid->apply(vec_sol, vec_rhs);
-      }
+      solver->apply(vec_sol, vec_rhs);
 
       TimeStamp st_f2;
       double solve_time_f = st_f2.elapsed(st_f1);
       solver_toe_f += solve_time_f;
       comm.print("Solve Apply Time: " + stringify_fp_fix(solve_time_f, 6));
+      comm.print(solver->get_summary());
 
       // set multigrid timings
       mg_f_stats.times[0][SolverTimes::gmg_apply] = solve_time_f;
@@ -955,8 +982,13 @@ namespace ClusterMultigridBench
           mg_f_stats.times.at(i)[SolverTimes::gmg_coarse];
       }
 
+      //if(ext_stats)
+      //{
+      //  comm.print(FEAT::Statistics::get_formatted_solver_internals());
+      //}
+
       // release solver
-      multigrid->done();
+      solver->done();
 
       comm.print_flush();
 
@@ -1012,13 +1044,6 @@ namespace ClusterMultigridBench
     comm.print(vec_mg_v_stats.front().summary("Multigrid V-Cycle", sys_stats.counts[0][Counts::num_dofs_g]));
     comm.print(vec_mg_f_stats.front().summary("Multigrid F-Cycle", sys_stats.counts[0][Counts::num_dofs_g]));
     comm.print_flush();
-
-    if(args.check("ext-stats") >= 0)
-    {
-      FEAT::Control::Statistics::report(solver_toe_v+solver_toe_f, 0, MeshType::ShapeType::dimension, system, domain);
-      comm.print(FEAT::Statistics::get_formatted_solver_internals());
-      comm.print(FEAT::Statistics::get_formatted_solver_tree().trim());
-    }
 
     TimeStamp stamp_end;
     comm.print("\nTotal Runtime: "  + stamp_end.elapsed_string(stamp_start));
