@@ -56,7 +56,7 @@ int main (int /*argc*/, char** /*argv*/)
     std::cout << "Device " << idevice << ": " << prop.name;
     std::cout << " (cc " << prop.major << "." << prop.minor << ")\n";
     std::cout << "Managed Memory Support: " << ((prop.managedMemory == 1) ? "yes" : "no") << "\n";
-    std::cout << "Important: configure all future builds with \" --cuda_arch=sm_";
+    std::cout << "Important: configure all future builds with \" --cuda-arch=sm_";
     std::cout << prop.major << prop.minor << "\" on this machine.\n";
 
     if (idevice + 1 < numDevices)
