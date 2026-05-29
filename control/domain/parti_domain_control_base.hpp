@@ -890,7 +890,7 @@ namespace FEAT
           XASSERT(!this->_layers.empty());
 
           // create a deque with the number of processes for each layer
-          std::deque<int> num_procs;
+          std::deque<std::int64_t> num_procs;
           for(auto it = this->_desired_levels.begin(); it != this->_desired_levels.end(); ++it)
           {
             if(it->second > 1)
@@ -903,8 +903,8 @@ namespace FEAT
           this->_ancestry.resize(num_procs.size()-std::size_t(1));
 
           // set up the ancestry
-          const int main_rank = this->_comm.rank();
-          const int main_size = this->_comm.size();
+          const std::int64_t main_rank = this->_comm.rank();
+          const std::int64_t main_size = this->_comm.size();
           for(std::size_t i(0); i < this->_ancestry.size(); ++i)
           {
             // get our ancestor info
@@ -917,10 +917,10 @@ namespace FEAT
             ancestor.layer_p = ((i+1u) < this->_layers.size() ? int(i)+1 : -1);
 
             // set the total number of processes for this layer
-            ancestor.num_procs = num_procs.at(i);
+            ancestor.num_procs = int(num_procs.at(i));
 
             // set the total number of partitions per progeny group
-            ancestor.num_parts = num_procs.at(i) / num_procs.at(i+1u);
+            ancestor.num_parts = int(num_procs.at(i) / num_procs.at(i+1u));
 
             // set desired maximum level
             XASSERT(i < this->_desired_levels.size());
@@ -933,12 +933,12 @@ namespace FEAT
               ancestor.desired_level_min = ancestor.desired_level_max;
 
             // set the progeny group
-            ancestor.progeny_group = ((main_rank * num_procs.at(i+1u)) / main_size) * ancestor.num_parts;
-            ancestor.progeny_child = ((main_rank * num_procs.at(i)) / main_size) % ancestor.num_parts;
+            ancestor.progeny_group = int((main_rank * num_procs.at(i+1u)) / main_size) * ancestor.num_parts;
+            ancestor.progeny_child = int((main_rank * num_procs.at(i))    / main_size) % ancestor.num_parts;
 
             // create the progeny communicator
-            ancestor.progeny_count = main_size / num_procs.at(i+1u);
-            ancestor.progeny_first = (main_rank / ancestor.progeny_count) * ancestor.progeny_count;
+            ancestor.progeny_count = int(main_size / num_procs.at(i+1u));
+            ancestor.progeny_first = int(main_rank / ancestor.progeny_count) * ancestor.progeny_count;
             ancestor.progeny_comm = this->_comm.comm_create_range_incl(ancestor.progeny_count, ancestor.progeny_first);
           }
         }
