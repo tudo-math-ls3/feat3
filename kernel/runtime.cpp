@@ -481,8 +481,14 @@ int Runtime::finalize()
   Util::cuda_finalize();
 #endif
 
+  // flush streams before we finalize the MPI runtime
+  std::cout.flush();
+  std::clog.flush();
+  std::cerr.flush();
+
   // finalize Dist operations
   Dist::finalize();
+
   // finalize Likwid markerAPI
   FEAT_MARKER_CLOSE;
 
