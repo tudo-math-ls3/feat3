@@ -23,7 +23,8 @@ namespace Gendie
     carreau = 1,
     carreau_yasuda = 2,
     power_law = 3,
-    bingham = 4
+    bingham = 4,
+    pseudo_power_law = 5
   };
 
   enum class TemperatureModelType : std::uint8_t
@@ -47,6 +48,8 @@ namespace Gendie
         return os << "Carreau Yasuda Model";
       case Gendie::MaterialType::power_law:
         return os << "Power Law Model";
+      case Gendie::MaterialType::pseudo_power_law:
+        return  os << "Pseudo Power Law Model";
       case Gendie::MaterialType::bingham:
         return os << "Bingham Model";
     }
@@ -335,6 +338,149 @@ namespace Gendie
       s += String("Recip Velocity lambda").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->data[1], this->prec, this->width) + "\n";
       s += String("Exponent n").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->data[2], this->prec, this->width) + "\n";
       s += String("Plateau Index").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->data[3], this->prec, this->width);
+      return s;
+    }
+  };
+
+  template<typename DT_>
+  struct PseudoPowerLawCarreauModel : public CarreauModelBase<DT_>
+  {
+    typedef DT_ DataType;
+    typedef CarreauModelBase<DT_> BaseClass;
+
+    template<typename T_>
+    using ViscoFuncT = typename BaseClass::template ViscoFuncT<T_>;
+    template<typename T_>
+    using ViscoDerFuncT = typename BaseClass::template ViscoFuncT<T_>;
+    /// clipping value used for shearrate
+    DataType clipping_value = DataType(1E-3);
+    // context
+    // data[0] -> mu_0   //in Pa.s i.e kg/m/s
+    // data[1] -> reciprocal velocity
+    // data[2] -> exponent
+
+    template<typename... T>
+    PseudoPowerLawCarreauModel(T... data) : BaseClass(data...){
+      this->type = MaterialType::carreau;
+    }
+
+    PseudoPowerLawCarreauModel(const PropertyMap* prop)
+    {
+      this->type = MaterialType::pseudo_power_law;
+      {
+        DataType a,b;
+        PARSE_PROP_OPTION(prop, "value_a", a, false);
+        PARSE_PROP_OPTION(prop, "value_b", b, false);
+        const DataType clipp_val_exp = FEAT::Math::pow(clipping_value, b-DataType(1));
+        this->data[0] = a*clipp_val_exp;
+        this->data[1] = DataType(1)/clipping_value;
+        this->data[2] = b;
+        this->data[3] = DataType(1);
+      }
+    }
+
+    PseudoPowerLawCarreauModel() = default;
+    PseudoPowerLawCarreauModel(const PseudoPowerLawCarreauModel&) = delete;
+    PseudoPowerLawCarreauModel& operator=(const PseudoPowerLawCarreauModel&) = delete;
+    PseudoPowerLawCarreauModel(PseudoPowerLawCarreauModel&&) = default;
+    PseudoPowerLawCarreauModel& operator=(PseudoPowerLawCarreauModel&&) = default;
+    virtual ~PseudoPowerLawCarreauModel(){}
+
+    using BaseClass::clamp_shearrate;
+
+    template<typename DT2_>
+    ViscoFuncT<DT2_> _get_visc_func(DT2_ mesh_scale) const
+    {
+      const DT2_ visco_scaling_factor = DT2_(this->get_visco_scaling_factor(mesh_scale));
+      if constexpr(clamp_shearrate)
+      {
+        return [a=DT2_(this->data[0]), b=DT2_(this->data[1]), c=DT2_(this->data[2]), d=DT2_(this->data[3]), visco_scale=DT2_(visco_scaling_factor), min_shear=DT2_(this->min_shear), max_shear=DT2_(this->max_shear)](DT2_ gamma_dot, DT2_ aT) -> DT2_
+        {
+          return aT * a * visco_scale * Math::pow(DT2_(1) + Math::pow(b * Math::clamp(gamma_dot, min_shear, max_shear), d), (c - DT2_(1))/d);
+        };
+      }
+      else
+      {
+        return [a=DT2_(this->data[0]), b=DT2_(this->data[1]), c=DT2_(this->data[2]), d=DT2_(this->data[3]), visco_scale=DT2_(visco_scaling_factor)](DT2_ gamma_dot, DT2_ aT) -> DT2_
+        {
+          return aT * a * visco_scale * Math::pow(DT2_(1) + Math::pow(b * gamma_dot, d), (c - DT2_(1))/d);
+        };
+      }
+    }
+
+    template<typename DT2_>
+    ViscoDerFuncT<DT2_> _get_visc_der_func(DT2_ mesh_scale) const
+    {
+      const DT2_ visco_scaling_factor = DT2_(this->get_visco_scaling_factor(mesh_scale));
+      if constexpr(clamp_shearrate)
+      {
+        return [a=DT2_(this->data[0]), b=DT2_(this->data[1]), c=DT2_(this->data[2]), d=DT2_(this->data[3]), visco_scale=DT2_(visco_scaling_factor), min_shear=DT2_(this->min_shear), max_shear=DT2_(this->max_shear)](DT2_ gamma_dot, DT2_ aT) -> DT2_
+        {
+          gamma_dot = Math::clamp(gamma_dot, min_shear, max_shear);
+          return aT * a * visco_scale * ((c-DT2_(1.0)) / d) *
+                  Math::pow( DT2_(1.0) + Math::pow(b * gamma_dot, d), ((c - DT2_(1.0) - d) / d)) *
+                  d * b * Math::pow(b * gamma_dot, d-DT2_(1.0));
+        };
+      }
+      else
+      {
+        return [a=DT2_(this->data[0]), b=DT2_(this->data[1]), c=DT2_(this->data[2]), d=DT2_(this->data[3]), visco_scale=DT2_(visco_scaling_factor)](DT2_ gamma_dot, DT2_ aT) -> DT2_
+        {
+          return aT * a * visco_scale * ((c-DT2_(1.0)) / d) *
+                  Math::pow( DT2_(1.0) + Math::pow(b * gamma_dot, d), ((c - DT2_(1.0) - d) / d)) *
+                  d * b * Math::pow(b * gamma_dot, d-DT2_(1.0));
+        };
+      }
+    }
+    ViscoFuncT<float> get_visc_func(float mesh_scale) const override
+    {
+      return _get_visc_func(mesh_scale);
+    }
+
+    ViscoDerFuncT<float> get_visc_der_func(float mesh_scale) const override
+    {
+      return _get_visc_der_func(mesh_scale);
+    }
+
+    ViscoFuncT<double> get_visc_func(double mesh_scale) const override
+    {
+      return _get_visc_func(mesh_scale);
+    }
+
+    ViscoDerFuncT<double> get_visc_der_func(double mesh_scale) const override
+    {
+      return _get_visc_der_func(mesh_scale);
+    }
+
+  #ifdef FEAT_HAVE_QUADMATH
+    ViscoFuncT<__float128> get_visc_func(__float128 mesh_scale) const override
+    {
+      return _get_visc_func(mesh_scale);
+    }
+
+    ViscoDerFuncT<__float128> get_visc_der_func(__float128 mesh_scale) const override
+    {
+      return _get_visc_der_func(mesh_scale);
+    }
+  #endif
+  #ifdef FEAT_HAVE_HALFMATH
+    ViscoFuncT<half> get_visc_func(half mesh_scale) const override
+    {
+      return _get_visc_func(mesh_scale);
+    }
+
+    ViscoDerFuncT<half> get_visc_der_func(half mesh_scale) const override
+    {
+      return _get_visc_der_func(mesh_scale);
+    }
+  #endif
+
+    virtual String format_string(std::size_t padlen = std::size_t(30), const char pc = '.') const override
+    {
+      String s = BaseClass::format_string(padlen, pc) + "\n";
+      s += String("Mu_0").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->data[0], this->prec, this->width) + "\n";
+      s += String("Recip Velocity lambda").pad_back(padlen, pc) + ": " + stringify_fp_fix(this->data[1], this->prec, this->width) + "\n";
+      s += String("Exponent n").pad_back(padlen, pc) + ": " + stringify_fp_fix(-this->data[2]+DataType(1), this->prec, this->width);
       return s;
     }
   };
@@ -692,7 +838,12 @@ namespace Gendie
       }
       else if(option.first.compare_no_case("powerlaw") == 0)
       {
-        in_type = MaterialType::power_law;
+        in_type = MaterialType::pseudo_power_law;
+        return true;
+      }
+      else if(option.first.compare_no_case("pseudo_powerlaw") == 0)
+      {
+        in_type = MaterialType::pseudo_power_law;
         return true;
       }
       else if(option.first.compare_no_case("bingham") == 0)
@@ -728,6 +879,10 @@ namespace Gendie
         case Gendie::MaterialType::power_law:
         {
           return std::make_unique<ViscosityDataPowerLawModel<DataType>>(prop);
+        }
+        case Gendie::MaterialType::pseudo_power_law:
+        {
+          return std::make_unique<PseudoPowerLawCarreauModel<DataType>>(prop);
         }
         case Gendie::MaterialType::bingham:
         {
