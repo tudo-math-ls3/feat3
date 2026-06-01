@@ -137,6 +137,7 @@ namespace Gendie
     virtual bool parse(const FEAT::PropertyMap* prop) = 0;
 
     virtual FEAT::String format_string() const = 0;
+    virtual FEAT::String format_linear_solver() const = 0;
 
     virtual void init() = 0;
     // virtual void init_symbolic() = 0;
@@ -267,6 +268,11 @@ namespace Gendie
 
       return s;
 
+    }
+
+    FEAT::String _format_linear_solver() const
+    {
+      return this->flow_solver->format_string();
     }
 
     void _init()
@@ -773,6 +779,11 @@ namespace Gendie
     virtual FEAT::String format_string() const override final
     {
       return this->cast()._format_string();
+    }
+
+    virtual FEAT::String format_linear_solver() const override final
+    {
+      return this->cast()._format_linear_solver();
     }
 
     virtual void init() override final

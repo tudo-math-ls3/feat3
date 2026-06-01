@@ -185,6 +185,11 @@ namespace Gendie
       return FEAT::String{};
     }
 
+    FEAT::String _format_parameters() const
+    {
+      return FEAT::String{};
+    }
+
   public:
 
     SteadyStokesFlowSolverBaseCRTP() = default;
@@ -353,6 +358,11 @@ namespace Gendie
     FEAT::String format_multigrid_timings() const
     {
       return this->cast()._format_multigrid_timings();
+    }
+
+    FEAT::String format_string() const
+    {
+      return this->cast()._format_parameters();
     }
 
     double get_total_time_elapsed() const
@@ -1095,6 +1105,42 @@ namespace Gendie
       // FEAT::Backend::set_preferred_backend(prev_backend);
     }
 
+    FEAT::String _format_coarse_gmres_info(unsigned long long padlen) const
+    {
+      FEAT::String s{};
+      s += FEAT::String("---------- Coarse GMRES --------------\n");
+      s += FEAT::String("GMRES Dim").pad_back(padlen, '.') + ":" + FEAT::stringify(coarse_gmres_params._gmres_dim) + "\n";
+      s += FEAT::String("Min Iters").pad_back(padlen, '.') + ":" + FEAT::stringify(coarse_gmres_params._miniter) + "\n";
+      s += FEAT::String("Max Iters").pad_back(padlen, '.') + ":" + FEAT::stringify(coarse_gmres_params._maxiter) + "\n";
+      s += FEAT::String("Tol Rel").pad_back(padlen, '.') + ":" + FEAT::stringify_fp_sci(coarse_gmres_params._tol_rel, 3, 5) + "\n";
+      s += FEAT::String("Tol Abs").pad_back(padlen, '.') + ":" + FEAT::stringify_fp_sci(coarse_gmres_params._tol_abs, 3, 5) + "\n";
+      s += FEAT::String("Inner Rescale").pad_back(padlen, '.') + ":" + FEAT::stringify_fp_fix(coarse_gmres_params._inner_rescale, 3, 5) + "\n";
+
+      return s;
+    }
+
+    FEAT::String format_parameters(unsigned long long padlen) const
+    {
+      FEAT::String s{};
+
+      s += FEAT::String("-----------------------------------\n Multigrid Component \n-----------------------------------\n");
+
+      s += FEAT::String("Smoother Damp").pad_back(padlen, '.') + ":" + FEAT::stringify_fp_fix(smoother_damp, 3, 5) + "\n";
+      s += FEAT::String("Smoother Steps").pad_back(padlen, '.') + ":" + FEAT::stringify(smooth_steps) + "\n";
+      s += FEAT::String("Smoother GMRES Dim").pad_back(padlen, '.') + ":" + FEAT::stringify(smooth_gmres_dim) + "\n";
+      s += FEAT::String("Solve GMRES Dim").pad_back(padlen, '.') + ":" + FEAT::stringify(solve_gmres_dim) + "\n";
+      s += FEAT::String("Min MG Iter").pad_back(padlen, '.') + ":" + FEAT::stringify(min_iter) + "\n";
+      s += FEAT::String("Max MG Iter").pad_back(padlen, '.') + ":" + FEAT::stringify(max_iter) + "\n";
+      s += FEAT::String("MG Tol Rel").pad_back(padlen, '.') + ":" + FEAT::stringify_fp_sci(mg_tol_rel, 3, 5) + "\n";
+      s += FEAT::String("Solver Backend").pad_back(padlen, '.') + ":" + FEAT::stringify(solver_backend) + "\n";
+      if(coarse_gmres)
+      {
+        s += _format_coarse_gmres_info(padlen);
+      }
+
+      return s;
+    }
+
     FEAT::String format_timings(const FEAT::Dist::Comm& comm, double total_time, unsigned long long padlen) const
     {
       enum class _TimeID : std::size_t
@@ -1429,6 +1475,12 @@ namespace Gendie
       s += multigrid_solver.format_timings(_logger->comm, timings_max[to_underlying(_TimeID::total)], this->padlen);
 
       return s;
+    }
+
+    FEAT::String _format_parameters() const
+    {
+      FEAT::String s{};
+      return this->multigrid_solver.format_parameters(20);
     }
 
   public:

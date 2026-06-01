@@ -119,6 +119,25 @@ namespace Gendie
 
   typedef FEAT::Control::StokesFBMDomainLevelBase<SpaceVeloType, SpacePresType> DomainLevelBase;
 
+  inline void _adjust_solver_config(FEAT::PropertyMap* config, FEAT::Index min_smooth_steps)
+  {
+    {
+      config->add_entry("datatype", "double");
+    }
+    {
+      FEAT::Index smooth_steps = 1u;
+      config->parse_entry("smooth-steps", smooth_steps);
+      if(smooth_steps < min_smooth_steps)
+      {
+        smooth_steps = min_smooth_steps;
+      }
+      config->add_entry("smooth-steps", FEAT::stringify(smooth_steps));
+    }
+    {
+      config->add_entry("init-with-stokes", "false");
+    }
+  }
+
   /**
    * \brief Navier-Stokes System Level base class
    */
@@ -544,6 +563,24 @@ namespace Gendie
     {
       // create the stokes solver
       return _create<DT_>(solver_type, this->_config, logger);
+    }
+
+    SolverPointer create_overwrite_config(solverType solver_type, const FEAT::PropertyMap* sol_config, Gendie::Logger* logger = nullptr)
+    {
+      // create the stokes solver
+      String datatype = "double";
+      if(sol_config)
+        XASSERTM(sol_config->parse_entry("datatype", datatype, true), "Could not parse datatype");
+
+      if(datatype.compare_no_case("double") == 0)
+      {
+        return _create<double>(solver_type, sol_config, logger);
+      }
+      else if(datatype.compare_no_case("float") == 0)
+      {
+        return _create<float>(solver_type, sol_config, logger);
+      }
+      return _create<SystemDataType>(solver_type, sol_config, logger);
     }
 
     static solverType parse_solver_type(const String& solver_string)

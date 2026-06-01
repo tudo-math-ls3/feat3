@@ -675,6 +675,15 @@ namespace Gendie
     args.support("config-file", "A list of config files in the ini file format.\n"
                                     "See the template ini file for details.");
     args.support("problem-file", "A list of additonal config files in the ini file format.");
+    args.support("log-level", "The log level to be used.");
+
+    if(args.check("log-level") > 0)
+    {
+      logger.std_out_lvl = print_level(args.parse_default("log-level", 2));
+      logger.log_lvl = print_level(args.parse_default("log-level", 2));
+    }
+
+    logger.print(FEAT::String("LogLevel: ") + stringify(logger.std_out_lvl));
 
 
     // our Propertymap
@@ -944,12 +953,30 @@ namespace Gendie
     // now we can construct our solver
     watch_create_solver.start();
     SteadyFlowSolverFactory flow_solver_factory(domain, system_level, inflow_boundaries, materials, config->query_section("solver-params"), true, param_holder);
-    auto solver_type = flow_solver_factory.parse_solver_type(config->query("solver-params/nl-solver", String("alpine")));
-    auto flow_solver = flow_solver_factory.create(solver_type, &logger);
     watch_create_solver.stop();
+    auto solver_type = flow_solver_factory.parse_solver_type(config->query("solver-params/nl-solver", String("alpine")));
+    decltype(flow_solver_factory.create(solver_type, &logger)) flow_solver;
+
+    if(materials.front().get_viscosity_model()->get_type() != MaterialType::pseudo_power_law)
+    {
+      watch_create_solver.start();
+      flow_solver = flow_solver_factory.create(solver_type, &logger);
+      watch_create_solver.stop();
+    }
+    else // we directly start with a beefed up ts solver
+    {
+      logger.print("Overwriting solver configuration for PowerLaw", info);
+      solver_type = decltype(solver_type)::pseudo_ts;
+      auto ts_config = config->query_section("solver-params")->clone();
+      watch_create_solver.start();
+      Gendie::_adjust_solver_config(ts_config.get(), 64);
+      flow_solver = flow_solver_factory.create_overwrite_config(solver_type, ts_config.get(), &logger);
+      watch_create_solver.stop();
+    }
 
     //print solver info
     logger.print(flow_solver->format_string(), PrintLevel::info);
+    logger.print(flow_solver->format_linear_solver(), PrintLevel::debug);
 
     logger.print("\n----------------------------------------------------------------------\n", PrintLevel::info);
     logger.flush_print();
@@ -990,9 +1017,14 @@ namespace Gendie
         flow_solver->done();
         flow_solver.reset();
         // always create ts solver with double solver precision in case we did not converge
-        flow_solver = flow_solver_factory.create(decltype(solver_type)::pseudo_ts, SystemDataType(1), &logger);
+        auto ts_config = config->query_section("solver-params")->clone();
+        Gendie::_adjust_solver_config(ts_config.get(), 64);
+        flow_solver = flow_solver_factory.create_overwrite_config(decltype(solver_type)::pseudo_ts, ts_config.get(), &logger);
         logger.print(flow_solver->format_string(), PrintLevel::info);
+        logger.print(flow_solver->format_linear_solver(), PrintLevel::debug);
         flow_solver->init();
+        // vec_sol.format();
+        flow_solver->init_sol(vec_sol, vec_rhs);
         status = flow_solver->apply(vec_sol, vec_rhs);
         if(status != NonLinearStatus::success)
         {

@@ -30,6 +30,5 @@ namespace Gendie
     }
     XABORTM("Unknown backend " + backend_string);
     return FEAT::PreferredBackend::generic;
-
   }
 }
