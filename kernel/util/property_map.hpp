@@ -468,6 +468,15 @@ namespace FEAT
     void write(std::ostream& os, String::size_type indent = 0) const;
 
     /**
+     * \brief Clones this property map to allow parameter modifications
+     *
+     * This function copies the current property map as new root to another property map by deep copying its entries.
+     *
+     * \returns A unique ptr with a new property map
+     */
+    std::unique_ptr<PropertyMap> clone() const;
+
+    /**
      * \brief Builds a new property map by inserting subsection based on section names
      *
      * This function transforms a all sections consisting of "sec1/sec2" into real subsections.

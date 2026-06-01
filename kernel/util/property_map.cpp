@@ -515,6 +515,28 @@ namespace FEAT
     }
   }
 
+  void _clone(PropertyMap* out, const PropertyMap* in)
+  {
+    for(auto ent = in->begin_entry(); ent != in->end_entry(); ++ent)
+    {
+      out->add_entry(ent->first, ent->second);
+    }
+    for(auto sec = in->begin_section(); sec != in->end_section(); ++sec)
+    {
+      auto curr_sec = out->add_section(sec->first);
+      _clone(curr_sec, sec->second.get());
+    }
+  }
+
+  std::unique_ptr<PropertyMap> PropertyMap::clone() const
+  {
+    auto base_prop = std::make_unique<PropertyMap>();
+    PropertyMap* ptr = base_prop.get();
+
+    _clone(ptr, this);
+    return base_prop;
+  }
+
   std::unique_ptr<PropertyMap> PropertyMap::treeify_structures() const
   {
     auto base_prop = std::make_unique<PropertyMap>();
