@@ -43,8 +43,9 @@ if(mumps_FOUND AND NOT TARGET mumps::mumps)
   if(FEAT_HAVE_MPI)
     # find_package(MPI COMPONENTS Fortran) depends on a working fortran compiler
     # We thus enable the language locally to avoid having to link against MPI manually
+    set(CMAKE_Fortran_COMPILER "mpifort" CACHE STRING "Required for Mumps in FROSch" FORCE)
     enable_language(Fortran)
-    find_package(MPI REQUIRED COMPONENTS Fortran)
-    target_link_libraries(mumps::mumps INTERFACE MPI::MPI_Fortran)
+    find_package(MPI REQUIRED COMPONENTS Fortran C CXX)
+    target_link_libraries(mumps::mumps INTERFACE MPI::MPI_CXX MPI::MPI_Fortran)
   endif()
 endif()

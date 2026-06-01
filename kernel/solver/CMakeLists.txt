@@ -84,13 +84,15 @@ if (FEAT_HAVE_TRILINOS)
       Xpetra
       Zoltan
       Zoltan2)
+  # Set sizes for index and float types for Trilinos' METIS/ParMETIS dependency
+  target_compile_definitions(Trilinos::all_selected_libs INTERFACE IDXTYPEWIDTH=32 REALTYPEWIDTH=64)
   target_link_libraries(feat-kernel-solver PRIVATE Trilinos::all_selected_libs)
 
   #target_compile_options(feat-kernel-solver PRIVATE ${Trilinos_CXX_COMPILER_FLAGS})
 
   ## if trilinos has mumps available, we have to link against the fortran headers, which requires fortran to be an activated language of the project
   if(TARGET MUMPS::all_libs)
-    set(CMAKE_Fortran_COMPILER "mpifort" CACHE STRING "" FORCE)
+    set(CMAKE_Fortran_COMPILER "mpifort" CACHE STRING "Blba" FORCE)
     enable_language(Fortran)
     find_package(MPI COMPONENTS Fortran C CXX)
     # target_link_libraries(feat-kernel-solver PRIVATE MUMPS::all_libs MPI::MPI_CXX MPI::MPI_Fortran mpi_mpifh gfortran)

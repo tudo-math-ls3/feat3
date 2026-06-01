@@ -679,7 +679,7 @@ if hasTag "superlu"; then
     fi
 fi
 
-if hasTag "trilinos"; then
+if hasTag "trilinos" || hasTag "mumps"; then
     if [[ ! -d "$WORKING_DIR"/scalapack-src ]]; then
         echo "[ScaLAPACK] Download step..."
         git clone https://github.com/Reference-ScaLAPACK/scalapack.git scalapack-src
@@ -806,7 +806,7 @@ LMETISDIR = @INSTALL_DIR@/lib64
 IMETIS    = -I@INSTALL_DIR@/include
 LMETIS    = -L$(LMETISDIR) -lparmetis -lmetis -lgklib
 
-ORDERINGSF = -Dscotch -Dmetis -Dpord -Dptscotch -Dparmetis
+ORDERINGSF = -Dscotch -Dmetis -Dpord -Dptscotch -Dparmetis -DIDXTYPEWIDTH=32 -DREALTYPEWIDTH=64
 #ORDERINGSF  = -Dpord -Dparmetis -Dptscotch
 #ORDERINGSF  = -Dpord -Dparmetis
 ORDERINGSC  = $(ORDERINGSF)
@@ -949,8 +949,8 @@ if hasTag "trilinos" && [ -d "$TRILINOS_DIR" ]; then
         cmake "$TRILINOS_DIR"  \
             -D Trilinos_ASSERT_MISSING_PACKAGES=OFF \
             -D CMAKE_VERBOSE_MAKEFILE:BOOL=OFF \
-            -D "CMAKE_C_FLAGS:STRING=-DH5_HAVE_PARALLEL -DSHYLU_NODEBASKER -DFROSCH_TIMER_DETAILS=2" \
-            -D "CMAKE_CXX_FLAGS:STRING=-O3 -fPIC -fno-var-tracking -DH5_HAVE_PARALLEL -DSHYLU_NODEBASKER -DFROSCH_TIMER_DETAILS=2" \
+            -D "CMAKE_C_FLAGS:STRING=-DH5_HAVE_PARALLEL -DSHYLU_NODEBASKER -DFROSCH_TIMER_DETAILS=2 -DIDXTYPEWIDTH=32 -DREALTYPEWIDTH=64" \
+            -D "CMAKE_CXX_FLAGS:STRING=-O3 -fPIC -fno-var-tracking -DH5_HAVE_PARALLEL -DSHYLU_NODEBASKER -DFROSCH_TIMER_DETAILS=2 -DIDXTYPEWIDTH=32 -DREALTYPEWIDTH=64" \
             -D CMAKE_CXX_STANDARD:STRING=20 \
             -D MPI_EXEC_MAX_NUMPROCS:STRING=4 \
             -D Trilinos_ENABLE_Fortran:BOOL=ON \
