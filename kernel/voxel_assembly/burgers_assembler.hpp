@@ -1493,12 +1493,12 @@ namespace FEAT
       sd_nu(DataType(0)), sd_v_norm(DataType(0)), shared_mem(0), gridsize(1), blocksize(32), print_occupancy(false),  deformation(true)
       {
         #ifdef FEAT_HAVE_CUDA
-        #ifdef DEBUG
-        const std::size_t stack_limit = Util::cuda_get_max_cache_thread();
-        const std::size_t stack_limit_target = sizeof(DataType) * (dim == 3 ? 8096u : 1012u);
-        if(stack_limit < stack_limit_target)
-          Util::cuda_set_max_cache_thread(stack_limit_target);
-        #endif
+        // #ifdef DEBUG
+        // const std::size_t stack_limit = Util::cuda_get_max_cache_thread();
+        // const std::size_t stack_limit_target = sizeof(DataType) * (dim == 3 ? 8096u : 1012u);
+        // if(stack_limit < stack_limit_target)
+        //   Util::cuda_set_max_cache_thread(stack_limit_target);
+        // #endif
         // set kernel launch parameters
         int target_elements = SpaceType::DofMappingType::dof_count * (dim == 3 ? (SpaceType::DofMappingType::dof_count/2+1) : SpaceType::DofMappingType::dof_count);
         set_kernel_launch_params(target_elements, blocksize);

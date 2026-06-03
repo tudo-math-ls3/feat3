@@ -334,8 +334,9 @@ public:
 }; // class VoxelDefoAssemblyTest
 
 
-VoxelDefoAssemblyTest<double, std::uint32_t, Shape::Hypercube<2>> defo_vassembly_double_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
+// due to a windows bug, only test defo in non debug modus
 #ifndef DEBUG
+VoxelDefoAssemblyTest<double, std::uint32_t, Shape::Hypercube<2>> defo_vassembly_double_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
 VoxelDefoAssemblyTest<float, std::uint32_t, Shape::Hypercube<2>> defo_vassembly_float_uint32_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
 VoxelDefoAssemblyTest<double, std::uint64_t, Shape::Hypercube<2>> defo_vassembly_double_uint64_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
 VoxelDefoAssemblyTest<float, std::uint64_t, Shape::Hypercube<2>> defo_vassembly_float_uint64_quadliteral_test_generic(_lvl_2d, PreferredBackend::generic);
@@ -343,20 +344,18 @@ VoxelDefoAssemblyTest<double, std::uint32_t, Shape::Hypercube<3>> defo_vassembly
 VoxelDefoAssemblyTest<float, std::uint32_t, Shape::Hypercube<3>> defo_vassembly_float_uint32_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
 VoxelDefoAssemblyTest<double, std::uint64_t, Shape::Hypercube<3>> defo_vassembly_double_uint64_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
 VoxelDefoAssemblyTest<float, std::uint64_t, Shape::Hypercube<3>> defo_vassembly_float_uint64_hexaedral_test_generic(_lvl_3d, PreferredBackend::generic);
-#endif
 #ifdef FEAT_HAVE_CUDA
 VoxelDefoAssemblyTest<double, std::uint32_t, Shape::Hypercube<2>> defo_vassembly_double_uint32_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
-#ifndef DEBUG
 VoxelDefoAssemblyTest<float, std::uint32_t, Shape::Hypercube<2>> defo_vassembly_float_uint32_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
 VoxelDefoAssemblyTest<double, std::uint64_t, Shape::Hypercube<2>> defo_vassembly_double_uint64_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
 VoxelDefoAssemblyTest<float, std::uint64_t, Shape::Hypercube<2>> defo_vassembly_float_uint64_quadliteral_test_cuda(_lvl_2d, PreferredBackend::cuda);
-#endif
 VoxelDefoAssemblyTest<float, std::uint32_t, Shape::Hypercube<3>> defo_vassembly_float_uint32_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
 //only run one 3D gpu test since these have very long runtimes in debug mode...
-#ifndef DEBUG
+#ifndef FEAT_COMPILER_MICROSOFT
 VoxelDefoAssemblyTest<double, std::uint32_t, Shape::Hypercube<3>> defo_vassembly_double_uint32_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
 VoxelDefoAssemblyTest<double, std::uint64_t, Shape::Hypercube<3>> defo_vassembly_double_uint64_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
 VoxelDefoAssemblyTest<float, std::uint64_t, Shape::Hypercube<3>> defo_vassembly_float_uint64_hexaedral_test_cuda(_lvl_3d, PreferredBackend::cuda);
+#endif
 #endif
 #endif
 

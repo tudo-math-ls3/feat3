@@ -144,6 +144,8 @@ namespace FEAT
       mesh_data(space, coloring, hint), nu(DataType(0.))
       {
         #ifdef FEAT_HAVE_CUDA
+        // this breaks on windows vm, but is, for now, required since the defo assembler cant handle smaller
+        // stack sizes. For this reason, debug tests are turned of, for now
         #ifdef DEBUG
         const std::size_t stack_limit = Util::cuda_get_max_cache_thread();
         const std::size_t stack_limit_target = sizeof(DataType) * (dim == 3 ? 8096u : 1012u);
