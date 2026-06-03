@@ -119,7 +119,7 @@ namespace Gendie
 
   typedef FEAT::Control::StokesFBMDomainLevelBase<SpaceVeloType, SpacePresType> DomainLevelBase;
 
-  inline void _adjust_solver_config(FEAT::PropertyMap* config, FEAT::Index min_smooth_steps)
+  inline void _adjust_solver_config(FEAT::PropertyMap* config, FEAT::Index min_smooth_steps, FEAT::Index min_frosch_gmres_dim)
   {
     {
       config->add_entry("datatype", "double");
@@ -127,14 +127,21 @@ namespace Gendie
     {
       FEAT::Index smooth_steps = 1u;
       config->parse_entry("smooth-steps", smooth_steps);
-      if(smooth_steps < min_smooth_steps)
-      {
-        smooth_steps = min_smooth_steps;
-      }
+      smooth_steps = smooth_steps < min_smooth_steps ? min_smooth_steps : smooth_steps;
       config->add_entry("smooth-steps", FEAT::stringify(smooth_steps));
     }
     {
       config->add_entry("init-with-stokes", "false");
+    }
+    {
+      FEAT::Index gmres_dim = 1u;
+      auto* frosch_conf = config->get_sub_section("frosch-gmres-parameters");
+      if(frosch_conf)
+      {
+        frosch_conf->parse_entry("gmres-dim", gmres_dim);
+        gmres_dim = gmres_dim < min_frosch_gmres_dim ? min_frosch_gmres_dim : gmres_dim;
+        frosch_conf->add_entry("gmres-dim", FEAT::stringify(gmres_dim));
+      }
     }
   }
 

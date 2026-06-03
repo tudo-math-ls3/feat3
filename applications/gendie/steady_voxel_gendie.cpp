@@ -969,7 +969,7 @@ namespace Gendie
       solver_type = decltype(solver_type)::pseudo_ts;
       auto ts_config = config->query_section("solver-params")->clone();
       watch_create_solver.start();
-      Gendie::_adjust_solver_config(ts_config.get(), 64);
+      Gendie::_adjust_solver_config(ts_config.get(), 64, 64);
       flow_solver = flow_solver_factory.create_overwrite_config(solver_type, ts_config.get(), &logger);
       watch_create_solver.stop();
     }
@@ -1018,7 +1018,7 @@ namespace Gendie
         flow_solver.reset();
         // always create ts solver with double solver precision in case we did not converge
         auto ts_config = config->query_section("solver-params")->clone();
-        Gendie::_adjust_solver_config(ts_config.get(), 64);
+        Gendie::_adjust_solver_config(ts_config.get(), 64, 64);
         flow_solver = flow_solver_factory.create_overwrite_config(decltype(solver_type)::pseudo_ts, ts_config.get(), &logger);
         logger.print(flow_solver->format_string(), PrintLevel::info);
         logger.print(flow_solver->format_linear_solver(), PrintLevel::debug);
