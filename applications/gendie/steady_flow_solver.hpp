@@ -285,7 +285,9 @@ namespace Gendie
       // XASSERTM(&(this->flow_solver->get_domain()) == &(this->defect_asm->get_domain()), "Solver and assembler do not share domain");
       // XASSERTM(&(this->flow_solver->get_domain()) == &(this->system_asm->get_domain()), "Solver and assembler do not share domain");
       this->_vec_def = this->defect_asm->create_vector();
+      this->_vec_def.format();
       this->_vec_cor = this->defect_asm->create_vector();
+      this->_vec_cor.format();
 
       // probably not required...
       // this->_system_matrix = this->system_asm.create_system_matrix();

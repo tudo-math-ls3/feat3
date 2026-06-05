@@ -136,6 +136,7 @@ namespace FEAT::Control
         this->local_matrix_sys.block_a() = this->matrix_a.local().clone(LAFEM::CloneMode::Layout);
         this->local_matrix_sys.block_b() = this->matrix_b.local().clone(LAFEM::CloneMode::Layout);
         this->local_matrix_sys.block_d() = this->matrix_d.local().clone(LAFEM::CloneMode::Layout);
+        this->local_matrix_sys.format();
       }
       // copy local matrices (and sync 1 if necessary)
       this->matrix_a.convert_to_1(this->local_matrix_sys.block_a(), false);

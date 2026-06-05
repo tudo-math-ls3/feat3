@@ -153,11 +153,11 @@ namespace SaddlePointAssemblyBench
     Cubature::DynamicFactory cubature("auto-degree:5");
 
 
-    matrix.format();
     Backend::set_preferred_backend(backend_asm);
     // assemble A, B and D
     asm_sym_matrix_watch.start();
     Assembly::SymbolicAssembler::assemble_matrix_std1(mat_a, space_v);
+    matrix.format();
     asm_sym_matrix_watch.stop();
     Random::SeedType seed(Random::SeedType(time(nullptr)));
     Random rng(seed);
@@ -322,11 +322,11 @@ namespace SaddlePointAssemblyBench
     Cubature::DynamicFactory cubature("auto-degree:5");
 
 
-    matrix.format();
     Backend::set_preferred_backend(backend_asm);
     // assemble A, B and D
     asm_sym_matrix_watch.start();
     Assembly::SymbolicAssembler::assemble_matrix_std1(mat_a, space_v);
+    matrix.format();
     typedef typename MatrixTypeA::VectorTypeL VectorTypeA;
     VectorTypeA dummy_conv(matrix.num_rows(), DataType(1));
     VoxelAssembly::VoxelBurgersVeloMaterialAssembler<SpaceVeloType, DataType, IndexType> voxel_defo(space_v, col);
@@ -532,8 +532,8 @@ namespace SaddlePointAssemblyBench
         for(Index i = 0; i < num_threads.size(); ++i)
         {
           PreferredBackend backend_asm = PreferredBackend::generic;
-          PreferredBackend backend_calc = PreferredBackend::mkl;
-          // PreferredBackend backend_calc = PreferredBackend::generic;
+          // PreferredBackend backend_calc = PreferredBackend::mkl;
+          PreferredBackend backend_calc = PreferredBackend::generic;
           omp_set_num_threads(int(num_threads[i]));
           run_bench_amavanka<Space_, DT_ , IT_, dim_>(int(lvl), result.at(i).at(0), backend_asm, backend_calc);
           run_bench_voxel_amavanka<Space_, DT_ , IT_, dim_>(int(lvl), result.at(i).at(1), backend_asm, backend_calc);
