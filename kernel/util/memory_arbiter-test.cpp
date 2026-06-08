@@ -988,6 +988,13 @@ public:
       Memory::View v(a.view(Memory::Location::cuda, Memory::Access::read));
       TEST_CHECK_THROWS(a.view(Memory::Location::cuda, Memory::Access::write | Memory::Access::overlap), Memory::AccessException);
     }
+
+    // overlap two read-writes (ok)
+    {
+      Memory::View v(a.view(Memory::Location::cuda, Memory::Access::read_write | Memory::Access::overlap));
+      Memory::View w(a.view(Memory::Location::cuda, Memory::Access::read_write | Memory::Access::overlap));
+      TEST_CHECK_EQUAL(v.raw_r(), w.raw_r());
+    }
   }
 
   virtual void run() const override

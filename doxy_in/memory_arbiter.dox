@@ -103,10 +103,10 @@ the allocated memory arrays of the block once the last memory arbiter referencin
 is destroyed.
 
 A memory arbiter object is usually created on the stack or as a class member variable and during
-its constructor call, one at least hast to specify the number of bytes that are to be reserved for
-the data that is to be stored and managed in the arbiter's memory block. Once the arbiter goes out
-of scope, all of its allocated memory is freed unless another arbiter still holds a reference to
-the arbiters memory block:
+its constructor call and you have to specify the number of bytes that are to be reserved for
+the data that is to be stored and managed in the arbiter's memory block at the very least.
+Once the arbiter goes out of scope, all of its allocated memory is freed unless another arbiter
+still holds a reference to the arbiters memory block:
 
 \code{.cpp}
 {
@@ -158,7 +158,7 @@ arbiter after its creation.
 
 \code{.cpp}
 // create an arbiter for an array of 8 int objects in main memory
-// and format the all bits of the array to zero
+// and format all bits of the array to zero
 Memory::Arbiter arb_1(8u*sizeof(int), Memory::Location::main, FEAT::Memory::Init::format_to_zero);
 
 // create an arbiter for an array of 4 double objects in CUDA memory
@@ -447,6 +447,9 @@ mapped for a memory arbiter, one may create as many read-only views for that par
 arbiter simultaneously on all available memory locations as one desires and the arbiter ensures
 that all requested memory locations are up-to-date.
 
+If you try to create a view that violates one of the above rules, you will get an instance of
+the FEAT::Memory::AccessException thrown at your face.
+
 \attention
 When requesting a view with only FEAT::Memory::Access::write access rights (i.e. <u>not</u>
 FEAT::Memory::Access::read_write), then the arbiter <b>silently assumes that you will overwrite
@@ -611,6 +614,9 @@ currently mapped to a memory arbiter for a specific memory location, then anothe
 write-only or read-write or read-only view for the same memory location can be created for that
 particular memory arbiter.
 
+Trying to create an overlapping view that violates one of the above rules will cause an instance of
+the FEAT::Memory::AccessException to be thrown.
+
 The two rules above imply the following corollaries:
 
 - Overlapping write/read views can only be created for the same memory location.
@@ -637,7 +643,8 @@ void axpy(Memory::Arbiter& r, Memory::Arbiter& y, Memory::Arbiter& x, DataType a
 }
 \endcode
 
-Here are some examples of what overlapping combinations are allowed and which result in an error:
+Here are some examples of what overlapping combinations are allowed and some attempts which result
+in an  instance of FEAT::Memory::AccessException to be thrown:
 \code{.cpp}
 
 // create an arbiter for 64 bytes:

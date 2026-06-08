@@ -460,12 +460,8 @@ namespace FEAT
           // do we allow overlapping write access?
           if(*(access & Access::overlap))
           {
-            // yes, overlap is allowed, but we must not have any mapped read views
-            if(this->_is_mapped_any_read())
-            {
-              throw AccessException("Memory::Block::map_view: cannot map read-mapped memory block for overlapping write access");
-            }
-            else if(this->_is_mapped_any_write())
+            // yes, overlap is allowed, but we must not have any mapped exclusive write views
+            if(this->_is_mapped_any_write())
             {
               // we can live with overlapping access, but some other write view is already mapped to this block,
               // so ensure that a) it also allows overlapped access and b) it is mapped to the same location
@@ -473,6 +469,13 @@ namespace FEAT
                 throw AccessException("Memory::Block::map_view: cannot map exclusively write-mapped memory block for overlapping write access");
               if(this->write_location != mem_loc)
                 throw AccessException("Memory::Block::map_view: memory block is write-mapped onto a different memory location");
+            }
+            // if no write overlapping write view was opened yet, then we also must not have mapped any read views yet;
+            // note that this if is never executed if an overlapping write view was already opened, which is intentional
+            // as one might not be able to create overlapping read-write views which are used in multi-threaded assembly
+            else if(this->_is_mapped_any_read())
+            {
+              throw AccessException("Memory::Block::map_view: cannot map read-mapped memory block for overlapping write access");
             }
           }
           else if(this->_is_mapped_any())
