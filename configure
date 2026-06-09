@@ -195,6 +195,10 @@ class FeatConfig:
     else:
       return self.compiler_cxx
 
+  def get_compiler_cxx_raw(self):
+    """Return the CXX compiler for this configuration. Ignores compiler wrappers."""
+    return self.compiler_cxx
+
   def get_compiler_c(self):
     """Return the CC compiler for this configuration. Handles compiler wrappers."""
     if self.compiler_wrapper:
@@ -827,8 +831,8 @@ for token in buildid:
     if args.cuda_host_compiler:
       cuda_host_compiler = args.cuda_host_compiler
     else:
-      cuda_host_compiler = find_exe(config.get_compiler_cxx())
-    config.cache_entry("FEAT_CUDA_HOST_COMPILER", cuda_host_compiler, "FILEPATH")
+      cuda_host_compiler = find_exe(config.get_compiler_cxx_raw())
+    config.cache_entry("CMAKE_CUDA_HOST_COMPILER", cuda_host_compiler, "FILEPATH")
 
     if not args.cuda_architectures:
       cuda_arch, cuda_arch_int = detect_cuda_arch()
@@ -938,6 +942,8 @@ print("")
 print("cxxflags: " + config.cxx_flags_str())
 print("")
 print("ldflags: " + config.ld_flags_str())
+print("")
+print("cudaflags: " + config.cuda_flags_str())
 print("")
 
 if config.cuda_architectures:

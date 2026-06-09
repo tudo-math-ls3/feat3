@@ -125,9 +125,6 @@
 /// The system compiler the actual host compiler will rely on, e.g. using its header files etc.
 #define FEAT_SYSTEM_HOST_COMPILER "${FEAT_SYSTEM_HOST_COMPILER}"
 
-/// The host compiler that will be used by nvcc for host code compilation.
-#define FEAT_CUDA_HOST_COMPILER "${FEAT_CUDA_HOST_COMPILER}"
-
 #ifdef FEAT_HAVE_CUDA
 /// Path to CUDA Compiler
 #define FEAT_CUDA_NVCC_EXECUTABLE "${CUDA_NVCC_EXECUTABLE}"
@@ -139,6 +136,8 @@
 #define FEAT_CUDA_VERSION_MAJOR "${CUDA_VERSION_MAJOR}"
 /// compile for this CUDA device architecture
 #define FEAT_CUDA_ARCH "${FEAT_CUDA_ARCH}"
+/// The host compiler that will be used by nvcc for host code compilation.
+#define FEAT_CUDA_HOST_COMPILER "${CMAKE_CUDA_HOST_COMPILER}"
 #endif
 
 #ifdef FEAT_HAVE_MPI

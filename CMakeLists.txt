@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.28.0)
 # enable compiler output
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
+
 if(NOT CMAKE_BUILD_TYPE)
   if(FEAT_DEBUG_MODE)
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "FEAT3 build type")
@@ -151,23 +152,22 @@ if(FEAT_HAVE_CUDA)
   endif(FEAT_CUDA_VERBOSE)
 
   if(FEAT_DEBUG_MODE)
-    target_compile_options(feat-dependency INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:-G --compiler-options=-rdynamic>)
+    target_compile_options(feat-dependency INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:-G>)
+    if((FEAT_COMPILER_ID STREQUAL "gcc"))
+      target_compile_options(feat-dependency INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:--compiler-options=-rdynamic>)
+    endif()
   else(FEAT_DEBUG_MODE)
     target_compile_options(feat-dependency INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:-lineinfo>)
   endif(FEAT_DEBUG_MODE)
 
-  ## host compiler <- thios should be done another way, correct, since this can simply be done
-  # by setting CMAKE_CUDA_HOST_COMPILER
-
-  option(FEAT_CUDA_ALLOW_UNSUPPORTED_COMPILER "Allow non officially tested compilers?" OFF)
-  if(FEAT_CUDA_ALLOW_UNSUPPORTED_COMPILER)
-    target_compile_options(feat-dependency INTERFACE $<$<COMPILE_LANGUAGE:CUDA>:--allow-unsupported-compiler>)
-  endif(FEAT_CUDA_ALLOW_UNSUPPORTED_COMPILER)
-
-
   enable_language(CUDA)
   find_package(CUDAToolkit REQUIRED)
   set(CUDA_PROPAGATE_HOST_FLAGS OFF)
+
+  option(FEAT_CUDA_ALLOW_UNSUPPORTED_COMPILER "Allow non officially tested compilers?" OFF)
+  if(FEAT_CUDA_ALLOW_UNSUPPORTED_COMPILER)
+    string(APPEND CMAKE_CUDA_FLAGS " --allow-unsupported-compiler")
+  endif(FEAT_CUDA_ALLOW_UNSUPPORTED_COMPILER)
 
   option(FEAT_CUDAMEMCHECK "Do cuda memcheck for testing?" OFF)
   if(FEAT_CUDAMEMCHECK)
