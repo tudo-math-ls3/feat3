@@ -1369,6 +1369,18 @@ namespace FEAT
         typename AsmTraits::template TLocalMatrix<MatValType> local_matrix;
         typename AsmTraits::template TLocalVector<ValueType> local_vec_sol;
 
+        static void add_local_product(ValueType& y, const MatValType& a, const ValueType& x)
+        {
+          if constexpr(std::is_same<MatValType, ValueType>::value)
+          {
+            y += a * x;
+          }
+          else
+          {
+            y.add_mat_vec_mult(a, x);
+          }
+        }
+
 
       public:
         explicit Task(DomainAssemblyBilinearOperatorApplyVectorJob1& job) :
@@ -1441,7 +1453,7 @@ namespace FEAT
           // apply to local vector
           for(int i(0); i < num_loc_dofs; ++i)
             for(int j(0); j < num_loc_dofs; ++j)
-              this->local_vector[i].add_mat_vec_mult(this->local_matrix(i,j), this->local_vec_sol[j]);
+              add_local_product(this->local_vector(i), this->local_matrix(i,j), local_vec_sol(j));
         }
 
         void finish()

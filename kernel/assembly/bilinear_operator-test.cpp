@@ -6,8 +6,11 @@
 #include <test_system/test_system.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/assembly/bilinear_operator_assembler.hpp>
+#include <kernel/assembly/domain_assembler_basic_jobs.hpp>
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/geometry/common_factories.hpp>
+#include <kernel/lafem/dense_vector_blocked.hpp>
+#include <kernel/lafem/sparse_matrix_bcsr.hpp>
 #include <kernel/geometry/structured_mesh.hpp>
 #include <kernel/lafem/sparse_matrix_csr.hpp>
 #include <kernel/lafem/dense_vector.hpp>
@@ -35,6 +38,8 @@ class BilinearOperatorTest :
   typedef IT_ IndexType_;
   typedef LAFEM::SparseMatrixCSR<DataType_, IndexType_> MatrixType;
   typedef LAFEM::DenseVector<DataType_, IndexType_> VectorType;
+  typedef LAFEM::SparseMatrixBCSR<DataType_, IndexType_, 2, 2> BlockedMatrixType;
+  typedef LAFEM::DenseVectorBlocked<DataType_, IndexType_, 2> BlockedVectorType;
 
   typedef Geometry::ConformalMesh<Shape::Quadrilateral, 2, DataType_> QuadMesh;
 
@@ -56,6 +61,7 @@ public:
   virtual void run() const override
   {
     test_unit_2d();
+    test_domain_apply_jobs_unit_square_q1();
 
     // Argyris has polynomial degree 6, so the integration for the indentity operator has only to be exact to
     // degree 6 + 6 = 12
@@ -191,6 +197,85 @@ public:
     // run tests
     test_unit_2d_q0(mesh);
     test_unit_2d_q1(mesh);
+  }
+
+  void test_domain_apply_jobs_unit_square_q1() const
+  {
+    Geometry::RefinedUnitCubeFactory<QuadMesh> unit_factory(2);
+    QuadMesh mesh(unit_factory);
+    QuadTrafo trafo(mesh);
+    QuadSpaceQ1 space(trafo);
+
+    Assembly::DomainAssembler<QuadTrafo> domain_assembler(trafo);
+    domain_assembler.compile_all_elements();
+
+    test_domain_apply_job_scalar_laplace(space, domain_assembler);
+    test_domain_apply_job_blocked_deformation(space, domain_assembler);
+  }
+
+  void test_domain_apply_job_scalar_laplace(
+    const QuadSpaceQ1& space,
+    Assembly::DomainAssembler<QuadTrafo>& domain_assembler) const
+  {
+    MatrixType matrix;
+    Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
+    matrix.format();
+
+    VectorType sol(space.get_num_dofs(), DataType_(0));
+    VectorType ref(space.get_num_dofs(), DataType_(0));
+    VectorType res(space.get_num_dofs(), DataType_(0));
+
+    fill_scalar_vector(sol);
+
+    Assembly::Common::LaplaceOperator operat;
+    Assembly::assemble_bilinear_operator_matrix_1(domain_assembler, matrix, operat, space, "gauss-legendre:2");
+    matrix.apply(ref, sol);
+    Assembly::assemble_bilinear_operator_apply_vector_1(domain_assembler, res, sol, operat, space, "gauss-legendre:2");
+
+    const DataType_ eps = TestSystem::tol<DataType_>();
+    TEST_CHECK_LESS_THAN(res.max_rel_diff(ref), eps);
+  }
+
+  void test_domain_apply_job_blocked_deformation(
+    const QuadSpaceQ1& space,
+    Assembly::DomainAssembler<QuadTrafo>& domain_assembler) const
+  {
+    BlockedMatrixType matrix;
+    Assembly::SymbolicAssembler::assemble_matrix_std1(matrix, space);
+    matrix.format();
+
+    BlockedVectorType sol(space.get_num_dofs(), DataType_(0));
+    BlockedVectorType ref(space.get_num_dofs(), DataType_(0));
+    BlockedVectorType res(space.get_num_dofs(), DataType_(0));
+
+    fill_blocked_vector(sol);
+
+    Assembly::Common::DuDvOperatorBlocked<2> operat;
+    Assembly::assemble_bilinear_operator_matrix_1(domain_assembler, matrix, operat, space, "gauss-legendre:2");
+    matrix.apply(ref, sol);
+    Assembly::assemble_bilinear_operator_apply_vector_1(domain_assembler, res, sol, operat, space, "gauss-legendre:2");
+
+    const DataType_ eps = TestSystem::tol<DataType_>();
+    TEST_CHECK_LESS_THAN(res.max_rel_diff(ref), eps);
+  }
+
+  void fill_scalar_vector(VectorType& x) const
+  {
+    const DataType_ fac = DataType_(1) / DataType_(x.size());
+    Memory::TypedView<DataType_> vx(x.elements_view_w());
+    for(Index i(0); i < x.size(); ++i)
+      vx[i] = fac * (DataType_(2) * DataType_(i) - Math::sqrt(DataType_(i)));
+  }
+
+  void fill_blocked_vector(BlockedVectorType& x) const
+  {
+    const DataType_ fac = DataType_(1) / DataType_(x.size());
+    Memory::TypedView<typename BlockedVectorType::ValueType> vx(x.elements_view_w());
+    for(Index i(0); i < x.size(); ++i)
+    {
+      vx[i][0] = fac * (DataType_(2) * DataType_(i) - Math::sqrt(DataType_(i) + DataType_(1)));
+      vx[i][1] = fac * (DataType_(3) * DataType_(i) + DataType_(1) - Math::sqrt(DataType_(i) + DataType_(2)));
+    }
   }
 
   void test_unit_2d_q0(QuadMesh& mesh) const
