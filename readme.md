@@ -48,8 +48,7 @@ compiled without any third-party libraries.
 
 FEAT3 is regularly being built and tested with various compilers and is confirmed to compile and
 work properly with at least the following C++ compilers:
-* GNU g++ compiler, version 7.0 or newer
-* Intel C/C++ compiler, version 19.0 or newer
+* GNU g++ compiler, version 8.0 or newer
 * Intel oneAPI DPC++/C++ compiler, version 2021 or newer
 * Clang LLVM compiler, version 19.0 or newer
 * Microsoft Visual C++ 2022 compiler or newer
