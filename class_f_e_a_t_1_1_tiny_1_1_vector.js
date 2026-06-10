@@ -56,6 +56,7 @@ var class_f_e_a_t_1_1_tiny_1_1_vector =
     [ "set_mat_vec_mult_n", "class_f_e_a_t_1_1_tiny_1_1_vector.html#a641cbdbb8ab36a7042ec48086df62cf6", null ],
     [ "set_vec_mat_mult", "class_f_e_a_t_1_1_tiny_1_1_vector.html#a4daf9c1a837d48ae9645aa6213eda922", null ],
     [ "set_vec_mat_mult_n", "class_f_e_a_t_1_1_tiny_1_1_vector.html#af776afb6b63692ffce0135bb50bfa7eb", null ],
+    [ "typemap", "class_f_e_a_t_1_1_tiny_1_1_vector.html#abbf9eca1d4696c698018344ca4546175", null ],
     [ "operator<<", "class_f_e_a_t_1_1_tiny_1_1_vector.html#a7199f26d844e596ac9511325d0fc3345", null ],
     [ "n", "class_f_e_a_t_1_1_tiny_1_1_vector.html#a6476874775adb0e63c7ed826f3838fca", null ],
     [ "s", "class_f_e_a_t_1_1_tiny_1_1_vector.html#ad6f045635ba9f3bfa657faa6bbc616df", null ],

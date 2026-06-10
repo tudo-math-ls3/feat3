@@ -219,6 +219,9 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a8cb834a697cc87ff49913154add2ad23"><td class="memItemLeft" align="right" valign="top">static CUDA_HOST_DEVICE <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_tensor3.html">Tensor3</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_tiny_1_1_tensor3.html#a8cb834a697cc87ff49913154add2ad23">null</a> ()</td></tr>
 <tr class="memdesc:a8cb834a697cc87ff49913154add2ad23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a null-tensor.  <a href="class_f_e_a_t_1_1_tiny_1_1_tensor3.html#a8cb834a697cc87ff49913154add2ad23">More...</a><br /></td></tr>
 <tr class="separator:a8cb834a697cc87ff49913154add2ad23"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a130cfbcc606843c595c07a8c91ce12f6"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="class_f_e_a_t_1_1_dist_1_1_typemap.html">Dist::Typemap</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_tiny_1_1_tensor3.html#a130cfbcc606843c595c07a8c91ce12f6">typemap</a> ()</td></tr>
+<tr class="memdesc:a130cfbcc606843c595c07a8c91ce12f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a Typemap for sending <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_tensor3.html" title="Tiny Tensor3 class template.">Tensor3</a> via MPI.  <a href="class_f_e_a_t_1_1_tiny_1_1_tensor3.html#a130cfbcc606843c595c07a8c91ce12f6">More...</a><br /></td></tr>
+<tr class="separator:a130cfbcc606843c595c07a8c91ce12f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
@@ -264,7 +267,7 @@ class FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;</div><p ><a cla
 </dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l00120">120</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l00121">121</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a141d74be9d7caa7f8963fc152de657eb" name="a141d74be9d7caa7f8963fc152de657eb"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a141d74be9d7caa7f8963fc152de657eb">&#9670;&#160;</a></span>DataType</h2>
@@ -282,7 +285,7 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 
 <p>The basic data type buried in the lowest level of the vector. </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02575">2575</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02592">2592</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 </div>
 </div>
@@ -302,7 +305,7 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 
 <p><a class="el" href="namespace_f_e_a_t_1_1_type.html" title="Type namespace.">Type</a> of tensor data; that's an array of matrices. </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02578">2578</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02595">2595</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 </div>
 </div>
@@ -322,7 +325,7 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 
 <p>the data type of the tensor </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02573">2573</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02590">2590</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 </div>
 </div>
@@ -354,9 +357,9 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 
 <p>default constructor </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02583">2583</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02600">2600</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tiny__algebra_8hpp_source.html#l02962">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::null()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="tiny__algebra_8hpp_source.html#l02979">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::null()</a>.</p>
 
 </div>
 </div>
@@ -388,9 +391,9 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 
 <p>value-assignment constructor </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02588">2588</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02605">2605</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
 
 </div>
 </div>
@@ -430,9 +433,9 @@ template&lt;typename Tx_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02601">2601</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02618">2618</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -472,9 +475,9 @@ template&lt;typename Tx_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02616">2616</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02633">2633</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -508,9 +511,9 @@ template&lt;int sla_, int sma_, int sna_&gt; </div>
 
 <p>copy-constructor </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02626">2626</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02643">2643</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>.</p>
 
 </div>
 </div>
@@ -582,9 +585,9 @@ template&lt;int lt_, int mt_, int nt_, int slt_, int smt_, int snt_, int smb_, i
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02890">2890</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02907">2907</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02702">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator()()</a>.</p>
+<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02719">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator()()</a>.</p>
 
 </div>
 </div>
@@ -648,9 +651,9 @@ template&lt;int k_, int sma_, int sna_, int slt_, int smt_, int snt_&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02836">2836</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02853">2853</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02702">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator()()</a>.</p>
+<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02719">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator()()</a>.</p>
 
 </div>
 </div>
@@ -714,9 +717,9 @@ template&lt;int slx_, int sma_, int sna_&gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>*this</code> </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02941">2941</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02958">2958</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02702">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator()()</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02719">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator()()</a>.</p>
 
 </div>
 </div>
@@ -750,11 +753,11 @@ template&lt;typename Tx_ , int sla_, int sma_, int sna_&gt; </div>
 
 <p>conversion operator </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02687">2687</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02704">2704</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02687">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::convert()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02704">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::convert()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tiny__algebra_8hpp_source.html#l02687">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::convert()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="tiny__algebra_8hpp_source.html#l02704">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::convert()</a>.</p>
 
 </div>
 </div>
@@ -794,9 +797,9 @@ template&lt;int sla_, int sma_, int sna_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02774">2774</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02791">2791</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01373">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01382">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>.</p>
 
 </div>
 </div>
@@ -843,9 +846,9 @@ template&lt;int ll_, int mm_, int nn_, int la_, int ma_, int na_, int sla_, int 
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02795">2795</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02812">2812</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01373">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01382">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>.</p>
 
 </div>
 </div>
@@ -877,7 +880,7 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 
 <p>formats the tensor </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02810">2810</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02827">2827</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 </div>
 </div>
@@ -908,9 +911,9 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 
 <p>Returns a null-tensor. </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02962">2962</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02979">2979</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02583">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::Tensor3()</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02600">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::Tensor3()</a>.</p>
 
 </div>
 </div>
@@ -965,11 +968,11 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A (const) reference to the tensor entry at position (h,i,j). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02702">2702</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02719">2719</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>.</p>
+<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tiny__algebra_8hpp_source.html#l02890">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::add_double_mat_mult()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02836">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::add_mat_tensor_mult()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02941">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::add_vec_mat_outer_product()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="tiny__algebra_8hpp_source.html#l02907">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::add_double_mat_mult()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02853">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::add_mat_tensor_mult()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02958">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::add_vec_mat_outer_product()</a>.</p>
 
 </div>
 </div>
@@ -1024,9 +1027,9 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A (const) reference to the tensor entry at position (h,i,j).  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02711">2711</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02728">2728</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>.</p>
+<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>.</p>
 
 </div>
 </div>
@@ -1058,9 +1061,9 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 
 <p>scalar right-multiply-by operator </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02742">2742</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02759">2759</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>.</p>
 
 </div>
 </div>
@@ -1094,9 +1097,9 @@ template&lt;int sla_, int sma_, int sna_&gt; </div>
 
 <p>tensor component-wise addition operator </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02751">2751</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02768">2768</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01373">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01382">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>.</p>
 
 </div>
 </div>
@@ -1130,9 +1133,9 @@ template&lt;int sla_, int sma_, int sna_&gt; </div>
 
 <p>tensor component-wise subtraction operator </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02760">2760</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02777">2777</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01373">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01382">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>.</p>
 
 </div>
 </div>
@@ -1173,9 +1176,9 @@ template&lt;typename Tx_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>*this </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02676">2676</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02693">2693</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -1216,9 +1219,9 @@ template&lt;typename Tx_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>*this </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02658">2658</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02675">2675</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -1252,9 +1255,9 @@ template&lt;int sla_, int sma_, int sna_&gt; </div>
 
 <p>copy-assignment operator </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02642">2642</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02659">2659</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01373">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l01382">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::v</a>.</p>
 
 </div>
 </div>
@@ -1286,9 +1289,9 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 
 <p>value-assignment operator </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02633">2633</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02650">2650</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
 
 </div>
 </div>
@@ -1327,9 +1330,9 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A (const) reference to the matrix representing the <code>h</code>-th plane of the tensor. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02728">2728</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02745">2745</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>.</p>
+<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>.</p>
 
 </div>
 </div>
@@ -1368,9 +1371,42 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A (const) reference to the matrix representing the <code>h</code>-th plane of the tensor.  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02735">2735</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02752">2752</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02580">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>.</p>
+<p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02597">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::v</a>.</p>
+
+</div>
+</div>
+<a id="a130cfbcc606843c595c07a8c91ce12f6" name="a130cfbcc606843c595c07a8c91ce12f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a130cfbcc606843c595c07a8c91ce12f6">&#9670;&#160;</a></span>typemap()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, int sn_ = n_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static <a class="el" href="class_f_e_a_t_1_1_dist_1_1_typemap.html">Dist::Typemap</a> <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_tensor3.html">FEAT::Tiny::Tensor3</a>&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::typemap </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns a Typemap for sending <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_tensor3.html" title="Tiny Tensor3 class template.">Tensor3</a> via MPI. </p>
+
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02987">2987</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="dist_8hpp_source.html#l00259">FEAT::Dist::Typemap::add_entry()</a>.</p>
 
 </div>
 </div>
@@ -1399,7 +1435,7 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 
 <p>the tube count of the tensor </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02560">2560</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02577">2577</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 </div>
 </div>
@@ -1427,7 +1463,7 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 
 <p>the row count of the tensor </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02562">2562</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02579">2579</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 </div>
 </div>
@@ -1455,7 +1491,7 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 
 <p>the column count of the tensor </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02564">2564</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02581">2581</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 </div>
 </div>
@@ -1483,7 +1519,7 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 
 <p>the tube stride of the tensor </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02566">2566</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02583">2583</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 </div>
 </div>
@@ -1511,7 +1547,7 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 
 <p>the row stride of the tensor </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02568">2568</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02585">2585</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 </div>
 </div>
@@ -1539,7 +1575,7 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 
 <p>the column stride of the tensor </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02570">2570</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02587">2587</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
 </div>
 </div>
@@ -1559,9 +1595,9 @@ template&lt;typename T_ , int l_, int m_, int n_, int sl_ = l_, int sm_ = m_, in
 
 <p>Actual tensor data. </p>
 
-<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02580">2580</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="tiny__algebra_8hpp_source.html#l02597">2597</a> of file <a class="el" href="tiny__algebra_8hpp_source.html">tiny_algebra.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="tiny__algebra_8hpp_source.html#l02588">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::Tensor3()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02687">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::convert()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02774">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::copy()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02795">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::copy_n()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02702">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator()()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02742">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator*=()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02751">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator+=()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02760">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator-=()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02633">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator=()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02728">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator[]()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="tiny__algebra_8hpp_source.html#l02605">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::Tensor3()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02704">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::convert()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02791">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::copy()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02812">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::copy_n()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02719">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator()()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02759">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator*=()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02768">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator+=()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02777">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator-=()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l02650">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator=()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l02745">FEAT::Tiny::Tensor3&lt; T_, l_, m_, n_, sl_, sm_, sn_ &gt;::operator[]()</a>.</p>
 
 </div>
 </div>

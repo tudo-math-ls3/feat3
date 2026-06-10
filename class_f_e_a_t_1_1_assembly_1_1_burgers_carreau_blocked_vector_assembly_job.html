@@ -234,7 +234,7 @@ Public Attributes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:ae61b3af50cbc027f706f78aff0ad3375"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_blocked_vector_assembly_job.html#ae61b3af50cbc027f706f78aff0ad3375">block_size</a> = Vector_::BlockSize</td></tr>
+<tr class="memitem:ae61b3af50cbc027f706f78aff0ad3375"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_blocked_vector_assembly_job.html#ae61b3af50cbc027f706f78aff0ad3375">block_size</a> = Vector_::block_size</td></tr>
 <tr class="memdesc:ae61b3af50cbc027f706f78aff0ad3375"><td class="mdescLeft">&#160;</td><td class="mdescRight">the block size  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_blocked_vector_assembly_job.html#ae61b3af50cbc027f706f78aff0ad3375">More...</a><br /></td></tr>
 <tr class="separator:ae61b3af50cbc027f706f78aff0ad3375"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -485,7 +485,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="burgers__carreau__assembly__job_8hpp_source.html#l00226">226</a> of file <a class="el" href="burgers__carreau__assembly__job_8hpp_source.html">burgers_carreau_assembly_job.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="burgers__carreau__assembly__job_8hpp_source.html#l00204">FEAT::Assembly::BurgersCarreauAssemblyJobBase&lt; DataType_, Space_, ConvVector_ &gt;::calc_sd_v_norm()</a>, <a class="el" href="vector_8hpp_source.html#l00149">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::get_gate()</a>, <a class="el" href="vector_8hpp_source.html#l00122">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>, and <a class="el" href="gate_8hpp_source.html#l00613">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max()</a>.</p>
+<p class="reference">References <a class="el" href="burgers__carreau__assembly__job_8hpp_source.html#l00204">FEAT::Assembly::BurgersCarreauAssemblyJobBase&lt; DataType_, Space_, ConvVector_ &gt;::calc_sd_v_norm()</a>, <a class="el" href="vector_8hpp_source.html#l00149">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::get_gate()</a>, <a class="el" href="vector_8hpp_source.html#l00122">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>, and <a class="el" href="gate_8hpp_source.html#l00662">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max()</a>.</p>
 
 </div>
 </div>
@@ -528,7 +528,7 @@ template&lt;typename IndexType_ , int conv_dim_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="burgers__carreau__assembly__job_8hpp_source.html#l00204">204</a> of file <a class="el" href="burgers__carreau__assembly__job_8hpp_source.html">burgers_carreau_assembly_job.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dense__vector__blocked_8hpp_source.html#l00502">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::elements()</a>, <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, and <a class="el" href="dense__vector__blocked_8hpp_source.html#l00528">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>.</p>
+<p class="reference">References <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, and <a class="el" href="dense__vector__blocked_8hpp_source.html#l00360">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::size()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="burgers__carreau__assembly__job_8hpp_source.html#l00226">FEAT::Assembly::BurgersCarreauAssemblyJobBase&lt; DataType_, Space_, ConvVector_ &gt;::calc_sd_v_norm()</a>, and <a class="el" href="burgers__carreau__assembly__job_8hpp_source.html#l00242">FEAT::Assembly::BurgersCarreauAssemblyJobBase&lt; DataType_, Space_, ConvVector_ &gt;::set_sd_v_norm()</a>.</p>
 
@@ -643,7 +643,7 @@ template&lt;typename Vector_ , typename Space_ , typename ConvVector_  = Vector_
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr int <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_blocked_vector_assembly_job.html">FEAT::Assembly::BurgersCarreauBlockedVectorAssemblyJob</a>&lt; Vector_, Space_, ConvVector_ &gt;::block_size = Vector_::BlockSize</td>
+          <td class="memname">constexpr int <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_carreau_blocked_vector_assembly_job.html">FEAT::Assembly::BurgersCarreauBlockedVectorAssemblyJob</a>&lt; Vector_, Space_, ConvVector_ &gt;::block_size = Vector_::block_size</td>
         </tr>
       </table>
   </td>

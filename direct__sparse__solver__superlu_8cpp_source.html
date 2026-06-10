@@ -163,14 +163,14 @@ $(document).ready(function(){initNavTree('direct__sparse__solver__superlu_8cpp_s
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>          was_factorized(false)</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>        {</div>
 <div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span>          <span class="comment">// first of all, memclear all SuperLU structures just to be safe</span></div>
-<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>          memset(&amp;slu_grid, 0, <span class="keyword">sizeof</span>(gridinfo_t));</div>
-<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>          memset(&amp;slu_opts, 0, <span class="keyword">sizeof</span>(superlu_dist_options_t));</div>
-<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>          memset(&amp;slu_stats, 0, <span class="keyword">sizeof</span>(SuperLUStat_t));</div>
-<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>          memset(&amp;slu_matrix, 0, <span class="keyword">sizeof</span>(SuperMatrix));</div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>          memset(&amp;slu_matrix_store, 0, <span class="keyword">sizeof</span>(NRformat_loc));</div>
-<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>          memset(&amp;slu_scale_perm, 0, <span class="keyword">sizeof</span>(dScalePermstruct_t));</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>          memset(&amp;slu_lu_struct, 0, <span class="keyword">sizeof</span>(dLUstruct_t));</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>          memset(&amp;slu_solve_struct, 0, <span class="keyword">sizeof</span>(dSOLVEstruct_t));</div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span>          Memory::memset_main(&amp;slu_grid, 0, <span class="keyword">sizeof</span>(gridinfo_t));</div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>          Memory::memset_main(&amp;slu_opts, 0, <span class="keyword">sizeof</span>(superlu_dist_options_t));</div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>          Memory::memset_main(&amp;slu_stats, 0, <span class="keyword">sizeof</span>(SuperLUStat_t));</div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span>          Memory::memset_main(&amp;slu_matrix, 0, <span class="keyword">sizeof</span>(SuperMatrix));</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>          Memory::memset_main(&amp;slu_matrix_store, 0, <span class="keyword">sizeof</span>(NRformat_loc));</div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>          Memory::memset_main(&amp;slu_scale_perm, 0, <span class="keyword">sizeof</span>(dScalePermstruct_t));</div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>          Memory::memset_main(&amp;slu_lu_struct, 0, <span class="keyword">sizeof</span>(dLUstruct_t));</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>          Memory::memset_main(&amp;slu_solve_struct, 0, <span class="keyword">sizeof</span>(dSOLVEstruct_t));</div>
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>          <span class="comment">// set up grid</span></div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>          <span class="keywordtype">int</span> ranks(0);</div>
@@ -214,7 +214,7 @@ $(document).ready(function(){initNavTree('direct__sparse__solver__superlu_8cpp_s
 <div class="line"><a id="l00131" name="l00131"></a><span class="lineno">  131</span>        <span class="keywordtype">void</span> init_symbolic()</div>
 <div class="line"><a id="l00132" name="l00132"></a><span class="lineno">  132</span>        {</div>
 <div class="line"><a id="l00133" name="l00133"></a><span class="lineno">  133</span>          <span class="comment">// copy column indices arrays, because SuperLU permutes them</span></div>
-<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>          memcpy(slu_col_idx2.data(), slu_col_idx.data(), <span class="keyword">sizeof</span>(int_t)*slu_col_idx.size());</div>
+<div class="line"><a id="l00134" name="l00134"></a><span class="lineno">  134</span>          Memory::memcopy_main(slu_col_idx2.data(), slu_col_idx.data(), <span class="keyword">sizeof</span>(int_t)*slu_col_idx.size());</div>
 <div class="line"><a id="l00135" name="l00135"></a><span class="lineno">  135</span> </div>
 <div class="line"><a id="l00136" name="l00136"></a><span class="lineno">  136</span>          <span class="comment">// set up default options</span></div>
 <div class="line"><a id="l00137" name="l00137"></a><span class="lineno">  137</span>          set_default_options_dist(&amp;slu_opts);</div>
@@ -239,7 +239,7 @@ $(document).ready(function(){initNavTree('direct__sparse__solver__superlu_8cpp_s
 <div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>        {</div>
 <div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>          <span class="comment">// reset column-index array because it might have been</span></div>
 <div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>          <span class="comment">// overwritten by the previous factorization call</span></div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>          memcpy(slu_col_idx2.data(), slu_col_idx.data(), <span class="keyword">sizeof</span>(int_t)*slu_col_idx.size());</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>          Memory::memcopy_main(slu_col_idx2.data(), slu_col_idx.data(), <span class="keyword">sizeof</span>(int_t)*slu_col_idx.size());</div>
 <div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span> </div>
 <div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>          <span class="comment">// have we already factorized before?</span></div>
 <div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>          slu_opts.Fact = (was_factorized ? SamePattern : DOFACT);</div>

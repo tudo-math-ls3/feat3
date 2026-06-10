@@ -290,12 +290,12 @@ Static Public Attributes</h2></td></tr>
 <tr class="memitem:af189d859c6d1a7563aad3863ee6f3f48"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#af189d859c6d1a7563aad3863ee6f3f48">_local_degree</a> = 4*SpaceType::local_degree + 1</td></tr>
 <tr class="memdesc:af189d859c6d1a7563aad3863ee6f3f48"><td class="mdescLeft">&#160;</td><td class="mdescRight">Maximum polynomial degree.  <a href="class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#af189d859c6d1a7563aad3863ee6f3f48">More...</a><br /></td></tr>
 <tr class="separator:af189d859c6d1a7563aad3863ee6f3f48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7cec326c09819bb49d438ce4b92cd038"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#a7cec326c09819bb49d438ce4b92cd038">BlockHeight</a> = MatrixType::BlockHeight</td></tr>
-<tr class="memdesc:a7cec326c09819bb49d438ce4b92cd038"><td class="mdescLeft">&#160;</td><td class="mdescRight">Blockheight of the system matrix.  <a href="class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#a7cec326c09819bb49d438ce4b92cd038">More...</a><br /></td></tr>
-<tr class="separator:a7cec326c09819bb49d438ce4b92cd038"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0cb4eca9b1f6bf50a8409233196a596"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#aa0cb4eca9b1f6bf50a8409233196a596">BlockWidth</a> = MatrixType::BlockWidth</td></tr>
-<tr class="memdesc:aa0cb4eca9b1f6bf50a8409233196a596"><td class="mdescLeft">&#160;</td><td class="mdescRight">Blockwidth of the system matrix.  <a href="class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#aa0cb4eca9b1f6bf50a8409233196a596">More...</a><br /></td></tr>
-<tr class="separator:aa0cb4eca9b1f6bf50a8409233196a596"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2c6d0bfbcc7f0dcff41aaa317a324e3"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#ad2c6d0bfbcc7f0dcff41aaa317a324e3">block_height</a> = MatrixType::block_height</td></tr>
+<tr class="memdesc:ad2c6d0bfbcc7f0dcff41aaa317a324e3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Blockheight of the system matrix.  <a href="class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#ad2c6d0bfbcc7f0dcff41aaa317a324e3">More...</a><br /></td></tr>
+<tr class="separator:ad2c6d0bfbcc7f0dcff41aaa317a324e3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac96b492aa5da5e8b21cb2a519f0b4556"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#ac96b492aa5da5e8b21cb2a519f0b4556">block_width</a> = MatrixType::block_width</td></tr>
+<tr class="memdesc:ac96b492aa5da5e8b21cb2a519f0b4556"><td class="mdescLeft">&#160;</td><td class="mdescRight">Blockwidth of the system matrix.  <a href="class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#ac96b492aa5da5e8b21cb2a519f0b4556">More...</a><br /></td></tr>
+<tr class="separator:ac96b492aa5da5e8b21cb2a519f0b4556"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -913,7 +913,7 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
 
 <p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00243">243</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00629">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_cell_scalar()</a>, and <a class="el" href="dense__vector_8hpp_source.html#l00737">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>.</p>
+<p class="reference">References <a class="el" href="export__vtk_8hpp_source.html#l00662">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::add_cell_scalar()</a>, and <a class="el" href="memory__arbiter_8hpp_source.html#l00483">FEAT::Memory::TypedView&lt; T_ &gt;::get_r()</a>.</p>
 
 </div>
 </div>
@@ -944,7 +944,7 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
 
 <p>Assembles the system matrix. </p>
 
-<p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00251">251</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00252">252</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dudv__functional_8hpp_source.html#l00128">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::_cubature_factory</a>, <a class="el" href="bilinear__operator__assembler_8hpp_source.html#l00225">FEAT::Assembly::BilinearOperatorAssembler::assemble_matrix1()</a>, <a class="el" href="dudv__functional_8hpp_source.html#l00116">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::matrix_sys</a>, and <a class="el" href="dudv__functional_8hpp_source.html#l00132">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::trafo_space</a>.</p>
 
@@ -1060,9 +1060,9 @@ As these quantities are global, this function has a pre_sync and post_sync part.
 
 <p>Implements <a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_mesh_quality_functional.html#acebd48b7bab06d89501ff534e2335372">FEAT::Meshopt::MeshQualityFunctional&lt; TrafoType_::MeshType &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00355">355</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00359">359</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dudv__functional_8hpp_source.html#l00427">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::compute_cell_size_defect_post_sync()</a>, and <a class="el" href="dudv__functional_8hpp_source.html#l00384">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::compute_cell_size_defect_pre_sync()</a>.</p>
+<p class="reference">References <a class="el" href="dudv__functional_8hpp_source.html#l00431">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::compute_cell_size_defect_post_sync()</a>, and <a class="el" href="dudv__functional_8hpp_source.html#l00388">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::compute_cell_size_defect_pre_sync()</a>.</p>
 
 </div>
 </div>
@@ -1137,11 +1137,11 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
 As these quantities are global, this function has a pre_sync and post_sync part.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd>Control::DuDvFunctionalControl::compute_cell_size_defect() </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00427">427</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00431">431</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dudv__functional_8hpp_source.html#l00122">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::_lambda</a>, <a class="el" href="math_8hpp_source.html#l00275">FEAT::Math::abs()</a>, <a class="el" href="mesh__quality__functional_8hpp_source.html#l00126">FEAT::Meshopt::MeshQualityFunctional&lt; TrafoType_::MeshType &gt;::get_mesh()</a>, <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, and <a class="el" href="math_8hpp_source.html#l00123">FEAT::Math::min()</a>.</p>
+<p class="reference">References <a class="el" href="math_8hpp_source.html#l00275">FEAT::Math::abs()</a>, <a class="el" href="mesh__quality__functional_8hpp_source.html#l00126">FEAT::Meshopt::MeshQualityFunctional&lt; TrafoType_::MeshType &gt;::get_mesh()</a>, <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, and <a class="el" href="math_8hpp_source.html#l00123">FEAT::Math::min()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00355">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::compute_cell_size_defect()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00359">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::compute_cell_size_defect()</a>.</p>
 
 </div>
 </div>
@@ -1202,11 +1202,11 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
 As these quantities are global, this function has a pre_sync and post_sync part.</dd></dl>
 <dl class="section see"><dt>See also</dt><dd>Control::DuDvFunctionalControl::compute_cell_size_defect() </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00384">384</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00388">388</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="mesh__quality__functional_8hpp_source.html#l00126">FEAT::Meshopt::MeshQualityFunctional&lt; TrafoType_::MeshType &gt;::get_mesh()</a>, <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, and <a class="el" href="math_8hpp_source.html#l00123">FEAT::Math::min()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00355">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::compute_cell_size_defect()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00359">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::compute_cell_size_defect()</a>.</p>
 
 </div>
 </div>
@@ -1237,7 +1237,7 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
 
 <p>Creates an L-vector for the functional's gradient. </p>
 
-<p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00459">459</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00464">464</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dudv__functional_8hpp_source.html#l00132">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::trafo_space</a>.</p>
 
@@ -1270,7 +1270,7 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
 
 <p>Creates an R-vector for the functional and its gradient. </p>
 
-<p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00467">467</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00472">472</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dudv__functional_8hpp_source.html#l00132">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::trafo_space</a>.</p>
 
@@ -1304,7 +1304,7 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
 <p>Checks if the functional is empty (= the null functional. </p>
 <dl class="section return"><dt>Returns</dt><dd>True if the number of DoFs is zero.) </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00451">451</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00456">456</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dudv__functional_8hpp_source.html#l00116">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::matrix_sys</a>.</p>
 
@@ -1570,7 +1570,7 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
 
 <p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00224">224</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dudv__functional_8hpp_source.html#l00251">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::assemble_system_matrix()</a>.</p>
+<p class="reference">References <a class="el" href="dudv__functional_8hpp_source.html#l00252">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::assemble_system_matrix()</a>.</p>
 
 </div>
 </div>
@@ -1681,7 +1681,7 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
 </dl>
 <p>Needs to be called whenever any data like the mesh etc. changed. </p>
 
-<p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00278">278</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00279">279</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dudv__functional_8hpp_source.html#l00124">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::_dirichlet_asm</a>, <a class="el" href="dudv__functional_8hpp_source.html#l00122">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::_lambda</a>, <a class="el" href="mesh__quality__functional_8hpp_source.html#l00048">FEAT::Meshopt::MeshQualityFunctional&lt; TrafoType_::MeshType &gt;::_mesh_node</a>, <a class="el" href="dudv__functional_8hpp_source.html#l00126">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::_slip_asm</a>, <a class="el" href="dudv__functional_8hpp_source.html#l00120">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::_trafo</a>, <a class="el" href="mesh__node_8hpp_source.html#l00523">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::adapt_by_name()</a>, <a class="el" href="mesh__quality__functional_8hpp_source.html#l00126">FEAT::Meshopt::MeshQualityFunctional&lt; TrafoType_::MeshType &gt;::get_mesh()</a>, <a class="el" href="dudv__functional_8hpp_source.html#l00132">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::trafo_space</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
 
@@ -1769,7 +1769,7 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
 
 <p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00128">128</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00251">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::assemble_system_matrix()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00252">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::assemble_system_matrix()</a>.</p>
 
 </div>
 </div>
@@ -1799,7 +1799,7 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
 
 <p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00124">124</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00151">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::DuDvFunctional()</a>, and <a class="el" href="dudv__functional_8hpp_source.html#l00278">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::prepare()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00151">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::DuDvFunctional()</a>, and <a class="el" href="dudv__functional_8hpp_source.html#l00279">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::prepare()</a>.</p>
 
 </div>
 </div>
@@ -1829,7 +1829,7 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
 
 <p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00122">122</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00427">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::compute_cell_size_defect_post_sync()</a>, and <a class="el" href="dudv__functional_8hpp_source.html#l00278">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::prepare()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00279">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::prepare()</a>.</p>
 
 </div>
 </div>
@@ -1991,7 +1991,7 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
 
 <p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00126">126</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00151">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::DuDvFunctional()</a>, and <a class="el" href="dudv__functional_8hpp_source.html#l00278">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::prepare()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00151">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::DuDvFunctional()</a>, and <a class="el" href="dudv__functional_8hpp_source.html#l00279">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::prepare()</a>.</p>
 
 </div>
 </div>
@@ -2021,12 +2021,12 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
 
 <p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00120">120</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00151">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::DuDvFunctional()</a>, and <a class="el" href="dudv__functional_8hpp_source.html#l00278">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::prepare()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00151">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::DuDvFunctional()</a>, and <a class="el" href="dudv__functional_8hpp_source.html#l00279">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::prepare()</a>.</p>
 
 </div>
 </div>
-<a id="a7cec326c09819bb49d438ce4b92cd038" name="a7cec326c09819bb49d438ce4b92cd038"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7cec326c09819bb49d438ce4b92cd038">&#9670;&#160;</a></span>BlockHeight</h2>
+<a id="ad2c6d0bfbcc7f0dcff41aaa317a324e3" name="ad2c6d0bfbcc7f0dcff41aaa317a324e3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2c6d0bfbcc7f0dcff41aaa317a324e3">&#9670;&#160;</a></span>block_height</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2037,7 +2037,7 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr int <a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html">FEAT::Meshopt::DuDvFunctional</a>&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::BlockHeight = MatrixType::BlockHeight</td>
+          <td class="memname">constexpr int <a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html">FEAT::Meshopt::DuDvFunctional</a>&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::block_height = MatrixType::block_height</td>
         </tr>
       </table>
   </td>
@@ -2053,8 +2053,8 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
 
 </div>
 </div>
-<a id="aa0cb4eca9b1f6bf50a8409233196a596" name="aa0cb4eca9b1f6bf50a8409233196a596"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa0cb4eca9b1f6bf50a8409233196a596">&#9670;&#160;</a></span>BlockWidth</h2>
+<a id="ac96b492aa5da5e8b21cb2a519f0b4556" name="ac96b492aa5da5e8b21cb2a519f0b4556"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac96b492aa5da5e8b21cb2a519f0b4556">&#9670;&#160;</a></span>block_width</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -2065,7 +2065,7 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr int <a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html">FEAT::Meshopt::DuDvFunctional</a>&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::BlockWidth = MatrixType::BlockWidth</td>
+          <td class="memname">constexpr int <a class="el" href="class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html">FEAT::Meshopt::DuDvFunctional</a>&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::block_width = MatrixType::block_width</td>
         </tr>
       </table>
   </td>
@@ -2099,7 +2099,7 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
 
 <p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00116">116</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00151">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::DuDvFunctional()</a>, <a class="el" href="dudv__functional_8hpp_source.html#l00251">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::assemble_system_matrix()</a>, and <a class="el" href="dudv__functional_8hpp_source.html#l00451">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::empty()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00151">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::DuDvFunctional()</a>, <a class="el" href="dudv__functional_8hpp_source.html#l00252">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::assemble_system_matrix()</a>, and <a class="el" href="dudv__functional_8hpp_source.html#l00456">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::empty()</a>.</p>
 
 </div>
 </div>
@@ -2121,7 +2121,7 @@ template&lt;typename DT_ , typename IT_ , typename TrafoType_ , template&lt; typ
 
 <p class="definition">Definition at line <a class="el" href="dudv__functional_8hpp_source.html#l00132">132</a> of file <a class="el" href="dudv__functional_8hpp_source.html">dudv_functional.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00151">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::DuDvFunctional()</a>, <a class="el" href="dudv__functional_8hpp_source.html#l00251">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::assemble_system_matrix()</a>, <a class="el" href="dudv__functional_8hpp_source.html#l00459">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::create_vector_l()</a>, <a class="el" href="dudv__functional_8hpp_source.html#l00467">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::create_vector_r()</a>, and <a class="el" href="dudv__functional_8hpp_source.html#l00278">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::prepare()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dudv__functional_8hpp_source.html#l00151">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::DuDvFunctional()</a>, <a class="el" href="dudv__functional_8hpp_source.html#l00252">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::assemble_system_matrix()</a>, <a class="el" href="dudv__functional_8hpp_source.html#l00464">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::create_vector_l()</a>, <a class="el" href="dudv__functional_8hpp_source.html#l00472">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::create_vector_r()</a>, and <a class="el" href="dudv__functional_8hpp_source.html#l00279">FEAT::Meshopt::DuDvFunctional&lt; DT_, IT_, TrafoType_, MatrixType_ &gt;::prepare()</a>.</p>
 
 </div>
 </div>

@@ -46,6 +46,7 @@ var namespace_f_e_a_t_1_1_l_a_f_e_m =
     [ "SparseMatrixFactory", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_factory.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_factory" ],
     [ "SparseVector", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector" ],
     [ "SparseVectorBlocked", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector_blocked.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector_blocked" ],
+    [ "SparseVectorFactory", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector_factory.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector_factory" ],
     [ "TestMatrixFactory", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_test_matrix_factory.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_test_matrix_factory" ],
     [ "Transfer", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_transfer.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_transfer" ],
     [ "TupleDiagMatrix", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_diag_matrix.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_diag_matrix" ],
@@ -94,10 +95,6 @@ var namespace_f_e_a_t_1_1_l_a_f_e_m =
       [ "fm_cscr", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646abd40859f4033e0cfe2220fa76a1e6451", null ],
       [ "fm_binary", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646a34b9b130e68b0a9ab2718496480e3142", null ]
     ] ],
-    [ "Perspective", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab2adeb0ceb5f9834949b5a865cd4f7e8", [
-      [ "native", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab2adeb0ceb5f9834949b5a865cd4f7e8a8e5f3adee38c8fccc13c1f3be0143796", null ],
-      [ "pod", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab2adeb0ceb5f9834949b5a865cd4f7e8adcc0caa97588ee058c2fcd764e5f919b", null ]
-    ] ],
     [ "SparseLayoutId", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638", [
       [ "lt_csr", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638a2b574af1e77683ec89ad7272eca992e2", null ],
       [ "lt_cscr", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#aabefea13a94890ded77e859eecd6a638a6e9aed08b64acac485b5a158adfadc4f", null ],
@@ -121,5 +118,5 @@ var namespace_f_e_a_t_1_1_l_a_f_e_m =
     [ "operator*", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#abc05c5351009d872162225b99ff13618", null ],
     [ "operator|", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#aeac797174e76e1c3df79dea5d70d1b4b", null ],
     [ "operator|", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab89839954f6e5f969ad6d5975da8b18b", null ],
-    [ "FileOutStreamBufferSize", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#a8c4c378c7a34eb8ccca4252d9bada38b", null ]
+    [ "file_out_stream_buffer_size", "namespace_f_e_a_t_1_1_l_a_f_e_m.html#a9fba230253cfc7904fb7e63086c896c1", null ]
 ];

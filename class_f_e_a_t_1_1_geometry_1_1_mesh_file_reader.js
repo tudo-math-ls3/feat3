@@ -1,14 +1,5 @@
 var class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader =
 [
-    [ "MeshType", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#abef75c771edd48fe54f531fe8ccf1999", [
-      [ "unknown", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#abef75c771edd48fe54f531fe8ccf1999aad921d60486366258809553a3db49a4a", null ],
-      [ "conformal", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#abef75c771edd48fe54f531fe8ccf1999add786cecc4c061d74f79de1c7abf040e", null ]
-    ] ],
-    [ "ShapeType", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#a7151af9ea20b00d88dd8d662e6517366", [
-      [ "unknown", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#a7151af9ea20b00d88dd8d662e6517366aad921d60486366258809553a3db49a4a", null ],
-      [ "simplex", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#a7151af9ea20b00d88dd8d662e6517366a0d387426f578f524f21c1bff75f78213", null ],
-      [ "hypercube", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#a7151af9ea20b00d88dd8d662e6517366a96f39b3b7bb9efe0df92d7bfb8bc480e", null ]
-    ] ],
     [ "MeshFileReader", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#a88e20de450dfb3c67e79da99a9107bbc", null ],
     [ "MeshFileReader", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#a596a8ac5d18112cdae2c3db7ac2c4063", null ],
     [ "~MeshFileReader", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#a88297dfd82fbfda44b44d3e7cf32b195", null ],
@@ -17,10 +8,10 @@ var class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader =
     [ "add_mesh_files", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#a22144ce486793719e9165b21f131efe3", null ],
     [ "add_mesh_files", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#acf8d5475a4bed0b2ea3b415166ec7183", null ],
     [ "add_stream", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#ad1b6cf8d3bfc236374bcaf330469047f", null ],
-    [ "get_mesh_type", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#acf3280c2caa46d698f68a3eff0bdd8d4", null ],
+    [ "get_mesh_type", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#a1622e10ee184775e64a937584293a375", null ],
     [ "get_meshtype_string", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#a5cbb03e61e83fdf4e6d75d43dfda0f3e", null ],
     [ "get_shape_dim", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#a7304e3c465c3747f4aefbc90732ef830", null ],
-    [ "get_shape_type", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#aa843e48f14e14718c810178c7833ec41", null ],
+    [ "get_shape_type", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#a23b62be90e3c4f5384d7a7984b0ffb56", null ],
     [ "get_world_dim", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#ad2942d03a0369e27b8aa1a6ebdd6be63", null ],
     [ "parse", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#ae1cec718bb235add5320a68552790cf9", null ],
     [ "parse", "class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#a97d181fdbb71511056be450654568f4a", null ],

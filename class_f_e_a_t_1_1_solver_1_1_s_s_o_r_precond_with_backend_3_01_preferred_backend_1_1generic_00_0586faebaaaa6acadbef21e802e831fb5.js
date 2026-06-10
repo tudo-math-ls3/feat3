@@ -1,0 +1,6 @@
+var class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_0586faebaaaa6acadbef21e802e831fb5 =
+[
+    [ "SSORPrecondWithBackend", "class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_0586faebaaaa6acadbef21e802e831fb5.html#a1dd0b7f1e35d3cc0919c24eb2d3c3fd7", null ],
+    [ "name", "class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_0586faebaaaa6acadbef21e802e831fb5.html#ac3efee3fdc3ac5ff4132ab7743dd7938", null ],
+    [ "set_omega", "class_f_e_a_t_1_1_solver_1_1_s_s_o_r_precond_with_backend_3_01_preferred_backend_1_1generic_00_0586faebaaaa6acadbef21e802e831fb5.html#acde73ddce8342097a3f83c2f05666d64", null ]
+];

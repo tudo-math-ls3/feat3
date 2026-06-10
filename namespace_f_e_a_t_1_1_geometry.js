@@ -38,6 +38,7 @@ var namespace_f_e_a_t_1_1_geometry =
     [ "FoundationAdaptiveAdjactor", "class_f_e_a_t_1_1_geometry_1_1_foundation_adaptive_adjactor.html", "class_f_e_a_t_1_1_geometry_1_1_foundation_adaptive_adjactor" ],
     [ "Gap", "struct_f_e_a_t_1_1_geometry_1_1_gap.html", null ],
     [ "GlobalMaskedBoundaryFactory", "class_f_e_a_t_1_1_geometry_1_1_global_masked_boundary_factory.html", "class_f_e_a_t_1_1_geometry_1_1_global_masked_boundary_factory" ],
+    [ "GmshFileReader", "class_f_e_a_t_1_1_geometry_1_1_gmsh_file_reader.html", "class_f_e_a_t_1_1_geometry_1_1_gmsh_file_reader" ],
     [ "HitTestFactory", "class_f_e_a_t_1_1_geometry_1_1_hit_test_factory.html", "class_f_e_a_t_1_1_geometry_1_1_hit_test_factory" ],
     [ "IndexCalculator", "class_f_e_a_t_1_1_geometry_1_1_index_calculator.html", "class_f_e_a_t_1_1_geometry_1_1_index_calculator" ],
     [ "IndexSet", "class_f_e_a_t_1_1_geometry_1_1_index_set.html", "class_f_e_a_t_1_1_geometry_1_1_index_set" ],
@@ -166,6 +167,15 @@ var namespace_f_e_a_t_1_1_geometry =
       [ "Sibling", "namespace_f_e_a_t_1_1_geometry.html#ad03b126d9c056078d9c866ee7549a8efaba3f6a5526b54675d54123702760ddf2", null ],
       [ "BoundaryEdge", "namespace_f_e_a_t_1_1_geometry.html#ad03b126d9c056078d9c866ee7549a8efa19681172742a6d255226e6463ca3cfae", null ],
       [ "BoundaryFace", "namespace_f_e_a_t_1_1_geometry.html#ad03b126d9c056078d9c866ee7549a8efa373cddef55a1570d51e743e27c0315d7", null ]
+    ] ],
+    [ "ParsedMeshType", "namespace_f_e_a_t_1_1_geometry.html#a46bbc119f810b28835e0f20d556c9845", [
+      [ "unknown", "namespace_f_e_a_t_1_1_geometry.html#a46bbc119f810b28835e0f20d556c9845aad921d60486366258809553a3db49a4a", null ],
+      [ "conformal", "namespace_f_e_a_t_1_1_geometry.html#a46bbc119f810b28835e0f20d556c9845add786cecc4c061d74f79de1c7abf040e", null ]
+    ] ],
+    [ "ParsedShapeType", "namespace_f_e_a_t_1_1_geometry.html#a7a1948d82559bb856d53452c6b129a6e", [
+      [ "unknown", "namespace_f_e_a_t_1_1_geometry.html#a7a1948d82559bb856d53452c6b129a6eaad921d60486366258809553a3db49a4a", null ],
+      [ "simplex", "namespace_f_e_a_t_1_1_geometry.html#a7a1948d82559bb856d53452c6b129a6ea0d387426f578f524f21c1bff75f78213", null ],
+      [ "hypercube", "namespace_f_e_a_t_1_1_geometry.html#a7a1948d82559bb856d53452c6b129a6ea96f39b3b7bb9efe0df92d7bfb8bc480e", null ]
     ] ],
     [ "PermutationStrategy", "namespace_f_e_a_t_1_1_geometry.html#a9a08208ef110199cc9c70de1f8b83de6", [
       [ "none", "namespace_f_e_a_t_1_1_geometry.html#a9a08208ef110199cc9c70de1f8b83de6a334c4a4c42fdb79d7ebc3e73b517e6f8", null ],

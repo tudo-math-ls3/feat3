@@ -248,10 +248,12 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:ad79496d37c06e8def375968449a272e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a864f80bb9b621d7e3ac60aa2e20d75f1"><td class="memItemLeft" align="right" valign="top">std::uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html#a864f80bb9b621d7e3ac60aa2e20d75f1">set_checkpoint_data</a> (std::vector&lt; char &gt; &amp;data, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_serial_config.html">LAFEM::SerialConfig</a> &amp;config)</td></tr>
 <tr class="separator:a864f80bb9b621d7e3ac60aa2e20d75f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a11dce24c2c27b0d102f920664d9e988b"><td class="memTemplParams" colspan="2">template&lt;<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab2adeb0ceb5f9834949b5a865cd4f7e8">LAFEM::Perspective</a> perspective_ = LAFEM::Perspective::pod&gt; </td></tr>
-<tr class="memitem:a11dce24c2c27b0d102f920664d9e988b"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html#a11dce24c2c27b0d102f920664d9e988b">size</a> () const</td></tr>
-<tr class="memdesc:a11dce24c2c27b0d102f920664d9e988b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total number of entries in this distributed vector.  <a href="class_f_e_a_t_1_1_global_1_1_vector.html#a11dce24c2c27b0d102f920664d9e988b">More...</a><br /></td></tr>
-<tr class="separator:a11dce24c2c27b0d102f920664d9e988b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a47460dfcfec1a333de4fa0050198d4c6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html#a47460dfcfec1a333de4fa0050198d4c6">size</a> () const</td></tr>
+<tr class="memdesc:a47460dfcfec1a333de4fa0050198d4c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total number of entries in this distributed vector.  <a href="class_f_e_a_t_1_1_global_1_1_vector.html#a47460dfcfec1a333de4fa0050198d4c6">More...</a><br /></td></tr>
+<tr class="separator:a47460dfcfec1a333de4fa0050198d4c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3e2cf8db4eab0d4beda06dadfcca8082"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html#a3e2cf8db4eab0d4beda06dadfcca8082">size_raw</a> () const</td></tr>
+<tr class="memdesc:a3e2cf8db4eab0d4beda06dadfcca8082"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total number of entries in this distributed vector.  <a href="class_f_e_a_t_1_1_global_1_1_vector.html#a3e2cf8db4eab0d4beda06dadfcca8082">More...</a><br /></td></tr>
+<tr class="separator:a3e2cf8db4eab0d4beda06dadfcca8082"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae304cf8e0c85bb03d3986b88140bf47b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html#ae304cf8e0c85bb03d3986b88140bf47b">sync_0</a> ()</td></tr>
 <tr class="memdesc:ae304cf8e0c85bb03d3986b88140bf47b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Performs a type-0 synchronization of the vector, i.e. sums up all local DOF contributions.  <a href="class_f_e_a_t_1_1_global_1_1_vector.html#ae304cf8e0c85bb03d3986b88140bf47b">More...</a><br /></td></tr>
 <tr class="separator:ae304cf8e0c85bb03d3986b88140bf47b"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -461,7 +463,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00095">95</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00270">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::clone()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00285">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::clone()</a>.</p>
 
 </div>
 </div>
@@ -562,7 +564,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00351">351</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00366">366</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, and <a class="el" href="vector_8hpp_source.html#l00122">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>.</p>
 
@@ -595,7 +597,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>Clears the underlying vector. </p>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00293">293</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00308">308</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>.</p>
 
@@ -648,7 +650,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00284">284</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00299">299</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
@@ -689,7 +691,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The created clone object </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00270">270</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00285">285</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="vector_8hpp_source.html#l00095">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::Vector()</a>, <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, and <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>.</p>
 
@@ -743,7 +745,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00468">468</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00483">483</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, and <a class="el" href="vector_8hpp_source.html#l00122">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>.</p>
 
@@ -794,7 +796,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00481">481</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00496">496</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, and <a class="el" href="vector_8hpp_source.html#l00122">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>.</p>
 
@@ -876,11 +878,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00333">333</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00348">348</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, and <a class="el" href="vector_8hpp_source.html#l00122">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="matrix_8hpp_source.html#l00407">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply()</a>, <a class="el" href="matrix_8hpp_source.html#l00485">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_async()</a>, <a class="el" href="matrix_8hpp_source.html#l00445">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed()</a>, and <a class="el" href="matrix_8hpp_source.html#l00525">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed_async()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="matrix_8hpp_source.html#l00423">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply()</a>, <a class="el" href="matrix_8hpp_source.html#l00501">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_async()</a>, <a class="el" href="matrix_8hpp_source.html#l00461">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed()</a>, and <a class="el" href="matrix_8hpp_source.html#l00541">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed_async()</a>.</p>
 
 </div>
 </div>
@@ -920,11 +922,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The dot-product of this and <code>x</code> </dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00381">381</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00396">396</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, <a class="el" href="gate_8hpp_source.html#l00500">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot()</a>, and <a class="el" href="vector_8hpp_source.html#l00122">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, <a class="el" href="gate_8hpp_source.html#l00549">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot()</a>, and <a class="el" href="vector_8hpp_source.html#l00122">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00412">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::norm2sqr()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00427">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::norm2sqr()</a>.</p>
 
 </div>
 </div>
@@ -964,11 +966,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A scalar ticket that has to be waited upon to complete the operation.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00398">398</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00413">413</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, <a class="el" href="gate_8hpp_source.html#l00530">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot_async()</a>, and <a class="el" href="vector_8hpp_source.html#l00122">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, <a class="el" href="gate_8hpp_source.html#l00579">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot_async()</a>, and <a class="el" href="vector_8hpp_source.html#l00122">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00425">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::norm2sqr_async()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00440">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::norm2sqr_async()</a>.</p>
 
 </div>
 </div>
@@ -1006,11 +1008,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00303">303</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00318">318</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="meshopt__control_8hpp_source.html#l00589">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_rhs_vector()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="meshopt__control_8hpp_source.html#l00588">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_rhs_vector()</a>.</p>
 
 </div>
 </div>
@@ -1068,7 +1070,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section note"><dt>Note</dt><dd>This function automatically synchronizes the resulting vector to ensure that the shared DOFs are consistent over all processes.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00321">321</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00336">336</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, and <a class="el" href="vector_8hpp_source.html#l00221">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_1()</a>.</p>
 
@@ -1105,9 +1107,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00173">173</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00387">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::from_1_to_0()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00436">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::from_1_to_0()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="matrix_8hpp_source.html#l00407">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply()</a>, <a class="el" href="matrix_8hpp_source.html#l00485">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_async()</a>, <a class="el" href="matrix_8hpp_source.html#l00445">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed()</a>, <a class="el" href="matrix_8hpp_source.html#l00525">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed_async()</a>, and <a class="el" href="splitter_8hpp_source.html#l00320">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::join()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="matrix_8hpp_source.html#l00423">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply()</a>, <a class="el" href="matrix_8hpp_source.html#l00501">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_async()</a>, <a class="el" href="matrix_8hpp_source.html#l00461">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed()</a>, <a class="el" href="matrix_8hpp_source.html#l00541">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed_async()</a>, and <a class="el" href="splitter_8hpp_source.html#l00320">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::join()</a>.</p>
 
 </div>
 </div>
@@ -1141,7 +1143,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <p >Calculate size of complete object as it is stored in the checkpoint</p>
 <dl class="section return"><dt>Returns</dt><dd>size of object  </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00630">630</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00645">645</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>.</p>
 
@@ -1251,7 +1253,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p class="reference">References <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="dudv__functional__control_8hpp_source.html#l00153">FEAT::Control::Meshopt::DuDvFunctionalControl&lt; DT_, IT_, DomainControl_ &gt;::DuDvFunctionalControl()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00406">FEAT::Solver::ADPSolverBase&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt;, SolverBase_ &gt;::_download_vector()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00373">FEAT::Solver::ADPSolverBase&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt;, SolverBase_ &gt;::_upload_vector()</a>, <a class="el" href="schwarz__precond_8hpp_source.html#l00161">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::apply()</a>, <a class="el" href="direct__stokes__solver_8hpp_source.html#l01427">FEAT::Solver::DirectStokesSolver&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::apply()</a>, <a class="el" href="matrix_8hpp_source.html#l00311">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00672">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::apply()</a>, <a class="el" href="matrix_8hpp_source.html#l00485">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_async()</a>, <a class="el" href="matrix_8hpp_source.html#l00332">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed()</a>, <a class="el" href="matrix_8hpp_source.html#l00525">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed_async()</a>, <a class="el" href="meshopt__control_8hpp_source.html#l00607">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_sol_vector()</a>, <a class="el" href="meshopt__control_8hpp_source.html#l00675">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_system_transfer()</a>, <a class="el" href="vector_8hpp_source.html#l00351">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::axpy()</a>, <a class="el" href="burgers__assembly__job_8hpp_source.html#l00210">FEAT::Assembly::BurgersAssemblyJobBase&lt; DataType_, Space_, ConvVector_ &gt;::calc_sd_v_norm()</a>, <a class="el" href="burgers__carreau__assembly__job_8hpp_source.html#l00226">FEAT::Assembly::BurgersCarreauAssemblyJobBase&lt; DataType_, Space_, ConvVector_ &gt;::calc_sd_v_norm()</a>, <a class="el" href="vector_8hpp_source.html#l00468">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::component_invert()</a>, <a class="el" href="vector_8hpp_source.html#l00481">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::component_product()</a>, <a class="el" href="vector_8hpp_source.html#l00333">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::copy()</a>, <a class="el" href="vector_8hpp_source.html#l00381">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="vector_8hpp_source.html#l00398">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot_async()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00283">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::extract_diag()</a>, <a class="el" href="matrix_8hpp_source.html#l00287">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::extract_diag()</a>, <a class="el" href="splitter_8hpp_source.html#l00283">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="matrix_8hpp_source.html#l00556">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::lump_rows()</a>, <a class="el" href="dudv__functional__control_8hpp_source.html#l00479">FEAT::Control::Meshopt::DuDvFunctionalControl&lt; DT_, IT_, DomainControl_ &gt;::optimize()</a>, <a class="el" href="hyperelasticity__functional__control_8hpp_source.html#l00466">FEAT::Control::Meshopt::HyperelasticityFunctionalControl&lt; DT_, IT_, DomainControl_, Hyperelasticity_ &gt;::optimize()</a>, <a class="el" href="dudv__functional__control_8hpp_source.html#l00424">FEAT::Control::Meshopt::DuDvFunctionalControl&lt; DT_, IT_, DomainControl_ &gt;::prepare()</a>, <a class="el" href="hyperelasticity__functional__control_8hpp_source.html#l00433">FEAT::Control::Meshopt::HyperelasticityFunctionalControl&lt; DT_, IT_, DomainControl_, Hyperelasticity_ &gt;::prepare()</a>, <a class="el" href="nonlinear__functional_8hpp_source.html#l00223">FEAT::Global::NonlinearFunctional&lt; LocalNonlinearFunctional_, RowMirrorType_, ColMirrorType_ &gt;::prepare()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00294">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00325">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol_recv()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00252">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::rest()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00274">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::rest_send()</a>, <a class="el" href="vector_8hpp_source.html#l00365">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::scale()</a>, <a class="el" href="assembly_2burgers__assembler_8hpp_source.html#l00982">FEAT::Assembly::BurgersAssembler&lt; DataType_, IndexType_, dim_ &gt;::set_sd_v_norm()</a>, <a class="el" href="burgers__assembler__carreau_8hpp_source.html#l00788">FEAT::Assembly::BurgersAssemblerCarreau&lt; DataType_, IndexType_, dim_ &gt;::set_sd_v_norm()</a>, <a class="el" href="splitter_8hpp_source.html#l00362">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::split()</a>, <a class="el" href="splitter_8hpp_source.html#l00442">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::split_read_from()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00210">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::trunc()</a>, and <a class="el" href="global_2transfer_8hpp_source.html#l00232">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::trunc_send()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="dudv__functional__control_8hpp_source.html#l00153">FEAT::Control::Meshopt::DuDvFunctionalControl&lt; DT_, IT_, DomainControl_ &gt;::DuDvFunctionalControl()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00406">FEAT::Solver::ADPSolverBase&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt;, SolverBase_ &gt;::_download_vector()</a>, <a class="el" href="adp__solver__base_8hpp_source.html#l00373">FEAT::Solver::ADPSolverBase&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt;, SolverBase_ &gt;::_upload_vector()</a>, <a class="el" href="schwarz__precond_8hpp_source.html#l00161">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::apply()</a>, <a class="el" href="direct__stokes__solver_8hpp_source.html#l01439">FEAT::Solver::DirectStokesSolver&lt; Global::Matrix&lt; LocalMatrix_, Mirror_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::apply()</a>, <a class="el" href="matrix_8hpp_source.html#l00327">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00676">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::apply()</a>, <a class="el" href="matrix_8hpp_source.html#l00501">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_async()</a>, <a class="el" href="matrix_8hpp_source.html#l00348">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed()</a>, <a class="el" href="matrix_8hpp_source.html#l00541">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed_async()</a>, <a class="el" href="meshopt__control_8hpp_source.html#l00606">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_sol_vector()</a>, <a class="el" href="meshopt__control_8hpp_source.html#l00674">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_system_transfer()</a>, <a class="el" href="vector_8hpp_source.html#l00366">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::axpy()</a>, <a class="el" href="burgers__assembly__job_8hpp_source.html#l00210">FEAT::Assembly::BurgersAssemblyJobBase&lt; DataType_, Space_, ConvVector_ &gt;::calc_sd_v_norm()</a>, <a class="el" href="burgers__carreau__assembly__job_8hpp_source.html#l00226">FEAT::Assembly::BurgersCarreauAssemblyJobBase&lt; DataType_, Space_, ConvVector_ &gt;::calc_sd_v_norm()</a>, <a class="el" href="vector_8hpp_source.html#l00483">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::component_invert()</a>, <a class="el" href="vector_8hpp_source.html#l00496">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::component_product()</a>, <a class="el" href="vector_8hpp_source.html#l00348">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::copy()</a>, <a class="el" href="vector_8hpp_source.html#l00396">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="vector_8hpp_source.html#l00413">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot_async()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00283">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::extract_diag()</a>, <a class="el" href="matrix_8hpp_source.html#l00303">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::extract_diag()</a>, <a class="el" href="splitter_8hpp_source.html#l00283">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::join()</a>, <a class="el" href="matrix_8hpp_source.html#l00572">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::lump_rows()</a>, <a class="el" href="dudv__functional__control_8hpp_source.html#l00479">FEAT::Control::Meshopt::DuDvFunctionalControl&lt; DT_, IT_, DomainControl_ &gt;::optimize()</a>, <a class="el" href="hyperelasticity__functional__control_8hpp_source.html#l00466">FEAT::Control::Meshopt::HyperelasticityFunctionalControl&lt; DT_, IT_, DomainControl_, Hyperelasticity_ &gt;::optimize()</a>, <a class="el" href="dudv__functional__control_8hpp_source.html#l00424">FEAT::Control::Meshopt::DuDvFunctionalControl&lt; DT_, IT_, DomainControl_ &gt;::prepare()</a>, <a class="el" href="hyperelasticity__functional__control_8hpp_source.html#l00433">FEAT::Control::Meshopt::HyperelasticityFunctionalControl&lt; DT_, IT_, DomainControl_, Hyperelasticity_ &gt;::prepare()</a>, <a class="el" href="nonlinear__functional_8hpp_source.html#l00223">FEAT::Global::NonlinearFunctional&lt; LocalNonlinearFunctional_, RowMirrorType_, ColMirrorType_ &gt;::prepare()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00294">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00325">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol_recv()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00252">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::rest()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00274">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::rest_send()</a>, <a class="el" href="vector_8hpp_source.html#l00380">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::scale()</a>, <a class="el" href="assembly_2burgers__assembler_8hpp_source.html#l00982">FEAT::Assembly::BurgersAssembler&lt; DataType_, IndexType_, dim_ &gt;::set_sd_v_norm()</a>, <a class="el" href="burgers__assembler__carreau_8hpp_source.html#l00788">FEAT::Assembly::BurgersAssemblerCarreau&lt; DataType_, IndexType_, dim_ &gt;::set_sd_v_norm()</a>, <a class="el" href="splitter_8hpp_source.html#l00362">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::split()</a>, <a class="el" href="splitter_8hpp_source.html#l00442">FEAT::Global::Splitter&lt; LocalVector_, Mirror_ &gt;::split_read_from()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00210">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::trunc()</a>, and <a class="el" href="global_2transfer_8hpp_source.html#l00232">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::trunc_send()</a>.</p>
 
 </div>
 </div>
@@ -1318,9 +1320,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The largest absolute value of this vector.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00494">494</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00509">509</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00613">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00662">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max()</a>.</p>
 
 </div>
 </div>
@@ -1353,9 +1355,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A scalar ticket that has to be waited upon to complete the operation.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00508">508</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00523">523</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00629">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max_async()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00678">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max_async()</a>.</p>
 
 </div>
 </div>
@@ -1388,9 +1390,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The largest value of this vector.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00550">550</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00565">565</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00629">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max_async()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00678">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max_async()</a>.</p>
 
 </div>
 </div>
@@ -1423,9 +1425,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A scalar ticket that has to be waited upon to complete the operation.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00564">564</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00579">579</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00629">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max_async()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00678">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max_async()</a>.</p>
 
 </div>
 </div>
@@ -1459,9 +1461,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The largest relative difference.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00607">607</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00622">622</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00613">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00662">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max()</a>.</p>
 
 </div>
 </div>
@@ -1495,9 +1497,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A scalar ticket that has to be waited upon to complete the operation.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00622">622</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00637">637</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00629">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max_async()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00678">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max_async()</a>.</p>
 
 </div>
 </div>
@@ -1530,9 +1532,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The smallest absolute value of this vector.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00522">522</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00537">537</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00580">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::min()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00629">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::min()</a>.</p>
 
 </div>
 </div>
@@ -1565,9 +1567,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A scalar ticket that has to be waited upon to complete the operation.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00536">536</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00551">551</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00596">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::min_async()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00645">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::min_async()</a>.</p>
 
 </div>
 </div>
@@ -1600,9 +1602,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The smallest value of this vector.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00578">578</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00593">593</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00580">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::min()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00629">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::min()</a>.</p>
 
 </div>
 </div>
@@ -1635,9 +1637,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A scalar ticket that has to be waited upon to complete the operation.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00592">592</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00607">607</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00596">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::min_async()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00645">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::min_async()</a>.</p>
 
 </div>
 </div>
@@ -1670,9 +1672,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The Euclid norm of this vector</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00438">438</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00453">453</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00412">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::norm2sqr()</a>, and <a class="el" href="math_8hpp_source.html#l00300">FEAT::Math::sqrt()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00427">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::norm2sqr()</a>, and <a class="el" href="math_8hpp_source.html#l00300">FEAT::Math::sqrt()</a>.</p>
 
 </div>
 </div>
@@ -1705,9 +1707,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A scalar ticket that has to be waited upon to complete the operation.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00451">451</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00466">466</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00530">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot_async()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00579">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot_async()</a>.</p>
 
 </div>
 </div>
@@ -1740,11 +1742,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The squared Euclid norm of this vector</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00412">412</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00427">427</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00381">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00396">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00438">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::norm2()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00453">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::norm2()</a>.</p>
 
 </div>
 </div>
@@ -1777,9 +1779,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A scalar ticket that has to be waited upon to complete the operation.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00425">425</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00440">440</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00398">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot_async()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00413">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot_async()</a>.</p>
 
 </div>
 </div>
@@ -1818,7 +1820,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00636">636</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00651">651</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>.</p>
 
@@ -1869,7 +1871,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00365">365</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00380">380</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, and <a class="el" href="vector_8hpp_source.html#l00122">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>.</p>
 
@@ -1913,21 +1915,19 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p></p>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00642">642</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00657">657</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>.</p>
 
 </div>
 </div>
-<a id="a11dce24c2c27b0d102f920664d9e988b" name="a11dce24c2c27b0d102f920664d9e988b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a11dce24c2c27b0d102f920664d9e988b">&#9670;&#160;</a></span>size()</h2>
+<a id="a47460dfcfec1a333de4fa0050198d4c6" name="a47460dfcfec1a333de4fa0050198d4c6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a47460dfcfec1a333de4fa0050198d4c6">&#9670;&#160;</a></span>size()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
 template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
-<div class="memtemplate">
-template&lt;<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab2adeb0ceb5f9834949b5a865cd4f7e8">LAFEM::Perspective</a> perspective_ = LAFEM::Perspective::pod&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
@@ -1951,9 +1951,45 @@ template&lt;<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab2adeb0ceb
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of entries </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00256">256</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00255">255</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, and <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00349">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>.</p>
+
+</div>
+</div>
+<a id="a3e2cf8db4eab0d4beda06dadfcca8082" name="a3e2cf8db4eab0d4beda06dadfcca8082"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3e2cf8db4eab0d4beda06dadfcca8082">&#9670;&#160;</a></span>size_raw()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_vector.html">FEAT::Global::Vector</a>&lt; LocalVector_, Mirror_ &gt;::size_raw </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the total number of entries in this distributed vector. </p>
+<dl class="section warning"><dt>Warning</dt><dd>In parallel, this requires communication and is very expensive, so use sparingly!</dd></dl>
+<dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock.</dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>The number of entries </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00271">271</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00392">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs_raw()</a>.</p>
 
 </div>
 </div>
@@ -1988,9 +2024,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00188">188</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00408">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_0()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00457">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_0()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="matrix_8hpp_source.html#l00311">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply()</a>, <a class="el" href="matrix_8hpp_source.html#l00332">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed()</a>, <a class="el" href="meshopt__control_8hpp_source.html#l00675">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_system_transfer()</a>, <a class="el" href="matrix_8hpp_source.html#l00287">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::extract_diag()</a>, <a class="el" href="matrix_8hpp_source.html#l00556">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::lump_rows()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00294">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00325">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol_recv()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00252">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::rest()</a>, and <a class="el" href="global_2transfer_8hpp_source.html#l00210">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::trunc()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="matrix_8hpp_source.html#l00327">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply()</a>, <a class="el" href="matrix_8hpp_source.html#l00348">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed()</a>, <a class="el" href="meshopt__control_8hpp_source.html#l00674">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_system_transfer()</a>, <a class="el" href="matrix_8hpp_source.html#l00303">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::extract_diag()</a>, <a class="el" href="matrix_8hpp_source.html#l00572">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::lump_rows()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00294">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00325">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::prol_recv()</a>, <a class="el" href="global_2transfer_8hpp_source.html#l00252">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::rest()</a>, and <a class="el" href="global_2transfer_8hpp_source.html#l00210">FEAT::Global::Transfer&lt; LocalTransfer_, Mirror_ &gt;::trunc()</a>.</p>
 
 </div>
 </div>
@@ -2028,9 +2064,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00205">205</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00432">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_0_async()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00481">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_0_async()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="matrix_8hpp_source.html#l00485">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_async()</a>, and <a class="el" href="matrix_8hpp_source.html#l00525">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed_async()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="matrix_8hpp_source.html#l00501">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_async()</a>, and <a class="el" href="matrix_8hpp_source.html#l00541">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::apply_transposed_async()</a>.</p>
 
 </div>
 </div>
@@ -2065,9 +2101,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00221">221</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00454">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00503">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="schwarz__precond_8hpp_source.html#l00161">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::apply()</a>, and <a class="el" href="vector_8hpp_source.html#l00321">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::format()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="schwarz__precond_8hpp_source.html#l00161">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::apply()</a>, and <a class="el" href="vector_8hpp_source.html#l00336">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::format()</a>.</p>
 
 </div>
 </div>
@@ -2105,7 +2141,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00238">238</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00482">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1_async()</a>.</p>
+<p class="reference">References <a class="el" href="vector_8hpp_source.html#l00089">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_gate</a>, <a class="el" href="vector_8hpp_source.html#l00091">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::_vector</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="gate_8hpp_source.html#l00531">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1_async()</a>.</p>
 
 </div>
 </div>
@@ -2136,7 +2172,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00089">89</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00270">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::clone()</a>, <a class="el" href="vector_8hpp_source.html#l00381">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="vector_8hpp_source.html#l00398">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot_async()</a>, <a class="el" href="vector_8hpp_source.html#l00173">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::from_1_to_0()</a>, <a class="el" href="vector_8hpp_source.html#l00159">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::get_comm()</a>, <a class="el" href="vector_8hpp_source.html#l00149">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::get_gate()</a>, <a class="el" href="vector_8hpp_source.html#l00494">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_abs_element()</a>, <a class="el" href="vector_8hpp_source.html#l00508">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_abs_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00550">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_element()</a>, <a class="el" href="vector_8hpp_source.html#l00564">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00607">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_rel_diff()</a>, <a class="el" href="vector_8hpp_source.html#l00622">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_rel_diff_async()</a>, <a class="el" href="vector_8hpp_source.html#l00522">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_abs_element()</a>, <a class="el" href="vector_8hpp_source.html#l00536">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_abs_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00578">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_element()</a>, <a class="el" href="vector_8hpp_source.html#l00592">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00451">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::norm2_async()</a>, <a class="el" href="vector_8hpp_source.html#l00256">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::size()</a>, <a class="el" href="vector_8hpp_source.html#l00188">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_0()</a>, <a class="el" href="vector_8hpp_source.html#l00205">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_0_async()</a>, <a class="el" href="vector_8hpp_source.html#l00221">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_1()</a>, and <a class="el" href="vector_8hpp_source.html#l00238">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_1_async()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00285">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::clone()</a>, <a class="el" href="vector_8hpp_source.html#l00396">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="vector_8hpp_source.html#l00413">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot_async()</a>, <a class="el" href="vector_8hpp_source.html#l00173">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::from_1_to_0()</a>, <a class="el" href="vector_8hpp_source.html#l00159">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::get_comm()</a>, <a class="el" href="vector_8hpp_source.html#l00149">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::get_gate()</a>, <a class="el" href="vector_8hpp_source.html#l00509">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_abs_element()</a>, <a class="el" href="vector_8hpp_source.html#l00523">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_abs_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00565">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_element()</a>, <a class="el" href="vector_8hpp_source.html#l00579">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00622">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_rel_diff()</a>, <a class="el" href="vector_8hpp_source.html#l00637">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_rel_diff_async()</a>, <a class="el" href="vector_8hpp_source.html#l00537">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_abs_element()</a>, <a class="el" href="vector_8hpp_source.html#l00551">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_abs_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00593">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_element()</a>, <a class="el" href="vector_8hpp_source.html#l00607">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00466">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::norm2_async()</a>, <a class="el" href="vector_8hpp_source.html#l00255">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::size()</a>, <a class="el" href="vector_8hpp_source.html#l00271">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::size_raw()</a>, <a class="el" href="vector_8hpp_source.html#l00188">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_0()</a>, <a class="el" href="vector_8hpp_source.html#l00205">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_0_async()</a>, <a class="el" href="vector_8hpp_source.html#l00221">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_1()</a>, and <a class="el" href="vector_8hpp_source.html#l00238">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_1_async()</a>.</p>
 
 </div>
 </div>
@@ -2166,7 +2202,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="vector_8hpp_source.html#l00091">91</a> of file <a class="el" href="vector_8hpp_source.html">vector.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00351">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::axpy()</a>, <a class="el" href="vector_8hpp_source.html#l00293">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::clear()</a>, <a class="el" href="vector_8hpp_source.html#l00270">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::clone()</a>, <a class="el" href="vector_8hpp_source.html#l00468">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::component_invert()</a>, <a class="el" href="vector_8hpp_source.html#l00481">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::component_product()</a>, <a class="el" href="vector_8hpp_source.html#l00333">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::copy()</a>, <a class="el" href="vector_8hpp_source.html#l00381">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="vector_8hpp_source.html#l00398">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot_async()</a>, <a class="el" href="vector_8hpp_source.html#l00303">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::format()</a>, <a class="el" href="vector_8hpp_source.html#l00630">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::get_checkpoint_size()</a>, <a class="el" href="vector_8hpp_source.html#l00122">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>, <a class="el" href="vector_8hpp_source.html#l00494">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_abs_element()</a>, <a class="el" href="vector_8hpp_source.html#l00508">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_abs_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00550">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_element()</a>, <a class="el" href="vector_8hpp_source.html#l00564">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00607">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_rel_diff()</a>, <a class="el" href="vector_8hpp_source.html#l00622">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_rel_diff_async()</a>, <a class="el" href="vector_8hpp_source.html#l00522">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_abs_element()</a>, <a class="el" href="vector_8hpp_source.html#l00536">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_abs_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00578">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_element()</a>, <a class="el" href="vector_8hpp_source.html#l00592">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00451">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::norm2_async()</a>, <a class="el" href="vector_8hpp_source.html#l00636">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::restore_from_checkpoint_data()</a>, <a class="el" href="vector_8hpp_source.html#l00365">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::scale()</a>, <a class="el" href="vector_8hpp_source.html#l00642">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::set_checkpoint_data()</a>, <a class="el" href="vector_8hpp_source.html#l00188">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_0()</a>, <a class="el" href="vector_8hpp_source.html#l00205">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_0_async()</a>, <a class="el" href="vector_8hpp_source.html#l00221">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_1()</a>, and <a class="el" href="vector_8hpp_source.html#l00238">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_1_async()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00366">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::axpy()</a>, <a class="el" href="vector_8hpp_source.html#l00308">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::clear()</a>, <a class="el" href="vector_8hpp_source.html#l00285">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::clone()</a>, <a class="el" href="vector_8hpp_source.html#l00483">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::component_invert()</a>, <a class="el" href="vector_8hpp_source.html#l00496">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::component_product()</a>, <a class="el" href="vector_8hpp_source.html#l00348">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::copy()</a>, <a class="el" href="vector_8hpp_source.html#l00396">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="vector_8hpp_source.html#l00413">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot_async()</a>, <a class="el" href="vector_8hpp_source.html#l00318">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::format()</a>, <a class="el" href="vector_8hpp_source.html#l00645">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::get_checkpoint_size()</a>, <a class="el" href="vector_8hpp_source.html#l00122">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>, <a class="el" href="vector_8hpp_source.html#l00509">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_abs_element()</a>, <a class="el" href="vector_8hpp_source.html#l00523">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_abs_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00565">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_element()</a>, <a class="el" href="vector_8hpp_source.html#l00579">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00622">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_rel_diff()</a>, <a class="el" href="vector_8hpp_source.html#l00637">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_rel_diff_async()</a>, <a class="el" href="vector_8hpp_source.html#l00537">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_abs_element()</a>, <a class="el" href="vector_8hpp_source.html#l00551">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_abs_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00593">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_element()</a>, <a class="el" href="vector_8hpp_source.html#l00607">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00466">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::norm2_async()</a>, <a class="el" href="vector_8hpp_source.html#l00651">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::restore_from_checkpoint_data()</a>, <a class="el" href="vector_8hpp_source.html#l00380">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::scale()</a>, <a class="el" href="vector_8hpp_source.html#l00657">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::set_checkpoint_data()</a>, <a class="el" href="vector_8hpp_source.html#l00188">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_0()</a>, <a class="el" href="vector_8hpp_source.html#l00205">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_0_async()</a>, <a class="el" href="vector_8hpp_source.html#l00221">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_1()</a>, and <a class="el" href="vector_8hpp_source.html#l00238">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_1_async()</a>.</p>
 
 </div>
 </div>

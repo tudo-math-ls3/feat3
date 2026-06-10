@@ -3,6 +3,7 @@ var namespace_f_e_a_t_1_1_control =
     [ "Domain", "namespace_f_e_a_t_1_1_control_1_1_domain.html", "namespace_f_e_a_t_1_1_control_1_1_domain" ],
     [ "Meshopt", "namespace_f_e_a_t_1_1_control_1_1_meshopt.html", "namespace_f_e_a_t_1_1_control_1_1_meshopt" ],
     [ "Time", "namespace_f_e_a_t_1_1_control_1_1_time.html", "namespace_f_e_a_t_1_1_control_1_1_time" ],
+    [ "AFCTransportSolver", "class_f_e_a_t_1_1_control_1_1_a_f_c_transport_solver.html", "class_f_e_a_t_1_1_control_1_1_a_f_c_transport_solver" ],
     [ "BlockedBasicSystemLevel", "class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level.html", "class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level" ],
     [ "BlockedCombinedSystemLevel", "class_f_e_a_t_1_1_control_1_1_blocked_combined_system_level.html", "class_f_e_a_t_1_1_control_1_1_blocked_combined_system_level" ],
     [ "BlockedUnitFilterSystemLevel", "class_f_e_a_t_1_1_control_1_1_blocked_unit_filter_system_level.html", "class_f_e_a_t_1_1_control_1_1_blocked_unit_filter_system_level" ],

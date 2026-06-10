@@ -121,9 +121,21 @@ Static Public Member Functions</h2></td></tr>
 <tr class="memitem:a76990bdb5dbc08669f823b3c215f93e7"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_backend.html#a76990bdb5dbc08669f823b3c215f93e7">set_preferred_backend</a> (<a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029">PreferredBackend</a> preferred_backend)</td></tr>
 <tr class="memdesc:a76990bdb5dbc08669f823b3c215f93e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">set new preferred backend  <a href="class_f_e_a_t_1_1_backend.html#a76990bdb5dbc08669f823b3c215f93e7">More...</a><br /></td></tr>
 <tr class="separator:a76990bdb5dbc08669f823b3c215f93e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ad34b441dec8a5732b328f09dd69352"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_backend.html#a9ad34b441dec8a5732b328f09dd69352">set_warn_missing</a> (bool enabled)</td></tr>
+<tr class="memdesc:a9ad34b441dec8a5732b328f09dd69352"><td class="mdescLeft">&#160;</td><td class="mdescRight">enables or disables missing backend warning  <a href="class_f_e_a_t_1_1_backend.html#a9ad34b441dec8a5732b328f09dd69352">More...</a><br /></td></tr>
+<tr class="separator:a9ad34b441dec8a5732b328f09dd69352"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a637b2b0760a100c8aa44586405973900"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_backend.html#a637b2b0760a100c8aa44586405973900">warn_missing</a> (const char *operation)</td></tr>
+<tr class="memdesc:a637b2b0760a100c8aa44586405973900"><td class="mdescLeft">&#160;</td><td class="mdescRight">issues a warning about unsupported backend usage  <a href="class_f_e_a_t_1_1_backend.html#a637b2b0760a100c8aa44586405973900">More...</a><br /></td></tr>
+<tr class="separator:a637b2b0760a100c8aa44586405973900"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aecff0214c80d7c35a88c4f9ecf1501b6"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_backend.html#aecff0214c80d7c35a88c4f9ecf1501b6">warn_missing</a> (const char *operation, <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029">PreferredBackend</a> preferred_backend, <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029">PreferredBackend</a> fallback_backend=<a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a3d517f8924ac7fd03699a29d97dc52d9">PreferredBackend::generic</a>)</td></tr>
+<tr class="memdesc:aecff0214c80d7c35a88c4f9ecf1501b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">issues a warning about unsupported backend usage  <a href="class_f_e_a_t_1_1_backend.html#aecff0214c80d7c35a88c4f9ecf1501b6">More...</a><br /></td></tr>
+<tr class="separator:aecff0214c80d7c35a88c4f9ecf1501b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-static-attribs" name="pri-static-attribs"></a>
 Static Private Attributes</h2></td></tr>
+<tr class="memitem:ac741e5743eddcc56272669af1e53a525"><td class="memItemLeft" align="right" valign="top">static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_backend.html#ac741e5743eddcc56272669af1e53a525">_enable_warn_missing</a> = false</td></tr>
+<tr class="memdesc:ac741e5743eddcc56272669af1e53a525"><td class="mdescLeft">&#160;</td><td class="mdescRight">missing backend warnings enabled/disabled  <a href="class_f_e_a_t_1_1_backend.html#ac741e5743eddcc56272669af1e53a525">More...</a><br /></td></tr>
+<tr class="separator:ac741e5743eddcc56272669af1e53a525"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a118f3308e73ed1b31cdb4b38f1bfe076"><td class="memItemLeft" align="right" valign="top">static <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029">PreferredBackend</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_backend.html#a118f3308e73ed1b31cdb4b38f1bfe076">_preferred_backend</a> = <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a3d517f8924ac7fd03699a29d97dc52d9">PreferredBackend::generic</a></td></tr>
 <tr class="memdesc:a118f3308e73ed1b31cdb4b38f1bfe076"><td class="mdescLeft">&#160;</td><td class="mdescRight">the currently preferred backend  <a href="class_f_e_a_t_1_1_backend.html#a118f3308e73ed1b31cdb4b38f1bfe076">More...</a><br /></td></tr>
 <tr class="separator:a118f3308e73ed1b31cdb4b38f1bfe076"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -132,7 +144,7 @@ Static Private Attributes</h2></td></tr>
 <div class="textblock"><p ><a class="el" href="class_f_e_a_t_1_1_backend.html" title="Backend support class.">Backend</a> support class. </p>
 <dl class="section author"><dt>Author</dt><dd>Dirk Ribbrock, Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="backend_8hpp_source.html#l00135">135</a> of file <a class="el" href="backend_8hpp_source.html">backend.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="backend_8hpp_source.html#l00029">29</a> of file <a class="el" href="backend_8hpp_source.html">backend.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="aacfb7dadbfabd2d5415c438652304e06" name="aacfb7dadbfabd2d5415c438652304e06"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aacfb7dadbfabd2d5415c438652304e06">&#9670;&#160;</a></span>get_preferred_backend()</h2>
@@ -159,11 +171,11 @@ Static Private Attributes</h2></td></tr>
 
 <p>get current preferred backend </p>
 
-<p class="definition">Definition at line <a class="el" href="backend_8cpp_source.html#l00027">27</a> of file <a class="el" href="backend_8cpp_source.html">backend.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="backend_8cpp_source.html#l00032">32</a> of file <a class="el" href="backend_8cpp_source.html">backend.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="backend_8hpp_source.html#l00139">_preferred_backend</a>.</p>
+<p class="reference">References <a class="el" href="backend_8hpp_source.html#l00033">_preferred_backend</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="memory__pool_8hpp_source.html#l00290">FEAT::MemoryPool::convert()</a>, <a class="el" href="memory__pool_8hpp_source.html#l00239">FEAT::MemoryPool::copy()</a>, and <a class="el" href="memory__pool_8hpp_source.html#l00185">FEAT::MemoryPool::set_memory()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html#l01542">FEAT::VoxelAssembly::VoxelBurgersAssembler&lt; Q2StandardHyperCube&lt; dim_ &gt;, DT_, IT_ &gt;::assemble_matrix1()</a>, <a class="el" href="burgers__velo__material__assembler_8hpp_source.html#l01301">FEAT::VoxelAssembly::VoxelBurgersVeloMaterialAssembler&lt; Q2StandardHyperCube&lt; dim_ &gt;, DT_, IT_ &gt;::assemble_matrix1()</a>, <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html#l01577">FEAT::VoxelAssembly::VoxelBurgersAssembler&lt; Q2StandardHyperCube&lt; dim_ &gt;, DT_, IT_ &gt;::assemble_vector()</a>, <a class="el" href="burgers__velo__material__assembler_8hpp_source.html#l01336">FEAT::VoxelAssembly::VoxelBurgersVeloMaterialAssembler&lt; Q2StandardHyperCube&lt; dim_ &gt;, DT_, IT_ &gt;::assemble_vector()</a>, <a class="el" href="container_8hpp_source.html#l00845">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::format()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00636">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::init_numeric()</a>, and <a class="el" href="voxel__assembly_2burgers__assembler_8hpp_source.html#l01603">FEAT::VoxelAssembly::VoxelBurgersAssembler&lt; Q2StandardHyperCube&lt; dim_ &gt;, DT_, IT_ &gt;::set_sd_v_norm()</a>.</p>
 
 </div>
 </div>
@@ -193,13 +205,154 @@ Static Private Attributes</h2></td></tr>
 
 <p>set new preferred backend </p>
 
-<p class="definition">Definition at line <a class="el" href="backend_8cpp_source.html#l00016">16</a> of file <a class="el" href="backend_8cpp_source.html">backend.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="backend_8cpp_source.html#l00019">19</a> of file <a class="el" href="backend_8cpp_source.html">backend.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="backend_8hpp_source.html#l00139">_preferred_backend</a>, and <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a39466fe22b062a34cfe09f3cc8c24868">FEAT::cuda</a>.</p>
+<p class="reference">References <a class="el" href="backend_8hpp_source.html#l00033">_preferred_backend</a>, and <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a39466fe22b062a34cfe09f3cc8c24868">FEAT::cuda</a>.</p>
+
+</div>
+</div>
+<a id="a9ad34b441dec8a5732b328f09dd69352" name="a9ad34b441dec8a5732b328f09dd69352"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ad34b441dec8a5732b328f09dd69352">&#9670;&#160;</a></span>set_warn_missing()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void FEAT::Backend::set_warn_missing </td>
+          <td>(</td>
+          <td class="paramtype">bool&#160;</td>
+          <td class="paramname"><em>enabled</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>enables or disables missing backend warning </p>
+
+<p class="definition">Definition at line <a class="el" href="backend_8cpp_source.html#l00061">61</a> of file <a class="el" href="backend_8cpp_source.html">backend.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="backend_8hpp_source.html#l00036">_enable_warn_missing</a>.</p>
+
+</div>
+</div>
+<a id="a637b2b0760a100c8aa44586405973900" name="a637b2b0760a100c8aa44586405973900"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a637b2b0760a100c8aa44586405973900">&#9670;&#160;</a></span>warn_missing() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void FEAT::Backend::warn_missing </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>operation</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>issues a warning about unsupported backend usage </p>
+
+<p class="definition">Definition at line <a class="el" href="backend_8hpp_source.html#l00052">52</a> of file <a class="el" href="backend_8hpp_source.html">backend.hpp</a>.</p>
+
+</div>
+</div>
+<a id="aecff0214c80d7c35a88c4f9ecf1501b6" name="aecff0214c80d7c35a88c4f9ecf1501b6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aecff0214c80d7c35a88c4f9ecf1501b6">&#9670;&#160;</a></span>warn_missing() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void FEAT::Backend::warn_missing </td>
+          <td>(</td>
+          <td class="paramtype">const char *&#160;</td>
+          <td class="paramname"><em>operation</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029">PreferredBackend</a>&#160;</td>
+          <td class="paramname"><em>preferred_backend</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029">PreferredBackend</a>&#160;</td>
+          <td class="paramname"><em>fallback_backend</em> = <code><a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a3d517f8924ac7fd03699a29d97dc52d9">PreferredBackend::generic</a></code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>issues a warning about unsupported backend usage </p>
+
+<p class="definition">Definition at line <a class="el" href="backend_8cpp_source.html#l00066">66</a> of file <a class="el" href="backend_8cpp_source.html">backend.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="backend_8hpp_source.html#l00036">_enable_warn_missing</a>, <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a39466fe22b062a34cfe09f3cc8c24868">FEAT::cuda</a>, <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a3d517f8924ac7fd03699a29d97dc52d9">FEAT::generic</a>, and <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a324ddb5e2f605b34cce9110cbf390f6b">FEAT::mkl</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="container_8hpp_source.html#l00845">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::format()</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="ac741e5743eddcc56272669af1e53a525" name="ac741e5743eddcc56272669af1e53a525"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac741e5743eddcc56272669af1e53a525">&#9670;&#160;</a></span>_enable_warn_missing</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool FEAT::Backend::_enable_warn_missing = false</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>missing backend warnings enabled/disabled </p>
+<p >do not warn for missing backends by default </p>
+
+<p class="definition">Definition at line <a class="el" href="backend_8hpp_source.html#l00036">36</a> of file <a class="el" href="backend_8hpp_source.html">backend.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="backend_8cpp_source.html#l00061">set_warn_missing()</a>, and <a class="el" href="backend_8cpp_source.html#l00066">warn_missing()</a>.</p>
+
+</div>
+</div>
 <a id="a118f3308e73ed1b31cdb4b38f1bfe076" name="a118f3308e73ed1b31cdb4b38f1bfe076"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a118f3308e73ed1b31cdb4b38f1bfe076">&#9670;&#160;</a></span>_preferred_backend</h2>
 
@@ -223,9 +376,9 @@ Static Private Attributes</h2></td></tr>
 <p>the currently preferred backend </p>
 <p >the static variable for the preferred backend </p>
 
-<p class="definition">Definition at line <a class="el" href="backend_8hpp_source.html#l00139">139</a> of file <a class="el" href="backend_8hpp_source.html">backend.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="backend_8hpp_source.html#l00033">33</a> of file <a class="el" href="backend_8hpp_source.html">backend.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="backend_8cpp_source.html#l00027">get_preferred_backend()</a>, and <a class="el" href="backend_8cpp_source.html#l00016">set_preferred_backend()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="backend_8cpp_source.html#l00032">get_preferred_backend()</a>, and <a class="el" href="backend_8cpp_source.html#l00019">set_preferred_backend()</a>.</p>
 
 </div>
 </div>

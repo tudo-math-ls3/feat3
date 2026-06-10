@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.5"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>FEAT: FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt; Class Template Reference</title>
+<title>FEAT: FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -105,7 +105,7 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_f
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt; Class Template Reference</div></div>
+  <div class="headertitle"><div class="title">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt; Class Template Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
@@ -116,108 +116,108 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_f
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a8b14895c1cfd911448f85053e704e7b1"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#ae534e1d12e171012dc8544a4078ede5d">VectorType::DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a8b14895c1cfd911448f85053e704e7b1">DataType</a></td></tr>
-<tr class="memdesc:a8b14895c1cfd911448f85053e704e7b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">data-type typedef  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a8b14895c1cfd911448f85053e704e7b1">More...</a><br /></td></tr>
-<tr class="separator:a8b14895c1cfd911448f85053e704e7b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2c5496e7cbee191de7aea9295325b5c2"><td class="memTemplParams" colspan="2">template&lt;typename DT2_  = DT_, typename IT2_  = IT_, int BlockSize2_ = BlockSize_&gt; </td></tr>
-<tr class="memitem:a2c5496e7cbee191de7aea9295325b5c2"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a2c5496e7cbee191de7aea9295325b5c2">FilterType</a> = <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a>&lt; DT2_, IT2_, BlockSize2_ &gt;</td></tr>
-<tr class="memdesc:a2c5496e7cbee191de7aea9295325b5c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Our 'base' class type.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a2c5496e7cbee191de7aea9295325b5c2">More...</a><br /></td></tr>
-<tr class="separator:a2c5496e7cbee191de7aea9295325b5c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a14e89c7bf87b8e71b765666f4339eb3b"><td class="memTemplParams" colspan="2">template&lt;typename DataType2_ , typename IndexType2_ , int BS2_&gt; </td></tr>
-<tr class="memitem:a14e89c7bf87b8e71b765666f4339eb3b"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a14e89c7bf87b8e71b765666f4339eb3b">FilterTypeByDI</a> = <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a2c5496e7cbee191de7aea9295325b5c2">FilterType</a>&lt; DataType2_, IndexType2_, BS2_ &gt;</td></tr>
-<tr class="memdesc:a14e89c7bf87b8e71b765666f4339eb3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">this typedef lets you create a filter with different Data and Index types  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a14e89c7bf87b8e71b765666f4339eb3b">More...</a><br /></td></tr>
-<tr class="separator:a14e89c7bf87b8e71b765666f4339eb3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6b6690205ea0872a4f87cde836ee53f5"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#ad8f8fa21227a071f586e092361bd8df4">VectorType::IndexType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a6b6690205ea0872a4f87cde836ee53f5">IndexType</a></td></tr>
-<tr class="memdesc:a6b6690205ea0872a4f87cde836ee53f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">index-type typedef  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a6b6690205ea0872a4f87cde836ee53f5">More...</a><br /></td></tr>
-<tr class="separator:a6b6690205ea0872a4f87cde836ee53f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4124da05f092c807b3f4194d83464bb6"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#a8908f5beea3784008d7d41d7bbebe815">VectorType::ValueType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a4124da05f092c807b3f4194d83464bb6">ValueType</a></td></tr>
-<tr class="memdesc:a4124da05f092c807b3f4194d83464bb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">value-type typedef  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a4124da05f092c807b3f4194d83464bb6">More...</a><br /></td></tr>
-<tr class="separator:a4124da05f092c807b3f4194d83464bb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a74504c17f67a0c1eb9f20d1dc22a12c8"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">DenseVectorBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a></td></tr>
-<tr class="memdesc:a74504c17f67a0c1eb9f20d1dc22a12c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">vector-type typedef  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">More...</a><br /></td></tr>
-<tr class="separator:a74504c17f67a0c1eb9f20d1dc22a12c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ce8c300f8ba28d3fa97c5ab5f1cc728"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#a9902a25c2832e42ec4200d62960b8b2a">VectorType::DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a5ce8c300f8ba28d3fa97c5ab5f1cc728">DataType</a></td></tr>
+<tr class="memdesc:a5ce8c300f8ba28d3fa97c5ab5f1cc728"><td class="mdescLeft">&#160;</td><td class="mdescRight">data-type typedef  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a5ce8c300f8ba28d3fa97c5ab5f1cc728">More...</a><br /></td></tr>
+<tr class="separator:a5ce8c300f8ba28d3fa97c5ab5f1cc728"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad49e89d66b45306c197aa2d9449dfe14"><td class="memTemplParams" colspan="2">template&lt;typename DT2_  = DT_, typename IT2_  = IT_, int block_size2_ = block_size_&gt; </td></tr>
+<tr class="memitem:ad49e89d66b45306c197aa2d9449dfe14"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#ad49e89d66b45306c197aa2d9449dfe14">FilterType</a> = <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a>&lt; DT2_, IT2_, block_size2_ &gt;</td></tr>
+<tr class="memdesc:ad49e89d66b45306c197aa2d9449dfe14"><td class="mdescLeft">&#160;</td><td class="mdescRight">Our 'base' class type.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#ad49e89d66b45306c197aa2d9449dfe14">More...</a><br /></td></tr>
+<tr class="separator:ad49e89d66b45306c197aa2d9449dfe14"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ef65ec93c9f83393439d32c099f5c78"><td class="memTemplParams" colspan="2">template&lt;typename DataType2_ , typename IndexType2_ , int block_size2_&gt; </td></tr>
+<tr class="memitem:a9ef65ec93c9f83393439d32c099f5c78"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a9ef65ec93c9f83393439d32c099f5c78">FilterTypeByDI</a> = <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#ad49e89d66b45306c197aa2d9449dfe14">FilterType</a>&lt; DataType2_, IndexType2_, block_size2_ &gt;</td></tr>
+<tr class="memdesc:a9ef65ec93c9f83393439d32c099f5c78"><td class="mdescLeft">&#160;</td><td class="mdescRight">this typedef lets you create a filter with different Data and Index types  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a9ef65ec93c9f83393439d32c099f5c78">More...</a><br /></td></tr>
+<tr class="separator:a9ef65ec93c9f83393439d32c099f5c78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aefdbbbd32592f5e7066867c25a5ced88"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#a2c0d8dd7b58899ec95c7e4c4ec57dcfb">VectorType::IndexType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#aefdbbbd32592f5e7066867c25a5ced88">IndexType</a></td></tr>
+<tr class="memdesc:aefdbbbd32592f5e7066867c25a5ced88"><td class="mdescLeft">&#160;</td><td class="mdescRight">index-type typedef  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#aefdbbbd32592f5e7066867c25a5ced88">More...</a><br /></td></tr>
+<tr class="separator:aefdbbbd32592f5e7066867c25a5ced88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a9c14f07bbd40ec04f458910c2a68a6"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#aad7b33095649a7f2ae134829236e69f3">VectorType::ValueType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1a9c14f07bbd40ec04f458910c2a68a6">ValueType</a></td></tr>
+<tr class="memdesc:a1a9c14f07bbd40ec04f458910c2a68a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">value-type typedef  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1a9c14f07bbd40ec04f458910c2a68a6">More...</a><br /></td></tr>
+<tr class="separator:a1a9c14f07bbd40ec04f458910c2a68a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a89684dc939d3c484adf193f522d3cc07"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">DenseVectorBlocked</a>&lt; DT_, IT_, block_size_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a></td></tr>
+<tr class="memdesc:a89684dc939d3c484adf193f522d3cc07"><td class="mdescLeft">&#160;</td><td class="mdescRight">vector-type typedef  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">More...</a><br /></td></tr>
+<tr class="separator:a89684dc939d3c484adf193f522d3cc07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a80f800663364bc14d3f2f5834cf9cb3f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a80f800663364bc14d3f2f5834cf9cb3f">MeanFilterBlocked</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a> &amp;&amp;other)</td></tr>
-<tr class="memdesc:a80f800663364bc14d3f2f5834cf9cb3f"><td class="mdescLeft">&#160;</td><td class="mdescRight">move ctor  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a80f800663364bc14d3f2f5834cf9cb3f">More...</a><br /></td></tr>
-<tr class="separator:a80f800663364bc14d3f2f5834cf9cb3f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a033940e203b83870ea7cca4f4280f419"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a033940e203b83870ea7cca4f4280f419">MeanFilterBlocked</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> &amp;&amp;vec_prim, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> &amp;&amp;vec_dual, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a4124da05f092c807b3f4194d83464bb6">ValueType</a> sol_mean, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a4124da05f092c807b3f4194d83464bb6">ValueType</a> volume)</td></tr>
-<tr class="memdesc:a033940e203b83870ea7cca4f4280f419"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a033940e203b83870ea7cca4f4280f419">More...</a><br /></td></tr>
-<tr class="separator:a033940e203b83870ea7cca4f4280f419"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a18f21f7cb67d768f2ce9a7a3fd0861ae"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a18f21f7cb67d768f2ce9a7a3fd0861ae">MeanFilterBlocked</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> &amp;&amp;vec_prim, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> &amp;&amp;vec_dual, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a4124da05f092c807b3f4194d83464bb6">ValueType</a> sol_mean=<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a4124da05f092c807b3f4194d83464bb6">ValueType</a>(0))</td></tr>
-<tr class="memdesc:a18f21f7cb67d768f2ce9a7a3fd0861ae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a18f21f7cb67d768f2ce9a7a3fd0861ae">More...</a><br /></td></tr>
-<tr class="separator:a18f21f7cb67d768f2ce9a7a3fd0861ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeac3d2eed2dc30d5d2cabec29febec1f"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#aeac3d2eed2dc30d5d2cabec29febec1f">~MeanFilterBlocked</a> ()</td></tr>
-<tr class="memdesc:aeac3d2eed2dc30d5d2cabec29febec1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">virtual destructor  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#aeac3d2eed2dc30d5d2cabec29febec1f">More...</a><br /></td></tr>
-<tr class="separator:aeac3d2eed2dc30d5d2cabec29febec1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a39f255633f1b8ea8fd6b25640048f229"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a39f255633f1b8ea8fd6b25640048f229">clear</a> ()</td></tr>
-<tr class="memdesc:a39f255633f1b8ea8fd6b25640048f229"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears this filter.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a39f255633f1b8ea8fd6b25640048f229">More...</a><br /></td></tr>
-<tr class="separator:a39f255633f1b8ea8fd6b25640048f229"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6c9131e5e2fc91cdeb6bf46600649737"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a6c9131e5e2fc91cdeb6bf46600649737">clone</a> (<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786f">CloneMode</a> clone_mode=<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa21d01af167e6874b88ed5f6dc7c4b1e4">CloneMode::Deep</a>) const</td></tr>
-<tr class="memdesc:a6c9131e5e2fc91cdeb6bf46600649737"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a clone of itself.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a6c9131e5e2fc91cdeb6bf46600649737">More...</a><br /></td></tr>
-<tr class="separator:a6c9131e5e2fc91cdeb6bf46600649737"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a58a144d84a231b9dd412ea1af2d2a900"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a58a144d84a231b9dd412ea1af2d2a900">clone</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a> &amp;other, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786f">CloneMode</a> clone_mode=<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa21d01af167e6874b88ed5f6dc7c4b1e4">CloneMode::Deep</a>)</td></tr>
-<tr class="memdesc:a58a144d84a231b9dd412ea1af2d2a900"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clones data from another <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html" title="Mean Filter Blocked class template.">MeanFilterBlocked</a>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a58a144d84a231b9dd412ea1af2d2a900">More...</a><br /></td></tr>
-<tr class="separator:a58a144d84a231b9dd412ea1af2d2a900"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6af01fbe2612c9c6d5a163fa257b5fa4"><td class="memTemplParams" colspan="2">template&lt;typename DT2_ , typename IT2_ , int BlockSize2_&gt; </td></tr>
-<tr class="memitem:a6af01fbe2612c9c6d5a163fa257b5fa4"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a6af01fbe2612c9c6d5a163fa257b5fa4">convert</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a>&lt; DT2_, IT2_, BlockSize2_ &gt; &amp;other)</td></tr>
-<tr class="memdesc:a6af01fbe2612c9c6d5a163fa257b5fa4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion method.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a6af01fbe2612c9c6d5a163fa257b5fa4">More...</a><br /></td></tr>
-<tr class="separator:a6af01fbe2612c9c6d5a163fa257b5fa4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac4ecfd10dff6260557dc0d8aa97a252f"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#ac4ecfd10dff6260557dc0d8aa97a252f">empty</a> () const</td></tr>
-<tr class="separator:ac4ecfd10dff6260557dc0d8aa97a252f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0deaf0e9242cb8ce50d90d3dc5f8ce0e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a0deaf0e9242cb8ce50d90d3dc5f8ce0e">filter_cor</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> &amp;vector) const</td></tr>
-<tr class="memdesc:a0deaf0e9242cb8ce50d90d3dc5f8ce0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto a correction vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a0deaf0e9242cb8ce50d90d3dc5f8ce0e">More...</a><br /></td></tr>
-<tr class="separator:a0deaf0e9242cb8ce50d90d3dc5f8ce0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a09f87722620fee21a0f9b97e3c5bbbb4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a09f87722620fee21a0f9b97e3c5bbbb4">filter_def</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> &amp;vector) const</td></tr>
-<tr class="memdesc:a09f87722620fee21a0f9b97e3c5bbbb4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto a defect vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a09f87722620fee21a0f9b97e3c5bbbb4">More...</a><br /></td></tr>
-<tr class="separator:a09f87722620fee21a0f9b97e3c5bbbb4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1847e0217ee1cb171812fe6e7f7eb5a4"><td class="memTemplParams" colspan="2">template&lt;typename MT_ &gt; </td></tr>
-<tr class="memitem:a1847e0217ee1cb171812fe6e7f7eb5a4"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1847e0217ee1cb171812fe6e7f7eb5a4">filter_mat</a> (MT_ &amp;matrix) const</td></tr>
-<tr class="memdesc:a1847e0217ee1cb171812fe6e7f7eb5a4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto a system matrix.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1847e0217ee1cb171812fe6e7f7eb5a4">More...</a><br /></td></tr>
-<tr class="separator:a1847e0217ee1cb171812fe6e7f7eb5a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6bb9377c82c9410547f4ec2ae9cd9c2b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a6bb9377c82c9410547f4ec2ae9cd9c2b">filter_rhs</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> &amp;vector) const</td></tr>
-<tr class="memdesc:a6bb9377c82c9410547f4ec2ae9cd9c2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto the right-hand-side vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a6bb9377c82c9410547f4ec2ae9cd9c2b">More...</a><br /></td></tr>
-<tr class="separator:a6bb9377c82c9410547f4ec2ae9cd9c2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21d6b7314bad6379a8794eb62013d0f3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a21d6b7314bad6379a8794eb62013d0f3">filter_sol</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> &amp;vector) const</td></tr>
-<tr class="memdesc:a21d6b7314bad6379a8794eb62013d0f3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto the solution vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a21d6b7314bad6379a8794eb62013d0f3">More...</a><br /></td></tr>
-<tr class="separator:a21d6b7314bad6379a8794eb62013d0f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:abf833ff4f08493a26c806246e138fe34"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#abf833ff4f08493a26c806246e138fe34">operator=</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a> &amp;&amp;other)</td></tr>
-<tr class="memdesc:abf833ff4f08493a26c806246e138fe34"><td class="mdescLeft">&#160;</td><td class="mdescRight">move-assign operator  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#abf833ff4f08493a26c806246e138fe34">More...</a><br /></td></tr>
-<tr class="separator:abf833ff4f08493a26c806246e138fe34"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ebaf314c879fd6cbcd0608afd68d830"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a7ebaf314c879fd6cbcd0608afd68d830">MeanFilterBlocked</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a> &amp;&amp;other)</td></tr>
+<tr class="memdesc:a7ebaf314c879fd6cbcd0608afd68d830"><td class="mdescLeft">&#160;</td><td class="mdescRight">move ctor  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a7ebaf314c879fd6cbcd0608afd68d830">More...</a><br /></td></tr>
+<tr class="separator:a7ebaf314c879fd6cbcd0608afd68d830"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a613020fa4ab23a688270c9a4e6212c46"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a613020fa4ab23a688270c9a4e6212c46">MeanFilterBlocked</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> &amp;&amp;vec_prim, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> &amp;&amp;vec_dual, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1a9c14f07bbd40ec04f458910c2a68a6">ValueType</a> sol_mean, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1a9c14f07bbd40ec04f458910c2a68a6">ValueType</a> volume)</td></tr>
+<tr class="memdesc:a613020fa4ab23a688270c9a4e6212c46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a613020fa4ab23a688270c9a4e6212c46">More...</a><br /></td></tr>
+<tr class="separator:a613020fa4ab23a688270c9a4e6212c46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08c052727584f15983fb1b4a51fef414"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a08c052727584f15983fb1b4a51fef414">MeanFilterBlocked</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> &amp;&amp;vec_prim, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> &amp;&amp;vec_dual, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1a9c14f07bbd40ec04f458910c2a68a6">ValueType</a> sol_mean=<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1a9c14f07bbd40ec04f458910c2a68a6">ValueType</a>(0))</td></tr>
+<tr class="memdesc:a08c052727584f15983fb1b4a51fef414"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a08c052727584f15983fb1b4a51fef414">More...</a><br /></td></tr>
+<tr class="separator:a08c052727584f15983fb1b4a51fef414"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00ccee4ecb92bd16140cd64b31f84a83"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a00ccee4ecb92bd16140cd64b31f84a83">~MeanFilterBlocked</a> ()</td></tr>
+<tr class="memdesc:a00ccee4ecb92bd16140cd64b31f84a83"><td class="mdescLeft">&#160;</td><td class="mdescRight">virtual destructor  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a00ccee4ecb92bd16140cd64b31f84a83">More...</a><br /></td></tr>
+<tr class="separator:a00ccee4ecb92bd16140cd64b31f84a83"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33de609fd31673572c71303c623f9228"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a33de609fd31673572c71303c623f9228">clear</a> ()</td></tr>
+<tr class="memdesc:a33de609fd31673572c71303c623f9228"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears this filter.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a33de609fd31673572c71303c623f9228">More...</a><br /></td></tr>
+<tr class="separator:a33de609fd31673572c71303c623f9228"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6993af53e161bbf9b38b6e058d2a6c2c"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a6993af53e161bbf9b38b6e058d2a6c2c">clone</a> (<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786f">CloneMode</a> clone_mode=<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa21d01af167e6874b88ed5f6dc7c4b1e4">CloneMode::Deep</a>) const</td></tr>
+<tr class="memdesc:a6993af53e161bbf9b38b6e058d2a6c2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a clone of itself.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a6993af53e161bbf9b38b6e058d2a6c2c">More...</a><br /></td></tr>
+<tr class="separator:a6993af53e161bbf9b38b6e058d2a6c2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8b8f982c7c2fc16635cc126f2b94dc8b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a8b8f982c7c2fc16635cc126f2b94dc8b">clone</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a> &amp;other, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786f">CloneMode</a> clone_mode=<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa21d01af167e6874b88ed5f6dc7c4b1e4">CloneMode::Deep</a>)</td></tr>
+<tr class="memdesc:a8b8f982c7c2fc16635cc126f2b94dc8b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clones data from another <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html" title="Mean Filter Blocked class template.">MeanFilterBlocked</a>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a8b8f982c7c2fc16635cc126f2b94dc8b">More...</a><br /></td></tr>
+<tr class="separator:a8b8f982c7c2fc16635cc126f2b94dc8b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1943bf8715300b54ffabfcaf10fd8dfa"><td class="memTemplParams" colspan="2">template&lt;typename DT2_ , typename IT2_ , int block_size2_&gt; </td></tr>
+<tr class="memitem:a1943bf8715300b54ffabfcaf10fd8dfa"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1943bf8715300b54ffabfcaf10fd8dfa">convert</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a>&lt; DT2_, IT2_, block_size2_ &gt; &amp;other)</td></tr>
+<tr class="memdesc:a1943bf8715300b54ffabfcaf10fd8dfa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Conversion method.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1943bf8715300b54ffabfcaf10fd8dfa">More...</a><br /></td></tr>
+<tr class="separator:a1943bf8715300b54ffabfcaf10fd8dfa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc5da414eef2ff80b8add66f44184ada"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#adc5da414eef2ff80b8add66f44184ada">empty</a> () const</td></tr>
+<tr class="separator:adc5da414eef2ff80b8add66f44184ada"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a793f6effd8f1875de6dd89ed01a38892"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a793f6effd8f1875de6dd89ed01a38892">filter_cor</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> &amp;vector) const</td></tr>
+<tr class="memdesc:a793f6effd8f1875de6dd89ed01a38892"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto a correction vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a793f6effd8f1875de6dd89ed01a38892">More...</a><br /></td></tr>
+<tr class="separator:a793f6effd8f1875de6dd89ed01a38892"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a309887d30bd82e62d1c09d5d3039b965"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a309887d30bd82e62d1c09d5d3039b965">filter_def</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> &amp;vector) const</td></tr>
+<tr class="memdesc:a309887d30bd82e62d1c09d5d3039b965"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto a defect vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a309887d30bd82e62d1c09d5d3039b965">More...</a><br /></td></tr>
+<tr class="separator:a309887d30bd82e62d1c09d5d3039b965"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1aea3461fcdd239476b0ff400e8bf72"><td class="memTemplParams" colspan="2">template&lt;typename MT_ &gt; </td></tr>
+<tr class="memitem:ac1aea3461fcdd239476b0ff400e8bf72"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#ac1aea3461fcdd239476b0ff400e8bf72">filter_mat</a> (MT_ &amp;matrix) const</td></tr>
+<tr class="memdesc:ac1aea3461fcdd239476b0ff400e8bf72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto a system matrix.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#ac1aea3461fcdd239476b0ff400e8bf72">More...</a><br /></td></tr>
+<tr class="separator:ac1aea3461fcdd239476b0ff400e8bf72"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29d9a0abf5bae7e4ae78a20090d0b494"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a29d9a0abf5bae7e4ae78a20090d0b494">filter_rhs</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> &amp;vector) const</td></tr>
+<tr class="memdesc:a29d9a0abf5bae7e4ae78a20090d0b494"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto the right-hand-side vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a29d9a0abf5bae7e4ae78a20090d0b494">More...</a><br /></td></tr>
+<tr class="separator:a29d9a0abf5bae7e4ae78a20090d0b494"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad63f4588b97a2a8cc70fe2c3bd34dc5c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#ad63f4588b97a2a8cc70fe2c3bd34dc5c">filter_sol</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> &amp;vector) const</td></tr>
+<tr class="memdesc:ad63f4588b97a2a8cc70fe2c3bd34dc5c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto the solution vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#ad63f4588b97a2a8cc70fe2c3bd34dc5c">More...</a><br /></td></tr>
+<tr class="separator:ad63f4588b97a2a8cc70fe2c3bd34dc5c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5ce37ab209a060270ac11d8f773bae9"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#ad5ce37ab209a060270ac11d8f773bae9">operator=</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a> &amp;&amp;other)</td></tr>
+<tr class="memdesc:ad5ce37ab209a060270ac11d8f773bae9"><td class="mdescLeft">&#160;</td><td class="mdescRight">move-assign operator  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#ad5ce37ab209a060270ac11d8f773bae9">More...</a><br /></td></tr>
+<tr class="separator:ad5ce37ab209a060270ac11d8f773bae9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a27c89101c640de2d667b129a6b56692a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a4124da05f092c807b3f4194d83464bb6">ValueType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a27c89101c640de2d667b129a6b56692a">_sol_mean</a></td></tr>
-<tr class="memdesc:a27c89101c640de2d667b129a6b56692a"><td class="mdescLeft">&#160;</td><td class="mdescRight">desired solution vector mean  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a27c89101c640de2d667b129a6b56692a">More...</a><br /></td></tr>
-<tr class="separator:a27c89101c640de2d667b129a6b56692a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac2b702c7a6e49aa402ef08cfd5b7e6e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#aac2b702c7a6e49aa402ef08cfd5b7e6e">_vec_dual</a></td></tr>
-<tr class="memdesc:aac2b702c7a6e49aa402ef08cfd5b7e6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">dual weighting vector  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#aac2b702c7a6e49aa402ef08cfd5b7e6e">More...</a><br /></td></tr>
-<tr class="separator:aac2b702c7a6e49aa402ef08cfd5b7e6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab796b290a583b6e2f54f1c48413064a8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#ab796b290a583b6e2f54f1c48413064a8">_vec_prim</a></td></tr>
-<tr class="memdesc:ab796b290a583b6e2f54f1c48413064a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">primal weighting vector  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#ab796b290a583b6e2f54f1c48413064a8">More...</a><br /></td></tr>
-<tr class="separator:ab796b290a583b6e2f54f1c48413064a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3b682a02530bd609379c1b65ed93c85"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a4124da05f092c807b3f4194d83464bb6">ValueType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#ac3b682a02530bd609379c1b65ed93c85">_volume</a></td></tr>
-<tr class="memdesc:ac3b682a02530bd609379c1b65ed93c85"><td class="mdescLeft">&#160;</td><td class="mdescRight">weight volume  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#ac3b682a02530bd609379c1b65ed93c85">More...</a><br /></td></tr>
-<tr class="separator:ac3b682a02530bd609379c1b65ed93c85"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af65c63287d68e6a4306a3e1db2d2bddc"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1a9c14f07bbd40ec04f458910c2a68a6">ValueType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#af65c63287d68e6a4306a3e1db2d2bddc">_sol_mean</a></td></tr>
+<tr class="memdesc:af65c63287d68e6a4306a3e1db2d2bddc"><td class="mdescLeft">&#160;</td><td class="mdescRight">desired solution vector mean  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#af65c63287d68e6a4306a3e1db2d2bddc">More...</a><br /></td></tr>
+<tr class="separator:af65c63287d68e6a4306a3e1db2d2bddc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0fe8b06a77557993a0b2c66c87fc1ad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#ae0fe8b06a77557993a0b2c66c87fc1ad">_vec_dual</a></td></tr>
+<tr class="memdesc:ae0fe8b06a77557993a0b2c66c87fc1ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">dual weighting vector  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#ae0fe8b06a77557993a0b2c66c87fc1ad">More...</a><br /></td></tr>
+<tr class="separator:ae0fe8b06a77557993a0b2c66c87fc1ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a959d10e2092a3c3110c1db9f3f497709"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a959d10e2092a3c3110c1db9f3f497709">_vec_prim</a></td></tr>
+<tr class="memdesc:a959d10e2092a3c3110c1db9f3f497709"><td class="mdescLeft">&#160;</td><td class="mdescRight">primal weighting vector  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a959d10e2092a3c3110c1db9f3f497709">More...</a><br /></td></tr>
+<tr class="separator:a959d10e2092a3c3110c1db9f3f497709"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a188c5344e009cea5e151061f65f701b0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1a9c14f07bbd40ec04f458910c2a68a6">ValueType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a188c5344e009cea5e151061f65f701b0">_volume</a></td></tr>
+<tr class="memdesc:a188c5344e009cea5e151061f65f701b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">weight volume  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a188c5344e009cea5e151061f65f701b0">More...</a><br /></td></tr>
+<tr class="separator:a188c5344e009cea5e151061f65f701b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><div class="compoundTemplParams">template&lt;typename DT_, typename IT_, int BlockSize_&gt;<br />
-class FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;</div><p >Mean Filter Blocked class template. </p>
+<div class="textblock"><div class="compoundTemplParams">template&lt;typename DT_, typename IT_, int block_size_&gt;<br />
+class FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;</div><p >Mean Filter Blocked class template. </p>
 <dl class="section author"><dt>Author</dt><dd>Pia Ritter </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="mean__filter__blocked_8hpp_source.html#l00020">20</a> of file <a class="el" href="mean__filter__blocked_8hpp_source.html">mean_filter_blocked.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="a8b14895c1cfd911448f85053e704e7b1" name="a8b14895c1cfd911448f85053e704e7b1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8b14895c1cfd911448f85053e704e7b1">&#9670;&#160;</a></span>DataType</h2>
+<a id="a5ce8c300f8ba28d3fa97c5ab5f1cc728" name="a5ce8c300f8ba28d3fa97c5ab5f1cc728"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ce8c300f8ba28d3fa97c5ab5f1cc728">&#9670;&#160;</a></span>DataType</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#ae534e1d12e171012dc8544a4078ede5d">VectorType::DataType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::DataType</td>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#a9902a25c2832e42ec4200d62960b8b2a">VectorType::DataType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::DataType</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -228,18 +228,18 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 </div>
 </div>
-<a id="a2c5496e7cbee191de7aea9295325b5c2" name="a2c5496e7cbee191de7aea9295325b5c2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2c5496e7cbee191de7aea9295325b5c2">&#9670;&#160;</a></span>FilterType</h2>
+<a id="ad49e89d66b45306c197aa2d9449dfe14" name="ad49e89d66b45306c197aa2d9449dfe14"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad49e89d66b45306c197aa2d9449dfe14">&#9670;&#160;</a></span>FilterType</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <div class="memtemplate">
-template&lt;typename DT2_  = DT_, typename IT2_  = IT_, int BlockSize2_ = BlockSize_&gt; </div>
+template&lt;typename DT2_  = DT_, typename IT2_  = IT_, int block_size2_ = block_size_&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::FilterType =  <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a>&lt;DT2_, IT2_, BlockSize2_&gt;</td>
+          <td class="memname">using <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::FilterType =  <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a>&lt;DT2_, IT2_, block_size2_&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -250,18 +250,18 @@ template&lt;typename DT2_  = DT_, typename IT2_  = IT_, int BlockSize2_ = BlockS
 
 </div>
 </div>
-<a id="a14e89c7bf87b8e71b765666f4339eb3b" name="a14e89c7bf87b8e71b765666f4339eb3b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a14e89c7bf87b8e71b765666f4339eb3b">&#9670;&#160;</a></span>FilterTypeByDI</h2>
+<a id="a9ef65ec93c9f83393439d32c099f5c78" name="a9ef65ec93c9f83393439d32c099f5c78"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9ef65ec93c9f83393439d32c099f5c78">&#9670;&#160;</a></span>FilterTypeByDI</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <div class="memtemplate">
-template&lt;typename DataType2_ , typename IndexType2_ , int BS2_&gt; </div>
+template&lt;typename DataType2_ , typename IndexType2_ , int block_size2_&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::FilterTypeByDI =  <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a2c5496e7cbee191de7aea9295325b5c2">FilterType</a>&lt;DataType2_, IndexType2_, BS2_&gt;</td>
+          <td class="memname">using <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::FilterTypeByDI =  <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#ad49e89d66b45306c197aa2d9449dfe14">FilterType</a>&lt;DataType2_, IndexType2_, block_size2_&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -272,16 +272,16 @@ template&lt;typename DataType2_ , typename IndexType2_ , int BS2_&gt; </div>
 
 </div>
 </div>
-<a id="a6b6690205ea0872a4f87cde836ee53f5" name="a6b6690205ea0872a4f87cde836ee53f5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6b6690205ea0872a4f87cde836ee53f5">&#9670;&#160;</a></span>IndexType</h2>
+<a id="aefdbbbd32592f5e7066867c25a5ced88" name="aefdbbbd32592f5e7066867c25a5ced88"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aefdbbbd32592f5e7066867c25a5ced88">&#9670;&#160;</a></span>IndexType</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#ad8f8fa21227a071f586e092361bd8df4">VectorType::IndexType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::IndexType</td>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#a2c0d8dd7b58899ec95c7e4c4ec57dcfb">VectorType::IndexType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::IndexType</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -292,16 +292,16 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 </div>
 </div>
-<a id="a4124da05f092c807b3f4194d83464bb6" name="a4124da05f092c807b3f4194d83464bb6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4124da05f092c807b3f4194d83464bb6">&#9670;&#160;</a></span>ValueType</h2>
+<a id="a1a9c14f07bbd40ec04f458910c2a68a6" name="a1a9c14f07bbd40ec04f458910c2a68a6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1a9c14f07bbd40ec04f458910c2a68a6">&#9670;&#160;</a></span>ValueType</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#a8908f5beea3784008d7d41d7bbebe815">VectorType::ValueType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::ValueType</td>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html#aad7b33095649a7f2ae134829236e69f3">VectorType::ValueType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::ValueType</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -312,16 +312,16 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 </div>
 </div>
-<a id="a74504c17f67a0c1eb9f20d1dc22a12c8" name="a74504c17f67a0c1eb9f20d1dc22a12c8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a74504c17f67a0c1eb9f20d1dc22a12c8">&#9670;&#160;</a></span>VectorType</h2>
+<a id="a89684dc939d3c484adf193f522d3cc07" name="a89684dc939d3c484adf193f522d3cc07"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a89684dc939d3c484adf193f522d3cc07">&#9670;&#160;</a></span>VectorType</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">DenseVectorBlocked</a>&lt;DT_, IT_, BlockSize_&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::VectorType</td>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">DenseVectorBlocked</a>&lt;DT_, IT_, block_size_&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::VectorType</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -333,19 +333,19 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="ab9977b212481b7da6e03c21db8c1658c" name="ab9977b212481b7da6e03c21db8c1658c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab9977b212481b7da6e03c21db8c1658c">&#9670;&#160;</a></span>MeanFilterBlocked() <span class="overload">[1/4]</span></h2>
+<a id="a93e7076232e9fef51af770246bef5c03" name="a93e7076232e9fef51af770246bef5c03"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a93e7076232e9fef51af770246bef5c03">&#9670;&#160;</a></span>MeanFilterBlocked() <span class="overload">[1/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::MeanFilterBlocked </td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::MeanFilterBlocked </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -362,34 +362,34 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 </div>
 </div>
-<a id="a18f21f7cb67d768f2ce9a7a3fd0861ae" name="a18f21f7cb67d768f2ce9a7a3fd0861ae"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a18f21f7cb67d768f2ce9a7a3fd0861ae">&#9670;&#160;</a></span>MeanFilterBlocked() <span class="overload">[2/4]</span></h2>
+<a id="a08c052727584f15983fb1b4a51fef414" name="a08c052727584f15983fb1b4a51fef414"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08c052727584f15983fb1b4a51fef414">&#9670;&#160;</a></span>MeanFilterBlocked() <span class="overload">[2/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::MeanFilterBlocked </td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::MeanFilterBlocked </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> &amp;&amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> &amp;&amp;&#160;</td>
           <td class="paramname"><em>vec_prim</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> &amp;&amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> &amp;&amp;&#160;</td>
           <td class="paramname"><em>vec_dual</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a4124da05f092c807b3f4194d83464bb6">ValueType</a>&#160;</td>
-          <td class="paramname"><em>sol_mean</em> = <code><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a4124da05f092c807b3f4194d83464bb6">ValueType</a>(0)</code>&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1a9c14f07bbd40ec04f458910c2a68a6">ValueType</a>&#160;</td>
+          <td class="paramname"><em>sol_mean</em> = <code><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1a9c14f07bbd40ec04f458910c2a68a6">ValueType</a>(0)</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -415,43 +415,43 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mean__filter__blocked_8hpp_source.html#l00069">69</a> of file <a class="el" href="mean__filter__blocked_8hpp_source.html">mean_filter_blocked.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_volume</a>, <a class="el" href="container_8hpp_source.html#l01165">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::empty()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01052">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::norm_euclid_sqr()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_volume</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00372">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::empty()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01053">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::norm_euclid_sqr()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
-<a id="a033940e203b83870ea7cca4f4280f419" name="a033940e203b83870ea7cca4f4280f419"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a033940e203b83870ea7cca4f4280f419">&#9670;&#160;</a></span>MeanFilterBlocked() <span class="overload">[3/4]</span></h2>
+<a id="a613020fa4ab23a688270c9a4e6212c46" name="a613020fa4ab23a688270c9a4e6212c46"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a613020fa4ab23a688270c9a4e6212c46">&#9670;&#160;</a></span>MeanFilterBlocked() <span class="overload">[3/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::MeanFilterBlocked </td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::MeanFilterBlocked </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> &amp;&amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> &amp;&amp;&#160;</td>
           <td class="paramname"><em>vec_prim</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> &amp;&amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> &amp;&amp;&#160;</td>
           <td class="paramname"><em>vec_dual</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a4124da05f092c807b3f4194d83464bb6">ValueType</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1a9c14f07bbd40ec04f458910c2a68a6">ValueType</a>&#160;</td>
           <td class="paramname"><em>sol_mean</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a4124da05f092c807b3f4194d83464bb6">ValueType</a>&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1a9c14f07bbd40ec04f458910c2a68a6">ValueType</a>&#160;</td>
           <td class="paramname"><em>volume</em>&#160;</td>
         </tr>
         <tr>
@@ -479,25 +479,25 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mean__filter__blocked_8hpp_source.html#l00093">93</a> of file <a class="el" href="mean__filter__blocked_8hpp_source.html">mean_filter_blocked.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_volume</a>, <a class="el" href="container_8hpp_source.html#l01165">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::empty()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01052">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::norm_euclid_sqr()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_volume</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00372">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::empty()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01053">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::norm_euclid_sqr()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
-<a id="a80f800663364bc14d3f2f5834cf9cb3f" name="a80f800663364bc14d3f2f5834cf9cb3f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a80f800663364bc14d3f2f5834cf9cb3f">&#9670;&#160;</a></span>MeanFilterBlocked() <span class="overload">[4/4]</span></h2>
+<a id="a7ebaf314c879fd6cbcd0608afd68d830" name="a7ebaf314c879fd6cbcd0608afd68d830"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7ebaf314c879fd6cbcd0608afd68d830">&#9670;&#160;</a></span>MeanFilterBlocked() <span class="overload">[4/4]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::MeanFilterBlocked </td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::MeanFilterBlocked </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt; &amp;&amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt; &amp;&amp;&#160;</td>
           <td class="paramname"><em>other</em></td><td>)</td>
           <td></td>
         </tr>
@@ -515,19 +515,19 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 </div>
 </div>
-<a id="aeac3d2eed2dc30d5d2cabec29febec1f" name="aeac3d2eed2dc30d5d2cabec29febec1f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeac3d2eed2dc30d5d2cabec29febec1f">&#9670;&#160;</a></span>~MeanFilterBlocked()</h2>
+<a id="a00ccee4ecb92bd16140cd64b31f84a83" name="a00ccee4ecb92bd16140cd64b31f84a83"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a00ccee4ecb92bd16140cd64b31f84a83">&#9670;&#160;</a></span>~MeanFilterBlocked()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::~<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a> </td>
+          <td class="memname">virtual <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::~<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -547,19 +547,19 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a39f255633f1b8ea8fd6b25640048f229" name="a39f255633f1b8ea8fd6b25640048f229"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a39f255633f1b8ea8fd6b25640048f229">&#9670;&#160;</a></span>clear()</h2>
+<a id="a33de609fd31673572c71303c623f9228" name="a33de609fd31673572c71303c623f9228"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a33de609fd31673572c71303c623f9228">&#9670;&#160;</a></span>clear()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::clear </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::clear </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -576,23 +576,23 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mean__filter__blocked_8hpp_source.html#l00168">168</a> of file <a class="el" href="mean__filter__blocked_8hpp_source.html">mean_filter_blocked.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00048">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sol_mean</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00044">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_dual</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_volume</a>, and <a class="el" href="container_8hpp_source.html#l00875">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::clear()</a>.</p>
+<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00048">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_sol_mean</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00044">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_dual</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_volume</a>, and <a class="el" href="container_8hpp_source.html#l00861">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::clear()</a>.</p>
 
 </div>
 </div>
-<a id="a6c9131e5e2fc91cdeb6bf46600649737" name="a6c9131e5e2fc91cdeb6bf46600649737"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6c9131e5e2fc91cdeb6bf46600649737">&#9670;&#160;</a></span>clone() <span class="overload">[1/2]</span></h2>
+<a id="a6993af53e161bbf9b38b6e058d2a6c2c" name="a6993af53e161bbf9b38b6e058d2a6c2c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6993af53e161bbf9b38b6e058d2a6c2c">&#9670;&#160;</a></span>clone() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::clone </td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::clone </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786f">CloneMode</a>&#160;</td>
           <td class="paramname"><em>clone_mode</em> = <code><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa21d01af167e6874b88ed5f6dc7c4b1e4">CloneMode::Deep</a></code></td><td>)</td>
@@ -611,25 +611,25 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mean__filter__blocked_8hpp_source.html#l00136">136</a> of file <a class="el" href="mean__filter__blocked_8hpp_source.html">mean_filter_blocked.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00048">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sol_mean</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00044">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_dual</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_volume</a>, and <a class="el" href="dense__vector__blocked_8hpp_source.html#l00402">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::clone()</a>.</p>
+<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00048">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_sol_mean</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00044">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_dual</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_volume</a>, and <a class="el" href="dense__vector__blocked_8hpp_source.html#l00279">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::clone()</a>.</p>
 
 </div>
 </div>
-<a id="a58a144d84a231b9dd412ea1af2d2a900" name="a58a144d84a231b9dd412ea1af2d2a900"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a58a144d84a231b9dd412ea1af2d2a900">&#9670;&#160;</a></span>clone() <span class="overload">[2/2]</span></h2>
+<a id="a8b8f982c7c2fc16635cc126f2b94dc8b" name="a8b8f982c7c2fc16635cc126f2b94dc8b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8b8f982c7c2fc16635cc126f2b94dc8b">&#9670;&#160;</a></span>clone() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::clone </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::clone </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt; &amp;&#160;</td>
           <td class="paramname"><em>other</em>, </td>
         </tr>
         <tr>
@@ -656,27 +656,27 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mean__filter__blocked_8hpp_source.html#l00145">145</a> of file <a class="el" href="mean__filter__blocked_8hpp_source.html">mean_filter_blocked.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00048">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sol_mean</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00044">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_dual</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_volume</a>, and <a class="el" href="dense__vector__blocked_8hpp_source.html#l00402">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::clone()</a>.</p>
+<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00048">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_sol_mean</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00044">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_dual</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_volume</a>, and <a class="el" href="dense__vector__blocked_8hpp_source.html#l00279">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::clone()</a>.</p>
 
 </div>
 </div>
-<a id="a6af01fbe2612c9c6d5a163fa257b5fa4" name="a6af01fbe2612c9c6d5a163fa257b5fa4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6af01fbe2612c9c6d5a163fa257b5fa4">&#9670;&#160;</a></span>convert()</h2>
+<a id="a1943bf8715300b54ffabfcaf10fd8dfa" name="a1943bf8715300b54ffabfcaf10fd8dfa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1943bf8715300b54ffabfcaf10fd8dfa">&#9670;&#160;</a></span>convert()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <div class="memtemplate">
-template&lt;typename DT2_ , typename IT2_ , int BlockSize2_&gt; </div>
+template&lt;typename DT2_ , typename IT2_ , int block_size2_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::convert </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::convert </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a>&lt; DT2_, IT2_, BlockSize2_ &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a>&lt; DT2_, IT2_, block_size2_ &gt; &amp;&#160;</td>
           <td class="paramname"><em>other</em></td><td>)</td>
           <td></td>
         </tr>
@@ -692,23 +692,23 @@ template&lt;typename DT2_ , typename IT2_ , int BlockSize2_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mean__filter__blocked_8hpp_source.html#l00155">155</a> of file <a class="el" href="mean__filter__blocked_8hpp_source.html">mean_filter_blocked.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00048">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sol_mean</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00044">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_dual</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_volume</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00431">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="container_8hpp_source.html#l01165">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::empty()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01052">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::norm_euclid_sqr()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00048">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_sol_mean</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00044">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_dual</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_volume</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00308">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::convert()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00372">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::empty()</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01053">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::norm_euclid_sqr()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
-<a id="ac4ecfd10dff6260557dc0d8aa97a252f" name="ac4ecfd10dff6260557dc0d8aa97a252f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac4ecfd10dff6260557dc0d8aa97a252f">&#9670;&#160;</a></span>empty()</h2>
+<a id="adc5da414eef2ff80b8add66f44184ada" name="adc5da414eef2ff80b8add66f44184ada"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adc5da414eef2ff80b8add66f44184ada">&#9670;&#160;</a></span>empty()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::empty </td>
+          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::empty </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -725,21 +725,21 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 </div>
 </div>
-<a id="a0deaf0e9242cb8ce50d90d3dc5f8ce0e" name="a0deaf0e9242cb8ce50d90d3dc5f8ce0e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0deaf0e9242cb8ce50d90d3dc5f8ce0e">&#9670;&#160;</a></span>filter_cor()</h2>
+<a id="a793f6effd8f1875de6dd89ed01a38892" name="a793f6effd8f1875de6dd89ed01a38892"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a793f6effd8f1875de6dd89ed01a38892">&#9670;&#160;</a></span>filter_cor()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::filter_cor </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::filter_cor </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> &amp;&#160;</td>
           <td class="paramname"><em>vector</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -761,25 +761,25 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mean__filter__blocked_8hpp_source.html#l00278">278</a> of file <a class="el" href="mean__filter__blocked_8hpp_source.html">mean_filter_blocked.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00044">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_dual</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_volume</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00832">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::axpy_blocked()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l01049">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::dot_blocked()</a>, <a class="el" href="container_8hpp_source.html#l01165">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::empty()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l00219">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::n</a>.</p>
+<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00044">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_dual</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_volume</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00737">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::axpy_blocked()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00989">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::dot_blocked()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00372">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::empty()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l00220">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::n</a>.</p>
 
 </div>
 </div>
-<a id="a09f87722620fee21a0f9b97e3c5bbbb4" name="a09f87722620fee21a0f9b97e3c5bbbb4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a09f87722620fee21a0f9b97e3c5bbbb4">&#9670;&#160;</a></span>filter_def()</h2>
+<a id="a309887d30bd82e62d1c09d5d3039b965" name="a309887d30bd82e62d1c09d5d3039b965"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a309887d30bd82e62d1c09d5d3039b965">&#9670;&#160;</a></span>filter_def()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::filter_def </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::filter_def </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> &amp;&#160;</td>
           <td class="paramname"><em>vector</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -801,17 +801,17 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mean__filter__blocked_8hpp_source.html#l00266">266</a> of file <a class="el" href="mean__filter__blocked_8hpp_source.html">mean_filter_blocked.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00219">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs()</a>.</p>
+<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00219">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::filter_rhs()</a>.</p>
 
 </div>
 </div>
-<a id="a1847e0217ee1cb171812fe6e7f7eb5a4" name="a1847e0217ee1cb171812fe6e7f7eb5a4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1847e0217ee1cb171812fe6e7f7eb5a4">&#9670;&#160;</a></span>filter_mat()</h2>
+<a id="ac1aea3461fcdd239476b0ff400e8bf72" name="ac1aea3461fcdd239476b0ff400e8bf72"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac1aea3461fcdd239476b0ff400e8bf72">&#9670;&#160;</a></span>filter_mat()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <div class="memtemplate">
 template&lt;typename MT_ &gt; </div>
 <table class="mlabels">
@@ -819,7 +819,7 @@ template&lt;typename MT_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::filter_mat </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::filter_mat </td>
           <td>(</td>
           <td class="paramtype">MT_ &amp;&#160;</td>
           <td class="paramname"><em>matrix</em></td><td>)</td>
@@ -845,21 +845,21 @@ template&lt;typename MT_ &gt; </div>
 
 </div>
 </div>
-<a id="a6bb9377c82c9410547f4ec2ae9cd9c2b" name="a6bb9377c82c9410547f4ec2ae9cd9c2b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6bb9377c82c9410547f4ec2ae9cd9c2b">&#9670;&#160;</a></span>filter_rhs()</h2>
+<a id="a29d9a0abf5bae7e4ae78a20090d0b494" name="a29d9a0abf5bae7e4ae78a20090d0b494"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29d9a0abf5bae7e4ae78a20090d0b494">&#9670;&#160;</a></span>filter_rhs()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::filter_rhs </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> &amp;&#160;</td>
           <td class="paramname"><em>vector</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -881,27 +881,27 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mean__filter__blocked_8hpp_source.html#l00219">219</a> of file <a class="el" href="mean__filter__blocked_8hpp_source.html">mean_filter_blocked.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00044">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_dual</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_volume</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00832">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::axpy_blocked()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l01049">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::dot_blocked()</a>, <a class="el" href="container_8hpp_source.html#l01165">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::empty()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l00219">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::n</a>.</p>
+<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00044">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_dual</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_volume</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00737">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::axpy_blocked()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00989">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::dot_blocked()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00372">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::empty()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l00220">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::n</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mean__filter__blocked_8hpp_source.html#l00266">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_def()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mean__filter__blocked_8hpp_source.html#l00266">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::filter_def()</a>.</p>
 
 </div>
 </div>
-<a id="a21d6b7314bad6379a8794eb62013d0f3" name="a21d6b7314bad6379a8794eb62013d0f3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a21d6b7314bad6379a8794eb62013d0f3">&#9670;&#160;</a></span>filter_sol()</h2>
+<a id="ad63f4588b97a2a8cc70fe2c3bd34dc5c" name="ad63f4588b97a2a8cc70fe2c3bd34dc5c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad63f4588b97a2a8cc70fe2c3bd34dc5c">&#9670;&#160;</a></span>filter_sol()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::filter_sol </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::filter_sol </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> &amp;&#160;</td>
           <td class="paramname"><em>vector</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -923,25 +923,25 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mean__filter__blocked_8hpp_source.html#l00239">239</a> of file <a class="el" href="mean__filter__blocked_8hpp_source.html">mean_filter_blocked.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00048">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sol_mean</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00044">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_dual</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_volume</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00832">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::axpy_blocked()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l01049">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::dot_blocked()</a>, <a class="el" href="container_8hpp_source.html#l01165">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::empty()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l00219">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::n</a>.</p>
+<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00048">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_sol_mean</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00044">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_dual</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_prim</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_volume</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00737">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::axpy_blocked()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00989">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::dot_blocked()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00372">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::empty()</a>, and <a class="el" href="tiny__algebra_8hpp_source.html#l00220">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::n</a>.</p>
 
 </div>
 </div>
-<a id="abf833ff4f08493a26c806246e138fe34" name="abf833ff4f08493a26c806246e138fe34"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#abf833ff4f08493a26c806246e138fe34">&#9670;&#160;</a></span>operator=()</h2>
+<a id="ad5ce37ab209a060270ac11d8f773bae9" name="ad5ce37ab209a060270ac11d8f773bae9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5ce37ab209a060270ac11d8f773bae9">&#9670;&#160;</a></span>operator=()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a> &amp; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::operator= </td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a> &amp; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::operator= </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt; &amp;&amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt; &amp;&amp;&#160;</td>
           <td class="paramname"><em>other</em></td><td>)</td>
           <td></td>
         </tr>
@@ -957,24 +957,24 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mean__filter__blocked_8hpp_source.html#l00115">115</a> of file <a class="el" href="mean__filter__blocked_8hpp_source.html">mean_filter_blocked.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00048">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_sol_mean</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00044">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_dual</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_vec_prim</a>, and <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::_volume</a>.</p>
+<p class="reference">References <a class="el" href="mean__filter__blocked_8hpp_source.html#l00048">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_sol_mean</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00044">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_dual</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_vec_prim</a>, and <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::_volume</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="a27c89101c640de2d667b129a6b56692a" name="a27c89101c640de2d667b129a6b56692a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a27c89101c640de2d667b129a6b56692a">&#9670;&#160;</a></span>_sol_mean</h2>
+<a id="af65c63287d68e6a4306a3e1db2d2bddc" name="af65c63287d68e6a4306a3e1db2d2bddc"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af65c63287d68e6a4306a3e1db2d2bddc">&#9670;&#160;</a></span>_sol_mean</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a4124da05f092c807b3f4194d83464bb6">ValueType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::_sol_mean</td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1a9c14f07bbd40ec04f458910c2a68a6">ValueType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::_sol_mean</td>
         </tr>
       </table>
   </td>
@@ -988,23 +988,23 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mean__filter__blocked_8hpp_source.html#l00048">48</a> of file <a class="el" href="mean__filter__blocked_8hpp_source.html">mean_filter_blocked.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mean__filter__blocked_8hpp_source.html#l00168">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clear()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00136">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clone()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00155">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00239">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_sol()</a>, and <a class="el" href="mean__filter__blocked_8hpp_source.html#l00115">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator=()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mean__filter__blocked_8hpp_source.html#l00168">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::clear()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00136">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::clone()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00155">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::convert()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00239">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::filter_sol()</a>, and <a class="el" href="mean__filter__blocked_8hpp_source.html#l00115">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::operator=()</a>.</p>
 
 </div>
 </div>
-<a id="aac2b702c7a6e49aa402ef08cfd5b7e6e" name="aac2b702c7a6e49aa402ef08cfd5b7e6e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aac2b702c7a6e49aa402ef08cfd5b7e6e">&#9670;&#160;</a></span>_vec_dual</h2>
+<a id="ae0fe8b06a77557993a0b2c66c87fc1ad" name="ae0fe8b06a77557993a0b2c66c87fc1ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae0fe8b06a77557993a0b2c66c87fc1ad">&#9670;&#160;</a></span>_vec_dual</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::_vec_dual</td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::_vec_dual</td>
         </tr>
       </table>
   </td>
@@ -1018,23 +1018,23 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mean__filter__blocked_8hpp_source.html#l00044">44</a> of file <a class="el" href="mean__filter__blocked_8hpp_source.html">mean_filter_blocked.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mean__filter__blocked_8hpp_source.html#l00168">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clear()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00136">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clone()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00155">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00278">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_cor()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00219">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00239">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_sol()</a>, and <a class="el" href="mean__filter__blocked_8hpp_source.html#l00115">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator=()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mean__filter__blocked_8hpp_source.html#l00168">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::clear()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00136">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::clone()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00155">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::convert()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00278">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::filter_cor()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00219">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::filter_rhs()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00239">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::filter_sol()</a>, and <a class="el" href="mean__filter__blocked_8hpp_source.html#l00115">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::operator=()</a>.</p>
 
 </div>
 </div>
-<a id="ab796b290a583b6e2f54f1c48413064a8" name="ab796b290a583b6e2f54f1c48413064a8"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab796b290a583b6e2f54f1c48413064a8">&#9670;&#160;</a></span>_vec_prim</h2>
+<a id="a959d10e2092a3c3110c1db9f3f497709" name="a959d10e2092a3c3110c1db9f3f497709"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a959d10e2092a3c3110c1db9f3f497709">&#9670;&#160;</a></span>_vec_prim</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a74504c17f67a0c1eb9f20d1dc22a12c8">VectorType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::_vec_prim</td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a89684dc939d3c484adf193f522d3cc07">VectorType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::_vec_prim</td>
         </tr>
       </table>
   </td>
@@ -1048,23 +1048,23 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mean__filter__blocked_8hpp_source.html#l00042">42</a> of file <a class="el" href="mean__filter__blocked_8hpp_source.html">mean_filter_blocked.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mean__filter__blocked_8hpp_source.html#l00069">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::MeanFilterBlocked()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00168">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clear()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00136">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clone()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00155">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00278">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_cor()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00219">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00239">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_sol()</a>, and <a class="el" href="mean__filter__blocked_8hpp_source.html#l00115">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator=()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mean__filter__blocked_8hpp_source.html#l00069">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::MeanFilterBlocked()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00168">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::clear()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00136">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::clone()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00155">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::convert()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00278">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::filter_cor()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00219">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::filter_rhs()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00239">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::filter_sol()</a>, and <a class="el" href="mean__filter__blocked_8hpp_source.html#l00115">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::operator=()</a>.</p>
 
 </div>
 </div>
-<a id="ac3b682a02530bd609379c1b65ed93c85" name="ac3b682a02530bd609379c1b65ed93c85"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac3b682a02530bd609379c1b65ed93c85">&#9670;&#160;</a></span>_volume</h2>
+<a id="a188c5344e009cea5e151061f65f701b0" name="a188c5344e009cea5e151061f65f701b0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a188c5344e009cea5e151061f65f701b0">&#9670;&#160;</a></span>_volume</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a4124da05f092c807b3f4194d83464bb6">ValueType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;::_volume</td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html#a1a9c14f07bbd40ec04f458910c2a68a6">ValueType</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_mean_filter_blocked.html">FEAT::LAFEM::MeanFilterBlocked</a>&lt; DT_, IT_, block_size_ &gt;::_volume</td>
         </tr>
       </table>
   </td>
@@ -1078,7 +1078,7 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="mean__filter__blocked_8hpp_source.html#l00046">46</a> of file <a class="el" href="mean__filter__blocked_8hpp_source.html">mean_filter_blocked.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="mean__filter__blocked_8hpp_source.html#l00069">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::MeanFilterBlocked()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00168">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clear()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00136">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::clone()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00155">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00278">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_cor()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00219">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00239">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::filter_sol()</a>, and <a class="el" href="mean__filter__blocked_8hpp_source.html#l00115">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, BlockSize_ &gt;::operator=()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mean__filter__blocked_8hpp_source.html#l00069">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::MeanFilterBlocked()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00168">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::clear()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00136">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::clone()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00155">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::convert()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00278">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::filter_cor()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00219">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::filter_rhs()</a>, <a class="el" href="mean__filter__blocked_8hpp_source.html#l00239">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::filter_sol()</a>, and <a class="el" href="mean__filter__blocked_8hpp_source.html#l00115">FEAT::LAFEM::MeanFilterBlocked&lt; DT_, IT_, block_size_ &gt;::operator=()</a>.</p>
 
 </div>
 </div>

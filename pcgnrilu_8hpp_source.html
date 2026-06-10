@@ -264,9 +264,9 @@ $(document).ready(function(){initNavTree('pcgnrilu_8hpp_source.html',''); initRe
 <div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>        vec_c.copy(vec_q);</div>
 <div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>        <span class="keywordflow">if</span>(<a class="code hl_variable" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#a632464a502081bd1a06c5d6841f6f211">_ilu_p</a> &gt;= 0)</div>
 <div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>        {</div>
-<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>          DataType* x = vec_c.elements();</div>
-<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>          <a class="code hl_variable" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#a794394b8f44f90ac46bc61b793fa8947">_ilu</a>.solve_il(x, x);</div>
-<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>          <a class="code hl_variable" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#a794394b8f44f90ac46bc61b793fa8947">_ilu</a>.solve_ilt(x, x);</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>          Memory::TypedView&lt;DataType&gt; x = vec_c.elements_view_rw();</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>          <a class="code hl_variable" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#a794394b8f44f90ac46bc61b793fa8947">_ilu</a>.solve_il(x.get_w(), x.get_w());</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>          <a class="code hl_variable" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#a794394b8f44f90ac46bc61b793fa8947">_ilu</a>.solve_ilt(x.get_w(), x.get_w());</div>
 <div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>        }</div>
 <div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>      }</div>
 <div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span> </div>
@@ -275,9 +275,9 @@ $(document).ready(function(){initNavTree('pcgnrilu_8hpp_source.html',''); initRe
 <div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>        vec_c.copy(vec_q);</div>
 <div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>        <span class="keywordflow">if</span>(<a class="code hl_variable" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#a632464a502081bd1a06c5d6841f6f211">_ilu_p</a> &gt;= 0)</div>
 <div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>        {</div>
-<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>          DataType* x = vec_c.elements();</div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>          <a class="code hl_variable" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#a794394b8f44f90ac46bc61b793fa8947">_ilu</a>.solve_dut(x, x);</div>
-<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>          <a class="code hl_variable" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#a794394b8f44f90ac46bc61b793fa8947">_ilu</a>.solve_du(x, x);</div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>          Memory::TypedView&lt;DataType&gt; x = vec_c.elements_view_rw();</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>          <a class="code hl_variable" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#a794394b8f44f90ac46bc61b793fa8947">_ilu</a>.solve_dut(x.get_w(), x.get_w());</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>          <a class="code hl_variable" href="class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r_i_l_u.html#a794394b8f44f90ac46bc61b793fa8947">_ilu</a>.solve_du(x.get_w(), x.get_w());</div>
 <div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>        }</div>
 <div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>      }</div>
 <div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span> </div>

@@ -15,7 +15,6 @@ var class_f_e_a_t_1_1_global_1_1_nonlinear_functional =
     [ "NonlinearFunctional", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#ab8e467d341ea8ac83640f28d7ce816c4", null ],
     [ "NonlinearFunctional", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a5f3e84d45724791bd45c0603d2ee485f", null ],
     [ "~NonlinearFunctional", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a19f121c4d90cb36b17f3da2796dcf837", null ],
-    [ "columns", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a34f9b98d7b272f3eef353eb0dccdfc63", null ],
     [ "compute_constraint", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#afbddddce3140300a5e33571fec8295e2", null ],
     [ "create_vector_l", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a14423566363f4eec07179c7ea151b111", null ],
     [ "create_vector_r", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a82b5a680d7a2b93cf6263231eca86507", null ],
@@ -29,13 +28,14 @@ var class_f_e_a_t_1_1_global_1_1_nonlinear_functional =
     [ "init", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a73b84dad5897ac4668238485de107ab6", null ],
     [ "local", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a1e0ce686dd9a89f8f8832b408111355f", null ],
     [ "local", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a6f188064f549bbc4791769073c1a0371", null ],
+    [ "num_cols", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a2645dfd2e54a7d0a13c392f10c5b715b", null ],
+    [ "num_rows", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#adcc3cf11c19674db34c262be50cecb80", null ],
     [ "prepare", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a7da2d45927385406651d64b15dccf26a", null ],
     [ "reset_num_evals", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a2b612d04b6c39786ce38453cca3278d8", null ],
-    [ "rows", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a6bd0c58e101894a1e96b1111fd72682a", null ],
     [ "set_penalty_param", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a108480f6ec09d68f539aa4c51cd81383", null ],
     [ "_col_gate", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a657ae457394bc8b3a101770fe8ca3705", null ],
     [ "_nonlinear_functional", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a57138c5fb7519ccfdf92fa292c4eace4", null ],
     [ "_row_gate", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#aa6bdcdff61091efde5ae1d55de4dfca4", null ],
-    [ "BlockHeight", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#af5b6142650b1502bdb086a2d91eded69", null ],
-    [ "BlockWidth", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#aafa1de964664b52a47d0535eddbc8125", null ]
+    [ "block_height", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a5a9fe23772718fd80941b73d0b8fbb93", null ],
+    [ "block_width", "class_f_e_a_t_1_1_global_1_1_nonlinear_functional.html#a3da7a8ceb088a0d72dc7aea616419639", null ]
 ];

@@ -1,14 +1,14 @@
 var namespace_f_e_a_t_1_1_voxel_assembly =
 [
     [ "Arch", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html", [
-      [ "assemble_burgers_csr", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#af0d0e9b96f87568ed5a25d6d549ddab4", null ],
-      [ "assemble_burgers_csr_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a6b2f1aefbd0865db566b4cf48f34c49a", null ],
-      [ "assemble_burgers_defect", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#acb6ece7251040c8d11ad7c55c05f51ae", null ],
-      [ "assemble_burgers_defect_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a3e6a55472d415879ff5a6899a016ae5c", null ],
-      [ "assemble_burgers_velo_material_csr", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a1f6eb0593d9f405d2c22f82b7d51d04b", null ],
-      [ "assemble_burgers_velo_material_csr_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a3918db8ed6d10aa45fb9868487a74052", null ],
-      [ "assemble_burgers_velo_material_defect", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#af67d1f8306bb0d6e3f4ffaa546c17210", null ],
-      [ "assemble_burgers_velo_material_defect_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a10c7db6c578c81fe7f1c473c30fb9f42", null ],
+      [ "assemble_burgers_csr", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#ad222380ceed151a53ac32143446f8e00", null ],
+      [ "assemble_burgers_csr_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a74bf9bd6e4ce536715af242561072b2e", null ],
+      [ "assemble_burgers_defect", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a4ea3d41ee3c19d453facd2d0cfecb88d", null ],
+      [ "assemble_burgers_defect_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a772d1cbf3037f972a8b1052ebbc38c84", null ],
+      [ "assemble_burgers_velo_material_csr", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a11f034db112740b3db2ae4bcd07f1c61", null ],
+      [ "assemble_burgers_velo_material_csr_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#ae3d97c015a42308e9df9e31fb22d44f2", null ],
+      [ "assemble_burgers_velo_material_defect", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a4b8a66e6c68a3ef7505429709aa70aef", null ],
+      [ "assemble_burgers_velo_material_defect_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a833df181c7200206cecd61dd6e077f6d", null ],
       [ "get_sd_v_norm", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#aa5bb883737c2cc04cc1ec321a2308fae", null ],
       [ "get_sd_v_norm", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#aec510f211770223f5e804a3ede770ae7", null ],
       [ "get_sd_v_norm_host", "namespace_f_e_a_t_1_1_voxel_assembly_1_1_arch.html#a55b4d5e867d4739199f9365a8cf5b00a", null ],

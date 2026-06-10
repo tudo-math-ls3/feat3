@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.5"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>FEAT: FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::ScatterAxpy Class Reference</title>
+<title>FEAT: FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, block_height_, block_width_ &gt;::ScatterAxpy Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -105,7 +105,7 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::ScatterAxpy Class Reference</div></div>
+  <div class="headertitle"><div class="title">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, block_height_, block_width_ &gt;::ScatterAxpy Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
@@ -116,132 +116,134 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a46f47a70dccb5a6af36b81e2d04fa6bf"><td class="memItemLeft" align="right" valign="top">typedef DT_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#a46f47a70dccb5a6af36b81e2d04fa6bf">DataType</a></td></tr>
-<tr class="separator:a46f47a70dccb5a6af36b81e2d04fa6bf"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad91e7e4d1b0f82039811b4fbc311570c"><td class="memItemLeft" align="right" valign="top">typedef IT_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#ad91e7e4d1b0f82039811b4fbc311570c">IndexType</a></td></tr>
-<tr class="separator:ad91e7e4d1b0f82039811b4fbc311570c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac9164442f8005c7d3eb713448dd6e624"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#ac9164442f8005c7d3eb713448dd6e624">MatrixType</a></td></tr>
-<tr class="separator:ac9164442f8005c7d3eb713448dd6e624"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab44e54b16b2ca03f3a755050a761b302"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; DT_, BlockHeight_, BlockWidth_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#ab44e54b16b2ca03f3a755050a761b302">ValueType</a></td></tr>
-<tr class="separator:ab44e54b16b2ca03f3a755050a761b302"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1845fd2e0e725738cb00af397d43fa2"><td class="memItemLeft" align="right" valign="top">typedef DT_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#ae1845fd2e0e725738cb00af397d43fa2">DataType</a></td></tr>
+<tr class="separator:ae1845fd2e0e725738cb00af397d43fa2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a39b69e34b89bc42d4b93855ff3b4b810"><td class="memItemLeft" align="right" valign="top">typedef IT_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#a39b69e34b89bc42d4b93855ff3b4b810">IndexType</a></td></tr>
+<tr class="separator:a39b69e34b89bc42d4b93855ff3b4b810"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab0f7ce4f46fe0289fe27465ead2bd198"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, block_height_, block_width_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#ab0f7ce4f46fe0289fe27465ead2bd198">MatrixType</a></td></tr>
+<tr class="separator:ab0f7ce4f46fe0289fe27465ead2bd198"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0270490e6c22f2859ed032049ab1e65b"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt; DT_, block_height_, block_width_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#a0270490e6c22f2859ed032049ab1e65b">ValueType</a></td></tr>
+<tr class="separator:a0270490e6c22f2859ed032049ab1e65b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a56f510df3f65938ae998d6c02d77036d"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#a56f510df3f65938ae998d6c02d77036d">ScatterAxpy</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">MatrixType</a> &amp;matrix)</td></tr>
-<tr class="separator:a56f510df3f65938ae998d6c02d77036d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afa4b3004ce39f4fab91a512f5ef9a8a9"><td class="memTemplParams" colspan="2">template&lt;typename LocalMatrix_ , typename RowMapping_ , typename ColMapping_ &gt; </td></tr>
-<tr class="memitem:afa4b3004ce39f4fab91a512f5ef9a8a9"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#afa4b3004ce39f4fab91a512f5ef9a8a9">operator()</a> (const LocalMatrix_ &amp;loc_mat, const RowMapping_ &amp;row_map, const ColMapping_ &amp;col_map, DT_ alpha=DT_(1))</td></tr>
-<tr class="separator:afa4b3004ce39f4fab91a512f5ef9a8a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad2a9ebc6134cf96f63b67f4de81e21f3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#ad2a9ebc6134cf96f63b67f4de81e21f3">ScatterAxpy</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">MatrixType</a> &amp;matrix)</td></tr>
+<tr class="separator:ad2a9ebc6134cf96f63b67f4de81e21f3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c10a5fd95001b17599422f7978f501c"><td class="memTemplParams" colspan="2">template&lt;typename LocalMatrix_ , typename RowMapping_ , typename ColMapping_ &gt; </td></tr>
+<tr class="memitem:a9c10a5fd95001b17599422f7978f501c"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#a9c10a5fd95001b17599422f7978f501c">operator()</a> (const LocalMatrix_ &amp;loc_mat, const RowMapping_ &amp;row_map, const ColMapping_ &amp;col_map, DT_ alpha=DT_(1))</td></tr>
+<tr class="separator:a9c10a5fd95001b17599422f7978f501c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:a8eb4933d54721d6ebafadeac62a7150c"><td class="memItemLeft" align="right" valign="top">IT_ *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#a8eb4933d54721d6ebafadeac62a7150c">_col_idx</a></td></tr>
-<tr class="separator:a8eb4933d54721d6ebafadeac62a7150c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8dc2c90182ed1673e7f741e64f6997fa"><td class="memItemLeft" align="right" valign="top">IT_ *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#a8dc2c90182ed1673e7f741e64f6997fa">_col_ptr</a></td></tr>
-<tr class="separator:a8dc2c90182ed1673e7f741e64f6997fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a146cea92c9eca4ed5bf3fbdc435f4f8e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">ValueType</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#a146cea92c9eca4ed5bf3fbdc435f4f8e">_data</a></td></tr>
-<tr class="separator:a146cea92c9eca4ed5bf3fbdc435f4f8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9eb5c83169fbdaac95b840363c2e2a4"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#ab9eb5c83169fbdaac95b840363c2e2a4">_num_cols</a></td></tr>
-<tr class="separator:ab9eb5c83169fbdaac95b840363c2e2a4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a17d6adbdafe8e2c4336d8f6e765a71b3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#a17d6adbdafe8e2c4336d8f6e765a71b3">_num_rows</a></td></tr>
-<tr class="separator:a17d6adbdafe8e2c4336d8f6e765a71b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9cfc417713c4ca9fe5dfb9f40574584a"><td class="memItemLeft" align="right" valign="top">IT_ *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#a9cfc417713c4ca9fe5dfb9f40574584a">_row_ptr</a></td></tr>
-<tr class="separator:a9cfc417713c4ca9fe5dfb9f40574584a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea6efce9fb7d6860b36dcccd85410543"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_memory_1_1_typed_view.html">Memory::TypedView</a>&lt; IT_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#aea6efce9fb7d6860b36dcccd85410543">_col_idx_view</a></td></tr>
+<tr class="separator:aea6efce9fb7d6860b36dcccd85410543"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aadc30128114b155d3aba3e07e63ee20f"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_memory_1_1_arbiter.html">Memory::Arbiter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#aadc30128114b155d3aba3e07e63ee20f">_col_ptr_arbiter</a></td></tr>
+<tr class="separator:aadc30128114b155d3aba3e07e63ee20f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a08762cbf46ba0aa1a0a0ee49ed1c6621"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_memory_1_1_typed_view.html">Memory::TypedView</a>&lt; IT_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#a08762cbf46ba0aa1a0a0ee49ed1c6621">_col_ptr_view</a></td></tr>
+<tr class="separator:a08762cbf46ba0aa1a0a0ee49ed1c6621"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab66c18432a27182fae82848148fb3ff5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_memory_1_1_typed_view.html">Memory::TypedView</a>&lt; <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">ValueType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#ab66c18432a27182fae82848148fb3ff5">_data_view</a></td></tr>
+<tr class="separator:ab66c18432a27182fae82848148fb3ff5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade8b084553050ca89feadbc098a6db02"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#ade8b084553050ca89feadbc098a6db02">_num_cols</a></td></tr>
+<tr class="separator:ade8b084553050ca89feadbc098a6db02"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3fcb29897e1888228715adb0349e47b1"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#a3fcb29897e1888228715adb0349e47b1">_num_rows</a></td></tr>
+<tr class="separator:a3fcb29897e1888228715adb0349e47b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29217d823c596bb7174956b1c1be73da"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_memory_1_1_typed_view.html">Memory::TypedView</a>&lt; IT_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r_1_1_scatter_axpy.html#a29217d823c596bb7174956b1c1be73da">_row_ptr_view</a></td></tr>
+<tr class="separator:a29217d823c596bb7174956b1c1be73da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><div class="compoundTemplParams">template&lt;typename DT_, typename IT_, int BlockHeight_, int BlockWidth_&gt;<br />
-class FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::ScatterAxpy</div><p >Scatter-Axpy operation for <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html" title="CSR based blocked sparse matrix.">SparseMatrixBCSR</a>. </p>
+<div class="textblock"><div class="compoundTemplParams">template&lt;typename DT_, typename IT_, int block_height_, int block_width_&gt;<br />
+class FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, block_height_, block_width_ &gt;::ScatterAxpy</div><p >Scatter-Axpy operation for <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html" title="CSR based blocked sparse matrix.">SparseMatrixBCSR</a>. </p>
 <p >Apart from the MatrixType and usage of DataTypeBlocked c&amp;p from <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html" title="CSR based sparse matrix.">SparseMatrixCSR</a>.</p>
 <dl class="section author"><dt>Author</dt><dd>Jordi Paul </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00136">136</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02447">2447</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="a46f47a70dccb5a6af36b81e2d04fa6bf" name="a46f47a70dccb5a6af36b81e2d04fa6bf"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a46f47a70dccb5a6af36b81e2d04fa6bf">&#9670;&#160;</a></span>DataType</h2>
+<a id="ae1845fd2e0e725738cb00af397d43fa2" name="ae1845fd2e0e725738cb00af397d43fa2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1845fd2e0e725738cb00af397d43fa2">&#9670;&#160;</a></span>DataType</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_height_, int block_width_&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">typedef DT_ <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::ScatterAxpy::DataType</td>
+          <td class="memname">typedef DT_ <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, block_height_, block_width_ &gt;::ScatterAxpy::DataType</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00140">140</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02451">2451</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ad91e7e4d1b0f82039811b4fbc311570c" name="ad91e7e4d1b0f82039811b4fbc311570c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad91e7e4d1b0f82039811b4fbc311570c">&#9670;&#160;</a></span>IndexType</h2>
+<a id="a39b69e34b89bc42d4b93855ff3b4b810" name="a39b69e34b89bc42d4b93855ff3b4b810"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a39b69e34b89bc42d4b93855ff3b4b810">&#9670;&#160;</a></span>IndexType</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_height_, int block_width_&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">typedef IT_ <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::ScatterAxpy::IndexType</td>
+          <td class="memname">typedef IT_ <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, block_height_, block_width_ &gt;::ScatterAxpy::IndexType</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00141">141</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02452">2452</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ac9164442f8005c7d3eb713448dd6e624" name="ac9164442f8005c7d3eb713448dd6e624"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac9164442f8005c7d3eb713448dd6e624">&#9670;&#160;</a></span>MatrixType</h2>
+<a id="ab0f7ce4f46fe0289fe27465ead2bd198" name="ab0f7ce4f46fe0289fe27465ead2bd198"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab0f7ce4f46fe0289fe27465ead2bd198">&#9670;&#160;</a></span>MatrixType</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_height_, int block_width_&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">LAFEM::SparseMatrixBCSR</a>&lt;DT_, IT_, BlockHeight_, BlockWidth_&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::ScatterAxpy::MatrixType</td>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">LAFEM::SparseMatrixBCSR</a>&lt;DT_, IT_, block_height_, block_width_&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, block_height_, block_width_ &gt;::ScatterAxpy::MatrixType</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00139">139</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02450">2450</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ab44e54b16b2ca03f3a755050a761b302" name="ab44e54b16b2ca03f3a755050a761b302"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab44e54b16b2ca03f3a755050a761b302">&#9670;&#160;</a></span>ValueType</h2>
+<a id="a0270490e6c22f2859ed032049ab1e65b" name="a0270490e6c22f2859ed032049ab1e65b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0270490e6c22f2859ed032049ab1e65b">&#9670;&#160;</a></span>ValueType</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_height_, int block_width_&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt;DT_, BlockHeight_, BlockWidth_&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::ScatterAxpy::ValueType</td>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">Tiny::Matrix</a>&lt;DT_, block_height_, block_width_&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, block_height_, block_width_ &gt;::ScatterAxpy::ValueType</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00142">142</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02453">2453</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a56f510df3f65938ae998d6c02d77036d" name="a56f510df3f65938ae998d6c02d77036d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a56f510df3f65938ae998d6c02d77036d">&#9670;&#160;</a></span>ScatterAxpy()</h2>
+<a id="ad2a9ebc6134cf96f63b67f4de81e21f3" name="ad2a9ebc6134cf96f63b67f4de81e21f3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad2a9ebc6134cf96f63b67f4de81e21f3">&#9670;&#160;</a></span>ScatterAxpy()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_height_, int block_width_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::ScatterAxpy::ScatterAxpy </td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, block_height_, block_width_ &gt;::ScatterAxpy::ScatterAxpy </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">MatrixType</a> &amp;&#160;</td>
           <td class="paramname"><em>matrix</em></td><td>)</td>
@@ -255,47 +257,18 @@ template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00156">156</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
-
-</div>
-</div>
-<a id="a60a4fffd1a0b697dd02eed64312b35c2" name="a60a4fffd1a0b697dd02eed64312b35c2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a60a4fffd1a0b697dd02eed64312b35c2">&#9670;&#160;</a></span>~ScatterAxpy()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">virtual <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::ScatterAxpy::~ScatterAxpy </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">virtual</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00177">177</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02468">2468</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="afa4b3004ce39f4fab91a512f5ef9a8a9" name="afa4b3004ce39f4fab91a512f5ef9a8a9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afa4b3004ce39f4fab91a512f5ef9a8a9">&#9670;&#160;</a></span>operator()()</h2>
+<a id="a9c10a5fd95001b17599422f7978f501c" name="a9c10a5fd95001b17599422f7978f501c"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c10a5fd95001b17599422f7978f501c">&#9670;&#160;</a></span>operator()()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_height_, int block_width_&gt; </div>
 <div class="memtemplate">
 template&lt;typename LocalMatrix_ , typename RowMapping_ , typename ColMapping_ &gt; </div>
 <table class="mlabels">
@@ -303,7 +276,7 @@ template&lt;typename LocalMatrix_ , typename RowMapping_ , typename ColMapping_ 
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::ScatterAxpy::operator() </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, block_height_, block_width_ &gt;::ScatterAxpy::operator() </td>
           <td>(</td>
           <td class="paramtype">const LocalMatrix_ &amp;&#160;</td>
           <td class="paramname"><em>loc_mat</em>, </td>
@@ -339,24 +312,24 @@ template&lt;typename LocalMatrix_ , typename RowMapping_ , typename ColMapping_ 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00186">186</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02480">2480</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="a8eb4933d54721d6ebafadeac62a7150c" name="a8eb4933d54721d6ebafadeac62a7150c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8eb4933d54721d6ebafadeac62a7150c">&#9670;&#160;</a></span>_col_idx</h2>
+<a id="aea6efce9fb7d6860b36dcccd85410543" name="aea6efce9fb7d6860b36dcccd85410543"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aea6efce9fb7d6860b36dcccd85410543">&#9670;&#160;</a></span>_col_idx_view</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_height_, int block_width_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">IT_* <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::ScatterAxpy::_col_idx</td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_memory_1_1_typed_view.html">Memory::TypedView</a>&lt;IT_&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, block_height_, block_width_ &gt;::ScatterAxpy::_col_idx_view</td>
         </tr>
       </table>
   </td>
@@ -366,23 +339,23 @@ template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00151">151</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02463">2463</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a8dc2c90182ed1673e7f741e64f6997fa" name="a8dc2c90182ed1673e7f741e64f6997fa"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8dc2c90182ed1673e7f741e64f6997fa">&#9670;&#160;</a></span>_col_ptr</h2>
+<a id="aadc30128114b155d3aba3e07e63ee20f" name="aadc30128114b155d3aba3e07e63ee20f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aadc30128114b155d3aba3e07e63ee20f">&#9670;&#160;</a></span>_col_ptr_arbiter</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_height_, int block_width_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">IT_* <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::ScatterAxpy::_col_ptr</td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_memory_1_1_arbiter.html">Memory::Arbiter</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, block_height_, block_width_ &gt;::ScatterAxpy::_col_ptr_arbiter</td>
         </tr>
       </table>
   </td>
@@ -392,23 +365,23 @@ template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00152">152</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02461">2461</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a146cea92c9eca4ed5bf3fbdc435f4f8e" name="a146cea92c9eca4ed5bf3fbdc435f4f8e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a146cea92c9eca4ed5bf3fbdc435f4f8e">&#9670;&#160;</a></span>_data</h2>
+<a id="a08762cbf46ba0aa1a0a0ee49ed1c6621" name="a08762cbf46ba0aa1a0a0ee49ed1c6621"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a08762cbf46ba0aa1a0a0ee49ed1c6621">&#9670;&#160;</a></span>_col_ptr_view</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_height_, int block_width_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">ValueType</a>* <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::ScatterAxpy::_data</td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_memory_1_1_typed_view.html">Memory::TypedView</a>&lt;IT_&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, block_height_, block_width_ &gt;::ScatterAxpy::_col_ptr_view</td>
         </tr>
       </table>
   </td>
@@ -418,23 +391,23 @@ template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00153">153</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02464">2464</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
 
 </div>
 </div>
-<a id="ab9eb5c83169fbdaac95b840363c2e2a4" name="ab9eb5c83169fbdaac95b840363c2e2a4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab9eb5c83169fbdaac95b840363c2e2a4">&#9670;&#160;</a></span>_num_cols</h2>
+<a id="ab66c18432a27182fae82848148fb3ff5" name="ab66c18432a27182fae82848148fb3ff5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab66c18432a27182fae82848148fb3ff5">&#9670;&#160;</a></span>_data_view</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_height_, int block_width_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::ScatterAxpy::_num_cols</td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_memory_1_1_typed_view.html">Memory::TypedView</a>&lt;<a class="el" href="class_f_e_a_t_1_1_tiny_1_1_matrix.html">ValueType</a>&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, block_height_, block_width_ &gt;::ScatterAxpy::_data_view</td>
         </tr>
       </table>
   </td>
@@ -444,23 +417,23 @@ template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00149">149</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02465">2465</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a17d6adbdafe8e2c4336d8f6e765a71b3" name="a17d6adbdafe8e2c4336d8f6e765a71b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a17d6adbdafe8e2c4336d8f6e765a71b3">&#9670;&#160;</a></span>_num_rows</h2>
+<a id="ade8b084553050ca89feadbc098a6db02" name="ade8b084553050ca89feadbc098a6db02"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade8b084553050ca89feadbc098a6db02">&#9670;&#160;</a></span>_num_cols</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_height_, int block_width_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::ScatterAxpy::_num_rows</td>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, block_height_, block_width_ &gt;::ScatterAxpy::_num_cols</td>
         </tr>
       </table>
   </td>
@@ -470,23 +443,23 @@ template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00148">148</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02460">2460</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
 
 </div>
 </div>
-<a id="a9cfc417713c4ca9fe5dfb9f40574584a" name="a9cfc417713c4ca9fe5dfb9f40574584a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9cfc417713c4ca9fe5dfb9f40574584a">&#9670;&#160;</a></span>_row_ptr</h2>
+<a id="a3fcb29897e1888228715adb0349e47b1" name="a3fcb29897e1888228715adb0349e47b1"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3fcb29897e1888228715adb0349e47b1">&#9670;&#160;</a></span>_num_rows</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_height_, int block_width_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">IT_* <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::ScatterAxpy::_row_ptr</td>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, block_height_, block_width_ &gt;::ScatterAxpy::_num_rows</td>
         </tr>
       </table>
   </td>
@@ -496,7 +469,33 @@ template&lt;typename DT_ , typename IT_ , int BlockHeight_, int BlockWidth_&gt; 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00150">150</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02459">2459</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a29217d823c596bb7174956b1c1be73da" name="a29217d823c596bb7174956b1c1be73da"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29217d823c596bb7174956b1c1be73da">&#9670;&#160;</a></span>_row_ptr_view</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename DT_ , typename IT_ , int block_height_, int block_width_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_memory_1_1_typed_view.html">Memory::TypedView</a>&lt;IT_&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_b_c_s_r.html">FEAT::LAFEM::SparseMatrixBCSR</a>&lt; DT_, IT_, block_height_, block_width_ &gt;::ScatterAxpy::_row_ptr_view</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">private</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02462">2462</a> of file <a class="el" href="sparse__matrix__bcsr_8hpp_source.html">sparse_matrix_bcsr.hpp</a>.</p>
 
 </div>
 </div>

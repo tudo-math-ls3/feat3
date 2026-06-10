@@ -162,8 +162,8 @@ $(document).ready(function(){initNavTree('direct__sparse__solver__mkl_8cpp_sourc
 <div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>          peak_mem_num(0)</div>
 <div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>        {</div>
 <div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="preprocessor">#ifdef FEAT_HAVE_MPI</span></div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>          memset(css_handle, 0, <span class="keyword">sizeof</span>(<span class="keywordtype">void</span>*)*64);</div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>          memset(css_iparm, 0, <span class="keyword">sizeof</span>(MKL_INT)*64);</div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>          Memory::memset_main(css_handle, 0, <span class="keyword">sizeof</span>(<span class="keywordtype">void</span>*)*64);</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span>          Memory::memset_main(css_iparm, 0, <span class="keyword">sizeof</span>(MKL_INT)*64);</div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
 <div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>          <span class="comment">// set parameters; see</span></div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>          <span class="comment">// https://www.intel.com/content/www/us/en/docs/onemkl/developer-reference-c/2025-2/cluster-sparse-solver-iparm-parameter.html</span></div>

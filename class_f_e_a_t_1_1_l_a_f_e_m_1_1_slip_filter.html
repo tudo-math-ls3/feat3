@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11"/>
 <meta name="generator" content="Doxygen 1.9.5"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>FEAT: FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt; Class Template Reference</title>
+<title>FEAT: FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt; Class Template Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -106,7 +106,7 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_f
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="#pri-attribs">Private Attributes</a> &#124;
 <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt; Class Template Reference</div></div>
+  <div class="headertitle"><div class="title">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt; Class Template Reference</div></div>
 </div><!--header-->
 <div class="contents">
 
@@ -117,113 +117,114 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_f
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-types" name="pub-types"></a>
 Public Types</h2></td></tr>
-<tr class="memitem:a3fae15c9247fe45a8ee188d7c9a1d655"><td class="memItemLeft" align="right" valign="top">typedef DT_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a3fae15c9247fe45a8ee188d7c9a1d655">DataType</a></td></tr>
-<tr class="memdesc:a3fae15c9247fe45a8ee188d7c9a1d655"><td class="mdescLeft">&#160;</td><td class="mdescRight">data-type typedef  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a3fae15c9247fe45a8ee188d7c9a1d655">More...</a><br /></td></tr>
-<tr class="separator:a3fae15c9247fe45a8ee188d7c9a1d655"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a16780403138fd6c3ada37aba285ccb61"><td class="memTemplParams" colspan="2">template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </td></tr>
-<tr class="memitem:a16780403138fd6c3ada37aba285ccb61"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a16780403138fd6c3ada37aba285ccb61">FilterType</a> = <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a>&lt; DT2_, IT2_, BlockSize_ &gt;</td></tr>
-<tr class="memdesc:a16780403138fd6c3ada37aba285ccb61"><td class="mdescLeft">&#160;</td><td class="mdescRight">Our 'base' class type.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a16780403138fd6c3ada37aba285ccb61">More...</a><br /></td></tr>
-<tr class="separator:a16780403138fd6c3ada37aba285ccb61"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1715e7d56f0d53638d3dabac8ee24c2a"><td class="memTemplParams" colspan="2">template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </td></tr>
-<tr class="memitem:a1715e7d56f0d53638d3dabac8ee24c2a"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a1715e7d56f0d53638d3dabac8ee24c2a">FilterTypeByDI</a> = <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a16780403138fd6c3ada37aba285ccb61">FilterType</a>&lt; DT2_, IT2_ &gt;</td></tr>
-<tr class="memdesc:a1715e7d56f0d53638d3dabac8ee24c2a"><td class="mdescLeft">&#160;</td><td class="mdescRight">For creating filter with different DT, IT.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a1715e7d56f0d53638d3dabac8ee24c2a">More...</a><br /></td></tr>
-<tr class="separator:a1715e7d56f0d53638d3dabac8ee24c2a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac5e06b891d1109217d980934fecfef79"><td class="memItemLeft" align="right" valign="top">typedef IT_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ac5e06b891d1109217d980934fecfef79">IndexType</a></td></tr>
-<tr class="memdesc:ac5e06b891d1109217d980934fecfef79"><td class="mdescLeft">&#160;</td><td class="mdescRight">index-type typedef  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ac5e06b891d1109217d980934fecfef79">More...</a><br /></td></tr>
-<tr class="separator:ac5e06b891d1109217d980934fecfef79"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af87cc579c3ec384c6a96dc2406a27383"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a3fae15c9247fe45a8ee188d7c9a1d655">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a3a72ccbdc487b71248783c52cebc1627">BlockSize</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#af87cc579c3ec384c6a96dc2406a27383">ValueType</a></td></tr>
-<tr class="memdesc:af87cc579c3ec384c6a96dc2406a27383"><td class="mdescLeft">&#160;</td><td class="mdescRight">Value type.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#af87cc579c3ec384c6a96dc2406a27383">More...</a><br /></td></tr>
-<tr class="separator:af87cc579c3ec384c6a96dc2406a27383"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1ed744d4084df2eb3b4b51eec1408f46"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">DenseVectorBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a1ed744d4084df2eb3b4b51eec1408f46">VectorType</a></td></tr>
-<tr class="memdesc:a1ed744d4084df2eb3b4b51eec1408f46"><td class="mdescLeft">&#160;</td><td class="mdescRight">Our supported vector type.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a1ed744d4084df2eb3b4b51eec1408f46">More...</a><br /></td></tr>
-<tr class="separator:a1ed744d4084df2eb3b4b51eec1408f46"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a00ef3ad57ba29ac341da441845adefb6"><td class="memItemLeft" align="right" valign="top">typedef DT_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a00ef3ad57ba29ac341da441845adefb6">DataType</a></td></tr>
+<tr class="memdesc:a00ef3ad57ba29ac341da441845adefb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">data-type typedef  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a00ef3ad57ba29ac341da441845adefb6">More...</a><br /></td></tr>
+<tr class="separator:a00ef3ad57ba29ac341da441845adefb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7a1f2e82565b5e2ca72dd8e22bbeedae"><td class="memTemplParams" colspan="2">template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </td></tr>
+<tr class="memitem:a7a1f2e82565b5e2ca72dd8e22bbeedae"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a7a1f2e82565b5e2ca72dd8e22bbeedae">FilterType</a> = <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a>&lt; DT2_, IT2_, block_size_ &gt;</td></tr>
+<tr class="memdesc:a7a1f2e82565b5e2ca72dd8e22bbeedae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Our 'base' class type.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a7a1f2e82565b5e2ca72dd8e22bbeedae">More...</a><br /></td></tr>
+<tr class="separator:a7a1f2e82565b5e2ca72dd8e22bbeedae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9219e21a458ce30158501b039019aede"><td class="memTemplParams" colspan="2">template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </td></tr>
+<tr class="memitem:a9219e21a458ce30158501b039019aede"><td class="memTemplItemLeft" align="right" valign="top">using&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a9219e21a458ce30158501b039019aede">FilterTypeByDI</a> = <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a7a1f2e82565b5e2ca72dd8e22bbeedae">FilterType</a>&lt; DT2_, IT2_ &gt;</td></tr>
+<tr class="memdesc:a9219e21a458ce30158501b039019aede"><td class="mdescLeft">&#160;</td><td class="mdescRight">For creating filter with different DT, IT.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a9219e21a458ce30158501b039019aede">More...</a><br /></td></tr>
+<tr class="separator:a9219e21a458ce30158501b039019aede"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9308f54831bba86304333c3e48d79999"><td class="memItemLeft" align="right" valign="top">typedef IT_&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a9308f54831bba86304333c3e48d79999">IndexType</a></td></tr>
+<tr class="memdesc:a9308f54831bba86304333c3e48d79999"><td class="mdescLeft">&#160;</td><td class="mdescRight">index-type typedef  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a9308f54831bba86304333c3e48d79999">More...</a><br /></td></tr>
+<tr class="separator:a9308f54831bba86304333c3e48d79999"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a32ba04c23ea938a0d9c6024fed3e74c9"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a00ef3ad57ba29ac341da441845adefb6">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a9a9e1e685d7b415fcebac099e886dbbd">block_size</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a32ba04c23ea938a0d9c6024fed3e74c9">ValueType</a></td></tr>
+<tr class="memdesc:a32ba04c23ea938a0d9c6024fed3e74c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Value type.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a32ba04c23ea938a0d9c6024fed3e74c9">More...</a><br /></td></tr>
+<tr class="separator:a32ba04c23ea938a0d9c6024fed3e74c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab6f9f08a95d50618e4a383fbfef25c26"><td class="memItemLeft" align="right" valign="top">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">DenseVectorBlocked</a>&lt; DT_, IT_, block_size_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ab6f9f08a95d50618e4a383fbfef25c26">VectorType</a></td></tr>
+<tr class="memdesc:ab6f9f08a95d50618e4a383fbfef25c26"><td class="mdescLeft">&#160;</td><td class="mdescRight">Our supported vector type.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ab6f9f08a95d50618e4a383fbfef25c26">More...</a><br /></td></tr>
+<tr class="separator:ab6f9f08a95d50618e4a383fbfef25c26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:afdf76eedf179ae4589847f886d5a6101"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#afdf76eedf179ae4589847f886d5a6101">SlipFilter</a> ()</td></tr>
-<tr class="memdesc:afdf76eedf179ae4589847f886d5a6101"><td class="mdescLeft">&#160;</td><td class="mdescRight">default constructor  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#afdf76eedf179ae4589847f886d5a6101">More...</a><br /></td></tr>
-<tr class="separator:afdf76eedf179ae4589847f886d5a6101"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a914f61d87b053b35bfcf2953d8b0cf43"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a914f61d87b053b35bfcf2953d8b0cf43">SlipFilter</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_vertices, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_dofs)</td></tr>
-<tr class="memdesc:a914f61d87b053b35bfcf2953d8b0cf43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a914f61d87b053b35bfcf2953d8b0cf43">More...</a><br /></td></tr>
-<tr class="separator:a914f61d87b053b35bfcf2953d8b0cf43"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a8cde28d0a596a381346496c6680990"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a1a8cde28d0a596a381346496c6680990">SlipFilter</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a> &amp;&amp;other)</td></tr>
-<tr class="memdesc:a1a8cde28d0a596a381346496c6680990"><td class="mdescLeft">&#160;</td><td class="mdescRight">move-ctor  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a1a8cde28d0a596a381346496c6680990">More...</a><br /></td></tr>
-<tr class="separator:a1a8cde28d0a596a381346496c6680990"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afdb29e32210ac1d2261aad30eef5571c"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#afdb29e32210ac1d2261aad30eef5571c">~SlipFilter</a> ()</td></tr>
-<tr class="memdesc:afdb29e32210ac1d2261aad30eef5571c"><td class="mdescLeft">&#160;</td><td class="mdescRight">virtual destructor  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#afdb29e32210ac1d2261aad30eef5571c">More...</a><br /></td></tr>
-<tr class="separator:afdb29e32210ac1d2261aad30eef5571c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3fb2547903a7c1221e7b4cb33f43c9e4"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a3fb2547903a7c1221e7b4cb33f43c9e4">add</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ac5e06b891d1109217d980934fecfef79">IndexType</a> idx, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#af87cc579c3ec384c6a96dc2406a27383">ValueType</a> val)</td></tr>
-<tr class="memdesc:a3fb2547903a7c1221e7b4cb33f43c9e4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Adds one element to the filter.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a3fb2547903a7c1221e7b4cb33f43c9e4">More...</a><br /></td></tr>
-<tr class="separator:a3fb2547903a7c1221e7b4cb33f43c9e4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8874e4e8640ed973ea70dec7dbcf5210"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a8874e4e8640ed973ea70dec7dbcf5210">bytes</a> () const</td></tr>
-<tr class="memdesc:a8874e4e8640ed973ea70dec7dbcf5210"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total amount of bytes allocated.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a8874e4e8640ed973ea70dec7dbcf5210">More...</a><br /></td></tr>
-<tr class="separator:a8874e4e8640ed973ea70dec7dbcf5210"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9f453edc7cb7de3457cf76fe38cf6946"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a9f453edc7cb7de3457cf76fe38cf6946">clear</a> ()</td></tr>
-<tr class="memdesc:a9f453edc7cb7de3457cf76fe38cf6946"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the underlying data (namely the <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector.html" title="Sparse vector class template.">SparseVector</a>)  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a9f453edc7cb7de3457cf76fe38cf6946">More...</a><br /></td></tr>
-<tr class="separator:a9f453edc7cb7de3457cf76fe38cf6946"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adf3d8dabb7f9b7a35bc029cc95a86649"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#adf3d8dabb7f9b7a35bc029cc95a86649">clone</a> (<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786f">CloneMode</a> clone_mode=<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa21d01af167e6874b88ed5f6dc7c4b1e4">CloneMode::Deep</a>) const</td></tr>
-<tr class="memdesc:adf3d8dabb7f9b7a35bc029cc95a86649"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a clone of itself.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#adf3d8dabb7f9b7a35bc029cc95a86649">More...</a><br /></td></tr>
-<tr class="separator:adf3d8dabb7f9b7a35bc029cc95a86649"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5584944b89788b3c6e85a43fb0617f39"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a5584944b89788b3c6e85a43fb0617f39">clone</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a> &amp;other, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786f">CloneMode</a> clone_mode=<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa21d01af167e6874b88ed5f6dc7c4b1e4">CloneMode::Deep</a>)</td></tr>
-<tr class="memdesc:a5584944b89788b3c6e85a43fb0617f39"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clones data from another <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html" title="Slip Filter class template.">SlipFilter</a>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a5584944b89788b3c6e85a43fb0617f39">More...</a><br /></td></tr>
-<tr class="separator:a5584944b89788b3c6e85a43fb0617f39"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0032a2c5fe73e182ca6171531fc0dc23"><td class="memTemplParams" colspan="2">template&lt;typename DT2_ , typename IT2_ , int BS_&gt; </td></tr>
-<tr class="memitem:a0032a2c5fe73e182ca6171531fc0dc23"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a0032a2c5fe73e182ca6171531fc0dc23">convert</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a>&lt; DT2_, IT2_, BS_ &gt; &amp;other)</td></tr>
-<tr class="memdesc:a0032a2c5fe73e182ca6171531fc0dc23"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts data from another <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html" title="Unit Filter class template.">UnitFilter</a>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a0032a2c5fe73e182ca6171531fc0dc23">More...</a><br /></td></tr>
-<tr class="separator:a0032a2c5fe73e182ca6171531fc0dc23"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a03a74f7c2dec3107f2ba40bee09e4502"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a03a74f7c2dec3107f2ba40bee09e4502">empty</a> () const</td></tr>
-<tr class="separator:a03a74f7c2dec3107f2ba40bee09e4502"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad6f2bab9c7beb470c43d429a9901bcb0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ad6f2bab9c7beb470c43d429a9901bcb0">filter_cor</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a1ed744d4084df2eb3b4b51eec1408f46">VectorType</a> &amp;vector) const</td></tr>
-<tr class="memdesc:ad6f2bab9c7beb470c43d429a9901bcb0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto a correction vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ad6f2bab9c7beb470c43d429a9901bcb0">More...</a><br /></td></tr>
-<tr class="separator:ad6f2bab9c7beb470c43d429a9901bcb0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a757711a4509b5efc24147d74c71146f9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a757711a4509b5efc24147d74c71146f9">filter_def</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a1ed744d4084df2eb3b4b51eec1408f46">VectorType</a> &amp;vector) const</td></tr>
-<tr class="memdesc:a757711a4509b5efc24147d74c71146f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto a defect vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a757711a4509b5efc24147d74c71146f9">More...</a><br /></td></tr>
-<tr class="separator:a757711a4509b5efc24147d74c71146f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e60611cfec358be7e2b12cdb1548e71"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a8e60611cfec358be7e2b12cdb1548e71">filter_rhs</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a1ed744d4084df2eb3b4b51eec1408f46">VectorType</a> &amp;vector) const</td></tr>
-<tr class="memdesc:a8e60611cfec358be7e2b12cdb1548e71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto the right-hand-side vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a8e60611cfec358be7e2b12cdb1548e71">More...</a><br /></td></tr>
-<tr class="separator:a8e60611cfec358be7e2b12cdb1548e71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a96a00762744125edf07498f31d0b7609"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a96a00762744125edf07498f31d0b7609">filter_sol</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a1ed744d4084df2eb3b4b51eec1408f46">VectorType</a> &amp;vector) const</td></tr>
-<tr class="memdesc:a96a00762744125edf07498f31d0b7609"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto the solution vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a96a00762744125edf07498f31d0b7609">More...</a><br /></td></tr>
-<tr class="separator:a96a00762744125edf07498f31d0b7609"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a54b8203b1cac73435b6737fcec8f5bf9"><td class="memItemLeft" align="right" valign="top">IT_ *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a54b8203b1cac73435b6737fcec8f5bf9">get_indices</a> ()</td></tr>
-<tr class="separator:a54b8203b1cac73435b6737fcec8f5bf9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab146bdfaa8d18ca4d81ad684d2c2dda2"><td class="memItemLeft" align="right" valign="top">const IT_ *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ab146bdfaa8d18ca4d81ad684d2c2dda2">get_indices</a> () const</td></tr>
-<tr class="separator:ab146bdfaa8d18ca4d81ad684d2c2dda2"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab276867ddd5b0e7470562826cc351308"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#af87cc579c3ec384c6a96dc2406a27383">ValueType</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ab276867ddd5b0e7470562826cc351308">get_values</a> ()</td></tr>
-<tr class="separator:ab276867ddd5b0e7470562826cc351308"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af86287098e3ffeb17994c0164321f37d"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#af87cc579c3ec384c6a96dc2406a27383">ValueType</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#af86287098e3ffeb17994c0164321f37d">get_values</a> () const</td></tr>
-<tr class="separator:af86287098e3ffeb17994c0164321f37d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3952d48ef546324edba509219b1560e"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#aa3952d48ef546324edba509219b1560e">operator=</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a> &amp;&amp;other)</td></tr>
-<tr class="memdesc:aa3952d48ef546324edba509219b1560e"><td class="mdescLeft">&#160;</td><td class="mdescRight">move-assignment operator  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#aa3952d48ef546324edba509219b1560e">More...</a><br /></td></tr>
-<tr class="separator:aa3952d48ef546324edba509219b1560e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9d35e962b548d07b014444f4d06f397b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a9d35e962b548d07b014444f4d06f397b">size</a> () const</td></tr>
-<tr class="separator:a9d35e962b548d07b014444f4d06f397b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a6dab9766b2319b858005bb68c7823b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a2a6dab9766b2319b858005bb68c7823b">used_elements</a> () const</td></tr>
-<tr class="separator:a2a6dab9766b2319b858005bb68c7823b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac759ac046b5af934f267ca921ebc9436"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ac759ac046b5af934f267ca921ebc9436">SlipFilter</a> ()</td></tr>
+<tr class="memdesc:ac759ac046b5af934f267ca921ebc9436"><td class="mdescLeft">&#160;</td><td class="mdescRight">default constructor  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ac759ac046b5af934f267ca921ebc9436">More...</a><br /></td></tr>
+<tr class="separator:ac759ac046b5af934f267ca921ebc9436"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac966f5bdaaca7076fa003b39a4e14561"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ac966f5bdaaca7076fa003b39a4e14561">SlipFilter</a> (<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_vertices, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> num_dofs, <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#aa96ba4c43bd6f83516104e15311d0062">num_nzes</a>)</td></tr>
+<tr class="memdesc:ac966f5bdaaca7076fa003b39a4e14561"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ac966f5bdaaca7076fa003b39a4e14561">More...</a><br /></td></tr>
+<tr class="separator:ac966f5bdaaca7076fa003b39a4e14561"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab77550ceb5de828999117a3801095038"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ab77550ceb5de828999117a3801095038">SlipFilter</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a> &amp;&amp;other)</td></tr>
+<tr class="memdesc:ab77550ceb5de828999117a3801095038"><td class="mdescLeft">&#160;</td><td class="mdescRight">move-ctor  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ab77550ceb5de828999117a3801095038">More...</a><br /></td></tr>
+<tr class="separator:ab77550ceb5de828999117a3801095038"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af361ebfd3c509a8a8bed1d66722b4b06"><td class="memItemLeft" align="right" valign="top">virtual&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#af361ebfd3c509a8a8bed1d66722b4b06">~SlipFilter</a> ()</td></tr>
+<tr class="memdesc:af361ebfd3c509a8a8bed1d66722b4b06"><td class="mdescLeft">&#160;</td><td class="mdescRight">virtual destructor  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#af361ebfd3c509a8a8bed1d66722b4b06">More...</a><br /></td></tr>
+<tr class="separator:af361ebfd3c509a8a8bed1d66722b4b06"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa3e0d4ad6c68ad8818026a2d0e6d7c55"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#aa3e0d4ad6c68ad8818026a2d0e6d7c55">bytes</a> () const</td></tr>
+<tr class="memdesc:aa3e0d4ad6c68ad8818026a2d0e6d7c55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total amount of bytes allocated.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#aa3e0d4ad6c68ad8818026a2d0e6d7c55">More...</a><br /></td></tr>
+<tr class="separator:aa3e0d4ad6c68ad8818026a2d0e6d7c55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a720965c132ed67f9d5a2bea443686c65"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a720965c132ed67f9d5a2bea443686c65">clear</a> ()</td></tr>
+<tr class="memdesc:a720965c132ed67f9d5a2bea443686c65"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the underlying data (namely the <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector.html" title="Sparse vector class template.">SparseVector</a>)  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a720965c132ed67f9d5a2bea443686c65">More...</a><br /></td></tr>
+<tr class="separator:a720965c132ed67f9d5a2bea443686c65"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab189dc146d34ecf6f12ddf3b83d272a0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ab189dc146d34ecf6f12ddf3b83d272a0">clone</a> (<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786f">CloneMode</a> clone_mode=<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa21d01af167e6874b88ed5f6dc7c4b1e4">CloneMode::Deep</a>) const</td></tr>
+<tr class="memdesc:ab189dc146d34ecf6f12ddf3b83d272a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Creates a clone of itself.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ab189dc146d34ecf6f12ddf3b83d272a0">More...</a><br /></td></tr>
+<tr class="separator:ab189dc146d34ecf6f12ddf3b83d272a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7bf5f414a42033fefec02df402c5ee20"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a7bf5f414a42033fefec02df402c5ee20">clone</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a> &amp;other, <a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786f">CloneMode</a> clone_mode=<a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa21d01af167e6874b88ed5f6dc7c4b1e4">CloneMode::Deep</a>)</td></tr>
+<tr class="memdesc:a7bf5f414a42033fefec02df402c5ee20"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clones data from another <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html" title="Slip Filter class template.">SlipFilter</a>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a7bf5f414a42033fefec02df402c5ee20">More...</a><br /></td></tr>
+<tr class="separator:a7bf5f414a42033fefec02df402c5ee20"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16ce3a738140b2144f7e24b6251ca826"><td class="memTemplParams" colspan="2">template&lt;typename DT2_ , typename IT2_ , int BS_&gt; </td></tr>
+<tr class="memitem:a16ce3a738140b2144f7e24b6251ca826"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a16ce3a738140b2144f7e24b6251ca826">convert</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a>&lt; DT2_, IT2_, BS_ &gt; &amp;other)</td></tr>
+<tr class="memdesc:a16ce3a738140b2144f7e24b6251ca826"><td class="mdescLeft">&#160;</td><td class="mdescRight">Converts data from another <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_unit_filter.html" title="Unit Filter class template.">UnitFilter</a>.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a16ce3a738140b2144f7e24b6251ca826">More...</a><br /></td></tr>
+<tr class="separator:a16ce3a738140b2144f7e24b6251ca826"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af75c55c19fdfd6f02c358b92a6a492c3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#af75c55c19fdfd6f02c358b92a6a492c3">empty</a> () const</td></tr>
+<tr class="memdesc:af75c55c19fdfd6f02c358b92a6a492c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the size of the filter is zero.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#af75c55c19fdfd6f02c358b92a6a492c3">More...</a><br /></td></tr>
+<tr class="separator:af75c55c19fdfd6f02c358b92a6a492c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aec32da257d67509b76f0e12a6a1b6b78"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#aec32da257d67509b76f0e12a6a1b6b78">filter_cor</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ab6f9f08a95d50618e4a383fbfef25c26">VectorType</a> &amp;vector) const</td></tr>
+<tr class="memdesc:aec32da257d67509b76f0e12a6a1b6b78"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto a correction vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#aec32da257d67509b76f0e12a6a1b6b78">More...</a><br /></td></tr>
+<tr class="separator:aec32da257d67509b76f0e12a6a1b6b78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f48bd9fd4120d6086ef7227e06d3b89"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a7f48bd9fd4120d6086ef7227e06d3b89">filter_def</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ab6f9f08a95d50618e4a383fbfef25c26">VectorType</a> &amp;vector) const</td></tr>
+<tr class="memdesc:a7f48bd9fd4120d6086ef7227e06d3b89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto a defect vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a7f48bd9fd4120d6086ef7227e06d3b89">More...</a><br /></td></tr>
+<tr class="separator:a7f48bd9fd4120d6086ef7227e06d3b89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1ab13652233973971613c90bde8b7898"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a1ab13652233973971613c90bde8b7898">filter_rhs</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ab6f9f08a95d50618e4a383fbfef25c26">VectorType</a> &amp;vector) const</td></tr>
+<tr class="memdesc:a1ab13652233973971613c90bde8b7898"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto the right-hand-side vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a1ab13652233973971613c90bde8b7898">More...</a><br /></td></tr>
+<tr class="separator:a1ab13652233973971613c90bde8b7898"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a297259ac4096ed95ddc7e3f9070ac2"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a3a297259ac4096ed95ddc7e3f9070ac2">filter_sol</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ab6f9f08a95d50618e4a383fbfef25c26">VectorType</a> &amp;vector) const</td></tr>
+<tr class="memdesc:a3a297259ac4096ed95ddc7e3f9070ac2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto the solution vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a3a297259ac4096ed95ddc7e3f9070ac2">More...</a><br /></td></tr>
+<tr class="separator:a3a297259ac4096ed95ddc7e3f9070ac2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7572f6776eee2142a09989e83002df71"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a7572f6776eee2142a09989e83002df71">hollow</a> () const</td></tr>
+<tr class="memdesc:a7572f6776eee2142a09989e83002df71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the filter does not contain any non-zero elements.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a7572f6776eee2142a09989e83002df71">More...</a><br /></td></tr>
+<tr class="separator:a7572f6776eee2142a09989e83002df71"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa96ba4c43bd6f83516104e15311d0062"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#aa96ba4c43bd6f83516104e15311d0062">num_nzes</a> () const</td></tr>
+<tr class="memdesc:aa96ba4c43bd6f83516104e15311d0062"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the number of non-zero entries in the filter.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#aa96ba4c43bd6f83516104e15311d0062">More...</a><br /></td></tr>
+<tr class="separator:aa96ba4c43bd6f83516104e15311d0062"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25401cb56bc59f1c98ac13a7c9a12ee8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a25401cb56bc59f1c98ac13a7c9a12ee8">num_nzes_raw</a> () const</td></tr>
+<tr class="memdesc:a25401cb56bc59f1c98ac13a7c9a12ee8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the raw number of non-zero entries in the filter.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a25401cb56bc59f1c98ac13a7c9a12ee8">More...</a><br /></td></tr>
+<tr class="separator:a25401cb56bc59f1c98ac13a7c9a12ee8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa4eb9e8a5d78ee9484613224564ef966"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#aa4eb9e8a5d78ee9484613224564ef966">operator=</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a> &amp;&amp;other)</td></tr>
+<tr class="memdesc:aa4eb9e8a5d78ee9484613224564ef966"><td class="mdescLeft">&#160;</td><td class="mdescRight">move-assignment operator  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#aa4eb9e8a5d78ee9484613224564ef966">More...</a><br /></td></tr>
+<tr class="separator:aa4eb9e8a5d78ee9484613224564ef966"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a09124306552ef9833d3954e5cf5cd541"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a09124306552ef9833d3954e5cf5cd541">size</a> () const</td></tr>
+<tr class="memdesc:a09124306552ef9833d3954e5cf5cd541"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total native size of the filter.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a09124306552ef9833d3954e5cf5cd541">More...</a><br /></td></tr>
+<tr class="separator:a09124306552ef9833d3954e5cf5cd541"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4619b029b6f6dfc4ce1c36515525fc89"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a4619b029b6f6dfc4ce1c36515525fc89">size_raw</a> () const</td></tr>
+<tr class="memdesc:a4619b029b6f6dfc4ce1c36515525fc89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total raw size of the filter.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a4619b029b6f6dfc4ce1c36515525fc89">More...</a><br /></td></tr>
+<tr class="separator:a4619b029b6f6dfc4ce1c36515525fc89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:a3a72ccbdc487b71248783c52cebc1627"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a3a72ccbdc487b71248783c52cebc1627">BlockSize</a> = BlockSize_</td></tr>
-<tr class="memdesc:a3a72ccbdc487b71248783c52cebc1627"><td class="mdescLeft">&#160;</td><td class="mdescRight">The block size.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a3a72ccbdc487b71248783c52cebc1627">More...</a><br /></td></tr>
-<tr class="separator:a3a72ccbdc487b71248783c52cebc1627"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9a9e1e685d7b415fcebac099e886dbbd"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a9a9e1e685d7b415fcebac099e886dbbd">block_size</a> = block_size_</td></tr>
+<tr class="memdesc:a9a9e1e685d7b415fcebac099e886dbbd"><td class="mdescLeft">&#160;</td><td class="mdescRight">The block size.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a9a9e1e685d7b415fcebac099e886dbbd">More...</a><br /></td></tr>
+<tr class="separator:a9a9e1e685d7b415fcebac099e886dbbd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pri-attribs" name="pri-attribs"></a>
 Private Attributes</h2></td></tr>
-<tr class="memitem:a11bd29839bb674a9543f2005fb880aa5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector_blocked.html">SparseVectorBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a11bd29839bb674a9543f2005fb880aa5">_nu</a></td></tr>
-<tr class="memdesc:a11bd29839bb674a9543f2005fb880aa5"><td class="mdescLeft">&#160;</td><td class="mdescRight">This will contain the pointwise outer unit normal in all vertices.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a11bd29839bb674a9543f2005fb880aa5">More...</a><br /></td></tr>
-<tr class="separator:a11bd29839bb674a9543f2005fb880aa5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a21854a5ba755ed39bac1516dbe5a0c55"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector_blocked.html">SparseVectorBlocked</a>&lt; DT_, IT_, BlockSize_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a21854a5ba755ed39bac1516dbe5a0c55">_sv</a></td></tr>
-<tr class="memdesc:a21854a5ba755ed39bac1516dbe5a0c55"><td class="mdescLeft">&#160;</td><td class="mdescRight">This will contain the data for filtering.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a21854a5ba755ed39bac1516dbe5a0c55">More...</a><br /></td></tr>
-<tr class="separator:a21854a5ba755ed39bac1516dbe5a0c55"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a38e795637cbed6e9831945e355f134e7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector_blocked.html">SparseVectorBlocked</a>&lt; DT_, IT_, block_size_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a38e795637cbed6e9831945e355f134e7">_nu</a></td></tr>
+<tr class="memdesc:a38e795637cbed6e9831945e355f134e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">This will contain the pointwise outer unit normal in all vertices.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a38e795637cbed6e9831945e355f134e7">More...</a><br /></td></tr>
+<tr class="separator:a38e795637cbed6e9831945e355f134e7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f77cad5e7e8b78d109dc5e91f28b1d6"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector_blocked.html">SparseVectorBlocked</a>&lt; DT_, IT_, block_size_ &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a2f77cad5e7e8b78d109dc5e91f28b1d6">_sv</a></td></tr>
+<tr class="memdesc:a2f77cad5e7e8b78d109dc5e91f28b1d6"><td class="mdescLeft">&#160;</td><td class="mdescRight">This will contain the data for filtering.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a2f77cad5e7e8b78d109dc5e91f28b1d6">More...</a><br /></td></tr>
+<tr class="separator:a2f77cad5e7e8b78d109dc5e91f28b1d6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><div class="compoundTemplParams">template&lt;typename DT_, typename IT_, int BlockSize_&gt;<br />
-class FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;</div><p >Slip Filter class template. </p>
+<div class="textblock"><div class="compoundTemplParams">template&lt;typename DT_, typename IT_, int block_size_&gt;<br />
+class FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;</div><p >Slip Filter class template. </p>
 <dl class="tparams"><dt>Template Parameters</dt><dd>
   <table class="tparams">
     <tr><td class="paramname">DT_</td><td>Data type, i.e. double</td></tr>
     <tr><td class="paramname">IT_</td><td>Index type, i.e. unsigned int</td></tr>
-    <tr><td class="paramname">BlockSize_</td><td>Size of the blocks, i.e. 2 for a filter acting on a velocity field in 2d</td></tr>
+    <tr><td class="paramname">block_size_</td><td>Size of the blocks, i.e. 2 for a filter acting on a velocity field in 2d</td></tr>
   </table>
   </dd>
 </dl>
@@ -251,16 +252,16 @@ class FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;</div><p >Slip Filter
 
 <p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00066">66</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
-<a id="a3fae15c9247fe45a8ee188d7c9a1d655" name="a3fae15c9247fe45a8ee188d7c9a1d655"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3fae15c9247fe45a8ee188d7c9a1d655">&#9670;&#160;</a></span>DataType</h2>
+<a id="a00ef3ad57ba29ac341da441845adefb6" name="a00ef3ad57ba29ac341da441845adefb6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a00ef3ad57ba29ac341da441845adefb6">&#9670;&#160;</a></span>DataType</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">typedef DT_ <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::DataType</td>
+          <td class="memname">typedef DT_ <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::DataType</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -271,18 +272,18 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 </div>
 </div>
-<a id="a16780403138fd6c3ada37aba285ccb61" name="a16780403138fd6c3ada37aba285ccb61"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a16780403138fd6c3ada37aba285ccb61">&#9670;&#160;</a></span>FilterType</h2>
+<a id="a7a1f2e82565b5e2ca72dd8e22bbeedae" name="a7a1f2e82565b5e2ca72dd8e22bbeedae"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7a1f2e82565b5e2ca72dd8e22bbeedae">&#9670;&#160;</a></span>FilterType</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <div class="memtemplate">
 template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::FilterType =  <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a>&lt;DT2_, IT2_, BlockSize_&gt;</td>
+          <td class="memname">using <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::FilterType =  <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a>&lt;DT2_, IT2_, block_size_&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -293,18 +294,18 @@ template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </div>
 
 </div>
 </div>
-<a id="a1715e7d56f0d53638d3dabac8ee24c2a" name="a1715e7d56f0d53638d3dabac8ee24c2a"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1715e7d56f0d53638d3dabac8ee24c2a">&#9670;&#160;</a></span>FilterTypeByDI</h2>
+<a id="a9219e21a458ce30158501b039019aede" name="a9219e21a458ce30158501b039019aede"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9219e21a458ce30158501b039019aede">&#9670;&#160;</a></span>FilterTypeByDI</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <div class="memtemplate">
 template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">using <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::FilterTypeByDI =  <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a16780403138fd6c3ada37aba285ccb61">FilterType</a>&lt;DT2_, IT2_&gt;</td>
+          <td class="memname">using <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::FilterTypeByDI =  <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a7a1f2e82565b5e2ca72dd8e22bbeedae">FilterType</a>&lt;DT2_, IT2_&gt;</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -315,16 +316,16 @@ template&lt;typename DT2_  = DT_, typename IT2_  = IT_&gt; </div>
 
 </div>
 </div>
-<a id="ac5e06b891d1109217d980934fecfef79" name="ac5e06b891d1109217d980934fecfef79"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac5e06b891d1109217d980934fecfef79">&#9670;&#160;</a></span>IndexType</h2>
+<a id="a9308f54831bba86304333c3e48d79999" name="a9308f54831bba86304333c3e48d79999"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9308f54831bba86304333c3e48d79999">&#9670;&#160;</a></span>IndexType</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">typedef IT_ <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::IndexType</td>
+          <td class="memname">typedef IT_ <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::IndexType</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -335,16 +336,16 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 </div>
 </div>
-<a id="af87cc579c3ec384c6a96dc2406a27383" name="af87cc579c3ec384c6a96dc2406a27383"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af87cc579c3ec384c6a96dc2406a27383">&#9670;&#160;</a></span>ValueType</h2>
+<a id="a32ba04c23ea938a0d9c6024fed3e74c9" name="a32ba04c23ea938a0d9c6024fed3e74c9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a32ba04c23ea938a0d9c6024fed3e74c9">&#9670;&#160;</a></span>ValueType</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt;<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a3fae15c9247fe45a8ee188d7c9a1d655">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a3a72ccbdc487b71248783c52cebc1627">BlockSize</a>&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::ValueType</td>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_tiny_1_1_vector.html">Tiny::Vector</a>&lt;<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a00ef3ad57ba29ac341da441845adefb6">DataType</a>, <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a9a9e1e685d7b415fcebac099e886dbbd">block_size</a>&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::ValueType</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -355,16 +356,16 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 </div>
 </div>
-<a id="a1ed744d4084df2eb3b4b51eec1408f46" name="a1ed744d4084df2eb3b4b51eec1408f46"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1ed744d4084df2eb3b4b51eec1408f46">&#9670;&#160;</a></span>VectorType</h2>
+<a id="ab6f9f08a95d50618e4a383fbfef25c26" name="ab6f9f08a95d50618e4a383fbfef25c26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab6f9f08a95d50618e4a383fbfef25c26">&#9670;&#160;</a></span>VectorType</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
       <table class="memname">
         <tr>
-          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">DenseVectorBlocked</a>&lt;DT_, IT_, BlockSize_&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::VectorType</td>
+          <td class="memname">typedef <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked.html">DenseVectorBlocked</a>&lt;DT_, IT_, block_size_&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::VectorType</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -376,19 +377,19 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="afdf76eedf179ae4589847f886d5a6101" name="afdf76eedf179ae4589847f886d5a6101"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afdf76eedf179ae4589847f886d5a6101">&#9670;&#160;</a></span>SlipFilter() <span class="overload">[1/3]</span></h2>
+<a id="ac759ac046b5af934f267ca921ebc9436" name="ac759ac046b5af934f267ca921ebc9436"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac759ac046b5af934f267ca921ebc9436">&#9670;&#160;</a></span>SlipFilter() <span class="overload">[1/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::SlipFilter </td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::SlipFilter </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -407,19 +408,19 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 </div>
 </div>
-<a id="a914f61d87b053b35bfcf2953d8b0cf43" name="a914f61d87b053b35bfcf2953d8b0cf43"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a914f61d87b053b35bfcf2953d8b0cf43">&#9670;&#160;</a></span>SlipFilter() <span class="overload">[2/3]</span></h2>
+<a id="ac966f5bdaaca7076fa003b39a4e14561" name="ac966f5bdaaca7076fa003b39a4e14561"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac966f5bdaaca7076fa003b39a4e14561">&#9670;&#160;</a></span>SlipFilter() <span class="overload">[2/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::SlipFilter </td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::SlipFilter </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
           <td class="paramname"><em>num_vertices</em>, </td>
@@ -428,7 +429,13 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
-          <td class="paramname"><em>num_dofs</em>&#160;</td>
+          <td class="paramname"><em>num_dofs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td>
+          <td class="paramname"><em>num_nzes</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -456,21 +463,21 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 </div>
 </div>
-<a id="a1a8cde28d0a596a381346496c6680990" name="a1a8cde28d0a596a381346496c6680990"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1a8cde28d0a596a381346496c6680990">&#9670;&#160;</a></span>SlipFilter() <span class="overload">[3/3]</span></h2>
+<a id="ab77550ceb5de828999117a3801095038" name="ab77550ceb5de828999117a3801095038"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab77550ceb5de828999117a3801095038">&#9670;&#160;</a></span>SlipFilter() <span class="overload">[3/3]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::SlipFilter </td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::SlipFilter </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt; &amp;&amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a>&lt; DT_, IT_, block_size_ &gt; &amp;&amp;&#160;</td>
           <td class="paramname"><em>other</em></td><td>)</td>
           <td></td>
         </tr>
@@ -488,19 +495,19 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 </div>
 </div>
-<a id="afdb29e32210ac1d2261aad30eef5571c" name="afdb29e32210ac1d2261aad30eef5571c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#afdb29e32210ac1d2261aad30eef5571c">&#9670;&#160;</a></span>~SlipFilter()</h2>
+<a id="af361ebfd3c509a8a8bed1d66722b4b06" name="af361ebfd3c509a8a8bed1d66722b4b06"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af361ebfd3c509a8a8bed1d66722b4b06">&#9670;&#160;</a></span>~SlipFilter()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">virtual <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::~<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a> </td>
+          <td class="memname">virtual <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::~<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a> </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -520,70 +527,19 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a id="a3fb2547903a7c1221e7b4cb33f43c9e4" name="a3fb2547903a7c1221e7b4cb33f43c9e4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3fb2547903a7c1221e7b4cb33f43c9e4">&#9670;&#160;</a></span>add()</h2>
+<a id="aa3e0d4ad6c68ad8818026a2d0e6d7c55" name="aa3e0d4ad6c68ad8818026a2d0e6d7c55"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa3e0d4ad6c68ad8818026a2d0e6d7c55">&#9670;&#160;</a></span>bytes()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::add </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ac5e06b891d1109217d980934fecfef79">IndexType</a>&#160;</td>
-          <td class="paramname"><em>idx</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#af87cc579c3ec384c6a96dc2406a27383">ValueType</a>&#160;</td>
-          <td class="paramname"><em>val</em>&#160;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>Adds one element to the filter. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramdir">[in]</td><td class="paramname">idx</td><td>Index where to add </td></tr>
-    <tr><td class="paramdir">[in]</td><td class="paramname">val</td><td>Value to add </td></tr>
-  </table>
-  </dd>
-</dl>
-
-<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00206">206</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>.</p>
-
-</div>
-</div>
-<a id="a8874e4e8640ed973ea70dec7dbcf5210" name="a8874e4e8640ed973ea70dec7dbcf5210"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8874e4e8640ed973ea70dec7dbcf5210">&#9670;&#160;</a></span>bytes()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">std::size_t <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::bytes </td>
+          <td class="memname">std::size_t <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::bytes </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -600,23 +556,23 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00174">174</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00092">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_nu</a>, and <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>.</p>
+<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00092">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::_nu</a>, and <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::_sv</a>.</p>
 
 </div>
 </div>
-<a id="a9f453edc7cb7de3457cf76fe38cf6946" name="a9f453edc7cb7de3457cf76fe38cf6946"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9f453edc7cb7de3457cf76fe38cf6946">&#9670;&#160;</a></span>clear()</h2>
+<a id="a720965c132ed67f9d5a2bea443686c65" name="a720965c132ed67f9d5a2bea443686c65"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a720965c132ed67f9d5a2bea443686c65">&#9670;&#160;</a></span>clear()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::clear </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::clear </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -633,23 +589,23 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00167">167</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00092">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_nu</a>, and <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>.</p>
+<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00092">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::_nu</a>, and <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::_sv</a>.</p>
 
 </div>
 </div>
-<a id="adf3d8dabb7f9b7a35bc029cc95a86649" name="adf3d8dabb7f9b7a35bc029cc95a86649"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#adf3d8dabb7f9b7a35bc029cc95a86649">&#9670;&#160;</a></span>clone() <span class="overload">[1/2]</span></h2>
+<a id="ab189dc146d34ecf6f12ddf3b83d272a0" name="ab189dc146d34ecf6f12ddf3b83d272a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab189dc146d34ecf6f12ddf3b83d272a0">&#9670;&#160;</a></span>clone() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::clone </td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::clone </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786f">CloneMode</a>&#160;</td>
           <td class="paramname"><em>clone_mode</em> = <code><a class="el" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa21d01af167e6874b88ed5f6dc7c4b1e4">CloneMode::Deep</a></code></td><td>)</td>
@@ -667,25 +623,25 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00144">144</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="direct__stokes__solver_8hpp_source.html#l00798">FEAT::Solver::DirectStokesCore&lt; SolverDT_, SolverIT_, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, dim_ &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt; &gt;::_add_filter_velo()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="direct__stokes__solver_8hpp_source.html#l00810">FEAT::Solver::DirectStokesCore&lt; SolverDT_, SolverIT_, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, dim_ &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt; &gt;::_add_filter_velo()</a>.</p>
 
 </div>
 </div>
-<a id="a5584944b89788b3c6e85a43fb0617f39" name="a5584944b89788b3c6e85a43fb0617f39"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5584944b89788b3c6e85a43fb0617f39">&#9670;&#160;</a></span>clone() <span class="overload">[2/2]</span></h2>
+<a id="a7bf5f414a42033fefec02df402c5ee20" name="a7bf5f414a42033fefec02df402c5ee20"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7bf5f414a42033fefec02df402c5ee20">&#9670;&#160;</a></span>clone() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::clone </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::clone </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt; &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a>&lt; DT_, IT_, block_size_ &gt; &amp;&#160;</td>
           <td class="paramname"><em>other</em>, </td>
         </tr>
         <tr>
@@ -711,17 +667,17 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00152">152</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00092">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_nu</a>, and <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>.</p>
+<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00092">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::_nu</a>, and <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::_sv</a>.</p>
 
 </div>
 </div>
-<a id="a0032a2c5fe73e182ca6171531fc0dc23" name="a0032a2c5fe73e182ca6171531fc0dc23"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a0032a2c5fe73e182ca6171531fc0dc23">&#9670;&#160;</a></span>convert()</h2>
+<a id="a16ce3a738140b2144f7e24b6251ca826" name="a16ce3a738140b2144f7e24b6251ca826"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a16ce3a738140b2144f7e24b6251ca826">&#9670;&#160;</a></span>convert()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <div class="memtemplate">
 template&lt;typename DT2_ , typename IT2_ , int BS_&gt; </div>
 <table class="mlabels">
@@ -729,7 +685,7 @@ template&lt;typename DT2_ , typename IT2_ , int BS_&gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::convert </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::convert </td>
           <td>(</td>
           <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a>&lt; DT2_, IT2_, BS_ &gt; &amp;&#160;</td>
           <td class="paramname"><em>other</em></td><td>)</td>
@@ -747,23 +703,23 @@ template&lt;typename DT2_ , typename IT2_ , int BS_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00160">160</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00092">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_nu</a>, and <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>.</p>
+<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00092">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::_nu</a>, and <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::_sv</a>.</p>
 
 </div>
 </div>
-<a id="a03a74f7c2dec3107f2ba40bee09e4502" name="a03a74f7c2dec3107f2ba40bee09e4502"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a03a74f7c2dec3107f2ba40bee09e4502">&#9670;&#160;</a></span>empty()</h2>
+<a id="af75c55c19fdfd6f02c358b92a6a492c3" name="af75c55c19fdfd6f02c358b92a6a492c3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af75c55c19fdfd6f02c358b92a6a492c3">&#9670;&#160;</a></span>empty()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::empty </td>
+          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::empty </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -776,25 +732,31 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00247">247</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
+<p>Checks whether the size of the filter is zero. </p>
+
+<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00224">224</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::_sv</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="slip__filter_8hpp_source.html#l00241">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::filter_rhs()</a>.</p>
 
 </div>
 </div>
-<a id="ad6f2bab9c7beb470c43d429a9901bcb0" name="ad6f2bab9c7beb470c43d429a9901bcb0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad6f2bab9c7beb470c43d429a9901bcb0">&#9670;&#160;</a></span>filter_cor()</h2>
+<a id="aec32da257d67509b76f0e12a6a1b6b78" name="aec32da257d67509b76f0e12a6a1b6b78"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aec32da257d67509b76f0e12a6a1b6b78">&#9670;&#160;</a></span>filter_cor()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::filter_cor </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::filter_cor </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a1ed744d4084df2eb3b4b51eec1408f46">VectorType</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ab6f9f08a95d50618e4a383fbfef25c26">VectorType</a> &amp;&#160;</td>
           <td class="paramname"><em>vector</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -814,27 +776,27 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00304">304</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00284">284</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00288">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::filter_def()</a>.</p>
+<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00241">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::filter_rhs()</a>.</p>
 
 </div>
 </div>
-<a id="a757711a4509b5efc24147d74c71146f9" name="a757711a4509b5efc24147d74c71146f9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a757711a4509b5efc24147d74c71146f9">&#9670;&#160;</a></span>filter_def()</h2>
+<a id="a7f48bd9fd4120d6086ef7227e06d3b89" name="a7f48bd9fd4120d6086ef7227e06d3b89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7f48bd9fd4120d6086ef7227e06d3b89">&#9670;&#160;</a></span>filter_def()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::filter_def </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::filter_def </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a1ed744d4084df2eb3b4b51eec1408f46">VectorType</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ab6f9f08a95d50618e4a383fbfef25c26">VectorType</a> &amp;&#160;</td>
           <td class="paramname"><em>vector</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -854,29 +816,27 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00288">288</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00272">272</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00528">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="slip__filter_8hpp_source.html#l00304">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::filter_cor()</a>.</p>
+<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00241">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::filter_rhs()</a>.</p>
 
 </div>
 </div>
-<a id="a8e60611cfec358be7e2b12cdb1548e71" name="a8e60611cfec358be7e2b12cdb1548e71"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8e60611cfec358be7e2b12cdb1548e71">&#9670;&#160;</a></span>filter_rhs()</h2>
+<a id="a1ab13652233973971613c90bde8b7898" name="a1ab13652233973971613c90bde8b7898"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1ab13652233973971613c90bde8b7898">&#9670;&#160;</a></span>filter_rhs()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::filter_rhs </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a1ed744d4084df2eb3b4b51eec1408f46">VectorType</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ab6f9f08a95d50618e4a383fbfef25c26">VectorType</a> &amp;&#160;</td>
           <td class="paramname"><em>vector</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -896,29 +856,29 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00258">258</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00241">241</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00528">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::_sv</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00378">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::elements_arbiter()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00224">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::empty()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00230">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::hollow()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l00360">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="slip__filter_8hpp_source.html#l00274">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::filter_sol()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="slip__filter_8hpp_source.html#l00284">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::filter_cor()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00272">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::filter_def()</a>, and <a class="el" href="slip__filter_8hpp_source.html#l00260">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::filter_sol()</a>.</p>
 
 </div>
 </div>
-<a id="a96a00762744125edf07498f31d0b7609" name="a96a00762744125edf07498f31d0b7609"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a96a00762744125edf07498f31d0b7609">&#9670;&#160;</a></span>filter_sol()</h2>
+<a id="a3a297259ac4096ed95ddc7e3f9070ac2" name="a3a297259ac4096ed95ddc7e3f9070ac2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a297259ac4096ed95ddc7e3f9070ac2">&#9670;&#160;</a></span>filter_sol()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::filter_sol </td>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::filter_sol </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#a1ed744d4084df2eb3b4b51eec1408f46">VectorType</a> &amp;&#160;</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#ab6f9f08a95d50618e4a383fbfef25c26">VectorType</a> &amp;&#160;</td>
           <td class="paramname"><em>vector</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -938,57 +898,25 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00274">274</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00260">260</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>, and <a class="el" href="slip__filter_8hpp_source.html#l00258">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs()</a>.</p>
+<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00241">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::filter_rhs()</a>.</p>
 
 </div>
 </div>
-<a id="a54b8203b1cac73435b6737fcec8f5bf9" name="a54b8203b1cac73435b6737fcec8f5bf9"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a54b8203b1cac73435b6737fcec8f5bf9">&#9670;&#160;</a></span>get_indices() <span class="overload">[1/2]</span></h2>
+<a id="a7572f6776eee2142a09989e83002df71" name="a7572f6776eee2142a09989e83002df71"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7572f6776eee2142a09989e83002df71">&#9670;&#160;</a></span>hollow()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">IT_ * <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::get_indices </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The index array. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00224">224</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>.</p>
-
-</div>
-</div>
-<a id="ab146bdfaa8d18ca4d81ad684d2c2dda2" name="ab146bdfaa8d18ca4d81ad684d2c2dda2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab146bdfaa8d18ca4d81ad684d2c2dda2">&#9670;&#160;</a></span>get_indices() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const IT_ * <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::get_indices </td>
+          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::hollow </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -1000,59 +928,30 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The index array. </dd></dl>
+
+<p>Checks whether the filter does not contain any non-zero elements. </p>
 
 <p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00230">230</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>.</p>
+<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::_sv</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="slip__filter_8hpp_source.html#l00241">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::filter_rhs()</a>.</p>
 
 </div>
 </div>
-<a id="ab276867ddd5b0e7470562826cc351308" name="ab276867ddd5b0e7470562826cc351308"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab276867ddd5b0e7470562826cc351308">&#9670;&#160;</a></span>get_values() <span class="overload">[1/2]</span></h2>
+<a id="aa96ba4c43bd6f83516104e15311d0062" name="aa96ba4c43bd6f83516104e15311d0062"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa96ba4c43bd6f83516104e15311d0062">&#9670;&#160;</a></span>num_nzes()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#af87cc579c3ec384c6a96dc2406a27383">ValueType</a> * <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::get_values </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The value array. </dd></dl>
-
-<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00236">236</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
-
-<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>.</p>
-
-</div>
-</div>
-<a id="af86287098e3ffeb17994c0164321f37d" name="af86287098e3ffeb17994c0164321f37d"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af86287098e3ffeb17994c0164321f37d">&#9670;&#160;</a></span>get_values() <span class="overload">[2/2]</span></h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html#af87cc579c3ec384c6a96dc2406a27383">ValueType</a> * <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::get_values </td>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::num_nzes </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -1064,29 +963,63 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The value array. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00242">242</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
+<p>Returns the number of non-zero entries in the filter. </p>
 
-<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>.</p>
+<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00212">212</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::_sv</a>.</p>
 
 </div>
 </div>
-<a id="aa3952d48ef546324edba509219b1560e" name="aa3952d48ef546324edba509219b1560e"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa3952d48ef546324edba509219b1560e">&#9670;&#160;</a></span>operator=()</h2>
+<a id="a25401cb56bc59f1c98ac13a7c9a12ee8" name="a25401cb56bc59f1c98ac13a7c9a12ee8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25401cb56bc59f1c98ac13a7c9a12ee8">&#9670;&#160;</a></span>num_nzes_raw()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a> &amp; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::operator= </td>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::num_nzes_raw </td>
           <td>(</td>
-          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt; &amp;&amp;&#160;</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns the raw number of non-zero entries in the filter. </p>
+
+<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00218">218</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::_sv</a>.</p>
+
+</div>
+</div>
+<a id="aa4eb9e8a5d78ee9484613224564ef966" name="aa4eb9e8a5d78ee9484613224564ef966"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa4eb9e8a5d78ee9484613224564ef966">&#9670;&#160;</a></span>operator=()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a> &amp; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::operator= </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">SlipFilter</a>&lt; DT_, IT_, block_size_ &gt; &amp;&amp;&#160;</td>
           <td class="paramname"><em>other</em></td><td>)</td>
           <td></td>
         </tr>
@@ -1102,23 +1035,23 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00128">128</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00092">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_nu</a>, and <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>.</p>
+<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00092">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::_nu</a>, and <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::_sv</a>.</p>
 
 </div>
 </div>
-<a id="a9d35e962b548d07b014444f4d06f397b" name="a9d35e962b548d07b014444f4d06f397b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9d35e962b548d07b014444f4d06f397b">&#9670;&#160;</a></span>size()</h2>
+<a id="a09124306552ef9833d3954e5cf5cd541" name="a09124306552ef9833d3954e5cf5cd541"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a09124306552ef9833d3954e5cf5cd541">&#9670;&#160;</a></span>size()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::size </td>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::size </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -1130,27 +1063,28 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The total size of the filter. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00212">212</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
+<p>Returns the total native size of the filter. </p>
 
-<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>.</p>
+<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00200">200</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::_sv</a>.</p>
 
 </div>
 </div>
-<a id="a2a6dab9766b2319b858005bb68c7823b" name="a2a6dab9766b2319b858005bb68c7823b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2a6dab9766b2319b858005bb68c7823b">&#9670;&#160;</a></span>used_elements()</h2>
+<a id="a4619b029b6f6dfc4ce1c36515525fc89" name="a4619b029b6f6dfc4ce1c36515525fc89"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4619b029b6f6dfc4ce1c36515525fc89">&#9670;&#160;</a></span>size_raw()</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::used_elements </td>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::size_raw </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -1162,28 +1096,29 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
   </tr>
 </table>
 </div><div class="memdoc">
-<dl class="section return"><dt>Returns</dt><dd>The number of entries in the filter. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00218">218</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
+<p>Returns the total raw size of the filter. </p>
 
-<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::_sv</a>.</p>
+<p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00206">206</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="slip__filter_8hpp_source.html#l00094">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::_sv</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="a11bd29839bb674a9543f2005fb880aa5" name="a11bd29839bb674a9543f2005fb880aa5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a11bd29839bb674a9543f2005fb880aa5">&#9670;&#160;</a></span>_nu</h2>
+<a id="a38e795637cbed6e9831945e355f134e7" name="a38e795637cbed6e9831945e355f134e7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a38e795637cbed6e9831945e355f134e7">&#9670;&#160;</a></span>_nu</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector_blocked.html">SparseVectorBlocked</a>&lt;DT_, IT_, BlockSize_&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::_nu</td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector_blocked.html">SparseVectorBlocked</a>&lt;DT_, IT_, block_size_&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::_nu</td>
         </tr>
       </table>
   </td>
@@ -1197,23 +1132,23 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00092">92</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="slip__filter_8hpp_source.html#l00174">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::bytes()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00167">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::clear()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00152">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::clone()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00160">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, and <a class="el" href="slip__filter_8hpp_source.html#l00128">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::operator=()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="slip__filter_8hpp_source.html#l00174">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::bytes()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00167">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::clear()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00152">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::clone()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00160">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::convert()</a>, and <a class="el" href="slip__filter_8hpp_source.html#l00128">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::operator=()</a>.</p>
 
 </div>
 </div>
-<a id="a21854a5ba755ed39bac1516dbe5a0c55" name="a21854a5ba755ed39bac1516dbe5a0c55"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a21854a5ba755ed39bac1516dbe5a0c55">&#9670;&#160;</a></span>_sv</h2>
+<a id="a2f77cad5e7e8b78d109dc5e91f28b1d6" name="a2f77cad5e7e8b78d109dc5e91f28b1d6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2f77cad5e7e8b78d109dc5e91f28b1d6">&#9670;&#160;</a></span>_sv</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector_blocked.html">SparseVectorBlocked</a>&lt;DT_, IT_, BlockSize_&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::_sv</td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_vector_blocked.html">SparseVectorBlocked</a>&lt;DT_, IT_, block_size_&gt; <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::_sv</td>
         </tr>
       </table>
   </td>
@@ -1227,23 +1162,23 @@ template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="slip__filter_8hpp_source.html#l00094">94</a> of file <a class="el" href="slip__filter_8hpp_source.html">slip_filter.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="slip__filter_8hpp_source.html#l00206">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::add()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00174">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::bytes()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00167">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::clear()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00152">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::clone()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00160">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::convert()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00288">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::filter_def()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00258">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::filter_rhs()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00274">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::filter_sol()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00224">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::get_indices()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00236">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::get_values()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00128">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::operator=()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00212">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::size()</a>, and <a class="el" href="slip__filter_8hpp_source.html#l00218">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, BlockSize_ &gt;::used_elements()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="slip__filter_8hpp_source.html#l00174">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::bytes()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00167">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::clear()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00152">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::clone()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00160">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::convert()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00224">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::empty()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00241">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::filter_rhs()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00230">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::hollow()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00212">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::num_nzes()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00218">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::num_nzes_raw()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00128">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::operator=()</a>, <a class="el" href="slip__filter_8hpp_source.html#l00200">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::size()</a>, and <a class="el" href="slip__filter_8hpp_source.html#l00206">FEAT::LAFEM::SlipFilter&lt; DT_, IT_, block_size_ &gt;::size_raw()</a>.</p>
 
 </div>
 </div>
-<a id="a3a72ccbdc487b71248783c52cebc1627" name="a3a72ccbdc487b71248783c52cebc1627"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3a72ccbdc487b71248783c52cebc1627">&#9670;&#160;</a></span>BlockSize</h2>
+<a id="a9a9e1e685d7b415fcebac099e886dbbd" name="a9a9e1e685d7b415fcebac099e886dbbd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9a9e1e685d7b415fcebac099e886dbbd">&#9670;&#160;</a></span>block_size</h2>
 
 <div class="memitem">
 <div class="memproto">
 <div class="memtemplate">
-template&lt;typename DT_ , typename IT_ , int BlockSize_&gt; </div>
+template&lt;typename DT_ , typename IT_ , int block_size_&gt; </div>
 <table class="mlabels">
   <tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr int <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, BlockSize_ &gt;::BlockSize = BlockSize_</td>
+          <td class="memname">constexpr int <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html">FEAT::LAFEM::SlipFilter</a>&lt; DT_, IT_, block_size_ &gt;::block_size = block_size_</td>
         </tr>
       </table>
   </td>

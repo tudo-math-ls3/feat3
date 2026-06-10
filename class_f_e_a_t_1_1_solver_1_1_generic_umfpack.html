@@ -103,6 +103,7 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_solver_1_1_generic_u
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt; Class Template Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div></div>
@@ -169,6 +170,17 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a540ba041bdc7ce1edc48511f7e1a3f69"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the name of the solver.  <a href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html#a540ba041bdc7ce1edc48511f7e1a3f69">More...</a><br /></td></tr>
 <tr class="separator:a540ba041bdc7ce1edc48511f7e1a3f69"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a6dd465cb71a6cd423ec23f2c79a68790"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html#a6dd465cb71a6cd423ec23f2c79a68790">_copy_matrix_vals</a> (const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html#a2db8671083d781503c4c3b8a25d07752">MatrixType</a> &amp;matrix)</td></tr>
+<tr class="separator:a6dd465cb71a6cd423ec23f2c79a68790"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3a1e9426d47c6e8e21fcc43c6db72833"><td class="memTemplParams" colspan="2">template&lt;typename IT2_ &gt; </td></tr>
+<tr class="memitem:a3a1e9426d47c6e8e21fcc43c6db72833"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html#a3a1e9426d47c6e8e21fcc43c6db72833">_copy_matrix_values</a> (const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html">LAFEM::SparseMatrixCSR</a>&lt; double, IT2_ &gt; &amp;matrix)</td></tr>
+<tr class="separator:a3a1e9426d47c6e8e21fcc43c6db72833"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a36f4733382461edd8c7cbe4ec29b427b"><td class="memTemplParams" colspan="2">template&lt;typename MT_ &gt; </td></tr>
+<tr class="memitem:a36f4733382461edd8c7cbe4ec29b427b"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html#a36f4733382461edd8c7cbe4ec29b427b">_copy_matrix_values</a> (const MT_ &amp;matrix)</td></tr>
+<tr class="separator:a36f4733382461edd8c7cbe4ec29b427b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
 <tr class="memitem:a5d8cc8e3be51985920004c7a862a1ac1"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html#a2db8671083d781503c4c3b8a25d07752">MatrixType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html#a5d8cc8e3be51985920004c7a862a1ac1">_matrix</a></td></tr>
@@ -198,7 +210,7 @@ class FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;</div><p >Generic UMFPACK sol
 <dl class="section attention"><dt>Attention</dt><dd>This class is only declared if <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> was configured to build and link against the <code>UMFPACK</code> third-party library.</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00647">647</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00654">654</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a37080506003494a373233f3de3c726cd" name="a37080506003494a373233f3de3c726cd"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a37080506003494a373233f3de3c726cd">&#9670;&#160;</a></span>BaseClass</h2>
@@ -216,7 +228,7 @@ template&lt;typename Matrix_ &gt; </div>
 
 <p>our base class </p>
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00652">652</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00659">659</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
 </div>
 </div>
@@ -236,7 +248,7 @@ template&lt;typename Matrix_ &gt; </div>
 
 <p>our matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00654">654</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00661">661</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
 </div>
 </div>
@@ -256,7 +268,7 @@ template&lt;typename Matrix_ &gt; </div>
 
 <p>our vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00656">656</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00663">663</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
 </div>
 </div>
@@ -287,7 +299,7 @@ template&lt;typename Matrix_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00671">671</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00708">708</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
 </div>
 </div>
@@ -318,11 +330,105 @@ template&lt;typename Matrix_ &gt; </div>
 
 <p>virtual destructor </p>
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00678">678</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00715">715</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a6dd465cb71a6cd423ec23f2c79a68790" name="a6dd465cb71a6cd423ec23f2c79a68790"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6dd465cb71a6cd423ec23f2c79a68790">&#9670;&#160;</a></span>_copy_matrix_vals()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html">FEAT::Solver::GenericUmfpack</a>&lt; Matrix_ &gt;::_copy_matrix_vals </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html#a2db8671083d781503c4c3b8a25d07752">MatrixType</a> &amp;&#160;</td>
+          <td class="paramname"><em>matrix</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00677">677</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a3a1e9426d47c6e8e21fcc43c6db72833" name="a3a1e9426d47c6e8e21fcc43c6db72833"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3a1e9426d47c6e8e21fcc43c6db72833">&#9670;&#160;</a></span>_copy_matrix_values() <span class="overload">[1/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename IT2_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html">FEAT::Solver::GenericUmfpack</a>&lt; Matrix_ &gt;::_copy_matrix_values </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html">LAFEM::SparseMatrixCSR</a>&lt; double, IT2_ &gt; &amp;&#160;</td>
+          <td class="paramname"><em>matrix</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00693">693</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a36f4733382461edd8c7cbe4ec29b427b" name="a36f4733382461edd8c7cbe4ec29b427b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a36f4733382461edd8c7cbe4ec29b427b">&#9670;&#160;</a></span>_copy_matrix_values() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ &gt; </div>
+<div class="memtemplate">
+template&lt;typename MT_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_solver_1_1_generic_umfpack.html">FEAT::Solver::GenericUmfpack</a>&lt; Matrix_ &gt;::_copy_matrix_values </td>
+          <td>(</td>
+          <td class="paramtype">const MT_ &amp;&#160;</td>
+          <td class="paramname"><em>matrix</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00702">702</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+
+</div>
+</div>
 <a id="ae162070c491d897ae6f91d263200af40" name="ae162070c491d897ae6f91d263200af40"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae162070c491d897ae6f91d263200af40">&#9670;&#160;</a></span>apply() <span class="overload">[1/2]</span></h2>
 
@@ -410,7 +516,7 @@ template&lt;typename Matrix_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00752">752</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00779">779</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
 </div>
 </div>
@@ -475,9 +581,9 @@ template&lt;typename Matrix_ &gt; </div>
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#af2ea6e8c96de45c8408f3dcc59b8f186">FEAT::Solver::SolverBase&lt; Matrix_::VectorTypeL &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00746">746</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00773">773</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="umfpack_8hpp_source.html#l00668">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_umfpack</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00246">FEAT::Solver::SolverBase&lt; typename Matrix_::VectorTypeL &gt;::done_numeric()</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_umfpack.html#acfeec5f3dad1c6ef0558c2a7617f319d">FEAT::Solver::Umfpack::done_numeric()</a>.</p>
+<p class="reference">References <a class="el" href="umfpack_8hpp_source.html#l00675">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_umfpack</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00246">FEAT::Solver::SolverBase&lt; typename Matrix_::VectorTypeL &gt;::done_numeric()</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_umfpack.html#acfeec5f3dad1c6ef0558c2a7617f319d">FEAT::Solver::Umfpack::done_numeric()</a>.</p>
 
 </div>
 </div>
@@ -511,9 +617,9 @@ template&lt;typename Matrix_ &gt; </div>
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#a70018a5e4ca2cd3dfc0cac9db3df051e">FEAT::Solver::SolverBase&lt; Matrix_::VectorTypeL &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00712">712</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00749">749</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="umfpack_8hpp_source.html#l00666">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_tmp_vsol</a>, <a class="el" href="umfpack_8hpp_source.html#l00662">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_umf_matrix</a>, <a class="el" href="umfpack_8hpp_source.html#l00664">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_umf_vsol</a>, <a class="el" href="umfpack_8hpp_source.html#l00668">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_umfpack</a>, <a class="el" href="container_8hpp_source.html#l00875">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::clear()</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00255">FEAT::Solver::SolverBase&lt; typename Matrix_::VectorTypeL &gt;::done_symbolic()</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_umfpack.html#aedb0d29f499703a6b8e671a838b7ca30">FEAT::Solver::Umfpack::done_symbolic()</a>.</p>
+<p class="reference">References <a class="el" href="umfpack_8hpp_source.html#l00673">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_tmp_vsol</a>, <a class="el" href="umfpack_8hpp_source.html#l00669">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_umf_matrix</a>, <a class="el" href="umfpack_8hpp_source.html#l00671">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_umf_vsol</a>, <a class="el" href="umfpack_8hpp_source.html#l00675">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_umfpack</a>, <a class="el" href="container_8hpp_source.html#l00861">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::clear()</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00255">FEAT::Solver::SolverBase&lt; typename Matrix_::VectorTypeL &gt;::done_symbolic()</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_umfpack.html#aedb0d29f499703a6b8e671a838b7ca30">FEAT::Solver::Umfpack::done_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -579,9 +685,9 @@ Before this function can be called, the symbolic initialization must be performe
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#a3d2a6e135e4af6af6be0c0aaf3330b3a">FEAT::Solver::SolverBase&lt; Matrix_::VectorTypeL &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00725">725</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00762">762</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="umfpack_8hpp_source.html#l00660">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_matrix</a>, <a class="el" href="umfpack_8hpp_source.html#l00662">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_umf_matrix</a>, <a class="el" href="umfpack_8hpp_source.html#l00668">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_umfpack</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01202">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::col_ind()</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00237">FEAT::Solver::SolverBase&lt; typename Matrix_::VectorTypeL &gt;::init_numeric()</a>, <a class="el" href="class_f_e_a_t_1_1_solver_1_1_umfpack.html#ae7f5ba187fc3e939976ba9e7b846a039">FEAT::Solver::Umfpack::init_numeric()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01244">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::row_ptr()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01169">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::rows()</a>, and <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01223">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::val()</a>.</p>
+<p class="reference">References <a class="el" href="umfpack_8hpp_source.html#l00667">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_matrix</a>, <a class="el" href="umfpack_8hpp_source.html#l00675">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_umfpack</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00237">FEAT::Solver::SolverBase&lt; typename Matrix_::VectorTypeL &gt;::init_numeric()</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_umfpack.html#ae7f5ba187fc3e939976ba9e7b846a039">FEAT::Solver::Umfpack::init_numeric()</a>.</p>
 
 </div>
 </div>
@@ -615,9 +721,9 @@ template&lt;typename Matrix_ &gt; </div>
 
 <p>Reimplemented from <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#a394e71e99c87e99a5eda16c302df725e">FEAT::Solver::SolverBase&lt; Matrix_::VectorTypeL &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00688">688</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00725">725</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="umfpack_8hpp_source.html#l00660">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_matrix</a>, <a class="el" href="umfpack_8hpp_source.html#l00666">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_tmp_vsol</a>, <a class="el" href="umfpack_8hpp_source.html#l00662">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_umf_matrix</a>, <a class="el" href="umfpack_8hpp_source.html#l00664">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_umf_vsol</a>, <a class="el" href="umfpack_8hpp_source.html#l00668">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_umfpack</a>, <a class="el" href="dense__vector_8hpp_source.html#l00403">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00568">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02718">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::create_vector_l()</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00227">FEAT::Solver::SolverBase&lt; typename Matrix_::VectorTypeL &gt;::init_symbolic()</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_umfpack.html#a2524df8c03faa3e03c12f12c08fbf5ff">FEAT::Solver::Umfpack::init_symbolic()</a>.</p>
+<p class="reference">References <a class="el" href="umfpack_8hpp_source.html#l00667">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_matrix</a>, <a class="el" href="umfpack_8hpp_source.html#l00673">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_tmp_vsol</a>, <a class="el" href="umfpack_8hpp_source.html#l00669">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_umf_matrix</a>, <a class="el" href="umfpack_8hpp_source.html#l00671">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_umf_vsol</a>, <a class="el" href="umfpack_8hpp_source.html#l00675">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::_umfpack</a>, <a class="el" href="dense__vector_8hpp_source.html#l00296">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l00362">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::convert()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02575">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::create_vector_l()</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00227">FEAT::Solver::SolverBase&lt; typename Matrix_::VectorTypeL &gt;::init_symbolic()</a>, and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_umfpack.html#a2524df8c03faa3e03c12f12c08fbf5ff">FEAT::Solver::Umfpack::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -650,7 +756,7 @@ template&lt;typename Matrix_ &gt; </div>
 
 <p>Implements <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ab7e792923921c7dbe2a1fefafd73ef0a">FEAT::Solver::SolverBase&lt; Matrix_::VectorTypeL &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00683">683</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00720">720</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
 </div>
 </div>
@@ -679,9 +785,9 @@ template&lt;typename Matrix_ &gt; </div>
 
 <p>our matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00660">660</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00667">667</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="umfpack_8hpp_source.html#l00725">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::init_numeric()</a>, and <a class="el" href="umfpack_8hpp_source.html#l00688">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="umfpack_8hpp_source.html#l00762">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::init_numeric()</a>, and <a class="el" href="umfpack_8hpp_source.html#l00725">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -707,7 +813,7 @@ template&lt;typename Matrix_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00666">666</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00673">673</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
 </div>
 </div>
@@ -735,9 +841,9 @@ template&lt;typename Matrix_ &gt; </div>
 
 <p>temporary vectors for datatype conversion </p>
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00666">666</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00673">673</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="umfpack_8hpp_source.html#l00712">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::done_symbolic()</a>, and <a class="el" href="umfpack_8hpp_source.html#l00688">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="umfpack_8hpp_source.html#l00749">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::done_symbolic()</a>, and <a class="el" href="umfpack_8hpp_source.html#l00725">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -765,9 +871,9 @@ template&lt;typename Matrix_ &gt; </div>
 
 <p>the matrix for our <a class="el" href="class_f_e_a_t_1_1_solver_1_1_umfpack.html" title="UMFPACK solver class.">Umfpack</a> solver (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_sparse_matrix_c_s_r.html">SparseMatrixCSR&lt;double, Index&gt;</a>) </p>
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00662">662</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00669">669</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="umfpack_8hpp_source.html#l00712">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::done_symbolic()</a>, <a class="el" href="umfpack_8hpp_source.html#l00725">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::init_numeric()</a>, and <a class="el" href="umfpack_8hpp_source.html#l00688">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="umfpack_8hpp_source.html#l00749">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::done_symbolic()</a>, and <a class="el" href="umfpack_8hpp_source.html#l00725">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -793,7 +899,7 @@ template&lt;typename Matrix_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00664">664</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00671">671</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
 </div>
 </div>
@@ -821,9 +927,9 @@ template&lt;typename Matrix_ &gt; </div>
 
 <p>the vectors for our <a class="el" href="class_f_e_a_t_1_1_solver_1_1_umfpack.html" title="UMFPACK solver class.">Umfpack</a> solver (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">DenseVector&lt;double, Index&gt;</a>) </p>
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00664">664</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00671">671</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="umfpack_8hpp_source.html#l00712">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::done_symbolic()</a>, and <a class="el" href="umfpack_8hpp_source.html#l00688">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="umfpack_8hpp_source.html#l00749">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::done_symbolic()</a>, and <a class="el" href="umfpack_8hpp_source.html#l00725">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -851,9 +957,9 @@ template&lt;typename Matrix_ &gt; </div>
 
 <p>the actual <a class="el" href="class_f_e_a_t_1_1_solver_1_1_umfpack.html" title="UMFPACK solver class.">Umfpack</a> solver object </p>
 
-<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00668">668</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="umfpack_8hpp_source.html#l00675">675</a> of file <a class="el" href="umfpack_8hpp_source.html">umfpack.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="umfpack_8hpp_source.html#l00746">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::done_numeric()</a>, <a class="el" href="umfpack_8hpp_source.html#l00712">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::done_symbolic()</a>, <a class="el" href="umfpack_8hpp_source.html#l00725">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::init_numeric()</a>, and <a class="el" href="umfpack_8hpp_source.html#l00688">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="umfpack_8hpp_source.html#l00773">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::done_numeric()</a>, <a class="el" href="umfpack_8hpp_source.html#l00749">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::done_symbolic()</a>, <a class="el" href="umfpack_8hpp_source.html#l00762">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::init_numeric()</a>, and <a class="el" href="umfpack_8hpp_source.html#l00725">FEAT::Solver::GenericUmfpack&lt; Matrix_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>

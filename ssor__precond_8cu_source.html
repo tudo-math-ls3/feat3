@@ -110,9 +110,9 @@ $(document).ready(function(){initNavTree('ssor__precond_8cu_source.html',''); in
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span> </div>
 <div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span>// includes, FEAT</div>
 <div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span>#include &lt;kernel/base_header.hpp&gt;</div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span> </div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>#include &lt;kernel/util/exception.hpp&gt;</div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>#include &lt;kernel/util/memory_pool.hpp&gt;</div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span>#include &lt;kernel/util/exception.hpp&gt;</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>#include &lt;kernel/util/memory_aux.hpp&gt;</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>#include &lt;kernel/util/cuda_util.hpp&gt;</div>
 <div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span> </div>
 <div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>#include &lt;vector&gt;</div>
 <div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>#include &lt;algorithm&gt;</div>
@@ -303,7 +303,7 @@ $(document).ready(function(){initNavTree('ssor__precond_8cu_source.html',''); in
 <div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>        }</div>
 <div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span> </div>
 <div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>        cudaDeviceSynchronize();</div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>#ifdef FEAT_DEBUG_MODE</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>#ifdef DEBUG</div>
 <div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>        cudaError_t last_error(cudaGetLastError());</div>
 <div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>        if (cudaSuccess != last_error)</div>
 <div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>          throw InternalError(__func__, __FILE__, __LINE__, &quot;CUDA error occurred in execution!\n&quot; + stringify(cudaGetErrorString(last_error)));</div>
@@ -329,7 +329,7 @@ $(document).ready(function(){initNavTree('ssor__precond_8cu_source.html',''); in
 <div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>        }</div>
 <div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span> </div>
 <div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>        cudaDeviceSynchronize();</div>
-<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>#ifdef FEAT_DEBUG_MODE</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>#ifdef DEBUG</div>
 <div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>        cudaError_t last_error(cudaGetLastError());</div>
 <div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>        if (cudaSuccess != last_error)</div>
 <div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>          throw InternalError(__func__, __FILE__, __LINE__, &quot;CUDA error occurred in execution!\n&quot; + stringify(cudaGetErrorString(last_error)));</div>
@@ -358,7 +358,7 @@ $(document).ready(function(){initNavTree('ssor__precond_8cu_source.html',''); in
 <div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>        }</div>
 <div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span> </div>
 <div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>        cudaDeviceSynchronize();</div>
-<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>#ifdef FEAT_DEBUG_MODE</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>#ifdef DEBUG</div>
 <div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>        cudaError_t last_error(cudaGetLastError());</div>
 <div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>        if (cudaSuccess != last_error)</div>
 <div class="line"><a id="l00259" name="l00259"></a><span class="lineno">  259</span>          throw InternalError(__func__, __FILE__, __LINE__, &quot;CUDA error occurred in execution!\n&quot; + stringify(cudaGetErrorString(last_error)));</div>
@@ -390,7 +390,7 @@ $(document).ready(function(){initNavTree('ssor__precond_8cu_source.html',''); in
 <div class="line"><a id="l00285" name="l00285"></a><span class="lineno">  285</span>        }</div>
 <div class="line"><a id="l00286" name="l00286"></a><span class="lineno">  286</span> </div>
 <div class="line"><a id="l00287" name="l00287"></a><span class="lineno">  287</span>        cudaDeviceSynchronize();</div>
-<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>#ifdef FEAT_DEBUG_MODE</div>
+<div class="line"><a id="l00288" name="l00288"></a><span class="lineno">  288</span>#ifdef DEBUG</div>
 <div class="line"><a id="l00289" name="l00289"></a><span class="lineno">  289</span>        cudaError_t last_error(cudaGetLastError());</div>
 <div class="line"><a id="l00290" name="l00290"></a><span class="lineno">  290</span>        if (cudaSuccess != last_error)</div>
 <div class="line"><a id="l00291" name="l00291"></a><span class="lineno">  291</span>          throw InternalError(__func__, __FILE__, __LINE__, &quot;CUDA error occurred in execution!\n&quot; + stringify(cudaGetErrorString(last_error)));</div>

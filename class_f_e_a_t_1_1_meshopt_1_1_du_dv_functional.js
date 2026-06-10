@@ -57,8 +57,8 @@ var class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional =
     [ "_num_hess_evals", "class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#ae11e8367484e608ce060bec2b515b2dd", null ],
     [ "_slip_asm", "class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#ab3e4f01c20046d7195c5f96b1c29d612", null ],
     [ "_trafo", "class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#aed917b93c92a4f95293196f4404c6d9d", null ],
-    [ "BlockHeight", "class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#a7cec326c09819bb49d438ce4b92cd038", null ],
-    [ "BlockWidth", "class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#aa0cb4eca9b1f6bf50a8409233196a596", null ],
+    [ "block_height", "class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#ad2c6d0bfbcc7f0dcff41aaa317a324e3", null ],
+    [ "block_width", "class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#ac96b492aa5da5e8b21cb2a519f0b4556", null ],
     [ "matrix_sys", "class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#a988f81e5af18de05c9caad0b47f5e967", null ],
     [ "trafo_space", "class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html#a993e0d4bb4b7359ce29f0a1b6eda6706", null ]
 ];

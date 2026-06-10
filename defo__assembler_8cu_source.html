@@ -250,29 +250,29 @@ $(document).ready(function(){initNavTree('defo__assembler_8cu_source.html',''); 
 <div class="line"><a id="l00145" name="l00145"></a><span class="lineno">  145</span>              const CSRMatrixData&lt;DT_, IT_&gt;&amp; matrix_data,</div>
 <div class="line"><a id="l00146" name="l00146"></a><span class="lineno">  146</span>              const AssemblyCubatureData&lt;DT_&gt;&amp; cubature,</div>
 <div class="line"><a id="l00147" name="l00147"></a><span class="lineno">  147</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
-<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>              const std::vector&lt;int*&gt;&amp; coloring_maps,</div>
-<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>              const std::vector&lt;Index&gt;&amp; coloring_map_sizes,</div>
-<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>              DT_ alpha, DT_ nu</div>
-<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>              )</div>
-<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>      {</div>
-<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>        const Index blocksize = Util::cuda_blocksize_blocked_assembly;</div>
-<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>        // const Index blocksize = 64;</div>
-<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span> </div>
-<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span>        for(Index i = 0; i &lt; coloring_maps.size(); ++i)</div>
-<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>        {</div>
-<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>          dim3 grid;</div>
-<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>          dim3 block;</div>
-<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>          block.x = (unsigned int)blocksize;</div>
-<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span>          grid.x = (unsigned int)ceil(double(coloring_map_sizes[i])/double(block.x));</div>
-<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span> </div>
-<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>          //kernel call, since this uses the standard stream, sync before next call is enforced:</div>
-<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>          VoxelAssembly::Kernel::template defo_assembler_matrix1_bcsr&lt;Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper&gt;&lt;&lt;&lt; grid, block &gt;&gt;&gt;(</div>
-<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>              matrix_data.data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
-<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>              (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>              cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>              dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>              (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>              (const int*) coloring_maps[i], coloring_map_sizes[i], dof_mapping.cell_to_dof_sorter, nu</div>
+<div class="line"><a id="l00148" name="l00148"></a><span class="lineno">  148</span>              const Adjacency::ColoringDataHandler&amp; coloring_data,</div>
+<div class="line"><a id="l00149" name="l00149"></a><span class="lineno">  149</span>              DT_ alpha, DT_ nu</div>
+<div class="line"><a id="l00150" name="l00150"></a><span class="lineno">  150</span>              )</div>
+<div class="line"><a id="l00151" name="l00151"></a><span class="lineno">  151</span>      {</div>
+<div class="line"><a id="l00152" name="l00152"></a><span class="lineno">  152</span>        const Memory::TypedView&lt;int&gt; color_view = coloring_data.color_map_view(Memory::Location::cuda, Memory::Access::read);</div>
+<div class="line"><a id="l00153" name="l00153"></a><span class="lineno">  153</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_view(dof_mapping.cell_to_dof.view(Memory::Location::cuda, Memory::Access::read));</div>
+<div class="line"><a id="l00154" name="l00154"></a><span class="lineno">  154</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_sorter_view(dof_mapping.cell_to_dof_sorter.view(Memory::Location::cuda, Memory::Access::read));</div>
+<div class="line"><a id="l00155" name="l00155"></a><span class="lineno">  155</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, Space_::world_dim&gt;&gt; nodes_view(dof_mapping.nodes.view(Memory::Location::cuda, Memory::Access::read));</div>
+<div class="line"><a id="l00156" name="l00156"></a><span class="lineno">  156</span> </div>
+<div class="line"><a id="l00157" name="l00157"></a><span class="lineno">  157</span>        for(Index i = 0; i &lt; coloring_data.get_num_colors(); ++i)</div>
+<div class="line"><a id="l00158" name="l00158"></a><span class="lineno">  158</span>        {</div>
+<div class="line"><a id="l00159" name="l00159"></a><span class="lineno">  159</span>          dim3 block(static_cast&lt;unsigned int&gt;(Util::cuda_blocksize_spmv));</div>
+<div class="line"><a id="l00160" name="l00160"></a><span class="lineno">  160</span>          dim3 grid((static_cast&lt;unsigned int&gt;(coloring_data.get_color_size(i)) + block.x - 1u) / block.x); // round up to next integer</div>
+<div class="line"><a id="l00161" name="l00161"></a><span class="lineno">  161</span> </div>
+<div class="line"><a id="l00162" name="l00162"></a><span class="lineno">  162</span>          //kernel call, since this uses the standard stream, sync before next call is enforced:</div>
+<div class="line"><a id="l00163" name="l00163"></a><span class="lineno">  163</span>          VoxelAssembly::Kernel::template defo_assembler_matrix1_bcsr&lt;Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper&gt;&lt;&lt;&lt; grid, block &gt;&gt;&gt;(</div>
+<div class="line"><a id="l00164" name="l00164"></a><span class="lineno">  164</span>              matrix_data.data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
+<div class="line"><a id="l00165" name="l00165"></a><span class="lineno">  165</span>              (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l00166" name="l00166"></a><span class="lineno">  166</span>              cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l00167" name="l00167"></a><span class="lineno">  167</span>              cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l00168" name="l00168"></a><span class="lineno">  168</span>              nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>              &amp;color_view.get_r()[coloring_data.get_color_offset(i)], coloring_data.get_color_size(i),</div>
+<div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span>              cell_to_dof_sorter_view.get_r(), nu</div>
 <div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>          );</div>
 <div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>        }</div>
 <div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span> </div>
@@ -285,78 +285,82 @@ $(document).ready(function(){initNavTree('defo__assembler_8cu_source.html',''); 
 <div class="line"><a id="l00180" name="l00180"></a><span class="lineno">  180</span>              const CSRMatrixData&lt;DT_, IT_&gt;&amp; matrix_data,</div>
 <div class="line"><a id="l00181" name="l00181"></a><span class="lineno">  181</span>              const AssemblyCubatureData&lt;DT_&gt;&amp; cubature,</div>
 <div class="line"><a id="l00182" name="l00182"></a><span class="lineno">  182</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
-<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>              const std::vector&lt;int*&gt;&amp; coloring_maps,</div>
-<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>              const std::vector&lt;Index&gt;&amp; coloring_map_sizes,</div>
-<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>              DT_ alpha, DT_ nu</div>
-<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>              )</div>
-<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>      {</div>
-<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>        for(Index col = 0; col &lt; Index(coloring_maps.size()); ++col)</div>
-<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>        {</div>
-<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>          VoxelAssembly::Kernel::template defo_assembler_matrix1_csr_host&lt;Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper&gt;(</div>
-<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>            matrix_data.data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
-<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>            (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>            cubature.cub_wg, cubature.num_cubs, alpha, dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>            (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>            (const int*) coloring_maps[col], coloring_map_sizes[col], dof_mapping.cell_to_dof_sorter, nu</div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>          );</div>
-<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>        }</div>
-<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>      }</div>
-<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>    }</div>
-<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>  }</div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>}</div>
-<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span> </div>
-<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span> </div>
-<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>using namespace FEAT;</div>
-<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>using namespace FEAT::VoxelAssembly;</div>
+<div class="line"><a id="l00183" name="l00183"></a><span class="lineno">  183</span>              const Adjacency::ColoringDataHandler&amp; coloring_data,</div>
+<div class="line"><a id="l00184" name="l00184"></a><span class="lineno">  184</span>              DT_ alpha, DT_ nu</div>
+<div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>              )</div>
+<div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>      {</div>
+<div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>        const Memory::TypedView&lt;int&gt; color_view = coloring_data.color_map_view(Memory::Location::main, Memory::Access::read);</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_view(dof_mapping.cell_to_dof.view(Memory::Location::main, Memory::Access::read));</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_sorter_view(dof_mapping.cell_to_dof_sorter.view(Memory::Location::main, Memory::Access::read));</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, Space_::world_dim&gt;&gt; nodes_view(dof_mapping.nodes.view(Memory::Location::main, Memory::Access::read));</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>        for(Index col = 0; col &lt; coloring_data.get_num_colors(); ++col)</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>        {</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>          VoxelAssembly::Kernel::template defo_assembler_matrix1_csr_host&lt;Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper&gt;(</div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>            matrix_data.data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>            (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>            cubature.cub_wg, cubature.num_cubs, alpha, cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>            nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>            &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col),</div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>            cell_to_dof_sorter_view.get_r(), nu</div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>          );</div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>        }</div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>      }</div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>    }</div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>  }</div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>}</div>
 <div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span> </div>
-<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>template void Arch::assemble_defo_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, double);</div>
-<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>template void Arch::assemble_defo_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, float);</div>
-<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>template void Arch::assemble_defo_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, double);</div>
-<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>template void Arch::assemble_defo_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, float);</div>
-<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>// template void Arch::assemble_defo_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;Half, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>//                                           const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, Half, Half);</div>
-<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>// template void Arch::assemble_defo_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;Half, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>//                                           const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, Half, Half);</div>
-<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>// #endif</div>
-<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span> </div>
-<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>template void Arch::assemble_defo_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, double);</div>
-<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>template void Arch::assemble_defo_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, float);</div>
-<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>template void Arch::assemble_defo_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, double);</div>
-<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>template void Arch::assemble_defo_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, float);</div>
-<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span> </div>
-<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span> </div>
-<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>template void Arch::assemble_defo_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, double);</div>
-<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span>template void Arch::assemble_defo_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, float);</div>
-<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>template void Arch::assemble_defo_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, double);</div>
-<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>template void Arch::assemble_defo_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, float);</div>
-<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>// template void Arch::assemble_defo_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;Half, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>//                                           const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, Half, Half);</div>
-<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>// template void Arch::assemble_defo_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;Half, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>//                                           const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, Half, Half);</div>
-<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>// #endif</div>
-<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span> </div>
-<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>template void Arch::assemble_defo_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, double);</div>
-<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>template void Arch::assemble_defo_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, float);</div>
-<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>template void Arch::assemble_defo_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, double);</div>
-<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>template void Arch::assemble_defo_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, float);</div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span> </div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>using namespace FEAT;</div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>using namespace FEAT::VoxelAssembly;</div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span> </div>
+<div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>template void Arch::assemble_defo_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span>                                          const Adjacency::ColoringDataHandler&amp;, double, double);</div>
+<div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>template void Arch::assemble_defo_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l00214" name="l00214"></a><span class="lineno">  214</span>                                          const Adjacency::ColoringDataHandler&amp;, float, float);</div>
+<div class="line"><a id="l00215" name="l00215"></a><span class="lineno">  215</span>template void Arch::assemble_defo_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l00216" name="l00216"></a><span class="lineno">  216</span>                                          const Adjacency::ColoringDataHandler&amp;, double, double);</div>
+<div class="line"><a id="l00217" name="l00217"></a><span class="lineno">  217</span>template void Arch::assemble_defo_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l00218" name="l00218"></a><span class="lineno">  218</span>                                          const Adjacency::ColoringDataHandler&amp;, float, float);</div>
+<div class="line"><a id="l00219" name="l00219"></a><span class="lineno">  219</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l00220" name="l00220"></a><span class="lineno">  220</span>// template void Arch::assemble_defo_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;Half, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l00221" name="l00221"></a><span class="lineno">  221</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, Half);</div>
+<div class="line"><a id="l00222" name="l00222"></a><span class="lineno">  222</span>// template void Arch::assemble_defo_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;Half, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l00223" name="l00223"></a><span class="lineno">  223</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, Half);</div>
+<div class="line"><a id="l00224" name="l00224"></a><span class="lineno">  224</span>// #endif</div>
+<div class="line"><a id="l00225" name="l00225"></a><span class="lineno">  225</span> </div>
+<div class="line"><a id="l00226" name="l00226"></a><span class="lineno">  226</span>template void Arch::assemble_defo_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l00227" name="l00227"></a><span class="lineno">  227</span>                                          const Adjacency::ColoringDataHandler&amp;, double, double);</div>
+<div class="line"><a id="l00228" name="l00228"></a><span class="lineno">  228</span>template void Arch::assemble_defo_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l00229" name="l00229"></a><span class="lineno">  229</span>                                          const Adjacency::ColoringDataHandler&amp;, float, float);</div>
+<div class="line"><a id="l00230" name="l00230"></a><span class="lineno">  230</span>template void Arch::assemble_defo_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l00231" name="l00231"></a><span class="lineno">  231</span>                                          const Adjacency::ColoringDataHandler&amp;, double, double);</div>
+<div class="line"><a id="l00232" name="l00232"></a><span class="lineno">  232</span>template void Arch::assemble_defo_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l00233" name="l00233"></a><span class="lineno">  233</span>                                          const Adjacency::ColoringDataHandler&amp;, float, float);</div>
+<div class="line"><a id="l00234" name="l00234"></a><span class="lineno">  234</span> </div>
+<div class="line"><a id="l00235" name="l00235"></a><span class="lineno">  235</span> </div>
+<div class="line"><a id="l00236" name="l00236"></a><span class="lineno">  236</span>template void Arch::assemble_defo_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l00237" name="l00237"></a><span class="lineno">  237</span>                                          const Adjacency::ColoringDataHandler&amp;, double, double);</div>
+<div class="line"><a id="l00238" name="l00238"></a><span class="lineno">  238</span>template void Arch::assemble_defo_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l00239" name="l00239"></a><span class="lineno">  239</span>                                          const Adjacency::ColoringDataHandler&amp;, float, float);</div>
+<div class="line"><a id="l00240" name="l00240"></a><span class="lineno">  240</span>template void Arch::assemble_defo_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l00241" name="l00241"></a><span class="lineno">  241</span>                                          const Adjacency::ColoringDataHandler&amp;, double, double);</div>
+<div class="line"><a id="l00242" name="l00242"></a><span class="lineno">  242</span>template void Arch::assemble_defo_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l00243" name="l00243"></a><span class="lineno">  243</span>                                          const Adjacency::ColoringDataHandler&amp;, float, float);</div>
+<div class="line"><a id="l00244" name="l00244"></a><span class="lineno">  244</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l00245" name="l00245"></a><span class="lineno">  245</span>// template void Arch::assemble_defo_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;Half, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l00246" name="l00246"></a><span class="lineno">  246</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, Half);</div>
+<div class="line"><a id="l00247" name="l00247"></a><span class="lineno">  247</span>// template void Arch::assemble_defo_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;Half, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l00248" name="l00248"></a><span class="lineno">  248</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, Half);</div>
+<div class="line"><a id="l00249" name="l00249"></a><span class="lineno">  249</span>// #endif</div>
+<div class="line"><a id="l00250" name="l00250"></a><span class="lineno">  250</span> </div>
+<div class="line"><a id="l00251" name="l00251"></a><span class="lineno">  251</span>template void Arch::assemble_defo_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l00252" name="l00252"></a><span class="lineno">  252</span>                                          const Adjacency::ColoringDataHandler&amp;, double, double);</div>
+<div class="line"><a id="l00253" name="l00253"></a><span class="lineno">  253</span>template void Arch::assemble_defo_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l00254" name="l00254"></a><span class="lineno">  254</span>                                          const Adjacency::ColoringDataHandler&amp;, float, float);</div>
+<div class="line"><a id="l00255" name="l00255"></a><span class="lineno">  255</span>template void Arch::assemble_defo_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l00256" name="l00256"></a><span class="lineno">  256</span>                                          const Adjacency::ColoringDataHandler&amp;, double, double);</div>
+<div class="line"><a id="l00257" name="l00257"></a><span class="lineno">  257</span>template void Arch::assemble_defo_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l00258" name="l00258"></a><span class="lineno">  258</span>                                          const Adjacency::ColoringDataHandler&amp;, float, float);</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

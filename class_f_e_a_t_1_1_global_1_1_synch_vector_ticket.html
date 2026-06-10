@@ -119,6 +119,9 @@ Public Types</h2></td></tr>
 <tr class="memitem:ab70294bdda8e967bf739eb89367c3fcc"><td class="memItemLeft" align="right" valign="top">using&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#ab70294bdda8e967bf739eb89367c3fcc">BufferType</a> = <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector.html">LAFEM::DenseVector</a>&lt; typename VT_::DataType, typename VT_::IndexType &gt;</td></tr>
 <tr class="memdesc:ab70294bdda8e967bf739eb89367c3fcc"><td class="mdescLeft">&#160;</td><td class="mdescRight">the buffer vector type  <a href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#ab70294bdda8e967bf739eb89367c3fcc">More...</a><br /></td></tr>
 <tr class="separator:ab70294bdda8e967bf739eb89367c3fcc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ad2c8d3e8c2e3019ddd1c56d33b9a5b"><td class="memItemLeft" align="right" valign="top">typedef VT_::DataType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#a5ad2c8d3e8c2e3019ddd1c56d33b9a5b">DataType</a></td></tr>
+<tr class="memdesc:a5ad2c8d3e8c2e3019ddd1c56d33b9a5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">our data type  <a href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#a5ad2c8d3e8c2e3019ddd1c56d33b9a5b">More...</a><br /></td></tr>
+<tr class="separator:a5ad2c8d3e8c2e3019ddd1c56d33b9a5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -164,12 +167,17 @@ Protected Attributes</h2></td></tr>
 <tr class="separator:aefac0108d9e845c8739dc91d951194d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad0c247a68b6efa241061518265e1070b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_dist_1_1_request_vector.html">Dist::RequestVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#ad0c247a68b6efa241061518265e1070b">_recv_reqs</a></td></tr>
 <tr class="separator:ad0c247a68b6efa241061518265e1070b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4fe7020886da8635d66e444059f800eb"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_memory_1_1_typed_view.html">Memory::TypedView</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#a5ad2c8d3e8c2e3019ddd1c56d33b9a5b">DataType</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#a4fe7020886da8635d66e444059f800eb">_recv_views</a></td></tr>
+<tr class="separator:a4fe7020886da8635d66e444059f800eb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae5c7912d4f9e034874f641ac4020aef7"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#ab70294bdda8e967bf739eb89367c3fcc">BufferType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#ae5c7912d4f9e034874f641ac4020aef7">_send_bufs</a></td></tr>
 <tr class="memdesc:ae5c7912d4f9e034874f641ac4020aef7"><td class="mdescLeft">&#160;</td><td class="mdescRight">send and receive buffers  <a href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#ae5c7912d4f9e034874f641ac4020aef7">More...</a><br /></td></tr>
 <tr class="separator:ae5c7912d4f9e034874f641ac4020aef7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4c06219820b1999b4b4b4043fea1356"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_dist_1_1_request_vector.html">Dist::RequestVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#ac4c06219820b1999b4b4b4043fea1356">_send_reqs</a></td></tr>
 <tr class="memdesc:ac4c06219820b1999b4b4b4043fea1356"><td class="mdescLeft">&#160;</td><td class="mdescRight">send and receive request vectors  <a href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#ac4c06219820b1999b4b4b4043fea1356">More...</a><br /></td></tr>
 <tr class="separator:ac4c06219820b1999b4b4b4043fea1356"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac20fdd77af733fc0c5a566221702e84d"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_memory_1_1_typed_view.html">Memory::TypedView</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#a5ad2c8d3e8c2e3019ddd1c56d33b9a5b">DataType</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#ac20fdd77af733fc0c5a566221702e84d">_send_views</a></td></tr>
+<tr class="memdesc:ac20fdd77af733fc0c5a566221702e84d"><td class="mdescLeft">&#160;</td><td class="mdescRight">send and receive buffer views  <a href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#ac20fdd77af733fc0c5a566221702e84d">More...</a><br /></td></tr>
+<tr class="separator:ac20fdd77af733fc0c5a566221702e84d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a54f1d1e8b2910d2ccc1540f263c3c6c6"><td class="memItemLeft" align="right" valign="top">VT_ *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#a54f1d1e8b2910d2ccc1540f263c3c6c6">_target</a></td></tr>
 <tr class="memdesc:a54f1d1e8b2910d2ccc1540f263c3c6c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">the vector to be synchronized  <a href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#a54f1d1e8b2910d2ccc1540f263c3c6c6">More...</a><br /></td></tr>
 <tr class="separator:a54f1d1e8b2910d2ccc1540f263c3c6c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -177,10 +185,11 @@ Protected Attributes</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename VT_, typename VMT_&gt;<br />
 class FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;</div><p >Ticket class for asynchronous global operations on vectors. </p>
-<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000032">Todo:</a></b></dt><dd>statistics</dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000034">Todo:</a></b></dt><dd>statistics</dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000035">Todo:</a></b></dt><dd>make use of cuda-aware MPI</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Dirk Ribbrock, Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00026">26</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00028">28</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="ab70294bdda8e967bf739eb89367c3fcc" name="ab70294bdda8e967bf739eb89367c3fcc"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ab70294bdda8e967bf739eb89367c3fcc">&#9670;&#160;</a></span>BufferType</h2>
@@ -198,7 +207,27 @@ template&lt;typename VT_ , typename VMT_ &gt; </div>
 
 <p>the buffer vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00030">30</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00034">34</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a5ad2c8d3e8c2e3019ddd1c56d33b9a5b" name="a5ad2c8d3e8c2e3019ddd1c56d33b9a5b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5ad2c8d3e8c2e3019ddd1c56d33b9a5b">&#9670;&#160;</a></span>DataType</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename VT_ , typename VMT_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">typedef VT_::DataType <a class="el" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html">FEAT::Global::SynchVectorTicket</a>&lt; VT_, VMT_ &gt;::DataType</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>our data type </p>
+
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00032">32</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
 
 </div>
 </div>
@@ -230,7 +259,7 @@ template&lt;typename VT_ , typename VMT_ &gt; </div>
 
 <p>default constructor </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00051">51</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00058">58</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
 
 </div>
 </div>
@@ -293,9 +322,9 @@ template&lt;typename VT_ , typename VMT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00083">83</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00092">92</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="synch__vec_8hpp_source.html#l00040">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_comm</a>, <a class="el" href="synch__vec_8hpp_source.html#l00042">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_mirrors</a>, <a class="el" href="synch__vec_8hpp_source.html#l00046">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_send_bufs</a>, <a class="el" href="synch__vec_8hpp_source.html#l00044">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_send_reqs</a>, <a class="el" href="synch__vec_8hpp_source.html#l00038">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_target</a>, <a class="el" href="time__stamp_8hpp_source.html#l00121">FEAT::TimeStamp::elapsed_now()</a>, <a class="el" href="dist_8cpp_source.html#l00716">FEAT::Dist::Comm::irecv()</a>, <a class="el" href="dist_8cpp_source.html#l00704">FEAT::Dist::Comm::isend()</a>, <a class="el" href="dist_8hpp_source.html#l00886">FEAT::Dist::RequestVector::push_back()</a>, <a class="el" href="dist_8hpp_source.html#l00813">FEAT::Dist::RequestVector::reserve()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="synch__vec_8hpp_source.html#l00044">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_comm</a>, <a class="el" href="synch__vec_8hpp_source.html#l00046">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_mirrors</a>, <a class="el" href="synch__vec_8hpp_source.html#l00050">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_send_bufs</a>, <a class="el" href="synch__vec_8hpp_source.html#l00048">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_send_reqs</a>, <a class="el" href="synch__vec_8hpp_source.html#l00052">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_send_views</a>, <a class="el" href="synch__vec_8hpp_source.html#l00042">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_target</a>, <a class="el" href="time__stamp_8hpp_source.html#l00121">FEAT::TimeStamp::elapsed_now()</a>, <a class="el" href="dist_8cpp_source.html#l00719">FEAT::Dist::Comm::irecv()</a>, <a class="el" href="dist_8cpp_source.html#l00707">FEAT::Dist::Comm::isend()</a>, <a class="el" href="dist_8hpp_source.html#l01194">FEAT::Dist::RequestVector::push_back()</a>, <a class="el" href="dist_8hpp_source.html#l01121">FEAT::Dist::RequestVector::reserve()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -327,7 +356,7 @@ template&lt;typename VT_ , typename VMT_ &gt; </div>
 
 <p>move constructor </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00136">136</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00157">157</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
 
 </div>
 </div>
@@ -358,9 +387,9 @@ template&lt;typename VT_ , typename VMT_ &gt; </div>
 
 <p>Destructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00217">217</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00243">243</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="synch__vec_8hpp_source.html#l00034">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_finished</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="synch__vec_8hpp_source.html#l00038">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_finished</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -393,9 +422,9 @@ template&lt;typename VT_ , typename VMT_ &gt; </div>
 
 <p>move-assign operator </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00160">160</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00183">183</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="synch__vec_8hpp_source.html#l00040">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_comm</a>, <a class="el" href="synch__vec_8hpp_source.html#l00034">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_finished</a>, <a class="el" href="synch__vec_8hpp_source.html#l00042">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_mirrors</a>, <a class="el" href="synch__vec_8hpp_source.html#l00046">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_send_bufs</a>, <a class="el" href="synch__vec_8hpp_source.html#l00044">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_send_reqs</a>, and <a class="el" href="synch__vec_8hpp_source.html#l00038">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_target</a>.</p>
+<p class="reference">References <a class="el" href="synch__vec_8hpp_source.html#l00044">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_comm</a>, <a class="el" href="synch__vec_8hpp_source.html#l00038">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_finished</a>, <a class="el" href="synch__vec_8hpp_source.html#l00046">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_mirrors</a>, <a class="el" href="synch__vec_8hpp_source.html#l00050">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_send_bufs</a>, <a class="el" href="synch__vec_8hpp_source.html#l00048">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_send_reqs</a>, <a class="el" href="synch__vec_8hpp_source.html#l00052">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_send_views</a>, and <a class="el" href="synch__vec_8hpp_source.html#l00042">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_target</a>.</p>
 
 </div>
 </div>
@@ -427,11 +456,11 @@ template&lt;typename VT_ , typename VMT_ &gt; </div>
 <p>wait method </p>
 <p >wait for completion barrier on return, the target vector has been updated </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00193">193</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00218">218</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="synch__vec_8hpp_source.html#l00034">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_finished</a>, <a class="el" href="synch__vec_8hpp_source.html#l00042">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_mirrors</a>, <a class="el" href="synch__vec_8hpp_source.html#l00044">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_send_reqs</a>, <a class="el" href="synch__vec_8hpp_source.html#l00038">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_target</a>, <a class="el" href="time__stamp_8hpp_source.html#l00121">FEAT::TimeStamp::elapsed_now()</a>, <a class="el" href="dist_8cpp_source.html#l00324">FEAT::Dist::RequestVector::wait_all()</a>, <a class="el" href="dist_8cpp_source.html#l00329">FEAT::Dist::RequestVector::wait_any()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="synch__vec_8hpp_source.html#l00038">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_finished</a>, <a class="el" href="synch__vec_8hpp_source.html#l00046">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_mirrors</a>, <a class="el" href="synch__vec_8hpp_source.html#l00048">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_send_reqs</a>, <a class="el" href="synch__vec_8hpp_source.html#l00042">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::_target</a>, <a class="el" href="time__stamp_8hpp_source.html#l00121">FEAT::TimeStamp::elapsed_now()</a>, <a class="el" href="dist_8cpp_source.html#l00327">FEAT::Dist::RequestVector::wait_all()</a>, <a class="el" href="dist_8cpp_source.html#l00332">FEAT::Dist::RequestVector::wait_any()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00408">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_0()</a>, and <a class="el" href="gate_8hpp_source.html#l00454">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00457">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_0()</a>, and <a class="el" href="gate_8hpp_source.html#l00503">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1()</a>.</p>
 
 </div>
 </div>
@@ -460,9 +489,9 @@ template&lt;typename VT_ , typename VMT_ &gt; </div>
 
 <p>our communicator </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00040">40</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00044">44</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00083">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, and <a class="el" href="synch__vec_8hpp_source.html#l00160">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::operator=()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00092">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, and <a class="el" href="synch__vec_8hpp_source.html#l00183">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::operator=()</a>.</p>
 
 </div>
 </div>
@@ -490,9 +519,9 @@ template&lt;typename VT_ , typename VMT_ &gt; </div>
 
 <p>signals, whether wait was already called </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00034">34</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00038">38</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00217">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::~SynchVectorTicket()</a>, <a class="el" href="synch__vec_8hpp_source.html#l00160">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::operator=()</a>, and <a class="el" href="synch__vec_8hpp_source.html#l00193">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::wait()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00243">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::~SynchVectorTicket()</a>, <a class="el" href="synch__vec_8hpp_source.html#l00183">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::operator=()</a>, and <a class="el" href="synch__vec_8hpp_source.html#l00218">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::wait()</a>.</p>
 
 </div>
 </div>
@@ -520,9 +549,9 @@ template&lt;typename VT_ , typename VMT_ &gt; </div>
 
 <p>the vector mirrors </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00042">42</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00046">46</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00083">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, <a class="el" href="synch__vec_8hpp_source.html#l00160">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::operator=()</a>, and <a class="el" href="synch__vec_8hpp_source.html#l00193">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::wait()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00092">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, <a class="el" href="synch__vec_8hpp_source.html#l00183">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::operator=()</a>, and <a class="el" href="synch__vec_8hpp_source.html#l00218">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::wait()</a>.</p>
 
 </div>
 </div>
@@ -548,7 +577,7 @@ template&lt;typename VT_ , typename VMT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00046">46</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00050">50</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
 
 </div>
 </div>
@@ -574,7 +603,33 @@ template&lt;typename VT_ , typename VMT_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00044">44</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00048">48</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a4fe7020886da8635d66e444059f800eb" name="a4fe7020886da8635d66e444059f800eb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fe7020886da8635d66e444059f800eb">&#9670;&#160;</a></span>_recv_views</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename VT_ , typename VMT_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="class_f_e_a_t_1_1_memory_1_1_typed_view.html">Memory::TypedView</a>&lt;<a class="el" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#a5ad2c8d3e8c2e3019ddd1c56d33b9a5b">DataType</a>&gt; &gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html">FEAT::Global::SynchVectorTicket</a>&lt; VT_, VMT_ &gt;::_recv_views</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00052">52</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
 
 </div>
 </div>
@@ -602,9 +657,9 @@ template&lt;typename VT_ , typename VMT_ &gt; </div>
 
 <p>send and receive buffers </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00046">46</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00050">50</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00083">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, and <a class="el" href="synch__vec_8hpp_source.html#l00160">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::operator=()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00092">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, and <a class="el" href="synch__vec_8hpp_source.html#l00183">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::operator=()</a>.</p>
 
 </div>
 </div>
@@ -632,9 +687,39 @@ template&lt;typename VT_ , typename VMT_ &gt; </div>
 
 <p>send and receive request vectors </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00044">44</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00048">48</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00083">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, <a class="el" href="synch__vec_8hpp_source.html#l00160">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::operator=()</a>, and <a class="el" href="synch__vec_8hpp_source.html#l00193">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::wait()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00092">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, <a class="el" href="synch__vec_8hpp_source.html#l00183">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::operator=()</a>, and <a class="el" href="synch__vec_8hpp_source.html#l00218">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::wait()</a>.</p>
+
+</div>
+</div>
+<a id="ac20fdd77af733fc0c5a566221702e84d" name="ac20fdd77af733fc0c5a566221702e84d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac20fdd77af733fc0c5a566221702e84d">&#9670;&#160;</a></span>_send_views</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename VT_ , typename VMT_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="class_f_e_a_t_1_1_memory_1_1_typed_view.html">Memory::TypedView</a>&lt;<a class="el" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html#a5ad2c8d3e8c2e3019ddd1c56d33b9a5b">DataType</a>&gt; &gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_synch_vector_ticket.html">FEAT::Global::SynchVectorTicket</a>&lt; VT_, VMT_ &gt;::_send_views</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>send and receive buffer views </p>
+
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00052">52</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00092">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, and <a class="el" href="synch__vec_8hpp_source.html#l00183">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::operator=()</a>.</p>
 
 </div>
 </div>
@@ -662,9 +747,9 @@ template&lt;typename VT_ , typename VMT_ &gt; </div>
 
 <p>the vector to be synchronized </p>
 
-<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00038">38</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="synch__vec_8hpp_source.html#l00042">42</a> of file <a class="el" href="synch__vec_8hpp_source.html">synch_vec.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00083">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, <a class="el" href="synch__vec_8hpp_source.html#l00160">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::operator=()</a>, and <a class="el" href="synch__vec_8hpp_source.html#l00193">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::wait()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="synch__vec_8hpp_source.html#l00092">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::SynchVectorTicket()</a>, <a class="el" href="synch__vec_8hpp_source.html#l00183">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::operator=()</a>, and <a class="el" href="synch__vec_8hpp_source.html#l00218">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::wait()</a>.</p>
 
 </div>
 </div>

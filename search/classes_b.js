@@ -31,5 +31,6 @@ var searchData=
   ['localmassmatrixsingularexception_28',['LocalMassMatrixSingularException',['../class_f_e_a_t_1_1_assembly_1_1_grid_transfer_1_1_local_mass_matrix_singular_exception.html',1,'FEAT::Assembly::GridTransfer::LocalMassMatrixSingularException'],['../class_f_e_a_t_1_1_assembly_1_1_space_transfer_1_1_local_mass_matrix_singular_exception.html',1,'FEAT::Assembly::SpaceTransfer::LocalMassMatrixSingularException']]],
   ['loopunroller_29',['LoopUnroller',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_intern_1_1_loop_unroller.html',1,'FEAT::LAFEM::Arch::Intern']]],
   ['loopunroller_3c_20start_2c_20start_2c_20step_20_3e_30',['LoopUnroller&lt; Start, Start, Step &gt;',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_intern_1_1_loop_unroller_3_01_start_00_01_start_00_01_step_01_4.html',1,'FEAT::LAFEM::Arch::Intern']]],
-  ['lumping_31',['Lumping',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_lumping.html',1,'FEAT::LAFEM::Arch']]]
+  ['lumpingbcsr_31',['LumpingBCSR',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_lumping_b_c_s_r.html',1,'FEAT::LAFEM::Arch']]],
+  ['lumpingcsr_32',['LumpingCSR',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_lumping_c_s_r.html',1,'FEAT::LAFEM::Arch']]]
 ];

@@ -6,5 +6,6 @@ var searchData=
   ['diagonal_3',['diagonal',['../namespace_f_e_a_t_1_1_solver.html#a8c9301b94ea72379786a83666a86c4ffaa0e17e2709a0404ae3d7de03b8ea9093',1,'FEAT::Solver']]],
   ['diagonal_5fdominant_4',['diagonal_dominant',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ab53d180cbfe294f59fa52996cf37c278a39be3c0940ff6f93390195ffa7967de0',1,'FEAT::LAFEM']]],
   ['diverged_5',['diverged',['../namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81adb5a93fff259ad3ff2017a64912fa156',1,'FEAT::Solver']]],
-  ['dom_5fpoint_6',['dom_point',['../namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879',1,'FEAT']]]
+  ['dom_5fpoint_6',['dom_point',['../namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879',1,'FEAT']]],
+  ['dont_5fcare_7',['dont_care',['../namespace_f_e_a_t_1_1_memory.html#ae0787ce444624fea4d61a5c5d00a53bbabe7bbe0cf3947e795861f1fa966bab58',1,'FEAT::Memory']]]
 ];

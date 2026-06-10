@@ -85,7 +85,6 @@ var searchData=
   ['preconditionediterativesolver_3c_20functional_5f_3a_3avectortyper_20_3e_82',['PreconditionedIterativeSolver&lt; Functional_::VectorTypeR &gt;',['../class_f_e_a_t_1_1_solver_1_1_preconditioned_iterative_solver.html',1,'FEAT::Solver']]],
   ['preconditionediterativesolver_3c_20matrix_5f_3a_3avectortyper_20_3e_83',['PreconditionedIterativeSolver&lt; Matrix_::VectorTypeR &gt;',['../class_f_e_a_t_1_1_solver_1_1_preconditioned_iterative_solver.html',1,'FEAT::Solver']]],
   ['preconwrapper_84',['PreconWrapper',['../class_f_e_a_t_1_1_solver_1_1_precon_wrapper.html',1,'FEAT::Solver']]],
-  ['productmatmat_85',['ProductMatMat',['../struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_product_mat_mat.html',1,'FEAT::LAFEM::Arch']]],
-  ['propertymap_86',['PropertyMap',['../class_f_e_a_t_1_1_property_map.html',1,'FEAT']]],
-  ['psd_87',['PSD',['../class_f_e_a_t_1_1_solver_1_1_p_s_d.html',1,'FEAT::Solver']]]
+  ['propertymap_85',['PropertyMap',['../class_f_e_a_t_1_1_property_map.html',1,'FEAT']]],
+  ['psd_86',['PSD',['../class_f_e_a_t_1_1_solver_1_1_p_s_d.html',1,'FEAT::Solver']]]
 ];

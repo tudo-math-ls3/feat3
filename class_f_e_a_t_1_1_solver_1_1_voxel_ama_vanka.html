@@ -162,8 +162,6 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:af667a9fb0956558df78c27b4720ce99f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#af667a9fb0956558df78c27b4720ce99f">clear_macro_dofs</a> ()</td></tr>
 <tr class="memdesc:af667a9fb0956558df78c27b4720ce99f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clears the macro dofs graphs.  <a href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#af667a9fb0956558df78c27b4720ce99f">More...</a><br /></td></tr>
 <tr class="separator:af667a9fb0956558df78c27b4720ce99f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99b2632490d1cd1eab6771135cbefe85"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a99b2632490d1cd1eab6771135cbefe85">compare</a> (const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html">AmaVanka</a> *other) const</td></tr>
-<tr class="separator:a99b2632490d1cd1eab6771135cbefe85"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9b9d1846417be83357859c2763c89a2f"><td class="memItemLeft" align="right" valign="top">std::size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a9b9d1846417be83357859c2763c89a2f">data_size</a> () const</td></tr>
 <tr class="memdesc:a9b9d1846417be83357859c2763c89a2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the total data size used by the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html" title="Additive Macro-wise Matrix-based Vanka preconditioner/smoother.">AmaVanka</a> smoother.  <a href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a9b9d1846417be83357859c2763c89a2f">More...</a><br /></td></tr>
 <tr class="separator:a9b9d1846417be83357859c2763c89a2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -180,6 +178,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:abc24ef50dc503e756a03c085e322f2a7"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#abc24ef50dc503e756a03c085e322f2a7">fill_color</a> (const ColoringType_ &amp;color, int hint=-1)</td></tr>
 <tr class="memdesc:abc24ef50dc503e756a03c085e322f2a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fills the coloring data.  <a href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#abc24ef50dc503e756a03c085e322f2a7">More...</a><br /></td></tr>
 <tr class="separator:abc24ef50dc503e756a03c085e322f2a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a67e5ccab106ab56e33e8a7d39f7c860a"><td class="memItemLeft" align="right" valign="top">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a5c1cfac0cf5411a933614fbe71efea9c">VankaMatrixType</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a67e5ccab106ab56e33e8a7d39f7c860a">get_vanka_matrix</a> () const</td></tr>
+<tr class="separator:a67e5ccab106ab56e33e8a7d39f7c860a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e61ce0b51e7f97317042a184aba8613"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#a7e61ce0b51e7f97317042a184aba8613">init</a> ()</td></tr>
 <tr class="memdesc:a7e61ce0b51e7f97317042a184aba8613"><td class="mdescLeft">&#160;</td><td class="mdescRight">Initialization method.  <a href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#a7e61ce0b51e7f97317042a184aba8613">More...</a><br /></td></tr>
 <tr class="separator:a7e61ce0b51e7f97317042a184aba8613"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -264,14 +264,14 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a8bc413d3a27112843ae2c7e9d74d0230"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_adjacency_1_1_coloring_data_handler.html">Adjacency::ColoringDataHandler</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a8bc413d3a27112843ae2c7e9d74d0230">_coloring_data</a></td></tr>
 <tr class="memdesc:a8bc413d3a27112843ae2c7e9d74d0230"><td class="mdescLeft">&#160;</td><td class="mdescRight">coloring  <a href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a8bc413d3a27112843ae2c7e9d74d0230">More...</a><br /></td></tr>
 <tr class="separator:a8bc413d3a27112843ae2c7e9d74d0230"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa0dd925cca2664019f3695da3a662ea6"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#aa0dd925cca2664019f3695da3a662ea6">_d_dof_macros</a></td></tr>
-<tr class="separator:aa0dd925cca2664019f3695da3a662ea6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad31b28019907130b16610dacd2640644"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#ad31b28019907130b16610dacd2640644">_d_macro_dofs</a></td></tr>
-<tr class="memdesc:ad31b28019907130b16610dacd2640644"><td class="mdescLeft">&#160;</td><td class="mdescRight">vector of graph arrays  <a href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#ad31b28019907130b16610dacd2640644">More...</a><br /></td></tr>
-<tr class="separator:ad31b28019907130b16610dacd2640644"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeb74f85bc2f203b1ed84351097c674fb"><td class="memItemLeft" align="right" valign="top">int *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#aeb74f85bc2f203b1ed84351097c674fb">_d_macro_mask</a></td></tr>
-<tr class="memdesc:aeb74f85bc2f203b1ed84351097c674fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">array of macro mask  <a href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#aeb74f85bc2f203b1ed84351097c674fb">More...</a><br /></td></tr>
-<tr class="separator:aeb74f85bc2f203b1ed84351097c674fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0fa2b31c7e00c2abfc607cfecc2c6659"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_memory_1_1_arbiter.html">Memory::Arbiter</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a0fa2b31c7e00c2abfc607cfecc2c6659">_d_dof_macros</a></td></tr>
+<tr class="separator:a0fa2b31c7e00c2abfc607cfecc2c6659"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6edd2ff369a03890cf7096f9a3e79b6b"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_memory_1_1_arbiter.html">Memory::Arbiter</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a6edd2ff369a03890cf7096f9a3e79b6b">_d_macro_dofs</a></td></tr>
+<tr class="memdesc:a6edd2ff369a03890cf7096f9a3e79b6b"><td class="mdescLeft">&#160;</td><td class="mdescRight">vector of graph arrays  <a href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a6edd2ff369a03890cf7096f9a3e79b6b">More...</a><br /></td></tr>
+<tr class="separator:a6edd2ff369a03890cf7096f9a3e79b6b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28c519c03a5f7da7f7ba8f3325dcaac5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_memory_1_1_arbiter.html">Memory::Arbiter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a28c519c03a5f7da7f7ba8f3325dcaac5">_d_macro_mask</a></td></tr>
+<tr class="memdesc:a28c519c03a5f7da7f7ba8f3325dcaac5"><td class="mdescLeft">&#160;</td><td class="mdescRight">array of macro mask  <a href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a28c519c03a5f7da7f7ba8f3325dcaac5">More...</a><br /></td></tr>
+<tr class="separator:a28c519c03a5f7da7f7ba8f3325dcaac5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e5cb8ce6c331b5ea60554ea19cb4005"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_adjacency_1_1_graph.html">Adjacency::Graph</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a8e5cb8ce6c331b5ea60554ea19cb4005">_dof_macros</a></td></tr>
 <tr class="separator:a8e5cb8ce6c331b5ea60554ea19cb4005"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa2274a7d4d2f275e2fc8a72e16990b8"><td class="memItemLeft" align="right" valign="top">const Filter_ &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#aaa2274a7d4d2f275e2fc8a72e16990b8">_filter</a></td></tr>
@@ -579,7 +579,7 @@ template&lt;typename ColoringType_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00515">515</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="voxel__amavanka_8hpp_source.html#l00333">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_allocate_device</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00325">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_coloring_data</a>, and <a class="el" href="coloring_8hpp_source.html#l00370">FEAT::Adjacency::ColoringDataHandler::fill_color()</a>.</p>
+<p class="reference">References <a class="el" href="voxel__amavanka_8hpp_source.html#l00333">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_allocate_device</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00325">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_coloring_data</a>, and <a class="el" href="coloring__data__handler_8hpp_source.html#l00155">FEAT::Adjacency::ColoringDataHandler::fill_color()</a>.</p>
 
 </div>
 </div>
@@ -613,7 +613,7 @@ template&lt;typename Matrix_ , typename Filter_ , FEAT::Intern::VankaAssemblyPol
 
 <p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">351</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="voxel__amavanka_8hpp_source.html#l00333">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_allocate_device</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00327">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_d_macro_dofs</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00331">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_d_macro_mask</a>, <a class="el" href="amavanka_8hpp_source.html#l00092">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_macro_dofs</a>, <a class="el" href="amavanka_8hpp_source.html#l00094">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_macro_mask</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00329">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_max_degree_dofs</a>, <a class="el" href="amavanka_8hpp_source.html#l00090">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_skip_singular</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="voxel__amavanka_8hpp_source.html#l00333">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_allocate_device</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00327">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_d_macro_dofs</a>, <a class="el" href="amavanka_8hpp_source.html#l00091">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_macro_dofs</a>, <a class="el" href="amavanka_8hpp_source.html#l00093">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_macro_mask</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00329">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_max_degree_dofs</a>, <a class="el" href="amavanka_8hpp_source.html#l00089">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_skip_singular</a>, <a class="el" href="namespace_f_e_a_t_1_1_memory.html#ae0787ce444624fea4d61a5c5d00a53bba537638ecbd3bee12333130d9c0621d23">FEAT::Memory::format_to_zero</a>, <a class="el" href="memory__arbiter_8hpp_source.html#l00473">FEAT::Memory::TypedView&lt; T_ &gt;::get_w()</a>, <a class="el" href="namespace_f_e_a_t_1_1_memory.html#a723b53b6060c8a2d420a40f79e4b8c06afad58de7366495db4650cfefac2fcd61">FEAT::Memory::main</a>, <a class="el" href="memory__aux__main_8cpp_source.html#l00067">FEAT::Memory::memcopy_main()</a>, <a class="el" href="memory__aux__main_8cpp_source.html#l00028">FEAT::Memory::memset_main()</a>, <a class="el" href="namespace_f_e_a_t_1_1_memory.html#a567578cf56f030248943beebab762ec6aefb2a684e4afb7d55e6147fbe5a332ee">FEAT::Memory::write</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00614">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::init_symbolic()</a>.</p>
 
@@ -648,7 +648,7 @@ template&lt;typename Matrix_ , typename Filter_ , FEAT::Intern::VankaAssemblyPol
 
 <p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00336">336</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="amavanka_8hpp_source.html#l00092">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_macro_dofs</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00329">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_max_degree_dofs</a>.</p>
+<p class="reference">References <a class="el" href="amavanka_8hpp_source.html#l00091">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_macro_dofs</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00329">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_max_degree_dofs</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00614">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::init_symbolic()</a>.</p>
 
@@ -681,9 +681,9 @@ template&lt;typename Matrix_ , typename Filter_ , FEAT::Intern::VankaAssemblyPol
 
 <p>Frees device pointers. </p>
 
-<p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00413">413</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00422">422</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="voxel__amavanka_8hpp_source.html#l00327">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_d_macro_dofs</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00331">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_d_macro_mask</a>.</p>
+<p class="reference">References <a class="el" href="voxel__amavanka_8hpp_source.html#l00327">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_d_macro_dofs</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00331">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_d_macro_mask</a>, and <a class="el" href="memory__arbiter_8cpp_source.html#l01365">FEAT::Memory::Arbiter::release()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00625">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::done_symbolic()</a>.</p>
 
@@ -755,9 +755,9 @@ template&lt;typename Matrix_ , typename Filter_ , FEAT::Intern::VankaAssemblyPol
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00472">472</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00473">473</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="voxel__amavanka_8hpp_source.html#l00333">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_allocate_device</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00325">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_coloring_data</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00327">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_d_macro_dofs</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00331">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_d_macro_mask</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00329">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_max_degree_dofs</a>, <a class="el" href="amavanka_8hpp_source.html#l00098">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_omega</a>, <a class="el" href="amavanka_8hpp_source.html#l00090">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_skip_singular</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="voxel__amavanka_8hpp_source.html#l00333">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_allocate_device</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00325">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_coloring_data</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00327">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_d_macro_dofs</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00331">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_d_macro_mask</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00329">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_max_degree_dofs</a>, <a class="el" href="amavanka_8hpp_source.html#l00097">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_omega</a>, <a class="el" href="amavanka_8hpp_source.html#l00089">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_skip_singular</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00636">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::init_numeric()</a>.</p>
 
@@ -829,9 +829,9 @@ template&lt;typename Matrix_ , typename Filter_ , FEAT::Intern::VankaAssemblyPol
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00446">446</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00447">447</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="amavanka_8hpp_source.html#l00092">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_macro_dofs</a>, <a class="el" href="amavanka_8hpp_source.html#l00094">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_macro_mask</a>, <a class="el" href="amavanka_8hpp_source.html#l00098">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_omega</a>, and <a class="el" href="amavanka_8hpp_source.html#l00090">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_skip_singular</a>.</p>
+<p class="reference">References <a class="el" href="amavanka_8hpp_source.html#l00091">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_macro_dofs</a>, <a class="el" href="amavanka_8hpp_source.html#l00093">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_macro_mask</a>, <a class="el" href="amavanka_8hpp_source.html#l00097">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_omega</a>, and <a class="el" href="amavanka_8hpp_source.html#l00089">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_skip_singular</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00636">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::init_numeric()</a>.</p>
 
@@ -877,9 +877,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Implements <a class="el" href="class_f_e_a_t_1_1_solver_1_1_solver_base.html#ae162070c491d897ae6f91d263200af40">FEAT::Solver::SolverBase&lt; Matrix_::VectorTypeL &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00444">444</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00443">443</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="amavanka_8hpp_source.html#l00096">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_num_steps</a>, <a class="el" href="stop__watch_8hpp_source.html#l00043">FEAT::StopWatch::start()</a>, <a class="el" href="stop__watch_8hpp_source.html#l00051">FEAT::StopWatch::stop()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81a260ca9dd8a4577fc00b7bd5810298076">FEAT::Solver::success</a>.</p>
+<p class="reference">References <a class="el" href="amavanka_8hpp_source.html#l00095">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_num_steps</a>, <a class="el" href="stop__watch_8hpp_source.html#l00043">FEAT::StopWatch::start()</a>, <a class="el" href="stop__watch_8hpp_source.html#l00051">FEAT::StopWatch::stop()</a>, and <a class="el" href="namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81a260ca9dd8a4577fc00b7bd5810298076">FEAT::Solver::success</a>.</p>
 
 </div>
 </div>
@@ -910,9 +910,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns the total number of bytes currently allocated in this object. </p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00212">212</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00211">211</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="amavanka_8hpp_source.html#l00092">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_macro_dofs</a>, <a class="el" href="amavanka_8hpp_source.html#l00086">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_vanka</a>, and <a class="el" href="amavanka_8hpp_source.html#l00100">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_vec_c</a>.</p>
+<p class="reference">References <a class="el" href="amavanka_8hpp_source.html#l00091">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_macro_dofs</a>, <a class="el" href="amavanka_8hpp_source.html#l00085">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_vanka</a>, and <a class="el" href="amavanka_8hpp_source.html#l00099">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_vec_c</a>.</p>
 
 </div>
 </div>
@@ -943,39 +943,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Clears the macro dofs graphs. </p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00143">143</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00142">142</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="amavanka_8hpp_source.html#l00088">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_auto_macros</a>.</p>
-
-</div>
-</div>
-<a id="a99b2632490d1cd1eab6771135cbefe85" name="a99b2632490d1cd1eab6771135cbefe85"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a99b2632490d1cd1eab6771135cbefe85">&#9670;&#160;</a></span>compare()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<div class="memtemplate">
-template&lt;typename Matrix_ , typename Filter_ &gt; </div>
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html">FEAT::Solver::AmaVanka</a>&lt; Matrix_, Filter_ &gt;::compare </td>
-          <td>(</td>
-          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html">AmaVanka</a>&lt; Matrix_, Filter_ &gt; *&#160;</td>
-          <td class="paramname"><em>other</em></td><td>)</td>
-          <td> const</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00472">472</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="reference">References <a class="el" href="amavanka_8hpp_source.html#l00087">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_auto_macros</a>.</p>
 
 </div>
 </div>
@@ -1007,9 +977,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 <p>Returns the total data size used by the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html" title="Additive Macro-wise Matrix-based Vanka preconditioner/smoother.">AmaVanka</a> smoother. </p>
 <dl class="section return"><dt>Returns</dt><dd>The total data size, i.e. the total number of floating point values used in the factorization. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00230">230</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00229">229</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="amavanka_8hpp_source.html#l00086">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_vanka</a>.</p>
+<p class="reference">References <a class="el" href="amavanka_8hpp_source.html#l00085">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_vanka</a>.</p>
 
 </div>
 </div>
@@ -1107,7 +1077,7 @@ template&lt;typename Matrix_ , typename Filter_ , FEAT::Intern::VankaAssemblyPol
 
 <p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00625">625</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="voxel__amavanka_8hpp_source.html#l00413">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_free_device()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00329">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_max_degree_dofs</a>, and <a class="el" href="amavanka_8hpp_source.html#l00322">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::done_symbolic()</a>.</p>
+<p class="reference">References <a class="el" href="voxel__amavanka_8hpp_source.html#l00422">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_free_device()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00329">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_max_degree_dofs</a>, and <a class="el" href="amavanka_8hpp_source.html#l00321">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::done_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -1166,7 +1136,36 @@ template&lt;typename ColoringType_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00600">600</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="voxel__amavanka_8hpp_source.html#l00325">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_coloring_data</a>, <a class="el" href="coloring_8hpp_source.html#l00370">FEAT::Adjacency::ColoringDataHandler::fill_color()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="voxel__amavanka_8hpp_source.html#l00325">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_coloring_data</a>, <a class="el" href="coloring__data__handler_8hpp_source.html#l00155">FEAT::Adjacency::ColoringDataHandler::fill_color()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+
+</div>
+</div>
+<a id="a67e5ccab106ab56e33e8a7d39f7c860a" name="a67e5ccab106ab56e33e8a7d39f7c860a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a67e5ccab106ab56e33e8a7d39f7c860a">&#9670;&#160;</a></span>get_vanka_matrix()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename Matrix_ , typename Filter_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">const <a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a5c1cfac0cf5411a933614fbe71efea9c">VankaMatrixType</a> &amp; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_ama_vanka.html">FEAT::Solver::AmaVanka</a>&lt; Matrix_, Filter_ &gt;::get_vanka_matrix </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">inherited</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00476">476</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
 </div>
 </div>
@@ -1232,7 +1231,7 @@ template&lt;typename Matrix_ , typename Filter_ , FEAT::Intern::VankaAssemblyPol
 
 <p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00636">636</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="voxel__amavanka_8hpp_source.html#l00472">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_cuda()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00446">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_generic()</a>, <a class="el" href="amavanka_8hpp_source.html#l00092">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_macro_dofs</a>, <a class="el" href="amavanka_8hpp_source.html#l00082">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_matrix</a>, <a class="el" href="amavanka_8hpp_source.html#l00086">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_vanka</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00237">FEAT::Solver::SolverBase&lt; Vector_ &gt;::init_numeric()</a>, <a class="el" href="stop__watch_8hpp_source.html#l00043">FEAT::StopWatch::start()</a>, and <a class="el" href="stop__watch_8hpp_source.html#l00051">FEAT::StopWatch::stop()</a>.</p>
+<p class="reference">References <a class="el" href="voxel__amavanka_8hpp_source.html#l00473">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_cuda()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00447">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_generic()</a>, <a class="el" href="amavanka_8hpp_source.html#l00091">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_macro_dofs</a>, <a class="el" href="amavanka_8hpp_source.html#l00081">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_matrix</a>, <a class="el" href="amavanka_8hpp_source.html#l00085">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_vanka</a>, <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a39466fe22b062a34cfe09f3cc8c24868">FEAT::cuda</a>, <a class="el" href="namespace_f_e_a_t_1_1_memory.html#a723b53b6060c8a2d420a40f79e4b8c06a39466fe22b062a34cfe09f3cc8c24868">FEAT::Memory::cuda</a>, <a class="el" href="backend_8cpp_source.html#l00032">FEAT::Backend::get_preferred_backend()</a>, <a class="el" href="kernel_2solver_2base_8hpp_source.html#l00237">FEAT::Solver::SolverBase&lt; Vector_ &gt;::init_numeric()</a>, <a class="el" href="namespace_f_e_a_t_1_1_memory.html#a723b53b6060c8a2d420a40f79e4b8c06afad58de7366495db4650cfefac2fcd61">FEAT::Memory::main</a>, <a class="el" href="stop__watch_8hpp_source.html#l00043">FEAT::StopWatch::start()</a>, and <a class="el" href="stop__watch_8hpp_source.html#l00051">FEAT::StopWatch::stop()</a>.</p>
 
 </div>
 </div>
@@ -1267,7 +1266,7 @@ template&lt;typename Matrix_ , typename Filter_ , FEAT::Intern::VankaAssemblyPol
 
 <p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00614">614</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00336">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_max_degrees()</a>, <a class="el" href="amavanka_8hpp_source.html#l00276">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>, <a class="el" href="stop__watch_8hpp_source.html#l00043">FEAT::StopWatch::start()</a>, and <a class="el" href="stop__watch_8hpp_source.html#l00051">FEAT::StopWatch::stop()</a>.</p>
+<p class="reference">References <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00336">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_max_degrees()</a>, <a class="el" href="amavanka_8hpp_source.html#l00275">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>, <a class="el" href="stop__watch_8hpp_source.html#l00043">FEAT::StopWatch::start()</a>, and <a class="el" href="stop__watch_8hpp_source.html#l00051">FEAT::StopWatch::stop()</a>.</p>
 
 </div>
 </div>
@@ -1338,9 +1337,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00155">155</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00154">154</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="amavanka_8hpp_source.html#l00088">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_auto_macros</a>, <a class="el" href="amavanka_8hpp_source.html#l00092">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_macro_dofs</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
+<p class="reference">References <a class="el" href="amavanka_8hpp_source.html#l00087">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_auto_macros</a>, <a class="el" href="amavanka_8hpp_source.html#l00091">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::_macro_dofs</a>, and <a class="el" href="assertion_8hpp_source.html#l00192">XABORTM</a>.</p>
 
 </div>
 </div>
@@ -1371,7 +1370,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Resets the internal stop watches for time measurement. </p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00238">238</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00237">237</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="stop__watch_8hpp_source.html#l00036">FEAT::StopWatch::reset()</a>.</p>
 
@@ -1411,7 +1410,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00180">180</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00179">179</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
@@ -1451,7 +1450,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00192">192</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00191">191</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
@@ -1491,7 +1490,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00204">204</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00203">203</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
 </div>
 </div>
@@ -1522,7 +1521,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns the total accumulated time for the solver application. </p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00264">264</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00263">263</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="stop__watch_8hpp_source.html#l00070">FEAT::StopWatch::elapsed()</a>.</p>
 
@@ -1555,7 +1554,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns the total accumulated time for numeric initialization. </p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00256">256</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00255">255</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="stop__watch_8hpp_source.html#l00070">FEAT::StopWatch::elapsed()</a>.</p>
 
@@ -1588,7 +1587,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>Returns the total accumulated time for symbolic initialization. </p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00248">248</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00247">247</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="stop__watch_8hpp_source.html#l00070">FEAT::StopWatch::elapsed()</a>.</p>
 
@@ -1621,7 +1620,7 @@ template&lt;typename Matrix_ , typename Filter_ , FEAT::Intern::VankaAssemblyPol
 
 <p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00333">333</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00515">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::VoxelAmaVanka()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00472">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_cuda()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00515">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::VoxelAmaVanka()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00473">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_cuda()</a>.</p>
 
 </div>
 </div>
@@ -1649,9 +1648,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>deduct macro dofs automatically? </p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00088">88</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00087">87</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="amavanka_8hpp_source.html#l00143">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::clear_macro_dofs()</a>, and <a class="el" href="amavanka_8hpp_source.html#l00155">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::push_macro_dofs()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="amavanka_8hpp_source.html#l00142">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::clear_macro_dofs()</a>, and <a class="el" href="amavanka_8hpp_source.html#l00154">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::push_macro_dofs()</a>.</p>
 
 </div>
 </div>
@@ -1681,12 +1680,12 @@ template&lt;typename Matrix_ , typename Filter_ , FEAT::Intern::VankaAssemblyPol
 
 <p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00325">325</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00515">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::VoxelAmaVanka()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00472">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_cuda()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00600">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::fill_color()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00515">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::VoxelAmaVanka()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00473">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_cuda()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00600">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::fill_color()</a>.</p>
 
 </div>
 </div>
-<a id="aa0dd925cca2664019f3695da3a662ea6" name="aa0dd925cca2664019f3695da3a662ea6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa0dd925cca2664019f3695da3a662ea6">&#9670;&#160;</a></span>_d_dof_macros</h2>
+<a id="a0fa2b31c7e00c2abfc607cfecc2c6659" name="a0fa2b31c7e00c2abfc607cfecc2c6659"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a0fa2b31c7e00c2abfc607cfecc2c6659">&#9670;&#160;</a></span>_d_dof_macros</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1697,7 +1696,7 @@ template&lt;typename Matrix_ , typename Filter_ , FEAT::Intern::VankaAssemblyPol
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>*&gt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html">FEAT::Solver::VoxelAmaVanka</a>&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_d_dof_macros</td>
+          <td class="memname">std::vector&lt;<a class="el" href="class_f_e_a_t_1_1_memory_1_1_arbiter.html">Memory::Arbiter</a>&gt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html">FEAT::Solver::VoxelAmaVanka</a>&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_d_dof_macros</td>
         </tr>
       </table>
   </td>
@@ -1711,8 +1710,8 @@ template&lt;typename Matrix_ , typename Filter_ , FEAT::Intern::VankaAssemblyPol
 
 </div>
 </div>
-<a id="ad31b28019907130b16610dacd2640644" name="ad31b28019907130b16610dacd2640644"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad31b28019907130b16610dacd2640644">&#9670;&#160;</a></span>_d_macro_dofs</h2>
+<a id="a6edd2ff369a03890cf7096f9a3e79b6b" name="a6edd2ff369a03890cf7096f9a3e79b6b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6edd2ff369a03890cf7096f9a3e79b6b">&#9670;&#160;</a></span>_d_macro_dofs</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1723,7 +1722,7 @@ template&lt;typename Matrix_ , typename Filter_ , FEAT::Intern::VankaAssemblyPol
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt;<a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>*&gt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html">FEAT::Solver::VoxelAmaVanka</a>&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_d_macro_dofs</td>
+          <td class="memname">std::vector&lt;<a class="el" href="class_f_e_a_t_1_1_memory_1_1_arbiter.html">Memory::Arbiter</a>&gt; <a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html">FEAT::Solver::VoxelAmaVanka</a>&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_d_macro_dofs</td>
         </tr>
       </table>
   </td>
@@ -1737,12 +1736,12 @@ template&lt;typename Matrix_ , typename Filter_ , FEAT::Intern::VankaAssemblyPol
 
 <p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00327">327</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00413">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_free_device()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00472">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_cuda()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00422">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_free_device()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00473">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_cuda()</a>.</p>
 
 </div>
 </div>
-<a id="aeb74f85bc2f203b1ed84351097c674fb" name="aeb74f85bc2f203b1ed84351097c674fb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aeb74f85bc2f203b1ed84351097c674fb">&#9670;&#160;</a></span>_d_macro_mask</h2>
+<a id="a28c519c03a5f7da7f7ba8f3325dcaac5" name="a28c519c03a5f7da7f7ba8f3325dcaac5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a28c519c03a5f7da7f7ba8f3325dcaac5">&#9670;&#160;</a></span>_d_macro_mask</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1753,7 +1752,7 @@ template&lt;typename Matrix_ , typename Filter_ , FEAT::Intern::VankaAssemblyPol
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">int* <a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html">FEAT::Solver::VoxelAmaVanka</a>&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_d_macro_mask</td>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_memory_1_1_arbiter.html">Memory::Arbiter</a> <a class="el" href="class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html">FEAT::Solver::VoxelAmaVanka</a>&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_d_macro_mask</td>
         </tr>
       </table>
   </td>
@@ -1767,7 +1766,7 @@ template&lt;typename Matrix_ , typename Filter_ , FEAT::Intern::VankaAssemblyPol
 
 <p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00331">331</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00413">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_free_device()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00472">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_cuda()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00422">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_free_device()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00473">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_cuda()</a>.</p>
 
 </div>
 </div>
@@ -1793,7 +1792,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00092">92</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00091">91</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
 </div>
 </div>
@@ -1821,7 +1820,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>the system filter </p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00084">84</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00083">83</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
 </div>
 </div>
@@ -1849,9 +1848,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>the DOF-macro graphs </p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00092">92</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00091">91</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00336">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_max_degrees()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00446">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_generic()</a>, <a class="el" href="amavanka_8hpp_source.html#l00212">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::bytes()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00636">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::init_numeric()</a>, <a class="el" href="amavanka_8hpp_source.html#l00276">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>, and <a class="el" href="amavanka_8hpp_source.html#l00155">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::push_macro_dofs()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00336">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_max_degrees()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00447">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_generic()</a>, <a class="el" href="amavanka_8hpp_source.html#l00211">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::bytes()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00636">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::init_numeric()</a>, <a class="el" href="amavanka_8hpp_source.html#l00275">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::init_symbolic()</a>, and <a class="el" href="amavanka_8hpp_source.html#l00154">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::push_macro_dofs()</a>.</p>
 
 </div>
 </div>
@@ -1879,9 +1878,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>the macro mask </p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00094">94</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00093">93</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00446">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_generic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00447">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_generic()</a>.</p>
 
 </div>
 </div>
@@ -1909,7 +1908,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>the system matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00082">82</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00081">81</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00636">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::init_numeric()</a>.</p>
 
@@ -1941,7 +1940,7 @@ template&lt;typename Matrix_ , typename Filter_ , FEAT::Intern::VankaAssemblyPol
 
 <p class="definition">Definition at line <a class="el" href="voxel__amavanka_8hpp_source.html#l00329">329</a> of file <a class="el" href="voxel__amavanka_8hpp_source.html">voxel_amavanka.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00336">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_max_degrees()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00472">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_cuda()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00625">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::done_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00336">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_max_degrees()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00473">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_cuda()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00625">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::done_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -1995,9 +1994,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>number of steps </p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00096">96</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00095">95</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="amavanka_8hpp_source.html#l00444">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::apply()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="amavanka_8hpp_source.html#l00443">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::apply()</a>.</p>
 
 </div>
 </div>
@@ -2025,7 +2024,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>number of threads for numeric factorization </p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00110">110</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00109">109</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
 </div>
 </div>
@@ -2053,9 +2052,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>damping parameter </p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00098">98</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00097">97</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00472">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_cuda()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00446">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_generic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00473">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_cuda()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00447">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_generic()</a>.</p>
 
 </div>
 </div>
@@ -2083,9 +2082,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>skip singular macros? </p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00090">90</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00089">89</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00472">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_cuda()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00446">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_generic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, <a class="el" href="voxel__amavanka_8hpp_source.html#l00473">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_cuda()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00447">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_init_numeric_generic()</a>.</p>
 
 </div>
 </div>
@@ -2113,9 +2112,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_vanka.html" title="Vanka preconditioner/smoother class template.">Vanka</a> preconditioner matrix </p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00086">86</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00085">85</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="amavanka_8hpp_source.html#l00212">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::bytes()</a>, <a class="el" href="amavanka_8hpp_source.html#l00230">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::data_size()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00636">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::init_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="amavanka_8hpp_source.html#l00211">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::bytes()</a>, <a class="el" href="amavanka_8hpp_source.html#l00229">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::data_size()</a>, and <a class="el" href="voxel__amavanka_8hpp_source.html#l00636">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::init_numeric()</a>.</p>
 
 </div>
 </div>
@@ -2143,9 +2142,9 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 
 <p>temporary vectors </p>
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00100">100</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00099">99</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="amavanka_8hpp_source.html#l00212">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::bytes()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="amavanka_8hpp_source.html#l00211">FEAT::Solver::AmaVanka&lt; Matrix_, Filter_ &gt;::bytes()</a>.</p>
 
 </div>
 </div>
@@ -2171,7 +2170,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00100">100</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00099">99</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
 </div>
 </div>
@@ -2197,7 +2196,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00107">107</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00106">106</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
 </div>
 </div>
@@ -2223,7 +2222,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00105">105</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00104">104</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
 </div>
 </div>
@@ -2249,7 +2248,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00103">103</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="amavanka_8hpp_source.html#l00102">102</a> of file <a class="el" href="amavanka_8hpp_source.html">amavanka.hpp</a>.</p>
 
 </div>
 </div>

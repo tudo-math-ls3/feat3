@@ -349,9 +349,10 @@ class FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &g
 <p class="interdd">add support for LAFEM/Global::MeanFilter </p>
 <p class="enddd">add support for <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_slip_filter.html" title="Slip Filter class template.">LAFEM::SlipFilter</a></p>
 </dd></dl>
+<dl class="todo"><dt><b><a class="el" href="todo.html#_todo000031">Todo:</a></b></dt><dd>make use of cuda-aware MPI</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00132">132</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00135">135</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a05b9af1328cbb2051ccab4fe19b4afa6" name="a05b9af1328cbb2051ccab4fe19b4afa6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a05b9af1328cbb2051ccab4fe19b4afa6">&#9670;&#160;</a></span>ADPFilAuxType</h2>
@@ -367,7 +368,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00176">176</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00179">179</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -385,7 +386,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00175">175</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00178">178</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -405,7 +406,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>the algebraic DOF partitioning </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00165">165</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00168">168</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -425,7 +426,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>the buffer matrix type used for communication </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00159">159</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00162">162</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -445,7 +446,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>the buffer vector type used for communication </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00157">157</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00160">160</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -465,7 +466,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>our data type </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00136">136</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00139">139</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -485,7 +486,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>donee neighbor mirror type </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00171">171</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00174">174</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -505,7 +506,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>the global filter type </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00154">154</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00157">157</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -525,7 +526,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>the global matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00145">145</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00148">148</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -545,7 +546,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>our index type </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00138">138</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00141">141</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -565,7 +566,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>auxiliary index vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00168">168</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00171">171</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -585,7 +586,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>the local filter type </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00151">151</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00154">154</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -605,7 +606,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>the local matrix type </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00141">141</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00144">144</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -625,7 +626,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>the local vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00148">148</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00151">151</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -645,7 +646,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>the vector mirror type </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00143">143</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00146">146</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -665,7 +666,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>the matrix type used for the internal storage of our owned matrix rows </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00162">162</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00165">165</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -685,7 +686,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>owner neighbor mirror type </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00173">173</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00176">176</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -735,7 +736,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00220">220</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00223">223</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -791,7 +792,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00242">242</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00245">245</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -846,11 +847,11 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>Assembles a matrix buffer for a given row mirror. </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00713">713</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00725">725</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00341">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::col_ind()</a>, <a class="el" href="omp__util_8hpp_source.html#l00153">FEAT::feat_omp_ex_scan()</a>, and <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00383">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::row_ptr()</a>.</p>
+<p class="reference">References <a class="el" href="omp__util_8hpp_source.html#l00153">FEAT::feat_omp_ex_scan()</a>, and <a class="el" href="memory__arbiter_8hpp_source.html#l00473">FEAT::Memory::TypedView&lt; T_ &gt;::get_w()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00760">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_buffers()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00772">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_buffers()</a>.</p>
 
 </div>
 </div>
@@ -904,11 +905,11 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>Auxiliary function: assembles a data-mirror for a donee-neighbor. </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00943">943</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00971">971</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00341">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::col_ind()</a>, <a class="el" href="graph_8hpp_source.html#l00359">FEAT::Adjacency::Graph::get_domain_ptr()</a>, <a class="el" href="graph_8hpp_source.html#l00374">FEAT::Adjacency::Graph::get_image_idx()</a>, <a class="el" href="graph_8hpp_source.html#l00390">FEAT::Adjacency::Graph::get_num_indices()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00231">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::indices()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00383">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::row_ptr()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00285">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::rows()</a>, and <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00307">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::used_elements()</a>.</p>
+<p class="reference">References <a class="el" href="graph_8hpp_source.html#l00359">FEAT::Adjacency::Graph::get_domain_ptr()</a>, <a class="el" href="graph_8hpp_source.html#l00374">FEAT::Adjacency::Graph::get_image_idx()</a>, <a class="el" href="graph_8hpp_source.html#l00390">FEAT::Adjacency::Graph::get_num_indices()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00242">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::num_nzes()</a>, and <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00222">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::num_rows()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00994">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_data_mirrors()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l01022">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_data_mirrors()</a>.</p>
 
 </div>
 </div>
@@ -939,11 +940,11 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>Assembles the owner and donee matrix buffers. </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00760">760</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00772">772</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00185">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_alg_dof_parti</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00713">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_asm_mat_buf()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00197">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_donee_bufs</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00296">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::columns()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00318">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::entries_per_nonzero()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00340">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_comm()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00412">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_donee_rank()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00364">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_global_dof_indices()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00384">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_donee_neighbors()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00350">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00378">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_owner_neighbors()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00429">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_owner_mirror()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00398">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_owner_rank()</a>, <a class="el" href="dist_8cpp_source.html#l00716">FEAT::Dist::Comm::irecv()</a>, <a class="el" href="dist_8cpp_source.html#l00704">FEAT::Dist::Comm::isend()</a>, <a class="el" href="matrix_8hpp_source.html#l00126">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::local()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00285">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::rows()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00307">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::used_elements()</a>, and <a class="el" href="dist_8cpp_source.html#l00324">FEAT::Dist::RequestVector::wait_all()</a>.</p>
+<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00188">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_alg_dof_parti</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00725">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_asm_mat_buf()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00200">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_donee_bufs</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00252">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::entries_per_nonzero()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00343">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_comm()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00412">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_donee_rank()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00364">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_global_dof_indices()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00384">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_donee_neighbors()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00350">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00378">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_owner_neighbors()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00429">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_owner_mirror()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00398">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_owner_rank()</a>, <a class="el" href="dist_8cpp_source.html#l00719">FEAT::Dist::Comm::irecv()</a>, <a class="el" href="dist_8cpp_source.html#l00707">FEAT::Dist::Comm::isend()</a>, <a class="el" href="matrix_8hpp_source.html#l00126">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::local()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00232">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::num_cols()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00242">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::num_nzes()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00222">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::num_rows()</a>, and <a class="el" href="dist_8cpp_source.html#l00327">FEAT::Dist::RequestVector::wait_all()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00427">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00430">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -975,11 +976,11 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 <p>Assembles the data-mirrors for all owner- and donee-neighbors. </p>
 <p >This functions assembles the data-mirrors, which are used for the communication of the numerical values of a matrix in the #upload_numeric() function. This allows that the matrix values can be uploaded and synchronized without the need to re-communicate the unchanged matrix buffer layouts every time. </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00994">994</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l01022">1022</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00185">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_alg_dof_parti</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00943">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_asm_neighbor_donee_data_mir()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00446">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_donee_mirror()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00364">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_global_dof_indices()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00372">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_owned_mirror()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00429">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_owner_mirror()</a>, and <a class="el" href="matrix_8hpp_source.html#l00126">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::local()</a>.</p>
+<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00188">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_alg_dof_parti</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00971">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_asm_neighbor_donee_data_mir()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00446">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_donee_mirror()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00364">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_global_dof_indices()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00372">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_owned_mirror()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00429">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_owner_mirror()</a>, and <a class="el" href="matrix_8hpp_source.html#l00126">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::local()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00427">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00430">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -1010,11 +1011,11 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>Assembles the matrix structure of the algebraic-DOF-partitioned matrix. </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00878">878</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00906">906</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00185">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_alg_dof_parti</a>, <a class="el" href="dist_8cpp_source.html#l00655">FEAT::Dist::Comm::allreduce()</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7ab91bbd5bee662ac721bd55c847e41a5b">FEAT::Adjacency::as_is</a>, <a class="el" href="dynamic__graph_8hpp_source.html#l00262">FEAT::Adjacency::DynamicGraph::clear()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00341">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::col_ind()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00340">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_comm()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00446">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_donee_mirror()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00364">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_global_dof_indices()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00384">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_donee_neighbors()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00350">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="dynamic__graph_8hpp_source.html#l00247">FEAT::Adjacency::DynamicGraph::get_num_indices()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00338">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_owned_dofs()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00372">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_owned_mirror()</a>, <a class="el" href="dynamic__graph_8hpp_source.html#l00301">FEAT::Adjacency::DynamicGraph::insert()</a>, <a class="el" href="matrix_8hpp_source.html#l00126">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::local()</a>, <a class="el" href="dist_8hpp_source.html#l00271">FEAT::Dist::op_sum</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00383">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::row_ptr()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00285">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::rows()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00188">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_alg_dof_parti</a>, <a class="el" href="dist_8cpp_source.html#l00658">FEAT::Dist::Comm::allreduce()</a>, <a class="el" href="namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7ab91bbd5bee662ac721bd55c847e41a5b">FEAT::Adjacency::as_is</a>, <a class="el" href="dynamic__graph_8hpp_source.html#l00262">FEAT::Adjacency::DynamicGraph::clear()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00343">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_comm()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00446">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_donee_mirror()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00364">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_global_dof_indices()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00384">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_donee_neighbors()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00350">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="dynamic__graph_8hpp_source.html#l00247">FEAT::Adjacency::DynamicGraph::get_num_indices()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00338">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_owned_dofs()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00372">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_owned_mirror()</a>, <a class="el" href="dynamic__graph_8hpp_source.html#l00301">FEAT::Adjacency::DynamicGraph::insert()</a>, <a class="el" href="matrix_8hpp_source.html#l00126">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::local()</a>, <a class="el" href="matrix__mirror__buffer_8hpp_source.html#l00222">FEAT::LAFEM::MatrixMirrorBuffer&lt; DT_, IT_ &gt;::num_rows()</a>, <a class="el" href="dist_8hpp_source.html#l00571">FEAT::Dist::op_sum</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00427">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::init_symbolic()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00430">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::init_symbolic()</a>.</p>
 
 </div>
 </div>
@@ -1064,11 +1065,11 @@ template&lt;typename DTA_ &gt; </div>
 
 <p>Scatters the values of a donee-neighbor buffer-vector into a local matrix. </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l01021">1021</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l01049">1049</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dense__vector_8hpp_source.html#l00737">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00231">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::indices()</a>, <a class="el" href="vector__mirror_8hpp_source.html#l00211">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::num_indices()</a>, <a class="el" href="container_8hpp_source.html#l01136">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="vector__mirror_8hpp_source.html#l00284">FEAT::LAFEM::VectorMirror&lt; DT_, IT_ &gt;::num_indices()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00620">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00550">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_matrix_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00553">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_matrix_numeric()</a>.</p>
 
 </div>
 </div>
@@ -1139,9 +1140,9 @@ Do not use this function except for <b>small-scale debugging</b> purposes. You h
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00402">402</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00405">405</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00607">FEAT::Dist::Comm::allgatherv()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00322">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_adp_matrix_cols()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00328">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_adp_matrix_nzes()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00316">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_adp_matrix_rows()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00340">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_comm()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00610">FEAT::Dist::Comm::allgatherv()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00343">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_comm()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -1171,9 +1172,9 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The size of this object in bytes </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00259">259</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00262">262</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00205">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_owned_data_mir</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00208">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_unit_filter_rows</a>, and <a class="el" href="unit__filter_8hpp_source.html#l00134">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::bytes()</a>.</p>
+<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00208">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_owned_data_mir</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00211">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_unit_filter_rows</a>, and <a class="el" href="unit__filter_8hpp_source.html#l00146">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::bytes()</a>.</p>
 
 </div>
 </div>
@@ -1224,7 +1225,7 @@ template&lt;typename DTV_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00375">375</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00378">378</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
@@ -1284,9 +1285,9 @@ template&lt;typename DTA_ , typename RPT_ , typename CIT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00679">679</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00691">691</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00208">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_unit_filter_rows</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00286">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_alg_dof_parti()</a>, <a class="el" href="unit__filter_8hpp_source.html#l00176">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::get_indices()</a>, <a class="el" href="unit__filter_8hpp_source.html#l00170">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::used_elements()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00211">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_unit_filter_rows</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00289">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_alg_dof_parti()</a>, <a class="el" href="unit__filter_8hpp_source.html#l00256">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::indices_view_r()</a>, <a class="el" href="unit__filter_8hpp_source.html#l00176">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::num_nzes()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
 </div>
 </div>
@@ -1326,9 +1327,9 @@ template&lt;typename DTV_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00653">653</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00664">664</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00208">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_unit_filter_rows</a>, <a class="el" href="unit__filter_8hpp_source.html#l00176">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::get_indices()</a>, <a class="el" href="unit__filter_8hpp_source.html#l00170">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::used_elements()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00211">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_unit_filter_rows</a>, <a class="el" href="unit__filter_8hpp_source.html#l00256">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::indices_view_r()</a>, <a class="el" href="namespace_f_e_a_t_1_1_memory.html#a723b53b6060c8a2d420a40f79e4b8c06afad58de7366495db4650cfefac2fcd61">FEAT::Memory::main</a>, <a class="el" href="unit__filter_8hpp_source.html#l00176">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::num_nzes()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
 </div>
 </div>
@@ -1368,9 +1369,9 @@ template&lt;typename DTV_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00636">636</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00645">645</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00208">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_unit_filter_rows</a>, <a class="el" href="unit__filter_8hpp_source.html#l00176">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::get_indices()</a>, <a class="el" href="unit__filter_8hpp_source.html#l00170">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::used_elements()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00211">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_unit_filter_rows</a>, <a class="el" href="unit__filter_8hpp_source.html#l00256">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::indices_view_r()</a>, <a class="el" href="namespace_f_e_a_t_1_1_memory.html#a723b53b6060c8a2d420a40f79e4b8c06afad58de7366495db4650cfefac2fcd61">FEAT::Memory::main</a>, <a class="el" href="unit__filter_8hpp_source.html#l00176">FEAT::LAFEM::UnitFilter&lt; DT_, IT_ &gt;::num_nzes()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
 </div>
 </div>
@@ -1400,9 +1401,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of columns of the local ADP matrix (corresponds to the total number of global DOFs). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00322">322</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00402">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::apply()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00325">325</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -1432,11 +1431,9 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of nonzero entries of the local ADP matrix </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00328">328</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00331">331</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00191">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_num_owned_non_zeros</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00402">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::apply()</a>.</p>
+<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00194">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_num_owned_non_zeros</a>.</p>
 
 </div>
 </div>
@@ -1466,9 +1463,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of rows of the local ADP matrix (corresponds to the number of owned DOFs). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00316">316</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00402">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::apply()</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00319">319</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -1498,7 +1493,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The size of a local ADP vector (corresponds to the number of owned DOFs). </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00310">310</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00313">313</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -1530,11 +1525,11 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 <p>Returns the algebraic dof partitioning that is used internally. </p>
 <dl class="section note"><dt>Note</dt><dd>The ADP object is (in general) allocated and initialized by the <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti_system.html#a5c01abaa6145a8621aff2c8ac92bb5bd" title="Performs the symbolic initialization.">init_symbolic()</a> function, so this function will (in general) return a null pointer if called before <a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti_system.html#a5c01abaa6145a8621aff2c8ac92bb5bd" title="Performs the symbolic initialization.">init_symbolic()</a>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00286">286</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00289">289</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00185">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_alg_dof_parti</a>.</p>
+<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00188">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_alg_dof_parti</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00679">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::filter_matrix()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00691">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::filter_matrix()</a>.</p>
 
 </div>
 </div>
@@ -1564,11 +1559,11 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the underlying communicator. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00340">340</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00343">343</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00760">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_buffers()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00878">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_structure()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00402">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::apply()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00550">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_matrix_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00772">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_buffers()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00906">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_structure()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00405">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::apply()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00553">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_matrix_numeric()</a>.</p>
 
 </div>
 </div>
@@ -1598,7 +1593,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The index of the first global DOF owned by this process. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00304">304</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00307">307</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -1628,7 +1623,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The total number of global DOFs. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00298">298</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00301">301</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -1658,9 +1653,9 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The total number of nonzero entries of the global ADP matrix </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00334">334</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00337">337</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00194">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_num_global_non_zeros</a>.</p>
+<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00197">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_num_global_non_zeros</a>.</p>
 
 </div>
 </div>
@@ -1690,9 +1685,9 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 </div><div class="memdoc">
 <dl class="section return"><dt>Returns</dt><dd>The number of local DOFs owned by this process. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00292">292</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00295">295</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00623">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_filter()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00631">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_filter()</a>.</p>
 
 </div>
 </div>
@@ -1724,9 +1719,9 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 <p>Performs the symbolic initialization. </p>
 <p >This function assembles the algebraic dof partitioning based on the gate of the system matrix (unless an already assembled ADP object was passed to the constructor) and assembles the required buffers and mirrors for the ADP system conversion. </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00427">427</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00430">430</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00760">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_buffers()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00994">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_data_mirrors()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00878">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_structure()</a>, and <a class="el" href="matrix_8hpp_source.html#l00154">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::get_row_gate()</a>.</p>
+<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00772">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_buffers()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l01022">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_data_mirrors()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00906">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_structure()</a>, and <a class="el" href="matrix_8hpp_source.html#l00154">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::get_row_gate()</a>.</p>
 
 </div>
 </div>
@@ -1757,11 +1752,11 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>Uploads the values of the system filter to the ADP system. </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00612">612</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00620">620</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00612">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_filter()</a>.</p>
+<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00620">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_filter()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00612">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_filter()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00620">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_filter()</a>.</p>
 
 </div>
 </div>
@@ -1799,9 +1794,9 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00623">623</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00631">631</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00185">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_alg_dof_parti</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00208">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_unit_filter_rows</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00292">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_num_owned_dofs()</a>.</p>
+<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00188">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_alg_dof_parti</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00211">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_unit_filter_rows</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00295">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_num_owned_dofs()</a>.</p>
 
 </div>
 </div>
@@ -1859,11 +1854,11 @@ template&lt;typename DTA_ , typename RPT_ , typename CIT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00521">521</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00524">524</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="matrix_8hpp_source.html#l00126">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::local()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00521">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_matrix_numeric()</a>.</p>
+<p class="reference">References <a class="el" href="matrix_8hpp_source.html#l00126">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::local()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00524">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_matrix_numeric()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00521">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_matrix_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00524">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_matrix_numeric()</a>.</p>
 
 </div>
 </div>
@@ -1929,9 +1924,9 @@ template&lt;typename DTA_ , typename RPT_ , typename CIT_ &gt; </div>
 </dl>
 <dl class="section attention"><dt>Attention</dt><dd>The input matrix is assumed to be an unfiltered type-0 matrix. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00550">550</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00553">553</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00185">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_alg_dof_parti</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l01021">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_scatter_donee_data()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00737">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::elements()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00340">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_comm()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00412">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_donee_rank()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00384">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_donee_neighbors()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00378">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_owner_neighbors()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00398">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_owner_rank()</a>, <a class="el" href="dist_8cpp_source.html#l00716">FEAT::Dist::Comm::irecv()</a>, <a class="el" href="dist_8cpp_source.html#l00704">FEAT::Dist::Comm::isend()</a>, <a class="el" href="container_8hpp_source.html#l01136">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::size()</a>, <a class="el" href="dist_8cpp_source.html#l00324">FEAT::Dist::RequestVector::wait_all()</a>, <a class="el" href="dist_8cpp_source.html#l00329">FEAT::Dist::RequestVector::wait_any()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00188">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_alg_dof_parti</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l01049">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_scatter_donee_data()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00343">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_comm()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00412">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_donee_rank()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00384">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_donee_neighbors()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00378">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_num_owner_neighbors()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00398">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::get_owner_rank()</a>, <a class="el" href="dist_8cpp_source.html#l00719">FEAT::Dist::Comm::irecv()</a>, <a class="el" href="dist_8cpp_source.html#l00707">FEAT::Dist::Comm::isend()</a>, <a class="el" href="memory__aux__main_8cpp_source.html#l00028">FEAT::Memory::memset_main()</a>, <a class="el" href="dense__vector_8hpp_source.html#l00620">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::size()</a>, <a class="el" href="dist_8cpp_source.html#l00327">FEAT::Dist::RequestVector::wait_all()</a>, <a class="el" href="dist_8cpp_source.html#l00332">FEAT::Dist::RequestVector::wait_any()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
 </div>
 </div>
@@ -1990,7 +1985,7 @@ template&lt;typename RPT_ , typename CIT_ &gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>The column indices in each row are always sorted in ascending order. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00465">465</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00468">468</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
@@ -2043,7 +2038,7 @@ template&lt;typename DTV_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00357">357</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00360">360</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
@@ -2066,9 +2061,9 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>the algebraic dof-partitioning </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00185">185</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00188">188</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00760">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_buffers()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00994">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_data_mirrors()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00878">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_structure()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00286">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_alg_dof_parti()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00623">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_filter()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00550">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_matrix_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00772">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_buffers()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l01022">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_data_mirrors()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00906">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_structure()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00289">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_alg_dof_parti()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00631">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_filter()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00553">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_matrix_numeric()</a>.</p>
 
 </div>
 </div>
@@ -2088,9 +2083,9 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>the matrix buffers for our donee and owner neighbors; both buffers use global DOF indices </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00197">197</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00200">200</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00760">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_buffers()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00772">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_assemble_buffers()</a>.</p>
 
 </div>
 </div>
@@ -2110,7 +2105,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>the data array mirrors for our donee and owner neighbors </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00201">201</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00204">204</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -2130,7 +2125,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>the global filter that we want to convert </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00182">182</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00185">185</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -2150,7 +2145,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>the global matrix that we want to convert </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00180">180</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00183">183</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -2170,9 +2165,9 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>number of non-zero entries in total </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00194">194</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00197">197</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00334">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_num_global_nonzeros()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00337">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_num_global_nonzeros()</a>.</p>
 
 </div>
 </div>
@@ -2192,9 +2187,9 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>number of non-zero entries owned by this process </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00191">191</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00194">194</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00328">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_adp_matrix_nzes()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00331">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::get_adp_matrix_nzes()</a>.</p>
 
 </div>
 </div>
@@ -2214,9 +2209,9 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>the data array mirror for this process </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00205">205</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00208">208</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00259">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::bytes()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00262">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::bytes()</a>.</p>
 
 </div>
 </div>
@@ -2236,7 +2231,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>adjacency graph containing the owned matrix structure </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00188">188</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00191">191</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -2254,7 +2249,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00198">198</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00201">201</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -2272,7 +2267,7 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00202">202</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00205">205</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
 </div>
 </div>
@@ -2292,9 +2287,9 @@ template&lt;typename LocalMatrix_ , typename LocalFilter_ , typename Mirror_ &gt
 
 <p>indices of all unit-filtered matrix rows; we store this as a mirror </p>
 
-<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00208">208</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00211">211</a> of file <a class="el" href="alg__dof__parti__system_8hpp_source.html">alg_dof_parti_system.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00259">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::bytes()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00679">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::filter_matrix()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00653">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::filter_vec_cor()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00636">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::filter_vec_def()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00623">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_filter()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00262">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::bytes()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00691">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::filter_matrix()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00664">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::filter_vec_cor()</a>, <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00645">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::filter_vec_def()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00631">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_filter()</a>.</p>
 
 </div>
 </div>

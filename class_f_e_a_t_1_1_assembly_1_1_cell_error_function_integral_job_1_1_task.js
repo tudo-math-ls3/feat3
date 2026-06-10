@@ -1,6 +1,7 @@
 var class_f_e_a_t_1_1_assembly_1_1_cell_error_function_integral_job_1_1_task =
 [
     [ "AsmTraits", "class_f_e_a_t_1_1_assembly_1_1_cell_error_function_integral_job_1_1_task.html#ad54c981c6f94af4b16cc3638c73b8bed", null ],
+    [ "scatter", "class_f_e_a_t_1_1_assembly_1_1_cell_error_function_integral_job_1_1_task.html#a9c2ae16589b33c3ed02527e90aff617d", null ],
     [ "cell_integral", "class_f_e_a_t_1_1_assembly_1_1_cell_error_function_integral_job_1_1_task.html#a03acdfb7521a44dbd75399233d12d7cf", null ],
     [ "cubature_rule", "class_f_e_a_t_1_1_assembly_1_1_cell_error_function_integral_job_1_1_task.html#a1a2b4bf8e5725bd7d3b4c62337ef10c3", null ],
     [ "dof_mapping", "class_f_e_a_t_1_1_assembly_1_1_cell_error_function_integral_job_1_1_task.html#a4f1ecca513d06181b9ebd081d5380483", null ],

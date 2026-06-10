@@ -25,6 +25,7 @@ var class_f_e_a_t_1_1_adjacency_1_1_permutation =
     [ "get_swap_pos", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#a5a3b10b52a929e498c171c3782f998b3", null ],
     [ "get_swap_pos", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#ad43adea5b4204833b536aeaa477670c4", null ],
     [ "inverse", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#aad27454d5963a516641df87bcac80171", null ],
+    [ "is_identity", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#a1928ea7b217cba147f8e80e256340a7d", null ],
     [ "operator=", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#a4ca5d318a56bad03f8b5d832efc4b7ca", null ],
     [ "size", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#a05b6e3c771bb66b881e3ba813c024926", null ],
     [ "_perm_pos", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html#afb0e418911ff02e8f001365fa56757c5", null ],

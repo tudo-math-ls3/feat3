@@ -186,6 +186,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aad27454d5963a516641df87bcac80171"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_adjacency_1_1_permutation.html">Permutation</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_adjacency_1_1_permutation.html#aad27454d5963a516641df87bcac80171">inverse</a> () const</td></tr>
 <tr class="memdesc:aad27454d5963a516641df87bcac80171"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the inverse permutation.  <a href="class_f_e_a_t_1_1_adjacency_1_1_permutation.html#aad27454d5963a516641df87bcac80171">More...</a><br /></td></tr>
 <tr class="separator:aad27454d5963a516641df87bcac80171"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1928ea7b217cba147f8e80e256340a7d"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_adjacency_1_1_permutation.html#a1928ea7b217cba147f8e80e256340a7d">is_identity</a> () const</td></tr>
+<tr class="memdesc:a1928ea7b217cba147f8e80e256340a7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Checks whether the permutation is the identity permutation.  <a href="class_f_e_a_t_1_1_adjacency_1_1_permutation.html#a1928ea7b217cba147f8e80e256340a7d">More...</a><br /></td></tr>
+<tr class="separator:a1928ea7b217cba147f8e80e256340a7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6aaf337bacc93371e98ff456d959f130"><td class="memTemplParams" colspan="2">template&lt;typename IT_ &gt; </td></tr>
 <tr class="memitem:a6aaf337bacc93371e98ff456d959f130"><td class="memTemplItemLeft" align="right" valign="top">IT_&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_adjacency_1_1_permutation.html#a6aaf337bacc93371e98ff456d959f130">map</a> (IT_ i) const</td></tr>
 <tr class="separator:a6aaf337bacc93371e98ff456d959f130"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -522,11 +525,11 @@ template&lt;typename Tx_ &gt; </div>
 </dl>
 <dl class="section warning"><dt>Warning</dt><dd>The function does not check, whether the referenced array x is large enough! </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="permutation_8hpp_source.html#l00198">198</a> of file <a class="el" href="permutation_8hpp_source.html">permutation.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="permutation_8hpp_source.html#l00201">201</a> of file <a class="el" href="permutation_8hpp_source.html">permutation.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00050">_swap_pos</a>, <a class="el" href="assertion_8hpp_source.html#l00230">ASSERTM</a>, <a class="el" href="permutation_8hpp_source.html#l00136">size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="permutation_8cpp_source.html#l00140">calc_perm_from_swap()</a>, <a class="el" href="dense__vector_8hpp_source.html#l01091">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::permute()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l01323">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::permute()</a>, <a class="el" href="vertex__set_8hpp_source.html#l00264">FEAT::Geometry::VertexSet&lt; num_coords_, Coord_ &gt;::permute()</a>, and <a class="el" href="index__set_8hpp_source.html#l00297">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::permute()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="permutation_8cpp_source.html#l00140">calc_perm_from_swap()</a>, <a class="el" href="dense__vector_8hpp_source.html#l01025">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::permute()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l01261">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::permute()</a>, <a class="el" href="vertex__set_8hpp_source.html#l00264">FEAT::Geometry::VertexSet&lt; num_coords_, Coord_ &gt;::permute()</a>, and <a class="el" href="index__set_8hpp_source.html#l00297">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::permute()</a>.</p>
 
 </div>
 </div>
@@ -584,7 +587,7 @@ template&lt;typename Ty_ , typename Tx_ &gt; </div>
 </dl>
 <dl class="section warning"><dt>Warning</dt><dd>The function does not check, whether the referenced arrays x and y are large enough! </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="permutation_8hpp_source.html#l00252">252</a> of file <a class="el" href="permutation_8hpp_source.html">permutation.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="permutation_8hpp_source.html#l00255">255</a> of file <a class="el" href="permutation_8hpp_source.html">permutation.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00048">_perm_pos</a>, <a class="el" href="permutation_8hpp_source.html#l00136">size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
@@ -609,7 +612,7 @@ template&lt;typename Ty_ , typename Tx_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="permutation_8cpp_source.html#l00140">140</a> of file <a class="el" href="permutation_8cpp_source.html">permutation.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00048">_perm_pos</a>, <a class="el" href="permutation_8hpp_source.html#l00198">apply()</a>, and <a class="el" href="permutation_8hpp_source.html#l00136">size()</a>.</p>
+<p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00048">_perm_pos</a>, <a class="el" href="permutation_8hpp_source.html#l00201">apply()</a>, and <a class="el" href="permutation_8hpp_source.html#l00136">size()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="permutation_8cpp_source.html#l00014">Permutation()</a>.</p>
 
@@ -736,7 +739,7 @@ template&lt;typename Ty_ , typename Tx_ &gt; </div>
 
 <p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00048">_perm_pos</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00316">FEAT::Assembly::SymbolicAssembler::assemble_graph_intermesh()</a>, <a class="el" href="grid__transfer_8hpp_source.html#l00120">FEAT::Assembly::GridTransfer::assemble_prolongation()</a>, <a class="el" href="grid__transfer_8hpp_source.html#l00507">FEAT::Assembly::GridTransfer::assemble_truncation()</a>, <a class="el" href="vertex__set_8hpp_source.html#l00264">FEAT::Geometry::VertexSet&lt; num_coords_, Coord_ &gt;::permute()</a>, <a class="el" href="index__set_8hpp_source.html#l00297">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::permute()</a>, <a class="el" href="grid__transfer_8hpp_source.html#l01303">FEAT::Assembly::GridTransfer::prolongate_vector()</a>, and <a class="el" href="mesh__permutation_8hpp_source.html#l01003">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::validate_sizes()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="symbolic__assembler_8hpp_source.html#l00316">FEAT::Assembly::SymbolicAssembler::assemble_graph_intermesh()</a>, <a class="el" href="grid__transfer_8hpp_source.html#l00120">FEAT::Assembly::GridTransfer::assemble_prolongation()</a>, <a class="el" href="grid__transfer_8hpp_source.html#l00507">FEAT::Assembly::GridTransfer::assemble_truncation()</a>, <a class="el" href="permutation_8cpp_source.html#l00165">is_identity()</a>, <a class="el" href="dense__vector_8hpp_source.html#l01025">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::permute()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l01261">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::permute()</a>, <a class="el" href="vertex__set_8hpp_source.html#l00264">FEAT::Geometry::VertexSet&lt; num_coords_, Coord_ &gt;::permute()</a>, <a class="el" href="index__set_8hpp_source.html#l00297">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::permute()</a>, <a class="el" href="grid__transfer_8hpp_source.html#l01303">FEAT::Assembly::GridTransfer::prolongate_vector()</a>, and <a class="el" href="mesh__permutation_8hpp_source.html#l01003">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::validate_sizes()</a>.</p>
 
 </div>
 </div>
@@ -769,7 +772,7 @@ template&lt;typename Ty_ , typename Tx_ &gt; </div>
 
 <p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00048">_perm_pos</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="graph_8cpp_source.html#l00108">FEAT::Adjacency::Graph::Graph()</a>, <a class="el" href="cuthill__mckee_8cpp_source.html#l00025">FEAT::Adjacency::CuthillMcKee::compute()</a>, <a class="el" href="permutation_8cpp_source.html#l00152">concat()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02610">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::permute()</a>, and <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02583">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::permute()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="graph_8cpp_source.html#l00108">FEAT::Adjacency::Graph::Graph()</a>, <a class="el" href="cuthill__mckee_8cpp_source.html#l00025">FEAT::Adjacency::CuthillMcKee::compute()</a>, <a class="el" href="permutation_8cpp_source.html#l00152">concat()</a>, <a class="el" href="permutation_8cpp_source.html#l00165">is_identity()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l01988">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, block_height_, block_width_ &gt;::permute()</a>, and <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02419">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::permute()</a>.</p>
 
 </div>
 </div>
@@ -896,7 +899,30 @@ template&lt;typename Ty_ , typename Tx_ &gt; </div>
 
 <p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00054">Permutation()</a>, <a class="el" href="permutation_8hpp_source.html#l00048">_perm_pos</a>, <a class="el" href="class_f_e_a_t_1_1_adjacency_1_1_permutation.html#acee2c516529073ea145a5e4db6d48d8ea058f75cadf5c21772dc599f89b46498a">inv_perm</a>, and <a class="el" href="permutation_8hpp_source.html#l00136">size()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="sparse__vector_8hpp_source.html#l00858">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::permute()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00777">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::permute()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02610">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::permute()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02583">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::permute()</a>, and <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00151">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::permute()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="sparse__vector_8hpp_source.html#l00698">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::permute()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00586">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::permute()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l01988">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, block_height_, block_width_ &gt;::permute()</a>, <a class="el" href="adaptive__mesh__layer_8hpp_source.html#l00151">FEAT::Geometry::AdaptiveVertexSet&lt; AdaptiveMeshType_ &gt;::permute()</a>, and <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02419">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::permute()</a>.</p>
+
+</div>
+</div>
+<a id="a1928ea7b217cba147f8e80e256340a7d" name="a1928ea7b217cba147f8e80e256340a7d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1928ea7b217cba147f8e80e256340a7d">&#9670;&#160;</a></span>is_identity()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool FEAT::Adjacency::Permutation::is_identity </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Checks whether the permutation is the identity permutation. </p>
+
+<p class="definition">Definition at line <a class="el" href="permutation_8cpp_source.html#l00165">165</a> of file <a class="el" href="permutation_8cpp_source.html">permutation.cpp</a>.</p>
+
+<p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00143">empty()</a>, <a class="el" href="permutation_8hpp_source.html#l00149">get_perm_pos()</a>, and <a class="el" href="permutation_8hpp_source.html#l00136">size()</a>.</p>
 
 </div>
 </div>
@@ -983,7 +1009,7 @@ template&lt;typename IT_ &gt; </div>
 
 <p class="reference">References <a class="el" href="permutation_8hpp_source.html#l00048">_perm_pos</a>, <a class="el" href="permutation_8hpp_source.html#l00050">_swap_pos</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="permutation_8hpp_source.html#l00198">apply()</a>, <a class="el" href="permutation_8cpp_source.html#l00140">calc_perm_from_swap()</a>, <a class="el" href="permutation_8cpp_source.html#l00126">calc_swap_from_perm()</a>, <a class="el" href="permutation_8hpp_source.html#l00114">clone()</a>, <a class="el" href="permutation_8cpp_source.html#l00152">concat()</a>, <a class="el" href="permutation_8hpp_source.html#l00127">inverse()</a>, <a class="el" href="dense__vector_8hpp_source.html#l01091">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::permute()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l01323">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::permute()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00858">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::permute()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00777">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::permute()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02610">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, BlockHeight_, BlockWidth_ &gt;::permute()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02583">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::permute()</a>, <a class="el" href="vertex__set_8hpp_source.html#l00264">FEAT::Geometry::VertexSet&lt; num_coords_, Coord_ &gt;::permute()</a>, <a class="el" href="index__set_8hpp_source.html#l00297">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::permute()</a>, <a class="el" href="graph_8cpp_source.html#l00221">FEAT::Adjacency::Graph::permute_indices()</a>, and <a class="el" href="mesh__permutation_8hpp_source.html#l01003">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::validate_sizes()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="permutation_8hpp_source.html#l00201">apply()</a>, <a class="el" href="permutation_8cpp_source.html#l00140">calc_perm_from_swap()</a>, <a class="el" href="permutation_8cpp_source.html#l00126">calc_swap_from_perm()</a>, <a class="el" href="permutation_8hpp_source.html#l00114">clone()</a>, <a class="el" href="permutation_8cpp_source.html#l00152">concat()</a>, <a class="el" href="permutation_8hpp_source.html#l00127">inverse()</a>, <a class="el" href="permutation_8cpp_source.html#l00165">is_identity()</a>, <a class="el" href="dense__vector_8hpp_source.html#l01025">FEAT::LAFEM::DenseVector&lt; DT_, IT_ &gt;::permute()</a>, <a class="el" href="dense__vector__blocked_8hpp_source.html#l01261">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::permute()</a>, <a class="el" href="sparse__vector_8hpp_source.html#l00698">FEAT::LAFEM::SparseVector&lt; DT_, IT_ &gt;::permute()</a>, <a class="el" href="sparse__vector__blocked_8hpp_source.html#l00586">FEAT::LAFEM::SparseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::permute()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l01988">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, block_height_, block_width_ &gt;::permute()</a>, <a class="el" href="vertex__set_8hpp_source.html#l00264">FEAT::Geometry::VertexSet&lt; num_coords_, Coord_ &gt;::permute()</a>, <a class="el" href="index__set_8hpp_source.html#l00297">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::permute()</a>, <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02419">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::permute()</a>, <a class="el" href="graph_8cpp_source.html#l00221">FEAT::Adjacency::Graph::permute_indices()</a>, and <a class="el" href="mesh__permutation_8hpp_source.html#l01003">FEAT::Geometry::MeshPermutation&lt; Shape_ &gt;::validate_sizes()</a>.</p>
 
 </div>
 </div>
@@ -1012,7 +1038,7 @@ template&lt;typename IT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="permutation_8hpp_source.html#l00048">48</a> of file <a class="el" href="permutation_8hpp_source.html">permutation.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="permutation_8cpp_source.html#l00014">Permutation()</a>, <a class="el" href="permutation_8hpp_source.html#l00252">apply()</a>, <a class="el" href="permutation_8cpp_source.html#l00140">calc_perm_from_swap()</a>, <a class="el" href="permutation_8cpp_source.html#l00126">calc_swap_from_perm()</a>, <a class="el" href="permutation_8hpp_source.html#l00114">clone()</a>, <a class="el" href="permutation_8hpp_source.html#l00143">empty()</a>, <a class="el" href="permutation_8hpp_source.html#l00149">get_perm_pos()</a>, <a class="el" href="permutation_8hpp_source.html#l00127">inverse()</a>, <a class="el" href="permutation_8cpp_source.html#l00111">operator=()</a>, and <a class="el" href="permutation_8hpp_source.html#l00136">size()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="permutation_8cpp_source.html#l00014">Permutation()</a>, <a class="el" href="permutation_8hpp_source.html#l00255">apply()</a>, <a class="el" href="permutation_8cpp_source.html#l00140">calc_perm_from_swap()</a>, <a class="el" href="permutation_8cpp_source.html#l00126">calc_swap_from_perm()</a>, <a class="el" href="permutation_8hpp_source.html#l00114">clone()</a>, <a class="el" href="permutation_8hpp_source.html#l00143">empty()</a>, <a class="el" href="permutation_8hpp_source.html#l00149">get_perm_pos()</a>, <a class="el" href="permutation_8hpp_source.html#l00127">inverse()</a>, <a class="el" href="permutation_8cpp_source.html#l00111">operator=()</a>, and <a class="el" href="permutation_8hpp_source.html#l00136">size()</a>.</p>
 
 </div>
 </div>
@@ -1040,7 +1066,7 @@ template&lt;typename IT_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="permutation_8hpp_source.html#l00050">50</a> of file <a class="el" href="permutation_8hpp_source.html">permutation.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="permutation_8cpp_source.html#l00014">Permutation()</a>, <a class="el" href="permutation_8hpp_source.html#l00198">apply()</a>, <a class="el" href="permutation_8cpp_source.html#l00126">calc_swap_from_perm()</a>, <a class="el" href="permutation_8hpp_source.html#l00161">get_swap_pos()</a>, <a class="el" href="permutation_8cpp_source.html#l00111">operator=()</a>, and <a class="el" href="permutation_8hpp_source.html#l00136">size()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="permutation_8cpp_source.html#l00014">Permutation()</a>, <a class="el" href="permutation_8hpp_source.html#l00201">apply()</a>, <a class="el" href="permutation_8cpp_source.html#l00126">calc_swap_from_perm()</a>, <a class="el" href="permutation_8hpp_source.html#l00161">get_swap_pos()</a>, <a class="el" href="permutation_8cpp_source.html#l00111">operator=()</a>, and <a class="el" href="permutation_8hpp_source.html#l00136">size()</a>.</p>
 
 </div>
 </div>

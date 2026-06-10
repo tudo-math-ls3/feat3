@@ -161,41 +161,42 @@ $(document).ready(function(){initNavTree('slip__filter__asm_8hpp_source.html',''
 <div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span>        <span class="keyword">auto</span> tmp = gate.get_freqs().clone(<a class="code hl_enumvalue" href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786faebd9bec4d70abc789d439c1f136b0538">LAFEM::CloneMode::Layout</a>);</div>
 <div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span>        tmp.format();</div>
 <div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span> </div>
-<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        <span class="keywordflow">if</span>(slip_filter_vector.used_elements() &gt; 0)</div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span>        <span class="keywordflow">if</span>(slip_filter_vector.num_nzes() &gt; 0)</div>
 <div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span>        {</div>
-<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>          <span class="keyword">auto</span>* tmp_elements = tmp.template elements&lt;LAFEM::Perspective::native&gt;();</div>
-<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>          <span class="keyword">auto</span>* sfv_elements = slip_filter_vector.template elements&lt;LAFEM::Perspective::native&gt;();</div>
-<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
-<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>          <span class="comment">// Copy sparse filter vector contents to DenseVector</span></div>
-<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>          <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> isparse(0); isparse &lt; slip_filter_vector.used_elements(); ++isparse)</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>          {</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>            <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> idense(slip_filter_vector.indices()[isparse]);</div>
-<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>            tmp_elements[idense] = sfv_elements[isparse];</div>
-<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>          }</div>
-<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span> </div>
-<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span>          gate.sync_0(tmp);</div>
-<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span> </div>
-<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span>          <span class="comment">// Copy sparse filter vector contents to DenseVector</span></div>
-<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>          <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> isparse(0); isparse &lt; slip_filter_vector.used_elements(); ++isparse)</div>
-<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>          {</div>
-<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>            <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> idense(slip_filter_vector.indices()[isparse]);</div>
-<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>            tmp_elements[idense].normalize();</div>
-<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>            sfv_elements[isparse] = tmp_elements[idense];</div>
-<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>          }</div>
-<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>        }</div>
-<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>        <span class="keywordflow">else</span></div>
-<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>        {</div>
-<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>          gate.sync_0(tmp);</div>
-<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>        }</div>
-<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>      }</div>
-<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>    } <span class="comment">// namespace Asm</span></div>
-<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>  } <span class="comment">// namespace Control</span></div>
-<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>} <span class="comment">// namespace FEAT</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span>          <span class="keyword">auto</span> tmp_elements = tmp.elements_view_rw();</div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>          <span class="keyword">const</span> <span class="keyword">auto</span> sfv_indices = slip_filter_vector.indices_view_r();</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>          <span class="keyword">auto</span> sfv_elements = slip_filter_vector.elements_view_rw();</div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span> </div>
+<div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>          <span class="comment">// Copy sparse filter vector contents to DenseVector</span></div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>          <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> isparse(0); isparse &lt; slip_filter_vector.num_nzes(); ++isparse)</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>          {</div>
+<div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span>            <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> idense(sfv_indices[isparse]);</div>
+<div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>            tmp_elements[idense] = sfv_elements[isparse];</div>
+<div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>          }</div>
+<div class="line"><a id="l00099" name="l00099"></a><span class="lineno">   99</span> </div>
+<div class="line"><a id="l00100" name="l00100"></a><span class="lineno">  100</span>          gate.sync_0(tmp);</div>
+<div class="line"><a id="l00101" name="l00101"></a><span class="lineno">  101</span> </div>
+<div class="line"><a id="l00102" name="l00102"></a><span class="lineno">  102</span>          <span class="comment">// Copy sparse filter vector contents to DenseVector</span></div>
+<div class="line"><a id="l00103" name="l00103"></a><span class="lineno">  103</span>          <span class="keywordflow">for</span>(<a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> isparse(0); isparse &lt; slip_filter_vector.num_nzes(); ++isparse)</div>
+<div class="line"><a id="l00104" name="l00104"></a><span class="lineno">  104</span>          {</div>
+<div class="line"><a id="l00105" name="l00105"></a><span class="lineno">  105</span>            <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> idense(sfv_indices[isparse]);</div>
+<div class="line"><a id="l00106" name="l00106"></a><span class="lineno">  106</span>            tmp_elements[idense].normalize();</div>
+<div class="line"><a id="l00107" name="l00107"></a><span class="lineno">  107</span>            sfv_elements[isparse] = tmp_elements[idense];</div>
+<div class="line"><a id="l00108" name="l00108"></a><span class="lineno">  108</span>          }</div>
+<div class="line"><a id="l00109" name="l00109"></a><span class="lineno">  109</span>        }</div>
+<div class="line"><a id="l00110" name="l00110"></a><span class="lineno">  110</span>        <span class="keywordflow">else</span></div>
+<div class="line"><a id="l00111" name="l00111"></a><span class="lineno">  111</span>        {</div>
+<div class="line"><a id="l00112" name="l00112"></a><span class="lineno">  112</span>          gate.sync_0(tmp);</div>
+<div class="line"><a id="l00113" name="l00113"></a><span class="lineno">  113</span>        }</div>
+<div class="line"><a id="l00114" name="l00114"></a><span class="lineno">  114</span>      }</div>
+<div class="line"><a id="l00115" name="l00115"></a><span class="lineno">  115</span>    } <span class="comment">// namespace Asm</span></div>
+<div class="line"><a id="l00116" name="l00116"></a><span class="lineno">  116</span>  } <span class="comment">// namespace Control</span></div>
+<div class="line"><a id="l00117" name="l00117"></a><span class="lineno">  117</span>} <span class="comment">// namespace FEAT</span></div>
 <div class="ttc" id="aassertion_8hpp_html_af5c647b0786db55f57452bfc26726bde"><div class="ttname"><a href="assertion_8hpp.html#af5c647b0786db55f57452bfc26726bde">XASSERT</a></div><div class="ttdeci">#define XASSERT(expr)</div><div class="ttdoc">Assertion macro definition.</div><div class="ttdef"><b>Definition:</b> <a href="assertion_8hpp_source.html#l00262">assertion.hpp:262</a></div></div>
 <div class="ttc" id="abase__header_8hpp_html"><div class="ttname"><a href="base__header_8hpp.html">base_header.hpp</a></div><div class="ttdoc">FEAT Kernel base header.</div></div>
 <div class="ttc" id="anamespace_f_e_a_t_1_1_l_a_f_e_m_html_ad372dae2e320ef82768327bb8342786faebd9bec4d70abc789d439c1f136b0538"><div class="ttname"><a href="namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786faebd9bec4d70abc789d439c1f136b0538">FEAT::LAFEM::CloneMode::Layout</a></div><div class="ttdeci">@ Layout</div></div>
 <div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00011">adjactor.hpp:12</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00122">base_header.hpp:122</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00129">base_header.hpp:129</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

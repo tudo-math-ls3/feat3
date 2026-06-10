@@ -34,10 +34,6 @@ var kernel_2lafem_2base_8hpp =
       [ "fm_cscr", "kernel_2lafem_2base_8hpp.html#ada0e93baecfc2c4933d9c5eb9c96a646abd40859f4033e0cfe2220fa76a1e6451", null ],
       [ "fm_binary", "kernel_2lafem_2base_8hpp.html#ada0e93baecfc2c4933d9c5eb9c96a646a34b9b130e68b0a9ab2718496480e3142", null ]
     ] ],
-    [ "Perspective", "kernel_2lafem_2base_8hpp.html#ab2adeb0ceb5f9834949b5a865cd4f7e8", [
-      [ "native", "kernel_2lafem_2base_8hpp.html#ab2adeb0ceb5f9834949b5a865cd4f7e8a8e5f3adee38c8fccc13c1f3be0143796", null ],
-      [ "pod", "kernel_2lafem_2base_8hpp.html#ab2adeb0ceb5f9834949b5a865cd4f7e8adcc0caa97588ee058c2fcd764e5f919b", null ]
-    ] ],
     [ "SparseLayoutId", "kernel_2lafem_2base_8hpp.html#aabefea13a94890ded77e859eecd6a638", [
       [ "lt_csr", "kernel_2lafem_2base_8hpp.html#aabefea13a94890ded77e859eecd6a638a2b574af1e77683ec89ad7272eca992e2", null ],
       [ "lt_cscr", "kernel_2lafem_2base_8hpp.html#aabefea13a94890ded77e859eecd6a638a6e9aed08b64acac485b5a158adfadc4f", null ],
@@ -47,5 +43,5 @@ var kernel_2lafem_2base_8hpp =
     ] ],
     [ "operator&", "kernel_2lafem_2base_8hpp.html#aca01e69d025c391d78f9da6e2ab8e7b2", null ],
     [ "operator|", "kernel_2lafem_2base_8hpp.html#aeac797174e76e1c3df79dea5d70d1b4b", null ],
-    [ "FileOutStreamBufferSize", "kernel_2lafem_2base_8hpp.html#a8c4c378c7a34eb8ccca4252d9bada38b", null ]
+    [ "file_out_stream_buffer_size", "kernel_2lafem_2base_8hpp.html#a9fba230253cfc7904fb7e63086c896c1", null ]
 ];

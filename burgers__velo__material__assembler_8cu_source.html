@@ -697,9 +697,9 @@ $(document).ready(function(){initNavTree('burgers__velo__material__assembler_8cu
 <div class="line"><a id="l00592" name="l00592"></a><span class="lineno">  592</span>      //               matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
 <div class="line"><a id="l00593" name="l00593"></a><span class="lineno">  593</span>      //               (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
 <div class="line"><a id="l00594" name="l00594"></a><span class="lineno">  594</span>      //               cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l00595" name="l00595"></a><span class="lineno">  595</span>      //               dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l00596" name="l00596"></a><span class="lineno">  596</span>      //               (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l00597" name="l00597"></a><span class="lineno">  597</span>      //               (const int*) coloring_maps[col], coloring_map_sizes[col], dof_mapping.cell_to_dof_sorter,</div>
+<div class="line"><a id="l00595" name="l00595"></a><span class="lineno">  595</span>      //               cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l00596" name="l00596"></a><span class="lineno">  596</span>      //               nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l00597" name="l00597"></a><span class="lineno">  597</span>      //               (const int*) coloring_maps[col], coloring_map_sizes[col], cell_to_dof_sorter_view.get_r(),</div>
 <div class="line"><a id="l00598" name="l00598"></a><span class="lineno">  598</span>      //               burgers_params, material_params, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T},</div>
 <div class="line"><a id="l00599" name="l00599"></a><span class="lineno">  599</span>      //               Intern::ViscoDFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T}</div>
 <div class="line"><a id="l00600" name="l00600"></a><span class="lineno">  600</span>      //           );</div>
@@ -713,9 +713,9 @@ $(document).ready(function(){initNavTree('burgers__velo__material__assembler_8cu
 <div class="line"><a id="l00608" name="l00608"></a><span class="lineno">  608</span>      //               matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
 <div class="line"><a id="l00609" name="l00609"></a><span class="lineno">  609</span>      //               (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
 <div class="line"><a id="l00610" name="l00610"></a><span class="lineno">  610</span>      //               cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l00611" name="l00611"></a><span class="lineno">  611</span>      //               dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l00612" name="l00612"></a><span class="lineno">  612</span>      //               (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l00613" name="l00613"></a><span class="lineno">  613</span>      //               (const int*) coloring_maps[col], coloring_map_sizes[col], dof_mapping.cell_to_dof_sorter,</div>
+<div class="line"><a id="l00611" name="l00611"></a><span class="lineno">  611</span>      //               cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l00612" name="l00612"></a><span class="lineno">  612</span>      //               nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l00613" name="l00613"></a><span class="lineno">  613</span>      //               (const int*) coloring_maps[col], coloring_map_sizes[col], cell_to_dof_sorter_view.get_r(),</div>
 <div class="line"><a id="l00614" name="l00614"></a><span class="lineno">  614</span>      //               burgers_params, material_params,</div>
 <div class="line"><a id="l00615" name="l00615"></a><span class="lineno">  615</span>      //               Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T,material_params.yasuda_a, material_params.mu_inf},</div>
 <div class="line"><a id="l00616" name="l00616"></a><span class="lineno">  616</span>      //               Intern::ViscoDFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T, material_params.yasuda_a, material_params.mu_inf}</div>
@@ -736,9 +736,9 @@ $(document).ready(function(){initNavTree('burgers__velo__material__assembler_8cu
 <div class="line"><a id="l00631" name="l00631"></a><span class="lineno">  631</span>      //               matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
 <div class="line"><a id="l00632" name="l00632"></a><span class="lineno">  632</span>      //               (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
 <div class="line"><a id="l00633" name="l00633"></a><span class="lineno">  633</span>      //               cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l00634" name="l00634"></a><span class="lineno">  634</span>      //               dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l00635" name="l00635"></a><span class="lineno">  635</span>      //               (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l00636" name="l00636"></a><span class="lineno">  636</span>      //               (const int*) coloring_maps[col], coloring_map_sizes[col], dof_mapping.cell_to_dof_sorter,</div>
+<div class="line"><a id="l00634" name="l00634"></a><span class="lineno">  634</span>      //               cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l00635" name="l00635"></a><span class="lineno">  635</span>      //               nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l00636" name="l00636"></a><span class="lineno">  636</span>      //               (const int*) coloring_maps[col], coloring_map_sizes[col], cell_to_dof_sorter_view.get_r(),</div>
 <div class="line"><a id="l00637" name="l00637"></a><span class="lineno">  637</span>      //               burgers_params, material_params, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T},</div>
 <div class="line"><a id="l00638" name="l00638"></a><span class="lineno">  638</span>      //               Intern::ViscoDFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T}</div>
 <div class="line"><a id="l00639" name="l00639"></a><span class="lineno">  639</span>      //           );</div>
@@ -752,9 +752,9 @@ $(document).ready(function(){initNavTree('burgers__velo__material__assembler_8cu
 <div class="line"><a id="l00647" name="l00647"></a><span class="lineno">  647</span>      //               matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
 <div class="line"><a id="l00648" name="l00648"></a><span class="lineno">  648</span>      //               (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
 <div class="line"><a id="l00649" name="l00649"></a><span class="lineno">  649</span>      //               cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l00650" name="l00650"></a><span class="lineno">  650</span>      //               dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l00651" name="l00651"></a><span class="lineno">  651</span>      //               (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l00652" name="l00652"></a><span class="lineno">  652</span>      //               (const int*) coloring_maps[col], coloring_map_sizes[col], dof_mapping.cell_to_dof_sorter,</div>
+<div class="line"><a id="l00650" name="l00650"></a><span class="lineno">  650</span>      //               cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l00651" name="l00651"></a><span class="lineno">  651</span>      //               nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l00652" name="l00652"></a><span class="lineno">  652</span>      //               (const int*) coloring_maps[col], coloring_map_sizes[col], cell_to_dof_sorter_view.get_r(),</div>
 <div class="line"><a id="l00653" name="l00653"></a><span class="lineno">  653</span>      //               burgers_params, material_params,</div>
 <div class="line"><a id="l00654" name="l00654"></a><span class="lineno">  654</span>      //               Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T,material_params.yasuda_a, material_params.mu_inf},</div>
 <div class="line"><a id="l00655" name="l00655"></a><span class="lineno">  655</span>      //               Intern::ViscoDFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T, material_params.yasuda_a, material_params.mu_inf}</div>
@@ -882,464 +882,480 @@ $(document).ready(function(){initNavTree('burgers__velo__material__assembler_8cu
 <div class="line"><a id="l00777" name="l00777"></a><span class="lineno">  777</span>              const DT_* conv_data,</div>
 <div class="line"><a id="l00778" name="l00778"></a><span class="lineno">  778</span>              const AssemblyCubatureData&lt;DT_&gt;&amp; cubature,</div>
 <div class="line"><a id="l00779" name="l00779"></a><span class="lineno">  779</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
-<div class="line"><a id="l00780" name="l00780"></a><span class="lineno">  780</span>              const std::vector&lt;int*&gt;&amp; coloring_maps,</div>
-<div class="line"><a id="l00781" name="l00781"></a><span class="lineno">  781</span>              const std::vector&lt;Index&gt;&amp; coloring_map_sizes,</div>
-<div class="line"><a id="l00782" name="l00782"></a><span class="lineno">  782</span>              DT_ alpha, const AssemblyBurgersData&lt;DT_&gt;&amp; burgers_params,</div>
-<div class="line"><a id="l00783" name="l00783"></a><span class="lineno">  783</span>              const AssemblyMaterialData&lt;DT_&gt;&amp; material_params,</div>
-<div class="line"><a id="l00784" name="l00784"></a><span class="lineno">  784</span>              MaterialType material_type, int shared_mem, int blocksize, int gridsize, bool print_occupancy)</div>
-<div class="line"><a id="l00785" name="l00785"></a><span class="lineno">  785</span>      {</div>
-<div class="line"><a id="l00786" name="l00786"></a><span class="lineno">  786</span>        // get the size of all necessary shared memory</div>
-<div class="line"><a id="l00787" name="l00787"></a><span class="lineno">  787</span>        typedef DT_ DataType;</div>
-<div class="line"><a id="l00788" name="l00788"></a><span class="lineno">  788</span>        const DataType tol_eps = CudaMath::cuda_get_sqrt_eps&lt;DataType&gt;();</div>
-<div class="line"><a id="l00789" name="l00789"></a><span class="lineno">  789</span>        constexpr int dim = Space_::ShapeType::dimension;</div>
-<div class="line"><a id="l00790" name="l00790"></a><span class="lineno">  790</span>        constexpr int num_loc_dofs = Space_::DofMappingType::dof_count;</div>
-<div class="line"><a id="l00791" name="l00791"></a><span class="lineno">  791</span>        const bool need_streamline = (CudaMath::cuda_abs(burgers_params.sd_delta) &gt; DataType(0)) &amp;&amp; (burgers_params.sd_v_norm &gt; tol_eps);</div>
-<div class="line"><a id="l00792" name="l00792"></a><span class="lineno">  792</span>        // overestimate necessary memory a bit... else this gets to complicated...?!</div>
-<div class="line"><a id="l00793" name="l00793"></a><span class="lineno">  793</span>        const int shared_size_nec = get_min_shared_size&lt;Space_, DT_, IT_&gt;(need_streamline);</div>
-<div class="line"><a id="l00794" name="l00794"></a><span class="lineno">  794</span>        const int loc_mat_shared_mem = shared_mem - shared_size_nec;</div>
-<div class="line"><a id="l00795" name="l00795"></a><span class="lineno">  795</span>        XASSERTM(loc_mat_shared_mem &gt; 0, String(&quot;Not enough assigned shared memory\n Minimum required: &quot;) + stringify(shared_size_nec)</div>
-<div class="line"><a id="l00796" name="l00796"></a><span class="lineno">  796</span>            + String(&quot;\nProvided: &quot;) + stringify(shared_mem));</div>
-<div class="line"><a id="l00797" name="l00797"></a><span class="lineno">  797</span> </div>
-<div class="line"><a id="l00798" name="l00798"></a><span class="lineno">  798</span>        const int loc_block_size = CudaMath::cuda_min(loc_mat_shared_mem / int(sizeof(DT_)*dim*dim), num_loc_dofs*num_loc_dofs);</div>
-<div class="line"><a id="l00799" name="l00799"></a><span class="lineno">  799</span>        XASSERTM(loc_block_size &gt; 0, &quot;Not enough memory assigned to assemble a single matrix entry!&quot;);</div>
-<div class="line"><a id="l00800" name="l00800"></a><span class="lineno">  800</span>        XASSERTM(loc_block_size &gt;= num_loc_dofs, &quot;Not enough memory assigned to assemble a single matrix row!&quot;);</div>
-<div class="line"><a id="l00801" name="l00801"></a><span class="lineno">  801</span> </div>
-<div class="line"><a id="l00802" name="l00802"></a><span class="lineno">  802</span>        if(print_occupancy)</div>
-<div class="line"><a id="l00803" name="l00803"></a><span class="lineno">  803</span>        {</div>
-<div class="line"><a id="l00804" name="l00804"></a><span class="lineno">  804</span>          int numBlocksWarp = get_num_block_warp&lt;Space_, DT_, IT_&gt;(material_type, need_streamline, blocksize, shared_mem);</div>
-<div class="line"><a id="l00805" name="l00805"></a><span class="lineno">  805</span>          const int max_blocks_per_sm = int(Util::cuda_get_max_blocks_per_sm());</div>
-<div class="line"><a id="l00806" name="l00806"></a><span class="lineno">  806</span>          printf(&quot;Numblocks/Occupancy per SM for device number %i: %i, %f\n&quot;, Util::cuda_device_number, numBlocksWarp, double(numBlocksWarp*(blocksize/32))/double(max_blocks_per_sm));</div>
-<div class="line"><a id="l00807" name="l00807"></a><span class="lineno">  807</span>        }</div>
-<div class="line"><a id="l00808" name="l00808"></a><span class="lineno">  808</span> </div>
-<div class="line"><a id="l00809" name="l00809"></a><span class="lineno">  809</span>        if(shared_mem &gt; 48000)</div>
-<div class="line"><a id="l00810" name="l00810"></a><span class="lineno">  810</span>        {</div>
-<div class="line"><a id="l00811" name="l00811"></a><span class="lineno">  811</span>          if(!set_shared_mem_attribute&lt;Space_, DT_, IT_&gt;(material_type, need_streamline, shared_mem))</div>
-<div class="line"><a id="l00812" name="l00812"></a><span class="lineno">  812</span>          {</div>
-<div class="line"><a id="l00813" name="l00813"></a><span class="lineno">  813</span>            XABORTM(&quot;cudaFuncSetAttribute failed.&quot;);</div>
-<div class="line"><a id="l00814" name="l00814"></a><span class="lineno">  814</span>          }</div>
-<div class="line"><a id="l00815" name="l00815"></a><span class="lineno">  815</span>        }</div>
-<div class="line"><a id="l00816" name="l00816"></a><span class="lineno">  816</span>        // const Index blocksize = 64;</div>
-<div class="line"><a id="l00817" name="l00817"></a><span class="lineno">  817</span> </div>
-<div class="line"><a id="l00818" name="l00818"></a><span class="lineno">  818</span>        for(Index col = 0; col &lt; coloring_maps.size(); ++col)</div>
-<div class="line"><a id="l00819" name="l00819"></a><span class="lineno">  819</span>        {</div>
-<div class="line"><a id="l00820" name="l00820"></a><span class="lineno">  820</span>          dim3 grid;</div>
-<div class="line"><a id="l00821" name="l00821"></a><span class="lineno">  821</span>          dim3 block;</div>
-<div class="line"><a id="l00822" name="l00822"></a><span class="lineno">  822</span>          block.x = (unsigned int)blocksize;</div>
-<div class="line"><a id="l00823" name="l00823"></a><span class="lineno">  823</span>          grid.x = (unsigned int)gridsize;</div>
-<div class="line"><a id="l00824" name="l00824"></a><span class="lineno">  824</span> </div>
-<div class="line"><a id="l00825" name="l00825"></a><span class="lineno">  825</span>          if(need_streamline)</div>
-<div class="line"><a id="l00826" name="l00826"></a><span class="lineno">  826</span>          {</div>
-<div class="line"><a id="l00827" name="l00827"></a><span class="lineno">  827</span>            switch(material_type)</div>
-<div class="line"><a id="l00828" name="l00828"></a><span class="lineno">  828</span>            {</div>
-<div class="line"><a id="l00829" name="l00829"></a><span class="lineno">  829</span>              case FEAT::VoxelAssembly::MaterialType::carreau:</div>
-<div class="line"><a id="l00830" name="l00830"></a><span class="lineno">  830</span>              {</div>
-<div class="line"><a id="l00831" name="l00831"></a><span class="lineno">  831</span>                //kernel call, since this uses the standard stream, sync before next call is enforced:</div>
-<div class="line"><a id="l00832" name="l00832"></a><span class="lineno">  832</span>                VoxelAssembly::Kernel::template full_burgers_vm_assembler_matrix1_bcsr_warp_based&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;,</div>
-<div class="line"><a id="l00833" name="l00833"></a><span class="lineno">  833</span>                                Intern::ViscoDFunctor&lt;DT_, MaterialType::carreau&gt;, true, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt;&lt;&lt;&lt; grid, block, shared_mem &gt;&gt;&gt;(</div>
-<div class="line"><a id="l00834" name="l00834"></a><span class="lineno">  834</span>                    matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
-<div class="line"><a id="l00835" name="l00835"></a><span class="lineno">  835</span>                    (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l00836" name="l00836"></a><span class="lineno">  836</span>                    cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l00837" name="l00837"></a><span class="lineno">  837</span>                    dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l00838" name="l00838"></a><span class="lineno">  838</span>                    (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l00839" name="l00839"></a><span class="lineno">  839</span>                    (const int*) coloring_maps[col], coloring_map_sizes[col], nullptr,</div>
-<div class="line"><a id="l00840" name="l00840"></a><span class="lineno">  840</span>                    burgers_params, material_params, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T},</div>
-<div class="line"><a id="l00841" name="l00841"></a><span class="lineno">  841</span>                    Intern::ViscoDFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T},</div>
-<div class="line"><a id="l00842" name="l00842"></a><span class="lineno">  842</span>                    loc_block_size</div>
-<div class="line"><a id="l00843" name="l00843"></a><span class="lineno">  843</span>                );</div>
-<div class="line"><a id="l00844" name="l00844"></a><span class="lineno">  844</span>                break;</div>
-<div class="line"><a id="l00845" name="l00845"></a><span class="lineno">  845</span>              }</div>
-<div class="line"><a id="l00846" name="l00846"></a><span class="lineno">  846</span>              case FEAT::VoxelAssembly::MaterialType::carreauYasuda:</div>
-<div class="line"><a id="l00847" name="l00847"></a><span class="lineno">  847</span>              {</div>
-<div class="line"><a id="l00848" name="l00848"></a><span class="lineno">  848</span>                //kernel call, since this uses the standard stream, sync before next call is enforced:</div>
-<div class="line"><a id="l00849" name="l00849"></a><span class="lineno">  849</span>                VoxelAssembly::Kernel::template full_burgers_vm_assembler_matrix1_bcsr_warp_based&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;,</div>
-<div class="line"><a id="l00850" name="l00850"></a><span class="lineno">  850</span>                                Intern::ViscoDFunctor&lt;DT_, MaterialType::carreauYasuda&gt;, true, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt;&lt;&lt;&lt; grid, block, shared_mem &gt;&gt;&gt;(</div>
-<div class="line"><a id="l00851" name="l00851"></a><span class="lineno">  851</span>                    matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
-<div class="line"><a id="l00852" name="l00852"></a><span class="lineno">  852</span>                    (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l00853" name="l00853"></a><span class="lineno">  853</span>                    cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l00854" name="l00854"></a><span class="lineno">  854</span>                    dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l00855" name="l00855"></a><span class="lineno">  855</span>                    (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l00856" name="l00856"></a><span class="lineno">  856</span>                    (const int*) coloring_maps[col], coloring_map_sizes[col], nullptr,</div>
-<div class="line"><a id="l00857" name="l00857"></a><span class="lineno">  857</span>                    burgers_params, material_params,</div>
-<div class="line"><a id="l00858" name="l00858"></a><span class="lineno">  858</span>                    Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T,material_params.yasuda_a, material_params.mu_inf},</div>
-<div class="line"><a id="l00859" name="l00859"></a><span class="lineno">  859</span>                    Intern::ViscoDFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T, material_params.yasuda_a, material_params.mu_inf},</div>
-<div class="line"><a id="l00860" name="l00860"></a><span class="lineno">  860</span>                    loc_block_size</div>
-<div class="line"><a id="l00861" name="l00861"></a><span class="lineno">  861</span>                );</div>
-<div class="line"><a id="l00862" name="l00862"></a><span class="lineno">  862</span>                break;</div>
-<div class="line"><a id="l00863" name="l00863"></a><span class="lineno">  863</span>              }</div>
-<div class="line"><a id="l00864" name="l00864"></a><span class="lineno">  864</span>            }</div>
-<div class="line"><a id="l00865" name="l00865"></a><span class="lineno">  865</span>          }</div>
-<div class="line"><a id="l00866" name="l00866"></a><span class="lineno">  866</span>          else</div>
-<div class="line"><a id="l00867" name="l00867"></a><span class="lineno">  867</span>          {</div>
-<div class="line"><a id="l00868" name="l00868"></a><span class="lineno">  868</span>            switch(material_type)</div>
-<div class="line"><a id="l00869" name="l00869"></a><span class="lineno">  869</span>            {</div>
-<div class="line"><a id="l00870" name="l00870"></a><span class="lineno">  870</span>              case FEAT::VoxelAssembly::MaterialType::carreau:</div>
-<div class="line"><a id="l00871" name="l00871"></a><span class="lineno">  871</span>              {</div>
-<div class="line"><a id="l00872" name="l00872"></a><span class="lineno">  872</span>                //kernel call, since this uses the standard stream, sync before next call is enforced:</div>
-<div class="line"><a id="l00873" name="l00873"></a><span class="lineno">  873</span>                VoxelAssembly::Kernel::template full_burgers_vm_assembler_matrix1_bcsr_warp_based&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;,</div>
-<div class="line"><a id="l00874" name="l00874"></a><span class="lineno">  874</span>                                Intern::ViscoDFunctor&lt;DT_, MaterialType::carreau&gt;, false, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt;&lt;&lt;&lt; grid, block, shared_mem &gt;&gt;&gt;(</div>
-<div class="line"><a id="l00875" name="l00875"></a><span class="lineno">  875</span>                    matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
-<div class="line"><a id="l00876" name="l00876"></a><span class="lineno">  876</span>                    (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l00877" name="l00877"></a><span class="lineno">  877</span>                    cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l00878" name="l00878"></a><span class="lineno">  878</span>                    dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l00879" name="l00879"></a><span class="lineno">  879</span>                    (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l00880" name="l00880"></a><span class="lineno">  880</span>                    (const int*) coloring_maps[col], coloring_map_sizes[col], nullptr,</div>
-<div class="line"><a id="l00881" name="l00881"></a><span class="lineno">  881</span>                    burgers_params, material_params, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T},</div>
-<div class="line"><a id="l00882" name="l00882"></a><span class="lineno">  882</span>                    Intern::ViscoDFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T},</div>
-<div class="line"><a id="l00883" name="l00883"></a><span class="lineno">  883</span>                    loc_block_size</div>
-<div class="line"><a id="l00884" name="l00884"></a><span class="lineno">  884</span>                );</div>
-<div class="line"><a id="l00885" name="l00885"></a><span class="lineno">  885</span>                break;</div>
-<div class="line"><a id="l00886" name="l00886"></a><span class="lineno">  886</span>              }</div>
-<div class="line"><a id="l00887" name="l00887"></a><span class="lineno">  887</span>              case FEAT::VoxelAssembly::MaterialType::carreauYasuda:</div>
-<div class="line"><a id="l00888" name="l00888"></a><span class="lineno">  888</span>              {</div>
-<div class="line"><a id="l00889" name="l00889"></a><span class="lineno">  889</span>                //kernel call, since this uses the standard stream, sync before next call is enforced:</div>
-<div class="line"><a id="l00890" name="l00890"></a><span class="lineno">  890</span>                VoxelAssembly::Kernel::template full_burgers_vm_assembler_matrix1_bcsr_warp_based&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;,</div>
-<div class="line"><a id="l00891" name="l00891"></a><span class="lineno">  891</span>                                Intern::ViscoDFunctor&lt;DT_, MaterialType::carreauYasuda&gt;, false, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt;&lt;&lt;&lt; grid, block, shared_mem &gt;&gt;&gt;(</div>
-<div class="line"><a id="l00892" name="l00892"></a><span class="lineno">  892</span>                    matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
-<div class="line"><a id="l00893" name="l00893"></a><span class="lineno">  893</span>                    (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l00894" name="l00894"></a><span class="lineno">  894</span>                    cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l00895" name="l00895"></a><span class="lineno">  895</span>                    dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l00896" name="l00896"></a><span class="lineno">  896</span>                    (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l00897" name="l00897"></a><span class="lineno">  897</span>                    (const int*) coloring_maps[col], coloring_map_sizes[col], nullptr,</div>
-<div class="line"><a id="l00898" name="l00898"></a><span class="lineno">  898</span>                    burgers_params, material_params,</div>
-<div class="line"><a id="l00899" name="l00899"></a><span class="lineno">  899</span>                    Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T,material_params.yasuda_a, material_params.mu_inf},</div>
-<div class="line"><a id="l00900" name="l00900"></a><span class="lineno">  900</span>                    Intern::ViscoDFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T, material_params.yasuda_a, material_params.mu_inf},</div>
-<div class="line"><a id="l00901" name="l00901"></a><span class="lineno">  901</span>                    loc_block_size</div>
-<div class="line"><a id="l00902" name="l00902"></a><span class="lineno">  902</span>                );</div>
-<div class="line"><a id="l00903" name="l00903"></a><span class="lineno">  903</span>                break;</div>
-<div class="line"><a id="l00904" name="l00904"></a><span class="lineno">  904</span>              }</div>
-<div class="line"><a id="l00905" name="l00905"></a><span class="lineno">  905</span>            }</div>
-<div class="line"><a id="l00906" name="l00906"></a><span class="lineno">  906</span>          }</div>
-<div class="line"><a id="l00907" name="l00907"></a><span class="lineno">  907</span>        }</div>
-<div class="line"><a id="l00908" name="l00908"></a><span class="lineno">  908</span>        //check for cuda error in our kernel</div>
-<div class="line"><a id="l00909" name="l00909"></a><span class="lineno">  909</span>        Util::cuda_check_last_error();</div>
-<div class="line"><a id="l00910" name="l00910"></a><span class="lineno">  910</span>      }</div>
-<div class="line"><a id="l00911" name="l00911"></a><span class="lineno">  911</span> </div>
-<div class="line"><a id="l00912" name="l00912"></a><span class="lineno">  912</span> </div>
-<div class="line"><a id="l00913" name="l00913"></a><span class="lineno">  913</span>      template&lt;typename Space_, typename DT_, typename IT_&gt;</div>
-<div class="line"><a id="l00914" name="l00914"></a><span class="lineno">  914</span>      void assemble_burgers_velo_material_defect_old([[maybe_unused]] const Space_&amp; space,</div>
-<div class="line"><a id="l00915" name="l00915"></a><span class="lineno">  915</span>              DT_* vector_data,</div>
-<div class="line"><a id="l00916" name="l00916"></a><span class="lineno">  916</span>              const DT_* conv_data,</div>
-<div class="line"><a id="l00917" name="l00917"></a><span class="lineno">  917</span>              const DT_* primal_data,</div>
-<div class="line"><a id="l00918" name="l00918"></a><span class="lineno">  918</span>              const AssemblyCubatureData&lt;DT_&gt;&amp; cubature,</div>
-<div class="line"><a id="l00919" name="l00919"></a><span class="lineno">  919</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
-<div class="line"><a id="l00920" name="l00920"></a><span class="lineno">  920</span>              const std::vector&lt;int*&gt;&amp; coloring_maps,</div>
-<div class="line"><a id="l00921" name="l00921"></a><span class="lineno">  921</span>              const std::vector&lt;Index&gt;&amp; coloring_map_sizes,</div>
-<div class="line"><a id="l00922" name="l00922"></a><span class="lineno">  922</span>              DT_ alpha, const AssemblyBurgersData&lt;DT_&gt;&amp; burgers_params,</div>
-<div class="line"><a id="l00923" name="l00923"></a><span class="lineno">  923</span>              const AssemblyMaterialData&lt;DT_&gt;&amp; material_params,</div>
-<div class="line"><a id="l00924" name="l00924"></a><span class="lineno">  924</span>              MaterialType material_type)</div>
-<div class="line"><a id="l00925" name="l00925"></a><span class="lineno">  925</span>      {</div>
-<div class="line"><a id="l00926" name="l00926"></a><span class="lineno">  926</span>        const Index blocksize = Util::cuda_blocksize_scalar_assembly;</div>
-<div class="line"><a id="l00927" name="l00927"></a><span class="lineno">  927</span>        // const Index blocksize = 64;</div>
-<div class="line"><a id="l00928" name="l00928"></a><span class="lineno">  928</span>        #ifdef DEBUG</div>
-<div class="line"><a id="l00929" name="l00929"></a><span class="lineno">  929</span>        std::size_t pValue;</div>
-<div class="line"><a id="l00930" name="l00930"></a><span class="lineno">  930</span>        cudaDeviceGetLimit(&amp;pValue, cudaLimit::cudaLimitStackSize);</div>
-<div class="line"><a id="l00931" name="l00931"></a><span class="lineno">  931</span>        std::cout &lt;&lt; &quot;Current maximum thread cache: &quot; &lt;&lt; pValue &lt;&lt; std::endl;</div>
-<div class="line"><a id="l00932" name="l00932"></a><span class="lineno">  932</span>        #endif</div>
-<div class="line"><a id="l00933" name="l00933"></a><span class="lineno">  933</span>        for(Index col = 0; col &lt; coloring_maps.size(); ++col)</div>
-<div class="line"><a id="l00934" name="l00934"></a><span class="lineno">  934</span>        {</div>
-<div class="line"><a id="l00935" name="l00935"></a><span class="lineno">  935</span>          dim3 grid;</div>
-<div class="line"><a id="l00936" name="l00936"></a><span class="lineno">  936</span>          dim3 block;</div>
-<div class="line"><a id="l00937" name="l00937"></a><span class="lineno">  937</span>          block.x = (unsigned int)blocksize;</div>
-<div class="line"><a id="l00938" name="l00938"></a><span class="lineno">  938</span>          grid.x = (unsigned int)ceil(double(coloring_map_sizes[col])/double(block.x));</div>
-<div class="line"><a id="l00939" name="l00939"></a><span class="lineno">  939</span>          switch(material_type)</div>
-<div class="line"><a id="l00940" name="l00940"></a><span class="lineno">  940</span>          {</div>
-<div class="line"><a id="l00941" name="l00941"></a><span class="lineno">  941</span>            case FEAT::VoxelAssembly::MaterialType::carreau:</div>
-<div class="line"><a id="l00942" name="l00942"></a><span class="lineno">  942</span>            {</div>
-<div class="line"><a id="l00943" name="l00943"></a><span class="lineno">  943</span>              VoxelAssembly::Kernel::template full_burgers_vm_assembler_vector_bd&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;&gt;&lt;&lt;&lt; grid, block &gt;&gt;&gt;(vector_data, conv_data, primal_data,</div>
-<div class="line"><a id="l00944" name="l00944"></a><span class="lineno">  944</span>                  space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l00945" name="l00945"></a><span class="lineno">  945</span>                  cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l00946" name="l00946"></a><span class="lineno">  946</span>                  dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l00947" name="l00947"></a><span class="lineno">  947</span>                  (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l00948" name="l00948"></a><span class="lineno">  948</span>                  (const int*) coloring_maps[col], coloring_map_sizes[col], burgers_params,</div>
-<div class="line"><a id="l00949" name="l00949"></a><span class="lineno">  949</span>                  Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T}</div>
-<div class="line"><a id="l00950" name="l00950"></a><span class="lineno">  950</span>              );</div>
-<div class="line"><a id="l00951" name="l00951"></a><span class="lineno">  951</span>              break;</div>
-<div class="line"><a id="l00952" name="l00952"></a><span class="lineno">  952</span>            }</div>
-<div class="line"><a id="l00953" name="l00953"></a><span class="lineno">  953</span>            case FEAT::VoxelAssembly::MaterialType::carreauYasuda:</div>
-<div class="line"><a id="l00954" name="l00954"></a><span class="lineno">  954</span>            {</div>
-<div class="line"><a id="l00955" name="l00955"></a><span class="lineno">  955</span>              VoxelAssembly::Kernel::template full_burgers_vm_assembler_vector_bd&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;&gt;&lt;&lt;&lt; grid, block &gt;&gt;&gt;(vector_data, conv_data, primal_data,</div>
-<div class="line"><a id="l00956" name="l00956"></a><span class="lineno">  956</span>                  space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l00957" name="l00957"></a><span class="lineno">  957</span>                  cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l00958" name="l00958"></a><span class="lineno">  958</span>                  dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l00959" name="l00959"></a><span class="lineno">  959</span>                  (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l00960" name="l00960"></a><span class="lineno">  960</span>                  (const int*) coloring_maps[col], coloring_map_sizes[col], burgers_params,</div>
-<div class="line"><a id="l00961" name="l00961"></a><span class="lineno">  961</span>                  Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T,material_params.yasuda_a, material_params.mu_inf}</div>
-<div class="line"><a id="l00962" name="l00962"></a><span class="lineno">  962</span>              );</div>
-<div class="line"><a id="l00963" name="l00963"></a><span class="lineno">  963</span>              break;</div>
-<div class="line"><a id="l00964" name="l00964"></a><span class="lineno">  964</span>            }</div>
-<div class="line"><a id="l00965" name="l00965"></a><span class="lineno">  965</span>          }</div>
-<div class="line"><a id="l00966" name="l00966"></a><span class="lineno">  966</span>        }</div>
-<div class="line"><a id="l00967" name="l00967"></a><span class="lineno">  967</span> </div>
-<div class="line"><a id="l00968" name="l00968"></a><span class="lineno">  968</span>        //check for cuda error (also synchronizes)</div>
-<div class="line"><a id="l00969" name="l00969"></a><span class="lineno">  969</span>        Util::cuda_check_last_error();</div>
-<div class="line"><a id="l00970" name="l00970"></a><span class="lineno">  970</span>      }</div>
-<div class="line"><a id="l00971" name="l00971"></a><span class="lineno">  971</span> </div>
-<div class="line"><a id="l00972" name="l00972"></a><span class="lineno">  972</span>      template&lt;typename Space_, typename DT_, typename IT_&gt;</div>
-<div class="line"><a id="l00973" name="l00973"></a><span class="lineno">  973</span>      void assemble_burgers_velo_material_defect([[maybe_unused]] const Space_&amp; space,</div>
-<div class="line"><a id="l00974" name="l00974"></a><span class="lineno">  974</span>              DT_* vector_data,</div>
-<div class="line"><a id="l00975" name="l00975"></a><span class="lineno">  975</span>              const DT_* conv_data,</div>
-<div class="line"><a id="l00976" name="l00976"></a><span class="lineno">  976</span>              const DT_* primal_data,</div>
-<div class="line"><a id="l00977" name="l00977"></a><span class="lineno">  977</span>              const AssemblyCubatureData&lt;DT_&gt;&amp; cubature,</div>
-<div class="line"><a id="l00978" name="l00978"></a><span class="lineno">  978</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
-<div class="line"><a id="l00979" name="l00979"></a><span class="lineno">  979</span>              const std::vector&lt;int*&gt;&amp; coloring_maps,</div>
-<div class="line"><a id="l00980" name="l00980"></a><span class="lineno">  980</span>              const std::vector&lt;Index&gt;&amp; coloring_map_sizes,</div>
-<div class="line"><a id="l00981" name="l00981"></a><span class="lineno">  981</span>              DT_ alpha, const AssemblyBurgersData&lt;DT_&gt;&amp; burgers_params,</div>
-<div class="line"><a id="l00982" name="l00982"></a><span class="lineno">  982</span>              const AssemblyMaterialData&lt;DT_&gt;&amp; material_params,</div>
-<div class="line"><a id="l00983" name="l00983"></a><span class="lineno">  983</span>              MaterialType material_type,</div>
-<div class="line"><a id="l00984" name="l00984"></a><span class="lineno">  984</span>              int shared_mem, int blocksize, int gridsize, bool print_occupancy)</div>
-<div class="line"><a id="l00985" name="l00985"></a><span class="lineno">  985</span>      {</div>
-<div class="line"><a id="l00986" name="l00986"></a><span class="lineno">  986</span>        // get the size of all necessary shared memory</div>
-<div class="line"><a id="l00987" name="l00987"></a><span class="lineno">  987</span>        constexpr int dim = Space_::ShapeType::dimension;</div>
-<div class="line"><a id="l00988" name="l00988"></a><span class="lineno">  988</span>        constexpr int num_loc_dofs = Space_::DofMappingType::dof_count;</div>
-<div class="line"><a id="l00989" name="l00989"></a><span class="lineno">  989</span>        const int shared_size_nec = get_min_shared_size&lt;Space_, DT_, IT_&gt;(false);</div>
-<div class="line"><a id="l00990" name="l00990"></a><span class="lineno">  990</span>        const int loc_vec_shared_mem = shared_mem - shared_size_nec;</div>
-<div class="line"><a id="l00991" name="l00991"></a><span class="lineno">  991</span>        XASSERTM(loc_vec_shared_mem &gt; 0, String(&quot;Not enough assigned shared memory\n Minimum required: &quot;) + stringify(shared_size_nec)</div>
-<div class="line"><a id="l00992" name="l00992"></a><span class="lineno">  992</span>            + String(&quot;\nProvided: &quot;) + stringify(shared_mem));</div>
-<div class="line"><a id="l00993" name="l00993"></a><span class="lineno">  993</span> </div>
-<div class="line"><a id="l00994" name="l00994"></a><span class="lineno">  994</span>        const int loc_block_size = CudaMath::cuda_min(loc_vec_shared_mem / int(sizeof(DT_)*dim), num_loc_dofs);</div>
-<div class="line"><a id="l00995" name="l00995"></a><span class="lineno">  995</span>        XASSERTM(loc_block_size &gt; 0, &quot;Not enough memory assigned to assemble a single defect entry!&quot;);</div>
-<div class="line"><a id="l00996" name="l00996"></a><span class="lineno">  996</span> </div>
-<div class="line"><a id="l00997" name="l00997"></a><span class="lineno">  997</span>        if(print_occupancy)</div>
-<div class="line"><a id="l00998" name="l00998"></a><span class="lineno">  998</span>        {</div>
-<div class="line"><a id="l00999" name="l00999"></a><span class="lineno">  999</span>          int numBlocksWarp = get_num_block_warp_defect&lt;Space_, DT_, IT_&gt;(material_type, blocksize, shared_mem);</div>
-<div class="line"><a id="l01000" name="l01000"></a><span class="lineno"> 1000</span>          const int max_blocks_per_sm = int(Util::cuda_get_max_blocks_per_sm());</div>
-<div class="line"><a id="l01001" name="l01001"></a><span class="lineno"> 1001</span>          printf(&quot;Numblocks/Occupancy per SM for device number %i: %i, %f\n&quot;, Util::cuda_device_number, numBlocksWarp, double(numBlocksWarp*(blocksize/32))/double(max_blocks_per_sm));</div>
-<div class="line"><a id="l01002" name="l01002"></a><span class="lineno"> 1002</span>        }</div>
-<div class="line"><a id="l01003" name="l01003"></a><span class="lineno"> 1003</span> </div>
-<div class="line"><a id="l01004" name="l01004"></a><span class="lineno"> 1004</span>        if(shared_mem &gt; 48000)</div>
-<div class="line"><a id="l01005" name="l01005"></a><span class="lineno"> 1005</span>        {</div>
-<div class="line"><a id="l01006" name="l01006"></a><span class="lineno"> 1006</span>          if(!set_shared_mem_attribute_defect&lt;Space_, DT_, IT_&gt;(material_type, shared_mem))</div>
-<div class="line"><a id="l01007" name="l01007"></a><span class="lineno"> 1007</span>          {</div>
-<div class="line"><a id="l01008" name="l01008"></a><span class="lineno"> 1008</span>            XABORTM(&quot;cudaFuncSetAttribute failed.&quot;);</div>
-<div class="line"><a id="l01009" name="l01009"></a><span class="lineno"> 1009</span>          }</div>
-<div class="line"><a id="l01010" name="l01010"></a><span class="lineno"> 1010</span>        }</div>
-<div class="line"><a id="l01011" name="l01011"></a><span class="lineno"> 1011</span> </div>
-<div class="line"><a id="l01012" name="l01012"></a><span class="lineno"> 1012</span>        for(Index col = 0; col &lt; coloring_maps.size(); ++col)</div>
-<div class="line"><a id="l01013" name="l01013"></a><span class="lineno"> 1013</span>        {</div>
-<div class="line"><a id="l01014" name="l01014"></a><span class="lineno"> 1014</span>          dim3 grid;</div>
-<div class="line"><a id="l01015" name="l01015"></a><span class="lineno"> 1015</span>          dim3 block;</div>
-<div class="line"><a id="l01016" name="l01016"></a><span class="lineno"> 1016</span>          block.x = (unsigned int)blocksize;</div>
-<div class="line"><a id="l01017" name="l01017"></a><span class="lineno"> 1017</span>          grid.x = (unsigned int)gridsize;</div>
-<div class="line"><a id="l01018" name="l01018"></a><span class="lineno"> 1018</span>          switch(material_type)</div>
-<div class="line"><a id="l01019" name="l01019"></a><span class="lineno"> 1019</span>          {</div>
-<div class="line"><a id="l01020" name="l01020"></a><span class="lineno"> 1020</span>            case FEAT::VoxelAssembly::MaterialType::carreau:</div>
-<div class="line"><a id="l01021" name="l01021"></a><span class="lineno"> 1021</span>            {</div>
-<div class="line"><a id="l01022" name="l01022"></a><span class="lineno"> 1022</span>              VoxelAssembly::Kernel::template full_burgers_vm_assembler_vector_bd_warp_based&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;&gt;&lt;&lt;&lt; grid, block, shared_mem &gt;&gt;&gt;(vector_data, conv_data, primal_data,</div>
-<div class="line"><a id="l01023" name="l01023"></a><span class="lineno"> 1023</span>                  space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l01024" name="l01024"></a><span class="lineno"> 1024</span>                  cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l01025" name="l01025"></a><span class="lineno"> 1025</span>                  dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l01026" name="l01026"></a><span class="lineno"> 1026</span>                  (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l01027" name="l01027"></a><span class="lineno"> 1027</span>                  (const int*) coloring_maps[col], coloring_map_sizes[col], burgers_params,</div>
-<div class="line"><a id="l01028" name="l01028"></a><span class="lineno"> 1028</span>                  Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T},</div>
-<div class="line"><a id="l01029" name="l01029"></a><span class="lineno"> 1029</span>                  loc_block_size</div>
-<div class="line"><a id="l01030" name="l01030"></a><span class="lineno"> 1030</span>              );</div>
-<div class="line"><a id="l01031" name="l01031"></a><span class="lineno"> 1031</span>              break;</div>
-<div class="line"><a id="l01032" name="l01032"></a><span class="lineno"> 1032</span>            }</div>
-<div class="line"><a id="l01033" name="l01033"></a><span class="lineno"> 1033</span>            case FEAT::VoxelAssembly::MaterialType::carreauYasuda:</div>
-<div class="line"><a id="l01034" name="l01034"></a><span class="lineno"> 1034</span>            {</div>
-<div class="line"><a id="l01035" name="l01035"></a><span class="lineno"> 1035</span>              VoxelAssembly::Kernel::template full_burgers_vm_assembler_vector_bd_warp_based&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;&gt;&lt;&lt;&lt; grid, block, shared_mem &gt;&gt;&gt;(vector_data, conv_data, primal_data,</div>
-<div class="line"><a id="l01036" name="l01036"></a><span class="lineno"> 1036</span>                  space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l01037" name="l01037"></a><span class="lineno"> 1037</span>                  cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l01038" name="l01038"></a><span class="lineno"> 1038</span>                  dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l01039" name="l01039"></a><span class="lineno"> 1039</span>                  (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l01040" name="l01040"></a><span class="lineno"> 1040</span>                  (const int*) coloring_maps[col], coloring_map_sizes[col], burgers_params,</div>
-<div class="line"><a id="l01041" name="l01041"></a><span class="lineno"> 1041</span>                  Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T,material_params.yasuda_a, material_params.mu_inf},</div>
-<div class="line"><a id="l01042" name="l01042"></a><span class="lineno"> 1042</span>                  loc_block_size</div>
-<div class="line"><a id="l01043" name="l01043"></a><span class="lineno"> 1043</span>              );</div>
-<div class="line"><a id="l01044" name="l01044"></a><span class="lineno"> 1044</span>              break;</div>
-<div class="line"><a id="l01045" name="l01045"></a><span class="lineno"> 1045</span>            }</div>
-<div class="line"><a id="l01046" name="l01046"></a><span class="lineno"> 1046</span>          }</div>
-<div class="line"><a id="l01047" name="l01047"></a><span class="lineno"> 1047</span>        }</div>
-<div class="line"><a id="l01048" name="l01048"></a><span class="lineno"> 1048</span> </div>
-<div class="line"><a id="l01049" name="l01049"></a><span class="lineno"> 1049</span>        //check for cuda error (also synchronizes)</div>
-<div class="line"><a id="l01050" name="l01050"></a><span class="lineno"> 1050</span>        Util::cuda_check_last_error();</div>
-<div class="line"><a id="l01051" name="l01051"></a><span class="lineno"> 1051</span>      }</div>
-<div class="line"><a id="l01052" name="l01052"></a><span class="lineno"> 1052</span> </div>
-<div class="line"><a id="l01053" name="l01053"></a><span class="lineno"> 1053</span>      template&lt;typename Space_, typename DT_, typename IT_&gt;</div>
-<div class="line"><a id="l01054" name="l01054"></a><span class="lineno"> 1054</span>      void assemble_burgers_velo_material_csr_host([[maybe_unused]] const Space_&amp; space,</div>
-<div class="line"><a id="l01055" name="l01055"></a><span class="lineno"> 1055</span>              const CSRMatrixData&lt;DT_, IT_&gt;&amp; matrix_data,</div>
-<div class="line"><a id="l01056" name="l01056"></a><span class="lineno"> 1056</span>              const DT_* conv_data,</div>
-<div class="line"><a id="l01057" name="l01057"></a><span class="lineno"> 1057</span>              const AssemblyCubatureData&lt;DT_&gt;&amp; cubature,</div>
-<div class="line"><a id="l01058" name="l01058"></a><span class="lineno"> 1058</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
-<div class="line"><a id="l01059" name="l01059"></a><span class="lineno"> 1059</span>              const std::vector&lt;int*&gt;&amp; coloring_maps,</div>
-<div class="line"><a id="l01060" name="l01060"></a><span class="lineno"> 1060</span>              const std::vector&lt;Index&gt;&amp; coloring_map_sizes,</div>
-<div class="line"><a id="l01061" name="l01061"></a><span class="lineno"> 1061</span>              DT_ alpha, const AssemblyBurgersData&lt;DT_&gt;&amp; burgers_params,</div>
-<div class="line"><a id="l01062" name="l01062"></a><span class="lineno"> 1062</span>              const AssemblyMaterialData&lt;DT_&gt;&amp; material_params, MaterialType material_type)</div>
-<div class="line"><a id="l01063" name="l01063"></a><span class="lineno"> 1063</span>      {</div>
-<div class="line"><a id="l01064" name="l01064"></a><span class="lineno"> 1064</span>        switch(material_type)</div>
-<div class="line"><a id="l01065" name="l01065"></a><span class="lineno"> 1065</span>        {</div>
-<div class="line"><a id="l01066" name="l01066"></a><span class="lineno"> 1066</span>          case MaterialType::carreau:</div>
-<div class="line"><a id="l01067" name="l01067"></a><span class="lineno"> 1067</span>          {</div>
-<div class="line"><a id="l01068" name="l01068"></a><span class="lineno"> 1068</span>            for(Index col = 0; col &lt; Index(coloring_maps.size()); ++col)</div>
-<div class="line"><a id="l01069" name="l01069"></a><span class="lineno"> 1069</span>            {</div>
-<div class="line"><a id="l01070" name="l01070"></a><span class="lineno"> 1070</span>              VoxelAssembly::Kernel::template full_burgers_vm_assembler_matrix1_bcsr_host&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;,</div>
-<div class="line"><a id="l01071" name="l01071"></a><span class="lineno"> 1071</span>                                                                    Intern::ViscoDFunctor&lt;DT_, MaterialType::carreau&gt;, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper&gt;(</div>
-<div class="line"><a id="l01072" name="l01072"></a><span class="lineno"> 1072</span>                  matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
-<div class="line"><a id="l01073" name="l01073"></a><span class="lineno"> 1073</span>                  (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l01074" name="l01074"></a><span class="lineno"> 1074</span>                  cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l01075" name="l01075"></a><span class="lineno"> 1075</span>                  dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l01076" name="l01076"></a><span class="lineno"> 1076</span>                  (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l01077" name="l01077"></a><span class="lineno"> 1077</span>                  (const int*) coloring_maps[col], coloring_map_sizes[col], dof_mapping.cell_to_dof_sorter,</div>
-<div class="line"><a id="l01078" name="l01078"></a><span class="lineno"> 1078</span>                  burgers_params, material_params, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T},</div>
-<div class="line"><a id="l01079" name="l01079"></a><span class="lineno"> 1079</span>                  Intern::ViscoDFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T}</div>
-<div class="line"><a id="l01080" name="l01080"></a><span class="lineno"> 1080</span>              );</div>
-<div class="line"><a id="l01081" name="l01081"></a><span class="lineno"> 1081</span>            }</div>
-<div class="line"><a id="l01082" name="l01082"></a><span class="lineno"> 1082</span>            break;</div>
-<div class="line"><a id="l01083" name="l01083"></a><span class="lineno"> 1083</span>          }</div>
-<div class="line"><a id="l01084" name="l01084"></a><span class="lineno"> 1084</span>          case MaterialType::carreauYasuda:</div>
-<div class="line"><a id="l01085" name="l01085"></a><span class="lineno"> 1085</span>          {</div>
-<div class="line"><a id="l01086" name="l01086"></a><span class="lineno"> 1086</span>            for(Index col = 0; col &lt; Index(coloring_maps.size()); ++col)</div>
-<div class="line"><a id="l01087" name="l01087"></a><span class="lineno"> 1087</span>            {</div>
-<div class="line"><a id="l01088" name="l01088"></a><span class="lineno"> 1088</span>              VoxelAssembly::Kernel::template full_burgers_vm_assembler_matrix1_bcsr_host&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;,</div>
-<div class="line"><a id="l01089" name="l01089"></a><span class="lineno"> 1089</span>                                                                    Intern::ViscoDFunctor&lt;DT_, MaterialType::carreauYasuda&gt;, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper&gt;(</div>
-<div class="line"><a id="l01090" name="l01090"></a><span class="lineno"> 1090</span>                  matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
-<div class="line"><a id="l01091" name="l01091"></a><span class="lineno"> 1091</span>                  (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l01092" name="l01092"></a><span class="lineno"> 1092</span>                  cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l01093" name="l01093"></a><span class="lineno"> 1093</span>                  dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l01094" name="l01094"></a><span class="lineno"> 1094</span>                  (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l01095" name="l01095"></a><span class="lineno"> 1095</span>                  (const int*) coloring_maps[col], coloring_map_sizes[col], dof_mapping.cell_to_dof_sorter,</div>
-<div class="line"><a id="l01096" name="l01096"></a><span class="lineno"> 1096</span>                  burgers_params, material_params,</div>
-<div class="line"><a id="l01097" name="l01097"></a><span class="lineno"> 1097</span>                  Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T,material_params.yasuda_a, material_params.mu_inf},</div>
-<div class="line"><a id="l01098" name="l01098"></a><span class="lineno"> 1098</span>                  Intern::ViscoDFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T, material_params.yasuda_a, material_params.mu_inf}</div>
-<div class="line"><a id="l01099" name="l01099"></a><span class="lineno"> 1099</span>              );</div>
-<div class="line"><a id="l01100" name="l01100"></a><span class="lineno"> 1100</span>            }</div>
-<div class="line"><a id="l01101" name="l01101"></a><span class="lineno"> 1101</span>            break;</div>
-<div class="line"><a id="l01102" name="l01102"></a><span class="lineno"> 1102</span>          }</div>
-<div class="line"><a id="l01103" name="l01103"></a><span class="lineno"> 1103</span>        }</div>
-<div class="line"><a id="l01104" name="l01104"></a><span class="lineno"> 1104</span>      }</div>
-<div class="line"><a id="l01105" name="l01105"></a><span class="lineno"> 1105</span> </div>
-<div class="line"><a id="l01106" name="l01106"></a><span class="lineno"> 1106</span>      template&lt;typename Space_, typename DT_, typename IT_&gt;</div>
-<div class="line"><a id="l01107" name="l01107"></a><span class="lineno"> 1107</span>      void assemble_burgers_velo_material_defect_host([[maybe_unused]] const Space_&amp; space,</div>
-<div class="line"><a id="l01108" name="l01108"></a><span class="lineno"> 1108</span>              DT_* vector_data,</div>
-<div class="line"><a id="l01109" name="l01109"></a><span class="lineno"> 1109</span>              const DT_* conv_data,</div>
-<div class="line"><a id="l01110" name="l01110"></a><span class="lineno"> 1110</span>              const DT_* primal_data,</div>
-<div class="line"><a id="l01111" name="l01111"></a><span class="lineno"> 1111</span>              const AssemblyCubatureData&lt;DT_&gt;&amp; cubature,</div>
-<div class="line"><a id="l01112" name="l01112"></a><span class="lineno"> 1112</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
-<div class="line"><a id="l01113" name="l01113"></a><span class="lineno"> 1113</span>              const std::vector&lt;int*&gt;&amp; coloring_maps,</div>
-<div class="line"><a id="l01114" name="l01114"></a><span class="lineno"> 1114</span>              const std::vector&lt;Index&gt;&amp; coloring_map_sizes,</div>
-<div class="line"><a id="l01115" name="l01115"></a><span class="lineno"> 1115</span>              DT_ alpha, const AssemblyBurgersData&lt;DT_&gt;&amp; burgers_params,</div>
-<div class="line"><a id="l01116" name="l01116"></a><span class="lineno"> 1116</span>              const AssemblyMaterialData&lt;DT_&gt;&amp; material_params, MaterialType material_type)</div>
-<div class="line"><a id="l01117" name="l01117"></a><span class="lineno"> 1117</span>      {</div>
-<div class="line"><a id="l01118" name="l01118"></a><span class="lineno"> 1118</span>        #ifdef DEBUG</div>
-<div class="line"><a id="l01119" name="l01119"></a><span class="lineno"> 1119</span>        std::size_t pValue;</div>
-<div class="line"><a id="l01120" name="l01120"></a><span class="lineno"> 1120</span>        cudaDeviceGetLimit(&amp;pValue, cudaLimit::cudaLimitStackSize);</div>
-<div class="line"><a id="l01121" name="l01121"></a><span class="lineno"> 1121</span>        std::cout &lt;&lt; &quot;Current maximum thread cache: &quot; &lt;&lt; pValue &lt;&lt; std::endl;</div>
-<div class="line"><a id="l01122" name="l01122"></a><span class="lineno"> 1122</span>        #endif</div>
-<div class="line"><a id="l01123" name="l01123"></a><span class="lineno"> 1123</span>        switch(material_type)</div>
-<div class="line"><a id="l01124" name="l01124"></a><span class="lineno"> 1124</span>        {</div>
-<div class="line"><a id="l01125" name="l01125"></a><span class="lineno"> 1125</span>          case MaterialType::carreau:</div>
-<div class="line"><a id="l01126" name="l01126"></a><span class="lineno"> 1126</span>          {</div>
-<div class="line"><a id="l01127" name="l01127"></a><span class="lineno"> 1127</span>            for(Index col = 0; col &lt; Index(coloring_maps.size()); ++col)</div>
-<div class="line"><a id="l01128" name="l01128"></a><span class="lineno"> 1128</span>            {</div>
-<div class="line"><a id="l01129" name="l01129"></a><span class="lineno"> 1129</span>              VoxelAssembly::Kernel::template full_burgers_vm_assembler_vector_bd_host&lt;Space_, DT_, IT_&gt;(vector_data, conv_data, primal_data,</div>
-<div class="line"><a id="l01130" name="l01130"></a><span class="lineno"> 1130</span>                  space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l01131" name="l01131"></a><span class="lineno"> 1131</span>                  cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l01132" name="l01132"></a><span class="lineno"> 1132</span>                  dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l01133" name="l01133"></a><span class="lineno"> 1133</span>                  (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l01134" name="l01134"></a><span class="lineno"> 1134</span>                  (const int*) coloring_maps[col], coloring_map_sizes[col], burgers_params,</div>
-<div class="line"><a id="l01135" name="l01135"></a><span class="lineno"> 1135</span>                  Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T}</div>
-<div class="line"><a id="l01136" name="l01136"></a><span class="lineno"> 1136</span>              );</div>
-<div class="line"><a id="l01137" name="l01137"></a><span class="lineno"> 1137</span>            }</div>
-<div class="line"><a id="l01138" name="l01138"></a><span class="lineno"> 1138</span>            break;</div>
-<div class="line"><a id="l01139" name="l01139"></a><span class="lineno"> 1139</span>          }</div>
-<div class="line"><a id="l01140" name="l01140"></a><span class="lineno"> 1140</span>          case MaterialType::carreauYasuda:</div>
-<div class="line"><a id="l01141" name="l01141"></a><span class="lineno"> 1141</span>          {</div>
-<div class="line"><a id="l01142" name="l01142"></a><span class="lineno"> 1142</span>            for(Index col = 0; col &lt; Index(coloring_maps.size()); ++col)</div>
-<div class="line"><a id="l01143" name="l01143"></a><span class="lineno"> 1143</span>            {</div>
-<div class="line"><a id="l01144" name="l01144"></a><span class="lineno"> 1144</span>              VoxelAssembly::Kernel::template full_burgers_vm_assembler_vector_bd_host&lt;Space_, DT_, IT_&gt;(vector_data, conv_data, primal_data,</div>
-<div class="line"><a id="l01145" name="l01145"></a><span class="lineno"> 1145</span>                  space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l01146" name="l01146"></a><span class="lineno"> 1146</span>                  cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l01147" name="l01147"></a><span class="lineno"> 1147</span>                  dof_mapping.cell_to_dof, dof_mapping.cell_num,</div>
-<div class="line"><a id="l01148" name="l01148"></a><span class="lineno"> 1148</span>                  (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) dof_mapping.nodes, dof_mapping.node_size,</div>
-<div class="line"><a id="l01149" name="l01149"></a><span class="lineno"> 1149</span>                  (const int*) coloring_maps[col], coloring_map_sizes[col], burgers_params,</div>
-<div class="line"><a id="l01150" name="l01150"></a><span class="lineno"> 1150</span>                  Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T,material_params.yasuda_a, material_params.mu_inf}</div>
-<div class="line"><a id="l01151" name="l01151"></a><span class="lineno"> 1151</span>              );</div>
-<div class="line"><a id="l01152" name="l01152"></a><span class="lineno"> 1152</span>            }</div>
-<div class="line"><a id="l01153" name="l01153"></a><span class="lineno"> 1153</span>            break;</div>
-<div class="line"><a id="l01154" name="l01154"></a><span class="lineno"> 1154</span>          }</div>
-<div class="line"><a id="l01155" name="l01155"></a><span class="lineno"> 1155</span>        }</div>
-<div class="line"><a id="l01156" name="l01156"></a><span class="lineno"> 1156</span>      }</div>
-<div class="line"><a id="l01157" name="l01157"></a><span class="lineno"> 1157</span>    }</div>
-<div class="line"><a id="l01158" name="l01158"></a><span class="lineno"> 1158</span>  }</div>
-<div class="line"><a id="l01159" name="l01159"></a><span class="lineno"> 1159</span>}</div>
-<div class="line"><a id="l01160" name="l01160"></a><span class="lineno"> 1160</span> </div>
-<div class="line"><a id="l01161" name="l01161"></a><span class="lineno"> 1161</span>using namespace FEAT;</div>
-<div class="line"><a id="l01162" name="l01162"></a><span class="lineno"> 1162</span>using namespace FEAT::VoxelAssembly;</div>
-<div class="line"><a id="l01163" name="l01163"></a><span class="lineno"> 1163</span> </div>
-<div class="line"><a id="l01164" name="l01164"></a><span class="lineno"> 1164</span>/*******************************************************2D implementations***************************************************/</div>
-<div class="line"><a id="l01165" name="l01165"></a><span class="lineno"> 1165</span>template void Arch::assemble_burgers_velo_material_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01166" name="l01166"></a><span class="lineno"> 1166</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType, int, int, int, bool);</div>
-<div class="line"><a id="l01167" name="l01167"></a><span class="lineno"> 1167</span>template void Arch::assemble_burgers_velo_material_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01168" name="l01168"></a><span class="lineno"> 1168</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType, int, int, int, bool);</div>
-<div class="line"><a id="l01169" name="l01169"></a><span class="lineno"> 1169</span>template void Arch::assemble_burgers_velo_material_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01170" name="l01170"></a><span class="lineno"> 1170</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType, int, int, int, bool);</div>
-<div class="line"><a id="l01171" name="l01171"></a><span class="lineno"> 1171</span>template void Arch::assemble_burgers_velo_material_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01172" name="l01172"></a><span class="lineno"> 1172</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType, int, int, int, bool);</div>
-<div class="line"><a id="l01173" name="l01173"></a><span class="lineno"> 1173</span> </div>
-<div class="line"><a id="l01174" name="l01174"></a><span class="lineno"> 1174</span>template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01175" name="l01175"></a><span class="lineno"> 1175</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType);</div>
-<div class="line"><a id="l01176" name="l01176"></a><span class="lineno"> 1176</span>template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01177" name="l01177"></a><span class="lineno"> 1177</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType);</div>
-<div class="line"><a id="l01178" name="l01178"></a><span class="lineno"> 1178</span>template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01179" name="l01179"></a><span class="lineno"> 1179</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType);</div>
-<div class="line"><a id="l01180" name="l01180"></a><span class="lineno"> 1180</span>template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01181" name="l01181"></a><span class="lineno"> 1181</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType);</div>
-<div class="line"><a id="l01182" name="l01182"></a><span class="lineno"> 1182</span> </div>
-<div class="line"><a id="l01183" name="l01183"></a><span class="lineno"> 1183</span>template void Arch::assemble_burgers_velo_material_defect(const Q2StandardQuad&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01184" name="l01184"></a><span class="lineno"> 1184</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType, int, int, int, bool);</div>
-<div class="line"><a id="l01185" name="l01185"></a><span class="lineno"> 1185</span>template void Arch::assemble_burgers_velo_material_defect(const Q2StandardQuad&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01186" name="l01186"></a><span class="lineno"> 1186</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType, int, int, int, bool);</div>
-<div class="line"><a id="l01187" name="l01187"></a><span class="lineno"> 1187</span>template void Arch::assemble_burgers_velo_material_defect(const Q2StandardQuad&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01188" name="l01188"></a><span class="lineno"> 1188</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType, int, int, int, bool);</div>
-<div class="line"><a id="l01189" name="l01189"></a><span class="lineno"> 1189</span>template void Arch::assemble_burgers_velo_material_defect(const Q2StandardQuad&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01190" name="l01190"></a><span class="lineno"> 1190</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType, int, int, int, bool);</div>
-<div class="line"><a id="l01191" name="l01191"></a><span class="lineno"> 1191</span> </div>
-<div class="line"><a id="l01192" name="l01192"></a><span class="lineno"> 1192</span>template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardQuad&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01193" name="l01193"></a><span class="lineno"> 1193</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType);</div>
-<div class="line"><a id="l01194" name="l01194"></a><span class="lineno"> 1194</span>template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardQuad&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01195" name="l01195"></a><span class="lineno"> 1195</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType);</div>
-<div class="line"><a id="l01196" name="l01196"></a><span class="lineno"> 1196</span>template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardQuad&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01197" name="l01197"></a><span class="lineno"> 1197</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType);</div>
-<div class="line"><a id="l01198" name="l01198"></a><span class="lineno"> 1198</span>template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardQuad&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01199" name="l01199"></a><span class="lineno"> 1199</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType);</div>
-<div class="line"><a id="l01200" name="l01200"></a><span class="lineno"> 1200</span> </div>
-<div class="line"><a id="l01201" name="l01201"></a><span class="lineno"> 1201</span>/*********************************************************3D implementations**************************************************************************************/</div>
-<div class="line"><a id="l01202" name="l01202"></a><span class="lineno"> 1202</span> </div>
-<div class="line"><a id="l01203" name="l01203"></a><span class="lineno"> 1203</span>template void Arch::assemble_burgers_velo_material_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01204" name="l01204"></a><span class="lineno"> 1204</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType, int, int, int, bool);</div>
-<div class="line"><a id="l01205" name="l01205"></a><span class="lineno"> 1205</span>template void Arch::assemble_burgers_velo_material_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01206" name="l01206"></a><span class="lineno"> 1206</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType, int, int, int, bool);</div>
-<div class="line"><a id="l01207" name="l01207"></a><span class="lineno"> 1207</span>template void Arch::assemble_burgers_velo_material_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01208" name="l01208"></a><span class="lineno"> 1208</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType, int, int, int, bool);</div>
-<div class="line"><a id="l01209" name="l01209"></a><span class="lineno"> 1209</span>template void Arch::assemble_burgers_velo_material_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01210" name="l01210"></a><span class="lineno"> 1210</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType, int, int, int, bool);</div>
-<div class="line"><a id="l01211" name="l01211"></a><span class="lineno"> 1211</span> </div>
-<div class="line"><a id="l01212" name="l01212"></a><span class="lineno"> 1212</span>template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01213" name="l01213"></a><span class="lineno"> 1213</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType);</div>
-<div class="line"><a id="l01214" name="l01214"></a><span class="lineno"> 1214</span>template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01215" name="l01215"></a><span class="lineno"> 1215</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType);</div>
-<div class="line"><a id="l01216" name="l01216"></a><span class="lineno"> 1216</span>template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01217" name="l01217"></a><span class="lineno"> 1217</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType);</div>
-<div class="line"><a id="l01218" name="l01218"></a><span class="lineno"> 1218</span>template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01219" name="l01219"></a><span class="lineno"> 1219</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType);</div>
-<div class="line"><a id="l01220" name="l01220"></a><span class="lineno"> 1220</span> </div>
-<div class="line"><a id="l01221" name="l01221"></a><span class="lineno"> 1221</span>template void Arch::assemble_burgers_velo_material_defect(const Q2StandardHexa&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01222" name="l01222"></a><span class="lineno"> 1222</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType, int, int, int, bool);</div>
-<div class="line"><a id="l01223" name="l01223"></a><span class="lineno"> 1223</span>template void Arch::assemble_burgers_velo_material_defect(const Q2StandardHexa&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01224" name="l01224"></a><span class="lineno"> 1224</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType, int, int, int, bool);</div>
-<div class="line"><a id="l01225" name="l01225"></a><span class="lineno"> 1225</span>template void Arch::assemble_burgers_velo_material_defect(const Q2StandardHexa&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01226" name="l01226"></a><span class="lineno"> 1226</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType, int, int, int, bool);</div>
-<div class="line"><a id="l01227" name="l01227"></a><span class="lineno"> 1227</span>template void Arch::assemble_burgers_velo_material_defect(const Q2StandardHexa&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01228" name="l01228"></a><span class="lineno"> 1228</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType, int, int, int, bool);</div>
-<div class="line"><a id="l01229" name="l01229"></a><span class="lineno"> 1229</span> </div>
-<div class="line"><a id="l01230" name="l01230"></a><span class="lineno"> 1230</span>template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardHexa&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01231" name="l01231"></a><span class="lineno"> 1231</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType);</div>
-<div class="line"><a id="l01232" name="l01232"></a><span class="lineno"> 1232</span>template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardHexa&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01233" name="l01233"></a><span class="lineno"> 1233</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType);</div>
-<div class="line"><a id="l01234" name="l01234"></a><span class="lineno"> 1234</span>template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardHexa&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01235" name="l01235"></a><span class="lineno"> 1235</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType);</div>
-<div class="line"><a id="l01236" name="l01236"></a><span class="lineno"> 1236</span>template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardHexa&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01237" name="l01237"></a><span class="lineno"> 1237</span>                                          const std::vector&lt;int*&gt;&amp;, const std::vector&lt;Index&gt;&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType);</div>
+<div class="line"><a id="l00780" name="l00780"></a><span class="lineno">  780</span>              const Adjacency::ColoringDataHandler&amp; coloring_data,</div>
+<div class="line"><a id="l00781" name="l00781"></a><span class="lineno">  781</span>              DT_ alpha, const AssemblyBurgersData&lt;DT_&gt;&amp; burgers_params,</div>
+<div class="line"><a id="l00782" name="l00782"></a><span class="lineno">  782</span>              const AssemblyMaterialData&lt;DT_&gt;&amp; material_params,</div>
+<div class="line"><a id="l00783" name="l00783"></a><span class="lineno">  783</span>              MaterialType material_type, int shared_mem, int blocksize, int gridsize, bool print_occupancy)</div>
+<div class="line"><a id="l00784" name="l00784"></a><span class="lineno">  784</span>      {</div>
+<div class="line"><a id="l00785" name="l00785"></a><span class="lineno">  785</span>        // get the size of all necessary shared memory</div>
+<div class="line"><a id="l00786" name="l00786"></a><span class="lineno">  786</span>        typedef DT_ DataType;</div>
+<div class="line"><a id="l00787" name="l00787"></a><span class="lineno">  787</span>        const DataType tol_eps = CudaMath::cuda_get_sqrt_eps&lt;DataType&gt;();</div>
+<div class="line"><a id="l00788" name="l00788"></a><span class="lineno">  788</span>        constexpr int dim = Space_::ShapeType::dimension;</div>
+<div class="line"><a id="l00789" name="l00789"></a><span class="lineno">  789</span>        constexpr int num_loc_dofs = Space_::DofMappingType::dof_count;</div>
+<div class="line"><a id="l00790" name="l00790"></a><span class="lineno">  790</span>        const bool need_streamline = (CudaMath::cuda_abs(burgers_params.sd_delta) &gt; DataType(0)) &amp;&amp; (burgers_params.sd_v_norm &gt; tol_eps);</div>
+<div class="line"><a id="l00791" name="l00791"></a><span class="lineno">  791</span>        // overestimate necessary memory a bit... else this gets to complicated...?!</div>
+<div class="line"><a id="l00792" name="l00792"></a><span class="lineno">  792</span>        const int shared_size_nec = get_min_shared_size&lt;Space_, DT_, IT_&gt;(need_streamline);</div>
+<div class="line"><a id="l00793" name="l00793"></a><span class="lineno">  793</span>        const int loc_mat_shared_mem = shared_mem - shared_size_nec;</div>
+<div class="line"><a id="l00794" name="l00794"></a><span class="lineno">  794</span>        XASSERTM(loc_mat_shared_mem &gt; 0, String(&quot;Not enough assigned shared memory\n Minimum required: &quot;) + stringify(shared_size_nec)</div>
+<div class="line"><a id="l00795" name="l00795"></a><span class="lineno">  795</span>            + String(&quot;\nProvided: &quot;) + stringify(shared_mem));</div>
+<div class="line"><a id="l00796" name="l00796"></a><span class="lineno">  796</span> </div>
+<div class="line"><a id="l00797" name="l00797"></a><span class="lineno">  797</span>        const int loc_block_size = CudaMath::cuda_min(loc_mat_shared_mem / int(sizeof(DT_)*dim*dim), num_loc_dofs*num_loc_dofs);</div>
+<div class="line"><a id="l00798" name="l00798"></a><span class="lineno">  798</span>        XASSERTM(loc_block_size &gt; 0, &quot;Not enough memory assigned to assemble a single matrix entry!&quot;);</div>
+<div class="line"><a id="l00799" name="l00799"></a><span class="lineno">  799</span>        XASSERTM(loc_block_size &gt;= num_loc_dofs, &quot;Not enough memory assigned to assemble a single matrix row!&quot;);</div>
+<div class="line"><a id="l00800" name="l00800"></a><span class="lineno">  800</span> </div>
+<div class="line"><a id="l00801" name="l00801"></a><span class="lineno">  801</span>        if(print_occupancy)</div>
+<div class="line"><a id="l00802" name="l00802"></a><span class="lineno">  802</span>        {</div>
+<div class="line"><a id="l00803" name="l00803"></a><span class="lineno">  803</span>          int numBlocksWarp = get_num_block_warp&lt;Space_, DT_, IT_&gt;(material_type, need_streamline, blocksize, shared_mem);</div>
+<div class="line"><a id="l00804" name="l00804"></a><span class="lineno">  804</span>          const int max_blocks_per_sm = int(Util::cuda_get_max_blocks_per_sm());</div>
+<div class="line"><a id="l00805" name="l00805"></a><span class="lineno">  805</span>          printf(&quot;Numblocks/Occupancy per SM for device number %i: %i, %f\n&quot;, Util::cuda_device_number, numBlocksWarp, double(numBlocksWarp*(blocksize/32))/double(max_blocks_per_sm));</div>
+<div class="line"><a id="l00806" name="l00806"></a><span class="lineno">  806</span>        }</div>
+<div class="line"><a id="l00807" name="l00807"></a><span class="lineno">  807</span> </div>
+<div class="line"><a id="l00808" name="l00808"></a><span class="lineno">  808</span>        if(shared_mem &gt; 48000)</div>
+<div class="line"><a id="l00809" name="l00809"></a><span class="lineno">  809</span>        {</div>
+<div class="line"><a id="l00810" name="l00810"></a><span class="lineno">  810</span>          if(!set_shared_mem_attribute&lt;Space_, DT_, IT_&gt;(material_type, need_streamline, shared_mem))</div>
+<div class="line"><a id="l00811" name="l00811"></a><span class="lineno">  811</span>          {</div>
+<div class="line"><a id="l00812" name="l00812"></a><span class="lineno">  812</span>            XABORTM(&quot;cudaFuncSetAttribute failed.&quot;);</div>
+<div class="line"><a id="l00813" name="l00813"></a><span class="lineno">  813</span>          }</div>
+<div class="line"><a id="l00814" name="l00814"></a><span class="lineno">  814</span>        }</div>
+<div class="line"><a id="l00815" name="l00815"></a><span class="lineno">  815</span>        // const Index blocksize = 64;</div>
+<div class="line"><a id="l00816" name="l00816"></a><span class="lineno">  816</span> </div>
+<div class="line"><a id="l00817" name="l00817"></a><span class="lineno">  817</span>        const Memory::TypedView&lt;int&gt; color_view = coloring_data.color_map_view(Memory::Location::cuda, Memory::Access::read);</div>
+<div class="line"><a id="l00818" name="l00818"></a><span class="lineno">  818</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_view(dof_mapping.cell_to_dof.view(Memory::Location::cuda, Memory::Access::read));</div>
+<div class="line"><a id="l00819" name="l00819"></a><span class="lineno">  819</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, Space_::world_dim&gt;&gt; nodes_view(dof_mapping.nodes.view(Memory::Location::cuda, Memory::Access::read));</div>
+<div class="line"><a id="l00820" name="l00820"></a><span class="lineno">  820</span> </div>
+<div class="line"><a id="l00821" name="l00821"></a><span class="lineno">  821</span>        for(Index col = 0; col &lt; coloring_data.get_num_colors(); ++col)</div>
+<div class="line"><a id="l00822" name="l00822"></a><span class="lineno">  822</span>        {</div>
+<div class="line"><a id="l00823" name="l00823"></a><span class="lineno">  823</span>          dim3 grid;</div>
+<div class="line"><a id="l00824" name="l00824"></a><span class="lineno">  824</span>          dim3 block;</div>
+<div class="line"><a id="l00825" name="l00825"></a><span class="lineno">  825</span>          block.x = (unsigned int)blocksize;</div>
+<div class="line"><a id="l00826" name="l00826"></a><span class="lineno">  826</span>          grid.x = (unsigned int)gridsize;</div>
+<div class="line"><a id="l00827" name="l00827"></a><span class="lineno">  827</span> </div>
+<div class="line"><a id="l00828" name="l00828"></a><span class="lineno">  828</span>          if(need_streamline)</div>
+<div class="line"><a id="l00829" name="l00829"></a><span class="lineno">  829</span>          {</div>
+<div class="line"><a id="l00830" name="l00830"></a><span class="lineno">  830</span>            switch(material_type)</div>
+<div class="line"><a id="l00831" name="l00831"></a><span class="lineno">  831</span>            {</div>
+<div class="line"><a id="l00832" name="l00832"></a><span class="lineno">  832</span>              case FEAT::VoxelAssembly::MaterialType::carreau:</div>
+<div class="line"><a id="l00833" name="l00833"></a><span class="lineno">  833</span>              {</div>
+<div class="line"><a id="l00834" name="l00834"></a><span class="lineno">  834</span>                //kernel call, since this uses the standard stream, sync before next call is enforced:</div>
+<div class="line"><a id="l00835" name="l00835"></a><span class="lineno">  835</span>                VoxelAssembly::Kernel::template full_burgers_vm_assembler_matrix1_bcsr_warp_based&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;,</div>
+<div class="line"><a id="l00836" name="l00836"></a><span class="lineno">  836</span>                                Intern::ViscoDFunctor&lt;DT_, MaterialType::carreau&gt;, true, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt;&lt;&lt;&lt; grid, block, shared_mem &gt;&gt;&gt;(</div>
+<div class="line"><a id="l00837" name="l00837"></a><span class="lineno">  837</span>                    matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
+<div class="line"><a id="l00838" name="l00838"></a><span class="lineno">  838</span>                    (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l00839" name="l00839"></a><span class="lineno">  839</span>                    cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l00840" name="l00840"></a><span class="lineno">  840</span>                    cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l00841" name="l00841"></a><span class="lineno">  841</span>                    nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l00842" name="l00842"></a><span class="lineno">  842</span>                    &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col), nullptr,</div>
+<div class="line"><a id="l00843" name="l00843"></a><span class="lineno">  843</span>                    burgers_params, material_params, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T},</div>
+<div class="line"><a id="l00844" name="l00844"></a><span class="lineno">  844</span>                    Intern::ViscoDFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T},</div>
+<div class="line"><a id="l00845" name="l00845"></a><span class="lineno">  845</span>                    loc_block_size</div>
+<div class="line"><a id="l00846" name="l00846"></a><span class="lineno">  846</span>                );</div>
+<div class="line"><a id="l00847" name="l00847"></a><span class="lineno">  847</span>                break;</div>
+<div class="line"><a id="l00848" name="l00848"></a><span class="lineno">  848</span>              }</div>
+<div class="line"><a id="l00849" name="l00849"></a><span class="lineno">  849</span>              case FEAT::VoxelAssembly::MaterialType::carreauYasuda:</div>
+<div class="line"><a id="l00850" name="l00850"></a><span class="lineno">  850</span>              {</div>
+<div class="line"><a id="l00851" name="l00851"></a><span class="lineno">  851</span>                //kernel call, since this uses the standard stream, sync before next call is enforced:</div>
+<div class="line"><a id="l00852" name="l00852"></a><span class="lineno">  852</span>                VoxelAssembly::Kernel::template full_burgers_vm_assembler_matrix1_bcsr_warp_based&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;,</div>
+<div class="line"><a id="l00853" name="l00853"></a><span class="lineno">  853</span>                                Intern::ViscoDFunctor&lt;DT_, MaterialType::carreauYasuda&gt;, true, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt;&lt;&lt;&lt; grid, block, shared_mem &gt;&gt;&gt;(</div>
+<div class="line"><a id="l00854" name="l00854"></a><span class="lineno">  854</span>                    matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
+<div class="line"><a id="l00855" name="l00855"></a><span class="lineno">  855</span>                    (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l00856" name="l00856"></a><span class="lineno">  856</span>                    cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l00857" name="l00857"></a><span class="lineno">  857</span>                    cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l00858" name="l00858"></a><span class="lineno">  858</span>                    nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l00859" name="l00859"></a><span class="lineno">  859</span>                    &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col), nullptr,</div>
+<div class="line"><a id="l00860" name="l00860"></a><span class="lineno">  860</span>                    burgers_params, material_params,</div>
+<div class="line"><a id="l00861" name="l00861"></a><span class="lineno">  861</span>                    Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T,material_params.yasuda_a, material_params.mu_inf},</div>
+<div class="line"><a id="l00862" name="l00862"></a><span class="lineno">  862</span>                    Intern::ViscoDFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T, material_params.yasuda_a, material_params.mu_inf},</div>
+<div class="line"><a id="l00863" name="l00863"></a><span class="lineno">  863</span>                    loc_block_size</div>
+<div class="line"><a id="l00864" name="l00864"></a><span class="lineno">  864</span>                );</div>
+<div class="line"><a id="l00865" name="l00865"></a><span class="lineno">  865</span>                break;</div>
+<div class="line"><a id="l00866" name="l00866"></a><span class="lineno">  866</span>              }</div>
+<div class="line"><a id="l00867" name="l00867"></a><span class="lineno">  867</span>            }</div>
+<div class="line"><a id="l00868" name="l00868"></a><span class="lineno">  868</span>          }</div>
+<div class="line"><a id="l00869" name="l00869"></a><span class="lineno">  869</span>          else</div>
+<div class="line"><a id="l00870" name="l00870"></a><span class="lineno">  870</span>          {</div>
+<div class="line"><a id="l00871" name="l00871"></a><span class="lineno">  871</span>            switch(material_type)</div>
+<div class="line"><a id="l00872" name="l00872"></a><span class="lineno">  872</span>            {</div>
+<div class="line"><a id="l00873" name="l00873"></a><span class="lineno">  873</span>              case FEAT::VoxelAssembly::MaterialType::carreau:</div>
+<div class="line"><a id="l00874" name="l00874"></a><span class="lineno">  874</span>              {</div>
+<div class="line"><a id="l00875" name="l00875"></a><span class="lineno">  875</span>                //kernel call, since this uses the standard stream, sync before next call is enforced:</div>
+<div class="line"><a id="l00876" name="l00876"></a><span class="lineno">  876</span>                VoxelAssembly::Kernel::template full_burgers_vm_assembler_matrix1_bcsr_warp_based&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;,</div>
+<div class="line"><a id="l00877" name="l00877"></a><span class="lineno">  877</span>                                Intern::ViscoDFunctor&lt;DT_, MaterialType::carreau&gt;, false, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt;&lt;&lt;&lt; grid, block, shared_mem &gt;&gt;&gt;(</div>
+<div class="line"><a id="l00878" name="l00878"></a><span class="lineno">  878</span>                    matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
+<div class="line"><a id="l00879" name="l00879"></a><span class="lineno">  879</span>                    (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l00880" name="l00880"></a><span class="lineno">  880</span>                    cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l00881" name="l00881"></a><span class="lineno">  881</span>                    cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l00882" name="l00882"></a><span class="lineno">  882</span>                    nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l00883" name="l00883"></a><span class="lineno">  883</span>                    &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col), nullptr,</div>
+<div class="line"><a id="l00884" name="l00884"></a><span class="lineno">  884</span>                    burgers_params, material_params, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T},</div>
+<div class="line"><a id="l00885" name="l00885"></a><span class="lineno">  885</span>                    Intern::ViscoDFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T},</div>
+<div class="line"><a id="l00886" name="l00886"></a><span class="lineno">  886</span>                    loc_block_size</div>
+<div class="line"><a id="l00887" name="l00887"></a><span class="lineno">  887</span>                );</div>
+<div class="line"><a id="l00888" name="l00888"></a><span class="lineno">  888</span>                break;</div>
+<div class="line"><a id="l00889" name="l00889"></a><span class="lineno">  889</span>              }</div>
+<div class="line"><a id="l00890" name="l00890"></a><span class="lineno">  890</span>              case FEAT::VoxelAssembly::MaterialType::carreauYasuda:</div>
+<div class="line"><a id="l00891" name="l00891"></a><span class="lineno">  891</span>              {</div>
+<div class="line"><a id="l00892" name="l00892"></a><span class="lineno">  892</span>                //kernel call, since this uses the standard stream, sync before next call is enforced:</div>
+<div class="line"><a id="l00893" name="l00893"></a><span class="lineno">  893</span>                VoxelAssembly::Kernel::template full_burgers_vm_assembler_matrix1_bcsr_warp_based&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;,</div>
+<div class="line"><a id="l00894" name="l00894"></a><span class="lineno">  894</span>                                Intern::ViscoDFunctor&lt;DT_, MaterialType::carreauYasuda&gt;, false, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt;&lt;&lt;&lt; grid, block, shared_mem &gt;&gt;&gt;(</div>
+<div class="line"><a id="l00895" name="l00895"></a><span class="lineno">  895</span>                    matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
+<div class="line"><a id="l00896" name="l00896"></a><span class="lineno">  896</span>                    (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l00897" name="l00897"></a><span class="lineno">  897</span>                    cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l00898" name="l00898"></a><span class="lineno">  898</span>                    cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l00899" name="l00899"></a><span class="lineno">  899</span>                    nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l00900" name="l00900"></a><span class="lineno">  900</span>                    &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col), nullptr,</div>
+<div class="line"><a id="l00901" name="l00901"></a><span class="lineno">  901</span>                    burgers_params, material_params,</div>
+<div class="line"><a id="l00902" name="l00902"></a><span class="lineno">  902</span>                    Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T,material_params.yasuda_a, material_params.mu_inf},</div>
+<div class="line"><a id="l00903" name="l00903"></a><span class="lineno">  903</span>                    Intern::ViscoDFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T, material_params.yasuda_a, material_params.mu_inf},</div>
+<div class="line"><a id="l00904" name="l00904"></a><span class="lineno">  904</span>                    loc_block_size</div>
+<div class="line"><a id="l00905" name="l00905"></a><span class="lineno">  905</span>                );</div>
+<div class="line"><a id="l00906" name="l00906"></a><span class="lineno">  906</span>                break;</div>
+<div class="line"><a id="l00907" name="l00907"></a><span class="lineno">  907</span>              }</div>
+<div class="line"><a id="l00908" name="l00908"></a><span class="lineno">  908</span>            }</div>
+<div class="line"><a id="l00909" name="l00909"></a><span class="lineno">  909</span>          }</div>
+<div class="line"><a id="l00910" name="l00910"></a><span class="lineno">  910</span>        }</div>
+<div class="line"><a id="l00911" name="l00911"></a><span class="lineno">  911</span>        //check for cuda error in our kernel</div>
+<div class="line"><a id="l00912" name="l00912"></a><span class="lineno">  912</span>        Util::cuda_check_last_error();</div>
+<div class="line"><a id="l00913" name="l00913"></a><span class="lineno">  913</span>      }</div>
+<div class="line"><a id="l00914" name="l00914"></a><span class="lineno">  914</span> </div>
+<div class="line"><a id="l00915" name="l00915"></a><span class="lineno">  915</span> </div>
+<div class="line"><a id="l00916" name="l00916"></a><span class="lineno">  916</span>      template&lt;typename Space_, typename DT_, typename IT_&gt;</div>
+<div class="line"><a id="l00917" name="l00917"></a><span class="lineno">  917</span>      void assemble_burgers_velo_material_defect_old([[maybe_unused]] const Space_&amp; space,</div>
+<div class="line"><a id="l00918" name="l00918"></a><span class="lineno">  918</span>              DT_* vector_data,</div>
+<div class="line"><a id="l00919" name="l00919"></a><span class="lineno">  919</span>              const DT_* conv_data,</div>
+<div class="line"><a id="l00920" name="l00920"></a><span class="lineno">  920</span>              const DT_* primal_data,</div>
+<div class="line"><a id="l00921" name="l00921"></a><span class="lineno">  921</span>              const AssemblyCubatureData&lt;DT_&gt;&amp; cubature,</div>
+<div class="line"><a id="l00922" name="l00922"></a><span class="lineno">  922</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
+<div class="line"><a id="l00923" name="l00923"></a><span class="lineno">  923</span>              const Adjacency::ColoringDataHandler&amp; coloring_data,</div>
+<div class="line"><a id="l00924" name="l00924"></a><span class="lineno">  924</span>              DT_ alpha, const AssemblyBurgersData&lt;DT_&gt;&amp; burgers_params,</div>
+<div class="line"><a id="l00925" name="l00925"></a><span class="lineno">  925</span>              const AssemblyMaterialData&lt;DT_&gt;&amp; material_params,</div>
+<div class="line"><a id="l00926" name="l00926"></a><span class="lineno">  926</span>              MaterialType material_type)</div>
+<div class="line"><a id="l00927" name="l00927"></a><span class="lineno">  927</span>      {</div>
+<div class="line"><a id="l00928" name="l00928"></a><span class="lineno">  928</span>        const Index blocksize = Util::cuda_blocksize_scalar_assembly;</div>
+<div class="line"><a id="l00929" name="l00929"></a><span class="lineno">  929</span>        // const Index blocksize = 64;</div>
+<div class="line"><a id="l00930" name="l00930"></a><span class="lineno">  930</span>        #ifdef DEBUG</div>
+<div class="line"><a id="l00931" name="l00931"></a><span class="lineno">  931</span>        std::size_t pValue;</div>
+<div class="line"><a id="l00932" name="l00932"></a><span class="lineno">  932</span>        cudaDeviceGetLimit(&amp;pValue, cudaLimit::cudaLimitStackSize);</div>
+<div class="line"><a id="l00933" name="l00933"></a><span class="lineno">  933</span>        std::cout &lt;&lt; &quot;Current maximum thread cache: &quot; &lt;&lt; pValue &lt;&lt; std::endl;</div>
+<div class="line"><a id="l00934" name="l00934"></a><span class="lineno">  934</span>        #endif</div>
+<div class="line"><a id="l00935" name="l00935"></a><span class="lineno">  935</span> </div>
+<div class="line"><a id="l00936" name="l00936"></a><span class="lineno">  936</span>        const Memory::TypedView&lt;int&gt; color_view = coloring_data.color_map_view(Memory::Location::cuda, Memory::Access::read);</div>
+<div class="line"><a id="l00937" name="l00937"></a><span class="lineno">  937</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_view(dof_mapping.cell_to_dof.view(Memory::Location::cuda, Memory::Access::read));</div>
+<div class="line"><a id="l00938" name="l00938"></a><span class="lineno">  938</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, Space_::world_dim&gt;&gt; nodes_view(dof_mapping.nodes.view(Memory::Location::cuda, Memory::Access::read));</div>
+<div class="line"><a id="l00939" name="l00939"></a><span class="lineno">  939</span> </div>
+<div class="line"><a id="l00940" name="l00940"></a><span class="lineno">  940</span>        for(Index col = 0; col &lt; coloring_data.get_num_colors(); ++col)</div>
+<div class="line"><a id="l00941" name="l00941"></a><span class="lineno">  941</span>        {</div>
+<div class="line"><a id="l00942" name="l00942"></a><span class="lineno">  942</span>          dim3 grid;</div>
+<div class="line"><a id="l00943" name="l00943"></a><span class="lineno">  943</span>          dim3 block;</div>
+<div class="line"><a id="l00944" name="l00944"></a><span class="lineno">  944</span>          block.x = (unsigned int)blocksize;</div>
+<div class="line"><a id="l00945" name="l00945"></a><span class="lineno">  945</span>          grid.x = (unsigned int)ceil(double(coloring_data.get_color_size(col))/double(block.x));</div>
+<div class="line"><a id="l00946" name="l00946"></a><span class="lineno">  946</span>          switch(material_type)</div>
+<div class="line"><a id="l00947" name="l00947"></a><span class="lineno">  947</span>          {</div>
+<div class="line"><a id="l00948" name="l00948"></a><span class="lineno">  948</span>            case FEAT::VoxelAssembly::MaterialType::carreau:</div>
+<div class="line"><a id="l00949" name="l00949"></a><span class="lineno">  949</span>            {</div>
+<div class="line"><a id="l00950" name="l00950"></a><span class="lineno">  950</span>              VoxelAssembly::Kernel::template full_burgers_vm_assembler_vector_bd&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;&gt;&lt;&lt;&lt; grid, block &gt;&gt;&gt;(vector_data, conv_data, primal_data,</div>
+<div class="line"><a id="l00951" name="l00951"></a><span class="lineno">  951</span>                  space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l00952" name="l00952"></a><span class="lineno">  952</span>                  cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l00953" name="l00953"></a><span class="lineno">  953</span>                  cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l00954" name="l00954"></a><span class="lineno">  954</span>                  nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l00955" name="l00955"></a><span class="lineno">  955</span>                  &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col), burgers_params,</div>
+<div class="line"><a id="l00956" name="l00956"></a><span class="lineno">  956</span>                  Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T}</div>
+<div class="line"><a id="l00957" name="l00957"></a><span class="lineno">  957</span>              );</div>
+<div class="line"><a id="l00958" name="l00958"></a><span class="lineno">  958</span>              break;</div>
+<div class="line"><a id="l00959" name="l00959"></a><span class="lineno">  959</span>            }</div>
+<div class="line"><a id="l00960" name="l00960"></a><span class="lineno">  960</span>            case FEAT::VoxelAssembly::MaterialType::carreauYasuda:</div>
+<div class="line"><a id="l00961" name="l00961"></a><span class="lineno">  961</span>            {</div>
+<div class="line"><a id="l00962" name="l00962"></a><span class="lineno">  962</span>              VoxelAssembly::Kernel::template full_burgers_vm_assembler_vector_bd&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;&gt;&lt;&lt;&lt; grid, block &gt;&gt;&gt;(vector_data, conv_data, primal_data,</div>
+<div class="line"><a id="l00963" name="l00963"></a><span class="lineno">  963</span>                  space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l00964" name="l00964"></a><span class="lineno">  964</span>                  cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l00965" name="l00965"></a><span class="lineno">  965</span>                  cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l00966" name="l00966"></a><span class="lineno">  966</span>                  nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l00967" name="l00967"></a><span class="lineno">  967</span>                  &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col), burgers_params,</div>
+<div class="line"><a id="l00968" name="l00968"></a><span class="lineno">  968</span>                  Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T,material_params.yasuda_a, material_params.mu_inf}</div>
+<div class="line"><a id="l00969" name="l00969"></a><span class="lineno">  969</span>              );</div>
+<div class="line"><a id="l00970" name="l00970"></a><span class="lineno">  970</span>              break;</div>
+<div class="line"><a id="l00971" name="l00971"></a><span class="lineno">  971</span>            }</div>
+<div class="line"><a id="l00972" name="l00972"></a><span class="lineno">  972</span>          }</div>
+<div class="line"><a id="l00973" name="l00973"></a><span class="lineno">  973</span>        }</div>
+<div class="line"><a id="l00974" name="l00974"></a><span class="lineno">  974</span> </div>
+<div class="line"><a id="l00975" name="l00975"></a><span class="lineno">  975</span>        //check for cuda error (also synchronizes)</div>
+<div class="line"><a id="l00976" name="l00976"></a><span class="lineno">  976</span>        Util::cuda_check_last_error();</div>
+<div class="line"><a id="l00977" name="l00977"></a><span class="lineno">  977</span>      }</div>
+<div class="line"><a id="l00978" name="l00978"></a><span class="lineno">  978</span> </div>
+<div class="line"><a id="l00979" name="l00979"></a><span class="lineno">  979</span>      template&lt;typename Space_, typename DT_, typename IT_&gt;</div>
+<div class="line"><a id="l00980" name="l00980"></a><span class="lineno">  980</span>      void assemble_burgers_velo_material_defect([[maybe_unused]] const Space_&amp; space,</div>
+<div class="line"><a id="l00981" name="l00981"></a><span class="lineno">  981</span>              DT_* vector_data,</div>
+<div class="line"><a id="l00982" name="l00982"></a><span class="lineno">  982</span>              const DT_* conv_data,</div>
+<div class="line"><a id="l00983" name="l00983"></a><span class="lineno">  983</span>              const DT_* primal_data,</div>
+<div class="line"><a id="l00984" name="l00984"></a><span class="lineno">  984</span>              const AssemblyCubatureData&lt;DT_&gt;&amp; cubature,</div>
+<div class="line"><a id="l00985" name="l00985"></a><span class="lineno">  985</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
+<div class="line"><a id="l00986" name="l00986"></a><span class="lineno">  986</span>              const Adjacency::ColoringDataHandler&amp; coloring_data,</div>
+<div class="line"><a id="l00987" name="l00987"></a><span class="lineno">  987</span>              DT_ alpha, const AssemblyBurgersData&lt;DT_&gt;&amp; burgers_params,</div>
+<div class="line"><a id="l00988" name="l00988"></a><span class="lineno">  988</span>              const AssemblyMaterialData&lt;DT_&gt;&amp; material_params,</div>
+<div class="line"><a id="l00989" name="l00989"></a><span class="lineno">  989</span>              MaterialType material_type,</div>
+<div class="line"><a id="l00990" name="l00990"></a><span class="lineno">  990</span>              int shared_mem, int blocksize, int gridsize, bool print_occupancy)</div>
+<div class="line"><a id="l00991" name="l00991"></a><span class="lineno">  991</span>      {</div>
+<div class="line"><a id="l00992" name="l00992"></a><span class="lineno">  992</span>        // get the size of all necessary shared memory</div>
+<div class="line"><a id="l00993" name="l00993"></a><span class="lineno">  993</span>        constexpr int dim = Space_::ShapeType::dimension;</div>
+<div class="line"><a id="l00994" name="l00994"></a><span class="lineno">  994</span>        constexpr int num_loc_dofs = Space_::DofMappingType::dof_count;</div>
+<div class="line"><a id="l00995" name="l00995"></a><span class="lineno">  995</span>        const int shared_size_nec = get_min_shared_size&lt;Space_, DT_, IT_&gt;(false);</div>
+<div class="line"><a id="l00996" name="l00996"></a><span class="lineno">  996</span>        const int loc_vec_shared_mem = shared_mem - shared_size_nec;</div>
+<div class="line"><a id="l00997" name="l00997"></a><span class="lineno">  997</span>        XASSERTM(loc_vec_shared_mem &gt; 0, String(&quot;Not enough assigned shared memory\n Minimum required: &quot;) + stringify(shared_size_nec)</div>
+<div class="line"><a id="l00998" name="l00998"></a><span class="lineno">  998</span>            + String(&quot;\nProvided: &quot;) + stringify(shared_mem));</div>
+<div class="line"><a id="l00999" name="l00999"></a><span class="lineno">  999</span> </div>
+<div class="line"><a id="l01000" name="l01000"></a><span class="lineno"> 1000</span>        const int loc_block_size = CudaMath::cuda_min(loc_vec_shared_mem / int(sizeof(DT_)*dim), num_loc_dofs);</div>
+<div class="line"><a id="l01001" name="l01001"></a><span class="lineno"> 1001</span>        XASSERTM(loc_block_size &gt; 0, &quot;Not enough memory assigned to assemble a single defect entry!&quot;);</div>
+<div class="line"><a id="l01002" name="l01002"></a><span class="lineno"> 1002</span> </div>
+<div class="line"><a id="l01003" name="l01003"></a><span class="lineno"> 1003</span>        if(print_occupancy)</div>
+<div class="line"><a id="l01004" name="l01004"></a><span class="lineno"> 1004</span>        {</div>
+<div class="line"><a id="l01005" name="l01005"></a><span class="lineno"> 1005</span>          int numBlocksWarp = get_num_block_warp_defect&lt;Space_, DT_, IT_&gt;(material_type, blocksize, shared_mem);</div>
+<div class="line"><a id="l01006" name="l01006"></a><span class="lineno"> 1006</span>          const int max_blocks_per_sm = int(Util::cuda_get_max_blocks_per_sm());</div>
+<div class="line"><a id="l01007" name="l01007"></a><span class="lineno"> 1007</span>          printf(&quot;Numblocks/Occupancy per SM for device number %i: %i, %f\n&quot;, Util::cuda_device_number, numBlocksWarp, double(numBlocksWarp*(blocksize/32))/double(max_blocks_per_sm));</div>
+<div class="line"><a id="l01008" name="l01008"></a><span class="lineno"> 1008</span>        }</div>
+<div class="line"><a id="l01009" name="l01009"></a><span class="lineno"> 1009</span> </div>
+<div class="line"><a id="l01010" name="l01010"></a><span class="lineno"> 1010</span>        if(shared_mem &gt; 48000)</div>
+<div class="line"><a id="l01011" name="l01011"></a><span class="lineno"> 1011</span>        {</div>
+<div class="line"><a id="l01012" name="l01012"></a><span class="lineno"> 1012</span>          if(!set_shared_mem_attribute_defect&lt;Space_, DT_, IT_&gt;(material_type, shared_mem))</div>
+<div class="line"><a id="l01013" name="l01013"></a><span class="lineno"> 1013</span>          {</div>
+<div class="line"><a id="l01014" name="l01014"></a><span class="lineno"> 1014</span>            XABORTM(&quot;cudaFuncSetAttribute failed.&quot;);</div>
+<div class="line"><a id="l01015" name="l01015"></a><span class="lineno"> 1015</span>          }</div>
+<div class="line"><a id="l01016" name="l01016"></a><span class="lineno"> 1016</span>        }</div>
+<div class="line"><a id="l01017" name="l01017"></a><span class="lineno"> 1017</span> </div>
+<div class="line"><a id="l01018" name="l01018"></a><span class="lineno"> 1018</span>        const Memory::TypedView&lt;int&gt; color_view = coloring_data.color_map_view(Memory::Location::cuda, Memory::Access::read);</div>
+<div class="line"><a id="l01019" name="l01019"></a><span class="lineno"> 1019</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_view(dof_mapping.cell_to_dof.view(Memory::Location::cuda, Memory::Access::read));</div>
+<div class="line"><a id="l01020" name="l01020"></a><span class="lineno"> 1020</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, Space_::world_dim&gt;&gt; nodes_view(dof_mapping.nodes.view(Memory::Location::cuda, Memory::Access::read));</div>
+<div class="line"><a id="l01021" name="l01021"></a><span class="lineno"> 1021</span> </div>
+<div class="line"><a id="l01022" name="l01022"></a><span class="lineno"> 1022</span>        for(Index col = 0; col &lt; coloring_data.get_num_colors(); ++col)</div>
+<div class="line"><a id="l01023" name="l01023"></a><span class="lineno"> 1023</span>        {</div>
+<div class="line"><a id="l01024" name="l01024"></a><span class="lineno"> 1024</span>          dim3 grid;</div>
+<div class="line"><a id="l01025" name="l01025"></a><span class="lineno"> 1025</span>          dim3 block;</div>
+<div class="line"><a id="l01026" name="l01026"></a><span class="lineno"> 1026</span>          block.x = (unsigned int)blocksize;</div>
+<div class="line"><a id="l01027" name="l01027"></a><span class="lineno"> 1027</span>          grid.x = (unsigned int)gridsize;</div>
+<div class="line"><a id="l01028" name="l01028"></a><span class="lineno"> 1028</span>          switch(material_type)</div>
+<div class="line"><a id="l01029" name="l01029"></a><span class="lineno"> 1029</span>          {</div>
+<div class="line"><a id="l01030" name="l01030"></a><span class="lineno"> 1030</span>            case FEAT::VoxelAssembly::MaterialType::carreau:</div>
+<div class="line"><a id="l01031" name="l01031"></a><span class="lineno"> 1031</span>            {</div>
+<div class="line"><a id="l01032" name="l01032"></a><span class="lineno"> 1032</span>              VoxelAssembly::Kernel::template full_burgers_vm_assembler_vector_bd_warp_based&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;&gt;&lt;&lt;&lt; grid, block, shared_mem &gt;&gt;&gt;(vector_data, conv_data, primal_data,</div>
+<div class="line"><a id="l01033" name="l01033"></a><span class="lineno"> 1033</span>                  space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l01034" name="l01034"></a><span class="lineno"> 1034</span>                  cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l01035" name="l01035"></a><span class="lineno"> 1035</span>                  cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l01036" name="l01036"></a><span class="lineno"> 1036</span>                  nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l01037" name="l01037"></a><span class="lineno"> 1037</span>                  &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col), burgers_params,</div>
+<div class="line"><a id="l01038" name="l01038"></a><span class="lineno"> 1038</span>                  Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T},</div>
+<div class="line"><a id="l01039" name="l01039"></a><span class="lineno"> 1039</span>                  loc_block_size</div>
+<div class="line"><a id="l01040" name="l01040"></a><span class="lineno"> 1040</span>              );</div>
+<div class="line"><a id="l01041" name="l01041"></a><span class="lineno"> 1041</span>              break;</div>
+<div class="line"><a id="l01042" name="l01042"></a><span class="lineno"> 1042</span>            }</div>
+<div class="line"><a id="l01043" name="l01043"></a><span class="lineno"> 1043</span>            case FEAT::VoxelAssembly::MaterialType::carreauYasuda:</div>
+<div class="line"><a id="l01044" name="l01044"></a><span class="lineno"> 1044</span>            {</div>
+<div class="line"><a id="l01045" name="l01045"></a><span class="lineno"> 1045</span>              VoxelAssembly::Kernel::template full_burgers_vm_assembler_vector_bd_warp_based&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;&gt;&lt;&lt;&lt; grid, block, shared_mem &gt;&gt;&gt;(vector_data, conv_data, primal_data,</div>
+<div class="line"><a id="l01046" name="l01046"></a><span class="lineno"> 1046</span>                  space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l01047" name="l01047"></a><span class="lineno"> 1047</span>                  cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l01048" name="l01048"></a><span class="lineno"> 1048</span>                  cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l01049" name="l01049"></a><span class="lineno"> 1049</span>                  nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l01050" name="l01050"></a><span class="lineno"> 1050</span>                  &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col), burgers_params,</div>
+<div class="line"><a id="l01051" name="l01051"></a><span class="lineno"> 1051</span>                  Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T,material_params.yasuda_a, material_params.mu_inf},</div>
+<div class="line"><a id="l01052" name="l01052"></a><span class="lineno"> 1052</span>                  loc_block_size</div>
+<div class="line"><a id="l01053" name="l01053"></a><span class="lineno"> 1053</span>              );</div>
+<div class="line"><a id="l01054" name="l01054"></a><span class="lineno"> 1054</span>              break;</div>
+<div class="line"><a id="l01055" name="l01055"></a><span class="lineno"> 1055</span>            }</div>
+<div class="line"><a id="l01056" name="l01056"></a><span class="lineno"> 1056</span>          }</div>
+<div class="line"><a id="l01057" name="l01057"></a><span class="lineno"> 1057</span>        }</div>
+<div class="line"><a id="l01058" name="l01058"></a><span class="lineno"> 1058</span> </div>
+<div class="line"><a id="l01059" name="l01059"></a><span class="lineno"> 1059</span>        //check for cuda error (also synchronizes)</div>
+<div class="line"><a id="l01060" name="l01060"></a><span class="lineno"> 1060</span>        Util::cuda_check_last_error();</div>
+<div class="line"><a id="l01061" name="l01061"></a><span class="lineno"> 1061</span>      }</div>
+<div class="line"><a id="l01062" name="l01062"></a><span class="lineno"> 1062</span> </div>
+<div class="line"><a id="l01063" name="l01063"></a><span class="lineno"> 1063</span>      template&lt;typename Space_, typename DT_, typename IT_&gt;</div>
+<div class="line"><a id="l01064" name="l01064"></a><span class="lineno"> 1064</span>      void assemble_burgers_velo_material_csr_host([[maybe_unused]] const Space_&amp; space,</div>
+<div class="line"><a id="l01065" name="l01065"></a><span class="lineno"> 1065</span>              const CSRMatrixData&lt;DT_, IT_&gt;&amp; matrix_data,</div>
+<div class="line"><a id="l01066" name="l01066"></a><span class="lineno"> 1066</span>              const DT_* conv_data,</div>
+<div class="line"><a id="l01067" name="l01067"></a><span class="lineno"> 1067</span>              const AssemblyCubatureData&lt;DT_&gt;&amp; cubature,</div>
+<div class="line"><a id="l01068" name="l01068"></a><span class="lineno"> 1068</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
+<div class="line"><a id="l01069" name="l01069"></a><span class="lineno"> 1069</span>              const Adjacency::ColoringDataHandler&amp; coloring_data,</div>
+<div class="line"><a id="l01070" name="l01070"></a><span class="lineno"> 1070</span>              DT_ alpha, const AssemblyBurgersData&lt;DT_&gt;&amp; burgers_params,</div>
+<div class="line"><a id="l01071" name="l01071"></a><span class="lineno"> 1071</span>              const AssemblyMaterialData&lt;DT_&gt;&amp; material_params, MaterialType material_type)</div>
+<div class="line"><a id="l01072" name="l01072"></a><span class="lineno"> 1072</span>      {</div>
+<div class="line"><a id="l01073" name="l01073"></a><span class="lineno"> 1073</span>        const Memory::TypedView&lt;int&gt; color_view = coloring_data.color_map_view(Memory::Location::main, Memory::Access::read);</div>
+<div class="line"><a id="l01074" name="l01074"></a><span class="lineno"> 1074</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_view(dof_mapping.cell_to_dof.view(Memory::Location::main, Memory::Access::read));</div>
+<div class="line"><a id="l01075" name="l01075"></a><span class="lineno"> 1075</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_sorter_view(dof_mapping.cell_to_dof_sorter.view(Memory::Location::main, Memory::Access::read));</div>
+<div class="line"><a id="l01076" name="l01076"></a><span class="lineno"> 1076</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, Space_::world_dim&gt;&gt; nodes_view(dof_mapping.nodes.view(Memory::Location::main, Memory::Access::read));</div>
+<div class="line"><a id="l01077" name="l01077"></a><span class="lineno"> 1077</span>        switch(material_type)</div>
+<div class="line"><a id="l01078" name="l01078"></a><span class="lineno"> 1078</span>        {</div>
+<div class="line"><a id="l01079" name="l01079"></a><span class="lineno"> 1079</span>          case MaterialType::carreau:</div>
+<div class="line"><a id="l01080" name="l01080"></a><span class="lineno"> 1080</span>          {</div>
+<div class="line"><a id="l01081" name="l01081"></a><span class="lineno"> 1081</span>            for(Index col = 0; col &lt; coloring_data.get_num_colors(); ++col)</div>
+<div class="line"><a id="l01082" name="l01082"></a><span class="lineno"> 1082</span>            {</div>
+<div class="line"><a id="l01083" name="l01083"></a><span class="lineno"> 1083</span>              VoxelAssembly::Kernel::template full_burgers_vm_assembler_matrix1_bcsr_host&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;,</div>
+<div class="line"><a id="l01084" name="l01084"></a><span class="lineno"> 1084</span>                                                                    Intern::ViscoDFunctor&lt;DT_, MaterialType::carreau&gt;, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper&gt;(</div>
+<div class="line"><a id="l01085" name="l01085"></a><span class="lineno"> 1085</span>                  matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
+<div class="line"><a id="l01086" name="l01086"></a><span class="lineno"> 1086</span>                  (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l01087" name="l01087"></a><span class="lineno"> 1087</span>                  cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l01088" name="l01088"></a><span class="lineno"> 1088</span>                  cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l01089" name="l01089"></a><span class="lineno"> 1089</span>                  nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l01090" name="l01090"></a><span class="lineno"> 1090</span>                  &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col), cell_to_dof_sorter_view.get_r(),</div>
+<div class="line"><a id="l01091" name="l01091"></a><span class="lineno"> 1091</span>                  burgers_params, material_params, Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T},</div>
+<div class="line"><a id="l01092" name="l01092"></a><span class="lineno"> 1092</span>                  Intern::ViscoDFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T}</div>
+<div class="line"><a id="l01093" name="l01093"></a><span class="lineno"> 1093</span>              );</div>
+<div class="line"><a id="l01094" name="l01094"></a><span class="lineno"> 1094</span>            }</div>
+<div class="line"><a id="l01095" name="l01095"></a><span class="lineno"> 1095</span>            break;</div>
+<div class="line"><a id="l01096" name="l01096"></a><span class="lineno"> 1096</span>          }</div>
+<div class="line"><a id="l01097" name="l01097"></a><span class="lineno"> 1097</span>          case MaterialType::carreauYasuda:</div>
+<div class="line"><a id="l01098" name="l01098"></a><span class="lineno"> 1098</span>          {</div>
+<div class="line"><a id="l01099" name="l01099"></a><span class="lineno"> 1099</span>            for(Index col = 0; col &lt; coloring_data.get_num_colors(); ++col)</div>
+<div class="line"><a id="l01100" name="l01100"></a><span class="lineno"> 1100</span>            {</div>
+<div class="line"><a id="l01101" name="l01101"></a><span class="lineno"> 1101</span>              VoxelAssembly::Kernel::template full_burgers_vm_assembler_matrix1_bcsr_host&lt;Space_, DT_, IT_, Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;,</div>
+<div class="line"><a id="l01102" name="l01102"></a><span class="lineno"> 1102</span>                                                                    Intern::ViscoDFunctor&lt;DT_, MaterialType::carreauYasuda&gt;, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper&gt;(</div>
+<div class="line"><a id="l01103" name="l01103"></a><span class="lineno"> 1103</span>                  matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
+<div class="line"><a id="l01104" name="l01104"></a><span class="lineno"> 1104</span>                  (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l01105" name="l01105"></a><span class="lineno"> 1105</span>                  cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l01106" name="l01106"></a><span class="lineno"> 1106</span>                  cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l01107" name="l01107"></a><span class="lineno"> 1107</span>                  nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l01108" name="l01108"></a><span class="lineno"> 1108</span>                  &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col), cell_to_dof_sorter_view.get_r(),</div>
+<div class="line"><a id="l01109" name="l01109"></a><span class="lineno"> 1109</span>                  burgers_params, material_params,</div>
+<div class="line"><a id="l01110" name="l01110"></a><span class="lineno"> 1110</span>                  Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T,material_params.yasuda_a, material_params.mu_inf},</div>
+<div class="line"><a id="l01111" name="l01111"></a><span class="lineno"> 1111</span>                  Intern::ViscoDFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T, material_params.yasuda_a, material_params.mu_inf}</div>
+<div class="line"><a id="l01112" name="l01112"></a><span class="lineno"> 1112</span>              );</div>
+<div class="line"><a id="l01113" name="l01113"></a><span class="lineno"> 1113</span>            }</div>
+<div class="line"><a id="l01114" name="l01114"></a><span class="lineno"> 1114</span>            break;</div>
+<div class="line"><a id="l01115" name="l01115"></a><span class="lineno"> 1115</span>          }</div>
+<div class="line"><a id="l01116" name="l01116"></a><span class="lineno"> 1116</span>        }</div>
+<div class="line"><a id="l01117" name="l01117"></a><span class="lineno"> 1117</span>      }</div>
+<div class="line"><a id="l01118" name="l01118"></a><span class="lineno"> 1118</span> </div>
+<div class="line"><a id="l01119" name="l01119"></a><span class="lineno"> 1119</span>      template&lt;typename Space_, typename DT_, typename IT_&gt;</div>
+<div class="line"><a id="l01120" name="l01120"></a><span class="lineno"> 1120</span>      void assemble_burgers_velo_material_defect_host([[maybe_unused]] const Space_&amp; space,</div>
+<div class="line"><a id="l01121" name="l01121"></a><span class="lineno"> 1121</span>              DT_* vector_data,</div>
+<div class="line"><a id="l01122" name="l01122"></a><span class="lineno"> 1122</span>              const DT_* conv_data,</div>
+<div class="line"><a id="l01123" name="l01123"></a><span class="lineno"> 1123</span>              const DT_* primal_data,</div>
+<div class="line"><a id="l01124" name="l01124"></a><span class="lineno"> 1124</span>              const AssemblyCubatureData&lt;DT_&gt;&amp; cubature,</div>
+<div class="line"><a id="l01125" name="l01125"></a><span class="lineno"> 1125</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
+<div class="line"><a id="l01126" name="l01126"></a><span class="lineno"> 1126</span>              const Adjacency::ColoringDataHandler&amp; coloring_data,</div>
+<div class="line"><a id="l01127" name="l01127"></a><span class="lineno"> 1127</span>              DT_ alpha, const AssemblyBurgersData&lt;DT_&gt;&amp; burgers_params,</div>
+<div class="line"><a id="l01128" name="l01128"></a><span class="lineno"> 1128</span>              const AssemblyMaterialData&lt;DT_&gt;&amp; material_params, MaterialType material_type)</div>
+<div class="line"><a id="l01129" name="l01129"></a><span class="lineno"> 1129</span>      {</div>
+<div class="line"><a id="l01130" name="l01130"></a><span class="lineno"> 1130</span>        #ifdef DEBUG</div>
+<div class="line"><a id="l01131" name="l01131"></a><span class="lineno"> 1131</span>        std::size_t pValue;</div>
+<div class="line"><a id="l01132" name="l01132"></a><span class="lineno"> 1132</span>        cudaDeviceGetLimit(&amp;pValue, cudaLimit::cudaLimitStackSize);</div>
+<div class="line"><a id="l01133" name="l01133"></a><span class="lineno"> 1133</span>        std::cout &lt;&lt; &quot;Current maximum thread cache: &quot; &lt;&lt; pValue &lt;&lt; std::endl;</div>
+<div class="line"><a id="l01134" name="l01134"></a><span class="lineno"> 1134</span>        #endif</div>
+<div class="line"><a id="l01135" name="l01135"></a><span class="lineno"> 1135</span>        const Memory::TypedView&lt;int&gt; color_view = coloring_data.color_map_view(Memory::Location::main, Memory::Access::read);</div>
+<div class="line"><a id="l01136" name="l01136"></a><span class="lineno"> 1136</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_view(dof_mapping.cell_to_dof.view(Memory::Location::main, Memory::Access::read));</div>
+<div class="line"><a id="l01137" name="l01137"></a><span class="lineno"> 1137</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, Space_::world_dim&gt;&gt; nodes_view(dof_mapping.nodes.view(Memory::Location::main, Memory::Access::read));</div>
+<div class="line"><a id="l01138" name="l01138"></a><span class="lineno"> 1138</span> </div>
+<div class="line"><a id="l01139" name="l01139"></a><span class="lineno"> 1139</span>        switch(material_type)</div>
+<div class="line"><a id="l01140" name="l01140"></a><span class="lineno"> 1140</span>        {</div>
+<div class="line"><a id="l01141" name="l01141"></a><span class="lineno"> 1141</span>          case MaterialType::carreau:</div>
+<div class="line"><a id="l01142" name="l01142"></a><span class="lineno"> 1142</span>          {</div>
+<div class="line"><a id="l01143" name="l01143"></a><span class="lineno"> 1143</span>            for(Index col = 0; col &lt; coloring_data.get_num_colors(); ++col)</div>
+<div class="line"><a id="l01144" name="l01144"></a><span class="lineno"> 1144</span>            {</div>
+<div class="line"><a id="l01145" name="l01145"></a><span class="lineno"> 1145</span>              VoxelAssembly::Kernel::template full_burgers_vm_assembler_vector_bd_host&lt;Space_, DT_, IT_&gt;(vector_data, conv_data, primal_data,</div>
+<div class="line"><a id="l01146" name="l01146"></a><span class="lineno"> 1146</span>                  space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l01147" name="l01147"></a><span class="lineno"> 1147</span>                  cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l01148" name="l01148"></a><span class="lineno"> 1148</span>                  cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l01149" name="l01149"></a><span class="lineno"> 1149</span>                  nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l01150" name="l01150"></a><span class="lineno"> 1150</span>                  &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col), burgers_params,</div>
+<div class="line"><a id="l01151" name="l01151"></a><span class="lineno"> 1151</span>                  Intern::ViscoFunctor&lt;DT_, MaterialType::carreau&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T}</div>
+<div class="line"><a id="l01152" name="l01152"></a><span class="lineno"> 1152</span>              );</div>
+<div class="line"><a id="l01153" name="l01153"></a><span class="lineno"> 1153</span>            }</div>
+<div class="line"><a id="l01154" name="l01154"></a><span class="lineno"> 1154</span>            break;</div>
+<div class="line"><a id="l01155" name="l01155"></a><span class="lineno"> 1155</span>          }</div>
+<div class="line"><a id="l01156" name="l01156"></a><span class="lineno"> 1156</span>          case MaterialType::carreauYasuda:</div>
+<div class="line"><a id="l01157" name="l01157"></a><span class="lineno"> 1157</span>          {</div>
+<div class="line"><a id="l01158" name="l01158"></a><span class="lineno"> 1158</span>            for(Index col = 0; col &lt; coloring_data.get_num_colors(); ++col)</div>
+<div class="line"><a id="l01159" name="l01159"></a><span class="lineno"> 1159</span>            {</div>
+<div class="line"><a id="l01160" name="l01160"></a><span class="lineno"> 1160</span>              VoxelAssembly::Kernel::template full_burgers_vm_assembler_vector_bd_host&lt;Space_, DT_, IT_&gt;(vector_data, conv_data, primal_data,</div>
+<div class="line"><a id="l01161" name="l01161"></a><span class="lineno"> 1161</span>                  space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l01162" name="l01162"></a><span class="lineno"> 1162</span>                  cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l01163" name="l01163"></a><span class="lineno"> 1163</span>                  cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l01164" name="l01164"></a><span class="lineno"> 1164</span>                  nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l01165" name="l01165"></a><span class="lineno"> 1165</span>                  &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col), burgers_params,</div>
+<div class="line"><a id="l01166" name="l01166"></a><span class="lineno"> 1166</span>                  Intern::ViscoFunctor&lt;DT_, MaterialType::carreauYasuda&gt;{material_params.mu_0, material_params.exp, material_params.lambda, material_params.a_T,material_params.yasuda_a, material_params.mu_inf}</div>
+<div class="line"><a id="l01167" name="l01167"></a><span class="lineno"> 1167</span>              );</div>
+<div class="line"><a id="l01168" name="l01168"></a><span class="lineno"> 1168</span>            }</div>
+<div class="line"><a id="l01169" name="l01169"></a><span class="lineno"> 1169</span>            break;</div>
+<div class="line"><a id="l01170" name="l01170"></a><span class="lineno"> 1170</span>          }</div>
+<div class="line"><a id="l01171" name="l01171"></a><span class="lineno"> 1171</span>        }</div>
+<div class="line"><a id="l01172" name="l01172"></a><span class="lineno"> 1172</span>      }</div>
+<div class="line"><a id="l01173" name="l01173"></a><span class="lineno"> 1173</span>    }</div>
+<div class="line"><a id="l01174" name="l01174"></a><span class="lineno"> 1174</span>  }</div>
+<div class="line"><a id="l01175" name="l01175"></a><span class="lineno"> 1175</span>}</div>
+<div class="line"><a id="l01176" name="l01176"></a><span class="lineno"> 1176</span> </div>
+<div class="line"><a id="l01177" name="l01177"></a><span class="lineno"> 1177</span>using namespace FEAT;</div>
+<div class="line"><a id="l01178" name="l01178"></a><span class="lineno"> 1178</span>using namespace FEAT::VoxelAssembly;</div>
+<div class="line"><a id="l01179" name="l01179"></a><span class="lineno"> 1179</span> </div>
+<div class="line"><a id="l01180" name="l01180"></a><span class="lineno"> 1180</span>/*******************************************************2D implementations***************************************************/</div>
+<div class="line"><a id="l01181" name="l01181"></a><span class="lineno"> 1181</span>template void Arch::assemble_burgers_velo_material_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01182" name="l01182"></a><span class="lineno"> 1182</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType, int, int, int, bool);</div>
+<div class="line"><a id="l01183" name="l01183"></a><span class="lineno"> 1183</span>template void Arch::assemble_burgers_velo_material_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01184" name="l01184"></a><span class="lineno"> 1184</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType, int, int, int, bool);</div>
+<div class="line"><a id="l01185" name="l01185"></a><span class="lineno"> 1185</span>template void Arch::assemble_burgers_velo_material_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01186" name="l01186"></a><span class="lineno"> 1186</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType, int, int, int, bool);</div>
+<div class="line"><a id="l01187" name="l01187"></a><span class="lineno"> 1187</span>template void Arch::assemble_burgers_velo_material_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01188" name="l01188"></a><span class="lineno"> 1188</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType, int, int, int, bool);</div>
+<div class="line"><a id="l01189" name="l01189"></a><span class="lineno"> 1189</span> </div>
+<div class="line"><a id="l01190" name="l01190"></a><span class="lineno"> 1190</span>template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01191" name="l01191"></a><span class="lineno"> 1191</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType);</div>
+<div class="line"><a id="l01192" name="l01192"></a><span class="lineno"> 1192</span>template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01193" name="l01193"></a><span class="lineno"> 1193</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType);</div>
+<div class="line"><a id="l01194" name="l01194"></a><span class="lineno"> 1194</span>template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01195" name="l01195"></a><span class="lineno"> 1195</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType);</div>
+<div class="line"><a id="l01196" name="l01196"></a><span class="lineno"> 1196</span>template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01197" name="l01197"></a><span class="lineno"> 1197</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType);</div>
+<div class="line"><a id="l01198" name="l01198"></a><span class="lineno"> 1198</span> </div>
+<div class="line"><a id="l01199" name="l01199"></a><span class="lineno"> 1199</span>template void Arch::assemble_burgers_velo_material_defect(const Q2StandardQuad&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01200" name="l01200"></a><span class="lineno"> 1200</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType, int, int, int, bool);</div>
+<div class="line"><a id="l01201" name="l01201"></a><span class="lineno"> 1201</span>template void Arch::assemble_burgers_velo_material_defect(const Q2StandardQuad&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01202" name="l01202"></a><span class="lineno"> 1202</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType, int, int, int, bool);</div>
+<div class="line"><a id="l01203" name="l01203"></a><span class="lineno"> 1203</span>template void Arch::assemble_burgers_velo_material_defect(const Q2StandardQuad&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01204" name="l01204"></a><span class="lineno"> 1204</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType, int, int, int, bool);</div>
+<div class="line"><a id="l01205" name="l01205"></a><span class="lineno"> 1205</span>template void Arch::assemble_burgers_velo_material_defect(const Q2StandardQuad&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01206" name="l01206"></a><span class="lineno"> 1206</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType, int, int, int, bool);</div>
+<div class="line"><a id="l01207" name="l01207"></a><span class="lineno"> 1207</span> </div>
+<div class="line"><a id="l01208" name="l01208"></a><span class="lineno"> 1208</span>template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardQuad&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01209" name="l01209"></a><span class="lineno"> 1209</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType);</div>
+<div class="line"><a id="l01210" name="l01210"></a><span class="lineno"> 1210</span>template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardQuad&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01211" name="l01211"></a><span class="lineno"> 1211</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType);</div>
+<div class="line"><a id="l01212" name="l01212"></a><span class="lineno"> 1212</span>template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardQuad&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01213" name="l01213"></a><span class="lineno"> 1213</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType);</div>
+<div class="line"><a id="l01214" name="l01214"></a><span class="lineno"> 1214</span>template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardQuad&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01215" name="l01215"></a><span class="lineno"> 1215</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType);</div>
+<div class="line"><a id="l01216" name="l01216"></a><span class="lineno"> 1216</span> </div>
+<div class="line"><a id="l01217" name="l01217"></a><span class="lineno"> 1217</span>/*********************************************************3D implementations**************************************************************************************/</div>
+<div class="line"><a id="l01218" name="l01218"></a><span class="lineno"> 1218</span> </div>
+<div class="line"><a id="l01219" name="l01219"></a><span class="lineno"> 1219</span>template void Arch::assemble_burgers_velo_material_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01220" name="l01220"></a><span class="lineno"> 1220</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType, int, int, int, bool);</div>
+<div class="line"><a id="l01221" name="l01221"></a><span class="lineno"> 1221</span>template void Arch::assemble_burgers_velo_material_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01222" name="l01222"></a><span class="lineno"> 1222</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType, int, int, int, bool);</div>
+<div class="line"><a id="l01223" name="l01223"></a><span class="lineno"> 1223</span>template void Arch::assemble_burgers_velo_material_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01224" name="l01224"></a><span class="lineno"> 1224</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType, int, int, int, bool);</div>
+<div class="line"><a id="l01225" name="l01225"></a><span class="lineno"> 1225</span>template void Arch::assemble_burgers_velo_material_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01226" name="l01226"></a><span class="lineno"> 1226</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType, int, int, int, bool);</div>
+<div class="line"><a id="l01227" name="l01227"></a><span class="lineno"> 1227</span> </div>
+<div class="line"><a id="l01228" name="l01228"></a><span class="lineno"> 1228</span>template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01229" name="l01229"></a><span class="lineno"> 1229</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType);</div>
+<div class="line"><a id="l01230" name="l01230"></a><span class="lineno"> 1230</span>template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01231" name="l01231"></a><span class="lineno"> 1231</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType);</div>
+<div class="line"><a id="l01232" name="l01232"></a><span class="lineno"> 1232</span>template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01233" name="l01233"></a><span class="lineno"> 1233</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType);</div>
+<div class="line"><a id="l01234" name="l01234"></a><span class="lineno"> 1234</span>template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01235" name="l01235"></a><span class="lineno"> 1235</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType);</div>
+<div class="line"><a id="l01236" name="l01236"></a><span class="lineno"> 1236</span> </div>
+<div class="line"><a id="l01237" name="l01237"></a><span class="lineno"> 1237</span>template void Arch::assemble_burgers_velo_material_defect(const Q2StandardHexa&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01238" name="l01238"></a><span class="lineno"> 1238</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType, int, int, int, bool);</div>
+<div class="line"><a id="l01239" name="l01239"></a><span class="lineno"> 1239</span>template void Arch::assemble_burgers_velo_material_defect(const Q2StandardHexa&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01240" name="l01240"></a><span class="lineno"> 1240</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType, int, int, int, bool);</div>
+<div class="line"><a id="l01241" name="l01241"></a><span class="lineno"> 1241</span>template void Arch::assemble_burgers_velo_material_defect(const Q2StandardHexa&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01242" name="l01242"></a><span class="lineno"> 1242</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType, int, int, int, bool);</div>
+<div class="line"><a id="l01243" name="l01243"></a><span class="lineno"> 1243</span>template void Arch::assemble_burgers_velo_material_defect(const Q2StandardHexa&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01244" name="l01244"></a><span class="lineno"> 1244</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType, int, int, int, bool);</div>
+<div class="line"><a id="l01245" name="l01245"></a><span class="lineno"> 1245</span> </div>
+<div class="line"><a id="l01246" name="l01246"></a><span class="lineno"> 1246</span>template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardHexa&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01247" name="l01247"></a><span class="lineno"> 1247</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType);</div>
+<div class="line"><a id="l01248" name="l01248"></a><span class="lineno"> 1248</span>template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardHexa&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01249" name="l01249"></a><span class="lineno"> 1249</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType);</div>
+<div class="line"><a id="l01250" name="l01250"></a><span class="lineno"> 1250</span>template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardHexa&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01251" name="l01251"></a><span class="lineno"> 1251</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const AssemblyMaterialData&lt;double&gt;&amp;, MaterialType);</div>
+<div class="line"><a id="l01252" name="l01252"></a><span class="lineno"> 1252</span>template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardHexa&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01253" name="l01253"></a><span class="lineno"> 1253</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const AssemblyMaterialData&lt;float&gt;&amp;, MaterialType);</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

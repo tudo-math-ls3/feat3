@@ -5,6 +5,7 @@ var namespace_f_e_a_t_1_1_trafo =
     [ "Standard", "namespace_f_e_a_t_1_1_trafo_1_1_standard.html", "namespace_f_e_a_t_1_1_trafo_1_1_standard" ],
     [ "EvalData", "class_f_e_a_t_1_1_trafo_1_1_eval_data.html", "class_f_e_a_t_1_1_trafo_1_1_eval_data" ],
     [ "EvaluatorBase", "class_f_e_a_t_1_1_trafo_1_1_evaluator_base.html", "class_f_e_a_t_1_1_trafo_1_1_evaluator_base" ],
+    [ "HierarchicalInverseMapping", "class_f_e_a_t_1_1_trafo_1_1_hierarchical_inverse_mapping.html", "class_f_e_a_t_1_1_trafo_1_1_hierarchical_inverse_mapping" ],
     [ "InverseMapping", "class_f_e_a_t_1_1_trafo_1_1_inverse_mapping.html", "class_f_e_a_t_1_1_trafo_1_1_inverse_mapping" ],
     [ "InverseMappingData", "class_f_e_a_t_1_1_trafo_1_1_inverse_mapping_data.html", "class_f_e_a_t_1_1_trafo_1_1_inverse_mapping_data" ],
     [ "InverseMappingError", "class_f_e_a_t_1_1_trafo_1_1_inverse_mapping_error.html", "class_f_e_a_t_1_1_trafo_1_1_inverse_mapping_error" ],

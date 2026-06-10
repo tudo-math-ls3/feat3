@@ -1,8 +1,8 @@
 var searchData=
 [
   ['f_0',['F',['../namespace_f_e_a_t_1_1_solver.html#a5b14b494b949c5eecc622f4ad6e2d59ba800618943025315f869e4e1f09471012',1,'FEAT::Solver']]],
-  ['fixed_1',['fixed',['../namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7acec315e3d0975e5cc2811d5d8725f149',1,'FEAT::Solver']]],
-  ['fixed_2',['Fixed',['../namespace_f_e_a_t_1_1_solver.html#a9d7f089c4ca7981d407aa7a7038f6e23a4457d440870ad6d42bab9082d9bf9b61',1,'FEAT::Solver']]],
+  ['fixed_1',['Fixed',['../namespace_f_e_a_t_1_1_solver.html#a9d7f089c4ca7981d407aa7a7038f6e23a4457d440870ad6d42bab9082d9bf9b61',1,'FEAT::Solver']]],
+  ['fixed_2',['fixed',['../namespace_f_e_a_t_1_1_solver.html#a289617fe7cdace66d3123dc0472c31d7acec315e3d0975e5cc2811d5d8725f149',1,'FEAT::Solver']]],
   ['fm_5fbcsr_3',['fm_bcsr',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646ad5501f80d1ffb260fbc6d7db56c2df94',1,'FEAT::LAFEM']]],
   ['fm_5fbinary_4',['fm_binary',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646a34b9b130e68b0a9ab2718496480e3142',1,'FEAT::LAFEM']]],
   ['fm_5fbm_5',['fm_bm',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646a6f9b45193f3549bfbf83b052a5c896a4',1,'FEAT::LAFEM']]],
@@ -19,5 +19,7 @@ var searchData=
   ['fm_5foff_16',['fm_off',['../namespace_f_e_a_t_1_1_geometry.html#abcc16a3ca21fc13d41a4a9af795fb25fa8eef80519359d88d82b1813cbe8f9a98',1,'FEAT::Geometry']]],
   ['fm_5fsv_17',['fm_sv',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646a94210b10bc764e7f575bee1abd9dff53',1,'FEAT::LAFEM']]],
   ['fm_5fsvb_18',['fm_svb',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ada0e93baecfc2c4933d9c5eb9c96a646a8d355878cf0f1f2e69d55a2229848e41',1,'FEAT::LAFEM']]],
-  ['full_19',['full',['../namespace_f_e_a_t_1_1_solver.html#a8c9301b94ea72379786a83666a86c4ffae9dc924f238fa6cc29465942875fe8f0',1,'FEAT::Solver']]]
+  ['format_5fto_5fone_19',['format_to_one',['../namespace_f_e_a_t_1_1_memory.html#ae0787ce444624fea4d61a5c5d00a53bbafe2779e3a4b1ff7365c4e024544c5ee3',1,'FEAT::Memory']]],
+  ['format_5fto_5fzero_20',['format_to_zero',['../namespace_f_e_a_t_1_1_memory.html#ae0787ce444624fea4d61a5c5d00a53bba537638ecbd3bee12333130d9c0621d23',1,'FEAT::Memory']]],
+  ['full_21',['full',['../namespace_f_e_a_t_1_1_solver.html#a8c9301b94ea72379786a83666a86c4ffae9dc924f238fa6cc29465942875fe8f0',1,'FEAT::Solver']]]
 ];

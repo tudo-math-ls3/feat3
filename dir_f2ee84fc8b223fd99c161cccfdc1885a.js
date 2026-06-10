@@ -4,6 +4,7 @@ var dir_f2ee84fc8b223fd99c161cccfdc1885a =
     [ "base.hpp", "kernel_2adjacency_2base_8hpp_source.html", null ],
     [ "coloring.cpp", "coloring_8cpp_source.html", null ],
     [ "coloring.hpp", "coloring_8hpp_source.html", null ],
+    [ "coloring_data_handler.hpp", "coloring__data__handler_8hpp_source.html", null ],
     [ "cuthill_mckee.cpp", "cuthill__mckee_8cpp_source.html", null ],
     [ "cuthill_mckee.hpp", "cuthill__mckee_8hpp_source.html", null ],
     [ "dynamic_graph.hpp", "dynamic__graph_8hpp_source.html", null ],

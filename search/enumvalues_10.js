@@ -3,7 +3,7 @@ var searchData=
   ['s_5fm_0',['s_m',['../namespace_f_e_a_t.html#abc175499504e9be922533b3a3627ccacacc771f6d1fd8ea65f44ad62befa37bb0',1,'FEAT']]],
   ['shallow_1',['Shallow',['../namespace_f_e_a_t_1_1_l_a_f_e_m.html#ad372dae2e320ef82768327bb8342786fa928d0f1285ee7d36c1c2fa1b1b7a164c',1,'FEAT::LAFEM']]],
   ['sibling_2',['Sibling',['../namespace_f_e_a_t_1_1_geometry.html#ad03b126d9c056078d9c866ee7549a8efaba3f6a5526b54675d54123702760ddf2',1,'FEAT::Geometry']]],
-  ['simplex_3',['simplex',['../class_f_e_a_t_1_1_geometry_1_1_mesh_file_reader.html#a7151af9ea20b00d88dd8d662e6517366a0d387426f578f524f21c1bff75f78213',1,'FEAT::Geometry::MeshFileReader']]],
+  ['simplex_3',['simplex',['../namespace_f_e_a_t_1_1_geometry.html#a7a1948d82559bb856d53452c6b129a6ea0d387426f578f524f21c1bff75f78213',1,'FEAT::Geometry']]],
   ['single_4',['single',['../namespace_f_e_a_t_1_1_assembly.html#a28186a335b7da11c0a4a2a3770462bf0add5c07036f2975ff4bce568b6511d3bc',1,'FEAT::Assembly']]],
   ['stagnated_5',['stagnated',['../namespace_f_e_a_t_1_1_solver.html#a769aeff8367a8325246f32ed1a3b9e81aa3d1e0a7dd736bc430ba471d9dfdf3a2',1,'FEAT::Solver']]],
   ['standard_6',['standard',['../class_f_e_a_t_1_1_adjacency_1_1_cuthill_mc_kee.html#a012aeb1b0b0435bac9a59114e6932e52ac00f0c4675b91fb8b918e4079a0b1bac',1,'FEAT::Adjacency::CuthillMcKee::standard()'],['../class_f_e_a_t_1_1_adjacency_1_1_cuthill_mc_kee.html#ae483849dde28cd0d8488aef99a8c8ffdac00f0c4675b91fb8b918e4079a0b1bac',1,'FEAT::Adjacency::CuthillMcKee::standard()']]],

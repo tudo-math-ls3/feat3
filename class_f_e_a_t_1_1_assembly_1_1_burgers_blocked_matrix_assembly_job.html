@@ -215,7 +215,7 @@ Public Attributes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
-<tr class="memitem:a490f5dd002edc3794221a35f4dcc122b"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_matrix_assembly_job.html#a490f5dd002edc3794221a35f4dcc122b">block_size</a> = Matrix_::BlockHeight</td></tr>
+<tr class="memitem:a490f5dd002edc3794221a35f4dcc122b"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_matrix_assembly_job.html#a490f5dd002edc3794221a35f4dcc122b">block_size</a> = Matrix_::block_height</td></tr>
 <tr class="memdesc:a490f5dd002edc3794221a35f4dcc122b"><td class="mdescLeft">&#160;</td><td class="mdescRight">the block size  <a href="class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_matrix_assembly_job.html#a490f5dd002edc3794221a35f4dcc122b">More...</a><br /></td></tr>
 <tr class="separator:a490f5dd002edc3794221a35f4dcc122b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -457,7 +457,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="burgers__assembly__job_8hpp_source.html#l00210">210</a> of file <a class="el" href="burgers__assembly__job_8hpp_source.html">burgers_assembly_job.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="burgers__assembly__job_8hpp_source.html#l00188">FEAT::Assembly::BurgersAssemblyJobBase&lt; DataType_, Space_, ConvVector_ &gt;::calc_sd_v_norm()</a>, <a class="el" href="vector_8hpp_source.html#l00149">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::get_gate()</a>, <a class="el" href="vector_8hpp_source.html#l00122">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>, and <a class="el" href="gate_8hpp_source.html#l00613">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max()</a>.</p>
+<p class="reference">References <a class="el" href="burgers__assembly__job_8hpp_source.html#l00188">FEAT::Assembly::BurgersAssemblyJobBase&lt; DataType_, Space_, ConvVector_ &gt;::calc_sd_v_norm()</a>, <a class="el" href="vector_8hpp_source.html#l00149">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::get_gate()</a>, <a class="el" href="vector_8hpp_source.html#l00122">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::local()</a>, and <a class="el" href="gate_8hpp_source.html#l00662">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max()</a>.</p>
 
 </div>
 </div>
@@ -500,7 +500,7 @@ template&lt;typename IndexType_ , int conv_dim_&gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="burgers__assembly__job_8hpp_source.html#l00188">188</a> of file <a class="el" href="burgers__assembly__job_8hpp_source.html">burgers_assembly_job.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dense__vector__blocked_8hpp_source.html#l00502">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::elements()</a>, <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, and <a class="el" href="dense__vector__blocked_8hpp_source.html#l00528">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, BlockSize_ &gt;::size()</a>.</p>
+<p class="reference">References <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, and <a class="el" href="dense__vector__blocked_8hpp_source.html#l00360">FEAT::LAFEM::DenseVectorBlocked&lt; DT_, IT_, block_size_ &gt;::size()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="burgers__assembly__job_8hpp_source.html#l00210">FEAT::Assembly::BurgersAssemblyJobBase&lt; DataType_, Space_, ConvVector_ &gt;::calc_sd_v_norm()</a>, and <a class="el" href="burgers__assembly__job_8hpp_source.html#l00226">FEAT::Assembly::BurgersAssemblyJobBase&lt; DataType_, Space_, ConvVector_ &gt;::set_sd_v_norm()</a>.</p>
 
@@ -617,7 +617,7 @@ template&lt;typename Matrix_ , typename Space_ , typename ConvVector_  = typenam
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr int <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_matrix_assembly_job.html">FEAT::Assembly::BurgersBlockedMatrixAssemblyJob</a>&lt; Matrix_, Space_, ConvVector_ &gt;::block_size = Matrix_::BlockHeight</td>
+          <td class="memname">constexpr int <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_burgers_blocked_matrix_assembly_job.html">FEAT::Assembly::BurgersBlockedMatrixAssemblyJob</a>&lt; Matrix_, Space_, ConvVector_ &gt;::block_size = Matrix_::block_height</td>
         </tr>
       </table>
   </td>
