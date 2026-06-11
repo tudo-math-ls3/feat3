@@ -608,38 +608,6 @@ if hasTag "hdf5" || hasTag "trilinos"; then
     fi
 fi
 
-if hasTag "metis" || hasTag "trilinos"; then
-    if [[ ! -d "$WORKING_DIR"/parmetis-src ]]; then
-        echo "[ParMETIS] Download step..."
-        git clone https://github.com/tudo-math-ls3/ParMETIS.git parmetis-src
-    else
-        echo "[ParMETIS] Skipping download step: $WORKING_DIR/parmetis-src already exists"
-    fi
-
-    if [ ! -d "$WORKING_DIR"/parmetis-build ]; then
-        echo "[ParMETIS] Build step..."
-        mkdir -p parmetis-build
-        cd parmetis-build
-
-        cmake ../parmetis-src -DINDEXTYPEWIDTH=32 -DREALTYPEWIDTH=64 2>&1 | tee "$WORKING_DIR"/logs/parmetis-configure.log
-        cmake --build . -j "${NP}" 2>&1 | tee "$WORKING_DIR"/logs/parmetis-build.log
-
-        cd ..
-    else
-        echo "[ParMETIS] Skipping build step: $WORKING_DIR/parmetis-build already exists"
-    fi
-
-    if [ ! -f "$INSTALL_DIR"/lib64/libparmetis.a ]; then
-        echo "[ParMETIS] Install step..."
-
-        cd parmetis-build
-        cmake --install . --prefix="$INSTALL_DIR" 2>&1 | tee "$WORKING_DIR"/logs/parmetis-install.log
-        cd ..
-    else
-        echo "[ParMETIS] Skipping install step: $INSTALL_DIR/lib64/libparmetis.a already exists"
-    fi
-fi
-
 if hasTag "superlu"; then
     if [ ! -d "$WORKING_DIR"/superludist-src ]; then
         echo "[SuperLU_DIST] Download step..."
@@ -654,8 +622,7 @@ if hasTag "superlu"; then
 
         cd superludist-build
         cmake ../superludist-src \
-            -D TPL_PARMETIS_INCLUDE_DIRS="$INSTALL_DIR/include" \
-            -D TPL_PARMETIS_LIBRARIES="$INSTALL_DIR/lib64/libparmetis.a;$INSTALL_DIR/lib64/libmetis.a;$INSTALL_DIR/lib64/libgklib.a" \
+            -D TPL_ENABLE_PARMETISLIB="OFF" \
             -D TPL_BLAS_INCLUDE_DIRS="$INSTALL_DIR/include" \
             -D TPL_BLAS_LIBRARIES="$INSTALL_DIR/lib/libopenblas.a" \
             -D BUILD_SHARED_LIBS=OFF \
@@ -796,7 +763,7 @@ if hasTag "mumps" || hasTag "trilinos"; then
 
 SCOTCHDIR  = @INSTALL_DIR@
 ISCOTCH    = -I$(SCOTCHDIR)/include
-LSCOTCH    = -L$(SCOTCHDIR)/lib -lptesmumps -lptscotch -lptscotcherr -lscotch
+LSCOTCH    = -L$(SCOTCHDIR)/lib64 -lptesmumps -lptscotch -lptscotcherr -lscotch
 
 LPORDDIR = $(topdir)/PORD/lib/
 IPORD    = -I$(topdir)/PORD/include/
@@ -806,14 +773,14 @@ LMETISDIR = @INSTALL_DIR@/lib64
 IMETIS    = -I@INSTALL_DIR@/include
 LMETIS    = -L$(LMETISDIR) -lparmetis -lmetis -lgklib
 
-ORDERINGSF = -Dscotch -Dmetis -Dpord -Dptscotch -Dparmetis -DIDXTYPEWIDTH=32 -DREALTYPEWIDTH=64
+ORDERINGSF = -Dscotch -Dpord -Dptscotch -DIDXTYPEWIDTH=32 -DREALTYPEWIDTH=64
 #ORDERINGSF  = -Dpord -Dparmetis -Dptscotch
 #ORDERINGSF  = -Dpord -Dparmetis
 ORDERINGSC  = $(ORDERINGSF)
 
-LORDERINGS = $(LMETIS) $(LPORD) $(LSCOTCH)
+LORDERINGS = $(LPORD) $(LSCOTCH)
 IORDERINGSF = $(ISCOTCH)
-IORDERINGSC = $(IMETIS) $(IPORD) $(ISCOTCH)
+IORDERINGSC = $(IPORD) $(ISCOTCH)
 
 #End orderings
 ########################################################################
@@ -906,9 +873,6 @@ if hasTag "zoltan"; then
             --with-scotch \
             --with-scotch-incdir="$INSTALL_DIR"/include/ \
             --with-scotch-libdir="$INSTALL_DIR"/lib64 \
-            --with-parmetis \
-            --with-parmetis-incdir="$INSTALL_DIR"/include \
-            --with-parmetis-libdir="$INSTALL_DIR"/lib64 \
             --with-libs="-lgklib" \
             2>&1 | tee "$WORKING_DIR"/logs/zoltan-configure.log
 
@@ -983,15 +947,7 @@ if hasTag "trilinos" && [ -d "$TRILINOS_DIR" ]; then
             -D TPL_ENABLE_Boost:BOOL=ON \
             -D TPL_ENABLE_LAPACK:BOOL=ON \
             -D TPL_ENABLE_Matio:BOOL=OFF \
-            -D TPL_ENABLE_METIS:BOOL=ON \
-            -D METIS_LIBRARY_DIRS:PATH="$INSTALL_DIR/lib64" \
-            -D METIS_INCLUDE_DIRS:PATH="$INSTALL_DIR/include" \
-            -D METIS_LIBRARY_NAMES:STRING="metis;gklib" \
             -D TPL_ENABLE_BLAS:BOOL=ON \
-            -D TPL_ENABLE_ParMETIS:BOOL=ON \
-            -D ParMETIS_LIBRARY_DIRS:PATH="$INSTALL_DIR/lib64"  \
-            -D ParMETIS_INCLUDE_DIRS:PATH="$INSTALL_DIR/include" \
-            -D ParMETIS_LIBRARY_NAMES:STRING="parmetis" \
             -D TPL_ENABLE_Scotch:BOOL=ON \
             -D Scotch_LIBRARY_DIRS:PATH="$INSTALL_DIR/lib64"  \
             -D Scotch_INCLUDE_DIRS:PATH="$INSTALL_DIR/include" \
@@ -1022,7 +978,7 @@ if hasTag "trilinos" && [ -d "$TRILINOS_DIR" ]; then
             -D UMFPACK_INCLUDE_DIRS:STRING="${INSTALL_DIR}/include/suitesparse" \
             -D MUMPS_LIBRARY_DIRS:STRING="${INSTALL_DIR}/lib" \
             -D MUMPS_INCLUDE_DIRS:STRING="${INSTALL_DIR}/include" \
-            -D MUMPS_LIBRARY_NAMES:STRING="dmumps;mumps_common;pord;parmetis;metis;esmumps;ptscotch;ptscotcherr;scotch;scotcherr;scalapack;openblas" \
+            -D MUMPS_LIBRARY_NAMES:STRING="dmumps;mumps_common;pord;esmumps;ptscotch;ptscotcherr;scotch;scotcherr;scalapack;openblas" \
             -D TRIBITS_TPL_FIND_INCLUDE_DIRS_AND_LIBRARIES_VERBOSE:BOOL=ON \
             -D CMAKE_PREFIX_PATH:PATH="$INSTALL_DIR" \
             -D CMAKE_INSTALL_PREFIX:PATH="$INSTALL_DIR" 2>&1 |
@@ -1030,9 +986,6 @@ if hasTag "trilinos" && [ -d "$TRILINOS_DIR" ]; then
 
         make all -j4 2>&1 | tee "$WORKING_DIR"/logs/trilinos-build.log || exit
         make install 2>&1 | tee "$WORKING_DIR"/logs/trilinos-install.log || exit
-
-            #-D Trilinos_EXTRA_LINK_FLAGS:STRING="-lgfortran;-lomp;-lmpi_mpifh;-L${INSTALL_DIR}/lib;-L${INSTALL_DIR}/lib64;-lscalapack;-lopenblas;-lpord;-lGKlib" \
-
 
         cd ..
     else

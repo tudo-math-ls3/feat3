@@ -64,6 +64,10 @@ if(FEAT_HAVE_CGAL)
   PUBLIC # TODO: necessary?
     feat-dependency feat-kernel-util)
 
+  if (FEAT_VALGRIND)
+    target_compile_definitions(feat-kernel-geometry-cgal PRIVATE CGAL_DISABLE_ROUNDING_MATH_CHECK=ON)
+  endif (FEAT_VALGRIND)
+
   target_link_libraries(feat-kernel-geometry PRIVATE feat-kernel-geometry-cgal)
 endif()
 
@@ -72,9 +76,6 @@ if(FEAT_HAVE_MESHHEXER)
   target_link_libraries(feat-kernel-geometry PRIVATE MeshHexer::MeshHexer)
 endif()
 
-if (FEAT_VALGRIND)
-  target_compile_definitions(feat-kernel-geometry PRIVATE CGAL_DISABLE_ROUNDING_MATH_CHECK=ON)
-endif (FEAT_VALGRIND)
 
 target_link_libraries(feat-kernel-geometry
 PUBLIC

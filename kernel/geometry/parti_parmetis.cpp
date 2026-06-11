@@ -191,23 +191,23 @@ namespace FEAT
 
       // call ParMETIS
       int rtn = ParMETIS_V3_PartGeomKway(
-        vtxdist.data(),   // in: first dof for each processor, on all processes, length P+1
-        xadj.data(),      // in: dom_ptr of adjacency Graph (w/o self-adjacency)
-        adjncy.data(),    // in: img_idx of adjacency Graph (w/o self-adjacency)
-        vwgt.data(),      // in: vertex weights (may be set to nullptr)
-        nullptr,          // in: edge weights (may be set to nullptr)
-        &wgtflag,         // in: 0 for no weights
-        &numflag,         // in: 0 for C numbering
-        &ndims,           // in: dimension of mesh
-        xyz.data(),       // in: vertex coords (element midpoints), process-local only
-        &ncon,            // in: =1
-        &nparts,          // in: number of desired partitions
-        tpwgts.data(),    // in: array of 1/nparts
-        ubvec.data(),     // in: array of 1.05
-        options.data(),   // parameter array
-        &edgecut,         // out: number of cut edges
-        part.data(),      // out: partition for each local node
-        &_sub_comm.mpi_comm() // in: self explanatory
+        vtxdist.data(),                          // in: first dof for each processor, on all processes, length P+1
+        xadj.data(),                             // in: dom_ptr of adjacency Graph (w/o self-adjacency)
+        adjncy.data(),                           // in: img_idx of adjacency Graph (w/o self-adjacency)
+        vwgt.size() > 0 ? vwgt.data() : nullptr, // in: vertex weights (may be set to nullptr)
+        nullptr,                                 // in: edge weights (may be set to nullptr)
+        &wgtflag,                                // in: 0 for no weights
+        &numflag,                                // in: 0 for C numbering
+        &ndims,                                  // in: dimension of mesh
+        xyz.data(),                              // in: vertex coords (element midpoints), process-local only
+        &ncon,                                   // in: =1
+        &nparts,                                 // in: number of desired partitions
+        tpwgts.data(),                           // in: array of 1/nparts
+        ubvec.data(),                            // in: array of 1.05
+        options.data(),                          // parameter array
+        &edgecut,                                // out: number of cut edges
+        part.data(),                             // out: partition for each local node
+        &_sub_comm.mpi_comm()                    // in: self explanatory
       );
 
       // convert parts
