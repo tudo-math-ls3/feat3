@@ -286,7 +286,7 @@ namespace Gendie
         {
           // if nothing is assembled, we have to do the deed now
           sys_lvl.assemble_velo_struct(dom_lvl.space_velo);
-          sys_lvl.assemble_velocity_laplace_matrix(dom_lvl.domain_asm, dom_lvl.space_velo, SolverDataType_(this->_materials.front().get_viscosity_model()->get_data()[0] * 1E3/mesh_unit_scale), true, cubature_matrix_a);
+          sys_lvl.assemble_velocity_laplace_matrix(dom_lvl.domain_asm, dom_lvl.space_velo, SolverDataType_(this->_materials.front().get_default_viscosity(mesh_unit_scale, BaseDataType(1))), true, cubature_matrix_a);
           sys_lvl.assemble_velocity_mass_matrix(dom_lvl.domain_asm, dom_lvl.space_velo, cubature_matrix_m);
           if constexpr(system_is_solver_level)
             sys_lvl.assemble_grad_div_matrices(dom_lvl.domain_asm, dom_lvl.space_velo, dom_lvl.space_pres, cubature_matrix_b);
@@ -316,7 +316,7 @@ namespace Gendie
         auto& sys_lvl = *solver_levels.at(i);
 
         sys_lvl.assemble_velo_struct(dom_lvl.space_velo);
-        sys_lvl.assemble_velocity_laplace_matrix(dom_lvl.domain_asm, dom_lvl.space_velo, SolverDataType_(this->_materials.front().get_viscosity_model()->get_data()[0] * 1E+3/mesh_unit_scale), true, cubature_matrix_a);
+        sys_lvl.assemble_velocity_laplace_matrix(dom_lvl.domain_asm, dom_lvl.space_velo, SolverDataType_(this->_materials.front().get_default_viscosity(mesh_unit_scale, BaseDataType(1))), true, cubature_matrix_a);
         sys_lvl.assemble_velocity_mass_matrix(dom_lvl.domain_asm, dom_lvl.space_velo, cubature_matrix_m);
         if constexpr(system_is_solver_level)
           sys_lvl.assemble_grad_div_matrices(dom_lvl.domain_asm, dom_lvl.space_velo, dom_lvl.space_pres, cubature_matrix_b);

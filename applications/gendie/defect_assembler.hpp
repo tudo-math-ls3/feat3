@@ -318,7 +318,8 @@ namespace Gendie
 
     DataType _calc_stiffness_factor() const
     {
-      return this->_material->get_viscosity_model()->get_data()[0] * DataType(1E3) / _mesh_scale;
+      const auto aT = this->_material->get_abiat_aT(this->_temperature);
+      return this->_material->get_default_viscosity(_mesh_scale, aT);
     }
 
     //the front system has to have B and D matrix correctly assembled
@@ -333,10 +334,10 @@ namespace Gendie
         this->_cubature, this->_material->get_visc_func(_mesh_scale), this->_material->get_visc_der_func(_mesh_scale)
       );
       {
-        const auto visc_model_data = this->_material->get_viscosity_model()->get_data();
+        const auto aT = this->_material->get_abiat_aT(this->_temperature);
         burgers_vec_job.deformation = true;
-        burgers_vec_job.nu = visc_model_data[0] * DataType(1E3) / _mesh_scale;
-        burgers_vec_job.aT = this->_material->get_abiat_aT(this->_temperature);
+        burgers_vec_job.nu = this->_material->get_default_viscosity(_mesh_scale, aT);
+        burgers_vec_job.aT = aT;
         burgers_vec_job.beta = navier ? this->_material->get_density_gram_per_unit(_mesh_scale) : DataType(0);
         burgers_vec_job.reg_eps = reg_eps;
         burgers_vec_job.alpha = DataType(-1) / this->stiffness_factor;
@@ -372,10 +373,10 @@ namespace Gendie
         this->_cubature, this->_material->get_visc_func(_mesh_scale), this->_material->get_visc_der_func(_mesh_scale)
       );
       {
-        const auto visc_model_data = this->_material->get_viscosity_model()->get_data();
+        const auto aT = this->_material->get_abiat_aT(this->_temperature);
         burgers_vec_job.deformation = true;
-        burgers_vec_job.nu = visc_model_data[0] * DataType(1E3) / _mesh_scale;
-        burgers_vec_job.aT = this->_material->get_abiat_aT(this->_temperature);
+        burgers_vec_job.nu = this->_material->get_default_viscosity(_mesh_scale, aT);
+        burgers_vec_job.aT = aT;
         burgers_vec_job.beta = navier ? this->_material->get_density_gram_per_unit(_mesh_scale) : DataType(0);
         burgers_vec_job.reg_eps = reg_eps;
         burgers_vec_job.alpha = DataType(-1) / this->stiffness_factor;

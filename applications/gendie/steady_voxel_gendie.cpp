@@ -115,7 +115,7 @@ namespace Gendie
     Parameter<bool> refine_vtk = parameter(false).property("postproc-params/refine-vtk");
     Parameter<bool> use_true_vtk_name = parameter(false).property("postproc-params/vtk-use-true-name");
     Parameter<bool> vtk_debug = parameter(false).property("postproc-params/vtk-debug-data");
-    Parameter<bool> measure_cgal_size = parameter(true).property("postproc-params/skip_cgal_meaure");
+    Parameter<bool> measure_cgal_size = parameter(true).property("postproc-params/skip-cgal-messure");
     Parameter<String> mesh_hierarchy_vtk = parameter(String("")).property("postproc-params/mesh-hierarchy-vtk");
 
     Derived<bool> want_vtk = Derived(false);
@@ -788,7 +788,7 @@ namespace Gendie
 
     // TODO: mass matrix really required?
     system_level->assemble_velo_struct(domain.front()->space_velo);
-    system_level->assemble_velocity_laplace_matrix(domain.front()->domain_asm, domain.front()->space_velo, materials.front().get_viscosity_model()->get_data()[0], true, *param_holder.cubature_m);
+    system_level->assemble_velocity_laplace_matrix(domain.front()->domain_asm, domain.front()->space_velo, materials.front().get_default_viscosity(*param_holder.mesh_unit_scale, SystemDataType(1)), true, *param_holder.cubature_m);
     system_level->assemble_velocity_mass_matrix(domain.front()->domain_asm, domain.front()->space_velo, *param_holder.cubature_m);
 
     //and compile the system matrix

@@ -316,19 +316,20 @@ namespace Gendie
 
     SystemDataType _calc_stiffness_factor() const
     {
-      return this->_material->get_viscosity_model()->get_data()[0] * SystemDataType(1E3) / _mesh_scale;
+      const auto aT = this->_material->get_abiat_aT(this->_temperature);
+      return this->_material->get_default_viscosity(_mesh_scale, aT);
     }
 
     template<typename Job_>
     void _set_job(Job_& job) const
     {
       typedef typename Job_::DataType AssemblyDataType;
-      const auto visc_model_data = this->_material->get_viscosity_model()->get_data();
+      const auto aT = this->_material->get_abiat_aT(this->_temperature);
       job.deformation = true;
-      job.nu = AssemblyDataType(visc_model_data[0] * SystemDataType(1E3) / this->_mesh_scale);
-      job.aT = AssemblyDataType(this->_material->get_abiat_aT(this->_temperature));
+      job.nu = AssemblyDataType(this->_material->get_default_viscosity(_mesh_scale, aT));
+      job.aT = AssemblyDataType(aT);
       job.sd_delta = AssemblyDataType(0);
-      job.sd_nu = AssemblyDataType(visc_model_data[0] * SystemDataType(1E3) / this->_mesh_scale);
+      job.sd_nu = job.nu;
       job.beta = navier ? AssemblyDataType(_material->get_density_gram_per_unit(this->_mesh_scale)) : AssemblyDataType(0);
       job.reg_eps = AssemblyDataType(reg_eps);
       job.frechet_beta = AssemblyDataType(SystemDataType(job.beta) * this->_weight_jacobian);
@@ -397,8 +398,7 @@ namespace Gendie
 
         // actual assembly
         Assembly::assemble_bilinear_operator_matrix_1(cur_dom.domain_asm, cur_sys.matrix_a.local(), laplace_op, cur_dom.space_velo, this->_cubature,
-          AssemblyDataType(this->_material->get_viscosity_model()->get_data()[0]) * AssemblyDataType(this->_material->get_viscosity_model()->get_visco_scaling_factor(AssemblyDataType(_mesh_scale))) *
-                 AssemblyDataType(SystemDataType(1) / this->stiffness_factor));
+          AssemblyDataType(1));
         if(i == 0) this->watch_assembly_fine.stop();
       }
       this->watch_assembly.stop();

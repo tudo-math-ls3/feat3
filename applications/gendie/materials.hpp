@@ -1164,6 +1164,12 @@ namespace Gendie
       _visc_mat_p = std::move(visco_model);
     }
 
+    template<typename DT2_>
+    DT2_ get_default_viscosity(DT2_ mesh_scaling_factor, DT2_ aT) const
+    {
+      return _visc_mat_p->get_visc_func(mesh_scaling_factor)(DT2_(1E-2), aT);
+    }
+
 
     const ViscoModelBase<DataType>* get_viscosity_model() const
     {
