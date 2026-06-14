@@ -609,6 +609,7 @@ namespace FEAT
         for(std::size_t idx(0u); recv_reqs.wait_any(idx); )
         {
           // scatter from buffer
+          donee_views.at(idx).release();
           this->_scatter_donee_data(val, donee_vbufs.at(idx), this->_donee_data_mirs.at(idx));
         }
 
@@ -784,8 +785,8 @@ namespace FEAT
         _donee_bufs.resize(num_neigh_donee);
 
         // allocate owner views
-        std::vector<Memory::TypedView<IndexType>> owner_row_ptr_views(num_neigh_donee);
-        std::vector<Memory::TypedView<IndexType>> owner_col_idx_views(num_neigh_donee);
+        std::vector<Memory::TypedView<IndexType>> owner_row_ptr_views(num_neigh_owner);
+        std::vector<Memory::TypedView<IndexType>> owner_col_idx_views(num_neigh_owner);
 
         // create the owner buffers by using the auxiliary helper function.
         for(Index i(0); i < num_neigh_owner; ++i)

@@ -804,7 +804,7 @@ namespace FEAT
         // to our donee-neighbors
         Dist::RequestVector send_reqs(num_neigh_donee);
         std::vector<BufferVectorType> send_bufs(num_neigh_donee);
-        std::vector<Memory::TypedView<DataType>> send_views(num_neigh_owner);
+        std::vector<Memory::TypedView<DataType>> send_views(num_neigh_donee);
         for(Index i(0); i < num_neigh_donee; ++i)
         {
           // get mirror, create buffer and gather the shared DOFs
@@ -961,7 +961,7 @@ namespace FEAT
         {
           const Index n = dof_owners.size();
           const Memory::TypedView<IT_> dof_own = dof_owners.elements_view_r();
-          Memory::TypedView<IT_> own_idx = owned_dofs.elements_view_rw();
+          Memory::TypedView<IT_> own_idx = owned_dofs.elements_view_w();
 
           Index k = 0;
           for(Index i = 0; i < n; ++i)
@@ -1211,7 +1211,7 @@ namespace FEAT
         {
           const Index n = dof_owners.size();
           const Memory::TypedView<Tiny::Vector<IT_, bs_>> dof_own = dof_owners.elements_view_r();
-          Memory::TypedView<Tiny::Vector<IT_, bs_>> own_idx = owned_dofs.elements_view_rw();
+          Memory::TypedView<Tiny::Vector<IT_, bs_>> own_idx = owned_dofs.elements_view_w();
 
           Index k = 0;
           for(Index i = 0; i < n; ++i)
@@ -1283,7 +1283,7 @@ namespace FEAT
             return Index(0);
 
           // store owner DOF indices
-          Memory::TypedView<IT_> own_idx = owner_mirror.indices_view_rw();
+          Memory::TypedView<IT_> own_idx = owner_mirror.indices_view_w();
           for(IT_ i = 0, k = 0; i < n; ++i)
           {
             if(dof_own[halo_idx[i]][0] == neighbor_rank)
@@ -1303,7 +1303,7 @@ namespace FEAT
           // get halo mirror indices
           const Index n = halo_mirror.num_indices();
           const Memory::TypedView<IT_> halo_idx = halo_mirror.indices_view_r();
-          Memory::TypedView<Tiny::Vector<IT_, bs_>> own_idx = own_dof_idx.elements_view_r();
+          const Memory::TypedView<Tiny::Vector<IT_, bs_>> own_idx = own_dof_idx.elements_view_r();
 
           // count number of owner dofs
           Index num_donee = 0u;
@@ -1325,8 +1325,8 @@ namespace FEAT
           // get halo mirror indices
           const Index n = halo_mirror.num_indices();
           const Memory::TypedView<IT_> halo_idx = halo_mirror.indices_view_r();
-          Memory::TypedView<Tiny::Vector<IT_, bs_>> own_idx = own_dof_idx.elements_view_r();
-          Memory::TypedView<IT_> donee_idx = donee_mirror.indices_view_rw();
+          const Memory::TypedView<Tiny::Vector<IT_, bs_>> own_idx = own_dof_idx.elements_view_r();
+          Memory::TypedView<IT_> donee_idx = donee_mirror.indices_view_w();
 
           // store donee DOF indices
           Index k = 0u;
@@ -1347,7 +1347,7 @@ namespace FEAT
           LAFEM::DenseVectorBlocked<IT_, IT_, bs_>& global_dof_idx,
           const LAFEM::VectorMirror<DT_, IT_>& owned_mirror, Index offset)
         {
-          Memory::TypedView<Tiny::Vector<IT_, bs_>> g_dof_idx = global_dof_idx.elements_view_rw();
+          Memory::TypedView<Tiny::Vector<IT_, bs_>> g_dof_idx = global_dof_idx.elements_view_w();
           const Memory::TypedView<IT_> own_idx = owned_mirror.indices_view_r();
           const Index n =  owned_mirror.num_indices();
           for(Index i = 0; i < n; ++i)
@@ -1366,7 +1366,7 @@ namespace FEAT
         {
           const Index num_indices = mirror.num_indices();
           const Memory::TypedView<IT_> mir_idx = mirror.indices_view_r();
-          Memory::TypedView<Tiny::Vector<IT_, bs_>> g_dof_idx = glob_dof_idx.elements_view_rw();
+          Memory::TypedView<Tiny::Vector<IT_, bs_>> g_dof_idx = glob_dof_idx.elements_view_w();
           for(Index i(0); i < num_indices; ++i)
           {
             for(int j = 0; j < bs_; ++j)
@@ -1400,7 +1400,7 @@ namespace FEAT
           XASSERT(mirror.size() == vector.size());
           const Index n = mirror.num_indices();
           const Memory::TypedView<IT_> idx = mirror.indices_view_r();
-          Memory::TypedView<Tiny::Vector<DT_, bs_>> val = vector.elements_view_rw();
+          Memory::TypedView<Tiny::Vector<DT_, bs_>> val = vector.elements_view_w();
           for(Index i = 0u, k = 0u; i < n; ++i)
           {
             for(int j = 0; j < bs_; ++j, ++k)
