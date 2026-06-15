@@ -148,7 +148,7 @@ namespace Gendie
       {
         vtk_name = *vtk_filename + "_level_" + level_string->split_by_whitespaces().front();
       }
-      if(vtk_filename && Gendie::check_option_off(*vtk_filename))
+      if(vtk_filename && !Gendie::check_option_off(*vtk_filename))
       {
         want_vtk = true;
       }
@@ -982,8 +982,7 @@ namespace Gendie
     watch_analyze_sol.stop();
 
     watch_write_out.start();
-    if(*param_holder.want_vtk)
-      write_vtk(vec_sol, vec_rhs, domain, *system_level, vec_shearrate, vec_viscosity, param_holder, &logger);
+    write_vtk(vec_sol, vec_rhs, domain, *system_level, vec_shearrate, vec_viscosity, param_holder, &logger);
     watch_write_out.stop();
 
 
