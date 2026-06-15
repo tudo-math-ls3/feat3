@@ -110,7 +110,7 @@ namespace Gendie
       FEAT::Parameter<FEAT::Index> max_mg_iter = parameter(FEAT::Index(50)).property("max-mg-iter").name("Max MG Iter");
       FEAT::Parameter<FEAT::Index> smooth_gmres = parameter(FEAT::Index(0)).property("smooth-gmres").name("Smoother GMRES Dimension");
       FEAT::Parameter<FEAT::Index> solve_gmres = parameter(FEAT::Index(4)).property("solve-gmres").name("Solver GMRES Dimension");
-      FEAT::Parameter<FEAT::Index> smooth_steps = parameter(FEAT::Index(12)).property("smooth-steps").name("Smoother Steps");
+      FEAT::Parameter<FEAT::Index> smooth_steps = parameter(FEAT::Index(32)).property("smooth-steps").name("Smoother Steps");
       FEAT::Parameter<DataType> smooth_damp = parameter(DataType(0.5)).property("smooth-damp").name("Smoother Damping");
       FEAT::Parameter<DataType> mg_tol_rel = parameter(DataType(0)).property("mg-tol-rel").name("MG Relative Tolerance");
       FEAT::Parameter<bool> coarse_gmres = parameter(true).property("coarse-gmres").name("Use Coarse GMRES").parser(parse_config_bool);
@@ -119,15 +119,15 @@ namespace Gendie
 
       FEAT::Parameter<FEAT::Index> coarse_gmres_dim = parameter(FEAT::Index(200)).property("coarse-gmres-parameters/gmres-dim").name("Coarse GMRES Dimension");
       FEAT::Parameter<FEAT::Index> coarse_min_iter = parameter(FEAT::Index(1)).property("coarse-gmres-parameters/min-iter").name("Coarse Min Iter");
-      FEAT::Parameter<FEAT::Index> coarse_max_iter = parameter(FEAT::Index(500)).property("coarse-gmres-parameters/max-iter").name("Coarse Max Iter");
+      FEAT::Parameter<FEAT::Index> coarse_max_iter = parameter(FEAT::Index(1000)).property("coarse-gmres-parameters/max-iter").name("Coarse Max Iter");
       FEAT::Parameter<DataType> coarse_tol_rel = parameter(DataType(1E-2)).property("coarse-gmres-parameters/tol-rel").name("Coarse Relative Tolerance");
       FEAT::Parameter<DataType> coarse_tol_abs = parameter(DataType(1E+10)).property("coarse-gmres-parameters/tol-abs").name("Coarse Absolute Tolerance");
       FEAT::Parameter<DataType> coarse_inner_rescale = parameter(DataType(1E+1)).property("coarse-gmres-parameters/inner-rescale").name("Coarse Inner Rescale");
 
       FEAT::Parameter<FEAT::Index> min_nl_iter = parameter(FEAT::Index(1)).property("min-nl-iter").name("Min Nonlinear Iter");
-      FEAT::Parameter<FEAT::Index> max_nl_iter = parameter(FEAT::Index(20)).property("max-nl-iter").name("Max Nonlinear Iter");
-      FEAT::Parameter<DataType> nl_tol_abs = parameter(DataType(1E-1)).property("nl-tol-abs").name("Nonlinear Absolute Tolerance");
-      FEAT::Parameter<DataType> nl_tol_rel = parameter(DataType(1E-4)).property("nl-tol-rel").name("Nonlinear Relative Tolerance");
+      FEAT::Parameter<FEAT::Index> max_nl_iter = parameter(FEAT::Index(50)).property("max-nl-iter").name("Max Nonlinear Iter");
+      FEAT::Parameter<DataType> nl_tol_abs = parameter(DataType(1E-3)).property("nl-tol-abs").name("Nonlinear Absolute Tolerance");
+      FEAT::Parameter<DataType> nl_tol_rel = parameter(DataType(1E-5)).property("nl-tol-rel").name("Nonlinear Relative Tolerance");
       FEAT::Parameter<DataType> nl_tol_low_abs = parameter(DataType(1E-8)).property("nl-tol-low-abs").name("Nonlinear Low Absolute Tolerance");
       FEAT::Parameter<DataType> nl_stagrate = parameter(DataType(0.98)).property("nl-stagrate").name("Nonlinear Stagnation Rate");
       FEAT::Parameter<DataType> fixed_ls_tol = parameter(DataType(-1)).property("fixed-ls-tol").name("Fixed Linear Solver Tolerance");
@@ -144,10 +144,10 @@ namespace Gendie
       FEAT::Parameter<DataType> stagnation_increase = parameter(DataType(100)).property("stagnation-increase").name("Stagnation Increase");
 
     #ifdef FEAT_HAVE_TRILINOS
-      FEAT::Parameter<FEAT::Index> frosch_gmres_dim = parameter(FEAT::Index(200)).property("frosch-gmres-parameters/gmres-dim").name("FROSch GMRES Dimension");
-      FEAT::Parameter<FEAT::Index> frosch_min_iter = parameter(FEAT::Index(1)).property("frosch-gmres-parameters/min-iter").name("FROSch Min Iter");
-      FEAT::Parameter<FEAT::Index> frosch_max_iter = parameter(FEAT::Index(500)).property("frosch-gmres-parameters/max-iter").name("FROSch Max Iter");
-      FEAT::Parameter<DataType> frosch_tol_rel = parameter(DataType(1E-2)).property("frosch-gmres-parameters/tol-rel").name("FROSch Relative Tolerance");
+      FEAT::Parameter<FEAT::Index> frosch_gmres_dim = parameter(FEAT::Index(32)).property("frosch-gmres-parameters/gmres-dim").name("FROSch GMRES Dimension");
+      FEAT::Parameter<FEAT::Index> frosch_min_iter = parameter(FEAT::Index(3)).property("frosch-gmres-parameters/min-iter").name("FROSch Min Iter");
+      FEAT::Parameter<FEAT::Index> frosch_max_iter = parameter(FEAT::Index(128)).property("frosch-gmres-parameters/max-iter").name("FROSch Max Iter");
+      FEAT::Parameter<DataType> frosch_tol_rel = parameter(DataType(1E-4)).property("frosch-gmres-parameters/tol-rel").name("FROSch Relative Tolerance");
       FEAT::Parameter<DataType> frosch_tol_abs = parameter(DataType(1E+10)).property("frosch-gmres-parameters/tol-abs").name("FROSch Absolute Tolerance");
       FEAT::Parameter<DataType> frosch_inner_rescale = parameter(DataType(1E+1)).property("frosch-gmres-parameters/inner-rescale").name("FROSch Inner Rescale");
 
