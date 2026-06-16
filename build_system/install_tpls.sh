@@ -897,7 +897,6 @@ if hasTag "trilinos" && [ -d "$TRILINOS_DIR" ]; then
         echo "[Trilinos] Build step..."
         mkdir -p trilinos-build
         cd trilinos-build
-        sed -i 's/REQUIRED_LIBS_NAMES umfpack amd/REQUIRED_LIBS_NAMES umfpack amd cholmod camd ccolamd colamd suitesparseconfig/' "$TRILINOS_DIR"/cmake/TPLs/FindTPLUMFPACK.cmake
 
         export CC=mpicc
         export CXX=mpicxx
