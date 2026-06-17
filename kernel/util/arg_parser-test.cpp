@@ -3,6 +3,7 @@
 // FEAT3 is released under the GNU General Public License version 3,
 // see the file 'copyright.txt' in the top level directory for details.
 
+#include <deque>
 #include <kernel/util/arg_parser.hpp>
 #include <kernel/util/property_map.hpp>
 #include <kernel/util/tiny_algebra.hpp>
@@ -61,17 +62,23 @@ public:
   void run() const override
   {
     test_metaprogramming();
+    test_flag_definition();
     test_parsing();
     test_overwrite();
     test_priority();
     test_multi_option();
+    test_map_parsing();
     test_validation();
     test_custom_parser();
     test_required();
     test_duplicate_parameter();
     test_needs();
+    test_derived_params();
     test_vector_parsing();
     test_matrix_parsing();
+    test_compose();
+    test_unknown_flags();
+    test_adding_to_property_map();
   }
 
   void test_metaprogramming() const
@@ -88,6 +95,19 @@ public:
     TEST_CHECK((!Intern::can_default_parse_v<Foo>));
   }
 
+  void test_flag_definition() const
+  {
+    // Check that both --foo and foo (as well as -f and f) are accepted as flags
+    struct Arg : public ArgParser
+    {
+      Parameter<int> a = parameter(0).long_flag("--foo").short_flag("-f");
+      Parameter<int> b = parameter(0).long_flag("bar").short_flag("b");
+    };
+
+    // Definition did not abort
+    TEST_CHECK(true);
+  }
+
   void test_parsing() const
   {
     std::array<const char*, 4> args = {"/path/to/program", "--verbose", "--count", "20"};
@@ -99,7 +119,13 @@ public:
     set_env("FEAT_N", "20", 1);
 
     TestArgParser parser;
-    TEST_CHECK(parser.parse(int(args.size()), args.data(), &map));
+    if(!parser.parse(int(args.size()), args.data(), &map))
+    {
+      for(const auto& error : parser.errors())
+      {
+        std::cout << error << "\n";
+      }
+    }
 
     TEST_CHECK_EQUAL(*parser.verbose, true);
     TEST_CHECK_EQUAL(*parser.count, 20);
@@ -198,6 +224,46 @@ public:
 
     // -b flag should have stopped collection of arguments for -a flag
     TEST_CHECK_EQUAL(args.arg2.value(), 10);
+  }
+
+  void test_map_parsing() const
+  {
+    struct Args : public ArgParser
+    {
+      Parameter<std::map<String, int>> string_int_map = parameter(std::map<String, int>{}).long_flag("--string-int-map");
+      Parameter<std::map<int, String>> int_string_map = parameter(std::map<int, String>{}).long_flag("--int-string-map");
+    };
+
+    std::array<const char*, 15> argv = {
+      "path/to/program",
+      "--string-int-map",
+      "Foo",
+      "1",
+      "Bar",
+      "2",
+      "Baz",
+      "3",
+      "--int-string-map",
+      "1",
+      "Foo",
+      "2",
+      "Bar",
+      "3",
+      "Baz"
+    };
+
+    Args args;
+    TEST_CHECK(args.parse(int(argv.size()), argv.data()));
+
+    TEST_CHECK_EQUAL(args.string_int_map->size(), 3);
+    TEST_CHECK_EQUAL((*args.string_int_map).at("Foo"), 1);
+    TEST_CHECK_EQUAL((*args.string_int_map).at("Bar"), 2);
+    TEST_CHECK_EQUAL((*args.string_int_map).at("Baz"), 3);
+
+    TEST_CHECK_EQUAL(args.int_string_map->size(), 3);
+    TEST_CHECK_EQUAL((*args.int_string_map).at(1), String("Foo"));
+    TEST_CHECK_EQUAL((*args.int_string_map).at(2), String("Bar"));
+    TEST_CHECK_EQUAL((*args.int_string_map).at(3), String("Baz"));
   }
 
   void test_validation() const
@@ -399,6 +465,55 @@ public:
     }
   }
 
+  void test_derived_params() const
+  {
+    struct Args : public ArgParser
+    {
+      Parameter<bool> flag = parameter(false).long_flag("--flag");
+      Parameter<bool> not_flag = parameter(true).derives_from(flag, [](const bool& bb) { return !bb; });
+
+      Parameter<int> a = parameter(0).long_flag("--a");
+      Parameter<int> b = parameter(0).long_flag("--b");
+      Parameter<int> c = parameter(0).long_flag("--c").derives_from(a, b, [](const int& foo, const int& bar) { return foo + bar; });
+    };
+
+    // Test that derived values are correct
+    {
+      Args args;
+      std::array<const char*, 6> argv = {
+        "path/to/program",
+        "--flag",
+        "--a",
+        "5",
+        "--b",
+        "10",
+      };
+
+      TEST_CHECK(args.parse(int(argv.size()), argv.data()));
+
+      TEST_CHECK_EQUAL(*args.not_flag, false);
+      TEST_CHECK_EQUAL(*args.c, 15);
+    }
+
+    // Test that derived values are not overwriting values set by user
+    {
+      Args args;
+      std::array<const char*, 8> argv = {
+        "path/to/program",
+        "--flag",
+        "--a",
+        "5",
+        "--b",
+        "10",
+        "--c",
+        "50",
+      };
+
+      TEST_CHECK(args.parse(int(argv.size()), argv.data()));
+      TEST_CHECK_EQUAL(*args.c, 50);
+    }
+  }
+
   void test_vector_parsing() const
   {
     struct Args : public ArgParser
@@ -434,6 +549,116 @@ public:
     TEST_CHECK_EQUAL((*args.a)(0, 1), 20.0);
     TEST_CHECK_EQUAL((*args.a)(1, 0), 30.0);
     TEST_CHECK_EQUAL((*args.a)(1, 1), 40.0);
+  }
+
+  void test_compose() const
+  {
+    struct A : public ArgParser
+    {
+      using ArgParser::ArgParser;
+
+      Parameter<int> a = parameter(0).long_flag("--option");
+      Parameter<int> b = parameter(0).property("prop");
+      Parameter<int> c = parameter(0).env("ENV");
+    };
+
+    struct B : public ArgParser
+    {
+      using ArgParser::ArgParser;
+
+      A a = parser<A>("A", "a", "a");
+    };
+
+    struct C : public ArgParser
+    {
+      using ArgParser::ArgParser;
+
+      B b = parser<B>("B", "b", "b");
+    };
+
+    {
+      C args_cli;
+      std::array<const char*, 3> argv = {"path/to/program", "--b-a-option", "5"};
+      TEST_CHECK(args_cli.parse(int(argv.size()), argv.data()));
+      TEST_CHECK_EQUAL((*args_cli.b.a.a), 5);
+    }
+
+    {
+      C args_prop;
+      PropertyMap pmap;
+      auto* b = pmap.add_section("b");
+      auto* a = b->add_section("a");
+      a->add_entry("prop", "5");
+      TEST_CHECK(args_prop.parse(0, nullptr, &pmap));
+      TEST_CHECK_EQUAL((*args_prop.b.a.b), 5);
+    }
+
+    {
+      C args_env;
+      set_env("B_A_ENV", "5", 1);
+      TEST_CHECK(args_env.parse(0, nullptr));
+      TEST_CHECK_EQUAL((*args_env.b.a.c), 5);
+    }
+  }
+
+  void test_unknown_flags() const
+  {
+    struct Args : public ArgParser
+    {
+      Parameter<int> foo = parameter(0).long_flag("--foo");
+    };
+
+    // Parse with unknown flag should fail
+    {
+      Args args;
+      std::array<const char*, 5> argv = {"path/to/program", "--foo", "1", "--bar" , "5"};
+
+      TEST_CHECK(!args.parse(int(argv.size()), argv.data()));
+    }
+
+    // Parse with unknown flag shouldn't fail, if allow_unknown_flags is set
+    {
+      Args args;
+      std::array<const char*, 5> argv = {"path/to/program", "--foo", "1", "--bar" , "5"};
+
+      args.allow_unknown_cli_flags();
+      TEST_CHECK(args.parse(int(argv.size()), argv.data()));
+    }
+  }
+
+  void test_adding_to_property_map() const
+  {
+    struct Args : public ArgParser
+    {
+      Parameter<int> a = parameter(0).property("foo/bar/a").long_flag("--a");
+      Parameter<int> b = parameter(1).property("foo/bar/b").long_flag("--b");
+      Parameter<int> c = parameter(2).property("foo/c").long_flag("--c");
+    };
+
+    {
+      Args args;
+      std::array<const char*, 7> argv = {"path/to/program", "--a", "5", "--b" , "10", "--c", "15"};
+
+      TEST_CHECK(args.parse(int(argv.size()), argv.data()));
+
+      PropertyMap default_map;
+      PropertyMap value_map;
+
+      args.add_values_to_property_map(value_map);
+      args.add_defaults_to_property_map(default_map);
+
+      TEST_CHECK_NOT_EQUAL(default_map.query_section("foo"), nullptr);
+      TEST_CHECK_NOT_EQUAL(default_map.query_section("foo/bar"), nullptr);
+      TEST_CHECK_EQUAL(default_map.query("foo/bar/a").first, "0");
+      TEST_CHECK_EQUAL(default_map.query("foo/bar/b").first, "1");
+      TEST_CHECK_EQUAL(default_map.query("foo/c").first, "2");
+
+      TEST_CHECK_NOT_EQUAL(value_map.query_section("foo"), nullptr);
+      TEST_CHECK_NOT_EQUAL(value_map.query_section("foo/bar"), nullptr);
+      TEST_CHECK_EQUAL(value_map.query("foo/bar/a").first, "5");
+      TEST_CHECK_EQUAL(value_map.query("foo/bar/b").first, "10");
+      TEST_CHECK_EQUAL(value_map.query("foo/c").first, "15");
+    }
   }
 private:
   static int set_env(const char* name, const char* value, int overwrite)

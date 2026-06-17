@@ -10,13 +10,11 @@
 #include <kernel/util/property_map.hpp>
 #include <kernel/util/string.hpp>
 
-#include <algorithm>
 #include <any>
 #include <deque>
 #include <functional>
 #include <iostream>
 #include <memory>
-#include <set>
 #include <sstream>
 #include <stdexcept>
 #include <utility>
@@ -73,6 +71,22 @@ namespace FEAT
     template<typename T>
     constexpr bool is_std_deque_v = is_std_deque<T>::value;
 
+    /// Check if type is some instantiation of std::map
+    template<typename>
+    struct is_std_map : std::false_type
+    {
+    };
+
+    /// Check if type is some instantiation of std::map
+    template<typename K, typename V, typename C, typename A>
+    struct is_std_map<std::map<K, V, C, A>> : std::true_type
+    {
+    };
+
+    /// Check if type is some instantiation of std::map
+    template<typename T>
+    constexpr bool is_std_map_v = is_std_map<T>::value;
+
     /// Check if type has an operator>> implementation, i.e. can be parsed by String::parse.
     template<typename T, typename = void>
     struct has_input_operator : std::false_type
@@ -94,9 +108,14 @@ namespace FEAT
     template<typename T, typename A>
     constexpr bool can_default_parse_v<std::deque<T, A>> = has_input_operator<T>::value;
 
+    /// Check if we can create a default parser for some type.
+    template<typename K, typename V, typename C, typename A>
+    constexpr bool can_default_parse_v<std::map<K, V, C, A>> =
+      has_input_operator<K>::value && has_input_operator<V>::value;
+
     /// Parser for collections. Splits by whitespace, then parses values
     template<typename T_>
-    static void parse_collection(std::any& any, const String& s)
+    static void parse_deque(std::any& any, const String& s)
     {
       std::deque<T_> collection;
       for(const String& value_str : s.split_by_whitespaces())
@@ -110,6 +129,39 @@ namespace FEAT
       }
 
       any = collection;
+    }
+
+    /// Parser for maps. Splits by whitespace, treats adjacent strings as key-value pairs.
+    template<typename K_, typename V_>
+    static void parse_map(std::any& any, const String& s)
+    {
+      std::map<K_, V_> map;
+      auto strs = s.split_by_whitespaces();
+
+      if(!(strs.size() % 2 == 1))
+      {
+        throw std::invalid_argument("Parsing failed for string '" + s + "': Odd number of strings in key-value pairs.");
+      }
+
+      for(Index i(0); i < strs.size(); i += 2)
+      {
+        K_ key{};
+        V_ value{};
+
+        if(!strs[i].parse(key))
+        {
+          throw std::invalid_argument("Parsing failed for string '" + s + "': Could not parse key '" + strs[i] + "'");
+        }
+
+        if(!strs[i + 1].parse(value))
+        {
+          throw std::invalid_argument("Parsing failed for string '" + s + "': Could not parse value '" + strs[i] + "'");
+        }
+
+        map.insert({key, value});
+      }
+
+      any = map;
     }
 
     /// Parser for single values
@@ -132,6 +184,10 @@ namespace FEAT
      * If \c T_ is some kind of std::deque, then the parser will split the
      * given string by whitespace, parse each segment individually,
      * construct a deque of the results, and store that deque in the std::any.
+     * If \c T_ is some kind of std::map, then the parser will split the given
+     * string by whitespace, parse keys and values in alternating order, place
+     * the resulting key-value pairs in a std::map, and store that map in the
+     * std::any.
      * Otherwise the parser will try to create a value of type \c T_ from
      * the String and write it to the std:.any&.
      *
@@ -154,7 +210,11 @@ namespace FEAT
       {
         if constexpr(is_std_deque_v<T_>)
         {
-          return parse_collection<typename T_::value_type>;
+          return parse_deque<typename T_::value_type>;
+        }
+        else if constexpr(is_std_map_v<T_>)
+        {
+          return parse_map<typename T_::key_type, typename T_::mapped_type>;
         }
         else
         {
@@ -186,6 +246,18 @@ namespace FEAT
             s << i << ", ";
           }
           s << "]";
+        };
+      }
+      else if constexpr(is_std_map_v<T_>)
+      {
+        return [](std::ostream& s, const std::any& v)
+        {
+          s << "{";
+          for(const auto& [key, value] : std::any_cast<const T_&>(v))
+          {
+            s << key << ": " << value << ", ";
+          }
+          s << "}";
         };
       }
       else
@@ -232,9 +304,16 @@ namespace FEAT
       using ValidatorType = std::function<void(const std::any&)>;
       /// Type of type-erased printer function
       using PrinterType = std::function<void(std::ostream&, const std::any&)>;
+      /// Type of type-erased deriver function
+      using DeriverType = std::function<void(std::any&, const std::deque<std::reference_wrapper<std::any>>&)>;
+      /// Type of type-erased predicate function
+      using PredicateType = std::function<bool(const std::any&)>;
 
       /// Type of "A needs B" declaration with condition
-      using Need = std::pair<std::weak_ptr<ParameterCore>, std::function<bool(const std::any&)>>;
+      using Need = std::pair<std::weak_ptr<ParameterCore>, PredicateType>;
+
+      /// Type of "Hide A if B" declaration
+      using HideIf = std::pair<std::weak_ptr<ParameterCore>, PredicateType>;
 
       // Parsing information
       ParameterType type = ParameterType::flag;
@@ -251,8 +330,12 @@ namespace FEAT
       // Metadata
       int priority = 0;
       bool required = false;
+      bool bootstrap = false;
       bool set_by_user = false;
+      bool hidden = false;
       std::deque<Need> needs;
+      std::deque<HideIf> hide_if;
+      std::deque<std::weak_ptr<ParameterCore>> derives_from;
 
       // Raw and parsed values
       std::deque<String> arguments;
@@ -263,6 +346,7 @@ namespace FEAT
       ParserType parser;
       ValidatorType validator;
       PrinterType printer;
+      DeriverType deriver;
 
       /// Constructor
       template<typename T_>
@@ -276,7 +360,7 @@ namespace FEAT
           // Boolean flags do not consume any arguments beyond the flag itself
           type = ParameterType::flag;
         }
-        else if constexpr(Intern::is_std_deque_v<T_>)
+        else if constexpr(Intern::is_std_deque_v<T_> || Intern::is_std_map_v<T_>)
         {
           // Collection options append all arguments until the next flag
           type = ParameterType::collection_option;
@@ -311,6 +395,20 @@ namespace FEAT
        * Convert the collected arguments into actual data types
        */
       void parse(std::deque<String>& errors);
+
+      /**
+       * \brief Sets this parameters value based on other parameters
+       *
+       * Uses the parameters and function given by the user in
+       * ParameterBuilder::derives_from() to set this parameters value. Does
+       * nothing if no derives_from has been set.
+       */
+      void derive_self();
+
+      /**
+       * \brief Hides other parameters based on this parameters hide_if declarations
+       */
+      void hide();
 
       /// Reset this parameter to default
       void reset();
@@ -349,7 +447,7 @@ namespace FEAT
      *
      * \return True, if the argument was explicitly set by the user, false otherwise.
      */
-    operator bool() // NOLINT
+    bool set_by_user() const
     {
       return _core->set_by_user;
     }
@@ -357,18 +455,27 @@ namespace FEAT
     /// Accessor for parameter value
     const T_& value() const
     {
+      XASSERTM(
+        !_core->hidden,
+        "Trying to access hidden parameter " + _core->name() + ". Check your parameter definitions.");
       return std::any_cast<const T_&>(_core->value);
     }
 
     /// Accessor for parameter value
     const T_& operator*() const
     {
+      XASSERTM(
+        !_core->hidden,
+        "Trying to access hidden parameter " + _core->name() + ". Check your parameter definitions.");
       return std::any_cast<const T_&>(_core->value);
     }
 
     /// Accessor for parameter value
     const T_* operator->() const
     {
+      XASSERTM(
+        !_core->hidden,
+        "Trying to access hidden parameter " + _core->name() + ". Check your parameter definitions.");
       return std::any_cast<const T_>(&(_core->value));
     }
   };
@@ -380,18 +487,36 @@ namespace FEAT
   private:
     std::shared_ptr<Intern::ParameterCore> _core;
 
+    String _env_prefix;
+    String _property_path_prefix;
+    String _flag_prefix;
+
   public:
-    explicit ParameterBuilder(std::shared_ptr<Intern::ParameterCore> core) : _core(std::move(core))
+    explicit ParameterBuilder(
+      std::shared_ptr<Intern::ParameterCore> core,
+      String env_prefix,
+      String property_path_prefix,
+      String flag_prefix) :
+      _core(std::move(core)),
+      _env_prefix(std::move(env_prefix)),
+      _property_path_prefix(std::move(property_path_prefix)),
+      _flag_prefix(std::move(flag_prefix))
     {
     }
 
     /**
      * \brief Set the short flag for a parameter
      *
-     * \param[in] s Short flag, must be of the form '-x' where x is some letter
+     * \param[in] s Short flag, can be of form "x" or "-x" where x is some letter.
      */
     ParameterBuilder& short_flag(String&& s)
     {
+      // Prepend dash if required
+      if(!s.starts_with("-"))
+      {
+        s = "-" + s;
+      }
+
       XASSERTM(s.size() == 2, "Short flag must have length two");
       XASSERTM(s[0] == '-', "Short must start with a '-'");
       XASSERTM(s[1] != '-', "Short must not end with a '-'");
@@ -403,12 +528,26 @@ namespace FEAT
     /**
      * \brief Set the long flag for a parameter
      *
-     * \param[in] s Long flag, must be of the form '--foo'. Additional dashes within the flag are allowed, e.g.
-     * '--foo-bar'
+     * \param[in] s long flag, can be of form "foo" or "--foo". Additional
+     * dashes within the flag are allowed, e.g. '--foo-bar'
      */
-    ParameterBuilder& long_flag(String&& s)
+    ParameterBuilder& long_flag(String s)
     {
-      _core->long_flag = std::move(s);
+      XASSERTM(!s.empty(), "Long flag must not be empty");
+
+      // Remove leading dashes
+      if(s.starts_with("--"))
+      {
+        s = s.substr(2);
+      }
+
+      // Append flag prefix if applicable
+      if(!_flag_prefix.empty())
+      {
+        s = _flag_prefix + "-" + s;
+      }
+
+      _core->long_flag = "--" + s;
       return *this;
     }
 
@@ -420,9 +559,16 @@ namespace FEAT
      * The parameters value will be taken from this environment variable during parsing,
      * if the environment variable is set.
      */
-    ParameterBuilder& env(String&& s)
+    ParameterBuilder& env(const String& s)
     {
-      _core->environment_variable = std::move(s);
+      if(!_env_prefix.empty())
+      {
+        _core->environment_variable = _env_prefix + "_" + s;
+      }
+      else
+      {
+        _core->environment_variable = std::move(s);
+      }
       return *this;
     }
 
@@ -434,10 +580,19 @@ namespace FEAT
      * The parameter will be filled with the (parsed) value refered to by this path.
      * The path is always interpreted as relative to the root of the property map given
      * to the ArgParser.
+     *
+     * \sa Path specification in PropertyMap
      */
     ParameterBuilder& property(String&& s)
     {
-      _core->property_path = std::move(s);
+      if(!_property_path_prefix.empty())
+      {
+        _core->property_path = _property_path_prefix + "/" + s;
+      }
+      else
+      {
+        _core->property_path = std::move(s);
+      }
       return *this;
     }
 
@@ -683,6 +838,193 @@ namespace FEAT
       return *this;
     }
 
+    /**
+     * \brief Conditionally mark another parameter as hidden
+     *
+     * \param[in] parameter The parameter to be conditionally hidden
+     * \param[in] condition Function pointer to predicate
+     *
+     * Indicates that if this parameter is set by the user _and_ has a certain
+     * value, as indicated by the condition function, then the given parameter
+     * should be hidden. A parameter is hidden as soon as any of the hide_if
+     * conditions regarding the parameter are fulfilled.
+     *
+     * To ensure that no parameter is accidentally hidden, accessing the value
+     * of hidden parameter is an error and aborts the program.
+     *
+     * Use this option if one parameter is unused, depending on another parameters value.
+     *
+     * \warning The parameter given to this function must already be fully defined.
+     * In other words, it must come before the current parameter in the parser struct.
+     */
+    template<typename U_>
+    ParameterBuilder& hide_if(const Parameter<U_>& parameter, bool (*condition)(const T_&))
+    {
+      XASSERTM(parameter._core != nullptr, "Needed parameter must be defined already!");
+
+      _core->hide_if.emplace_back(
+        parameter._core,
+        [condition](const std::any& value) { return condition(std::any_cast<const T_&>(value)); });
+
+      return *this;
+    }
+
+    /**
+     * \brief Mark this parameter as a bootstrap parameter
+     *
+     * A common FEAT idiom is parsing a path (or paths) to a property map from
+     * the command line, loading that property map, and then parsing remaining
+     * options from that map. Naively, this would required defining at least two
+     * parsers, where the first parser just determines the paths of the property
+     * maps and the second parser does the full parsing run.
+     * To avoid this parameters can be marked as bootstrap parameters.
+     * The ArgParser::bootstrap method will parse just those parameters, with no
+     * further validation, and assemble a merged property map from the given
+     * paths. With that merged property map the full parsing can then be run.
+     *
+     * \warning Bootstrap parameters must be of type std::deque<String>.
+     */
+    template<typename V_ = T_, typename = std::enable_if_t<std::is_same_v<std::deque<String>, V_>>>
+    ParameterBuilder& bootstrap()
+    {
+      _core->bootstrap = true;
+
+      return *this;
+    }
+
+    /**
+     * \brief Derive this parameter from another parameter if it has not been set by the user
+     *
+     * \param[in] param Parameter this parameter derives from
+     * \param[in] fn Function which calculates value from other parameter.
+     *
+     * Indicates that this parameter should have its value set based on the
+     * value of one other parameter, if this parameter has not been set by the
+     * user. If this parameter has been set by the user, the value set by the
+     * user will be kept. A parameter that has no flags, properties, or
+     * environment variables associated with it will always be derived.
+     */
+    template<typename U_>
+    ParameterBuilder& derives_from(Parameter<U_>& param, T_ (*fn)(const U_&))
+    {
+      XASSERTM(param._core != nullptr, "Derivee needs to be initialized");
+
+      // NOTE(mmuegge): It is totally possible to abstract over derives_from_1
+      // and derives_from_2: The easiest way would probably be to convert the
+      // std::deque passed into the deriver into a tuple of the same length as
+      // the number of parameters this parameter is derived from, then cast the
+      // tuple to the proper types via a fold-expression, then use std::apply to
+      // call fn with the arguments from the tuple. All of that code is
+      // possible, but just plain ugly and hard to understand. So I choose the
+      // easy route for now.
+
+      _core->derives_from.clear();
+      _core->derives_from.emplace_back(param._core);
+      _core->deriver = [fn](std::any& out, const std::deque<std::reference_wrapper<std::any>>& args)
+      {
+        XASSERT(args.size() >= 1);
+        out = fn(std::any_cast<const U_&>(args[0]));
+      };
+
+      return *this;
+    }
+
+    /// ArgParser::derive_from wrapper for casting lambdas to function pointers
+    template<typename U_, typename Fn_>
+    ParameterBuilder& derives_from(Parameter<U_>& param, Fn_&& fn)
+    {
+      return derives_from(param, static_cast<T_ (*)(const U_&)>(std::forward<Fn_>(fn)));
+    }
+
+    /**
+     * \brief Derive this parameter from two other parameters if it has not been set by the user
+     *
+     * \param[in] param_one First parameter this parameter derives from
+     * \param[in] param_two Second parameter this parameter derives from
+     * \param[in] fn Function which calculates value from other parameter.
+     *
+     * Indicates that this parameter should have its value set based on the
+     * value of two other parameters, if this parameter has not been set by the
+     * user. If this parameter has been set by the user, the value set by the
+     * user will be kept. A parameter that has no flags, properties, or
+     * environment variables associated with it will always be derived.
+     */
+    template<typename U_, typename V_>
+    ParameterBuilder& derives_from(Parameter<U_>& param_one, Parameter<V_>& param_two, T_ (*fn)(const U_&, const V_&))
+    {
+      XASSERTM(param_one._core != nullptr, "Derivee needs to be initialized");
+      XASSERTM(param_two._core != nullptr, "Derivee needs to be initialized");
+
+      _core->derives_from.clear();
+      _core->derives_from.emplace_back(param_one._core);
+      _core->derives_from.emplace_back(param_two._core);
+      _core->deriver = [fn](std::any& out, const std::deque<std::reference_wrapper<std::any>>& args)
+      {
+        XASSERT(args.size() >= 2);
+        out = fn(std::any_cast<const U_&>(args[0]), std::any_cast<const V_&>(args[1]));
+      };
+
+      return *this;
+    }
+
+    /// ArgParser::derive_from wrapper for casting lambdas to function pointers
+    template<typename U_, typename V_, typename Fn_>
+    ParameterBuilder& derives_from(Parameter<U_>& param_one, Parameter<V_>& param_two, Fn_&& fn)
+    {
+      return derives_from(param_one, param_two, static_cast<T_ (*)(const U_&, const V_&)>(std::forward<Fn_>(fn)));
+    }
+
+    /**
+     * \brief Derive this parameter from three other parameters if it has not been set by the user
+     *
+     * \param[in] param_one First parameter this parameter derives from
+     * \param[in] param_two Second parameter this parameter derives from
+     * \param[in] param_three Third parameter this parameter derives from
+     * \param[in] fn Function which calculates value from other parameter.
+     *
+     * Indicates that this parameter should have its value set based on the
+     * value of three other parameters, if this parameter has not been set by the
+     * user. If this parameter has been set by the user, the value set by the
+     * user will be kept. A parameter that has no flags, properties, or
+     * environment variables associated with it will always be derived.
+     */
+    template<typename U_, typename V_, typename W_>
+    ParameterBuilder& derives_from(
+      const Parameter<U_>& param_one,
+      const Parameter<V_>& param_two,
+      const Parameter<W_>& param_three,
+      T_ (*fn)(const U_&, const V_&))
+    {
+      XASSERTM(param_one._core != nullptr, "Derivee needs to be initialized");
+      XASSERTM(param_two._core != nullptr, "Derivee needs to be initialized");
+      XASSERTM(param_three._core != nullptr, "Derivee needs to be initialized");
+
+      _core->derives_from.clear();
+      _core->derives_from.emplace_back(param_one._core);
+      _core->derives_from.emplace_back(param_two._core);
+      _core->derives_from.emplace_back(param_three._core);
+      _core->deriver = [fn](std::any& out, const std::deque<std::reference_wrapper<std::any>>& args)
+      {
+        XASSERT(args.size() >= 3);
+        out =
+          fn(std::any_cast<const U_&>(args[0]), std::any_cast<const V_&>(args[1]), std::any_cast<const W_&>(args[2]));
+      };
+
+      return *this;
+    }
+
+    /// ArgParser::derive_from wrapper for casting lambdas to function pointers
+    template<typename U_, typename V_, typename W_, typename Fn_>
+    ParameterBuilder&
+    derives_from(Parameter<U_>& param_one, Parameter<V_>& param_two, Parameter<W_>& param_three, Fn_&& fn)
+    {
+      return derives_from(
+        param_one,
+        param_two,
+        param_three,
+        static_cast<T_ (*)(const U_&, const V_&, const W_&)>(std::forward<Fn_>(fn)));
+    }
+
     // NOTE: This conversion operator exists to convert the ParameterBuilder produced by ArgParser::parameter
     // into a parameter without forcing the user to call an additional function for every parameter.
     // For that reason it is deliberately implicit
@@ -809,6 +1151,11 @@ namespace FEAT
    * index at whitespace and parsing each value individually, or by parsing all following command line
    * arguments until the next flag occurs.
    *
+   * If types K and V can be parsed, then the parser also supports Parameters of
+   * type std::map<K, V>. These parameters are parsed similarly to std::deques,
+   * except that pairs of arguments are treated as key-value pairs for the
+   * std::map.
+   *
    * **Help Text**
    *
    * You can create a help text with a list of all parameters with their flags, property map paths,
@@ -829,6 +1176,54 @@ namespace FEAT
    * - unset required parameters
    * - failed validators
    * - unfulfilled dependencies between parameters
+   *
+   * **Composing parsers**
+   *
+   * You might have a parser A with several parameters and want to create a
+   * parser B with the same parameters as A, plus some additional ones. There
+   * are two mechanisms for composing parsers like that. Inheritance and
+   * sub-parsers.
+   *
+   * Inheritance allows you to compose parser in a "flat" manner. You can have
+   * parser B inherit from A, then B will naturally have all the same parameters
+   * as A, plus any additional ones you define in the class definition of B. All
+   * these parameters will be available as members of B.
+   *
+   * Sub-parsers allow you to compose parsers in a tree-like manner. You can add
+   * A as a sub-parser of B via the ArgParser::parser member function, similar
+   * to defining a parameter:
+   * \code
+    class B : public ArgParser
+    {
+      A a = parser<A>();
+      //... additional parameters
+    }
+   * \endcode
+   * A will automatically participate in the parsing of B, including tracking of
+   * required parameters, dependencies between parameters, etc. No further
+   * action by the user is required. You can access the parameters of A via the
+   * member a of parser B, just like you would expect.
+   *
+   * The ArgParser::parser member function also allows you to set prefixes for a
+   * parsers environment variables, property maps paths, and flags. For example,
+   * assume that parser A has a parameter with a long flag of "--foo". If we
+   * define a parser C via:
+   * \code
+    class C : public ArgParser
+    {
+      A a = parser<A>("A", "a", "a");
+      //... additional parameters
+    }
+   * \endcode
+   *
+   * The the parameter associated with the "--foo" flag of A will be treated as
+   * being defined with the flag "--a-foo". You can set separate prefixes for
+   * environment variables, property map paths, and long flags.
+   *
+   * This prefix mechanism is especially useful when dealing with PropertyMaps.
+   * It allows you to define a parser for each expected subsection of the
+   * PropertyMap in isolation and then compose those parsers, setting the
+   * subsection name as prefix for each parser.
    */
   class ArgParser
   {
@@ -836,8 +1231,20 @@ namespace FEAT
     std::deque<std::shared_ptr<Intern::ParameterCore>> _parameters;
     std::deque<String> _errors;
 
+    /// Path to program, i.e. argv[0]
     String _program{""};
+    /// Description of this parser. Displayed in help text.
     String _description{""};
+
+    /// Prefix for environment variables. Gets preprended to this parsers environment variables.
+    String _env_prefix{""};
+    /// Prefix for property map paths. Gets preprended to this parsers property map paths.
+    String _property_prefix{""};
+    /// Prefix for long flags. Gets preprended to this parsers long flags.
+    String _flag_prefix{""};
+
+    /// If true, unknown CLI flags do not produce errors
+    bool _allow_unknown_cli_flags = false;
 
     static constexpr int priority_default = 0;
     static constexpr int priority_env = 1;
@@ -845,6 +1252,33 @@ namespace FEAT
     static constexpr int priority_cli = 3;
 
   public:
+    ArgParser() = default;
+
+    /// Prefix constructor
+    ArgParser(String env_prefix, String property_prefix, String flag_prefix) :
+      _env_prefix(std::move(env_prefix)),
+      _property_prefix(std::move(property_prefix)),
+      _flag_prefix(std::move(flag_prefix))
+    {
+    }
+
+    /**
+     * \brief Allow parser to ignore unknown CLI flags
+     *
+     * The default behavior is to generate an error upon encountering a CLI flag
+     * for which no parameter exists and declare the parse as failed. If this
+     * option is set, then unknown flags will instead be silently ignored.
+     *
+     * \warning Erroring upon encountering an unknown flag is mean to protect
+     * the user from errors due to misspelling a flag. Use this option with
+     * care.
+     */
+    void allow_unknown_cli_flags(bool allow = true)
+    {
+      _allow_unknown_cli_flags = allow;
+    }
+
+    /// Error accessor
     const std::deque<String>& errors() const
     {
       return _errors;
@@ -869,30 +1303,7 @@ namespace FEAT
      *
      * The help text gives information about all parameters supported by this parser
      */
-    [[nodiscard]] String help_text()
-    {
-      // Sort parameters alphabetically
-      std::sort(
-        _parameters.begin(),
-        _parameters.end(),
-        [](auto& a, auto& b) { return a->name().compare_no_case(b->name()) <= 0; });
-
-      std::stringstream stream;
-
-      if(!_description.empty())
-      {
-        stream << _description << "\n\n";
-      }
-      stream << "Usage: " << _program << " [OPTIONS]\n\n";
-      stream << "Options:\n";
-
-      for(const auto& core : _parameters)
-      {
-        parameter_help(*core, stream);
-      }
-
-      return stream.str();
-    }
+    [[nodiscard]] String help_text() const;
 
     /**
      * \brief Produce formatted output of all values in this parser
@@ -902,55 +1313,26 @@ namespace FEAT
      * \note This function shows the arguments given by the user.
      * Parser might change these values however they like.
      */
-    [[nodiscard]] String display()
-    {
-      // Sort parameters alphabetically
-      std::sort(
-        _parameters.begin(),
-        _parameters.end(),
-        [](auto& a, auto& b) { return a->name().compare_no_case(b->name()) <= 0; });
+    [[nodiscard]] String display() const;
 
-      std::stringstream stream;
-
-      // Print header
-      stream << String("Parameter").pad_back(40, ' ');
-      stream << "|";
-      stream << String("Source").pad_back(10, ' ');
-      stream << "|";
-      stream << "Value\n";
-      stream << String("").pad_back(75, '-') << "\n";
-
-      for(const auto& core : _parameters)
-      {
-        XASSERT(core->value.has_value());
-
-        stream << core->name().pad_back(40, '.');
-        stream << "|";
-
-        switch(core->priority)
-        {
-        case priority_default:  stream << "default   |"; break;
-        case priority_env:      stream << "env       |"; break;
-        case priority_property: stream << "property  |"; break;
-        case priority_cli:      stream << "cli       |"; break;
-        default:                stream << "          |";
-        }
-
-        if(core->type == Intern::ParameterType::flag)
-        {
-          stream << (std::any_cast<const bool&>(core->value) ? "true" : "false");
-        }
-        else
-        {
-          XASSERT(bool(core->printer));
-          core->printer(stream, core->value);
-        }
-
-        stream << "\n";
-      }
-
-      return stream.str();
-    }
+    /**
+     * \brief Load PropertyMaps based on command line parameters or environment variables.
+     *
+     * \param[in,out] pmap Property map to merge additional property maps into.
+     *
+     * This method parses parameters marked as bootstrap parameters to load an
+     * initial set of PropertyMaps for a full parse. Loaded property maps are merged
+     * into the given PropertyMap. Entries are replaced by later maps.
+     *
+     * Errors that occur during the scanning of command line arguments and
+     * during the parsing of bootstrap parameters are recorded. No further
+     * validation is done.
+     *
+     * \note No parsing results are recorded into any parameters, including the
+     * bootstrap parameters. Run ArgParser::parse() after bootstrapping your
+     * PropertyMap to do the actual parsing.
+     */
+    [[nodiscard]] bool bootstrap(int argc, const char* const* argv, PropertyMap& pmap);
 
     /**
      * \brief Populate this parser
@@ -963,44 +1345,7 @@ namespace FEAT
      * Note that the parser expects the first command line parameter to be the path
      * to the program binary, as is usual.
      */
-    [[nodiscard]] bool parse(int argc, const char* const* argv, const PropertyMap* property_map = nullptr)
-    {
-      // Reset errors
-      _errors.clear();
-
-      if(!_check_for_unique_parameters())
-      {
-        return false;
-      }
-
-      // Set default values, reset priorities, clear arguments
-      for(auto& core : _parameters)
-      {
-        core->reset();
-      }
-
-      // Collect values in environment variables
-      _collect_env();
-
-      // Collect values in property map
-      if(property_map != nullptr)
-      {
-        _collect_property_map(property_map);
-      }
-
-      // Collect command line args
-      _collect_args(argc, argv);
-
-      // Parse collected data types into proper data types
-      for(auto& core : _parameters)
-      {
-        core->parse(_errors);
-      }
-
-      _validate();
-
-      return _errors.empty();
-    }
+    [[nodiscard]] bool parse(int argc, const char* const* argv, const PropertyMap* property_map = nullptr);
 
     /**
      * \brief Populate this parser
@@ -1046,6 +1391,26 @@ namespace FEAT
       return parse(0, nullptr, &pmap);
     }
 
+    /**
+     * \brief Adds the default values of all property-parameters to the given PropertyMap
+     *
+     * \param[in,out] pmap PropertyMap to fill
+     *
+     * This functions adds an entry to the given PropertyMap for each parameter with an associated PropertyMap path.
+     * Each added entry contains that parameters default value.
+     */
+    void add_defaults_to_property_map(PropertyMap& pmap);
+
+    /**
+     * \brief Adds the values of all property-parameters to the given PropertyMap
+     *
+     * \param[in,out] pmap PropertyMap to fill
+     *
+     * This functions adds an entry to the given PropertyMap for each parameter with an associated PropertyMap path.
+     * Each added entry contains that parameters parsed value.
+     */
+    void add_values_to_property_map(PropertyMap& pmap);
+
   protected:
     /**
      * \brief Add a Parameter to this parser
@@ -1058,7 +1423,8 @@ namespace FEAT
     ParameterBuilder<T_> parameter(T_&& default_value = T_{})
     {
       // Create type-erased parameter core
-      std::shared_ptr<Intern::ParameterCore> core = std::make_shared<Intern::ParameterCore>(std::forward<T_>(default_value));
+      std::shared_ptr<Intern::ParameterCore> core =
+        std::make_shared<Intern::ParameterCore>(std::forward<T_>(default_value));
 
       // Store type-erased core for parsing purposes.
       // This allows the parser to treat all parameters the same,
@@ -1066,146 +1432,76 @@ namespace FEAT
       _parameters.push_back(core);
 
       // Return builder to user for defining the parameter fully
-      return ParameterBuilder<T_>(std::move(core));
+      return ParameterBuilder<T_>(std::move(core), _env_prefix, _property_prefix, _flag_prefix);
+    }
+
+    /**
+     * \brief Add a sub-parser to this parser
+     *
+     * \param[in] env_prefix
+     * All environment variables of the sub-parser will be prefixed with this string, separated by an underscore.
+     *
+     * \param[in] property_path_prefix
+     * All PropertyMap paths of the sub-parser will be prefixed with this string, separated by a slash.
+     *
+     * \param[in] flag_prefix
+     * All flags of the sub-parser will be prefixed with this string, separated by a dash.
+     *
+     * Prefixes are recursive. If B is a sub-parser of A with a flag prefix "b",
+     * and C is a sub-parser of B with a flag prefix "b", then a flag "--foo" of
+     * parser C will be treated as "--b-c-foo". Analogously for environment
+     * variables and PropertyMap paths.
+     *
+     * The sub-parsers automatically take part in the parsing of the root
+     * parser. No extra action by the user is required.
+     */
+    template<typename Parser_>
+    Parser_ parser(String env_prefix = "", String property_path_prefix = "", String flag_prefix = "")
+    {
+      // NOTE: On the implementation of this function. Rather than parsing fully
+      // recursively, and having to deal with tracking of used arguments and
+      // error handling across parsers, we just add all parameters of the
+      // sub-parser (with their prefix) to this parser. The parse method of this
+      // parser will then parse the parameters the same way it parses its own
+      // parameters. This might be terribly inconvenient later, but is very easy
+      // to implement for now.
+      const auto append = [](const String& a, const String& b, char delimiter) -> String
+      {
+        if(a.empty())
+        {
+          return b;
+        }
+        else if(!b.empty())
+        {
+          return a + delimiter + b;
+        }
+        else
+        {
+          return "";
+        }
+      };
+
+      // Create sub-parser
+      Parser_ parser(
+        append(_env_prefix, env_prefix, '_'),
+        append(_property_prefix, property_path_prefix, '/'),
+        append(_flag_prefix, flag_prefix, '-'));
+
+      // Add sub-parsers parameters to our own
+      _parameters.insert(_parameters.end(), parser._parameters.begin(), parser._parameters.end());
+
+      // Return parser to store it in current parser
+      return parser;
     }
 
   private:
     /// Search for short flags, long flags, environment variables, or property paths that get used by multiple
     /// parameters
-    bool _check_for_unique_parameters()
-    {
-      std::set<String> short_flags;
-      std::set<String> long_flags;
-      std::set<String> environment_variables;
-      std::set<String> property_paths;
+    bool _check_for_unique_parameters();
 
-      bool result = true;
-
-      auto handle_flag = [&](std::set<String>& set, const String& s)
-      {
-        if(s.empty())
-        {
-          return;
-        }
-
-        if(set.find(s) != set.end())
-        {
-          _errors.push_back("Error: Flag " + s + " is used by multiple parameters");
-          result = false;
-        }
-        else
-        {
-          set.insert(s);
-        }
-      };
-
-      for(auto& core : _parameters)
-      {
-        handle_flag(short_flags, core->short_flag);
-        handle_flag(long_flags, core->long_flag);
-        handle_flag(environment_variables, core->environment_variable);
-        handle_flag(property_paths, core->property_path);
-      }
-
-      return result;
-    }
-
-    void _collect_env()
-    {
-      for(auto& core : _parameters)
-      {
-        const char* value = std::getenv(core->environment_variable.c_str());
-        if(value != nullptr)
-        {
-          String s(value);
-          core->add_argument(s, priority_env);
-        }
-      }
-    }
-
-    void _collect_property_map(const PropertyMap* property_map)
-    {
-      for(auto& core : _parameters)
-      {
-        auto [string, success] = property_map->query(core->property_path);
-        if(success)
-        {
-          core->add_argument(string, priority_property);
-        }
-      }
-    }
-
-    void _collect_args(int argc, const char* const* argv)
-    {
-      if(argc == 0)
-      {
-        return;
-      }
-
-      _program = String(argv[0]);
-
-      std::deque<String> args;
-
-      for(int i(1); i < argc; i++)
-      {
-        args.emplace_back(argv[i]);
-      }
-
-      Index idx(0);
-      while(idx < args.size())
-      {
-        const String& flag = args[idx++];
-
-        if(!is_flag(flag))
-        {
-          XABORTM("Error: Expected flag in position " + stringify(idx));
-        }
-
-        bool handled = false;
-        for(auto& core : _parameters)
-        {
-          if(flag.compare_no_case(core->short_flag) != 0 && flag.compare_no_case(core->long_flag) != 0)
-          {
-            continue;
-          }
-
-          handled = true;
-
-          if(core->type == Intern::ParameterType::flag)
-          {
-            // Flag was given. Invert its state.
-            // any_cast is safe because flags must be bool parameters
-            core->value = !std::any_cast<const bool&>(core->default_value);
-            core->set_by_user = true;
-          }
-          else if(core->type == Intern::ParameterType::option)
-          {
-            // Normal option. Consume a single argument
-            core->add_argument(args[idx++], priority_cli);
-          }
-          else if(core->type == Intern::ParameterType::collection_option)
-          {
-            // Collect arguments until next flag
-            while(idx < args.size() && !is_flag(args[idx]))
-            {
-              core->add_argument(args[idx++], priority_cli);
-            }
-          }
-        }
-
-        if(!handled)
-        {
-          // We found no parameter for this flag. Generate error
-          _errors.push_back("Error: Unknown flag " + flag);
-
-          // Then advance to next flag
-          while(idx < args.size() && !is_flag(args[idx]))
-          {
-            idx++;
-          }
-        }
-      }
-    }
+    void _collect_env();
+    void _collect_property_map(const PropertyMap* property_map);
+    void _collect_args(int argc, const char* const* argv);
 
     /// Validate parameters after parsing
     void _validate()
@@ -1216,99 +1512,29 @@ namespace FEAT
       }
     }
 
-    /// Write flags, property path, environment variable and help text for given parameter to stringstream
-    static void parameter_help(const Intern::ParameterCore& core, std::stringstream& s)
+    /// Derive parameters from other parameters
+    void _derive()
     {
-      if(
-        core.short_flag.empty() && core.long_flag.empty() && core.property_path.empty() &&
-        core.environment_variable.empty())
+      for(auto& core : _parameters)
       {
-        return;
+        core->derive_self();
       }
-
-      s << "\t";
-
-      auto format_flag = [&s](Intern::ParameterType type, const String& flag, const String& placeholder)
-      {
-        if(type == Intern::ParameterType::flag)
-        {
-          s << flag;
-        }
-        if(type == Intern::ParameterType::option)
-        {
-          s << flag << " <" << placeholder << ">";
-        }
-        if(type == Intern::ParameterType::collection_option)
-        {
-          s << flag << " <" << placeholder << "s...>";
-        }
-      };
-
-      auto format_other = [&s](const std::string_view prefix, const String& value)
-      { s << "[" << prefix << ":" << value << "]"; };
-
-      // -a,  --arg, [property:arg], [env:FEAT_ARG]
-
-      bool has_prev = false;
-      if(!core.short_flag.empty())
-      {
-        format_flag(core.type, core.short_flag, core.placeholder);
-        has_prev = true;
-      }
-
-      if(!core.long_flag.empty())
-      {
-        if(has_prev)
-        {
-          s << ", ";
-        }
-
-        format_flag(core.type, core.long_flag, core.placeholder);
-
-        has_prev = true;
-      }
-
-      if(!core.property_path.empty())
-      {
-        if(has_prev)
-        {
-          s << ", ";
-        }
-
-        format_other("property", core.property_path);
-
-        has_prev = true;
-      }
-
-      if(!core.environment_variable.empty())
-      {
-        if(has_prev)
-        {
-          s << ", ";
-        }
-
-        format_other("env", core.environment_variable);
-
-        has_prev = true;
-      }
-
-      if(has_prev)
-      {
-        s << "\n";
-      }
-
-      if(core.required)
-      {
-        s << "\t\tRequired argument.\n";
-      }
-
-      for(const String& line : core.help_string.split_by_charset("\n"))
-      {
-        s << "\t\t" << line.trim() << "\n";
-      }
-
-      s << "\n";
     }
+
+    /// Hide parameters if requested
+    void _hide()
+    {
+      for(auto& core : _parameters)
+      {
+        core->hide();
+      }
+    }
+
+    /// Create a PropertyMap from all property-parameters using the given extractor
+    void _property_map(PropertyMap& pmap, const std::function<String(const Intern::ParameterCore&)>& extractor);
+
+    /// Write flags, property path, environment variable and help text for given parameter to stringstream
+    static void parameter_help(const Intern::ParameterCore& core, std::stringstream& s);
 
     static bool is_flag(const String& s)
     {
