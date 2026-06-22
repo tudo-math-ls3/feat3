@@ -42,6 +42,11 @@ target_link_libraries (mesh2tri feat)
 add_executable(tri2mesh tri_to_mesh.cpp)
 target_link_libraries (tri2mesh feat)
 
+if(FEAT_HAVE_CGAL)
+  add_executable(mesh-deformer mesh_deformer.cpp)
+  target_link_libraries(mesh-deformer feat)
+endif()
+
 if(FEAT_HAVE_MESHHEXER)
   add_executable(fbm-mesh-generator fbm_mesh_generator.cpp)
   target_link_libraries(fbm-mesh-generator feat)
