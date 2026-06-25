@@ -7,6 +7,7 @@
 #include <kernel/util/arg_parser.hpp>
 #include <kernel/util/property_map.hpp>
 #include <kernel/util/tiny_algebra.hpp>
+#include <stdexcept>
 #include <test_system/test_system.hpp>
 
 #include <array>
@@ -78,7 +79,6 @@ public:
     test_compose();
     test_unknown_flags();
     test_adding_to_property_map();
-    test_derived_values();
   }
 
   void test_metaprogramming() const
@@ -661,27 +661,6 @@ public:
       TEST_CHECK_EQUAL(value_map.query("foo/bar/b").first, "10");
       TEST_CHECK_EQUAL(value_map.query("foo/c").first, "15");
     }
-  }
-
-  void test_derived_values() const
-  {
-    struct Args : public ArgParser
-    {
-      Parameter<Real> arg = parameter(Real(0)).long_flag("--a");
-
-      Derived<Real> derived;
-
-      void post_parse() override
-      {
-        derived = Real(2) * *arg;
-      }
-    };
-
-    Args args;
-    std::array<const char*, 3> argv = {"path/to/program", "--a", "2"};
-
-    TEST_CHECK(args.parse(int(argv.size()), argv.data()));
-    TEST_CHECK_EQUAL(*args.derived, Real(2) * Real(2));
   }
 private:
   static int set_env(const char* name, const char* value, int overwrite)

@@ -67,7 +67,7 @@ namespace Gendie
     Parameter<String> level_string = parameter(String("")).property("problem-setup/level").required();
     Parameter<String> voxel_map_file = parameter(String("")).property("problem-setup/voxel-map");
     Parameter<Real> min_gap = parameter(Real(0)).property("special-problem-definition/min-gap");
-    Parameter<String> vtk_filename = parameter(String("gendie_material")).property("postproc-params/vtk");
+    Parameter<String> vtk_filename = parameter(String("")).property("postproc-params/vtk");
     Parameter<MeshDef> mesh_def = parameter(MeshDef{})
                                     .property("problem-setup/background-mesh")
                                     .parser(
@@ -118,41 +118,47 @@ namespace Gendie
     Parameter<bool> measure_cgal_size = parameter(true).property("postproc-params/skip-cgal-messure");
     Parameter<String> mesh_hierarchy_vtk = parameter(String("")).property("postproc-params/mesh-hierarchy-vtk");
 
-    Derived<bool> want_vtk = Derived(false);
-    Derived<String> vtk_name;
+    Parameter<bool> want_vtk = parameter(false).derives_from(
+      vtk_filename,
+      [](const String& filename) { return !Gendie::check_option_off(filename); });
+    Parameter<String> vtk_name =
+      parameter(String(""))
+        .derives_from(
+          vtk_filename,
+          use_true_vtk_name,
+          level_string,
+          [](const String& filename, const bool& use_true_name, const String& ls)
+          {
+            if(filename.empty())
+            {
+              return String("gendie_material") + String("-lvl") + ls.split_by_whitespaces().front();
+            }
+            else if(!use_true_name)
+            {
+              return filename + "_level_" + ls.split_by_whitespaces().front();
+            }
+            else
+            {
+              return filename;
+            }
+          });
     Parameter<bool> cheap_weights = parameter(true).property("problem-setup/cheap-weights");
     Parameter<bool> always_flush_print = parameter(false).property("problem-setup/always-flush-print");
     Parameter<bool> exact_deslagging = parameter(false).property("problem-setup/exact-deslagging");
 
-    Derived<SystemDataType> resolution;                 // Pseudo derived
-
-    void post_parse() override
-    {
-      if(!*use_base_mesh)
+    Parameter<SystemDataType> resolution = parameter(0.0).derives_from(
+      mesh_def,
+      level_string,
+      [](const MeshDef& md, const String& ls)
       {
         SystemDataType r = Math::Limits<SystemDataType>::max();
         for(int i = 0; i < dim; ++i)
         {
-          r = Math::min(r, Math::abs((mesh_def->max[i]-mesh_def->min[i])/ SystemDataType(mesh_def->num_cells[i])));
+          r = Math::min(r, Math::abs((md.max[i] - md.min[i]) / SystemDataType(md.num_cells[i])));
         }
-        r *= Math::pow(SystemDataType(2), -SystemDataType(std::stoi(level_string->split_by_whitespaces().front())));
-        resolution = r;
-      }
-      // -- postproc-params
-      vtk_name = *vtk_filename;
-      if(vtk_name->empty())
-      {
-        vtk_name = String("gendie_material") + String("-lvl") + level_string->split_by_whitespaces().front();
-      }
-      else if(!*use_true_vtk_name)
-      {
-        vtk_name = *vtk_filename + "_level_" + level_string->split_by_whitespaces().front();
-      }
-      if(vtk_filename && !Gendie::check_option_off(*vtk_filename))
-      {
-        want_vtk = true;
-      }
-    }
+        r *= Math::pow(SystemDataType(2), -SystemDataType(std::stoi(ls.split_by_whitespaces().front())));
+        return r;
+      });
   };
 
   template<typename ParamHolder_>
@@ -712,7 +718,7 @@ namespace Gendie
 
     // TODO fix this as well
     // if(Gendie::check_for_config_option(config->query("postproc-params/mesh-hirarchy-vtk")))
-    if(param_holder.mesh_hierarchy_vtk)
+    if(param_holder.mesh_hierarchy_vtk.set_by_user())
     {
       const String& mesh_hirarchy_vtk = *param_holder.mesh_hierarchy_vtk; // config->query("postproc-params/mesh-hirarchy-vtk").first;
       logger.print("Writing Mesh hirarchy output to '" + mesh_hirarchy_vtk + "_<LEVEL>.pvtu'", PrintLevel::info);

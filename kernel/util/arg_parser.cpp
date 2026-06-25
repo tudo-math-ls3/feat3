@@ -388,12 +388,6 @@ namespace FEAT
     // Hide parameters
     _hide();
 
-    // Call post_parse hook on successful parse
-    if(_errors.empty())
-    {
-      post_parse();
-    }
-
     // Sort parameters alphabetically for help and display output
     std::sort(
       _parameters.begin(),

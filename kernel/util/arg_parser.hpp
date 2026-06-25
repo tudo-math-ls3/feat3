@@ -480,91 +480,6 @@ namespace FEAT
     }
   };
 
-  /**
-   * \brief Wrapper for derived values.
-   *
-   * Derived values are values that are directly computed from parameters
-   * without being parameters themselves. These could be stored as regular
-   * additional members on the ArgParser, but then the user is forced to
-   * remember how to access each member of the ArgParser. Instead derived values
-   * can be wrapped with this wrapper and accessed the same way as normal
-   * parameters.
-   */
-  template<typename T_>
-  class Derived
-  {
-    /// Internal value of the wrapper
-    T_ _value;
-
-  public:
-    /// Default constructor
-    Derived() = default;
-
-    /// Constructor
-    explicit Derived(const T_& v) : _value(v)
-    {
-    }
-
-    /// Constructor
-    explicit Derived(T_&& v) : _value(std::move(v))
-    {
-    }
-
-    /// Assignment operator from other derived value
-    Derived& operator=(const Derived& d)
-    {
-      _value = d._value;
-    }
-
-    /// Move-assignment operator from other derived value
-    Derived& operator=(Derived&& d)
-    {
-      _value = std::move(d._value);
-    }
-
-    /// Assignment operator from raw value
-    Derived& operator=(const T_& v)
-    {
-      _value = v;
-      return *this;
-    }
-
-    /// Move-assignment operator from raw value
-    Derived& operator=(T_&& v)
-    {
-      _value = std::move(v);
-      return *this;
-    }
-
-    /// Accessor for derived value
-    const T_& value() const
-    {
-      return _value;
-    }
-
-    /// Accessor for derived value
-    const T_& operator*() const
-    {
-      return _value;
-    }
-
-    /// Accessor for derived value
-    const T_* operator->() const
-    {
-      return &_value;
-    }
-
-    /**
-     * \brief Check if argument was set by user
-     *
-     * \return True. We treat derived values as always being set by the user.
-     */
-    operator bool() // NOLINT
-    {
-      return true;
-    }
-  };
-
   /// Builder-pattern for defining parameters. See methods for details.
   template<typename T_>
   class ParameterBuilder
@@ -1173,7 +1088,7 @@ namespace FEAT
 
     if(!success)
     {
-      for(const String& error : args.errors())
+      for(const String& error : parser.errors())
       {
         std::cout << error << "\n";
       }
@@ -1240,21 +1155,6 @@ namespace FEAT
    * type std::map<K, V>. These parameters are parsed similarly to std::deques,
    * except that pairs of arguments are treated as key-value pairs for the
    * std::map.
-   *
-   * **Derived values**
-   *
-   * Some values get directly derived from parameters without being parameters
-   * themselves. For example some scaling factor that depends on other
-   * parameters. It is convenient to store such values together with the other
-   * parameters, but this leads to unsightly differences in the calls sites,
-   * where parameters need to be dereferenced but derived values do not.
-   *
-   * For such cases a Derived<T> wrapper exists, which is a no-op wrapper around
-   * a value of type T, which can be accessed the same way a parameter can.
-   *
-   * The ArgParser::post_parse() member function is called automatically
-   * after parsing and can be overriden by the user to compute derived values in
-   * a central location.
    *
    * **Help Text**
    *
@@ -1351,7 +1251,6 @@ namespace FEAT
     static constexpr int priority_property = 2;
     static constexpr int priority_cli = 3;
 
-
   public:
     ArgParser() = default;
 
@@ -1377,19 +1276,6 @@ namespace FEAT
     void allow_unknown_cli_flags(bool allow = true)
     {
       _allow_unknown_cli_flags = allow;
-    }
-
-    /// Destructor
-    virtual ~ArgParser() = default;
-
-    /**
-     * \brief Hook for performing additional initialization after parsing arguments
-     *
-     * Automatically called at the end of ArgParser::parse if the parsing produced no errors.
-     */
-    virtual void post_parse()
-    {
-
     }
 
     /// Error accessor
