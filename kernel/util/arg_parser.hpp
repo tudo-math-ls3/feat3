@@ -138,7 +138,7 @@ namespace FEAT
       std::map<K_, V_> map;
       auto strs = s.split_by_whitespaces();
 
-      if(!(strs.size() % 2 == 1))
+      if(!(strs.size() % 2 == 0))
       {
         throw std::invalid_argument("Parsing failed for string '" + s + "': Odd number of strings in key-value pairs.");
       }
@@ -905,7 +905,7 @@ namespace FEAT
      * environment variables associated with it will always be derived.
      */
     template<typename U_>
-    ParameterBuilder& derives_from(Parameter<U_>& param, T_ (*fn)(const U_&))
+    ParameterBuilder& derives_from(const Parameter<U_>& param, T_ (*fn)(const U_&))
     {
       XASSERTM(param._core != nullptr, "Derivee needs to be initialized");
 
@@ -931,7 +931,7 @@ namespace FEAT
 
     /// ArgParser::derive_from wrapper for casting lambdas to function pointers
     template<typename U_, typename Fn_>
-    ParameterBuilder& derives_from(Parameter<U_>& param, Fn_&& fn)
+    ParameterBuilder& derives_from(const Parameter<U_>& param, Fn_&& fn)
     {
       return derives_from(param, static_cast<T_ (*)(const U_&)>(std::forward<Fn_>(fn)));
     }
@@ -950,7 +950,7 @@ namespace FEAT
      * environment variables associated with it will always be derived.
      */
     template<typename U_, typename V_>
-    ParameterBuilder& derives_from(Parameter<U_>& param_one, Parameter<V_>& param_two, T_ (*fn)(const U_&, const V_&))
+    ParameterBuilder& derives_from(const Parameter<U_>& param_one, const Parameter<V_>& param_two, T_ (*fn)(const U_&, const V_&))
     {
       XASSERTM(param_one._core != nullptr, "Derivee needs to be initialized");
       XASSERTM(param_two._core != nullptr, "Derivee needs to be initialized");
@@ -969,7 +969,7 @@ namespace FEAT
 
     /// ArgParser::derive_from wrapper for casting lambdas to function pointers
     template<typename U_, typename V_, typename Fn_>
-    ParameterBuilder& derives_from(Parameter<U_>& param_one, Parameter<V_>& param_two, Fn_&& fn)
+    ParameterBuilder& derives_from(const Parameter<U_>& param_one, const Parameter<V_>& param_two, Fn_&& fn)
     {
       return derives_from(param_one, param_two, static_cast<T_ (*)(const U_&, const V_&)>(std::forward<Fn_>(fn)));
     }
@@ -993,7 +993,7 @@ namespace FEAT
       const Parameter<U_>& param_one,
       const Parameter<V_>& param_two,
       const Parameter<W_>& param_three,
-      T_ (*fn)(const U_&, const V_&))
+      T_ (*fn)(const U_&, const V_&, const W_&))
     {
       XASSERTM(param_one._core != nullptr, "Derivee needs to be initialized");
       XASSERTM(param_two._core != nullptr, "Derivee needs to be initialized");
@@ -1016,7 +1016,7 @@ namespace FEAT
     /// ArgParser::derive_from wrapper for casting lambdas to function pointers
     template<typename U_, typename V_, typename W_, typename Fn_>
     ParameterBuilder&
-    derives_from(Parameter<U_>& param_one, Parameter<V_>& param_two, Parameter<W_>& param_three, Fn_&& fn)
+    derives_from(const Parameter<U_>& param_one, const Parameter<V_>& param_two, const Parameter<W_>& param_three, Fn_&& fn)
     {
       return derives_from(
         param_one,

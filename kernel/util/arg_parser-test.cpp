@@ -475,6 +475,7 @@ public:
       Parameter<int> a = parameter(0).long_flag("--a");
       Parameter<int> b = parameter(0).long_flag("--b");
       Parameter<int> c = parameter(0).long_flag("--c").derives_from(a, b, [](const int& foo, const int& bar) { return foo + bar; });
+      Parameter<int> d = parameter(0).derives_from(flag, a, b, [](const bool& sub, const int& foo, const int& bar) { return sub ? foo + bar : foo - bar; });
     };
 
     // Test that derived values are correct
@@ -493,6 +494,7 @@ public:
 
       TEST_CHECK_EQUAL(*args.not_flag, false);
       TEST_CHECK_EQUAL(*args.c, 15);
+      TEST_CHECK_EQUAL(*args.d, 15);
     }
 
     // Test that derived values are not overwriting values set by user
