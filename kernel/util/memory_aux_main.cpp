@@ -15,15 +15,19 @@ namespace FEAT
 {
   namespace Memory
   {
+    #ifndef FEAT_HAVE_CUDA
     void* alloc_main(std::size_t bytes)
     {
       return malloc(bytes);
     }
+    #endif
 
+    #ifndef FEAT_HAVE_CUDA
     void free_main(void* ptr)
     {
       free(ptr);
     }
+    #endif
 
     void memset_main(void* ptr, int value, std::size_t bytes)
     {

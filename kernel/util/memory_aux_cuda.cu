@@ -10,6 +10,20 @@ namespace FEAT
 {
   namespace Memory
   {
+    void* alloc_main(std::size_t bytes)
+    {
+      void* ptr = nullptr;
+      if(cudaSuccess != ::cudaMallocHost(&ptr, bytes))
+        return nullptr;
+      return ptr;
+    }
+
+    void free_main(void* ptr)
+    {
+      XASSERTM(ptr != nullptr, "Memory::free_main: cannot free nullptr");
+      ::cudaFreeHost(ptr);
+    }
+
     void* alloc_cuda(std::size_t bytes)
     {
       void* ptr = nullptr;
