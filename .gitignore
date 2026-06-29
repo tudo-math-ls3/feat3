@@ -108,3 +108,8 @@ ipch
 
 # Ignore Visual Studio user-configfiles
 config-vc*.xml
+
+# Ignore agent directories
+/.agents
+/.codex
+/.claude
