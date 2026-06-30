@@ -241,104 +241,157 @@ namespace FEAT::Global
       const auto pack_size = (std::size_t)Intern::tuple_pack_size<Args_...>(_comm);
 
       ////////////////////////////////////////////
-      // Phase 1 - Exchange number of messages
+      // Phase 1 - Exchange number of calls
       ////////////////////////////////////////////
 
-      std::vector<int> receivecounts(num_ranks, 0);
+      // NOTE: Arguments are batched. If rank A wants to (in total) perform
+      // three lambda calls on rank B, then a single message containing three
+      // argument tuples is sent. The number of calls is only relevant to
+      // allocate appropriate buffers.
+
+      // Number of incoming lambda calls
+      std::vector<int> calls_from(num_ranks, 0);
+      // Number of outgoing lambda calls
+      std::vector<int> calls_to(num_ranks, 0);
       {
-        std::vector<int> sendcounts(num_ranks, 0);
         for(auto i : ranks)
         {
-          sendcounts[(std::size_t)i] += 1;
+          calls_to[(std::size_t)i] += 1;
         }
-        _comm.alltoall(sendcounts.data(), 1, receivecounts.data(), 1);
+
+        // Sync number of calls across all ranks
+        _comm.alltoall(calls_to.data(), 1, calls_from.data(), 1);
       }
 
       ////////////////////////////////////////////
-      // Phase 2 - Send args and receive results
+      // Phase 2 - Create required buffers
       ////////////////////////////////////////////
 
-      Dist::RequestVector arg_sends;
-      Dist::RequestVector result_receives;
-      std::vector<char> arg_sendbuffer(num_calls * pack_size, 0);
-      std::vector<ReturnType> return_receivebuffer(num_calls);
+      // Buffer for sending arguments
+      std::vector<std::vector<char>> argument_s_buffers(num_ranks);
+      // Buffer for receiving arguments
+      std::vector<std::vector<char>> argument_r_buffers(num_ranks);
+      // Buffer for sending return values
+      std::vector<std::vector<ReturnType>> return_s_buffers(num_ranks);
+      // Buffer for receiving return values
+      std::vector<std::vector<ReturnType>> return_r_buffers(num_ranks);
+
+      for(Index rank(0); rank < num_ranks; rank++)
+      {
+        // We send as many arguments to rank r as our local sendcount for rank r
+        argument_s_buffers[rank].resize(std::size_t(calls_to[rank]) * pack_size);
+        // We receive as many arguments from rank r as our local receivecount for rank r
+        argument_r_buffers[rank].resize(std::size_t(calls_from[rank]) * pack_size);
+
+        // We send as many return values to rank r as we received arguments from rank r
+        return_s_buffers[rank] = std::vector<ReturnType>(std::size_t(calls_from[rank]));
+        // We receive as many return values from rank r as we sent arguments to rank r
+        return_r_buffers[rank] = std::vector<ReturnType>(std::size_t(calls_to[rank]));
+      }
+
+      ////////////////////////////////////////////
+      // Phase 3 - Pack argument buffers
+      ////////////////////////////////////////////
+
+      // argument_buffer_pos[r] is the current offset into argument_r_buffer[r]
+      std::vector<int> argument_buffer_pos(num_ranks, 0);
       {
         auto rank_iter = ranks.begin();
         auto index_iter = indices.begin();
 
-        std::size_t send_pos(0);
-        std::size_t receive_pos(0);
         while(rank_iter != ranks.end())
         {
           const Index idx = *index_iter++;
-          const int rank = *rank_iter++;
+          const Index rank = Index(*rank_iter++);
           const ArgumentTuple& arg = Intern::nth_of_range(args, idx);
 
-          // NOTE(mmuegge): We need to tag arguments and return types differently,
-          // because MPI will match arg-sends and return-receives if the return type
-          // and the packed tuple happen to have the same size.
-
-          // Post receive for final result
-          result_receives.push_back(_comm.irecv(&return_receivebuffer[receive_pos], 1, rank, tag_return));
-
-          // Pack tuple for sending arg
-          int pos = (int)send_pos;
-          Intern::pack_tuple(_comm, arg, arg_sendbuffer.data(), num_calls * pack_size, &pos);
-
-          // Post send for sending argument tuple
-          arg_sends.push_back(_comm.isend(&arg_sendbuffer[send_pos], pack_size, Dist::dt_packed, rank, tag_argument));
-
-          // Increment buffer positions
-          receive_pos++;
-          send_pos += pack_size;
+          // Pack tuple for sending arg, appends to current buffer
+          Intern::pack_tuple(_comm, arg, argument_s_buffers[rank].data(), argument_s_buffers[rank].size(), &argument_buffer_pos[rank]);
         }
       }
 
       ////////////////////////////////////////////
-      // Phase 3 - Receive args and send results
+      // Phase 4 - Send args and receive results
       ////////////////////////////////////////////
 
-      const auto num_args = (std::size_t)std::accumulate(receivecounts.begin(), receivecounts.end(), 0);
-      Dist::RequestVector arg_receives;
-      std::vector<char> arg_receivebuffer(num_args * pack_size, 0);
+      Dist::RequestVector arg_sends;
+      Dist::RequestVector result_receives;
       {
-        std::size_t pos(0);
-        for(std::size_t rank(0); rank < num_ranks; rank++)
+        for(Index rank(0); rank < num_ranks; rank++)
         {
-          const int receive_count = receivecounts[rank];
+          // Send packed argument buffer to intended rank
+          arg_sends.push_back(_comm.isend(argument_s_buffers[rank].data(), (std::size_t)argument_buffer_pos[rank], (int)rank, tag_argument));
 
-          for(int i(0); i < receive_count; i++)
-          {
-            arg_receives.push_back(
-              _comm.irecv(&arg_receivebuffer[pos], pack_size, Dist::dt_packed, (int)rank, tag_argument));
-            pos += pack_size;
-          }
+          // Post receive for results from this rank
+          result_receives.push_back(_comm.irecv(return_r_buffers[rank].data(), return_r_buffers[rank].size(), (int)rank, tag_return));
         }
       }
 
+      ////////////////////////////////////////////
+      // Phase 5 - Receive args and send results
+      ////////////////////////////////////////////
+
+      Dist::RequestVector arg_receives;
+      for(Index rank(0); rank < num_ranks; rank++)
+      {
+        // Post receive for incoming arguments
+        arg_receives.push_back(_comm.irecv(argument_r_buffers[rank].data(), argument_r_buffers[rank].size(), (int)rank, tag_argument));
+      }
+
+      // For all incoming arguments, handle them in order and write their results into the appropriate send buffer
       Dist::RequestVector result_sends;
-      std::vector<ReturnType> return_sendbuffer(num_args);
       {
         std::size_t idx(0);
         Dist::Status status;
 
         while(arg_receives.wait_any(idx, status))
         {
-          ArgumentTuple t;
-          int arg_pos = (int)(idx * pack_size);
-          Intern::unpack_tuple(_comm, t, arg_receivebuffer.data(), num_args * pack_size, &arg_pos);
+          auto rank = Index(status.source());
 
-          return_sendbuffer[idx] = std::apply(lambda, t);
-          result_sends.push_back(_comm.isend(&return_sendbuffer[idx], 1, status.source(), tag_return));
+          int pos(0);
+          for(Index arg(0); arg < Index(calls_from[rank]); arg++)
+          {
+            ArgumentTuple t;
+            Intern::unpack_tuple(_comm, t, argument_r_buffers[rank].data(), argument_r_buffers[rank].size(), &pos);
+
+            return_s_buffers[rank][arg] = std::apply(lambda, t);
+          }
         }
       }
+
+      // Post sends for return values
+      for(Index rank(0); rank < num_ranks; rank++)
+      {
+        result_sends.push_back(_comm.isend(return_s_buffers[rank].data(), return_s_buffers[rank].size(), (int)rank, tag_return));
+      }
+
+      ////////////////////////////////////////////
+      // Phase 6 - Merge batches back into final result
+      ////////////////////////////////////////////
 
       arg_sends.wait_all();
       arg_receives.wait_all();
       result_sends.wait_all();
       result_receives.wait_all();
 
-      return return_receivebuffer;
+      // We now have the results of all lambda calls, sorted by rank We need to
+      // remap these into the order of lambda calls originally given by the
+      // user, so that the user knows which return value belongs to which call
+      std::vector<ReturnType> result(num_calls);
+      std::vector<Index> result_pos(num_ranks, 0);
+      {
+        auto rank_iter = ranks.begin();
+
+        Index idx(0);
+        while(rank_iter != ranks.end())
+        {
+          const Index rank = Index(*rank_iter++);
+
+          result[idx++] = return_r_buffers[rank][result_pos[rank]++];
+        }
+      }
+
+      return result;
     }
   };
 
@@ -453,124 +506,133 @@ namespace FEAT::Global
       // Phase 1 - Exchange number of calls
       ////////////////////////////////////////////
 
-      // Each rank needs to know how many arguments it is to receive from each rank
-      // so that it can post the necessary sends and receives.
+      // NOTE: Arguments are batched. If rank A wants to (in total) perform
+      // three lambda calls on rank B, then a single message containing three
+      // argument tuples is sent. The number of calls is only relevant to
+      // allocate appropriate buffers.
 
-      std::vector<int> receivecounts(num_ranks, 0);
+      // Number of incoming lambda calls
+      std::vector<int> calls_from(num_ranks, 0);
+      // Number of outgoing lambda calls
+      std::vector<int> calls_to(num_ranks, 0);
       {
-        std::vector<int> sendcounts(num_ranks, 0);
         for(auto i : ranks)
         {
-          sendcounts[(std::size_t)i] += 1;
+          calls_to[(std::size_t)i] += 1;
         }
-        _comm.alltoall(sendcounts.data(), 1, receivecounts.data(), 1);
+
+        // Sync number of calls across all ranks
+        _comm.alltoall(calls_to.data(), 1, calls_from.data(), 1);
       }
 
-      ////////////////////////////////////////////////////
-      // Phase 2 - Send args and receive sizes of ranges
-      ////////////////////////////////////////////////////
+      ////////////////////////////////////////////
+      // Phase 2 - Create required buffers
+      ////////////////////////////////////////////
 
-      // Sends and receives are posted in the same order as given by the user
-      Dist::RequestVector size_receives;
-      Dist::RequestVector arg_sends;
-      std::vector<std::size_t> range_message_sizes(num_calls, 0);
-      std::vector<char> arg_sendbuffer(num_calls * pack_size, 0);
+      std::vector<std::vector<char>> argument_s_buffers(num_ranks);
+      std::vector<std::vector<char>> argument_r_buffers(num_ranks);
+      std::vector<std::vector<std::size_t>> range_size_s_buffers(num_ranks);
+      std::vector<std::vector<std::size_t>> range_size_r_buffers(num_ranks);
+      for(Index rank(0); rank < num_ranks; rank++)
+      {
+        // We send as many arguments to rank r as our local sendcount for rank r
+        argument_s_buffers[rank].resize(std::size_t(calls_to[rank]) * pack_size);
+        // We receive as many arguments from rank r as our local receivecount for rank r
+        argument_r_buffers[rank].resize(std::size_t(calls_from[rank]) * pack_size);
+
+        // We send as many range sizes to rank r as we received arguments from rank r
+        range_size_s_buffers[rank].resize(std::size_t(calls_from[rank]));
+        // We receive as many range sizes from rank r as we sent argument to rank r
+        range_size_r_buffers[rank].resize(std::size_t(calls_to[rank]));
+      }
+
+      ////////////////////////////////////////////
+      // Phase 3 - Pack argument buffers
+      ////////////////////////////////////////////
+
+      // argument_buffer_pos[r] is the current offset into argument_r_buffer[r]
+      std::vector<int> argument_buffer_pos(num_ranks, 0);
       {
         auto rank_iter = ranks.begin();
         auto index_iter = indices.begin();
 
-        std::size_t send_pos(0);
-        std::size_t receive_pos(0);
         while(rank_iter != ranks.end())
         {
           const Index idx = *index_iter++;
-          const int rank = *rank_iter++;
+          const Index rank = Index(*rank_iter++);
           const ArgumentTuple& arg = Intern::nth_of_range(args, idx);
 
           // Pack tuple for sending arg
-          int pos = (int)send_pos;
-          Intern::pack_tuple(_comm, arg, arg_sendbuffer.data(), num_calls * pack_size, &pos);
-
-          // Post send for sending argument tuple
-          arg_sends.push_back(_comm.isend(&arg_sendbuffer[send_pos], pack_size, Dist::dt_packed, rank, tag_argument));
-
-          // Post receive for size of resulting range
-          size_receives.push_back(_comm.irecv(&range_message_sizes[receive_pos], 1, rank, tag_size));
-
-          // Increment buffer positions
-          send_pos += pack_size;
-          receive_pos++;
+          Intern::pack_tuple(_comm, arg, argument_s_buffers[rank].data(), argument_s_buffers[rank].size(), &argument_buffer_pos[rank]);
         }
       }
 
-      ///////////////////////////////////////////////////
-      // Phase 3 - Receive args and send range sizes and ranges
-      ///////////////////////////////////////////////////
+      ////////////////////////////////////////////////////
+      // Phase 4 - Send args and receive sizes of ranges
+      ////////////////////////////////////////////////////
 
-      const auto num_args = (std::size_t)std::accumulate(receivecounts.begin(), receivecounts.end(), 0);
-      Dist::RequestVector arg_receives;
-      std::vector<char> arg_receivebuffer(num_args * pack_size, 0);
+      Dist::RequestVector arg_sends;
+      Dist::RequestVector size_receives;
       {
-        std::size_t pos(0);
-        for(std::size_t rank(0); rank < num_ranks; rank++)
+        for(Index rank(0); rank < num_ranks; rank++)
         {
-          const int receive_count = receivecounts[rank];
+          // Send packed argument buffer to intended rank
+          arg_sends.push_back(_comm.isend(argument_s_buffers[rank].data(), (std::size_t)argument_buffer_pos[rank], (int)rank, tag_argument));
 
-          for(int i(0); i < receive_count; i++)
-          {
-            // Post receive for argument
-            arg_receives.push_back(
-              _comm.irecv(&arg_receivebuffer[pos], pack_size, Dist::dt_packed, (int)rank, tag_argument));
-            pos += pack_size;
-          }
+          // Post receive for range sizes from this rank
+          size_receives.push_back(_comm.irecv(range_size_r_buffers[rank].data(), range_size_r_buffers[rank].size(), (int)rank, tag_size));
         }
       }
 
-      Dist::RequestVector size_sends;
+      ///////////////////////////////////////////////////
+      // Phase 5 - Receive args and send range sizes and ranges
+      ///////////////////////////////////////////////////
+
+      Dist::RequestVector arg_receives;
+      for(Index rank(0); rank < num_ranks; rank++)
+      {
+        // Post receive for argument buffer
+        arg_receives.push_back(_comm.irecv(argument_r_buffers[rank].data(), argument_r_buffers[rank].size(), (int)rank, tag_argument));
+      }
+
       Dist::RequestVector range_sends;
-      std::vector<ReturnType> ranges(num_args);
-      std::vector<std::size_t> range_sizes(num_args, 0);
-      std::vector<std::size_t> range_buffer_sizes(num_ranks, 0);
+      Dist::RequestVector size_sends;
+
+      std::vector<std::vector<ValueType>> return_s_buffers(num_ranks);
       {
         std::size_t idx(0);
         Dist::Status status;
 
         while(arg_receives.wait_any(idx, status))
         {
-          int arg_pos = (int)(idx * pack_size);
+          auto rank = Index(status.source());
 
-          ArgumentTuple t;
-          Intern::unpack_tuple(_comm, t, arg_receivebuffer.data(), num_args * pack_size, &arg_pos);
+          int pos(0);
+          for(Index arg(0); arg < Index(calls_from[rank]); arg++)
+          {
+            // Unpack argument
+            ArgumentTuple t;
+            Intern::unpack_tuple(_comm, t, argument_r_buffers[rank].data(), argument_r_buffers[rank].size(), &pos);
 
-          ranges[idx] = std::apply(lambda, t);
-          range_sizes[idx] = (std::size_t)std::distance(ranges[idx].begin(), ranges[idx].end());
-          range_buffer_sizes[std::size_t(status.source())] += range_sizes[idx];
+            // Create result range
+            auto range = std::apply(lambda, t);
 
-          // Post send for sizes
-          size_sends.push_back(_comm.isend(&range_sizes[idx], 1, status.source(), tag_size));
+            // Record range size so that range can be reconstructed after sending
+            range_size_s_buffers[rank][arg] = (std::size_t)std::distance(range.begin(), range.end());
 
-          // Pointer to beginning of range, or nullptr if range is empty
-          // NOTE: This assumes the range is contiguous in memory
-          const void* range_pointer = range_sizes[idx] > 0 ? &*ranges[idx].begin() : nullptr;
-
-          // Post send for range
-          range_sends.push_back(
-            _comm.isend(range_pointer, range_sizes[idx], Dist::autotype<ValueType>(), status.source(), tag_return));
+            // Append range values to sendbuffer for that rank
+            return_s_buffers[rank].insert(return_s_buffers[rank].end(), range.begin(), range.end());
+          }
         }
       }
 
-      /////////////////////////////////////////////////////
-      // Phase 4 - Exchange buffer sizes for all ranks
-      /////////////////////////////////////////////////////
-
-      // At this point each ranks knows how many values it will send to each other rank.
-      // Exchange these values so that reach ranks can allocate its range_buffer before receiving individual ranges.
-
-      // TODO: Is there a smarter way than doing _comm.size() reduces?
-      std::size_t range_buffer_size(0);
-      for(std::size_t rank(0); rank < num_ranks; rank++)
+      for(Index rank(0); rank < num_ranks; rank++)
       {
-        _comm.reduce(&range_buffer_sizes[rank], &range_buffer_size, 1, Dist::op_sum, (int)rank);
+        // Post sends for range sizes
+        size_sends.push_back(_comm.isend(range_size_s_buffers[rank].data(), range_size_s_buffers[rank].size(), (int)rank, tag_size));
+
+        // Post sends for ranges
+        range_sends.push_back(_comm.isend(return_s_buffers[rank].data(), return_s_buffers[rank].size(), (int)rank, tag_return));
       }
 
       ////////////////////////////////////////////
@@ -578,28 +640,21 @@ namespace FEAT::Global
       ////////////////////////////////////////////
 
       size_sends.wait_all();
+      size_receives.wait_all();
+
+      // Allocate return values buffer for each rank
+      // Each buffer must be large enough to receive all values of all generated ranges
+      std::vector<std::vector<ValueType>> return_r_buffers(num_ranks);
+      for(Index rank(0); rank < num_ranks; rank++)
+      {
+        return_r_buffers[rank].resize(std::accumulate(range_size_r_buffers[rank].begin(), range_size_r_buffers[rank].end(), 0ULL));
+      }
 
       Dist::RequestVector range_receives;
-      std::vector<ValueType> range_buffer(range_buffer_size);
-      std::vector<std::size_t> range_buffer_offsets;
-      std::exclusive_scan(
-        range_message_sizes.begin(),
-        range_message_sizes.end(),
-        std::back_inserter(range_buffer_offsets),
-        std::size_t(0));
+      for(Index rank(0); rank < num_ranks; rank++)
       {
-        std::size_t idx(0);
-        Dist::Status status;
-
-        // For each message containing a range size, post the corresponding range receive
-        while(size_receives.wait_any(idx, status))
-        {
-          std::size_t offset = range_buffer_offsets[idx];
-          std::size_t size = range_message_sizes[idx];
-          void* range_pointer = size > 0 ? &range_buffer[offset] : nullptr;
-          range_receives.push_back(
-            _comm.irecv(range_pointer, size, Dist::autotype<ValueType>(), status.source(), tag_return));
-        }
+        // Post receives for ranges
+        range_receives.push_back(_comm.irecv(return_r_buffers[rank].data(), return_r_buffers[rank].size(), (int)rank, tag_return));
       }
 
       ////////////////////////////////////////////
@@ -611,18 +666,39 @@ namespace FEAT::Global
       range_receives.wait_all();
       range_sends.wait_all();
 
-      std::vector<ReturnType> result;
+      // We now have the returned ranges from each rank as one long array, plus the sizes of the individual ranges
+      // We now reconstruct the original ranges, by taking subranges according to the range sizes.
+      std::vector<std::vector<ReturnType>> ranges(num_ranks);
 
-      // NOTE: We are keeping the same message order throughout all of the above code,
-      // so we can just walk linearly over the range_buffer and the reconstructed ranges
-      // will have the same order as the input parameters.
-      std::size_t pos(0);
-      for(std::size_t size : range_message_sizes)
+      for(Index rank(0); rank < num_ranks; rank++)
       {
-        auto begin = range_buffer.data() + pos;
-        auto end = begin + size;
-        result.emplace_back(begin, end);
-        pos += size;
+        Index start(0);
+
+        for(Index arg(0); arg < Index(calls_to[rank]); arg++)
+        {
+          auto size = range_size_r_buffers[rank][arg];
+          auto begin = return_r_buffers[rank].data() + start;
+          auto end = return_r_buffers[rank].data() + start + size;
+          ranges[rank].emplace_back(begin, end);
+          start += size;
+        }
+      }
+
+      // Same as in the scalar case, we now have the returned ranges sorted by rank
+      // We need to reorder them so that they match the order of the original lambda calls,
+      // so that the user knows which range belongs to which call.
+      std::vector<ReturnType> result(num_calls);
+      std::vector<Index> result_pos(num_ranks, 0);
+      {
+        auto rank_iter = ranks.begin();
+
+        Index idx(0);
+        while(rank_iter != ranks.end())
+        {
+          const Index rank = Index(*rank_iter++);
+
+          result[idx++] = ranges[rank][result_pos[rank]++];
+        }
       }
 
       return result;
