@@ -506,8 +506,9 @@ namespace FEAT
           if(this->valid_locations == Location::none)
           {
             // emit a warning
-            std::cerr << "\n>>> MEMORY ARBITER: map_view: trying to map uninitialized memory for reading!\n";
-            //XABORTM("\n>>> MEMORY ARBITER: map_view: trying to map uninitialized memory for reading!\n");
+            // std::cerr << "\n>>> MEMORY ARBITER: map_view: trying to map uninitialized memory for reading!\n";
+            throw AccessException("Memory::Block::map_view: trying to map uninitialized memory for reading");
+            // XABORTM("\n>>> MEMORY ARBITER: map_view: trying to map uninitialized memory for reading!\n");
 #ifdef _WIN32
             Windows::dump_call_stack_to_stderr();
 #endif
