@@ -1205,6 +1205,27 @@ namespace FEAT
       }
 
       /**
+       * \brief Inits persistent workspace
+       *
+       * Creates persistent workspace for spmv apply backend.
+       *
+       * \note Not required, but can speedup consecutive apply for this matrix
+       * \note For now only sensible for cuda backend
+       *
+       * \warning The matrix has to be symbolically assembled at this point and the underlying ptr
+       *          are not allowed to change.
+       */
+      void init_workspace() const
+      {
+        #ifdef FEAT_HAVE_CUDA
+        Arch::MatVecMultCSRDense::init_workspace_cuda<DT_, IT_>(
+          this->_backend_workspaces[BackendIdx::cuda],
+          this->val_arbiter(), this->col_idx_arbiter(), this->row_ptr_arbiter(),
+          this->num_rows(), this->num_cols(), this->num_nzes(), false);
+        #endif
+      }
+
+      /**
        * \brief Retrieve maximum radius among all column.
        *
        * The radius is defined as the maximal distance to the main diagonal
@@ -1666,7 +1687,7 @@ namespace FEAT
 
         TimeStamp ts_start;
 
-        Arch::MatVecMultCSRDense::template exec<DT_, IT_>(r.elements_arbiter(), DT_(1), x.elements_arbiter(), Memory::Arbiter(),
+        Arch::MatVecMultCSRDense::template exec<DT_, IT_>(this->_backend_workspaces, r.elements_arbiter(), DT_(1), x.elements_arbiter(), Memory::Arbiter(),
           this->val_arbiter(), this->col_idx_arbiter(), this->row_ptr_arbiter(),
           this->num_rows(), this->num_cols(), this->num_nzes(), false);
 
@@ -1701,7 +1722,7 @@ namespace FEAT
 
         TimeStamp ts_start;
 
-        Arch::MatVecMultCSRDense::template exec<DT_, IT_>(r.elements_arbiter(), DT_(1), x.elements_arbiter(), Memory::Arbiter(),
+        Arch::MatVecMultCSRDense::template exec<DT_, IT_>(this->_backend_workspaces, r.elements_arbiter(), DT_(1), x.elements_arbiter(), Memory::Arbiter(),
           this->val_arbiter(), this->col_idx_arbiter(), this->row_ptr_arbiter(),
           this->num_rows(), this->num_cols(), this->num_nzes(), true);
 
@@ -1783,7 +1804,7 @@ namespace FEAT
 
         TimeStamp ts_start;
 
-        Arch::MatVecMultCSRDense::template exec<DT_, IT_>(r.elements_arbiter(), alpha, x.elements_arbiter(), y.elements_arbiter(),
+        Arch::MatVecMultCSRDense::template exec<DT_, IT_>(this->_backend_workspaces, r.elements_arbiter(), alpha, x.elements_arbiter(), y.elements_arbiter(),
           this->val_arbiter(), this->col_idx_arbiter(), this->row_ptr_arbiter(),
           this->num_rows(), this->num_cols(), this->num_nzes(), false);
 
@@ -1828,7 +1849,7 @@ namespace FEAT
 
         TimeStamp ts_start;
 
-        Arch::MatVecMultCSRDense::template exec<DT_, IT_>(r.elements_arbiter(), alpha, x.elements_arbiter(), y.elements_arbiter(),
+        Arch::MatVecMultCSRDense::template exec<DT_, IT_>(this->_backend_workspaces, r.elements_arbiter(), alpha, x.elements_arbiter(), y.elements_arbiter(),
           this->val_arbiter(), this->col_idx_arbiter(), this->row_ptr_arbiter(),
           this->num_rows(), this->num_cols(), this->num_nzes(), true);
 

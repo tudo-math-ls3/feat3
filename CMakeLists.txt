@@ -161,8 +161,29 @@ if(FEAT_HAVE_CUDA)
   endif(FEAT_DEBUG_MODE)
 
   enable_language(CUDA)
+  string(REGEX MATCHALL "[0-9]+" _versionCuda ${CMAKE_CUDA_COMPILER_VERSION})
+  list(LENGTH _versionCuda _lenCuda)
+  if(LEN LESS_EQUAL 2)
+    message(ERROR "Cuda language not enabled")
+  endif()
+  list(GET _versionCuda 0 FEAT_CUDA_VERSION_MAJOR)
+  # list(GET _versionCuda 1 FEAT_CUDA_VERSION_MINOR)
+  # list(GET _versionCuda 2 _minorVersionUpdate)
+
   find_package(CUDAToolkit REQUIRED)
   set(CUDA_PROPAGATE_HOST_FLAGS OFF)
+
+  if(CUDAToolkit_VERSION VERSION_GREATER_EQUAL "13.0.85")
+    set(FEAT_CUSPARSE_BSR_SPMV_SUPPORTED ON)
+    message(STATUS "Cuda version 13 fully supported")
+  endif()
+
+  # Standard CSR (block_dim == 1) always uses cuSPARSE. When this option is ON, real BCSR
+  # (block_dim > 1) does NOT use cuSPARSE but the custom compile-time-specialized kernels instead.
+  option(FEAT_NO_CUSPARSE_BCSR "Do not use cuSPARSE for real (block_dim>1) BCSR matvec; use the custom kernels. Standard CSR still uses cuSPARSE." OFF)
+  if(FEAT_NO_CUSPARSE_BCSR)
+    message(STATUS "cuSPARSE disabled for real BCSR matvec (using custom kernels)")
+  endif(FEAT_NO_CUSPARSE_BCSR)
 
   option(FEAT_CUDA_ALLOW_UNSUPPORTED_COMPILER "Allow non officially tested compilers?" OFF)
   if(FEAT_CUDA_ALLOW_UNSUPPORTED_COMPILER)

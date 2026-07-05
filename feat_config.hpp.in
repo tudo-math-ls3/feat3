@@ -135,12 +135,16 @@
 #define FEAT_CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS}"
 /// CUDA SDK Version
 #define FEAT_CUDA_VERSION "${CUDA_VERSION}"
-/// CUDA major version
-#define FEAT_CUDA_VERSION_MAJOR "${CUDA_VERSION_MAJOR}"
+/// Which CUDA major version?
+#cmakedefine FEAT_CUDA_VERSION_MAJOR ${FEAT_CUDA_VERSION_MAJOR}
 /// compile for this CUDA device architecture
 #define FEAT_CUDA_ARCH "${FEAT_CUDA_ARCH}"
 /// The host compiler that will be used by nvcc for host code compilation.
 #define FEAT_CUDA_HOST_COMPILER "${CMAKE_CUDA_HOST_COMPILER}"
+/// Ist cusparse spmv fully supported, i.e. ver >= 13.0.1
+#cmakedefine FEAT_CUSPARSE_BSR_SPMV_SUPPORTED "${FEAT_CUSPARSE_BSR_SPMV_SUPPORTED}"
+/// If defined, real BCSR (block_dim>1) matvec does not use cuSPARSE but the custom kernels (standard CSR still uses cuSPARSE)
+#cmakedefine FEAT_NO_CUSPARSE_BCSR "${FEAT_NO_CUSPARSE_BCSR}"
 #endif
 
 #ifdef FEAT_HAVE_MPI

@@ -143,6 +143,20 @@ namespace FEAT
       {
       }
 
+      void init_workspace() const
+      {
+        _matrix_a.init_workspace();
+        _matrix_b.init_workspace();
+        _matrix_d.init_workspace();
+      }
+
+      void reset_workspace() const
+      {
+        _matrix_a.reset_workspace();
+        _matrix_b.reset_workspace();
+        _matrix_d.reset_workspace();
+      }
+
       /**
        * \brief Constructor
        *

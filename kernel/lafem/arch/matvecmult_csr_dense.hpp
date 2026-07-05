@@ -10,6 +10,8 @@
 #include <kernel/backend.hpp>
 #include <kernel/util/memory_arbiter.hpp>
 
+#include <array>
+
 namespace FEAT::LAFEM::Arch
 {
   /// r[i] <- y[i] + alpha * sum_{j=0..n-1} A[i][j] * x[j]
@@ -29,7 +31,7 @@ namespace FEAT::LAFEM::Arch
     }
 
     template <typename DT_, typename IT_>
-    static void exec_cuda_impl(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_ * const y, const DT_ * const val, const IT_ * const col_idx, const IT_ * const row_ptr, const Index rows, const Index cols, const Index nonzeros, const bool transposed);
+    static void exec_cuda_impl(void* workspace, DT_ * r, const DT_ alpha, const DT_ * const x, const DT_ * const y, const DT_ * const val, const IT_ * const col_idx, const IT_ * const row_ptr, const Index rows, const Index cols, const Index nonzeros, const bool transposed);
 
     template <typename DT_, typename IT_>
     static void exec_generic(Memory::Arbiter& r, const DT_ alpha, const Memory::Arbiter& x, const Memory::Arbiter& y, const Memory::Arbiter& a, const Memory::Arbiter& col_idx, const Memory::Arbiter& row_ptr,  const Index rows, const Index cols, const Index nonzeros, const bool transposed)
@@ -75,7 +77,7 @@ namespace FEAT::LAFEM::Arch
     }
 
     template <typename DT_, typename IT_>
-    static void exec_cuda(Memory::Arbiter& r, const DT_ alpha, const Memory::Arbiter& x, const Memory::Arbiter& y, const Memory::Arbiter& a, const Memory::Arbiter& col_idx, const Memory::Arbiter& row_ptr, const Index rows, const Index cols, const Index nonzeros, const bool transposed)
+    static void exec_cuda(void* workspace, Memory::Arbiter& r, const DT_ alpha, const Memory::Arbiter& x, const Memory::Arbiter& y, const Memory::Arbiter& a, const Memory::Arbiter& col_idx, const Memory::Arbiter& row_ptr, const Index rows, const Index cols, const Index nonzeros, const bool transposed)
     {
       Memory::TypedView<IT_> rp_view(row_ptr.view(Memory::Location::cuda, Memory::Access::read));
       Memory::TypedView<IT_> ci_view(col_idx.view(Memory::Location::cuda, Memory::Access::read));
@@ -85,18 +87,18 @@ namespace FEAT::LAFEM::Arch
       if(y)
       {
         Memory::TypedView<DT_> y_view(y.view(Memory::Location::cuda, Memory::Access::read));
-        exec_cuda_impl(r_view.get_w(), alpha, x_view.get_r(), y_view.get_r(), a_view.get_r(),
+        exec_cuda_impl(workspace, r_view.get_w(), alpha, x_view.get_r(), y_view.get_r(), a_view.get_r(),
           ci_view.get_r(), rp_view.get_r(), rows, cols, nonzeros, transposed);
       }
       else
       {
-        exec_cuda_impl(r_view.get_w(), alpha, x_view.get_r(), (DT_*)nullptr, a_view.get_r(),
+        exec_cuda_impl(workspace, r_view.get_w(), alpha, x_view.get_r(), (DT_*)nullptr, a_view.get_r(),
           ci_view.get_r(), rp_view.get_r(), rows, cols, nonzeros, transposed);
       }
     }
 
     template <typename DT_, typename IT_>
-    static void exec(Memory::Arbiter& r, const DT_ alpha, const Memory::Arbiter& x, const Memory::Arbiter& y, const Memory::Arbiter& a, const Memory::Arbiter& col_idx, const Memory::Arbiter& row_ptr, const Index rows, const Index cols, const Index nonzeros, const bool transposed)
+    static void exec([[maybe_unused]] std::array<std::shared_ptr<void>, BackendIdx::num_backends>& workspaces, Memory::Arbiter& r, const DT_ alpha, const Memory::Arbiter& x, const Memory::Arbiter& y, const Memory::Arbiter& a, const Memory::Arbiter& col_idx, const Memory::Arbiter& row_ptr, const Index rows, const Index cols, const Index nonzeros, const bool transposed)
     {
       XASSERT(r != x);
 
@@ -122,7 +124,7 @@ namespace FEAT::LAFEM::Arch
 
       case PreferredBackend::cuda:
 #ifdef FEAT_HAVE_CUDA
-        exec_cuda<DT_, IT_>(r, alpha, x, y, a, col_idx, row_ptr, rows, cols, nonzeros, transposed);
+        exec_cuda<DT_, IT_>(workspaces[BackendIdx::cuda].get(), r, alpha, x, y, a, col_idx, row_ptr, rows, cols, nonzeros, transposed);
 #else
         XABORTM("LAFEM::Arch::MatVecMultCSRDense::exec: CUDA backend not available!");
 #endif
@@ -133,6 +135,20 @@ namespace FEAT::LAFEM::Arch
         break;
       }
     }
+
+    /**
+     * \brief Sets up a persistent cuSPARSE SpMV workspace for this matrix.
+     *
+     * Creates the (persistent) cuSPARSE CSR matrix descriptor and the SpMV buffer once, so that
+     * consecutive apply() calls do not have to recreate them. The returned workspace is stored in
+     * \p workspace (a type-erased Util::CuSparseSPMVWorkSpace behind a shared_ptr).
+     *
+     * \warning This assumes the row-pointer and column-index arrays (and their device pointers) do
+     *          not change after this call.
+     */
+    template <typename DT_, typename IT_>
+    static void init_workspace_cuda(std::shared_ptr<void>& workspace, const Memory::Arbiter& val, const Memory::Arbiter& col_idx, const Memory::Arbiter& row_ptr, const Index rows, const Index cols, const Index nonzeros, const bool transposed);
+
   }; // struct MatVecMultCSRDense
 
 #ifdef FEAT_EICKT

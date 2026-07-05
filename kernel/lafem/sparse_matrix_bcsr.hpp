@@ -157,7 +157,7 @@ namespace FEAT
         FEAT_KERNEL_MARKER_START("BCSR-apply");
 
         Arch::MatVecMultBCSRDense::template exec<DT_, IT_, block_height_, block_width_, transposed_>(
-          r.elements_arbiter(),DT_(1), x.elements_arbiter(), Memory::Arbiter(),
+          this->_backend_workspaces, r.elements_arbiter(),DT_(1), x.elements_arbiter(), Memory::Arbiter(),
           this->val_arbiter(), this->col_idx_arbiter(), this->row_ptr_arbiter(),
           this->num_rows(), this->num_cols(), this->num_nzes());
 
@@ -198,7 +198,7 @@ namespace FEAT
         FEAT_KERNEL_MARKER_START("BCSR-apply");
 
         Arch::MatVecMultBCSRDense::template exec<DT_, IT_, block_height_, block_width_, transposed_>(
-          r.elements_arbiter(),alpha, x.elements_arbiter(), y.elements_arbiter(),
+          this->_backend_workspaces, r.elements_arbiter(),alpha, x.elements_arbiter(), y.elements_arbiter(),
           this->val_arbiter(), this->col_idx_arbiter(), this->row_ptr_arbiter(),
           this->num_rows(), this->num_cols(), this->num_nzes());
 
@@ -967,6 +967,27 @@ namespace FEAT
         if(this->_indices.empty())
           return Memory::TypedView<IT_>();
         return Memory::TypedView<IT_>(this->_indices.at(1).view(loc, acc));
+      }
+
+      /**
+       * \brief Inits persistent workspace
+       *
+       * Creates persistent workspace for spmv apply backend.
+       *
+       * \note Not required, but can speedup consecutive apply for this matrix
+       * \note For now only sensible for cuda backend
+       *
+       * \warning The matrix has to be symbolically assembled at this point and the underlying ptr
+       *          are not allowed to change.
+       */
+      void init_workspace() const
+      {
+        #ifdef FEAT_HAVE_CUDA
+        Arch::MatVecMultBCSRDense::init_workspace_cuda<DT_, IT_>(
+          this->_backend_workspaces[BackendIdx::cuda],
+          this->val_arbiter(), this->col_idx_arbiter(), this->row_ptr_arbiter(),
+          this->num_rows(), this->num_cols(), this->num_nzes(), block_height_, block_width_, false);
+        #endif
       }
 
       /**

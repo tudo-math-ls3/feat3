@@ -118,6 +118,16 @@ namespace FEAT
         }
       }
 
+      void init_workspace() const
+      {
+        _matrix.init_workspace();
+      }
+
+      void reset_workspace() const
+      {
+        _matrix.reset_workspace();
+      }
+
       /**
        * \brief Returns a reference to the internal local LAFEM matrix object.
        *

@@ -136,6 +136,16 @@ namespace FEAT
       {
       }
 
+      VankaMatrixType& get_vanka_matrix()
+      {
+        return _vanka;
+      }
+
+      const VankaMatrixType& get_vanka_matrix() const
+      {
+        return _vanka;
+      }
+
       /**
        * \brief Clears the macro dofs graphs.
        */
@@ -436,7 +446,14 @@ namespace FEAT
         // scale rows of Vanka matrix
         Solver::Intern::AmaVankaCore::scale_rows(this->_vanka, this->_omega, this->_dof_macros, this->_macro_mask, Index(0), Index(0));
 
+        this->get_vanka_matrix().init_workspace();
+
         watch_init_numeric.stop();
+      }
+
+      virtual void done_numeric() override
+      {
+        this->get_vanka_matrix().reset_workspace();
       }
 
       /// applies the preconditioner
@@ -473,10 +490,6 @@ namespace FEAT
         return Intern::AmaVankaMatrixHelper<VankaMatrixType>::compare(this->_vanka, other->_vanka);
       }*/
 
-      const VankaMatrixType& get_vanka_matrix() const
-      {
-        return this->_vanka;
-      }
     }; // class AmaVanka
 
     /**

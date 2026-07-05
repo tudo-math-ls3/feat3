@@ -132,6 +132,18 @@ namespace FEAT
         return TupleMatrixRow(_first.clone(mode), _rest.clone(mode));
       }
 
+      void init_workspace() const
+      {
+        _first.init_workspace();
+        _rest.init_workspace();
+      }
+
+      void reset_workspace() const
+      {
+        _first.reset_workspace();
+        _rest.reset_workspace();
+      }
+
       /**
        * \brief Turns this matrix into a clone of other
        *
@@ -508,6 +520,16 @@ namespace FEAT
       TupleMatrixRow clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
         return TupleMatrixRow(_first.clone(mode));
+      }
+
+      void init_workspace() const
+      {
+        _first.init_workspace();
+      }
+
+      void reset_workspace() const
+      {
+        _first.reset_workspace();
       }
 
       void clone(const TupleMatrixRow& other, CloneMode clone_mode)
@@ -905,6 +927,18 @@ namespace FEAT
       TupleMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
         return TupleMatrix(_first.clone(mode), _rest.clone(mode));
+      }
+
+      void init_workspace() const
+      {
+        _first.init_workspace();
+        _rest.init_workspace();
+      }
+
+      void reset_workspace() const
+      {
+        _first.reset_workspace();
+        _rest.reset_workspace();
       }
 
       /**
@@ -1321,6 +1355,16 @@ namespace FEAT
       TupleMatrix clone(LAFEM::CloneMode mode = LAFEM::CloneMode::Weak) const
       {
         return TupleMatrix(_first.clone(mode));
+      }
+
+      void init_workspace() const
+      {
+        _first.init_workspace();
+      }
+
+      void reset_workspace() const
+      {
+        _first.reset_workspace();
       }
 
       void clone(const TupleMatrix& other, CloneMode clone_mode)

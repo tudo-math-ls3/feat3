@@ -18,7 +18,15 @@ namespace FEAT
   {
     generic = 0, /**< generic c++ code */
     mkl, /**< intel mkl blas library */
-    cuda /**< nvidia cuda gpgpu support */
+    cuda, /**< nvidia cuda gpgpu support */
+  };
+
+  enum BackendIdx : std::uint8_t
+  {
+    generic = 0,
+    mkl,
+    cuda,
+    num_backends
   };
 
   /**
@@ -52,6 +60,18 @@ namespace FEAT
     static void warn_missing(const char* operation)
     {
       warn_missing(operation, get_preferred_backend());
+    }
+
+    /// Helper function for idx mapping
+    static BackendIdx backend_to_index(PreferredBackend backend)
+    {
+      switch(backend)
+      {
+        case PreferredBackend::generic: return BackendIdx::generic;
+        case PreferredBackend::mkl: return BackendIdx::mkl;
+        case PreferredBackend::cuda: return BackendIdx::cuda;
+      };
+      return BackendIdx::generic;
     }
   }; // class Backend
 

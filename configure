@@ -424,6 +424,9 @@ parser.add_argument("--no-external-downloads", "--no_external_download", action=
 parser.add_argument("--no-external-libs", "--no_external_libs", action="store_true", default=False, help =
 "always download thirdparty dependencies in the configure step (default: %(default)s)")
 
+parser.add_argument("--no-cusparse-bcsr", "--no_cusparse_bcsr", action="store_true", default=False, help =
+"Shut off the bcsr cusparse kernel")
+
 parser.add_argument("--preset", action="store_true", default=False, help=
 "write a CMake preset to the repositories CMakeUserPresets.json")
 
@@ -631,6 +634,9 @@ if args.no_external_downloads:
 
 if args.no_external_libs:
   config.cache_entry("FEAT_PREFER_EXTERNAL_TPL", "OFF", "BOOL")
+
+if args.no_cusparse_bcsr:
+  config.cache_entry("FEAT_NO_CUSPARSE_BCSR", "ON", "BOOL")
 
 if args.no_thirdparty_cache:
   config.cache_entry("FEAT_TPL_CACHE_DIRECTORY", "", "STRING")
@@ -862,6 +868,8 @@ for token in buildid:
       config.cache_entry("FEAT_CUDA_VERBOSE", "ON", "BOOL")
   elif token == "cudamemcheck":
     config.cache_entry("FEAT_CUDAMEMCHECK", "ON", "BOOL")
+  elif token == "nocusparsebcsr":
+    config.cache_entry("FEAT_NO_CUSPARSE_BCSR", "ON", "BOOL")
   elif token == "cudss":
     config.cache_entry("FEAT_HAVE_CUDSS", "ON", "BOOL")
   elif token == "mkl":

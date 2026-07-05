@@ -411,6 +411,21 @@ public:
       r.copy(y);
       a.apply(r, x, r, alpha);
       TEST_CHECK_LESS_THAN(r.max_rel_diff(ref2), tol);
+
+      a.init_workspace();
+      a.apply(r, x);
+      TEST_CHECK_LESS_THAN(r.max_rel_diff(ref1), tol);
+
+      a.apply(r, x, y, DT_(0.0));
+      TEST_CHECK_LESS_THAN(r.max_rel_diff(y), tol);
+
+      a.apply(r, x, y, alpha);
+      TEST_CHECK_LESS_THAN(r.max_rel_diff(ref2), tol);
+
+      r.copy(y);
+      a.apply(r, x, r, alpha);
+      TEST_CHECK_LESS_THAN(r.max_rel_diff(ref2), tol);
+
     }
   }
 };

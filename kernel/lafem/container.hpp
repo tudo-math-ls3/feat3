@@ -15,6 +15,9 @@
 
 
 #include <vector>
+#include <array>
+#include <memory>
+#include <algorithm>
 #include <limits>
 #include <cmath>
 #include <typeinfo>
@@ -236,6 +239,9 @@ namespace FEAT
       /// List of scalars with datatype DT_
       std::vector<DT_> _scalar_dt;
 
+      /// List of backend workspaces
+      mutable std::array<std::shared_ptr<void>, BackendIdx::num_backends> _backend_workspaces;
+
       void _copy_content(const Container & other, bool full)
       {
         // avoid self-copy
@@ -278,6 +284,7 @@ namespace FEAT
       template <typename DT2_, typename IT2_>
       void assign(const Container<DT2_, IT2_> & other)
       {
+        this->reset_workspace();
         this->_elements.clear();
         this->_indices.clear();
         this->_elements_size.clear();
@@ -805,7 +812,8 @@ namespace FEAT
         _elements_size(std::move(other._elements_size)),
         _indices_size(std::move(other._indices_size)),
         _scalar_index(std::move(other._scalar_index)),
-        _scalar_dt(std::move(other._scalar_dt))
+        _scalar_dt(std::move(other._scalar_dt)),
+        _backend_workspaces(std::move(other._backend_workspaces))
       {
         other._elements.clear();
         other._indices.clear();
@@ -855,11 +863,28 @@ namespace FEAT
         }
       }
 
+      void init_workspace() const
+      {
+        //do nothing
+      }
+
+      /**
+       * \brief Resets the workspace allocation
+       *
+       * It is silently assumed that it is safe to deallocate the shared ptr and the internal
+       * `Deleter` keeps the workspace clean.
+       */
+      void reset_workspace() const
+      {
+        std::for_each(_backend_workspaces.begin(), _backend_workspaces.end(), [](auto& a){a.reset();});
+      }
+
       /**
        * \brief Free all allocated arrays
        */
       virtual void clear()
       {
+        this->reset_workspace();
         this->_elements.clear();
         this->_indices.clear();
         this->_elements_size.clear();
@@ -990,6 +1015,7 @@ namespace FEAT
         this->_indices_size = std::move(source._indices_size);
         this->_scalar_index = std::move(source._scalar_index);
         this->_scalar_dt = std::move(source._scalar_dt);
+        this->_backend_workspaces = std::move(source._backend_workspaces);
 
         source._elements.clear();
         source._indices.clear();
@@ -1080,6 +1106,11 @@ namespace FEAT
       const std::vector<DT_> & get_scalar_dt() const
       {
         return _scalar_dt;
+      }
+
+      const std::shared_ptr<void>& get_workspace(PreferredBackend backend) const
+      {
+        return _backend_workspaces[Backend::backend_to_index(backend)];
       }
 
       /**

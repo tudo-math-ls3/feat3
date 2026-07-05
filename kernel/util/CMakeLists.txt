@@ -86,11 +86,18 @@ if (FEAT_HAVE_CUDA)
     cuda_util.cu
     memory_aux_cuda.cu
   )
+  find_package(CUDAToolkit REQUIRED)
   target_link_libraries(feat-kernel-util-cuda
   PUBLIC
     feat-dependency
   PRIVATE
-    ${CUDA_cusparse_LIBRARY} ${CUDA_cublas_LIBRARY})
+    CUDA::cusparse CUDA::cublas)
+
+  if(FEAT_CUDA_VERSION_MAJOR LESS 13)
+    target_link_libraries(feat-kernel-util-cuda
+    PRIVATE
+      nvToolsExt)
+  endif()
 
   if(FEAT_HAVE_CUDSS)
     target_link_libraries(feat-kernel-util-cuda PUBLIC cuDSS::cuDSS)
