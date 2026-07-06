@@ -69,9 +69,9 @@ namespace FEAT::LAFEM::Arch
         cudaDataType t_valtype;
         cusparseCheck(cusparseCsrGet(descr, &t_rows, &t_cols, &t_nnz, &t_row_off, &t_col_ind, &t_values, &t_row_type, &t_col_type, &t_idxbase, &t_valtype), "cusparseCSRGet");
         // check if structure is the same
-        XASSERT(t_rows == rows);
-        XASSERT(t_cols == cols);
-        XASSERT(t_nnz == nonzeros);
+        XASSERT(Index(t_rows) == rows);
+        XASSERT(Index(t_cols) == cols);
+        XASSERT(Index(t_nnz) == nonzeros);
         XASSERT(t_col_ind == (void*)col_idx);
         XASSERT(t_row_off == (void*)row_ptr);
         XASSERT(dt == t_valtype);

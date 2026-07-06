@@ -174,36 +174,6 @@ namespace FEAT::LAFEM::Arch
 #endif
   }
 
-  /// launcher for the 1 x N rectangular BCSR matvec; warp-per-row for float/double, else thread-per-row
-  template <typename DT_, typename IT_, int bw_>
-  void bcsr_intern_cuda_1xn_ct(DT_ * r, const DT_ alpha, const DT_ * const x, const DT_ * const y, const DT_ * const val,
-    const IT_ * const col_idx, const IT_ * const row_ptr, const Index rows, const bool transposed)
-  {
-    XASSERTM(!transposed, "transposed BCSR matvec for CUDA not implemented");
-    if constexpr (std::is_same<DT_, float>::value || std::is_same<DT_, double>::value)
-    {
-      // one warp per block-row
-      const unsigned int block_x = static_cast<unsigned int>(Util::cuda_blocksize_spmv);
-      const unsigned int warps_per_block = (block_x >= 32u ? block_x / 32u : 1u);
-      dim3 block(block_x);
-      dim3 grid((static_cast<unsigned int>(rows) + warps_per_block - 1u) / warps_per_block);
-
-      cuda_apply_bcsr_1xn_warp<DT_, IT_, bw_><<<grid, block>>>(r, alpha, x, y, val, col_idx, row_ptr, rows);
-
-#ifdef DEBUG
-      cudaDeviceSynchronize();
-      cudaError_t last_error(cudaGetLastError());
-      if (cudaSuccess != last_error)
-        throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
-#endif
-    }
-    else
-    {
-      // no warp-shuffle partner type (e.g. Half): fall back to the thread-per-row kernel
-      bcsr_intern_cuda_ct<DT_, IT_, 1, bw_>(r, alpha, x, y, val, col_idx, row_ptr, rows, transposed);
-    }
-  }
-
   /**
    * \brief Routes a real BCSR matvec to the compile-time-specialized custom kernels.
    *
