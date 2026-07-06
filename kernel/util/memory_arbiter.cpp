@@ -1525,5 +1525,15 @@ namespace FEAT
 
       return r;
     }
+
+    // Explicit instantiations of the TypedView specializations used by the non-LTO CUDA kernels
+    // (see kernel/lafem/arch/batched_vector_apply.cu). TypedView's destructor and move operators are
+    // defaulted inline, so without an explicit instantiation they only exist as weak COMDAT symbols.
+    // In an LTO build the linker plugin then picks an LTO-object copy as prevailing and dead-code-
+    // eliminates it (nothing in the LTO program references it out-of-line), leaving the non-LTO CUDA
+    // object with an unresolvable reference. Emitting them here as real machine code (this TU is built
+    // -fno-lto, see kernel/util/CMakeLists.txt) provides a definition that survives and prevails.
+    template class TypedView<float>;
+    template class TypedView<double>;
   } // namespace Memory
 } // namespace FEAT

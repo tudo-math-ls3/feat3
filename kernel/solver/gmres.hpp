@@ -7,6 +7,7 @@
 
 // includes, FEAT
 #include <kernel/solver/iterative.hpp>
+#include <kernel/solver/krylov_orthogonalizer.hpp>
 
 // includes, FEAT
 #include <vector>
@@ -27,6 +28,17 @@ namespace FEAT
      * solver should be used instead, as it is designed to handle such cases.
      * If used with a preconditioner that does fulfill the linearity condition or if used without a preconditioner,
      * the FGMRES(k) and GMRES(k) solvers are equivalent with the exception of rounding errors, of course.
+     *
+     * At the core of the algorithm lies the orthogonalization of the Krylov-space of the residuals
+     * \f$\text{span}(v, (AM^{-1})v, (AM^{-1})^2v, \dots)$\f.
+     * A very stable way to orthogonalize the system is by doing a modified Gram-Schmidt procedure with the pretty
+     * large downside of sequentializing all inner dot-products of the support vectors, which results in a large number
+     * of required global reductions for even moderate Krylov dimension. To parallize this, we can fall back to the
+     * classical Gram-Schmidt which is less stable, which we remidy by a CGS2 approach, i.e. redo the
+     * orthogonalization step, if rounding errors are to be expected.
+     *
+     * To generalize the implementation, we hide the orthogonalization procedure behind a component, handling all extra
+     * allocations etc.
      *
      * <u><b>Details about the inner resolution scaling factor:</b></u>\n
      * In contrast to other popular iterative Krylov subspace methods like PCG or BiCGStab, the GMRES method and all
@@ -68,7 +80,7 @@ namespace FEAT
      * \tparam Filter_
      * The filter class to be used by the solver.
      *
-     * \author Pia Ritter, Peter Zajac
+     * \author Maximilian Esser, Pia Ritter, Peter Zajac
      */
     template<
       typename Matrix_,
@@ -84,6 +96,7 @@ namespace FEAT
       typedef PreconditionedIterativeSolver<VectorType> BaseClass;
 
       typedef SolverBase<VectorType> PrecondType;
+      typedef KrylovSubspaceOrthogonalizer<VectorType> OrthoType;
 
     protected:
       /// the matrix for the solver
@@ -94,8 +107,11 @@ namespace FEAT
       Index _krylov_dim;
       /// inner pseudo-residual scaling factor, see the documentation of this class for details
       DataType _inner_res_scale;
-      /// krylov basis vector
-      std::vector<VectorType> _vec_v;
+      /// the orthogonalization strategy used to build the Krylov basis
+      KrylovOrthogonalizerType _ortho_type = KrylovOrthogonalizerType::modified_gram_schmidt;
+      // /// krylov basis vector
+      // std::vector<VectorType> _vec_v;
+      std::unique_ptr<OrthoType> _subspace;
       VectorType _vec_w;
       /// Givens rotation coefficients
       std::vector<DataType> _c, _s, _q;
@@ -162,6 +178,20 @@ namespace FEAT
         if(!krylov_dim_p.first.parse(this->_krylov_dim) || (this->_krylov_dim <= Index(0)))
           throw ParseError(section_name + ".krylov_dim", krylov_dim_p.first, "a positive integer");
 
+        // Set the orthogonalization strategy by parameter or use the default (modified Gram-Schmidt)
+        auto ortho_p = section->query("orthogonalizer");
+        if(ortho_p.second)
+        {
+          if(ortho_p.first == "mgs")
+            this->_ortho_type = KrylovOrthogonalizerType::modified_gram_schmidt;
+          else if(ortho_p.first == "cgs")
+            this->_ortho_type = KrylovOrthogonalizerType::classical_gram_schmidt;
+          else if(ortho_p.first == "cgs2")
+            this->_ortho_type = KrylovOrthogonalizerType::cgs2;
+          else
+            throw ParseError(section_name + ".orthogonalizer", ortho_p.first, "one of: mgs, cgs, cgs2");
+        }
+
         this->set_plot_name("GMRES("+stringify(_krylov_dim)+")");
       }
 
@@ -203,17 +233,13 @@ namespace FEAT
           _h.at(i).resize(i+1);
         }
 
-        _vec_v.push_back(this->_system_matrix.create_vector_r());
         _vec_w = this->_system_matrix.create_vector_r();
-        for(Index i(0); i < _krylov_dim; ++i)
-        {
-          _vec_v.push_back(this->_vec_v.front().clone(LAFEM::CloneMode::Layout));
-        }
+        _subspace = _create_orthogonalizer(_vec_w);
       }
 
       virtual void done_symbolic() override
       {
-        _vec_v.clear();
+        _subspace.reset();
         _vec_w.clear();
         BaseClass::done_symbolic();
       }
@@ -243,13 +269,24 @@ namespace FEAT
         _inner_res_scale = inner_res_scale;
       }
 
+      /**
+       * \brief Sets the Krylov subspace orthogonalization strategy
+       *
+       * \param[in] ortho_type
+       * The orthogonalization strategy to use. Takes effect on the next init_symbolic().
+       *
+       * \see KrylovOrthogonalizerType
+       */
+      virtual void set_orthogonalizer(KrylovOrthogonalizerType ortho_type)
+      {
+        _ortho_type = ortho_type;
+      }
+
       /// \copydoc IterativeSolver::apply()
       virtual Status apply(VectorType& vec_sol, const VectorType& vec_rhs) override
       {
-
-        // BEGIN: Test auskommentiert
         // save input rhs vector as initial defect
-        this->_vec_v.at(0).copy(vec_rhs);
+        this->_subspace->at(0).copy(vec_rhs);
 
         // clear solution vector
         vec_sol.format();
@@ -264,8 +301,8 @@ namespace FEAT
       virtual Status correct(VectorType& vec_sol, const VectorType& vec_rhs) override
       {
         // compute initial defect
-        this->_system_matrix.apply(this->_vec_v.at(0), vec_sol, vec_rhs, -DataType(1));
-        this->_system_filter.filter_def(this->_vec_v.at(0));
+        this->_system_matrix.apply(this->_subspace->at(0), vec_sol, vec_rhs, -DataType(1));
+        this->_system_filter.filter_def(this->_subspace->at(0));
 
         // apply
         this->_status = _apply_intern(vec_sol, vec_rhs);
@@ -282,9 +319,11 @@ namespace FEAT
         const FilterType& filter(this->_system_filter);
 
         // compute initial defect
-        Status status = this->_set_initial_defect(this->_vec_v.at(0), vec_sol);
+        Status status = this->_set_initial_defect(this->_subspace->at(0), vec_sol);
 
         pre_iter.destroy();
+
+        const Index krylov_dim = this->_subspace->get_krylov_dim();
 
         // outer GMRES loop
         while(status == Status::progress)
@@ -297,14 +336,14 @@ namespace FEAT
           _q.push_back(this->_def_cur);
 
           // normalize v[0]
-          this->_vec_v.at(0).scale(this->_vec_v.at(0), DataType(1) / _q.back());
+          this->_subspace->at(0).scale(this->_subspace->at(0), DataType(1) / _q.back());
 
           // inner GMRES loop
           Index i(0);
-          while(i < this->_krylov_dim)
+          while(i < krylov_dim)
           {
             // apply preconditioner
-            if(!this->_apply_precond(this->_vec_w, this->_vec_v.at(i), filter))
+            if(!this->_apply_precond(this->_vec_w, this->_subspace->at(i), filter))
             {
               stat.destroy();
               Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
@@ -313,19 +352,14 @@ namespace FEAT
             //filter.filter_cor(this->_vec_z.at(i));
 
             // v[i+1] := A*w
-            matrix.apply(this->_vec_v.at(i+1), this->_vec_w);
-            filter.filter_def(this->_vec_v.at(i+1));
+            matrix.apply(this->_subspace->at(i+1), this->_vec_w);
+            filter.filter_def(this->_subspace->at(i+1));
 
-            // Gram-Schmidt process
-            for(Index k(0); k <= i; ++k)
-            {
-              this->_h.at(i).at(k) = this->_vec_v.at(i+1).dot(this->_vec_v.at(k));
-              this->_vec_v.at(i+1).axpy(this->_vec_v.at(k), -this->_h.at(i).at(k));
-            }
+            // orthogonalize v_{i+1}
+            DataType alpha = this->_subspace->orthogonalize(this->_h.at(i).data(), i+1);
 
-            // normalize v[i+1]
-            DataType alpha = this->_vec_v.at(i+1).norm2();
-            this->_vec_v.at(i+1).scale(this->_vec_v.at(i+1), DataType(1) / alpha);
+            // and now normalize
+            this->_subspace->at(i+1).scale(this->_subspace->at(i+1), DataType(1) / alpha);
 
             // apply Givens rotations
             for(Index k(0); k < i; ++k)
@@ -398,7 +432,7 @@ namespace FEAT
             this->_print_line(msg);
           }
 
-          Index n = Math::min(i, this->_krylov_dim);
+          Index n = Math::min(i, krylov_dim);
 
           // solve H*q = q
           for(Index k(n); k > 0;)
@@ -414,30 +448,45 @@ namespace FEAT
 
           // update solution
           this->_vec_w.format();
-          for(Index k(0); k < n; ++k)
-            this->_vec_w.axpy(this->_vec_v.at(k), this->_q.at(k));
+
+          // dispatch vector correction to subspace (fused kernel possible)
+          this->_subspace->correct_vector(this->_vec_w, this->_q.data(), n, DataType(1));
 
           // re-use v[0] for preconditioned correction
-          if(!this->_apply_precond(this->_vec_v.front(), this->_vec_w, filter))
+          if(!this->_apply_precond(this->_subspace->at(0), this->_vec_w, filter))
           {
             stat.destroy();
             Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), Status::aborted, this->get_num_iter()));
             return Status::aborted;
           }
-          vec_sol.axpy(this->_vec_v.front());
+          vec_sol.axpy(this->_subspace->at(0));
 
           // compute "real" residual
-          matrix.apply(this->_vec_v.at(0), vec_sol, vec_rhs, -DataType(1));
-          filter.filter_def(this->_vec_v.at(0));
+          matrix.apply(this->_subspace->at(0), vec_sol, vec_rhs, -DataType(1));
+          filter.filter_def(this->_subspace->at(0));
 
           // set the current defect
-          status = this->_set_new_defect(this->_vec_v.at(0), vec_sol);
+          status = this->_set_new_defect(this->_subspace->at(0), vec_sol);
 
         }
 
         // finished
         Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
         return status;
+      }
+
+      std::unique_ptr<OrthoType> _create_orthogonalizer(const VectorType& vec_w)
+      {
+        switch(_ortho_type)
+        {
+        case KrylovOrthogonalizerType::classical_gram_schmidt:
+          return std::make_unique<ClassicGramSchmidtOrthogonalizer<VectorType>>(vec_w, this->_krylov_dim);
+        case KrylovOrthogonalizerType::cgs2:
+          return std::make_unique<CGS2Orthogonalizer<VectorType>>(vec_w, this->_krylov_dim);
+        case KrylovOrthogonalizerType::modified_gram_schmidt:
+        default:
+          return std::make_unique<ModifiedGramSchmidtOrthogonalizer<VectorType>>(vec_w, this->_krylov_dim);
+        }
       }
     }; // class GMRES<...>
 

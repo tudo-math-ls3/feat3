@@ -77,6 +77,7 @@ target_link_libraries(feat-kernel-lafem-arch PUBLIC feat-dependency)
 if (FEAT_HAVE_CUDA)
   add_library(feat-kernel-lafem-arch-cuda STATIC
     axpy_dense.cu
+    batched_vector_apply.cu
     component_invert_dense.cu
     component_product_dense.cu
     copy_stride.cu
@@ -121,7 +122,7 @@ if (FEAT_HAVE_CUDA)
   PUBLIC
     feat-dependency
   PRIVATE
-    feat-kernel-util-cuda ${CUDA_cusparse_LIBRARY} ${CUDA_cublas_LIBRARY} ${CUDA_cublasLt_LIBRARY}) #with new cuda support, we want cmake to be able to link against stubs...
+    feat-kernel-util feat-kernel-util-cuda ${CUDA_cusparse_LIBRARY} ${CUDA_cublas_LIBRARY} ${CUDA_cublasLt_LIBRARY}) #with new cuda support, we want cmake to be able to link against stubs...
 #TODO: Use Static variants?  target_link_libraries(kernel-lafem-arch-cuda kernel-util-cuda ${CUDA_cusparse_static_LIBRARY} ${CUDA_cublas_static_LIBRARY})
 
   if(FEAT_HAVE_CUDSS)

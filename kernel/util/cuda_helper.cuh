@@ -29,4 +29,52 @@ namespace FEAT
     std::uint64_t ptr_a = reinterpret_cast<std::uint64_t>(ptr);
     return (DT_*)((ptr_a + align - 1u)&(-align));
   }
+
+
+  /// reduce shared array across block size arrays so the final value is inside shared_array[0]
+  template<typename DT_, int blockSize_>
+  CUDA_DEVICE void inline static reduce_sum(DT_* shared_array, int thread_idx)
+  {
+    __syncthreads();
+    if constexpr(blockSize_ >= 1024)
+    {
+      if(thread_idx < 512)
+        shared_array[thread_idx] += shared_array[thread_idx + 512];
+      __syncthreads();
+    }
+    if constexpr(blockSize_ >= 512)
+    {
+      if(thread_idx < 256)
+        shared_array[thread_idx] += shared_array[thread_idx + 256];
+      __syncthreads();
+    }
+    if constexpr(blockSize_ >= 256)
+    {
+      if(thread_idx < 128)
+        shared_array[thread_idx] += shared_array[thread_idx + 128];
+      __syncthreads();
+    }
+    if constexpr(blockSize_ >= 128)
+    {
+      if(thread_idx < 64)
+        shared_array[thread_idx] += shared_array[thread_idx + 64];
+      __syncthreads();
+    }
+
+    // warp internal sync does not require explicit synchonization
+    // from here, we always assume that we have at least a block size of 64, so these adds are safe
+    if constexpr(blockSize_ >= 64)
+    {
+      if(thread_idx < 32) shared_array[thread_idx] += shared_array[thread_idx + 32];
+    }
+    // final warp is done by warp shuffle intrinsics, else we would need to sync after each shuffle
+    if(thread_idx < 32)
+    {
+      shared_array[thread_idx] += __shfl_down_sync(0xFFFFFFFF, shared_array[thread_idx], 16);
+      shared_array[thread_idx] += __shfl_down_sync(0xFFFFFFFF, shared_array[thread_idx], 8);
+      shared_array[thread_idx] += __shfl_down_sync(0xFFFFFFFF, shared_array[thread_idx], 4);
+      shared_array[thread_idx] += __shfl_down_sync(0xFFFFFFFF, shared_array[thread_idx], 2);
+      shared_array[thread_idx] += __shfl_down_sync(0xFFFFFFFF, shared_array[thread_idx], 1);
+    }
+  }
 }

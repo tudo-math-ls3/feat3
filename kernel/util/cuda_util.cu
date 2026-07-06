@@ -9,7 +9,16 @@
 #include <kernel/util/half.hpp>
 #include <kernel/util/string.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/lafem/arch/batched_vector_apply.hpp>
 #include "cuda_profiler_api.h"
+
+
+#if FEAT_CUDA_VERSION_MAJOR >= 13
+#include <nvtx3/nvToolsExt.h>
+#else
+#include <nvToolsExt.h>
+#endif
+
 
 #ifdef FEAT_HAVE_CUDSS
 #include <kernel/solver/cudss.hpp>
@@ -144,6 +153,8 @@ void FEAT::Util::cuda_finalize()
 {
   if (cudaSuccess != cudaDeviceSynchronize())
     throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceSynchronize failed!");
+
+  LAFEM::Arch::BatchedScratchSpace::free();
 
   if (CUBLAS_STATUS_SUCCESS != cublasDestroy(Util::Intern::cublas_handle))
     throw InternalError(__func__, __FILE__, __LINE__, "cublasDestroy failed!");
@@ -303,4 +314,19 @@ std::size_t FEAT::Util::cuda_get_sm_count()
   }
   return std::size_t(max_sm_per_device);
 
+}
+
+std::uint64_t FEAT::Util::cuda_start_range(const char* name)
+{
+  return std::uint64_t(nvtxRangeStartA(name));
+}
+
+void FEAT::Util::cuda_stop_range(std::uint64_t id)
+{
+  nvtxRangeEnd(nvtxRangeId_t(id));
+}
+
+void FEAT::Util::cuda_mark_event(const char* name)
+{
+  nvtxMarkA(name);
 }

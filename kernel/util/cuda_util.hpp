@@ -111,6 +111,12 @@ namespace FEAT
       return num_blocks;
     }
     #endif
+
+    std::uint64_t cuda_start_range(const char* name);
+
+    void cuda_stop_range(std::uint64_t id);
+
+    void cuda_mark_event(const char* name);
   }
 }
 #endif // FEAT_HAVE_CUDA

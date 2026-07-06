@@ -115,6 +115,7 @@ endif (FEAT_HAVE_UMFPACK)
 set(test_list
   amavanka-test
   basic_solver-test
+  batched_vector_apply-test
   cudss-test
   direct_sparse_solver-test
   direct_stokes_solver-test
@@ -129,4 +130,4 @@ set(test_list
 )
 
 include(FEATKernelTests)
-add_feat_kernel_tests(TESTS test_list TARGET solver_tests CUDA)
+add_feat_kernel_tests(TESTS test_list TARGET solver_tests CUDA LINK_AGAINST feat-kernel-solver)
