@@ -75,7 +75,11 @@ namespace GMRESTest
     static constexpr std::size_t solve_stnd_gmres_cgs = 9u;
     /// standard solver/gmres.hpp with the batched CGS2 (reorthogonalizing) orthogonalizer
     static constexpr std::size_t solve_stnd_gmres_cgs2 = 10u;
-    static constexpr std::size_t count = 12u;
+    /// scalar (CPU) AmaVankaGMRES with the CGS2 (reorthogonalizing) orthogonalizer
+    static constexpr std::size_t solve_scalar_gmres_cgs2 = 11u;
+    /// cuda AmaVankaGMRES with the CGS2 (reorthogonalizing) orthogonalizer
+    static constexpr std::size_t solve_cuda_gmres_cgs2 = 12u;
+    static constexpr std::size_t count = 14u;
   };
 
   struct Sizes
@@ -274,6 +278,12 @@ namespace GMRESTest
     }
     if(param_holder.scalar_gmres)
     {
+      // scalar (CPU) AmaVankaGMRES with the classical Gram-Schmidt and CGS2 orthogonalizers
+      const std::array<std::pair<Solver::KrylovOrthogonalizerType, std::size_t>, 2> variants{{
+        {Solver::KrylovOrthogonalizerType::classical_gram_schmidt, Times::solve_scalar_gmres},
+        {Solver::KrylovOrthogonalizerType::cgs2, Times::solve_scalar_gmres_cgs2}
+      }};
+      for(const auto& variant : variants)
       {
         auto tmp_def = vec_def.clone();
         auto tmp_cor = vec_cor.clone();
@@ -282,6 +292,7 @@ namespace GMRESTest
         auto gmres = Solver::new_amavanka_gmres(system->matrix_sys, system->filter_sys, vanka, param_holder.krylov_dim, DataType(1));
         gmres->set_plot_mode(Solver::PlotMode::none);
         gmres->set_use_cuda_gmres(false);
+        gmres->set_orthogonalizer(variant.first);
 
         gmres->init();
         Backend::set_preferred_backend(backend);
@@ -292,11 +303,13 @@ namespace GMRESTest
         gmres->set_plot_mode(param_holder.plot_mode);
         gmres->set_min_iter(param_holder.num_iter);
         gmres->set_max_iter(param_holder.num_iter);
-        String name = name_conv + "scalar gmres";
+        String name = name_conv + (variant.first == Solver::KrylovOrthogonalizerType::cgs2 ? "scalar gmres cgs2" : "scalar gmres");
         auto id = Util::cuda_start_range(name.c_str());
-        run_solver(*gmres, tmp_cor, tmp_def, times[Times::solve_scalar_gmres]);
+        run_solver(*gmres, tmp_cor, tmp_def, times[variant.second]);
         // std::printf("Flops %lu \n", gmres->get_flops());
-        sizes[Sizes::flops] = gmres->get_global_flops();
+        // report the flop baseline from the plain CGS run
+        if(variant.first == Solver::KrylovOrthogonalizerType::classical_gram_schmidt)
+          sizes[Sizes::flops] = gmres->get_global_flops();
         Util::cuda_stop_range(id);
         Backend::set_preferred_backend(PreferredBackend::generic);
         gmres->done();
@@ -304,6 +317,12 @@ namespace GMRESTest
     }
     if(param_holder.cuda_gmres)
     {
+      // cuda AmaVankaGMRES with the classical Gram-Schmidt and CGS2 orthogonalizers
+      const std::array<std::pair<Solver::KrylovOrthogonalizerType, std::size_t>, 2> variants{{
+        {Solver::KrylovOrthogonalizerType::classical_gram_schmidt, Times::solve_cuda_gmres},
+        {Solver::KrylovOrthogonalizerType::cgs2, Times::solve_cuda_gmres_cgs2}
+      }};
+      for(const auto& variant : variants)
       {
         auto tmp_def = vec_def.clone();
         auto tmp_cor = vec_cor.clone();
@@ -312,6 +331,7 @@ namespace GMRESTest
         auto gmres = Solver::new_amavanka_gmres(system->matrix_sys, system->filter_sys, vanka, param_holder.krylov_dim, DataType(1));
         gmres->set_plot_mode(Solver::PlotMode::none);
         gmres->set_use_cuda_gmres(true);
+        gmres->set_orthogonalizer(variant.first);
 
         gmres->init();
         Backend::set_preferred_backend(backend);
@@ -322,9 +342,9 @@ namespace GMRESTest
         gmres->set_plot_mode(param_holder.plot_mode);
         gmres->set_min_iter(param_holder.num_iter);
         gmres->set_max_iter(param_holder.num_iter);
-        String name = name_conv + "cuda gmres";
+        String name = name_conv + (variant.first == Solver::KrylovOrthogonalizerType::cgs2 ? "cuda gmres cgs2" : "cuda gmres");
         auto id = Util::cuda_start_range(name.c_str());
-        run_solver(*gmres, tmp_cor, tmp_def, times[Times::solve_cuda_gmres]);
+        run_solver(*gmres, tmp_cor, tmp_def, times[variant.second]);
         Util::cuda_stop_range(id);
         Backend::set_preferred_backend(PreferredBackend::generic);
         gmres->done();
@@ -557,10 +577,12 @@ namespace GMRESTest
       if(param_holder.scalar_gmres)
       {
         msg += String("Scalar").pad_back(15);
+        msg += String("Scalar-CGS2").pad_back(15);
       }
       if(param_holder.cuda_gmres)
       {
         msg += String("Cuda").pad_back(15);
+        msg += String("Cuda-CGS2").pad_back(15);
         if(param_holder.compare_to_parallel_kernel)
           msg += String("CudaPara").pad_back(15);
         if(param_holder.cuda_prefetch)
@@ -583,10 +605,12 @@ namespace GMRESTest
         if(param_holder.scalar_gmres)
         {
           msg += stringify_fp_fix(timing_array.at(k)[Times::solve_scalar_gmres]).pad_back(tabelle_pad);
+          msg += stringify_fp_fix(timing_array.at(k)[Times::solve_scalar_gmres_cgs2]).pad_back(tabelle_pad);
         }
         if(param_holder.cuda_gmres)
         {
           msg += stringify_fp_fix(timing_array.at(k)[Times::solve_cuda_gmres]).pad_back(tabelle_pad);
+          msg += stringify_fp_fix(timing_array.at(k)[Times::solve_cuda_gmres_cgs2]).pad_back(tabelle_pad);
           if(param_holder.compare_to_parallel_kernel)
             msg += stringify_fp_fix(timing_array.at(k)[Times::solve_cuda_gmres_parallel_kernel]).pad_back(tabelle_pad);
           if(param_holder.cuda_prefetch)
@@ -615,10 +639,12 @@ namespace GMRESTest
       if(param_holder.scalar_gmres)
       {
         msg += String("Scalar").pad_back(15);
+        msg += String("Scalar-CGS2").pad_back(15);
       }
       if(param_holder.cuda_gmres)
       {
         msg += String("Cuda").pad_back(15);
+        msg += String("Cuda-CGS2").pad_back(15);
         if(param_holder.compare_to_parallel_kernel)
           msg += String("CudaPara").pad_back(15);
         if(param_holder.cuda_prefetch)
@@ -643,10 +669,12 @@ namespace GMRESTest
         if(param_holder.scalar_gmres)
         {
           msg += stringify_fp_fix(calc_flops(timing_array.at(k)[Times::solve_scalar_gmres], size_array.at(k)[Sizes::flops])).pad_back(tabelle_pad);
+          msg += stringify_fp_fix(calc_flops(timing_array.at(k)[Times::solve_scalar_gmres_cgs2], size_array.at(k)[Sizes::flops])).pad_back(tabelle_pad);
         }
         if(param_holder.cuda_gmres)
         {
           msg += stringify_fp_fix(calc_flops(timing_array.at(k)[Times::solve_cuda_gmres], size_array.at(k)[Sizes::flops])).pad_back(tabelle_pad);
+          msg += stringify_fp_fix(calc_flops(timing_array.at(k)[Times::solve_cuda_gmres_cgs2], size_array.at(k)[Sizes::flops])).pad_back(tabelle_pad);
           if(param_holder.compare_to_parallel_kernel)
             msg += stringify_fp_fix(calc_flops(timing_array.at(k)[Times::solve_cuda_gmres_parallel_kernel], size_array.at(k)[Sizes::flops])).pad_back(tabelle_pad);
           if(param_holder.cuda_prefetch)

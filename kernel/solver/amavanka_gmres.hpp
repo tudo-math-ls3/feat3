@@ -331,6 +331,15 @@ namespace FEAT
       Index _krylov_dim;
       /// inner pseudo-residual scaling factor, see the documentation of this class for details
       DataType _inner_res_scale;
+      /// the orthogonalization strategy used to build the Krylov basis; this specialization only
+      /// supports the batched classical Gram-Schmidt (\c classical_gram_schmidt) and its (conditional)
+      /// reorthogonalization variant (\c cgs2)
+      KrylovOrthogonalizerType _ortho_type = KrylovOrthogonalizerType::classical_gram_schmidt;
+      /// DGKS norm-ratio threshold below which a corrective reorthogonalization sweep is triggered
+      /// (only relevant for cgs2); see CGS2Orthogonalizer
+      DataType _reortho_tol = DataType(0.3);
+      /// if set, always perform the corrective reorthogonalization sweep in cgs2 mode
+      bool _force_reortho = false;
       /// krylov basis vector
       std::vector<GlobalVecType> _vec_v;
       // std::vector<VecType> _vec_v_helper;
@@ -344,6 +353,8 @@ namespace FEAT
       std::vector<DataType> _c, _s, _q;
       /// Hessenberg matrix
       std::vector<std::vector<DataType>> _h;
+      /// scratch for the cgs2 corrective sweep's dot products, kept separate from the accumulated h[k]
+      std::vector<DataType> _corr;
       /// device-resident accumulation buffer for the scalar-path batched dots (the kernels acquire
       /// their views from this arbiter)
       Memory::Arbiter _dots_arb;
@@ -526,6 +537,7 @@ namespace FEAT
         {
           _h.at(i).resize(i+1);
         }
+        _corr.resize(_krylov_dim);
         _dots_arb = Memory::Arbiter((_krylov_dim + 1) * sizeof(DataType));
 
         _vec_v.reserve(_krylov_dim+1);
@@ -613,6 +625,45 @@ namespace FEAT
         _inner_res_scale = inner_res_scale;
       }
 
+      /**
+       * \brief Sets the Krylov subspace orthogonalization strategy
+       *
+       * \param[in] ortho_type
+       * The orthogonalization strategy to use. This specialization only supports the batched
+       * classical Gram-Schmidt (\c classical_gram_schmidt) and its (conditional) reorthogonalization
+       * variant (\c cgs2); passing \c modified_gram_schmidt is not supported.
+       *
+       * \see KrylovOrthogonalizerType
+       */
+      virtual void set_orthogonalizer(KrylovOrthogonalizerType ortho_type)
+      {
+        XASSERTM(ortho_type == KrylovOrthogonalizerType::classical_gram_schmidt
+          || ortho_type == KrylovOrthogonalizerType::cgs2,
+          "AmaVankaGMRES only supports classical_gram_schmidt or cgs2");
+        _ortho_type = ortho_type;
+      }
+
+      /**
+       * \brief Sets the DGKS norm-ratio threshold that triggers a corrective reorthogonalization sweep
+       *
+       * Only relevant in \c cgs2 mode. See CGS2Orthogonalizer.
+       */
+      virtual void set_reortho_tol(DataType tol)
+      {
+        XASSERT(tol >= DataType(0));
+        _reortho_tol = tol;
+      }
+
+      /**
+       * \brief Forces (or unforces) a corrective reorthogonalization sweep in every step
+       *
+       * Only relevant in \c cgs2 mode. See CGS2Orthogonalizer.
+       */
+      virtual void set_force_reortho(bool force)
+      {
+        _force_reortho = force;
+      }
+
       /// returns the overall distributed flops performed by the last apply call
       /// do not comm -> reduce this number
       Index get_global_flops() const
@@ -685,33 +736,110 @@ namespace FEAT
         _stop_cuda_range(id_dot);
       }
 
-      void _calc_dots_s(std::vector<DataType>& loc_dots, const VecType& vec_target, const std::vector<Memory::Arbiter*>& vec_arb, const Index num_dots)
+      /// \brief Batched dot: computes \p num_dots projection dots into \p loc_dots and returns the
+      /// appended self-dot \f$\langle w,w\rangle\f$ in the same batched reduction.
+      ///
+      /// \p vec_arb holds all \c krylov_dim+1 basis vectors, so slot \p num_dots of the reduction is
+      /// the target vector itself and thus yields the self-dot without a separate norm reduction.
+      DataType _calc_dots_s(std::vector<DataType>& loc_dots, const VecType& vec_target, const std::vector<Memory::Arbiter*>& vec_arb, const Index num_dots)
       {
         const auto id_dot = _start_cuda_range("Calc Dots");
         // zero the accumulation arbiter (host), run the batched dot (device-accumulates for cuda), read back
         _dots_arb.format();
-        LAFEM::Arch::BatchedDotProduct::exec<DataType, DataType>(this->_dots_arb, vec_target.elements_arbiter(), vec_target.size(), vec_arb.data(), num_dots);
+        LAFEM::Arch::BatchedDotProduct::exec<DataType, DataType>(this->_dots_arb, vec_target.elements_arbiter(), vec_target.size(), vec_arb.data(), num_dots + 1u);
+        DataType self_dot(0);
         {
           Memory::TypedView<DataType> dv(this->_dots_arb.view(Memory::Location::main, Memory::Access::read));
           const DataType* dp = dv.get_r();
           for(Index i = 0; i < num_dots; ++i)
             loc_dots[i] = dp[i];
+          self_dot = dp[num_dots];
         }
         _stop_cuda_range(id_dot);
+        return self_dot;
       }
 
-      void _calc_triple_dots_s(std::vector<DataType>& loc_dots, const VecType& vec_target, const std::vector<Memory::Arbiter*>& vec_arb, const VecType& freqs, const Index num_dots)
+      /// \brief Distributed batched (frequency-weighted) dot with appended self-dot; the single
+      /// all-reduce covers the \p num_dots projections \b and the self-dot together.
+      DataType _calc_triple_dots_s(std::vector<DataType>& loc_dots, const VecType& vec_target, const std::vector<Memory::Arbiter*>& vec_arb, const VecType& freqs, const Index num_dots)
       {
         const auto id_dot = _start_cuda_range("Calc Dots");
         _dots_arb.format();
-        LAFEM::Arch::BatchedTripleDotProduct::exec<DataType, DataType>(this->_dots_arb, vec_target.elements_arbiter(), vec_target.size(), vec_arb.data(), freqs.elements_arbiter(), num_dots);
+        LAFEM::Arch::BatchedTripleDotProduct::exec<DataType, DataType>(this->_dots_arb, vec_target.elements_arbiter(), vec_target.size(), vec_arb.data(), freqs.elements_arbiter(), num_dots + 1u);
+        DataType self_dot(0);
         {
-          Memory::TypedView<DataType> dv(this->_dots_arb.view(Memory::Location::main, Memory::Access::read));
-          const DataType* dp = dv.get_r();
+          // acquire the host view (device->host copy if needed) and all-reduce projections + self-dot in one go
+          Memory::TypedView<DataType> dv(this->_dots_arb.view(Memory::Location::main, Memory::Access::read_write));
+          DataType* dp = dv.get_w();
+          this->_comm->allreduce(dp, dp, num_dots + 1u, Dist::op_sum);
           for(Index i = 0; i < num_dots; ++i)
             loc_dots[i] = dp[i];
+          self_dot = dp[num_dots];
         }
         _stop_cuda_range(id_dot);
+        return self_dot;
+      }
+
+      /**
+       * \brief Orthogonalizes v[i+1] against v[0..i] and returns its post-orthogonalization norm.
+       *
+       * Recreates the classical Gram-Schmidt (\c classical_gram_schmidt) / conditional CGS2 (\c cgs2)
+       * strategies of KrylovSubspaceOrthogonalizer: a single batched reduction supplies both the
+       * projection coefficients (written into \c _h.at(i)) and the appended self-dot, from which the
+       * norm is recovered algebraically as \f$\sqrt{\langle w,w\rangle - \sum_k h_k^2}\f$ (with a
+       * norm2 fallback on heavy cancellation). In cgs2 mode a corrective sweep is added when forced
+       * or when the DGKS criterion \f$\text{nrm\_sqr} < \tau^2\langle w,w\rangle\f$ triggers.
+       */
+      DataType _orthogonalize_cpu(const Index i)
+      {
+        VecType& target = this->_vec_v.at(i+1).local();
+        const Index num_basis = i + 1u;
+        const bool distributed = this->_comm && (this->_comm->size() > 1);
+
+        // first classical Gram-Schmidt sweep: batched projection dots + appended self-dot
+        DataType self_dot = distributed
+          ? _calc_triple_dots_s(this->_h.at(i), target, this->_vec_v_elements, this->_gate.get_freqs(), num_basis)
+          : _calc_dots_s(this->_h.at(i), target, this->_vec_v_elements, num_basis);
+        _internal_flop_counter += (num_basis + 1u) * 2u * _global_vec_size;
+
+        DataType sum_sqr(0);
+        for(Index k(0); k < num_basis; ++k)
+          sum_sqr += Math::sqr(this->_h.at(i).at(k));
+
+        // subtract the projection in a single batched cumulative axpy: target -= sum_k h[k] * v[k]
+        _add_vecs_s(target, this->_vec_v_elements, this->_h.at(i), num_basis, DataType(-1));
+        _internal_flop_counter += num_basis * 2u * _global_vec_size;
+
+        DataType nrm_sqr = self_dot - sum_sqr;
+
+        // conditional corrective reorthogonalization sweep (cgs2); the second batched reduction
+        // supplies both the corrections and the updated self-dot, so no extra reduction is needed
+        if((this->_ortho_type == KrylovOrthogonalizerType::cgs2)
+          && (this->_force_reortho || (nrm_sqr < Math::sqr(this->_reortho_tol) * self_dot)))
+        {
+          DataType self_dot2 = distributed
+            ? _calc_triple_dots_s(this->_corr, target, this->_vec_v_elements, this->_gate.get_freqs(), num_basis)
+            : _calc_dots_s(this->_corr, target, this->_vec_v_elements, num_basis);
+          _internal_flop_counter += (num_basis + 1u) * 2u * _global_vec_size;
+          DataType sum_sqr2(0);
+          for(Index k(0); k < num_basis; ++k)
+          {
+            this->_h.at(i).at(k) += this->_corr.at(k);
+            sum_sqr2 += Math::sqr(this->_corr.at(k));
+          }
+          _add_vecs_s(target, this->_vec_v_elements, this->_corr, num_basis, DataType(-1));
+          _internal_flop_counter += num_basis * 2u * _global_vec_size;
+          nrm_sqr = self_dot2 - sum_sqr2;
+        }
+
+        // recover the norm algebraically; fall back to an explicit norm2 on heavy cancellation
+        // (guarantees a positive result so the subsequent normalization cannot produce a NaN)
+        if(nrm_sqr <= Math::Limits<DataType>::epsilon() * DataType(100))
+        {
+          _internal_flop_counter += 2u * _global_vec_size;
+          return this->_vec_v.at(i+1).norm2();
+        }
+        return Math::sqrt(nrm_sqr);
       }
 
       template<typename VecT_>
@@ -862,6 +990,9 @@ namespace FEAT
           apply_info.plot_interval = this->_plot_interval;
           apply_info.plot_mode = this->_plot_mode;
           apply_info.prefetch_data = this->_prefetch_data;
+          apply_info.ortho_type = this->_ortho_type;
+          apply_info.reortho_tol = this->_reortho_tol;
+          apply_info.force_reortho = this->_force_reortho;
         }
 
         CSRHelper::GMRESStatus<DataType> stat;
@@ -942,27 +1073,12 @@ namespace FEAT
               _internal_flop_counter += 2u*_global_used_elements;
             }
 
-            // Gram-Schmidt process
-            // _calc_dots(this->_h.at(i), this->_vec_v_helper, i+1);
-            if(this->_comm && (this->_comm->size() > 1))
-            {
-              _calc_triple_dots_s(this->_h.at(i), this->_vec_v.at(i+1).local(), this->_vec_v_elements, this->_gate.get_freqs(), i+1);
-              this->_comm->allreduce(this->_h.at(i).data(), this->_h.at(i).data(), i+1, Dist::op_sum);
-            }
-            else
-              _calc_dots_s(this->_h.at(i), this->_vec_v.at(i+1).local(), this->_vec_v_elements, i+1);
-
-            _internal_flop_counter += (i+1u) * 2u * _global_vec_size;
-
-            // and now, add local vecs
-            // _add_vecs(this->_vec_v.at(i+1).local(), this->_vec_v_helper, this->_h.at(i), i+1, DataType(-1));
-            _add_vecs_s(this->_vec_v.at(i+1).local(), this->_vec_v_elements, this->_h.at(i), i+1, DataType(-1));
-            _internal_flop_counter += (i+1u) * 2u * _global_vec_size;
+            // Gram-Schmidt process (classical / conditional CGS2), with the self-dot fused into the
+            // batched reduction so the orthogonalized norm is recovered without a separate norm2
+            const DataType alpha = _orthogonalize_cpu(i);
 
             // normalize v[i+1]
             const auto id_scale= _start_cuda_range("Norm scale");
-            const DataType alpha = this->_vec_v.at(i+1).norm2();
-            _internal_flop_counter += 2u * _global_vec_size;
             this->_vec_v.at(i+1).scale(this->_vec_v.at(i+1), DataType(1) / alpha);
             _internal_flop_counter += 2u * _global_vec_size;
             _stop_cuda_range(id_scale);

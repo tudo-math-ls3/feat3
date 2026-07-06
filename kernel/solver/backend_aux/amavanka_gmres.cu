@@ -550,6 +550,10 @@ namespace FEAT::Solver::VankaGMRES
     // cudaCheck(cudaMalloc(&_s_d, size_t(krylov_dim)*sizeof(DT_)), "cudaMalloc");
     cudaCheck(cudaMalloc(&_q_d, size_t(krylov_dim+1)*sizeof(DT_)), "cudaMalloc");
     cudaCheck(cudaMalloc(&_h_d, size_t(gauss_size)*sizeof(DT_)), "cudaMalloc");
+    // scratch for the batched projection dots plus the appended self-dot (krylov_dim projections + 1)
+    DT_ *batch_dots_h, *batch_dots_d;
+    cudaCheck(cudaMallocHost(&batch_dots_h, size_t(krylov_dim+1)*sizeof(DT_)), "cudaMallocHost");
+    cudaCheck(cudaMalloc(&batch_dots_d, size_t(krylov_dim+1)*sizeof(DT_)), "cudaMalloc");
     DT_** vec_v = vec_v_host.data();
     Memory::TypedView<DT_> vec_w_view(apply_info.vec_w->view(Memory::Location::cuda, Memory::Access::read_write));
     DT_* vec_w = vec_w_view.get_w();
@@ -657,21 +661,61 @@ namespace FEAT::Solver::VankaGMRES
           Intern::apply_def_filter(vec_v[i+1], filter_idx, filter_ue, blocksize, filter_gridsize);
         }
 
-        {
-          // calculate dots
-          Intern::calculate_batched_dots(_h_d + h_offset, vec_v[i+1], vec_v_d, rows, i+1);
-          // download h for later
-          cudaCheck(cudaMemcpyAsync(_h + h_offset, _h_d + h_offset, size_t(i+1) * sizeof(DT_), cudaMemcpyDeviceToHost), "cudaMemcopyAsync");
-          // and add vecs
-          Intern::add_vecs(vec_v[i+1], vec_v_d, _h_d + h_offset, rows, i+1, DT_(-1));
-        }
-
-        // scale vector
+        // Gram-Schmidt process (classical / conditional CGS2) with the self-dot fused into the
+        // batched reduction: request i+2 dots so slot i+1 (vec_v_d has krylov_dim+1 pointers) holds
+        // <v[i+1], v[i+1]>, from which the orthogonalized norm is recovered algebraically.
         DT_ alpha = DT_(0);
-        Intern::cublas_dot(alpha, vec_v[i+1], vec_v[i+1], rows, dt);
-        cudaDeviceSynchronize();
-        Util::cuda_check_last_error();
-        alpha = Math::sqrt(alpha);
+        {
+          // the batched dot kernel accumulates atomically, so zero the scratch first
+          cudaCheck(cudaMemsetAsync(batch_dots_d, 0, size_t(i+2)*sizeof(DT_)), "memsetAsync");
+          Intern::calculate_batched_dots(batch_dots_d, vec_v[i+1], vec_v_d, rows, i+2);
+          cudaCheck(cudaMemcpyAsync(batch_dots_h, batch_dots_d, size_t(i+2)*sizeof(DT_), cudaMemcpyDeviceToHost), "cudaMemcopyAsync");
+          cudaDeviceSynchronize();
+          Util::cuda_check_last_error();
+          // subtract the projection (reads the leading i+1 scale entries)
+          Intern::add_vecs(vec_v[i+1], vec_v_d, batch_dots_d, rows, i+1, DT_(-1));
+
+          // store projections into the Hessenberg column and recover the norm algebraically
+          DT_ sum_sqr = DT_(0);
+          for(Index k = 0; k < i+1; ++k)
+          {
+            _h[h_offset + k] = batch_dots_h[k];
+            sum_sqr += Math::sqr(batch_dots_h[k]);
+          }
+          const DT_ self_dot = batch_dots_h[i+1];
+          DT_ nrm_sqr = self_dot - sum_sqr;
+
+          // conditional corrective reorthogonalization (cgs2); the second batched reduction supplies
+          // both the corrections and the updated self-dot, so no extra reduction is needed
+          if((apply_info.ortho_type == FEAT::Solver::KrylovOrthogonalizerType::cgs2)
+            && (apply_info.force_reortho || (nrm_sqr < Math::sqr(apply_info.reortho_tol) * self_dot)))
+          {
+            cudaCheck(cudaMemsetAsync(batch_dots_d, 0, size_t(i+2)*sizeof(DT_)), "memsetAsync");
+            Intern::calculate_batched_dots(batch_dots_d, vec_v[i+1], vec_v_d, rows, i+2);
+            cudaCheck(cudaMemcpyAsync(batch_dots_h, batch_dots_d, size_t(i+2)*sizeof(DT_), cudaMemcpyDeviceToHost), "cudaMemcopyAsync");
+            cudaDeviceSynchronize();
+            Util::cuda_check_last_error();
+            Intern::add_vecs(vec_v[i+1], vec_v_d, batch_dots_d, rows, i+1, DT_(-1));
+            DT_ sum_sqr2 = DT_(0);
+            for(Index k = 0; k < i+1; ++k)
+            {
+              _h[h_offset + k] += batch_dots_h[k];
+              sum_sqr2 += Math::sqr(batch_dots_h[k]);
+            }
+            nrm_sqr = batch_dots_h[i+1] - sum_sqr2;
+          }
+
+          // recover the norm; fall back to an explicit dot on heavy cancellation (guarantees a
+          // positive result so the subsequent normalization cannot produce a NaN)
+          if(nrm_sqr <= Math::Limits<DT_>::epsilon() * DT_(100))
+          {
+            Intern::cublas_dot(nrm_sqr, vec_v[i+1], vec_v[i+1], rows, dt);
+            cudaDeviceSynchronize();
+            Util::cuda_check_last_error();
+            nrm_sqr = Math::abs(nrm_sqr);
+          }
+          alpha = Math::sqrt(nrm_sqr);
+        }
         Util::cuda_stop_range(first_section);
         auto second_section = Util::cuda_start_range("Second Section");
         Intern::cublas_scale(vec_v[i+1], DT_(1)/alpha, rows, dt);
@@ -821,6 +865,8 @@ namespace FEAT::Solver::VankaGMRES
     cudaCheck(cudaFreeHost(_s), "cudaFreeHost");
     cudaCheck(cudaFreeHost(_q), "cudaFreeHost");
     cudaCheck(cudaFreeHost(_h), "cudaFreeHost");
+    cudaCheck(cudaFreeHost(batch_dots_h), "cudaFreeHost");
+    cudaCheck(cudaFree(batch_dots_d), "cudaFree");
     // cudaCheck(cudaFree(_c_d), "cudaFree");
     // cudaCheck(cudaFree(_s_d), "cudaFree");
     cudaCheck(cudaFree(_q_d), "cudaFree");
@@ -1078,6 +1124,11 @@ namespace FEAT::Solver::VankaGMRES
     cudaCheck(cudaMallocHost(&dot_helper, sizeof(DT_)), "cudaMallocHost");
     cudaCheck(cudaMalloc(&dot_helper_d, sizeof(DT_)), "cudaMalloc");
 
+    // scratch for the batched projection dots plus the appended self-dot (krylov_dim projections + 1)
+    DT_ *batch_dots_h, *batch_dots_d;
+    cudaCheck(cudaMallocHost(&batch_dots_h, size_t(krylov_dim+1)*sizeof(DT_)), "cudaMallocHost");
+    cudaCheck(cudaMalloc(&batch_dots_d, size_t(krylov_dim+1)*sizeof(DT_)), "cudaMalloc");
+
     if(apply_info.prefetch_data)
     {
       cudaMemLocation location;
@@ -1199,27 +1250,58 @@ namespace FEAT::Solver::VankaGMRES
           Util::cuda_stop_range(id_defect);
         }
 
+        // fused batched Gram-Schmidt (classical / conditional CGS2): i+1 frequency-weighted
+        // projections plus the appended self-dot, reduced in a SINGLE all-reduce over i+2 entries
+        // (previously the norm needed a second all-reduce per inner step)
+        DT_ alpha = DT_(0);
         {
-          // calculate dots, careful, in _h resides the synchronized dot products, in h_d the unsyhcronzied
-          // here, direct gpu communication would make actual sense...
           auto id_batched = Util::cuda_start_range("Batched Dot");
-          Intern::calculate_synced_batched_dots(_h + h_offset, _h_d + h_offset, vec_v[i+1], vec_v_d, freqs, rows, i+1, comm, mainstream);
-          // so, we have to copy back the dot prodcts
-          cudaCheck(cudaMemcpyAsync(_h_d + h_offset, _h + h_offset, size_t(i+1)*sizeof(DT_), cudaMemcpyHostToDevice, mainstream), "cudaMemcpyAsync");
+          Intern::calculate_synced_batched_dots(batch_dots_h, batch_dots_d, vec_v[i+1], vec_v_d, freqs, rows, i+2, comm, mainstream);
+          // copy the leading i+1 (synchronized) projections back to device for the batched axpy
+          cudaCheck(cudaMemcpyAsync(batch_dots_d, batch_dots_h, size_t(i+1)*sizeof(DT_), cudaMemcpyHostToDevice, mainstream), "cudaMemcpyAsync");
           cudaStreamSynchronize(mainstream);
           Util::cuda_stop_range(id_batched);
-          // and add vecs
-          Intern::add_vecs(vec_v[i+1], vec_v_d, _h_d + h_offset, rows, i+1, DT_(-1));
-        }
+          Intern::add_vecs(vec_v[i+1], vec_v_d, batch_dots_d, rows, i+1, DT_(-1));
 
-        {
-          auto id_dot = Util::cuda_start_range("Single Dot");
-          // scale vector
-          Intern::cuda_sync_dot(dot_helper, dot_helper_d, vec_v[i+1], vec_v[i+1], freqs, rows, comm, mainstream);
-          Util::cuda_stop_range(id_dot);
-        }
+          // store projections into the Hessenberg column and recover the norm algebraically
+          DT_ sum_sqr = DT_(0);
+          for(Index k = 0; k < i+1; ++k)
+          {
+            _h[h_offset + k] = batch_dots_h[k];
+            sum_sqr += Math::sqr(batch_dots_h[k]);
+          }
+          const DT_ self_dot = batch_dots_h[i+1];
+          DT_ nrm_sqr = self_dot - sum_sqr;
 
-        DT_ alpha = Math::sqrt(*dot_helper);
+          // conditional corrective reorthogonalization (cgs2); the second batched all-reduce supplies
+          // both the corrections and the updated self-dot, so no extra reduction is needed
+          if((apply_info.ortho_type == FEAT::Solver::KrylovOrthogonalizerType::cgs2)
+            && (apply_info.force_reortho || (nrm_sqr < Math::sqr(apply_info.reortho_tol) * self_dot)))
+          {
+            Intern::calculate_synced_batched_dots(batch_dots_h, batch_dots_d, vec_v[i+1], vec_v_d, freqs, rows, i+2, comm, mainstream);
+            cudaCheck(cudaMemcpyAsync(batch_dots_d, batch_dots_h, size_t(i+1)*sizeof(DT_), cudaMemcpyHostToDevice, mainstream), "cudaMemcpyAsync");
+            cudaStreamSynchronize(mainstream);
+            Intern::add_vecs(vec_v[i+1], vec_v_d, batch_dots_d, rows, i+1, DT_(-1));
+            DT_ sum_sqr2 = DT_(0);
+            for(Index k = 0; k < i+1; ++k)
+            {
+              _h[h_offset + k] += batch_dots_h[k];
+              sum_sqr2 += Math::sqr(batch_dots_h[k]);
+            }
+            nrm_sqr = batch_dots_h[i+1] - sum_sqr2;
+          }
+
+          // recover the norm; fall back to an explicit synced dot on heavy cancellation (guarantees
+          // a positive result so the subsequent normalization cannot produce a NaN)
+          if(nrm_sqr <= Math::Limits<DT_>::epsilon() * DT_(100))
+          {
+            auto id_dot = Util::cuda_start_range("Single Dot");
+            Intern::cuda_sync_dot(dot_helper, dot_helper_d, vec_v[i+1], vec_v[i+1], freqs, rows, comm, mainstream);
+            Util::cuda_stop_range(id_dot);
+            nrm_sqr = Math::abs(*dot_helper);
+          }
+          alpha = Math::sqrt(nrm_sqr);
+        }
         Util::cuda_stop_range(first_section);
         auto second_section = Util::cuda_start_range("Second Section");
         Intern::cublas_scale(vec_v[i+1], DT_(1)/alpha, rows, dt);
@@ -1356,6 +1438,8 @@ namespace FEAT::Solver::VankaGMRES
     delete[](_c);
     delete[](_s);
     cudaCheck(cudaFreeHost(dot_helper), "cudaFreeHost");
+    cudaCheck(cudaFreeHost(batch_dots_h), "cudaFreeHost");
+    cudaCheck(cudaFree(batch_dots_d), "cudaFree");
     cudaCheck(cudaFreeHost(_q), "cudaFreeHost");
     cudaCheck(cudaFreeHost(_h), "cudaFreeHost");
     // cudaCheck(cudaFree(_c_d), "cudaFree");

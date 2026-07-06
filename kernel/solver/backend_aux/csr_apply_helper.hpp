@@ -11,6 +11,7 @@
 #include <kernel/backend.hpp>
 #include <kernel/global/gate.hpp>
 #include <kernel/solver/iterative.hpp>
+#include <kernel/solver/krylov_orthogonalizer.hpp>
 
 
 
@@ -58,6 +59,12 @@ namespace FEAT::Solver::CSRHelper
     Index plot_interval;
     FEAT::Solver::PlotMode plot_mode;
     bool prefetch_data;
+    // orthogonalization strategy: only classical_gram_schmidt or cgs2 are supported here
+    FEAT::Solver::KrylovOrthogonalizerType ortho_type;
+    // DGKS norm-ratio threshold triggering a corrective reorthogonalization sweep (cgs2 only)
+    DT_ reortho_tol;
+    // if set, always perform the corrective reorthogonalization sweep (cgs2 only)
+    bool force_reortho;
   };
 
   template<typename DT_>
