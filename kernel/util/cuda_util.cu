@@ -9,8 +9,9 @@
 #include <kernel/util/half.hpp>
 #include <kernel/util/string.hpp>
 #include <kernel/util/assertion.hpp>
-#include <kernel/lafem/arch/batched_vector_apply.hpp>
 #include "cuda_profiler_api.h"
+
+#include <vector>
 
 
 #if FEAT_CUDA_VERSION_MAJOR >= 13
@@ -25,6 +26,18 @@
 #endif
 
 using namespace FEAT;
+
+namespace
+{
+  // Callbacks registered by higher-level modules to release their device resources during
+  // cuda_finalize(). See Util::cuda_register_finalize_callback().
+  std::vector<void (*)()> cuda_finalize_callbacks;
+}
+
+void FEAT::Util::cuda_register_finalize_callback(void (*callback)())
+{
+  cuda_finalize_callbacks.push_back(callback);
+}
 
 Index FEAT::Util::cuda_blocksize_misc = 256;
 Index FEAT::Util::cuda_blocksize_reduction = 256;
@@ -154,7 +167,11 @@ void FEAT::Util::cuda_finalize()
   if (cudaSuccess != cudaDeviceSynchronize())
     throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceSynchronize failed!");
 
-  LAFEM::Arch::BatchedScratchSpace::free();
+  // release device resources of higher-level modules (registered via
+  // cuda_register_finalize_callback) while the CUDA context is still alive
+  for (auto callback : cuda_finalize_callbacks)
+    callback();
+  cuda_finalize_callbacks.clear();
 
   if (CUBLAS_STATUS_SUCCESS != cublasDestroy(Util::Intern::cublas_handle))
     throw InternalError(__func__, __FILE__, __LINE__, "cublasDestroy failed!");

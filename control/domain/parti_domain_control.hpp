@@ -282,6 +282,40 @@ namespace FEAT
         }
 
         /**
+         * \brief Creates a domain control from a structured rectilinear base mesh
+         *
+         * \note This function also creates a mesh-part named "bnd" that represents the entire domain boundary.
+         *
+         * \param[in] num_elems_x, num_elems_y, num_elems_z
+         * The number of elements in each dimension for the base-mesh
+         */
+        virtual void create_rectilinear(Index num_elems_x, Index num_elems_y = 0u, Index num_elems_z = 0u)
+        {
+          // ensure that the domain control is still empty
+          XASSERTM(!this->_was_created, "domain has already been created");
+          XASSERT(this->size_physical() == std::size_t(0));
+          XASSERT(this->size_virtual() == std::size_t(0));
+
+          TimeStamp stamp_create;
+
+          // allocate a base-mesh node and create mesh
+          std::unique_ptr<MeshNodeType> base_mesh_node = MeshNodeType::make_unique(
+            Geometry::StructUnitCubeFactory<MeshType>::make_unique_from(num_elems_x, num_elems_y, num_elems_z));
+
+          // get mesh and create boundary
+          {
+            Geometry::BoundaryFactory<MeshType> bnd_factory(*base_mesh_node->get_mesh());
+            base_mesh_node->add_mesh_part("bnd", bnd_factory.make_unique());
+          }
+
+          // create control
+          this->create(std::move(base_mesh_node));
+
+          // collect partition statistics
+          FEAT::Statistics::toe_partition = stamp_create.elapsed_now();
+        }
+
+        /**
          * \brief Creates a domain control from a structured rectilinear base mesh for specific size and add standard
          *        boundary names
          *

@@ -38,6 +38,17 @@ namespace FEAT::LAFEM::Arch
     {
       if(cap < bytes)
       {
+        // Register the teardown hook the first time we allocate any scratch. This decouples the
+        // low-level util layer (which owns cuda_finalize) from this module: util does not depend on
+        // LAFEM, and if the batched kernels are never used, nothing is registered and nothing is
+        // freed. Registration is safe to do here because the batched ops are issued single-threaded.
+        static bool finalize_registered = false;
+        if(!finalize_registered)
+        {
+          Util::cuda_register_finalize_callback(&BatchedScratchSpace::free);
+          finalize_registered = true;
+        }
+
         if(buf != nullptr)
           Memory::free_cuda(buf);
         size_t new_bytes = 2u*bytes;

@@ -73,6 +73,15 @@ namespace FEAT
     void cuda_free_static_memory();
     void cuda_initialize(int rank, int ranks_per_node, int ranks_per_uma, int gpus_per_node);
     void cuda_finalize();
+    /**
+     * \brief Registers a callback to be invoked during cuda_finalize().
+     *
+     * This lets higher-level modules (e.g. LAFEM::Arch) hook the CUDA teardown to release their
+     * own device resources without the low-level util layer having to depend on them (which would
+     * create a circular link dependency). Callbacks are invoked in registration order at the very
+     * start of cuda_finalize(), while the CUDA context is still alive.
+     */
+    void cuda_register_finalize_callback(void (*callback)());
     NOINLINE void cuda_synchronize();
     NOINLINE void cuda_force_synchronize();
     void cuda_reset_device();
