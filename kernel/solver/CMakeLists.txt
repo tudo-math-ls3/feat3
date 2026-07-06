@@ -30,6 +30,7 @@ PRIVATE
 
 if (FEAT_HAVE_CUDA)
   add_library(feat-kernel-solver-cuda STATIC
+    backend_aux/amavanka_gmres.cu
     ilu_precond.cu
     sor_precond.cu
     ssor_precond.cu

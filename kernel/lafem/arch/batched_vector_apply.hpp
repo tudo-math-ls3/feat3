@@ -14,7 +14,6 @@
 
 namespace FEAT::LAFEM::Arch
 {
-
   struct BatchedScratchSpace
   {
     // free scratch space of batched kernel

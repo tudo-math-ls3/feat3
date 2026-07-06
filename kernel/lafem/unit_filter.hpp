@@ -94,6 +94,11 @@ namespace FEAT
       {
       }
 
+      explicit UnitFilter(Index size_in, const std::map<IT_, DT_>& map) :
+        _sv(size_in, map)
+      {
+      }
+
       /// move-ctor
       UnitFilter(UnitFilter && other) :
         _sv(std::forward<SparseVector<DT_, IT_>>(other._sv))

@@ -24,7 +24,7 @@ endif (WIN32)
 # ones no LTO object references out-of-line, so small CUDA executables (e.g. unit tests) fail to link.
 # Building this one TU without LTO keeps its symbols as real machine code the non-LTO CUDA objects can
 # resolve against; the explicit TypedView instantiations at the end of the file anchor the weak ones.
-if (CMAKE_CXX_FLAGS MATCHES "-flto")
+if (FEAT_HAVE_CUDA AND CMAKE_CXX_FLAGS MATCHES "-flto")
   set_source_files_properties(memory_arbiter.cpp PROPERTIES COMPILE_OPTIONS "-fno-lto")
 endif ()
 

@@ -159,7 +159,7 @@ namespace FEAT::LAFEM::Arch
   }
 
   template<typename DT_, int blockSize_>
-  __global__ void cuda_commulative_axpy(DT_* __restrict__ target, const Index vec_size, DT_ const* const* others, DT_ const * __restrict__ device_scales, const Index num_axpy, const DT_ alpha)
+  __global__ void cuda_cumulative_axpy(DT_* __restrict__ target, const Index vec_size, DT_ const* const* others, DT_ const * __restrict__ device_scales, const Index num_axpy, const DT_ alpha)
   {
     // Obtain the current thread's cooperative group
     cg::thread_block my_group = cg::this_thread_block();

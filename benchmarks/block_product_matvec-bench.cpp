@@ -45,6 +45,14 @@ void run(PreferredBackend backend)
     }
   }
   init_mat.clear();
+  DenseVectorBlocked<DT_, IT_, block_width_> b(sys_main.num_rows());
+  {
+    auto vb = b.elements_view_w();
+    for (Index i (0) ; i < b.size() ; ++i)
+    {
+      vb[i] = DT_(i%100) / DT_(100);
+    }
+  }
 
   {
     Backend::set_preferred_backend(PreferredBackend::generic);
@@ -57,15 +65,7 @@ void run(PreferredBackend backend)
     std::cout<<backend<<" "<<sys.name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<< " dimension " << d <<" Blocksize: " << stringify(block_height_) << ", " << stringify(block_width_) << "\n";
     std::cout<<"vector size: "<<size<<", block_height: " << stringify(block_height_) << ", block_height: " << stringify(block_height_);
     std::cout << ", used elements: "<<num_nzes<<"\n";
-    DenseVectorBlocked<DT_, IT_, block_height_> b(size);
-    {
-      auto vb = b.elements_view_w();
-      for (Index i (0) ; i < b.size() ; ++i)
-      {
-        vb[i] = DT_(i%100) / DT_(100);
-      }
-    }
-    DenseVectorBlocked<DT_, IT_, block_width_> x(size, DT_(4711));
+    DenseVectorBlocked<DT_, IT_, block_height_> x(size, DT_(4711));
 
     double flops = double(num_nzes);
     flops *= 2;
@@ -76,31 +76,35 @@ void run(PreferredBackend backend)
     bytes += DT_(size * block_height_ * sizeof(DT_));
 
     Backend::set_preferred_backend(backend);
-    auto func = [&] () { sys.apply(b, x); };
+    auto func = [&] () { sys.apply(x, b); };
     FEAT_NVMARKER_START("bcsr-apply");
     run_bench(func, flops, bytes);
     FEAT_NVMARKER_STOP("bcsr-apply");
+    x.format();
+    func();
 
     std::cout<<"control norm: "<<x.norm2()<<"\n";
   }
 
-  if constexpr(block_height_ == block_width_)
+  // if constexpr(block_height_ == block_width_)
   {
     Backend::set_preferred_backend(PreferredBackend::generic);
     SparseMatrixCSR<DT_, IT_> sys;
     sys.convert(sys_main);
 
 
-    Index size(sys.num_rows());
+    Index size(sys.num_rows_raw());
     Index num_nzes(sys.num_nzes_raw());
     std::cout<<backend<<" "<<sys.name()<<" "<<Type::Traits<DT_>::name()<<" "<<Type::Traits<IT_>::name()<< " dimension " << d << "\n";
     std::cout<<"vector size: "<<size<<", used elements: "<<num_nzes<<"\n";
-    DenseVector<DT_, IT_> b(size);
+    DenseVector<DT_, IT_> b_p;
+    b_p.convert(b);
     {
       auto vb = b.elements_view_w();
-      for (Index i (0) ; i < b.size() ; ++i)
+      for (Index i (0) ; i < b.size()/block_width_ ; i+=block_width_)
       {
-        vb[i] = DT_(i%100) / DT_(100);
+        for(Index k = 0; k < block_width_; ++k)
+          vb[k] = DT_(i%100) / DT_(100);
       }
     }
     DenseVector<DT_, IT_> x(size, DT_(4711));
@@ -114,10 +118,13 @@ void run(PreferredBackend backend)
     bytes += DT_(size * sizeof(DT_));
     Backend::set_preferred_backend(backend);
 
-    auto func = [&] () { sys.apply(b, x); };
+    auto func = [&] () { sys.apply(x, b_p); };
     FEAT_NVMARKER_START("csr-apply");
     run_bench(func, flops, bytes);
     FEAT_NVMARKER_STOP("csr-apply");
+
+    x.format();
+    func();
 
     std::cout<<"control norm: "<<x.norm2()<<"\n";
   }
@@ -131,10 +138,16 @@ int main(int argc, char ** argv)
 #ifdef FEAT_HAVE_CUDA
   run<SparseMatrixCSR<double, std::uint32_t>, 2, 2, 2 >(PreferredBackend::cuda);
   run<SparseMatrixCSR<double, std::uint64_t>, 2, 2, 2 >(PreferredBackend::cuda);
+  run<SparseMatrixCSR<double, std::uint32_t>, 2, 2, 1 >(PreferredBackend::cuda);
+  run<SparseMatrixCSR<double, std::uint64_t>, 2, 2, 1 >(PreferredBackend::cuda);
+  run<SparseMatrixCSR<double, std::uint32_t>, 2, 1, 2 >(PreferredBackend::cuda);
+  run<SparseMatrixCSR<double, std::uint64_t>, 2, 1, 2 >(PreferredBackend::cuda);
   run<SparseMatrixCSR<double, std::uint32_t>, 3, 3, 3 >(PreferredBackend::cuda);
   run<SparseMatrixCSR<double, std::uint64_t>, 3, 3, 3 >(PreferredBackend::cuda);
   run<SparseMatrixCSR<double, std::uint32_t>, 3, 3, 1 >(PreferredBackend::cuda);
   run<SparseMatrixCSR<double, std::uint64_t>, 3, 3, 1 >(PreferredBackend::cuda);
+  run<SparseMatrixCSR<double, std::uint32_t>, 3, 1, 3 >(PreferredBackend::cuda);
+  run<SparseMatrixCSR<double, std::uint64_t>, 3, 1, 3 >(PreferredBackend::cuda);
 #endif
   run<SparseMatrixCSR<double, std::uint32_t>, 2, 2, 2 >(PreferredBackend::generic);
   run<SparseMatrixCSR<double, std::uint64_t>, 2, 2, 2 >(PreferredBackend::generic);

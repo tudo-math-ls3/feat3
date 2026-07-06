@@ -25,6 +25,15 @@ namespace FEAT
 {
   namespace LAFEM
   {
+    namespace Intern
+    {
+      template<typename, typename = void>
+      static constexpr int dim_vec = 1;
+
+      template<typename T>
+      static constexpr int dim_vec<T,
+      std::void_t<decltype(T::BlockSize)>> = T::BlockSize;
+    }
     /**
      * \brief Handles vector prolongation, restriction and serialization
      *
@@ -337,8 +346,8 @@ namespace FEAT
        * \param[in] vector
        * The vector whose buffer size is to be computed.
        */
-      template<typename DT2_, typename IT2_>
-      Index buffer_size(const DenseVector<DT2_, IT2_>& DOXY(vector)) const
+      template<typename Vector_>
+      Index buffer_size(const Vector_& DOXY(vector)) const
       {
         return num_indices();
       }

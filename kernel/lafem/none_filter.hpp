@@ -47,6 +47,9 @@ namespace FEAT
       static constexpr bool is_global = false;
       static constexpr bool is_local = true;
 
+      /// Size of the space this filter usually acts upon, to be set by user
+      Index size_info = 0u;
+
       /// \brief Creates a (empty) clone of itself
       NoneFilter clone(CloneMode /*clone_mode*/ = CloneMode::Deep) const
       {
@@ -120,6 +123,30 @@ namespace FEAT
       void filter_mat(MT_& DOXY(matrix)) const
       {
       }
+
+      /**
+       * \brief Gets optional size information
+       *
+       * Return an internal size value, set by the user, necessary to track sizes when iterating through filter chains
+       *
+       * \returns Size of the underlying space
+       */
+      Index size() const
+      {
+        return size_info;
+      }
+
+      /**
+       * \brief Gets optional raw size information
+       *
+       * Return an internal size value, set by the user, necessary to track sizes when iterating through filter chains
+       *
+       * \returns Raw size of the underlying dofs
+       */
+      Index size_raw() const
+      {
+        return size();
+      }
     }; // class NoneFilter<...>
 
     /**
@@ -156,6 +183,9 @@ namespace FEAT
       /// this typedef lets you create a filter with different Data and Index types
       template <typename DataType2_, typename IndexType2_, int block_size2_>
       using FilterTypeByDI = FilterType<DataType2_, IndexType2_, block_size2_>;
+
+      /// Size of the space this filter usually acts upon, to be set by user
+      Index size_info = 0u;
 
       /// \brief Creates a (empty) clone of itself
       NoneFilterBlocked clone(CloneMode /*clone_mode*/ = CloneMode::Deep) const
@@ -229,6 +259,30 @@ namespace FEAT
       template<typename MT_>
       void filter_mat(MT_& DOXY(matrix)) const
       {
+      }
+
+      /**
+       * \brief Gets optional size information
+       *
+       * Return an internal size value, set by the user, necessary to track sizes when iterating through filter chains
+       *
+       * \returns Size of the underlying space
+       */
+      Index size() const
+      {
+        return size_info;
+      }
+
+      /**
+       * \brief Gets optional raw size information
+       *
+       * Return an internal size value, set by the user, necessary to track sizes when iterating through filter chains
+       *
+       * \returns Raw size of the underlying dofs
+       */
+      Index size_raw() const
+      {
+        return block_size * size_info;
       }
     }; // class NoneFilterBlocked<...>
   } // namespace LAFEM

@@ -1533,7 +1533,9 @@ namespace FEAT
     // eliminates it (nothing in the LTO program references it out-of-line), leaving the non-LTO CUDA
     // object with an unresolvable reference. Emitting them here as real machine code (this TU is built
     // -fno-lto, see kernel/util/CMakeLists.txt) provides a definition that survives and prevails.
-    template class TypedView<float>;
-    template class TypedView<double>;
+    #ifdef FEAT_HAVE_CUDA
+      template class TypedView<float>;
+      template class TypedView<double>;
+    #endif
   } // namespace Memory
 } // namespace FEAT

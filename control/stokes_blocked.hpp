@@ -522,7 +522,10 @@ namespace FEAT
       void compile_system_filter()
       {
         filter_sys.local().template at<0>() = filter_velo.local().clone(LAFEM::CloneMode::Shallow);
+        // set filter info represent pressure space size
+        filter_pres.local().size_info = this->gate_pres.get_freqs().size_raw();
         filter_sys.local().template at<1>() = filter_pres.local().clone(LAFEM::CloneMode::Shallow);
+
       }
 
       void compile_local_matrix_sys_type1()
@@ -581,6 +584,8 @@ namespace FEAT
       void compile_system_filter()
       {
         filter_sys.local().template at<0>() = filter_velo.local().clone(LAFEM::CloneMode::Shallow);
+        // set filter info represent pressure space size
+        filter_pres.local().size_info = this->gate_pres.get_freqs().size_raw();
         filter_sys.local().template at<1>() = filter_pres.local().clone(LAFEM::CloneMode::Shallow);
       }
 

@@ -89,6 +89,31 @@ namespace FEAT
         this->_indices_size.push_back(nnze_in);
       }
 
+      explicit SparseVector(Index size_in, const std::map<IT_, DT_>& map)
+      {
+        Index nnze_in = map.size();
+        this->_scalar_index.push_back(size_in);
+        this->_scalar_index.push_back(nnze_in);
+        this->_elements.push_back(Memory::Arbiter(sizeof(DT_) * nnze_in));
+        this->_elements_size.push_back(nnze_in);
+        this->_indices.push_back(Memory::Arbiter(sizeof(IT_) * nnze_in));
+        this->_indices_size.push_back(nnze_in);
+
+        if(nnze_in == 0u)
+          return;
+
+        auto ind_view = this->indices_view_w();
+        auto ele_view = this->elements_view_w();
+        auto* id_p = ind_view.get_w();
+        auto* ele_p = ele_view.get_w();
+
+        for(auto mp = map.cbegin(); mp != map.cend(); ++mp, ++id_p, ++ele_p)
+        {
+          *id_p = mp->first;
+          *ele_p = mp->second;
+        }
+      }
+
       /**
        * \brief Constructor
        *

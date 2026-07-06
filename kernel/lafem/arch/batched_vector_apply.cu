@@ -277,7 +277,7 @@ namespace FEAT::LAFEM::Arch
 
     cudaCheck(cudaMemcpyAsync(device_scales, local_scales, num_axpy * sizeof(DT_), cudaMemcpyHostToDevice), "cudaMemcpyAsync");
 
-    cuda_commulative_axpy<DT_, blocksize><<<grid, block, blocksize*sizeof(DT_)>>>(target_ptr, vec_size, other_ptrs, device_scales, num_axpy, DT_(alpha));
+    cuda_cumulative_axpy<DT_, blocksize><<<grid, block, blocksize*sizeof(DT_)>>>(target_ptr, vec_size, other_ptrs, device_scales, num_axpy, DT_(alpha));
 
     // release and destroy the in-place constructed views (see the placement-new above)
     if(num_axpy > max_size_)
