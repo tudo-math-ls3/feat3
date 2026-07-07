@@ -110,6 +110,10 @@ ipch
 config-vc*.xml
 
 # Ignore agent directories
+CLAUDE.md
+AGENTS.md
+CODEX.md
 /.agents
 /.codex
 /.claude
+/agenticfeat
