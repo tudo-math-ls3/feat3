@@ -389,40 +389,40 @@ namespace Gendie
 
     FEAT::String _format_timings() const
     {
-      enum _TimeID
+      enum class _TimeID : std::size_t
       {
         total = 0,
-        assembly = 1,
-        fbm_filter = 2,
-        grad_apply = 3,
-        sync_and_rhs = 4,
-        init = 5,
-        create_vector = 6,
-        num_entries = 7
+        assembly,
+        fbm_filter,
+        grad_apply,
+        sync_and_rhs,
+        init,
+        create_vector,
+        num_entries
       };
       FEAT::String s;
-      double timings_max[_TimeID::num_entries], timings_min[_TimeID::num_entries], timings[_TimeID::num_entries];
-      timings_min[_TimeID::total] = timings_max[_TimeID::total] = timings[_TimeID::total] = this->watch_total.elapsed();
-      timings_min[_TimeID::assembly] = timings_max[_TimeID::assembly] = timings[_TimeID::assembly] = this->watch_assembly.elapsed();
-      timings_min[_TimeID::fbm_filter] = timings_max[_TimeID::fbm_filter] = timings[_TimeID::fbm_filter] = this->watch_fbm_filter.elapsed();
-      timings_min[_TimeID::grad_apply] = timings_max[_TimeID::grad_apply] = timings[_TimeID::grad_apply] = this->watch_grad_apply.elapsed();
-      timings_min[_TimeID::sync_and_rhs] = timings_max[_TimeID::sync_and_rhs] = timings[_TimeID::sync_and_rhs] = this->watch_sync_and_rhs.elapsed();
-      timings_min[_TimeID::init] = timings_max[_TimeID::init] = timings[_TimeID::init] = this->watch_init.elapsed();
-      timings_min[_TimeID::create_vector] = timings_max[_TimeID::create_vector] = timings[_TimeID::create_vector] = this->watch_create_vector.elapsed();
+      double timings_max[to_underlying(_TimeID::num_entries)], timings_min[to_underlying(_TimeID::num_entries)], timings[to_underlying(_TimeID::num_entries)];
+      timings_min[to_underlying(_TimeID::total)] = timings_max[to_underlying(_TimeID::total)] = timings[to_underlying(_TimeID::total)] = this->watch_total.elapsed();
+      timings_min[to_underlying(_TimeID::assembly)] = timings_max[to_underlying(_TimeID::assembly)] = timings[to_underlying(_TimeID::assembly)] = this->watch_assembly.elapsed();
+      timings_min[to_underlying(_TimeID::fbm_filter)] = timings_max[to_underlying(_TimeID::fbm_filter)] = timings[to_underlying(_TimeID::fbm_filter)] = this->watch_fbm_filter.elapsed();
+      timings_min[to_underlying(_TimeID::grad_apply)] = timings_max[to_underlying(_TimeID::grad_apply)] = timings[to_underlying(_TimeID::grad_apply)] = this->watch_grad_apply.elapsed();
+      timings_min[to_underlying(_TimeID::sync_and_rhs)] = timings_max[to_underlying(_TimeID::sync_and_rhs)] = timings[to_underlying(_TimeID::sync_and_rhs)] = this->watch_sync_and_rhs.elapsed();
+      timings_min[to_underlying(_TimeID::init)] = timings_max[to_underlying(_TimeID::init)] = timings[to_underlying(_TimeID::init)] = this->watch_init.elapsed();
+      timings_min[to_underlying(_TimeID::create_vector)] = timings_max[to_underlying(_TimeID::create_vector)] = timings[to_underlying(_TimeID::create_vector)] = this->watch_create_vector.elapsed();
       // sync our timings
-      this->domain->comm().allreduce(timings_max, timings_max, _TimeID::num_entries, FEAT::Dist::op_max);
-      this->domain->comm().allreduce(timings_min, timings_min, _TimeID::num_entries, FEAT::Dist::op_min);
+      this->domain->comm().allreduce(timings_max, timings_max, to_underlying(_TimeID::num_entries), FEAT::Dist::op_max);
+      this->domain->comm().allreduce(timings_min, timings_min, to_underlying(_TimeID::num_entries), FEAT::Dist::op_min);
 
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
       s += FEAT::String("\n------------------------------------Timings Single Material Defect Assembler----------------------\n");
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
-      s += format_subtime_mm("Sync and add RHS", timings[_TimeID::sync_and_rhs], timings[_TimeID::total], timings_min[_TimeID::sync_and_rhs], timings_max[_TimeID::sync_and_rhs], this->padlen);
-      s += format_subtime_mm("Apply Gradient Matrix", timings[_TimeID::grad_apply], timings[_TimeID::total], timings_min[_TimeID::grad_apply], timings_max[_TimeID::grad_apply], this->padlen);
-      s += format_subtime_mm("Apply FBM Filter", timings[_TimeID::fbm_filter], timings[_TimeID::total], timings_min[_TimeID::fbm_filter], timings_max[_TimeID::fbm_filter], this->padlen);
-      s += format_subtime_mm("Assemble Defect", timings[_TimeID::assembly], timings[_TimeID::total], timings_min[_TimeID::assembly], timings_max[_TimeID::assembly], this->padlen);
-      s += format_subtime_mm("Init Assembler", timings[_TimeID::init], timings[_TimeID::total], timings_min[_TimeID::init], timings_max[_TimeID::init], this->padlen);
-      s += format_subtime_mm("Create Defect Vector", timings[_TimeID::create_vector], timings[_TimeID::total], timings_min[_TimeID::create_vector], timings_max[_TimeID::create_vector], this->padlen);
-      s += format_subtime_mm("Defect Assembly Total Time", timings[_TimeID::total], timings[_TimeID::total], timings_min[_TimeID::total], timings_max[_TimeID::total], this->padlen);
+      s += format_subtime_mm("Sync and add RHS", timings[to_underlying(_TimeID::sync_and_rhs)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::sync_and_rhs)], timings_max[to_underlying(_TimeID::sync_and_rhs)], this->padlen);
+      s += format_subtime_mm("Apply Gradient Matrix", timings[to_underlying(_TimeID::grad_apply)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::grad_apply)], timings_max[to_underlying(_TimeID::grad_apply)], this->padlen);
+      s += format_subtime_mm("Apply FBM Filter", timings[to_underlying(_TimeID::fbm_filter)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::fbm_filter)], timings_max[to_underlying(_TimeID::fbm_filter)], this->padlen);
+      s += format_subtime_mm("Assemble Defect", timings[to_underlying(_TimeID::assembly)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::assembly)], timings_max[to_underlying(_TimeID::assembly)], this->padlen);
+      s += format_subtime_mm("Init Assembler", timings[to_underlying(_TimeID::init)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::init)], timings_max[to_underlying(_TimeID::init)], this->padlen);
+      s += format_subtime_mm("Create Defect Vector", timings[to_underlying(_TimeID::create_vector)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_vector)], timings_max[to_underlying(_TimeID::create_vector)], this->padlen);
+      s += format_subtime_mm("Defect Assembly Total Time", timings[to_underlying(_TimeID::total)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::total)], timings_max[to_underlying(_TimeID::total)], this->padlen);
 
       return s;
     }
@@ -567,40 +567,40 @@ namespace Gendie
 
     FEAT::String _format_timings() const
     {
-      enum _TimeID
+      enum class _TimeID : std::size_t
       {
         total = 0,
-        assembly = 1,
-        fbm_filter = 2,
-        grad_apply = 3,
-        sync_and_rhs = 4,
-        init = 5,
-        create_vector = 6,
-        num_entries = 7
+        assembly,
+        fbm_filter,
+        grad_apply,
+        sync_and_rhs,
+        init,
+        create_vector,
+        num_entries
       };
       FEAT::String s;
-      double timings_max[_TimeID::num_entries], timings_min[_TimeID::num_entries], timings[_TimeID::num_entries];
-      timings_min[_TimeID::total] = timings_max[_TimeID::total] = timings[_TimeID::total] = this->watch_total.elapsed();
-      timings_min[_TimeID::assembly] = timings_max[_TimeID::assembly] = timings[_TimeID::assembly] = this->watch_assembly.elapsed();
-      timings_min[_TimeID::fbm_filter] = timings_max[_TimeID::fbm_filter] = timings[_TimeID::fbm_filter] = this->watch_fbm_filter.elapsed();
-      timings_min[_TimeID::grad_apply] = timings_max[_TimeID::grad_apply] = timings[_TimeID::grad_apply] = this->watch_grad_apply.elapsed();
-      timings_min[_TimeID::sync_and_rhs] = timings_max[_TimeID::sync_and_rhs] = timings[_TimeID::sync_and_rhs] = this->watch_sync_and_rhs.elapsed();
-      timings_min[_TimeID::init] = timings_max[_TimeID::init] = timings[_TimeID::init] = this->watch_init.elapsed();
-      timings_min[_TimeID::create_vector] = timings_max[_TimeID::create_vector] = timings[_TimeID::create_vector] = this->watch_create_vector.elapsed();
+      double timings_max[to_underlying(_TimeID::num_entries)], timings_min[to_underlying(_TimeID::num_entries)], timings[to_underlying(_TimeID::num_entries)];
+      timings_min[to_underlying(_TimeID::total)] = timings_max[to_underlying(_TimeID::total)] = timings[to_underlying(_TimeID::total)] = this->watch_total.elapsed();
+      timings_min[to_underlying(_TimeID::assembly)] = timings_max[to_underlying(_TimeID::assembly)] = timings[to_underlying(_TimeID::assembly)] = this->watch_assembly.elapsed();
+      timings_min[to_underlying(_TimeID::fbm_filter)] = timings_max[to_underlying(_TimeID::fbm_filter)] = timings[to_underlying(_TimeID::fbm_filter)] = this->watch_fbm_filter.elapsed();
+      timings_min[to_underlying(_TimeID::grad_apply)] = timings_max[to_underlying(_TimeID::grad_apply)] = timings[to_underlying(_TimeID::grad_apply)] = this->watch_grad_apply.elapsed();
+      timings_min[to_underlying(_TimeID::sync_and_rhs)] = timings_max[to_underlying(_TimeID::sync_and_rhs)] = timings[to_underlying(_TimeID::sync_and_rhs)] = this->watch_sync_and_rhs.elapsed();
+      timings_min[to_underlying(_TimeID::init)] = timings_max[to_underlying(_TimeID::init)] = timings[to_underlying(_TimeID::init)] = this->watch_init.elapsed();
+      timings_min[to_underlying(_TimeID::create_vector)] = timings_max[to_underlying(_TimeID::create_vector)] = timings[to_underlying(_TimeID::create_vector)] = this->watch_create_vector.elapsed();
       // sync our timings
-      this->domain->comm().allreduce(timings_max, timings_max, _TimeID::num_entries, FEAT::Dist::op_max);
-      this->domain->comm().allreduce(timings_min, timings_min, _TimeID::num_entries, FEAT::Dist::op_min);
+      this->domain->comm().allreduce(timings_max, timings_max, to_underlying(_TimeID::num_entries), FEAT::Dist::op_max);
+      this->domain->comm().allreduce(timings_min, timings_min, to_underlying(_TimeID::num_entries), FEAT::Dist::op_min);
 
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
       s += FEAT::String("\n------------------------------------Timings Single Material Defect Assembler----------------------\n");
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
-      s += format_subtime_mm("Sync and add RHS", timings[_TimeID::sync_and_rhs], timings[_TimeID::total], timings_min[_TimeID::sync_and_rhs], timings_max[_TimeID::sync_and_rhs], this->padlen);
-      s += format_subtime_mm("Apply Gradient Matrix", timings[_TimeID::grad_apply], timings[_TimeID::total], timings_min[_TimeID::grad_apply], timings_max[_TimeID::grad_apply], this->padlen);
-      s += format_subtime_mm("Apply FBM Filter", timings[_TimeID::fbm_filter], timings[_TimeID::total], timings_min[_TimeID::fbm_filter], timings_max[_TimeID::fbm_filter], this->padlen);
-      s += format_subtime_mm("Assemble Defect", timings[_TimeID::assembly], timings[_TimeID::total], timings_min[_TimeID::assembly], timings_max[_TimeID::assembly], this->padlen);
-      s += format_subtime_mm("Init Assembler", timings[_TimeID::init], timings[_TimeID::total], timings_min[_TimeID::init], timings_max[_TimeID::init], this->padlen);
-      s += format_subtime_mm("Create Defect Vector", timings[_TimeID::create_vector], timings[_TimeID::total], timings_min[_TimeID::create_vector], timings_max[_TimeID::create_vector], this->padlen);
-      s += format_subtime_mm("Defect Assembly Total Time", timings[_TimeID::total], timings[_TimeID::total], timings_min[_TimeID::total], timings_max[_TimeID::total], this->padlen);
+      s += format_subtime_mm("Sync and add RHS", timings[to_underlying(_TimeID::sync_and_rhs)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::sync_and_rhs)], timings_max[to_underlying(_TimeID::sync_and_rhs)], this->padlen);
+      s += format_subtime_mm("Apply Gradient Matrix", timings[to_underlying(_TimeID::grad_apply)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::grad_apply)], timings_max[to_underlying(_TimeID::grad_apply)], this->padlen);
+      s += format_subtime_mm("Apply FBM Filter", timings[to_underlying(_TimeID::fbm_filter)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::fbm_filter)], timings_max[to_underlying(_TimeID::fbm_filter)], this->padlen);
+      s += format_subtime_mm("Assemble Defect", timings[to_underlying(_TimeID::assembly)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::assembly)], timings_max[to_underlying(_TimeID::assembly)], this->padlen);
+      s += format_subtime_mm("Init Assembler", timings[to_underlying(_TimeID::init)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::init)], timings_max[to_underlying(_TimeID::init)], this->padlen);
+      s += format_subtime_mm("Create Defect Vector", timings[to_underlying(_TimeID::create_vector)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_vector)], timings_max[to_underlying(_TimeID::create_vector)], this->padlen);
+      s += format_subtime_mm("Defect Assembly Total Time", timings[to_underlying(_TimeID::total)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::total)], timings_max[to_underlying(_TimeID::total)], this->padlen);
 
       return s;
     }

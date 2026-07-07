@@ -98,7 +98,7 @@ namespace FEAT::LAFEM::Arch
     }
 
     template <typename DT_, typename IT_>
-    static void exec([[maybe_unused]] std::array<std::shared_ptr<void>, BackendIdx::num_backends>& workspaces, Memory::Arbiter& r, const DT_ alpha, const Memory::Arbiter& x, const Memory::Arbiter& y, const Memory::Arbiter& a, const Memory::Arbiter& col_idx, const Memory::Arbiter& row_ptr, const Index rows, const Index cols, const Index nonzeros, const bool transposed)
+    static void exec([[maybe_unused]] std::array<std::shared_ptr<void>, to_underlying(BackendIdx::num_backends)>& workspaces, Memory::Arbiter& r, const DT_ alpha, const Memory::Arbiter& x, const Memory::Arbiter& y, const Memory::Arbiter& a, const Memory::Arbiter& col_idx, const Memory::Arbiter& row_ptr, const Index rows, const Index cols, const Index nonzeros, const bool transposed)
     {
       XASSERT(r != x);
 
@@ -124,7 +124,7 @@ namespace FEAT::LAFEM::Arch
 
       case PreferredBackend::cuda:
 #ifdef FEAT_HAVE_CUDA
-        exec_cuda<DT_, IT_>(workspaces[BackendIdx::cuda].get(), r, alpha, x, y, a, col_idx, row_ptr, rows, cols, nonzeros, transposed);
+        exec_cuda<DT_, IT_>(workspaces[to_underlying(BackendIdx::cuda)].get(), r, alpha, x, y, a, col_idx, row_ptr, rows, cols, nonzeros, transposed);
 #else
         XABORTM("LAFEM::Arch::MatVecMultCSRDense::exec: CUDA backend not available!");
 #endif

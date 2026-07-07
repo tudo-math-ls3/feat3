@@ -22,62 +22,62 @@ namespace Gendie
 {
   using namespace FEAT;
 
-  enum InflowGeometry
+  enum class InflowGeometry : std::uint8_t
   {
     unkown = 0,
-    circle = 1,
-    ellipse = 2,
-    ring = 3,
-    rectangle = 4,
-    curved_rectangle = 5
+    circle,
+    ellipse,
+    ring,
+    rectangle,
+    curved_rectangle
   };
 
-  String stringify_enum(InflowGeometry type)
+  std::ostream& operator<<(std::ostream& os, InflowGeometry geo)
   {
-    switch(type)
+    switch(geo)
     {
-      case unkown:
-        return String("Unknown");
-      case circle:
-        return String("Circle");
-      case ellipse:
-        return String("Ellipse");
-      case ring:
-        return String("Ring");
-      case rectangle:
-        return String("Rectangle");
-      case curved_rectangle:
-        return String("Curved-Rectangle");
+      case InflowGeometry::unkown:
+        return os << "Unknown";
+      case InflowGeometry::circle:
+        return os << "Circle";
+      case InflowGeometry::ellipse:
+        return os << "Ellipse";
+      case InflowGeometry::ring:
+        return os << "Ring";
+      case InflowGeometry::rectangle:
+        return os << "Rectangle";
+      case InflowGeometry::curved_rectangle:
+        return os << "Curved-Rectangle";
       default:
         XABORTM("InflowGeometry not known");
     }
-    return String();
+    return os;
   }
 
-  enum InflowType
+  enum class InflowType : std::uint8_t
   {
     best = 0,
-    constant = 1,
-    parabolic = 2,
-    curved_flat = 3
+    constant,
+    parabolic,
+    curved_flat
   };
 
-  String stringify_enum(InflowType type)
+  std::ostream& operator<<(std::ostream& os, InflowType type)
   {
     switch(type)
     {
-      case best:
-        return String("Best");
-      case constant:
-        return String("Constant");
-      case parabolic:
-        return String("Parabolic");
-      case curved_flat:
-        return String("Curved-Flat");
+      case InflowType::best:
+        return os << "Best";
+      case InflowType::constant:
+        return os << "Constant";
+      case InflowType::parabolic:
+        return os << "Parabolic";
+      case InflowType::curved_flat:
+        return os << "Curved-Flat";
       default:
         XABORTM("InflowType not known");
     }
-    return String();
+    return os;
   }
 
   template<typename MeshType_, typename DT_ = typename MeshType_::CoordType>
@@ -291,8 +291,8 @@ namespace Gendie
     virtual String format_string(std::size_t padlen = std::size_t(30), const char pc = '.') const
     {
       String s;
-      s += String("Inflow Geometry").pad_back(padlen, pc) + ": " + stringify_enum(inflow_geometry) + "\n";
-      s += String("Inflow Type").pad_back(padlen, pc) + ": " + stringify_enum(inflow_type) + "\n";
+      s += String("Inflow Geometry").pad_back(padlen, pc) + ": " + stringify(inflow_geometry) + "\n";
+      s += String("Inflow Type").pad_back(padlen, pc) + ": " + stringify(inflow_type) + "\n";
       if constexpr(dim==3)
       {
         s += String("Inflow center").pad_back(padlen, pc) + ": [" + stringify_fp_fix(center[0], prec, width)

@@ -1097,27 +1097,27 @@ namespace Gendie
 
     FEAT::String format_timings(const FEAT::Dist::Comm& comm, double total_time, unsigned long long padlen) const
     {
-      enum _TimeID
+      enum class _TimeID : std::size_t
       {
         mg_hirarch = 0,
-        vanka_symbolic_init = 1,
-        vanka_numeric_init = 2,
-        num_entries = 3
+        vanka_symbolic_init,
+        vanka_numeric_init,
+        num_entries
       };
       FEAT::String s;
-      double timings_max[_TimeID::num_entries], timings_min[_TimeID::num_entries], timings[_TimeID::num_entries];
-      timings_min[_TimeID::mg_hirarch] = timings_max[_TimeID::mg_hirarch] = timings[_TimeID::mg_hirarch] = this->watch_mg_hirarch.elapsed();
-      timings_min[_TimeID::vanka_symbolic_init] = timings_max[_TimeID::vanka_symbolic_init] = timings[_TimeID::vanka_symbolic_init] = std::accumulate(this->vanka_solver.begin(), this->vanka_solver.end(), double(0),
+      double timings_max[to_underlying(_TimeID::num_entries)], timings_min[to_underlying(_TimeID::num_entries)], timings[to_underlying(_TimeID::num_entries)];
+      timings_min[to_underlying(_TimeID::mg_hirarch)] = timings_max[to_underlying(_TimeID::mg_hirarch)] = timings[to_underlying(_TimeID::mg_hirarch)] = this->watch_mg_hirarch.elapsed();
+      timings_min[to_underlying(_TimeID::vanka_symbolic_init)] = timings_max[to_underlying(_TimeID::vanka_symbolic_init)] = timings[to_underlying(_TimeID::vanka_symbolic_init)] = std::accumulate(this->vanka_solver.begin(), this->vanka_solver.end(), double(0),
                               [](double t, const auto& van){return t + van->time_init_symbolic();});
-      timings_min[_TimeID::vanka_numeric_init] = timings_max[_TimeID::vanka_numeric_init] = timings[_TimeID::vanka_numeric_init] = std::accumulate(this->vanka_solver.begin(), this->vanka_solver.end(), double(0),
+      timings_min[to_underlying(_TimeID::vanka_numeric_init)] = timings_max[to_underlying(_TimeID::vanka_numeric_init)] = timings[to_underlying(_TimeID::vanka_numeric_init)] = std::accumulate(this->vanka_solver.begin(), this->vanka_solver.end(), double(0),
                               [](double t, const auto& van){return t + van->time_init_numeric();});
       // sync our timings
-      comm.allreduce(timings_max, timings_max, _TimeID::num_entries, FEAT::Dist::op_max);
-      comm.allreduce(timings_min, timings_min, _TimeID::num_entries, FEAT::Dist::op_min);
+      comm.allreduce(timings_max, timings_max, to_underlying(_TimeID::num_entries), FEAT::Dist::op_max);
+      comm.allreduce(timings_min, timings_min, to_underlying(_TimeID::num_entries), FEAT::Dist::op_min);
 
-      s += format_subtime_mm("Create MG Hirarch", timings[_TimeID::mg_hirarch], total_time, timings_min[_TimeID::mg_hirarch], timings_max[_TimeID::mg_hirarch], padlen);
-      s += format_subtime_mm("Vanka Symbolic Init", timings[_TimeID::vanka_symbolic_init], total_time, timings_min[_TimeID::vanka_symbolic_init], timings_max[_TimeID::vanka_symbolic_init], padlen);
-      s += format_subtime_mm("Vanka Numeric Init", timings[_TimeID::vanka_numeric_init], total_time, timings_min[_TimeID::vanka_numeric_init], timings_max[_TimeID::vanka_numeric_init], padlen);
+      s += format_subtime_mm("Create MG Hirarch", timings[to_underlying(_TimeID::mg_hirarch)], total_time, timings_min[to_underlying(_TimeID::mg_hirarch)], timings_max[to_underlying(_TimeID::mg_hirarch)], padlen);
+      s += format_subtime_mm("Vanka Symbolic Init", timings[to_underlying(_TimeID::vanka_symbolic_init)], total_time, timings_min[to_underlying(_TimeID::vanka_symbolic_init)], timings_max[to_underlying(_TimeID::vanka_symbolic_init)], padlen);
+      s += format_subtime_mm("Vanka Numeric Init", timings[to_underlying(_TimeID::vanka_numeric_init)], total_time, timings_min[to_underlying(_TimeID::vanka_numeric_init)], timings_max[to_underlying(_TimeID::vanka_numeric_init)], padlen);
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
       s += this->_format_multigrid_timings();
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
@@ -1395,38 +1395,38 @@ namespace Gendie
 
     FEAT::String _format_timings() const
     {
-      enum _TimeID
+      enum class _TimeID : std::size_t
       {
         total = 0,
-        solver_apply = 1,
-        symbolic_init = 2,
-        create_solver = 3,
-        numeric_init = 4,
-        system_filter = 5,
-        num_entries = 6
+        solver_apply,
+        symbolic_init,
+        create_solver,
+        numeric_init,
+        system_filter,
+        num_entries
       };
       FEAT::String s;
-      double timings_max[_TimeID::num_entries], timings_min[_TimeID::num_entries], timings[_TimeID::num_entries];
-      timings_min[_TimeID::total] = timings_max[_TimeID::total] = timings[_TimeID::total] = this->watch_total.elapsed();
-      timings_min[_TimeID::solver_apply] = timings_max[_TimeID::solver_apply] = timings[_TimeID::solver_apply] = this->watch_apply.elapsed();
-      timings_min[_TimeID::symbolic_init] = timings_max[_TimeID::symbolic_init] = timings[_TimeID::symbolic_init] = this->watch_init_symbolic.elapsed();
-      timings_min[_TimeID::create_solver] = timings_max[_TimeID::create_solver] = timings[_TimeID::create_solver] = watch_create_solver.elapsed();
-      timings_min[_TimeID::numeric_init] = timings_max[_TimeID::numeric_init] = timings[_TimeID::numeric_init] = this->watch_init_numeric.elapsed();
-      timings_min[_TimeID::system_filter] = timings_max[_TimeID::system_filter] = timings[_TimeID::system_filter] = watch_system_filter.elapsed();
+      double timings_max[to_underlying(_TimeID::num_entries)], timings_min[to_underlying(_TimeID::num_entries)], timings[to_underlying(_TimeID::num_entries)];
+      timings_min[to_underlying(_TimeID::total)] = timings_max[to_underlying(_TimeID::total)] = timings[to_underlying(_TimeID::total)] = this->watch_total.elapsed();
+      timings_min[to_underlying(_TimeID::solver_apply)] = timings_max[to_underlying(_TimeID::solver_apply)] = timings[to_underlying(_TimeID::solver_apply)] = this->watch_apply.elapsed();
+      timings_min[to_underlying(_TimeID::symbolic_init)] = timings_max[to_underlying(_TimeID::symbolic_init)] = timings[to_underlying(_TimeID::symbolic_init)] = this->watch_init_symbolic.elapsed();
+      timings_min[to_underlying(_TimeID::create_solver)] = timings_max[to_underlying(_TimeID::create_solver)] = timings[to_underlying(_TimeID::create_solver)] = watch_create_solver.elapsed();
+      timings_min[to_underlying(_TimeID::numeric_init)] = timings_max[to_underlying(_TimeID::numeric_init)] = timings[to_underlying(_TimeID::numeric_init)] = this->watch_init_numeric.elapsed();
+      timings_min[to_underlying(_TimeID::system_filter)] = timings_max[to_underlying(_TimeID::system_filter)] = timings[to_underlying(_TimeID::system_filter)] = watch_system_filter.elapsed();
       // sync our timings
-      _logger->comm.allreduce(timings_max, timings_max, _TimeID::num_entries, FEAT::Dist::op_max);
-      _logger->comm.allreduce(timings_min, timings_min, _TimeID::num_entries, FEAT::Dist::op_min);
+      _logger->comm.allreduce(timings_max, timings_max, to_underlying(_TimeID::num_entries), FEAT::Dist::op_max);
+      _logger->comm.allreduce(timings_min, timings_min, to_underlying(_TimeID::num_entries), FEAT::Dist::op_min);
 
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
       s += FEAT::String("\n------------------------------------Timings MG Vanka Solver---------------------------------------\n");
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
-      s += format_subtime_mm("Filter Local System", timings[_TimeID::system_filter], timings_max[_TimeID::total], timings_min[_TimeID::system_filter], timings_max[_TimeID::system_filter], this->padlen);
-      s += format_subtime_mm("Create Solver", timings[_TimeID::create_solver], timings_max[_TimeID::total], timings_min[_TimeID::create_solver], timings_max[_TimeID::create_solver], this->padlen);
-      s += format_subtime_mm("Symbolic Init", timings[_TimeID::symbolic_init], timings_max[_TimeID::total], timings_min[_TimeID::symbolic_init], timings_max[_TimeID::symbolic_init], this->padlen);
-      s += format_subtime_mm("Numeric Init", timings[_TimeID::numeric_init], timings_max[_TimeID::total], timings_min[_TimeID::numeric_init], timings_max[_TimeID::numeric_init], this->padlen);
-      s += format_subtime_mm("Apply Linear Solver", timings[_TimeID::solver_apply], timings_max[_TimeID::total], timings_min[_TimeID::solver_apply], timings_max[_TimeID::solver_apply], this->padlen);
-      s += format_subtime_mm("Linear Solver Total Time", timings_max[_TimeID::total], timings[_TimeID::total], timings_min[_TimeID::total], timings_max[_TimeID::total], this->padlen);
-      s += multigrid_solver.format_timings(_logger->comm, timings_max[_TimeID::total], this->padlen);
+      s += format_subtime_mm("Filter Local System", timings[to_underlying(_TimeID::system_filter)], timings_max[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::system_filter)], timings_max[to_underlying(_TimeID::system_filter)], this->padlen);
+      s += format_subtime_mm("Create Solver", timings[to_underlying(_TimeID::create_solver)], timings_max[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_solver)], timings_max[to_underlying(_TimeID::create_solver)], this->padlen);
+      s += format_subtime_mm("Symbolic Init", timings[to_underlying(_TimeID::symbolic_init)], timings_max[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::symbolic_init)], timings_max[to_underlying(_TimeID::symbolic_init)], this->padlen);
+      s += format_subtime_mm("Numeric Init", timings[to_underlying(_TimeID::numeric_init)], timings_max[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::numeric_init)], timings_max[to_underlying(_TimeID::numeric_init)], this->padlen);
+      s += format_subtime_mm("Apply Linear Solver", timings[to_underlying(_TimeID::solver_apply)], timings_max[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::solver_apply)], timings_max[to_underlying(_TimeID::solver_apply)], this->padlen);
+      s += format_subtime_mm("Linear Solver Total Time", timings_max[to_underlying(_TimeID::total)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::total)], timings_max[to_underlying(_TimeID::total)], this->padlen);
+      s += multigrid_solver.format_timings(_logger->comm, timings_max[to_underlying(_TimeID::total)], this->padlen);
 
       return s;
     }

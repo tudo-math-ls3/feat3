@@ -1121,7 +1121,7 @@ namespace FBMTest
 
     std::deque<String> mesh_files = args.query("mesh")->second;
 
-    logger.print("Reading from files " + std::accumulate(mesh_files.begin(), mesh_files.end(), String(""), [](const FEAT::String& a, const FEAT::String& b){return a + " " + b;}), Gendie::info);
+    logger.print("Reading from files " + std::accumulate(mesh_files.begin(), mesh_files.end(), String(""), [](const FEAT::String& a, const FEAT::String& b){return a + " " + b;}), Gendie::PrintLevel::info);
 
     Geometry::MeshFileReader mesh_reader;
     mesh_reader.add_mesh_files(comm, mesh_files);
@@ -1264,12 +1264,12 @@ namespace FBMTest
     }
   }
 
-  enum surface_integration_type : std::uint8_t
+  enum class surface_integration_type : std::uint8_t
   {
     point_values = 0,
-    delta_peak = 1,
-    cell_mean = 2,
-    unkown = 3
+    delta_peak,
+    cell_mean,
+    unkown
   };
 
   static inline surface_integration_type parse_integration_type(const FEAT::String& type_string)
@@ -1287,20 +1287,20 @@ namespace FBMTest
       return surface_integration_type::cell_mean;
     }
 
-    return unkown;
+    return surface_integration_type::unkown;
   }
 
   static inline FEAT::String print_integration_type(surface_integration_type type)
   {
     switch (type)
     {
-      case point_values:
+      case surface_integration_type::point_values:
         return FEAT::String("Point Values");
-      case delta_peak:
+      case surface_integration_type::delta_peak:
         return FEAT::String("Delta Peak");
-      case cell_mean:
+      case surface_integration_type::cell_mean:
         return FEAT::String("Cell Mean");
-      case unkown:
+      case surface_integration_type::unkown:
         return FEAT::String("unkown");
     }
 
@@ -1309,7 +1309,7 @@ namespace FBMTest
 
   void run_fbm(Dist::Comm& comm, SimpleArgParser& args, Gendie::Logger& logger)
   {
-    logger.print("Running fbm case", Gendie::info);
+    logger.print("Running fbm case", Gendie::PrintLevel::info);
     args.support("reference-data-file", "Read in ref surface integral");
     args.support("nu");
     args.support("stokes");
@@ -1349,13 +1349,13 @@ namespace FBMTest
     DataType vmax =args.parse_default("v-max", 0.3);
     bool use_q2_fbm = args.check("use-q2-fbm") >= 0;
     bool use_fbm_function = args.check("use-fbm-function") >= 0;
-    logger.print("Running with v-max: " + stringify(vmax), Gendie::info);
-    logger.print("Running with nu: " + stringify(nu), Gendie::info);
-    logger.print("Running navier: " + stringify(navier), Gendie::info);
-    logger.print("Calc face values: " + String(face_values ? "Yes" : "No"), Gendie::info);
-    logger.print("Surface Integrator Type: " + print_integration_type(integrator_type), Gendie::info);
-    logger.print("Using q2 FBM: " + String(use_q2_fbm ? "Yes" : "No") , Gendie::info);
-    logger.print("Setting up domain", Gendie::info);
+    logger.print("Running with v-max: " + stringify(vmax), Gendie::PrintLevel::info);
+    logger.print("Running with nu: " + stringify(nu), Gendie::PrintLevel::info);
+    logger.print("Running navier: " + stringify(navier), Gendie::PrintLevel::info);
+    logger.print("Calc face values: " + String(face_values ? "Yes" : "No"), Gendie::PrintLevel::info);
+    logger.print("Surface Integrator Type: " + print_integration_type(integrator_type), Gendie::PrintLevel::info);
+    logger.print("Using q2 FBM: " + String(use_q2_fbm ? "Yes" : "No") , Gendie::PrintLevel::info);
+    logger.print("Setting up domain", Gendie::PrintLevel::info);
     PartitionControl<FBMDomainLevel> domain(comm, true);
     {
       auto levels = args.query("level")->second;
@@ -1439,7 +1439,7 @@ namespace FBMTest
 
     assemble_filters<decltype(domain), FBMSystemLevel, true>(inflows, outflows, system, domain, vmax, use_q2_fbm);
 
-    logger.print("After filter assemble", Gendie::info);
+    logger.print("After filter assemble", Gendie::PrintLevel::info);
 
     // system is assembled, now we need to create the components
     auto stokes_solver = std::make_shared<Gendie::MultigridVankaFlowSolver<FBMSystemLevel, true>>(system, domain, nullptr, &logger);
@@ -1582,14 +1582,14 @@ namespace FBMTest
       {
         switch (integrator_type)
         {
-          case point_values:
+          case surface_integration_type::point_values:
           {
             Intern::FaceGradientIntegratorJob int_job(face_val, sol_vec.local().template at<0>(), domain.front()->space_velo);
 
             surf_integrator.assemble(int_job);
             break;
           }
-          case delta_peak:
+          case surface_integration_type::delta_peak:
           {
             FEAT::Space::Lagrange1::Element<TrafoType> mask_space(domain.front()->trafo);
             // for now, use lagrange2 -> lagrange1 ordering to construct our mask vector
@@ -1610,7 +1610,7 @@ namespace FBMTest
             surf_integrator.assemble(int_job);
             break;
           }
-          case cell_mean:
+          case surface_integration_type::cell_mean:
           {
             Intern::FaceGradientCellMeanIntegratorJob int_job(face_val, sol_vec.local().template at<0>(), domain.front()->space_velo);
 
@@ -1661,7 +1661,7 @@ namespace FBMTest
 
   void run_no_fbm(Dist::Comm& comm, SimpleArgParser& args, Gendie::Logger& logger)
   {
-    logger.print("Running no fbm case", Gendie::info);
+    logger.print("Running no fbm case", Gendie::PrintLevel::info);
     args.support("create-reference-data", "Create reference data and write it out as blocked vector");
     args.support("nu");
     args.support("stokes");
@@ -1672,11 +1672,11 @@ namespace FBMTest
     DataType vmax =args.parse_default("v-max", 0.3);
     args.support("calc-face-values", "Instead of normal gradients, integrate the actual values of our FE function (which are zero due to boundary conditions)");
     bool face_values = args.check("calc-face-values") >= 0;
-    logger.print("Running with v-max: " + stringify(vmax), Gendie::info);
-    logger.print("Running with nu: " + stringify(nu), Gendie::info);
-    logger.print("Running navier: " + stringify(navier), Gendie::info);
-    logger.print("Calc face values: " + String(face_values ? "Yes" : "No"), Gendie::info);
-    logger.print("Setting up domain", Gendie::info);
+    logger.print("Running with v-max: " + stringify(vmax), Gendie::PrintLevel::info);
+    logger.print("Running with nu: " + stringify(nu), Gendie::PrintLevel::info);
+    logger.print("Running navier: " + stringify(navier), Gendie::PrintLevel::info);
+    logger.print("Calc face values: " + String(face_values ? "Yes" : "No"), Gendie::PrintLevel::info);
+    logger.print("Setting up domain", Gendie::PrintLevel::info);
 
     args.support("vtk");
 
@@ -1711,7 +1711,7 @@ namespace FBMTest
 
     assemble_filters<decltype(domain), SystemLevel, false>(inflows, outflows, system, domain, vmax);
 
-    logger.print("After filter assemble", Gendie::info);
+    logger.print("After filter assemble", Gendie::PrintLevel::info);
     // system is assembled, now we need to create the components
     auto stokes_solver = std::make_shared<Gendie::MultigridVankaFlowSolver<SystemLevel, false>>(system, domain, nullptr, &logger);
     auto defect_asm = std::make_shared<Gendie::BurgersDefectFlowAssembler<decltype(domain), SystemLevel>>(domain, system.front(), nullptr);
@@ -1943,7 +1943,7 @@ namespace FBMTest
     }
 
     // write out our vectors
-    logger.print(String("Writing out reference data to ") + ref_file, Gendie::info);
+    logger.print(String("Writing out reference data to ") + ref_file, Gendie::PrintLevel::info);
     if(comm.rank() == 0)
     {
       global_part_vertices.write_out(FEAT::LAFEM::FileMode::fm_binary, ref_file + String("_verts.bin"));

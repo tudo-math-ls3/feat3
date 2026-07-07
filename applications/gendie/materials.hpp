@@ -17,7 +17,7 @@ namespace Gendie
 {
   using namespace FEAT;
 
-  enum MaterialType
+  enum class MaterialType : std::uint8_t
   {
     abc_model = 0,
     carreau = 1,
@@ -26,7 +26,7 @@ namespace Gendie
     bingham = 4
   };
 
-  enum TemperatureModelType
+  enum class TemperatureModelType : std::uint8_t
   {
     isotherm = 0,
     c1c2 = 1,
@@ -35,52 +35,40 @@ namespace Gendie
     etb = 4
   };
 
-  String stringify_enum(MaterialType ty)
+  std::ostream& operator<<(std::ostream& os, MaterialType ty)
   {
     switch(ty)
     {
       case Gendie::MaterialType::abc_model:
-        return String("ABC Model");
+        return os << "ABC Model";
       case Gendie::MaterialType::carreau:
-        return String("Carreau Model");
+        return os << "Carreau Model";
       case Gendie::MaterialType::carreau_yasuda:
-        return String("Carreau Yasuda Model");
+        return os << "Carreau Yasuda Model";
       case Gendie::MaterialType::power_law:
-        return String("Power Law Model");
+        return os << "Power Law Model";
       case Gendie::MaterialType::bingham:
-        return String("Bingham Model");
+        return os << "Bingham Model";
     }
-    return String("Unkown Model");
+    return os;
   }
 
-  String stringify_enum(TemperatureModelType ty)
+  std::ostream& operator<<(std::ostream& os, TemperatureModelType ty)
   {
     switch(ty)
     {
       case Gendie::TemperatureModelType::isotherm:
-        return String("Isotherm");
+        return os << "Isotherm";
       case Gendie::TemperatureModelType::c1c2:
-        return String("C1C2");
+        return os << "C1C2";
       case Gendie::TemperatureModelType::tbts:
-        return String("TBTS");
+        return os << "TBTS";
       case Gendie::TemperatureModelType::melt_tbts:
-        return String("Melt TBTS");
+        return os << "Melt TBTS";
       case Gendie::TemperatureModelType::etb:
-        return String("ETB");
+        return os << "ETB";
     }
-    return String("Unkown Model");
-  }
-
-  std::ostream& operator<<(std::ostream& os, MaterialType mat)
-  {
-    os << stringify_enum(mat);
-    return os;
-  }
-
-  std::ostream& operator<<(std::ostream& os, TemperatureModelType tmp_model)
-  {
-    os << stringify_enum(tmp_model);
-    return os;
+    return os << "Unkown Model";
   }
 
   template<typename DT_>
@@ -135,7 +123,7 @@ namespace Gendie
     virtual String format_string(std::size_t padlen = std::size_t(30), const char pc = '.') const
     {
       String s;
-      s += String("Material Type").pad_back(padlen, pc) + ": " + stringify_enum(type);
+      s += String("Material Type").pad_back(padlen, pc) + ": " + stringify(type);
 
       return s;
     }
@@ -906,7 +894,7 @@ namespace Gendie
      * \brief Ctor writing visco mat ptr explicitly
      *
      */
-    Material(DataType density, std::unique_ptr<ViscoModelBase<DataType>>&& visco_model) : _visc_mat_p(std::move(visco_model)), _density(density),  _temp_type(isotherm)
+    Material(DataType density, std::unique_ptr<ViscoModelBase<DataType>>&& visco_model) : _visc_mat_p(std::move(visco_model)), _density(density),  _temp_type(TemperatureModelType::isotherm)
     {
       _temp_mat_data[0] = DataType(200.);
     }
@@ -963,7 +951,7 @@ namespace Gendie
 
       s = "Material " + stringify(material_id)  + " parameters:\n";
       s += String("Density ").pad_back(padlen, pc) + ": " + stringify_fp_fix(_density, 3, 10) + " kg/m^3\n";
-      s += String("Temperature Model").pad_back(padlen, pc) + ": " + stringify_enum(_temp_type) + "\n";
+      s += String("Temperature Model").pad_back(padlen, pc) + ": " + stringify(_temp_type) + "\n";
       s += String("TB").pad_back(padlen, pc) + ": " + stringify_fp_fix(_temp_mat_data[0], 3, 10) + "\n";
       s += String("TS").pad_back(padlen, pc) + ": " + stringify_fp_fix(_temp_mat_data[1], 3, 10) + "\n";
       s += String("C1").pad_back(padlen, pc) + ": " + stringify_fp_fix(_temp_mat_data[2], 3, 10) + "\n";

@@ -229,7 +229,7 @@ namespace Gendie
         if(prop == nullptr)
         {
           if(_logger)
-            _logger->print("Propertymap is null!", error);
+            _logger->print("Propertymap is null!", PrintLevel::error);
           return false;
         }
 
@@ -315,21 +315,21 @@ namespace Gendie
 
     FEAT::String _format_timings() const
     {
-      enum _TimeID
+      enum class _TimeID
       {
         total_t = 0,
-        scaling_t = 1,
-        init_sol_t = 2,
-        num_entries_t = 3
+        scaling_t,
+        init_sol_t,
+        num_entries_t
       };
       FEAT::String s;
-      double timings_max[num_entries_t], timings_min[num_entries_t], timings[num_entries_t];
-      timings_min[_TimeID::total_t] = timings_max[_TimeID::total_t] = timings[_TimeID::total_t] = watch_total.elapsed();
-      timings_min[_TimeID::scaling_t] = timings_max[_TimeID::scaling_t] = timings[_TimeID::scaling_t] = watch_internal_scaling.elapsed();
-      timings_min[_TimeID::init_sol_t] = timings_max[_TimeID::init_sol_t] = timings[_TimeID::init_sol_t] = watch_init_sol.elapsed();
+      double timings_max[to_underlying(_TimeID::num_entries_t)], timings_min[to_underlying(_TimeID::num_entries_t)], timings[to_underlying(_TimeID::num_entries_t)];
+      timings_min[to_underlying(_TimeID::total_t)] = timings_max[to_underlying(_TimeID::total_t)] = timings[to_underlying(_TimeID::total_t)] = watch_total.elapsed();
+      timings_min[to_underlying(_TimeID::scaling_t)] = timings_max[to_underlying(_TimeID::scaling_t)] = timings[to_underlying(_TimeID::scaling_t)] = watch_internal_scaling.elapsed();
+      timings_min[to_underlying(_TimeID::init_sol_t)] = timings_max[to_underlying(_TimeID::init_sol_t)] = timings[to_underlying(_TimeID::init_sol_t)] = watch_init_sol.elapsed();
       // sync our timings
-      _logger->comm.allreduce(timings_max, timings_max, _TimeID::num_entries_t, FEAT::Dist::op_max);
-      _logger->comm.allreduce(timings_min, timings_min, _TimeID::num_entries_t, FEAT::Dist::op_min);
+      _logger->comm.allreduce(timings_max, timings_max, to_underlying(_TimeID::num_entries_t), FEAT::Dist::op_max);
+      _logger->comm.allreduce(timings_min, timings_min, to_underlying(_TimeID::num_entries_t), FEAT::Dist::op_min);
 
 
       s += this->defect_asm->format_timings();
@@ -339,9 +339,9 @@ namespace Gendie
       s += FEAT::String("\n------------------------------------Timings Flow Solver-------------------------------------------\n");
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
 
-      s += format_subtime_mm("Internal Pressure Scaling", timings[_TimeID::scaling_t], timings[_TimeID::total_t], timings_min[_TimeID::scaling_t], timings_max[_TimeID::scaling_t], this->padlen);
-      s += format_subtime_mm("Init Solution", timings[_TimeID::init_sol_t], timings[_TimeID::total_t], timings_min[_TimeID::init_sol_t], timings_max[_TimeID::init_sol_t], this->padlen);
-      s += format_subtime_mm("Total Time", timings[_TimeID::total_t], timings[_TimeID::total_t], timings_min[_TimeID::total_t], timings_max[_TimeID::total_t], this->padlen);
+      s += format_subtime_mm("Internal Pressure Scaling", timings[to_underlying(_TimeID::scaling_t)], timings[to_underlying(_TimeID::total_t)], timings_min[to_underlying(_TimeID::scaling_t)], timings_max[to_underlying(_TimeID::scaling_t)], this->padlen);
+      s += format_subtime_mm("Init Solution", timings[to_underlying(_TimeID::init_sol_t)], timings[to_underlying(_TimeID::total_t)], timings_min[to_underlying(_TimeID::init_sol_t)], timings_max[to_underlying(_TimeID::init_sol_t)], this->padlen);
+      s += format_subtime_mm("Total Time", timings[to_underlying(_TimeID::total_t)], timings[to_underlying(_TimeID::total_t)], timings_min[to_underlying(_TimeID::total_t)], timings_max[to_underlying(_TimeID::total_t)], this->padlen);
 
       return s;
     }
@@ -365,7 +365,7 @@ namespace Gendie
             sys->matrix_a.extract_diag(diag_a, true);
             sys->velo_mass_matrix.extract_diag(diag_m, true);
             auto sc_factor = diag_a.max_abs_element() / diag_m.max_abs_element();
-            this->_logger->print("Interface factor " + FEAT::stringify(sc_factor), debug);
+            this->_logger->print("Interface factor " + FEAT::stringify(sc_factor), PrintLevel::debug);
             auto& fbm_int_filter = sys->filter_interface_fbm;
             // get prev value
             auto& _internal_vec = fbm_int_filter.get_filter_vector();
@@ -387,7 +387,7 @@ namespace Gendie
       {
         if(this->_logger)
         {
-          this->_logger->print("\nInit solution vector by solving stokes", info);
+          this->_logger->print("\nInit solution vector by solving stokes", PrintLevel::info);
         }
 
         this->system_asm->set_backend();
@@ -437,7 +437,7 @@ namespace Gendie
 
         if(!FEAT::Solver::status_success(status))
         {
-          this->_logger->print("Stokes solver diverged, refomatting with zero", warning);
+          this->_logger->print("Stokes solver diverged, refomatting with zero", PrintLevel::warning);
           vec_sol.format();
           this->filter.filter_sol(vec_sol);
           success = false;
@@ -532,8 +532,8 @@ namespace Gendie
       {
         if(this->_logger)
         {
-          this->_logger->print(line, info);
-          this->_logger->print("NONLINEAR SOLVER DIVERGED !!!", error);
+          this->_logger->print(line, PrintLevel::info);
+          this->_logger->print("NONLINEAR SOLVER DIVERGED !!!", PrintLevel::error);
         }
         this->_cur_status = static_cast<NonLinearStatus>(FEAT::Solver::Status::diverged);
         return false;
@@ -546,14 +546,14 @@ namespace Gendie
       else if((def_nl < this->_tol_abs && def_rel < this->_tol_rel) || def_nl < this->_tol_low_abs)
       {
         if(this->_logger)
-          this->_logger->print(line + "\nNonlinear solver converged!\n", info);
+          this->_logger->print(line + "\nNonlinear solver converged!\n", PrintLevel::info);
         this->_cur_status = NonLinearStatus::success;
         return false;
       }
       else if(this->_cur_iter >= this->_max_nonlin_iter)
       {
         if(this->_logger)
-          this->_logger->print(line + "\nMaximum iterations reached!\n", warning);
+          this->_logger->print(line + "\nMaximum iterations reached!\n", PrintLevel::warning);
         this->_cur_status = NonLinearStatus::max_iter;
         return false;
       }
@@ -563,7 +563,7 @@ namespace Gendie
         if(this->cast()._linear_solver_stagnated(def_nl))
         {
           if(this->_logger) this->_logger->print(line + "\nLinear Solver Stagnated, Lin def " + FEAT::stringify_fp_sci(this->flow_solver->get_def_final(), 2) + " vs. nl def"
-                              + FEAT::stringify_fp_sci(def_nl, 2), warning);
+                              + FEAT::stringify_fp_sci(def_nl, 2), PrintLevel::warning);
           this->_cur_status = NonLinearStatus::inner_stagnated;
           return false;
         }
@@ -571,21 +571,21 @@ namespace Gendie
         {
           if(!this->cast()._handle_stagnation())
           {
-            if(this->_logger) this->_logger->print(line + "\nSolver cannot handle stagnation, aborting solver...", warning);
+            if(this->_logger) this->_logger->print(line + "\nSolver cannot handle stagnation, aborting solver...", PrintLevel::warning);
             return false;
           }
-          if(this->_logger) this->_logger->print("Nonlinear Solver stagnated " + FEAT::stringify(this->_stagnation_counter) + "/" + FEAT::stringify(this->_max_stagnations), info);
+          if(this->_logger) this->_logger->print("Nonlinear Solver stagnated " + FEAT::stringify(this->_stagnation_counter) + "/" + FEAT::stringify(this->_max_stagnations), PrintLevel::info);
           if(this->_prev_stag_defect * this->_stag_rate <= def_nl)
           {
-            if(this->_logger) this->_logger->print("No improvement since to last stagnation: " + stringify_fp_sci(this->_prev_stag_defect), warning);
-            if(this->_logger) this->_logger->print(line + "\nNonlinear Solver stagnated!\n", warning);
+            if(this->_logger) this->_logger->print("No improvement since to last stagnation: " + stringify_fp_sci(this->_prev_stag_defect), PrintLevel::warning);
+            if(this->_logger) this->_logger->print(line + "\nNonlinear Solver stagnated!\n", PrintLevel::warning);
             this->_cur_status = NonLinearStatus::stagnated;
             return false;
           }
         }
         else
         {
-          if(this->_logger) this->_logger->print(line + "\nNonlinear Solver stagnated!\n", warning);
+          if(this->_logger) this->_logger->print(line + "\nNonlinear Solver stagnated!\n", PrintLevel::warning);
           this->_cur_status = NonLinearStatus::stagnated;
           return false;
         }
@@ -619,7 +619,7 @@ namespace Gendie
           + stringify_fp_sci(this->flow_solver->get_def_final() / this->flow_solver->get_def_initial(), 4);
         if((this->_fixed_ls_tol<DefectDataType(0)) && (this->_cur_iter > Index(0)))
           line += FEAT::String(" [") + stringify_fp_sci(this->flow_solver->get_tol_abs(), 4) + "]";
-        this->_logger->print(line, info);
+        this->_logger->print(line, PrintLevel::info);
       }
 
       this->flow_solver->done_numeric();
@@ -627,7 +627,7 @@ namespace Gendie
       if(!FEAT::Solver::status_success(status))
       {
         if(this->_logger)
-          this->_logger->print("\n LINEAR SOLVER BREAKDOWN\n", error);
+          this->_logger->print("\n LINEAR SOLVER BREAKDOWN\n", PrintLevel::error);
         this->_cur_status = static_cast<NonLinearStatus>(status);
         return false;
       }
@@ -662,9 +662,9 @@ namespace Gendie
 
       if(this->_logger)
       {
-        this->_logger->print("Using scaling factor: " + stringify_fp_sci(this->_scaling_factor) , info);
-        this->_logger->print("\nSolver   #  Defect (abs)   Defect (rel)   Improve   |  LS  fin abs Def   fin rel Def  abs Tol", info);
-        this->_logger->print(  "----------------------------------------------------+---------------------------------------------", info);
+        this->_logger->print("Using scaling factor: " + stringify_fp_sci(this->_scaling_factor) , PrintLevel::info);
+        this->_logger->print("\nSolver   #  Defect (abs)   Defect (rel)   Improve   |  LS  fin abs Def   fin rel Def  abs Tol", PrintLevel::info);
+        this->_logger->print(  "----------------------------------------------------+---------------------------------------------", PrintLevel::info);
       }
 
       for(this->_cur_iter = 0; this->_cur_iter < this->_max_nonlin_iter+1; ++this->_cur_iter)
@@ -1184,14 +1184,14 @@ namespace Gendie
       if(!adp_step_size)
       {
         if(this->_logger)
-          this->_logger->print("\nNonlinear solver stagnated!\n", warning);
+          this->_logger->print("\nNonlinear solver stagnated!\n", PrintLevel::warning);
         this->_cur_status = this->_inner_status == FEAT::Solver::Status::stagnated ? NonLinearStatus::inner_stagnated : NonLinearStatus::stagnated;
         return false;
       }
       ++this->_stagnation_counter;
       time_step_size = FEAT::Math::min(stag_increase * time_step_size, max_ts_size);
       if(this->_logger)
-        this->_logger->print("\nIncrease timestepsize to " + FEAT::stringify_fp_sci(time_step_size, 2) + " due to stagnation\n", info);
+        this->_logger->print("\nIncrease timestepsize to " + FEAT::stringify_fp_sci(time_step_size, 2) + " due to stagnation\n", PrintLevel::info);
       return true;
     }
 
@@ -1210,7 +1210,7 @@ namespace Gendie
       if(!_convergence_stable(this->_cur_iter, def_nl, def_improve, this->_defects))
       {
         time_step_size = FEAT::Math::min(time_step_size * adaptive_factor, max_ts_size);
-        if(this->_logger) this->_logger->print("Increase time step size to " + FEAT::stringify_fp_sci(time_step_size, 2), info);
+        if(this->_logger) this->_logger->print("Increase time step size to " + FEAT::stringify_fp_sci(time_step_size, 2), PrintLevel::info);
       }
     }
 

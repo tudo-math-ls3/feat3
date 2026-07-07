@@ -240,7 +240,7 @@ namespace FEAT
       std::vector<DT_> _scalar_dt;
 
       /// List of backend workspaces
-      mutable std::array<std::shared_ptr<void>, BackendIdx::num_backends> _backend_workspaces;
+      mutable std::array<std::shared_ptr<void>, to_underlying(BackendIdx::num_backends)> _backend_workspaces;
 
       void _copy_content(const Container & other, bool full)
       {
@@ -1110,7 +1110,7 @@ namespace FEAT
 
       const std::shared_ptr<void>& get_workspace(PreferredBackend backend) const
       {
-        return _backend_workspaces[Backend::backend_to_index(backend)];
+        return _backend_workspaces[to_underlying(Backend::backend_to_index(backend))];
       }
 
       /**

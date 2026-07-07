@@ -56,6 +56,7 @@
 // also define the __GNUC__ macro used to identify the GNU C/C++ compiler, thus leading to incorrect
 // compiler detection.
 #include <kernel/util/compiler_gnu.hpp>        // GNU C/C++ compiler
+#include <type_traits>
 
 // hide the following block from doxygen
 /// \cond nodoxy
@@ -133,6 +134,15 @@ namespace FEAT
    * \brief Real data type.
    */
   typedef double Real;
+
+  /**
+   * \brief Cast enum to underlying type
+   */
+  template <typename E>
+  constexpr auto to_underlying(E e) noexcept
+  {
+      return static_cast<std::underlying_type_t<E>>(e);
+  }
 } // namespace FEAT
 
 // define macros for nvcc

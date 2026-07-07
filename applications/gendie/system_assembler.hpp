@@ -425,34 +425,34 @@ namespace Gendie
 
     FEAT::String _format_timings() const
     {
-      enum _TimeID
+      enum class _TimeID : std::size_t
       {
         total = 0,
-        assembly = 1,
-        assembly_fine = 2,
-        restrict = 3,
-        restrict_alloc = 4,
-        num_entries = 5
+        assembly,
+        assembly_fine,
+        restrict,
+        restrict_alloc,
+        num_entries
       };
       FEAT::String s;
-      double timings_max[_TimeID::num_entries], timings_min[_TimeID::num_entries], timings[_TimeID::num_entries];
-      timings_min[_TimeID::total] = timings_max[_TimeID::total] = timings[_TimeID::total] = this->watch_total.elapsed();
-      timings_min[_TimeID::assembly] = timings_max[_TimeID::assembly] = timings[_TimeID::assembly] = this->watch_assembly.elapsed();
-      timings_min[_TimeID::assembly_fine] = timings_max[_TimeID::assembly_fine] = timings[_TimeID::assembly_fine] = this->watch_assembly_fine.elapsed();
-      timings_min[_TimeID::restrict] = timings_max[_TimeID::restrict] = timings[_TimeID::restrict] = this->watch_restrict.elapsed();
-      timings_min[_TimeID::restrict_alloc] = timings_max[_TimeID::restrict_alloc] = timings[_TimeID::restrict_alloc] = this->watch_restrict_alloc.elapsed();
+      double timings_max[to_underlying(_TimeID::num_entries)], timings_min[to_underlying(_TimeID::num_entries)], timings[to_underlying(_TimeID::num_entries)];
+      timings_min[to_underlying(_TimeID::total)] = timings_max[to_underlying(_TimeID::total)] = timings[to_underlying(_TimeID::total)] = this->watch_total.elapsed();
+      timings_min[to_underlying(_TimeID::assembly)] = timings_max[to_underlying(_TimeID::assembly)] = timings[to_underlying(_TimeID::assembly)] = this->watch_assembly.elapsed();
+      timings_min[to_underlying(_TimeID::assembly_fine)] = timings_max[to_underlying(_TimeID::assembly_fine)] = timings[to_underlying(_TimeID::assembly_fine)] = this->watch_assembly_fine.elapsed();
+      timings_min[to_underlying(_TimeID::restrict)] = timings_max[to_underlying(_TimeID::restrict)] = timings[to_underlying(_TimeID::restrict)] = this->watch_restrict.elapsed();
+      timings_min[to_underlying(_TimeID::restrict_alloc)] = timings_max[to_underlying(_TimeID::restrict_alloc)] = timings[to_underlying(_TimeID::restrict_alloc)] = this->watch_restrict_alloc.elapsed();
       // sync our timings
-      this->domain->comm().allreduce(timings_max, timings_max, _TimeID::num_entries, FEAT::Dist::op_max);
-      this->domain->comm().allreduce(timings_min, timings_min, _TimeID::num_entries, FEAT::Dist::op_min);
+      this->domain->comm().allreduce(timings_max, timings_max, to_underlying(_TimeID::num_entries), FEAT::Dist::op_max);
+      this->domain->comm().allreduce(timings_min, timings_min, to_underlying(_TimeID::num_entries), FEAT::Dist::op_min);
 
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
       s += FEAT::String("\n------------------------------------Timings Single Material System Assembler----------------------\n");
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
-      s += format_subtime_mm("Allocate Restrictions", timings[_TimeID::restrict_alloc], timings[_TimeID::total], timings_min[_TimeID::restrict_alloc], timings_max[_TimeID::restrict_alloc], this->padlen);
-      s += format_subtime_mm("Restrict Convection", timings[_TimeID::restrict], timings[_TimeID::total], timings_min[_TimeID::restrict], timings_max[_TimeID::restrict], this->padlen);
-      s += format_subtime_mm("Assemble Systems", timings[_TimeID::assembly], timings[_TimeID::total], timings_min[_TimeID::assembly], timings_max[_TimeID::assembly], this->padlen);
-      s += format_subtime_mm("Assemble Fine System", timings[_TimeID::assembly_fine], timings[_TimeID::total], timings_min[_TimeID::assembly_fine], timings_max[_TimeID::assembly_fine], this->padlen);
-      s += format_subtime_mm("System Assembly Total Time", timings[_TimeID::total], timings[_TimeID::total], timings_min[_TimeID::total], timings_max[_TimeID::total], this->padlen);
+      s += format_subtime_mm("Allocate Restrictions", timings[to_underlying(_TimeID::restrict_alloc)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::restrict_alloc)], timings_max[to_underlying(_TimeID::restrict_alloc)], this->padlen);
+      s += format_subtime_mm("Restrict Convection", timings[to_underlying(_TimeID::restrict)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::restrict)], timings_max[to_underlying(_TimeID::restrict)], this->padlen);
+      s += format_subtime_mm("Assemble Systems", timings[to_underlying(_TimeID::assembly)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::assembly)], timings_max[to_underlying(_TimeID::assembly)], this->padlen);
+      s += format_subtime_mm("Assemble Fine System", timings[to_underlying(_TimeID::assembly_fine)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::assembly_fine)], timings_max[to_underlying(_TimeID::assembly_fine)], this->padlen);
+      s += format_subtime_mm("System Assembly Total Time", timings[to_underlying(_TimeID::total)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::total)], timings_max[to_underlying(_TimeID::total)], this->padlen);
 
       return s;
     }
@@ -626,7 +626,7 @@ namespace Gendie
 
     FEAT::String _format_timings() const
     {
-      enum _TimeID
+      enum class _TimeID : std::size_t
       {
         total = 0,
         assembly = 1,
@@ -636,24 +636,24 @@ namespace Gendie
         num_entries = 5
       };
       FEAT::String s;
-      double timings_max[_TimeID::num_entries], timings_min[_TimeID::num_entries], timings[_TimeID::num_entries];
-      timings_min[_TimeID::total] = timings_max[_TimeID::total] = timings[_TimeID::total] = this->watch_total.elapsed();
-      timings_min[_TimeID::assembly] = timings_max[_TimeID::assembly] = timings[_TimeID::assembly] = this->watch_assembly.elapsed();
-      timings_min[_TimeID::assembly_fine] = timings_max[_TimeID::assembly_fine] = timings[_TimeID::assembly_fine] = this->watch_assembly_fine.elapsed();
-      timings_min[_TimeID::restrict] = timings_max[_TimeID::restrict] = timings[_TimeID::restrict] = this->watch_restrict.elapsed();
-      timings_min[_TimeID::restrict_alloc] = timings_max[_TimeID::restrict_alloc] = timings[_TimeID::restrict_alloc] = this->watch_restrict_alloc.elapsed();
+      double timings_max[to_underlying(_TimeID::num_entries)], timings_min[to_underlying(_TimeID::num_entries)], timings[to_underlying(_TimeID::num_entries)];
+      timings_min[to_underlying(_TimeID::total)] = timings_max[to_underlying(_TimeID::total)] = timings[to_underlying(_TimeID::total)] = this->watch_total.elapsed();
+      timings_min[to_underlying(_TimeID::assembly)] = timings_max[to_underlying(_TimeID::assembly)] = timings[to_underlying(_TimeID::assembly)] = this->watch_assembly.elapsed();
+      timings_min[to_underlying(_TimeID::assembly_fine)] = timings_max[to_underlying(_TimeID::assembly_fine)] = timings[to_underlying(_TimeID::assembly_fine)] = this->watch_assembly_fine.elapsed();
+      timings_min[to_underlying(_TimeID::restrict)] = timings_max[to_underlying(_TimeID::restrict)] = timings[to_underlying(_TimeID::restrict)] = this->watch_restrict.elapsed();
+      timings_min[to_underlying(_TimeID::restrict_alloc)] = timings_max[to_underlying(_TimeID::restrict_alloc)] = timings[to_underlying(_TimeID::restrict_alloc)] = this->watch_restrict_alloc.elapsed();
       // sync our timings
-      this->domain->comm().allreduce(timings_max, timings_max, _TimeID::num_entries, FEAT::Dist::op_max);
-      this->domain->comm().allreduce(timings_min, timings_min, _TimeID::num_entries, FEAT::Dist::op_min);
+      this->domain->comm().allreduce(timings_max, timings_max, to_underlying(_TimeID::num_entries), FEAT::Dist::op_max);
+      this->domain->comm().allreduce(timings_min, timings_min, to_underlying(_TimeID::num_entries), FEAT::Dist::op_min);
 
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
       s += FEAT::String("\n------------------------------------Timings Single Material System Assembler----------------------\n");
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
-      s += format_subtime_mm("Allocate Restrictions", timings[_TimeID::restrict_alloc], timings[_TimeID::total], timings_min[_TimeID::restrict_alloc], timings_max[_TimeID::restrict_alloc], this->padlen);
-      s += format_subtime_mm("Restrict Convection", timings[_TimeID::restrict], timings[_TimeID::total], timings_min[_TimeID::restrict], timings_max[_TimeID::restrict], this->padlen);
-      s += format_subtime_mm("Assemble Systems", timings[_TimeID::assembly], timings[_TimeID::total], timings_min[_TimeID::assembly], timings_max[_TimeID::assembly], this->padlen);
-      s += format_subtime_mm("Assemble Fine System", timings[_TimeID::assembly_fine], timings[_TimeID::total], timings_min[_TimeID::assembly_fine], timings_max[_TimeID::assembly_fine], this->padlen);
-      s += format_subtime_mm("System Assembly Total Time", timings[_TimeID::total], timings[_TimeID::total], timings_min[_TimeID::total], timings_max[_TimeID::total], this->padlen);
+      s += format_subtime_mm("Allocate Restrictions", timings[to_underlying(_TimeID::restrict_alloc)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::restrict_alloc)], timings_max[to_underlying(_TimeID::restrict_alloc)], this->padlen);
+      s += format_subtime_mm("Restrict Convection", timings[to_underlying(_TimeID::restrict)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::restrict)], timings_max[to_underlying(_TimeID::restrict)], this->padlen);
+      s += format_subtime_mm("Assemble Systems", timings[to_underlying(_TimeID::assembly)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::assembly)], timings_max[to_underlying(_TimeID::assembly)], this->padlen);
+      s += format_subtime_mm("Assemble Fine System", timings[to_underlying(_TimeID::assembly_fine)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::assembly_fine)], timings_max[to_underlying(_TimeID::assembly_fine)], this->padlen);
+      s += format_subtime_mm("System Assembly Total Time", timings[to_underlying(_TimeID::total)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::total)], timings_max[to_underlying(_TimeID::total)], this->padlen);
 
       return s;
     }

@@ -9,33 +9,33 @@
 
 namespace Gendie
 {
-  enum print_level
+  enum class PrintLevel : std::uint8_t
   {
     debug = 0,
-    verbose = 1,
-    info = 2,
-    warning = 3,
-    error = 4,
-    off = 5
+    verbose,
+    info,
+    warning,
+    error,
+    off
   };
 
   namespace Intern
   {
-    inline const char* get_print_char(print_level lvl)
+    inline const char* get_print_char(PrintLevel lvl)
     {
       switch(lvl)
       {
-        case print_level::debug:
+        case PrintLevel::debug:
           return "Debug";
-        case print_level::verbose:
+        case PrintLevel::verbose:
           return "Verbose";
-        case print_level::info:
+        case PrintLevel::info:
           return "Info";
-        case print_level::warning:
+        case PrintLevel::warning:
           return "Warning";
-        case print_level::error:
+        case PrintLevel::error:
           return "Error";
-        case print_level::off:
+        case PrintLevel::off:
           return "Off";
       }
       return "Unknown";
@@ -47,13 +47,13 @@ namespace Gendie
   public:
     const FEAT::Dist::Comm& comm;
     mutable FEAT::String log;
-    print_level std_out_lvl = print_level::info;
-    print_level log_lvl = print_level::verbose;
+    PrintLevel std_out_lvl = PrintLevel::info;
+    PrintLevel log_lvl = PrintLevel::verbose;
 
     bool print_time, always_flush;
 
 
-    Logger(const FEAT::Dist::Comm& comm_, print_level out_lvl_ = print_level::info, print_level log_lvl_ = print_level::verbose, bool print_time_ = true, bool always_flush_ = false) :
+    Logger(const FEAT::Dist::Comm& comm_, PrintLevel out_lvl_ = PrintLevel::info, PrintLevel log_lvl_ = PrintLevel::verbose, bool print_time_ = true, bool always_flush_ = false) :
       comm(comm_),
       std_out_lvl(out_lvl_),
       log_lvl(log_lvl_),
@@ -78,7 +78,7 @@ namespace Gendie
 
     }
 
-    void print(const FEAT::String& msg, print_level lvl = print_level::info) const
+    void print(const FEAT::String& msg, PrintLevel lvl = PrintLevel::info) const
     {
       FEAT::String pre_line = FEAT::String(Intern::get_print_char(lvl)).pad_back(6, '.');
       if(print_time)

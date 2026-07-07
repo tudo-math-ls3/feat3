@@ -1219,7 +1219,7 @@ namespace FEAT
       {
         #ifdef FEAT_HAVE_CUDA
         Arch::MatVecMultCSRDense::init_workspace_cuda<DT_, IT_>(
-          this->_backend_workspaces[BackendIdx::cuda],
+          this->_backend_workspaces[to_underlying(BackendIdx::cuda)],
           this->val_arbiter(), this->col_idx_arbiter(), this->row_ptr_arbiter(),
           this->num_rows(), this->num_cols(), this->num_nzes(), false);
         #endif

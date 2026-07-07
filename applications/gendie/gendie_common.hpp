@@ -135,14 +135,14 @@ namespace Gendie
     typedef std::vector<InflowBounds_> InflowBoundsType;
     typedef std::vector<Material<BaseDataType>> MaterialsType;
 
-    enum solverType : std::uint8_t
+    enum class solverType : std::uint8_t
     {
       alpine = 0,
-      backtrace_newton = 1,
-      pseudo_ts = 2,
-      newton = 3,
-      picard = 4,
-      unknown = 5
+      backtrace_newton,
+      pseudo_ts,
+      newton,
+      picard,
+      unknown
     };
 
   protected:

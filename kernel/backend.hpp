@@ -21,7 +21,7 @@ namespace FEAT
     cuda, /**< nvidia cuda gpgpu support */
   };
 
-  enum BackendIdx : std::uint8_t
+  enum class BackendIdx : std::uint8_t
   {
     generic = 0,
     mkl,
@@ -70,7 +70,7 @@ namespace FEAT
         case PreferredBackend::generic: return BackendIdx::generic;
         case PreferredBackend::mkl: return BackendIdx::mkl;
         case PreferredBackend::cuda: return BackendIdx::cuda;
-      };
+      }
       return BackendIdx::generic;
     }
   }; // class Backend

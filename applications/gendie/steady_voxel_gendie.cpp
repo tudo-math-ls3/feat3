@@ -102,7 +102,7 @@ namespace Gendie
           std::pair<String, bool> lvl_string_ = base_config->query("level");
           if(!lvl_string_.second)
           {
-            logger->print("You must provide a level field inside the problem-setup section!", error);
+            logger->print("You must provide a level field inside the problem-setup section!", PrintLevel::error);
             Runtime::abort();
           }
           level_string = lvl_string_.first;
@@ -132,14 +132,14 @@ namespace Gendie
           {
             logger->print(String("Number of parameters for background-mesh does not fit to dimension!\n")
                       + String("Number of provided arguments: " + stringify(tmp_msh_string.size()) + " Number of expected arguments: "
-                      + stringify(Index(3*dim))), error);
+                      + stringify(Index(3*dim))), PrintLevel::error);
           }
           //first parse the min parameters
           for(int i = 0; i < dim; ++i)
           {
             if(!tmp_msh_string.at(std::size_t(i)).parse(mesh_bb_min[i]))
             {
-              logger->print("Could not parse " + stringify(i) + "th Parameter of BB min parameter!", error);
+              logger->print("Could not parse " + stringify(i) + "th Parameter of BB min parameter!", PrintLevel::error);
               Runtime::abort();
             }
           }
@@ -147,7 +147,7 @@ namespace Gendie
           {
             if(!tmp_msh_string.at(std::size_t(i+dim)).parse(mesh_bb_max[i]))
             {
-              logger->print("Could not parse " + stringify(i) + "th Parameter of BB max parameter!", error);
+              logger->print("Could not parse " + stringify(i) + "th Parameter of BB max parameter!", PrintLevel::error);
               Runtime::abort();
             }
           }
@@ -155,7 +155,7 @@ namespace Gendie
           {
             if(!tmp_msh_string.at(std::size_t(i+2*dim)).parse(mesh_bb_num_cells[i]))
             {
-              logger->print("Could not parse " + stringify(i) + "th Parameter of BB num cells parameter!", error);
+              logger->print("Could not parse " + stringify(i) + "th Parameter of BB num cells parameter!", PrintLevel::error);
               Runtime::abort();
             }
           }
@@ -182,7 +182,7 @@ namespace Gendie
           const auto* spec_problem_def = config->get_sub_section("special-problem-definition");
           if(!spec_problem_def)
           {
-            logger->print("No special problem definition section found", warning);
+            logger->print("No special problem definition section found", PrintLevel::warning);
           }
           if(spec_problem_def && Gendie::check_for_config_option(spec_problem_def->query("min-gap")))
           {
@@ -196,7 +196,7 @@ namespace Gendie
 
         if(!base_config->parse_entry("mesh-unit-factor", mesh_unit_scale))
         {
-          logger->print("Could not parse mesh-unit-factor", error);
+          logger->print("Could not parse mesh-unit-factor", PrintLevel::error);
           Runtime::abort();
         }
 
@@ -213,7 +213,7 @@ namespace Gendie
         want_vtk = Gendie::check_for_config_option(postproc_config->query("vtk"));
         if(!want_vtk)
         {
-          logger->print("Vtk output not requested!", warning);
+          logger->print("Vtk output not requested!", PrintLevel::warning);
           return;
         }
         std::pair<FEAT::String, bool> vtk_filename_query = postproc_config->query("vtk");
@@ -239,7 +239,7 @@ namespace Gendie
       }
       else
       {
-        logger->print("No postproc-params section found!", warning);
+        logger->print("No postproc-params section found!", PrintLevel::warning);
       }
 
     }
@@ -288,7 +288,7 @@ namespace Gendie
   template<typename ParamHolder_>
   void create_voxel_domain(PartitionControl<DomainLevel>& domain, const SimpleArgParser& /*args*/, const PropertyMap* config, ParamHolder_& param_holder, const Logger* logger)
   {
-    logger->print("Going into create_voxel_domain", info);
+    logger->print("Going into create_voxel_domain", PrintLevel::info);
     domain.cheap_weight_calculation(param_holder.cheap_weights);
     TimeStamp create_voxel_domain;
     {
@@ -348,11 +348,11 @@ namespace Gendie
     logger->print("Creating hirarchy");
     domain.create_hierarchy();
 
-    logger->print("Printing chosen parti info", info);
+    logger->print("Printing chosen parti info", PrintLevel::info);
 
     if(domain.front_layer().comm().rank() == 0)
     {
-      logger->print(domain.get_chosen_parti_info(), info);
+      logger->print(domain.get_chosen_parti_info(), PrintLevel::info);
       logger->flush_print();
     }
 
@@ -498,17 +498,17 @@ namespace Gendie
   {
     if(!param_holder.want_vtk)
     {
-      logger->print("Vtk output not requested!", warning);
+      logger->print("Vtk output not requested!", PrintLevel::warning);
       return;
     }
-    logger->print("Writing VTK output to '" + param_holder.vtk_name + ".pvtu'", info);
+    logger->print("Writing VTK output to '" + param_holder.vtk_name + ".pvtu'", PrintLevel::info);
 
     std::unique_ptr<MeshType> refined_mesh;
     // get the mesh for the VTK output
     const MeshType* mesh = &domain.front()->get_mesh();
     if(param_holder.refine_vtk)
     {
-      logger->print("Write out refined mesh", info);
+      logger->print("Write out refined mesh", PrintLevel::info);
       Geometry::StandardRefinery<MeshType> refinery(domain.front()->get_mesh());
       refined_mesh = refinery.make_unique();
       mesh = refined_mesh.get();
@@ -670,9 +670,9 @@ namespace Gendie
     // create world communicator
     Dist::Comm comm(Dist::Comm::world());
     // setup our logging object
-    print_level comm_out_level = print_level::info;
-    Logger logger(comm, comm_out_level, print_level::off);
-    logger.print("-------------------Welcome to FEAT3 Steady Gendie Simulator tool--------------------", info);
+    PrintLevel comm_out_level = PrintLevel::info;
+    Logger logger(comm, comm_out_level, PrintLevel::off);
+    logger.print("-------------------Welcome to FEAT3 Steady Gendie Simulator tool--------------------", PrintLevel::info);
     logger.flush_print();
 
     // create arg parser
@@ -722,12 +722,12 @@ namespace Gendie
 
 
     // start by constructing our domain and systemlevels
-    logger.print("Number of Processes: " + stringify(comm.size()), info);
-    logger.print("Number of OMP Threads: " + stringify(feat_omp_get_max_threads()), info);
-    logger.print("System DataType: " + String(fp_typename), info);
-    logger.print("System IndexType: " + String(ix_typename), info);
+    logger.print("Number of Processes: " + stringify(comm.size()), PrintLevel::info);
+    logger.print("Number of OMP Threads: " + stringify(feat_omp_get_max_threads()), PrintLevel::info);
+    logger.print("System DataType: " + String(fp_typename), PrintLevel::info);
+    logger.print("System IndexType: " + String(ix_typename), PrintLevel::info);
 
-    logger.print("Parsing Parameters...", info);
+    logger.print("Parsing Parameters...", PrintLevel::info);
     logger.flush_print();
     // wrapper class for our parameters
     ParameterHolder param_holder(config.get(), &logger);
@@ -736,7 +736,7 @@ namespace Gendie
     /*----------------------------------------------------------------------------------------------*/
     /*------------------------- Domain and System Setup --------------------------------------------*/
     /*----------------------------------------------------------------------------------------------*/
-    logger.print("Setting up domain", info);
+    logger.print("Setting up domain", PrintLevel::info);
     watch_create_domain.start();
     PartitionControl<DomainLevel> domain(comm, true);
     {
@@ -752,7 +752,7 @@ namespace Gendie
         comm.allreduce(&bytes_min, &bytes_min, 1, FEAT::Dist::op_min);
         comm.allreduce(&bytes_max, &bytes_max, 1, FEAT::Dist::op_max);
         comm.allreduce(&bytes_sum, &bytes_sum, 1, FEAT::Dist::op_sum);
-        logger.print(format_submemory_mm_t_kb("CGAL Size", bytes_sum, bytes_min, bytes_max, pad_len), info);
+        logger.print(format_submemory_mm_t_kb("CGAL Size", bytes_sum, bytes_min, bytes_max, pad_len), PrintLevel::info);
       }
       domain.set_cgal_wrapper(std::move(_cgal_tmp));
     }
@@ -777,25 +777,25 @@ namespace Gendie
       }
       else
       {
-        logger.print("Could not query problem_params section", error);
+        logger.print("Could not query problem_params section", PrintLevel::error);
         Runtime::abort();
       }
       //print material and inflow information
       for(std::size_t i = 0; i < materials.size(); ++i)
       {
-        logger.print(materials[i].format_string(int(i)), info);
+        logger.print(materials[i].format_string(int(i)), PrintLevel::info);
       }
       for(const auto& in : inflow_boundaries)
       {
-        logger.print(in.format_string(), info);
+        logger.print(in.format_string(), PrintLevel::info);
       }
-      logger.print("Create Boundaries", info);
+      logger.print("Create Boundaries", PrintLevel::info);
       // finally, create boundaries
       create_boundaries(domain, inflow_boundaries, param_holder, &logger);
 
 
       // now we create our fine resolved mesh part based on the surface file
-      logger.print("Create FBM Meshpart and Assembler", info);
+      logger.print("Create FBM Meshpart and Assembler", PrintLevel::info);
       {
         // release here to free used memory of cgal afterwards
         std::unique_ptr<Geometry::CGALWrapper<SystemDataType>> cgal_wrapper(domain.release_cgal_wrapper());
@@ -807,7 +807,7 @@ namespace Gendie
           auto* ptr = Gendie::add_cgal_mesh_part(domain.at(i)->get_mesh_node(), cgal_wrapper.get(), "fbm");
           if(ptr == nullptr)
           {
-            logger.print("Meshpart is nullptr", error);
+            logger.print("Meshpart is nullptr", PrintLevel::error);
             Runtime::abort();
           }
           // create FBM assembler
@@ -820,10 +820,10 @@ namespace Gendie
       #endif
 
       // at this point, our domain is compiled, so print chosen levels
-      logger.print(String("Desired levels").pad_back(pad_len, pad_char) + ": " + domain.format_desired_levels(), info);
-      logger.print(String("Chosen levels").pad_back(pad_len, pad_char) + ": " + domain.format_chosen_levels(), info);
+      logger.print(String("Desired levels").pad_back(pad_len, pad_char) + ": " + domain.format_desired_levels(), PrintLevel::info);
+      logger.print(String("Chosen levels").pad_back(pad_len, pad_char) + ": " + domain.format_chosen_levels(), PrintLevel::info);
       //print our config
-      logger.print(param_holder.format_string(), info);
+      logger.print(param_holder.format_string(), PrintLevel::info);
       //flush output
       logger.flush_print();
     }
@@ -833,7 +833,7 @@ namespace Gendie
     if(Gendie::check_for_config_option(config->query("postproc-params/mesh-hirarchy-vtk")))
     {
       const String& mesh_hirarchy_vtk = config->query("postproc-params/mesh-hirarchy-vtk").first;
-      logger.print("Writing Mesh hirarchy output to '" + mesh_hirarchy_vtk + "_<LEVEL>.pvtu'", info);
+      logger.print("Writing Mesh hirarchy output to '" + mesh_hirarchy_vtk + "_<LEVEL>.pvtu'", PrintLevel::info);
       //todo: write out refinement hirarchy with mesh parts
       for(std::size_t i = 0; i < std::size_t(domain.size_physical()); ++i)
       {
@@ -876,7 +876,7 @@ namespace Gendie
     }
 
 
-    logger.print("Compile Domain Assembler", info);
+    logger.print("Compile Domain Assembler", PrintLevel::info);
     watch_create_domain.start();
     {
       //create domain assembler for all levels
@@ -897,7 +897,7 @@ namespace Gendie
     }
     watch_create_domain.stop();
 
-    logger.print("Compile Main Systemlevel", info);
+    logger.print("Compile Main Systemlevel", PrintLevel::info);
     watch_create_system.start();
     //next up, create our defect system level, which does not require any mesh hirarchy, but at least the B matrices assembled
     std::shared_ptr<SystemLevel<SystemDataType, SystemIndexType>> system_level(new SystemLevel<SystemDataType, SystemIndexType>());
@@ -917,44 +917,44 @@ namespace Gendie
 
     // print system information
     {
-      enum _SysID
+      enum class _SysID : std::size_t
       {
         elements = 0,
-        dofs_v = 1,
-        dofs_p = 2,
-        num_entries = 3
+        dofs_v,
+        dofs_p,
+        num_entries
       };
 
-      Index dofs_total[_SysID::num_entries], dofs_min[_SysID::num_entries], dofs_max[_SysID::num_entries];
+      Index dofs_total[to_underlying(_SysID::num_entries)], dofs_min[to_underlying(_SysID::num_entries)], dofs_max[to_underlying(_SysID::num_entries)];
 
       {
         auto tv = system_level->gate_velo._freqs.clone(LAFEM::CloneMode::Deep);
         tv.format(1.0);
-        dofs_total[_SysID::dofs_v] = Index(system_level->gate_velo.dot(tv, tv));
-        dofs_min[_SysID::dofs_v] = dofs_max[_SysID::dofs_v] = Index(tv.size_raw());
-        dofs_total[_SysID::dofs_p] = dofs_min[_SysID::dofs_p] = dofs_max[_SysID::dofs_p] = system_level->gate_pres._freqs.size();
-        dofs_total[_SysID::elements] = dofs_min[_SysID::elements] = dofs_max[_SysID::elements] = domain.front()->get_mesh().get_num_elements();
+        dofs_total[to_underlying(_SysID::dofs_v)] = Index(system_level->gate_velo.dot(tv, tv));
+        dofs_min[to_underlying(_SysID::dofs_v)] = dofs_max[to_underlying(_SysID::dofs_v)] = Index(tv.size_raw());
+        dofs_total[to_underlying(_SysID::dofs_p)] = dofs_min[to_underlying(_SysID::dofs_p)] = dofs_max[to_underlying(_SysID::dofs_p)] = system_level->gate_pres._freqs.size();
+        dofs_total[to_underlying(_SysID::elements)] = dofs_min[to_underlying(_SysID::elements)] = dofs_max[to_underlying(_SysID::elements)] = domain.front()->get_mesh().get_num_elements();
       }
 
-      comm.allreduce(dofs_min, dofs_min, _SysID::num_entries, FEAT::Dist::op_min);
-      comm.allreduce(dofs_max, dofs_max, _SysID::num_entries, FEAT::Dist::op_max);
-      comm.allreduce(&dofs_total[_SysID::elements], &dofs_total[_SysID::elements], 1u, FEAT::Dist::op_sum);
-      comm.allreduce(&dofs_total[_SysID::dofs_p], &dofs_total[_SysID::dofs_p], 1u, FEAT::Dist::op_sum);
+      comm.allreduce(dofs_min, dofs_min, to_underlying(_SysID::num_entries), FEAT::Dist::op_min);
+      comm.allreduce(dofs_max, dofs_max, to_underlying(_SysID::num_entries), FEAT::Dist::op_max);
+      comm.allreduce(&dofs_total[to_underlying(_SysID::elements)], &dofs_total[to_underlying(_SysID::elements)], 1u, FEAT::Dist::op_sum);
+      comm.allreduce(&dofs_total[to_underlying(_SysID::dofs_p)], &dofs_total[to_underlying(_SysID::dofs_p)], 1u, FEAT::Dist::op_sum);
 
-      logger.print("\n----------------------------------------------------------------------\n", info);
-      logger.print(format_index_mm("Element Count", dofs_total[_SysID::elements], dofs_min[_SysID::elements], dofs_max[_SysID::elements], pad_len), info);
-      logger.print(format_index_mm("Velo Dofs", dofs_total[_SysID::dofs_v], dofs_min[_SysID::dofs_v], dofs_max[_SysID::dofs_v], pad_len), info);
-      logger.print(format_index_mm("Pres Dofs", dofs_total[_SysID::dofs_p], dofs_min[_SysID::dofs_p], dofs_max[_SysID::dofs_p], pad_len), info);
-      logger.print(format_index_mm("All Count", dofs_total[_SysID::dofs_v] + dofs_total[_SysID::dofs_p], dofs_min[_SysID::dofs_v] + dofs_min[_SysID::dofs_p], dofs_max[_SysID::dofs_v] + dofs_max[_SysID::dofs_p], pad_len), info);
+      logger.print("\n----------------------------------------------------------------------\n", PrintLevel::info);
+      logger.print(format_index_mm("Element Count", dofs_total[to_underlying(_SysID::elements)], dofs_min[to_underlying(_SysID::elements)], dofs_max[to_underlying(_SysID::elements)], pad_len), PrintLevel::info);
+      logger.print(format_index_mm("Velo Dofs", dofs_total[to_underlying(_SysID::dofs_v)], dofs_min[to_underlying(_SysID::dofs_v)], dofs_max[to_underlying(_SysID::dofs_v)], pad_len), PrintLevel::info);
+      logger.print(format_index_mm("Pres Dofs", dofs_total[to_underlying(_SysID::dofs_p)], dofs_min[to_underlying(_SysID::dofs_p)], dofs_max[to_underlying(_SysID::dofs_p)], pad_len), PrintLevel::info);
+      logger.print(format_index_mm("All Count", dofs_total[to_underlying(_SysID::dofs_v)] + dofs_total[to_underlying(_SysID::dofs_p)], dofs_min[to_underlying(_SysID::dofs_v)] + dofs_min[to_underlying(_SysID::dofs_p)], dofs_max[to_underlying(_SysID::dofs_v)] + dofs_max[to_underlying(_SysID::dofs_p)], pad_len), PrintLevel::info);
     }
 
-    logger.print("Compile Filter", info);
+    logger.print("Compile Filter", PrintLevel::info);
     // now we create our system defect filters
     watch_create_filter.start();
     assemble_filters(*system_level, domain.front()->get_mesh_node()->get_mesh_part_names(true), *domain.front(), inflow_boundaries, materials, param_holder, true);
     watch_create_filter.stop();
 
-    logger.print("Create Solver", info);
+    logger.print("Create Solver", PrintLevel::info);
     // now we can construct our solver
     watch_create_solver.start();
     SteadyFlowSolverFactory flow_solver_factory(domain, system_level, inflow_boundaries, materials, config->query_section("solver-params"), true, param_holder);
@@ -963,16 +963,16 @@ namespace Gendie
     watch_create_solver.stop();
 
     //print solver info
-    logger.print(flow_solver->format_string(), info);
+    logger.print(flow_solver->format_string(), PrintLevel::info);
 
-    logger.print("\n----------------------------------------------------------------------\n", info);
+    logger.print("\n----------------------------------------------------------------------\n", PrintLevel::info);
     logger.flush_print();
 
     // and now, init our solver
     flow_solver->init();
 
-    logger.print("Initialize Solution", info);
-    logger.print("\n--------------------------------------------------------------------------------------------------\n", info);
+    logger.print("Initialize Solution", PrintLevel::info);
+    logger.print("\n--------------------------------------------------------------------------------------------------\n", PrintLevel::info);
     logger.flush_print();
     //create solution vector and rhs
     typename SystemLevel<SystemDataType, SystemIndexType>::GlobalSystemVector vec_sol = system_level->create_global_vector_sys();
@@ -986,38 +986,38 @@ namespace Gendie
     //init solution
     flow_solver->init_sol(vec_sol, vec_rhs);
 
-    logger.print("Start Nonlinear Solver", info);
+    logger.print("Start Nonlinear Solver", PrintLevel::info);
     logger.flush_print();
     //now solve
     NonLinearStatus status = flow_solver->apply(vec_sol, vec_rhs);
 
     if(status != NonLinearStatus::success)
     {
-      logger.print("Solver did not converge with status code" + stringify(status), warning);
+      logger.print("Solver did not converge with status code" + stringify(status), PrintLevel::warning);
       if(solver_type != decltype(solver_type)::pseudo_ts)
       {
-        logger.print("Printing previous solver timings", debug);
-        logger.print(flow_solver->format_timings(), debug);
-        logger.print("\n----------------------------------------------------------------------\n", info);
-        logger.print("Retrying with pseudo timestepping", info);
+        logger.print("Printing previous solver timings", PrintLevel::debug);
+        logger.print(flow_solver->format_timings(), PrintLevel::debug);
+        logger.print("\n----------------------------------------------------------------------\n", PrintLevel::info);
+        logger.print("Retrying with pseudo timestepping", PrintLevel::info);
         logger.flush_print();
         flow_solver->done();
         flow_solver.reset();
         // always create ts solver with double solver precision in case we did not converge
         flow_solver = flow_solver_factory.create(decltype(solver_type)::pseudo_ts, SystemDataType(1), &logger);
-        logger.print(flow_solver->format_string(), info);
+        logger.print(flow_solver->format_string(), PrintLevel::info);
         flow_solver->init();
         status = flow_solver->apply(vec_sol, vec_rhs);
         if(status != NonLinearStatus::success)
         {
-          logger.print("Pseudo ts solver did not converge with status code" + stringify(status), error);
+          logger.print("Pseudo ts solver did not converge with status code" + stringify(status), PrintLevel::error);
         }
       }
     }
 
-    logger.print("\n----------------------------------------------------------------------\n", info);
+    logger.print("\n----------------------------------------------------------------------\n", PrintLevel::info);
     // print timings
-    logger.print(flow_solver->format_timings(), info);
+    logger.print(flow_solver->format_timings(), PrintLevel::info);
 
     // and done
     flow_solver->done();
@@ -1097,10 +1097,10 @@ namespace Gendie
       comm.allreduce(&mem_per_cell_max, &mem_per_cell_max, 1u, FEAT::Dist::op_max);
       comm.allreduce(&elements_total, &elements_total, 1u, FEAT::Dist::op_sum);
 
-      logger.print("\n----------------------------------------------------------------------\n", info);
-      logger.print(format_submemory_mm_t("Peak Physical Memory", peak_phys_total, peak_phys_min, peak_phys_max, pad_len), info);
-      logger.print(format_submemory_mm_t("Peak Virtual Memory", peak_virt_total, peak_virt_min, peak_virt_max, pad_len), info);
-      logger.print(format_submemory_mm_t_kb("Peak Pyhsical Per Cell", std::size_t(double(peak_phys_total)/(double(elements_total))), mem_per_cell_min, mem_per_cell_max, pad_len), info);
+      logger.print("\n----------------------------------------------------------------------\n", PrintLevel::info);
+      logger.print(format_submemory_mm_t("Peak Physical Memory", peak_phys_total, peak_phys_min, peak_phys_max, pad_len), PrintLevel::info);
+      logger.print(format_submemory_mm_t("Peak Virtual Memory", peak_virt_total, peak_virt_min, peak_virt_max, pad_len), PrintLevel::info);
+      logger.print(format_submemory_mm_t_kb("Peak Pyhsical Per Cell", std::size_t(double(peak_phys_total)/(double(elements_total))), mem_per_cell_min, mem_per_cell_max, pad_len), PrintLevel::info);
     }
 
     logger.flush_print();
@@ -1108,56 +1108,56 @@ namespace Gendie
     watch_total.stop();
 
     {
-      enum _TimeID
+      enum class _TimeID : std::size_t
       {
         total = 0,
-        create_domain = 1,
-        create_system = 2,
-        create_filter = 3,
-        create_solver = 4,
-        write_out = 5,
-        analyze = 6,
-        time_asm = 7,
-        lin_sol = 8,
-        create_weights = 9,
-        create_hirarch = 10,
-        num_entries = 11
+        create_domain,
+        create_system,
+        create_filter,
+        create_solver,
+        write_out,
+        analyze,
+        time_asm,
+        lin_sol,
+        create_weights,
+        create_hirarch,
+        num_entries
       };
       FEAT::String s;
-      double timings_max[num_entries], timings_min[num_entries], timings[num_entries];
-      timings_min[_TimeID::total] = timings_max[_TimeID::total] = timings[_TimeID::total] = watch_total.elapsed();
-      timings_min[_TimeID::create_domain] = timings_max[_TimeID::create_domain] = timings[_TimeID::create_domain] = watch_create_domain.elapsed();
-      timings_min[_TimeID::create_system] = timings_max[_TimeID::create_system] = timings[_TimeID::create_system] = watch_create_system.elapsed();
-      timings_min[_TimeID::create_filter] = timings_max[_TimeID::create_filter] = timings[_TimeID::create_filter] = watch_create_filter.elapsed();
-      timings_min[_TimeID::create_solver] = timings_max[_TimeID::create_solver] = timings[_TimeID::create_solver] = watch_create_solver.elapsed();
-      timings_min[_TimeID::write_out] = timings_max[_TimeID::write_out] = timings[_TimeID::write_out] = watch_write_out.elapsed();
-      timings_min[_TimeID::analyze] = timings_max[_TimeID::analyze] = timings[_TimeID::analyze] = watch_analyze_sol.elapsed();
-      timings_min[_TimeID::time_asm] = timings_max[_TimeID::time_asm] = timings[_TimeID::time_asm] = assembly_time_solver;
-      timings_min[_TimeID::lin_sol] = timings_max[_TimeID::lin_sol] = timings[_TimeID::lin_sol] = ls_time_solver;
-      timings_min[_TimeID::create_weights] = timings_max[_TimeID::create_weights] = timings[_TimeID::create_weights] = domain.get_watch_weights().elapsed();
-      timings_min[_TimeID::create_hirarch] = timings_max[_TimeID::create_hirarch] = timings[_TimeID::create_hirarch] = domain.get_watch_hierarchy().elapsed();
+      double timings_max[to_underlying(_TimeID::num_entries)], timings_min[to_underlying(_TimeID::num_entries)], timings[to_underlying(_TimeID::num_entries)];
+      timings_min[to_underlying(_TimeID::total)] = timings_max[to_underlying(_TimeID::total)] = timings[to_underlying(_TimeID::total)] = watch_total.elapsed();
+      timings_min[to_underlying(_TimeID::create_domain)] = timings_max[to_underlying(_TimeID::create_domain)] = timings[to_underlying(_TimeID::create_domain)] = watch_create_domain.elapsed();
+      timings_min[to_underlying(_TimeID::create_system)] = timings_max[to_underlying(_TimeID::create_system)] = timings[to_underlying(_TimeID::create_system)] = watch_create_system.elapsed();
+      timings_min[to_underlying(_TimeID::create_filter)] = timings_max[to_underlying(_TimeID::create_filter)] = timings[to_underlying(_TimeID::create_filter)] = watch_create_filter.elapsed();
+      timings_min[to_underlying(_TimeID::create_solver)] = timings_max[to_underlying(_TimeID::create_solver)] = timings[to_underlying(_TimeID::create_solver)] = watch_create_solver.elapsed();
+      timings_min[to_underlying(_TimeID::write_out)] = timings_max[to_underlying(_TimeID::write_out)] = timings[to_underlying(_TimeID::write_out)] = watch_write_out.elapsed();
+      timings_min[to_underlying(_TimeID::analyze)] = timings_max[to_underlying(_TimeID::analyze)] = timings[to_underlying(_TimeID::analyze)] = watch_analyze_sol.elapsed();
+      timings_min[to_underlying(_TimeID::time_asm)] = timings_max[to_underlying(_TimeID::time_asm)] = timings[to_underlying(_TimeID::time_asm)] = assembly_time_solver;
+      timings_min[to_underlying(_TimeID::lin_sol)] = timings_max[to_underlying(_TimeID::lin_sol)] = timings[to_underlying(_TimeID::lin_sol)] = ls_time_solver;
+      timings_min[to_underlying(_TimeID::create_weights)] = timings_max[to_underlying(_TimeID::create_weights)] = timings[to_underlying(_TimeID::create_weights)] = domain.get_watch_weights().elapsed();
+      timings_min[to_underlying(_TimeID::create_hirarch)] = timings_max[to_underlying(_TimeID::create_hirarch)] = timings[to_underlying(_TimeID::create_hirarch)] = domain.get_watch_hierarchy().elapsed();
       // sync our timings
-      comm.allreduce(timings_max, timings_max, _TimeID::num_entries, FEAT::Dist::op_max);
-      comm.allreduce(timings_min, timings_min, _TimeID::num_entries, FEAT::Dist::op_min);
+      comm.allreduce(timings_max, timings_max, to_underlying(_TimeID::num_entries), FEAT::Dist::op_max);
+      comm.allreduce(timings_min, timings_min, to_underlying(_TimeID::num_entries), FEAT::Dist::op_min);
 
 
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
       s += FEAT::String("\n------------------------------------Overall Timings-------------------------------------------\n");
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
 
-      s += format_subtime_mm("Create Domain", timings[_TimeID::create_domain], timings[_TimeID::total], timings_min[_TimeID::create_domain], timings_max[_TimeID::create_domain], pad_len);
-      s += format_subtime_mm("Create Domain Weights", timings[_TimeID::create_weights], timings[_TimeID::total], timings_min[_TimeID::create_weights], timings_max[_TimeID::create_weights], pad_len);
-      s += format_subtime_mm("Create Domain Hirarch", timings[_TimeID::create_hirarch], timings[_TimeID::total], timings_min[_TimeID::create_hirarch], timings_max[_TimeID::create_hirarch], pad_len);
-      s += format_subtime_mm("Create System", timings[_TimeID::create_system], timings[_TimeID::total], timings_min[_TimeID::create_system], timings_max[_TimeID::create_system], pad_len);
-      s += format_subtime_mm("Create Filter", timings[_TimeID::create_filter], timings[_TimeID::total], timings_min[_TimeID::create_filter], timings_max[_TimeID::create_filter], pad_len);
-      s += format_subtime_mm("Create Solver", timings[_TimeID::create_solver], timings[_TimeID::total], timings_min[_TimeID::create_solver], timings_max[_TimeID::create_solver], pad_len);
-      s += format_subtime_mm("VTK Output", timings[_TimeID::write_out], timings[_TimeID::total], timings_min[_TimeID::write_out], timings_max[_TimeID::write_out], pad_len);
-      s += format_subtime_mm("Solution Analyze", timings[_TimeID::analyze], timings[_TimeID::total], timings_min[_TimeID::analyze], timings_max[_TimeID::analyze], pad_len);
-      s += format_subtime_mm("Total Time Assembly", timings[_TimeID::time_asm], timings[_TimeID::total], timings_min[_TimeID::time_asm], timings_max[_TimeID::time_asm], pad_len);
-      s += format_subtime_mm("Total Time Linear Solver", timings[_TimeID::lin_sol], timings[_TimeID::total], timings_min[_TimeID::lin_sol], timings_max[_TimeID::lin_sol], pad_len);
-      s += format_subtime_mm("Total Time", timings[_TimeID::total], timings[_TimeID::total], timings_min[_TimeID::total], timings_max[_TimeID::total], pad_len);
+      s += format_subtime_mm("Create Domain", timings[to_underlying(_TimeID::create_domain)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_domain)], timings_max[to_underlying(_TimeID::create_domain)], pad_len);
+      s += format_subtime_mm("Create Domain Weights", timings[to_underlying(_TimeID::create_weights)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_weights)], timings_max[to_underlying(_TimeID::create_weights)], pad_len);
+      s += format_subtime_mm("Create Domain Hirarch", timings[to_underlying(_TimeID::create_hirarch)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_hirarch)], timings_max[to_underlying(_TimeID::create_hirarch)], pad_len);
+      s += format_subtime_mm("Create System", timings[to_underlying(_TimeID::create_system)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_system)], timings_max[to_underlying(_TimeID::create_system)], pad_len);
+      s += format_subtime_mm("Create Filter", timings[to_underlying(_TimeID::create_filter)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_filter)], timings_max[to_underlying(_TimeID::create_filter)], pad_len);
+      s += format_subtime_mm("Create Solver", timings[to_underlying(_TimeID::create_solver)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_solver)], timings_max[to_underlying(_TimeID::create_solver)], pad_len);
+      s += format_subtime_mm("VTK Output", timings[to_underlying(_TimeID::write_out)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::write_out)], timings_max[to_underlying(_TimeID::write_out)], pad_len);
+      s += format_subtime_mm("Solution Analyze", timings[to_underlying(_TimeID::analyze)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::analyze)], timings_max[to_underlying(_TimeID::analyze)], pad_len);
+      s += format_subtime_mm("Total Time Assembly", timings[to_underlying(_TimeID::time_asm)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::time_asm)], timings_max[to_underlying(_TimeID::time_asm)], pad_len);
+      s += format_subtime_mm("Total Time Linear Solver", timings[to_underlying(_TimeID::lin_sol)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::lin_sol)], timings_max[to_underlying(_TimeID::lin_sol)], pad_len);
+      s += format_subtime_mm("Total Time", timings[to_underlying(_TimeID::total)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::total)], timings_max[to_underlying(_TimeID::total)], pad_len);
 
-      logger.print(s, info);
+      logger.print(s, PrintLevel::info);
     }
 
   }
