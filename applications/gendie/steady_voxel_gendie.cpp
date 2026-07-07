@@ -645,16 +645,6 @@ namespace Gendie
     {
       create_voxel_domain(domain, args, config.get(), param_holder, &logger);
 
-      if(*param_holder.measure_cgal_size)
-      {
-        std::size_t bytes_sum, bytes_min, bytes_max;
-        bytes_sum = bytes_min = bytes_max = dynamic_cast<DeslaggingPredicateType&>(domain.get_deslagging_predicate()).get_cgal_wrapper().bytes();
-        comm.allreduce(&bytes_min, &bytes_min, 1, FEAT::Dist::op_min);
-        comm.allreduce(&bytes_max, &bytes_max, 1, FEAT::Dist::op_max);
-        comm.allreduce(&bytes_sum, &bytes_sum, 1, FEAT::Dist::op_sum);
-        logger.print(format_submemory_mm_t_kb("CGAL Size", bytes_sum, bytes_min, bytes_max, pad_len), PrintLevel::info);
-      }
-
       logger.print(String("Reading materials and inflow boundaries"), PrintLevel::info);
       String material_info, inflow_info;
       if(const PropertyMap* problem_config = config->get_sub_section("problem_params"))
