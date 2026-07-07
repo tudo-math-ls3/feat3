@@ -190,7 +190,7 @@ namespace FEAT
       class FilterHelper<LAFEM::FilterSequence<FType_>>
       {
       public:
-        typedef LAFEM::FilterChain<FType_> InFilterType;
+        typedef LAFEM::FilterSequence<FType_> InFilterType;
         /// by default, add nothing from the filter
         template<typename DT_, typename IT_, typename Vec_>
         static Index add_filter(std::map<IT_, DT_>& filter_map, const InFilterType& input, const Vec_& vec, Index offset = 0u)

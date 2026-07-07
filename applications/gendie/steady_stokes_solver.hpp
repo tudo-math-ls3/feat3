@@ -15,6 +15,7 @@
 #include <kernel/solver/voxel_amavanka.hpp>
 #include <kernel/solver/schwarz_precond.hpp>
 #include <kernel/solver/gmres.hpp>
+#include <kernel/solver/amavanka_gmres.hpp>
 #include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/richardson.hpp>
 #include "logger.hpp"
@@ -60,6 +61,23 @@ namespace Gendie
     inline bool is_direct_solver(const FEAT::String& option)
     {
       return (option.compare_no_case("umfpack") == 0) || (option.compare_no_case("mumps") == 0) || (option.compare_no_case("ilu") == 0) || (option.compare_no_case("klu") == 0);
+    }
+
+    inline bool is_orthogonalizer(const FEAT::String& option)
+    {
+      return (option.compare_no_case("mgs") == 0 || option.compare_no_case("cgs") == 0) || (option.compare_no_case("cgs2") == 0);
+    }
+
+    inline FEAT::Solver::KrylovOrthogonalizerType orthogonalizer_from_string(const FEAT::String& option)
+    {
+      if(option.compare_no_case("mgs") == 0)
+        return FEAT::Solver::KrylovOrthogonalizerType::modified_gram_schmidt;
+      if(option.compare_no_case("cgs") == 0)
+        return FEAT::Solver::KrylovOrthogonalizerType::classical_gram_schmidt;
+      if(option.compare_no_case("cgs2") == 0)
+        return FEAT::Solver::KrylovOrthogonalizerType::cgs2;
+      XABORTM("Unknown orthogonalizer " + option);
+      return FEAT::Solver::KrylovOrthogonalizerType::cgs2;
     }
 
     inline bool is_frosch_precond(const FEAT::String& option)
@@ -123,6 +141,7 @@ namespace Gendie
       FEAT::Parameter<DataType> coarse_tol_rel = parameter(DataType(1E-2)).property("coarse-gmres-parameters/tol-rel").name("Coarse Relative Tolerance");
       FEAT::Parameter<DataType> coarse_tol_abs = parameter(DataType(1E+10)).property("coarse-gmres-parameters/tol-abs").name("Coarse Absolute Tolerance");
       FEAT::Parameter<DataType> coarse_inner_rescale = parameter(DataType(1E+1)).property("coarse-gmres-parameters/inner-rescale").name("Coarse Inner Rescale");
+      FEAT::Parameter<FEAT::String> coarse_orthogonalizer = parameter(FEAT::String("cgs2")).property("coarse-gmres-parameters/orthogonalizer").name("Coarse GMRES Orthogonalizer").validator(is_orthogonalizer);
 
       FEAT::Parameter<FEAT::Index> min_nl_iter = parameter(FEAT::Index(1)).property("min-nl-iter").name("Min Nonlinear Iter");
       FEAT::Parameter<FEAT::Index> max_nl_iter = parameter(FEAT::Index(50)).property("max-nl-iter").name("Max Nonlinear Iter");
@@ -582,6 +601,7 @@ namespace Gendie
       DataType _tol_rel = DataType(1E-2);
       DataType _tol_abs = DataType(1E+10);
       DataType _inner_rescale = DataType(1E+1);
+      FEAT::Solver::KrylovOrthogonalizerType _ortho = FEAT::Solver::KrylovOrthogonalizerType::cgs2;
     };
     CoarseParams coarse_gmres_params;
   #ifdef FEAT_HAVE_TRILINOS
@@ -764,6 +784,7 @@ namespace Gendie
       params._tol_rel = *parser.coarse_tol_rel;
       params._tol_abs = *parser.coarse_tol_abs;
       params._inner_rescale = *parser.coarse_inner_rescale;
+      params._ortho = Intern::orthogonalizer_from_string(*parser.coarse_orthogonalizer);
       return true;
     }
 
@@ -980,10 +1001,28 @@ namespace Gendie
             vanka = FEAT::Solver::new_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local());
           vanka->set_skip_singular(true);
           // ama_vankas.push_back(vanka);
-          auto schwarz = FEAT::Solver::new_schwarz_precond(vanka, lvl.filter_sys);
-          schwarz->set_ignore_status(true);
-          //auto coarse_solver = FEAT::Solver::new_bicgstab(lvl.matrix_sys, lvl.filter_sys, schwarz);
-          auto coarse_solver_t = FEAT::Solver::new_gmres(lvl.matrix_sys, lvl.filter_sys, coarse_gmres_params._gmres_dim, coarse_gmres_params._inner_rescale, schwarz);
+          // the coarse grid solver: on the CUDA backend we use the specialized, kernel-fused
+          // AmaVankaGMRES (which uses the raw AmaVanka directly), otherwise the standard GMRES
+          // with a Schwarz-wrapped AmaVanka preconditioner. Both default to the cgs2 orthogonalizer.
+          std::shared_ptr<FEAT::Solver::IterativeSolver<DefectVectorType>> coarse_solver_t;
+#ifdef FEAT_HAVE_CUDA
+          if(solver_backend == FEAT::PreferredBackend::cuda)
+          {
+            auto amavanka_gmres = FEAT::Solver::new_amavanka_gmres(lvl.matrix_sys, lvl.filter_sys, vanka, coarse_gmres_params._gmres_dim, coarse_gmres_params._inner_rescale);
+            amavanka_gmres->set_use_cuda_gmres(true);
+            amavanka_gmres->set_orthogonalizer(coarse_gmres_params._ortho);
+            coarse_solver_t = amavanka_gmres;
+          }
+          else
+#endif // FEAT_HAVE_CUDA
+          {
+            auto schwarz = FEAT::Solver::new_schwarz_precond(vanka, lvl.filter_sys);
+            schwarz->set_ignore_status(true);
+            //auto coarse_solver = FEAT::Solver::new_bicgstab(lvl.matrix_sys, lvl.filter_sys, schwarz);
+            auto gmres = FEAT::Solver::new_gmres(lvl.matrix_sys, lvl.filter_sys, coarse_gmres_params._gmres_dim, coarse_gmres_params._inner_rescale, schwarz);
+            gmres->set_orthogonalizer(coarse_gmres_params._ortho);
+            coarse_solver_t = gmres;
+          }
           coarse_solver_t->set_tol_rel(coarse_gmres_params._tol_rel);
           coarse_solver_t->set_tol_abs(coarse_gmres_params._tol_abs);
           coarse_solver_t->set_tol_abs_low(DataType(1e-14));
@@ -1060,6 +1099,7 @@ namespace Gendie
       s += FEAT::String("Tol Rel").pad_back(padlen, '.') + ":" + FEAT::stringify_fp_sci(coarse_gmres_params._tol_rel, 3, 5) + "\n";
       s += FEAT::String("Tol Abs").pad_back(padlen, '.') + ":" + FEAT::stringify_fp_sci(coarse_gmres_params._tol_abs, 3, 5) + "\n";
       s += FEAT::String("Inner Rescale").pad_back(padlen, '.') + ":" + FEAT::stringify_fp_fix(coarse_gmres_params._inner_rescale, 3, 5) + "\n";
+      s += FEAT::String("Orthogonalizer").pad_back(padlen, '.') + ":" + (coarse_gmres_params._ortho == FEAT::Solver::KrylovOrthogonalizerType::cgs2 ? FEAT::String("cgs2") : FEAT::String("cgs")) + "\n";
 
       return s;
     }
