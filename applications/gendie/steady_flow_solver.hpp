@@ -768,7 +768,7 @@ namespace Gendie
       if(prop == nullptr)
       {
         if(_logger)
-          _logger->print("Propertymap is null!", error);
+          _logger->print("Propertymap is null!", PrintLevel::error);
         return false;
       }
       Intern::SolverParser<DefectDataType> parser;

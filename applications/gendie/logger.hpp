@@ -42,6 +42,11 @@ namespace Gendie
     }
   }
 
+  std::ostream& operator<<(std::ostream& os, PrintLevel lvl)
+  {
+    return os << Intern::get_print_char(lvl);
+  }
+
   class Logger
   {
   public:

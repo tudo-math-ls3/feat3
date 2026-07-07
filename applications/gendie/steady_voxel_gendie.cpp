@@ -372,7 +372,7 @@ namespace Gendie
       logger->print("Vtk output not requested!", PrintLevel::warning);
       return;
     }
-    logger->print("Writing VTK output to '" + param_holder.vtk_name + ".pvtu'", PrintLevel::info);
+    logger->print("Writing VTK output to '" + *param_holder.vtk_name + ".pvtu'", PrintLevel::info);
 
     std::unique_ptr<MeshType> refined_mesh;
     // get the mesh for the VTK output
@@ -555,8 +555,8 @@ namespace Gendie
 
     if(args.check("log-level") > 0)
     {
-      logger.std_out_lvl = print_level(args.parse_default("log-level", 2));
-      logger.log_lvl = print_level(args.parse_default("log-level", 2));
+      logger.std_out_lvl = PrintLevel(args.parse_default("log-level", 2));
+      logger.log_lvl = PrintLevel(args.parse_default("log-level", 2));
     }
 
     logger.print(FEAT::String("LogLevel: ") + stringify(logger.std_out_lvl));
@@ -616,10 +616,10 @@ namespace Gendie
     {
       for(const String& s : param_holder.errors())
       {
-        logger.print(s, error);
+        logger.print(s, PrintLevel::error);
       }
     }
-    logger.print(param_holder.display(), print_level::info);
+    logger.print(param_holder.display(), PrintLevel::info);
     logger.always_flush = *param_holder.always_flush_print;
 
     /*----------------------------------------------------------------------------------------------*/
@@ -651,20 +651,20 @@ namespace Gendie
         logger.print(format_submemory_mm_t_kb("CGAL Size", bytes_sum, bytes_min, bytes_max, pad_len), PrintLevel::info);
       }
 
-      logger.print(String("Reading materials and inflow boundaries"), info);
+      logger.print(String("Reading materials and inflow boundaries"), PrintLevel::info);
       String material_info, inflow_info;
       if(const PropertyMap* problem_config = config->get_sub_section("problem_params"))
       {
         auto mat_parse = parse_materials(materials, problem_config->get_sub_section("list_materials"), material_info);
         if(mat_parse != MaterialParserError::success)
         {
-          logger.print(String("Material parsing went wrong with: ") + parse_error(mat_parse), error);
+          logger.print(String("Material parsing went wrong with: ") + parse_error(mat_parse), PrintLevel::error);
           Runtime::abort();
         }
         auto inflow_parse = parse_inflow_boundaries(inflow_boundaries, problem_config->get_sub_section("list_inflows"), materials, domain, inflow_info);
         if(inflow_parse != InflowParserError::success)
         {
-          logger.print(String("Inflow parsing went wrong with") + parse_error(inflow_parse), error);
+          logger.print(String("Inflow parsing went wrong with") + parse_error(inflow_parse), PrintLevel::error);
           Runtime::abort();
         }
       }
@@ -851,7 +851,7 @@ namespace Gendie
     {
       for(const auto& err: solver_parser.errors())
       {
-        logger.print(err, error);
+        logger.print(err, PrintLevel::error);
       }
       XABORTM("Could not parse solver section");
     }
@@ -868,7 +868,7 @@ namespace Gendie
     }
     else // we directly start with a beefed up ts solver
     {
-      logger.print("Overwriting solver configuration for PowerLaw", info);
+      logger.print("Overwriting solver configuration for PowerLaw", PrintLevel::info);
       solver_type = decltype(solver_type)::pseudo_ts;
       auto ts_config = config->query_section("solver-params")->clone();
       watch_create_solver.start();
