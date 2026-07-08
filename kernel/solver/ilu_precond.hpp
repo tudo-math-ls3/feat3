@@ -1229,8 +1229,8 @@ namespace FEAT
         TimeStamp ts_start;
 
         // get vector data views
-        Memory::TypedView<DataType> vx = out.elements_view_w();
-        const Memory::TypedView<DataType> vb = in.elements_view_r();
+        Memory::TypedView<Tiny::Vector<DataType, dim_>> vx = out.elements_view_w();
+        const Memory::TypedView<Tiny::Vector<DataType, dim_>> vb = in.elements_view_r();
 
         // solve: (I+L)*y = b
         _ilu.solve_il(vx.get_w(), vb.get_r());
