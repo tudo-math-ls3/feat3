@@ -143,7 +143,12 @@ if(FEAT_HAVE_CUDA)
   # since we call this before enable_language, this should be set as long as the user does not provide them
   set(CMAKE_CUDA_FLAGS_RELWITHDEBINFO "-g -O3" CACHE STRING "Cuda release with deb")
   set(CMAKE_CUDA_FLAGS_RELEASE "-O3" CACHE STRING "Cuda release")
-  set(CMAKE_CUDA_FLAGS_DEBUG "-g -O1" CACHE STRING "Cuda debug")
+  if(MSVC)
+    ### 01 with RTC1 goes wrong, so dont do that
+    set(CMAKE_CUDA_FLAGS_DEBUG "-g" CACHE STRING "Cuda debug")
+  else()
+    set(CMAKE_CUDA_FLAGS_DEBUG "-g -O1" CACHE STRING "Cuda debug")
+  endif()
 
   option(FEAT_CUDA_VERBOSE "Enable verbose cuda compiler?" OFF)
   if(FEAT_CUDA_VERBOSE)
