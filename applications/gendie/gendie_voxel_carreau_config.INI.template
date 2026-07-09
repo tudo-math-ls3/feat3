@@ -149,10 +149,12 @@ smooth-damp = float                 #default 0.5
 # Choose the preferred backend
 backend = generic or cuda or mkl   #default generic
 
-# Choose the preferred backend
+# Choose the preferred (fallback) assembly backend; per-level overrides live in
+# [solver-params/backend-parameters]. Note: the CPU domain-assembler has no CUDA path,
+# so 'cuda' is only honored where voxel-assembly applies (Carreau-family material, Q2 space).
 assembly-backend = generic or cuda or mkl   #default generic
 
-# Do we want to use voxel assembler?
+# Do we want to use voxel assembler? (velocity block, Carreau-family materials, Q2 hypercube spaces)
 voxel-assembly = true or false     #default false
 
 # Do we want to use voxel assembler?
@@ -198,6 +200,20 @@ max-iter = uint #default 500
 tol-rel = float # default 1E-2
 tol-abs = float # default 1E+10
 inner-rescale = float # default 1E+1
+
+# Per-level compute backend selection for assembly and solve.
+# Each *-backends key is a whitespace-separated list, one entry per multigrid level (index 0 = finest);
+# levels beyond the list length fall back to the heuristic / global default. Each *-threshold key (Index,
+# 0 = disabled) selects 'cuda' for levels whose size metric (local rows) is >= threshold, else 'generic'.
+# Resolution precedence per level: explicit list entry > threshold heuristic > global fallback
+# ('assembly-backend' for assembly, 'backend' for solve).
+[solver-params/backend-parameters]
+
+# e.g. assembly-backends = cuda cuda generic
+assembly-backends = list of (generic|cuda|mkl)   #default empty
+assembly-threshold = uint                        #default 0 (disabled)
+solve-backends = list of (generic|cuda|mkl)      #default empty
+solve-threshold = uint                           #default 0 (disabled)
 
 
 # Set postprocessing flags, mainly for paraview

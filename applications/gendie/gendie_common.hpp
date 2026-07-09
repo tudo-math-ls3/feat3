@@ -544,6 +544,19 @@ namespace Gendie
         _system_asm = std::make_shared<CarreauSingleMatSystemFlowAssembler<Domain_>>(_domain, _config, _materials.front(), _inflow_bounds.front().get_temperature(), mesh_unit_scale);
         _system_asm->set_cubature(cubature_matrix_a);
 
+        // per-level assembly backend + voxel assembler configuration (shared by system & defect asm)
+        const FEAT::PreferredBackend asm_fallback = Intern::backend_from_string(_config ? _config->query("assembly-backend", "generic") : FEAT::String("generic"));
+        const Intern::BackendSelector asm_sel = Intern::parse_backend_selector(_config, "backend-parameters/assembly-backends", "backend-parameters/assembly-threshold", asm_fallback);
+        bool voxel_asm = false;
+        if(_config)
+        {
+          const FEAT::String v = _config->query("voxel-assembly", "false");
+          voxel_asm = (v.compare_no_case("true") == 0) || (v.compare_no_case("on") == 0) || (v.compare_no_case("1") == 0);
+        }
+        _defect_asm->set_asm_backend_selector(asm_sel);
+        _defect_asm->set_voxel_asm(voxel_asm);
+        _system_asm->set_asm_backend_selector(asm_sel);
+        _system_asm->set_voxel_asm(voxel_asm);
       }
 
 

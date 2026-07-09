@@ -56,6 +56,14 @@ namespace Gendie
     return os;
   }
 
+  /// returns true for viscosity models that derive from the Carreau base (Carreau-shaped data[]),
+  /// i.e. those the voxel assembler can approximate via its carreau functor
+  inline bool is_carreau_family(MaterialType ty)
+  {
+    return (ty == MaterialType::carreau) || (ty == MaterialType::carreau_yasuda)
+        || (ty == MaterialType::pseudo_power_law) || (ty == MaterialType::abc_model);
+  }
+
   std::ostream& operator<<(std::ostream& os, TemperatureModelType ty)
   {
     switch(ty)

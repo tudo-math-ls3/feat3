@@ -709,7 +709,7 @@ namespace Gendie
       logger.print(String("Desired levels").pad_back(pad_len, pad_char) + ": " + domain.format_desired_levels(), PrintLevel::info);
       logger.print(String("Chosen levels").pad_back(pad_len, pad_char) + ": " + domain.format_chosen_levels(), PrintLevel::info);
       // print config
-      logger.print(param_holder.display());
+      // logger.print(param_holder.display());
       //flush output
       logger.flush_print();
     }
@@ -879,7 +879,7 @@ namespace Gendie
 
     //print solver info
     logger.print(flow_solver->format_string(), PrintLevel::info);
-    logger.print(flow_solver->format_linear_solver(), PrintLevel::debug);
+    logger.print(flow_solver->format_linear_solver(), PrintLevel::verbose);
 
     logger.print("\n----------------------------------------------------------------------\n", PrintLevel::info);
     logger.flush_print();
@@ -912,8 +912,8 @@ namespace Gendie
       logger.print("Solver did not converge with status code" + stringify(status), PrintLevel::warning);
       if(solver_type != decltype(solver_type)::pseudo_ts)
       {
-        logger.print("Printing previous solver timings", PrintLevel::debug);
-        logger.print(flow_solver->format_timings(), PrintLevel::debug);
+        logger.print("Printing previous solver timings", PrintLevel::verbose);
+        logger.print(flow_solver->format_timings(), PrintLevel::verbose);
         logger.print("\n----------------------------------------------------------------------\n", PrintLevel::info);
         logger.print("Retrying with pseudo timestepping", PrintLevel::info);
         logger.flush_print();
@@ -924,7 +924,7 @@ namespace Gendie
         Gendie::_adjust_solver_config(ts_config.get(), 64, 64);
         flow_solver = flow_solver_factory.create_overwrite_config(decltype(solver_type)::pseudo_ts, ts_config.get(), &logger);
         logger.print(flow_solver->format_string(), PrintLevel::info);
-        logger.print(flow_solver->format_linear_solver(), PrintLevel::debug);
+        logger.print(flow_solver->format_linear_solver(), PrintLevel::verbose);
         flow_solver->init();
         // vec_sol.format();
         flow_solver->init_sol(vec_sol, vec_rhs);

@@ -19,6 +19,7 @@
 #include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/richardson.hpp>
 #include "logger.hpp"
+#include "backend_plan.hpp"
 #include <kernel/util/stop_watch.hpp>
 #include <kernel/util/string.hpp>
 
@@ -39,23 +40,6 @@ namespace Gendie
     inline bool parse_config_bool(const FEAT::String& option)
     {
       return !(option.empty() || (option.compare_no_case("false") == 0) || (option.compare_no_case("off") == 0) || (option.compare_no_case("0") == 0));
-    }
-
-    inline bool is_backend(const FEAT::String& option)
-    {
-      return (option.compare_no_case("cuda") == 0) || (option.compare_no_case("mkl") == 0) || (option.compare_no_case("generic") == 0);
-    }
-
-    inline FEAT::PreferredBackend backend_from_string(const FEAT::String& option)
-    {
-      if(option.compare_no_case("cuda") == 0)
-        return FEAT::PreferredBackend::cuda;
-      if(option.compare_no_case("mkl") == 0)
-        return FEAT::PreferredBackend::mkl;
-      if(option.compare_no_case("generic") == 0)
-        return FEAT::PreferredBackend::generic;
-      XABORTM("Unknown backend " + option);
-      return FEAT::PreferredBackend::generic;
     }
 
     inline bool is_direct_solver(const FEAT::String& option)
@@ -142,6 +126,16 @@ namespace Gendie
       FEAT::Parameter<DataType> coarse_tol_abs = parameter(DataType(1E+10)).property("coarse-gmres-parameters/tol-abs").name("Coarse Absolute Tolerance");
       FEAT::Parameter<DataType> coarse_inner_rescale = parameter(DataType(1E+1)).property("coarse-gmres-parameters/inner-rescale").name("Coarse Inner Rescale");
       FEAT::Parameter<FEAT::String> coarse_orthogonalizer = parameter(FEAT::String("cgs2")).property("coarse-gmres-parameters/orthogonalizer").name("Coarse GMRES Orthogonalizer").validator(is_orthogonalizer);
+
+      // per-level solve backend: explicit list (index 0 = finest) and/or a level-size heuristic threshold
+      FEAT::Parameter<std::deque<FEAT::String>> solve_backends = parameter(std::deque<FEAT::String>{}).property("backend-parameters/solve-backends").name("Per-Level Solve Backends");
+      FEAT::Parameter<FEAT::Index> solve_backend_threshold = parameter(FEAT::Index(0)).property("backend-parameters/solve-threshold").name("Solve Backend Threshold");
+
+      // assembly backend plan (mirrors the assembler configuration); used to decide per level whether the
+      // voxel AmaVanka is applicable (only where assembly runs on CUDA)
+      FEAT::Parameter<FEAT::String> assembly_backend = parameter(FEAT::String("generic")).property("assembly-backend").name("Assembly Backend").validator(is_backend);
+      FEAT::Parameter<std::deque<FEAT::String>> assembly_backends = parameter(std::deque<FEAT::String>{}).property("backend-parameters/assembly-backends").name("Per-Level Assembly Backends");
+      FEAT::Parameter<FEAT::Index> assembly_backend_threshold = parameter(FEAT::Index(0)).property("backend-parameters/assembly-threshold").name("Assembly Backend Threshold");
 
       FEAT::Parameter<FEAT::Index> min_nl_iter = parameter(FEAT::Index(1)).property("min-nl-iter").name("Min Nonlinear Iter");
       FEAT::Parameter<FEAT::Index> max_nl_iter = parameter(FEAT::Index(50)).property("max-nl-iter").name("Max Nonlinear Iter");
@@ -618,11 +612,12 @@ namespace Gendie
     FEAT::Index max_iter;
     FEAT::Index min_stag_iter;
     FEAT::PreferredBackend solver_backend;
+    Intern::BackendSelector solve_backend_sel;
+    Intern::BackendSelector asm_backend_sel;
     FEAT::Solver::MultiGridCycle cycle;
     mutable FEAT::StopWatch watch_mg_hirarch;
     bool coarse_frosch;
     bool coarse_gmres;
-    bool voxel_vanka;
     bool coarse_solver_info;
 
   public:
@@ -637,6 +632,9 @@ namespace Gendie
       smoother_damp = *parser.smooth_damp;
       mg_tol_rel = *parser.mg_tol_rel;
       solver_backend = Intern::backend_from_string(*parser.backend);
+      solve_backend_sel = Intern::make_backend_selector(*parser.solve_backends, *parser.solve_backend_threshold, solver_backend);
+      const FEAT::PreferredBackend asm_fallback = Intern::backend_from_string(*parser.assembly_backend);
+      asm_backend_sel = Intern::make_backend_selector(*parser.assembly_backends, *parser.assembly_backend_threshold, asm_fallback);
       coarse_gmres |= *parser.coarse_gmres;
       coarse_frosch |= *parser.coarse_frosch;
       coarse_solver_info |= *parser.coarse_info;
@@ -882,7 +880,9 @@ namespace Gendie
 #endif // FEAT_HAVE_TRILINOS
         else
         {
-          if(voxel_vanka)
+          // use the voxel vanka only where the assembly backend for this level resolves to CUDA
+          const bool use_voxel_vanka = (asm_backend_sel.backend_for(0, system_levels.front()->local_matrix_sys.num_rows()) == FEAT::PreferredBackend::cuda);
+          if(use_voxel_vanka)
           {
             if constexpr(Intern::supports_element_coloring<Domain_>)
               this->vanka_solver.push_back(FEAT::Solver::new_voxel_amavanka(system_levels.front()->local_matrix_sys, filter_sys.local(), domain.front()->element_coloring));
@@ -918,11 +918,19 @@ namespace Gendie
       {
         auto& lvl = *system_levels.at(i);
 
+        // resolve the per-level solve backend (direct list or size heuristic); used both to pin the
+        // level's smoother/coarse solver and to select the coarse solver variant
+        const FEAT::PreferredBackend lvl_solve_backend = solve_backend_sel.backend_for(i, lvl.local_matrix_sys.num_rows());
+
+        // the voxel vanka is only applicable where the matrix was produced by the voxel assembler,
+        // i.e. where this level's assembly backend resolves to CUDA
+        const bool use_voxel_vanka = (asm_backend_sel.backend_for(i, lvl.local_matrix_sys.num_rows()) == FEAT::PreferredBackend::cuda);
+
         if((i+1) < domain_virtual_size)
         {
           // create Schwarz-AmaVanka
           std::shared_ptr<FEAT::Solver::AmaVanka<LocalSystemMatrix, LocalSystemFilter>> vanka(nullptr);
-          if(voxel_vanka)
+          if(use_voxel_vanka)
           {
             if constexpr(Intern::supports_element_coloring<Domain_>)
               vanka = FEAT::Solver::new_voxel_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local(), domain.at(i)->element_coloring);
@@ -945,17 +953,20 @@ namespace Gendie
           smoother_l->set_min_iter(smooth_steps);
           smoother_l->set_max_iter(smooth_steps);
           // smoother_l->set_plot_mode(FEAT::Solver::PlotMode::all);
+          // pin the smoother to this level's solve backend, so the multigrid cycle runs it there
+          auto pinned_smoother = Intern::new_backend_pinned_solver<DefectVectorType>(smoother_l, lvl_solve_backend);
           // save our smoother and vanka
-          this->multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, lvl.transfer_sys, smoother_l, smoother_l, smoother_l);
+          this->multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, lvl.transfer_sys, pinned_smoother, pinned_smoother, pinned_smoother);
           this->smoother.push_back(std::move(smoother_l));
           this->vanka_solver.push_back(std::move(vanka));
         }
         else if(!coarse_frosch && !coarse_gmres && FEAT::Solver::have_direct_sparse_solver(lvl.matrix_sys, lvl.filter_sys))
         {
           auto backendt = FEAT::Backend::get_preferred_backend();
-          FEAT::Backend::set_preferred_backend(solver_backend);
+          FEAT::Backend::set_preferred_backend(lvl_solve_backend);
           // create UMFPACK coarse grid solver
-          this->coarse_solver = FEAT::Solver::new_direct_sparse_solver(lvl.matrix_sys, lvl.filter_sys);
+          auto direct_solver = FEAT::Solver::new_direct_sparse_solver(lvl.matrix_sys, lvl.filter_sys);
+          this->coarse_solver = Intern::new_backend_pinned_solver<DefectVectorType>(direct_solver, lvl_solve_backend);
           this->multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, this->coarse_solver);
           FEAT::Backend::set_preferred_backend(backendt);
         }
@@ -982,7 +993,7 @@ namespace Gendie
           // solver_iterative->set_plot_mode(FEAT::Solver::PlotMode::summary);
           solver_iterative->set_plot_mode(coarse_solver_info ? FEAT::Solver::PlotMode::summary : FEAT::Solver::PlotMode::none);
 
-          this->coarse_solver = solver_iterative;
+          this->coarse_solver = Intern::new_backend_pinned_solver<DefectVectorType>(solver_iterative, lvl_solve_backend);
           this->multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, this->coarse_solver);
         }
 #endif
@@ -990,7 +1001,7 @@ namespace Gendie
         {
           // create FGMRES-AmaVanka coarse grid solver
           std::shared_ptr<FEAT::Solver::AmaVanka<LocalSystemMatrix, LocalSystemFilter>> vanka(nullptr);
-          if(voxel_vanka)
+          if(use_voxel_vanka)
           {
             if constexpr(Intern::supports_element_coloring<Domain_>)
               vanka = FEAT::Solver::new_voxel_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local(), domain.at(i)->element_coloring);
@@ -1006,7 +1017,7 @@ namespace Gendie
           // with a Schwarz-wrapped AmaVanka preconditioner. Both default to the cgs2 orthogonalizer.
           std::shared_ptr<FEAT::Solver::IterativeSolver<DefectVectorType>> coarse_solver_t;
 #ifdef FEAT_HAVE_CUDA
-          if(solver_backend == FEAT::PreferredBackend::cuda)
+          if(lvl_solve_backend == FEAT::PreferredBackend::cuda)
           {
             auto amavanka_gmres = FEAT::Solver::new_amavanka_gmres(lvl.matrix_sys, lvl.filter_sys, vanka, coarse_gmres_params._gmres_dim, coarse_gmres_params._inner_rescale);
             amavanka_gmres->set_use_cuda_gmres(true);
@@ -1030,8 +1041,9 @@ namespace Gendie
           coarse_solver_t->set_max_iter(coarse_gmres_params._maxiter);
           coarse_solver_t->set_plot_mode(coarse_solver_info ? FEAT::Solver::PlotMode::summary : FEAT::Solver::PlotMode::none);
 
-          this->multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, coarse_solver_t);
-          this->coarse_solver = std::move(coarse_solver_t);
+          // pin the coarse solver to the coarse level's solve backend
+          this->coarse_solver = Intern::new_backend_pinned_solver<DefectVectorType>(coarse_solver_t, lvl_solve_backend);
+          this->multigrid_hierarchy->push_level(lvl.matrix_sys, lvl.filter_sys, this->coarse_solver);
           this->vanka_solver.push_back(std::move(vanka));
         }
       }
@@ -1118,6 +1130,8 @@ namespace Gendie
       s += FEAT::String("Max MG Iter").pad_back(padlen, '.') + ":" + FEAT::stringify(max_iter) + "\n";
       s += FEAT::String("MG Tol Rel").pad_back(padlen, '.') + ":" + FEAT::stringify_fp_sci(mg_tol_rel, 3, 5) + "\n";
       s += FEAT::String("Solver Backend").pad_back(padlen, '.') + ":" + FEAT::stringify(solver_backend) + "\n";
+      s += FEAT::String("Solve Backend Plan").pad_back(padlen, '.') + ":" + solve_backend_sel.display() + "\n";
+      s += FEAT::String("Assembly Backend Plan").pad_back(padlen, '.') + ":" + asm_backend_sel.display() + "\n";
       if(coarse_gmres)
       {
         s += _format_coarse_gmres_info(padlen);
@@ -1225,7 +1239,6 @@ namespace Gendie
         cycle(FEAT::Solver::MultiGridCycle::V),
         coarse_frosch(false),
         coarse_gmres(false),
-        voxel_vanka(false),
         coarse_solver_info(false)
     {}
 
@@ -1276,7 +1289,6 @@ namespace Gendie
         cycle(FEAT::Solver::MultiGridCycle::V),
         coarse_frosch(false),
         coarse_gmres((domain.back_layer().comm().size() > 1)),
-        voxel_vanka(false),
         coarse_solver_info(false)
     {
       this->parse(prop);
@@ -1387,6 +1399,7 @@ namespace Gendie
       watch_system_filter.start();
       for(std::size_t i = 0; i < this->system_levels.size(); ++i)
       {
+        // todo: set backend for each initialization
         auto& system = *this->system_levels.at(i);
         // this solver always assumes fbm
         if constexpr(use_fbm_)

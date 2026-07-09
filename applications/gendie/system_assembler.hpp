@@ -9,11 +9,17 @@
 #include <kernel/assembly/domain_assembler_basic_jobs.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/util/stop_watch.hpp>
+#include <kernel/voxel_assembly/burgers_velo_material_assembler.hpp>
+#include <kernel/cubature/dynamic_factory.hpp>
 
 #include "format_helper.hpp"
+#include "backend_plan.hpp"
+#include "voxel_assembler_cache.hpp"
+#include "template_helper.hpp"
 #include "kernel/assembly/burgers_assembly_job.hpp"
 
 #include <memory>
+#include <type_traits>
 
 namespace Gendie
 {
@@ -32,6 +38,10 @@ namespace Gendie
     SystemDataType stiffness_factor = SystemDataType(1);
     SystemDataType theta = SystemDataType(0);
     FEAT::PreferredBackend asm_backend = FEAT::PreferredBackend::generic;
+    /// per-level assembly backend selector (direct list and/or size heuristic)
+    Intern::BackendSelector asm_backend_sel;
+    /// use the voxel assembler for the velocity block (Carreau-family materials, Q2 hypercube spaces)
+    bool voxel_asm = false;
 
 
   protected:
@@ -260,6 +270,18 @@ namespace Gendie
       this->_set_backend();
     }
 
+    /// sets the per-level assembly backend selector
+    void set_asm_backend_selector(const Intern::BackendSelector& sel)
+    {
+      this->asm_backend_sel = sel;
+    }
+
+    /// enables/disables the voxel assembler for the velocity block
+    void set_voxel_asm(bool use)
+    {
+      this->voxel_asm = use;
+    }
+
     FEAT::String format_timings() const
     {
       return this->cast()._format_timings();
@@ -294,6 +316,8 @@ namespace Gendie
     bool navier = false;
 
   protected:
+    /// per-level cache of voxel assemblers, owned by the active solve (see _init/_done)
+    mutable Intern::VoxelAssemblerCache _voxel_cache;
 
     bool _parse([[maybe_unused]] const FEAT::PropertyMap* prop)
     {
@@ -303,10 +327,14 @@ namespace Gendie
 
     void _init()
     {
+      // resources are bound to the solve lifecycle; start from a clean slate
+      _voxel_cache.clear();
     }
 
     void _done()
     {
+      // free the voxel assembler resources when the solve tears down
+      _voxel_cache.clear();
     }
 
     void _set_jacobian(double weight)
@@ -338,6 +366,47 @@ namespace Gendie
       job.alpha = AssemblyDataType(SystemDataType(1) / this->stiffness_factor);
     }
 
+    /**
+     * \brief Assembles the velocity A-block via the voxel assembler (CPU/CUDA by preferred backend).
+     *
+     * Only instantiated for Q2/Lagrange2 hypercube velocity spaces (see the \c if \c constexpr guard
+     * in _assemble_matrices). The gendie Carreau-family material is mapped approximately onto the
+     * voxel carreau functor mu = a_T * mu_0 * (1 + lambda*a_T*gamma_dot)^(-exp); this is exact only
+     * for the plateau exponent d=1, unclamped shear rate. Parameters mirror \c _set_job.
+     */
+    template<typename MatrixA_, typename ConvVec_, typename Space_, typename Coloring_>
+    void _assemble_matrix_a_voxel(std::size_t level, MatrixA_& matrix_a, const ConvVec_& convect, const Space_& space, const Coloring_& coloring) const
+    {
+      typedef typename MatrixA_::DataType DT;
+      typedef typename MatrixA_::IndexType IT;
+      // reuse the per-level voxel assembler (expensive to construct); only the scalar material
+      // parameters below change between calls
+      auto& voxel = _voxel_cache.template get<Space_, DT, IT>(level, space, coloring);
+
+      const auto aT = this->_material->get_abiat_aT(this->_temperature);
+      const SystemDataType visco_scale = SystemDataType(1000) / this->_mesh_scale;
+      const auto data = this->_material->get_viscosity_model()->get_data();
+
+      voxel.deformation = true;
+      voxel.nu = DT(this->_material->get_default_viscosity(this->_mesh_scale, aT));
+      voxel.sd_nu = voxel.nu;
+      voxel.sd_delta = DT(0);
+      voxel.beta = navier ? DT(this->_material->get_density_gram_per_unit(this->_mesh_scale)) : DT(0);
+      voxel.frechet_beta = DT(SystemDataType(voxel.beta) * this->_weight_jacobian);
+      voxel.frechet_material = DT(SystemDataType(1) * this->_weight_jacobian);
+      voxel.theta = DT(this->theta);
+      voxel.reg_eps = DT(reg_eps);
+      // approximate mapping of the Carreau-family model onto the voxel carreau functor
+      voxel.material_type = FEAT::VoxelAssembly::MaterialType::carreau;
+      voxel.mu_0 = DT(SystemDataType(data[0]) * visco_scale);
+      voxel.lambda = DT(data[1]);
+      voxel.exp = DT(SystemDataType(1) - SystemDataType(data[2]));
+      voxel.a_T = DT(aT);
+
+      const DT alpha = DT(SystemDataType(1) / this->stiffness_factor);
+      voxel.assemble_matrix1(matrix_a, convect, space, FEAT::Cubature::DynamicFactory(this->_cubature), alpha);
+    }
+
     /// always assume that matrix structure is preassambled
     template<typename LevelType_, typename VecType_>
     void _assemble_matrices(std::deque<std::shared_ptr<LevelType_>>& system_levels, const VecType_& vec_sol) const
@@ -362,16 +431,48 @@ namespace Gendie
         ASSERTM(!cur_sys.matrix_a.local().empty(), "A Matrix not allocated");
         ASSERTM(!cur_sys.matrix_b.local().empty(), "B Matrix not allocated");
         ASSERTM(!cur_sys.matrix_d.local().empty(), "D Matrix not allocated");
-        FEAT::Assembly::BurgersVeloMaterialBlockedMatrixAssemblyJob burgers_mat_job(
-          cur_sys.matrix_a.local(), conv_vecs[i].local(), cur_dom.space_velo,
-          this->_cubature, this->_material->get_visc_func(AssemblyDataType(_mesh_scale)), this->_material->get_visc_der_func(AssemblyDataType(_mesh_scale))
-        );
-        _set_job(burgers_mat_job);
 
-        cur_sys.matrix_a.local().format();
+        // resolve the per-level assembly backend (direct list or A-block size heuristic)
+        FEAT::PreferredBackend lvl_backend = this->asm_backend_sel.backend_for(i, cur_sys.matrix_a.local().num_rows());
 
-        // actual assembly
-        cur_dom.domain_asm.assemble(burgers_mat_job);
+        bool did_voxel = false;
+        // voxel assembler path: only for Q2/Lagrange2 hypercube velocity spaces on domains providing
+        // an element coloring, only for Carreau-family materials, and only when this level actually
+        // wants the CUDA backend (the voxel assembler exists for the CUDA path; CPU levels use the
+        // regular domain-assembler job below)
+        if constexpr(std::is_same_v<std::decay_t<decltype(cur_dom.space_velo)>, FEAT::VoxelAssembly::Q2StandardHyperCube<LevelType_::dim>> && Intern::supports_element_coloring<Domain_>)
+        {
+#ifdef FEAT_HAVE_CUDA
+          if(this->voxel_asm && lvl_backend == FEAT::PreferredBackend::cuda && is_carreau_family(this->_material->get_current_visc_model_type()))
+          {
+            FEAT::Backend::set_preferred_backend(lvl_backend);
+            cur_sys.matrix_a.local().format();
+            this->_assemble_matrix_a_voxel(i, cur_sys.matrix_a.local(), conv_vecs[i].local(), cur_dom.space_velo, this->domain->at(i)->element_coloring);
+            did_voxel = true;
+          }
+#endif // FEAT_HAVE_CUDA
+        }
+
+        if(!did_voxel)
+        {
+          if(lvl_backend == FEAT::PreferredBackend::cuda)
+          {
+            // the CPU domain-assembler Burgers job has no CUDA implementation; fall back to generic
+            this->domain->comm().print("WARNING: assembly backend 'cuda' on level " + FEAT::stringify(i) + " needs voxel-assembly with a Carreau-family material and a Q2 space; falling back to 'generic'");
+            lvl_backend = FEAT::PreferredBackend::generic;
+          }
+          FEAT::Backend::set_preferred_backend(lvl_backend);
+          FEAT::Assembly::BurgersVeloMaterialBlockedMatrixAssemblyJob burgers_mat_job(
+            cur_sys.matrix_a.local(), conv_vecs[i].local(), cur_dom.space_velo,
+            this->_cubature, this->_material->get_visc_func(AssemblyDataType(_mesh_scale)), this->_material->get_visc_der_func(AssemblyDataType(_mesh_scale))
+          );
+          _set_job(burgers_mat_job);
+
+          cur_sys.matrix_a.local().format();
+
+          // actual assembly
+          cur_dom.domain_asm.assemble(burgers_mat_job);
+        }
         if(i == 0) this->watch_assembly_fine.stop();
       }
       this->watch_assembly.stop();

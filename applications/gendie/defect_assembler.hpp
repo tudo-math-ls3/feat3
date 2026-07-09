@@ -8,10 +8,15 @@
 #include <kernel/assembly/burgers_assembly_job.hpp>
 #include <kernel/assembly/burgers_velo_material_assembly_job.hpp>
 #include <kernel/util/stop_watch.hpp>
+#include <kernel/voxel_assembly/burgers_velo_material_assembler.hpp>
+#include <kernel/cubature/dynamic_factory.hpp>
 #include "format_helper.hpp"
 #include "template_helper.hpp"
+#include "backend_plan.hpp"
+#include "voxel_assembler_cache.hpp"
 
 #include <memory>
+#include <type_traits>
 
 namespace Gendie
 {
@@ -89,6 +94,10 @@ namespace Gendie
     std::shared_ptr<LevelType> system_level;
     DataType stiffness_factor = DataType(1);
     FEAT::PreferredBackend asm_backend = FEAT::PreferredBackend::generic;
+    /// per-level assembly backend selector (the defect is assembled on the finest level, index 0)
+    Intern::BackendSelector asm_backend_sel;
+    /// use the voxel assembler for the velocity residual (Carreau-family materials, Q2 hypercube spaces)
+    bool voxel_asm = false;
 
   protected:
     /**
@@ -241,6 +250,18 @@ namespace Gendie
       this->_set_backend();
     }
 
+    /// sets the per-level assembly backend selector
+    void set_asm_backend_selector(const Intern::BackendSelector& sel)
+    {
+      this->asm_backend_sel = sel;
+    }
+
+    /// enables/disables the voxel assembler for the velocity residual
+    void set_voxel_asm(bool use)
+    {
+      this->voxel_asm = use;
+    }
+
     DataType calc_stiffness_factor() const
     {
       return this->cast()._calc_stiffness_factor();
@@ -296,6 +317,8 @@ namespace Gendie
     bool navier = false;
 
   protected:
+    /// per-level cache of voxel assemblers, owned by the active solve (see _init/_done)
+    mutable Intern::VoxelAssemblerCache _voxel_cache;
 
     bool _parse([[maybe_unused]] const FEAT::PropertyMap* prop)
     {
@@ -305,10 +328,14 @@ namespace Gendie
 
     void _init()
     {
+      // resources are bound to the solve lifecycle; start from a clean slate
+      _voxel_cache.clear();
     }
 
     void _done()
     {
+      // free the voxel assembler resources when the solve tears down
+      _voxel_cache.clear();
     }
 
     VectorType _create_vector() const
@@ -322,29 +349,108 @@ namespace Gendie
       return this->_material->get_default_viscosity(_mesh_scale, aT);
     }
 
+    /**
+     * \brief Assembles the velocity residual via the voxel assembler (CPU/CUDA by preferred backend).
+     *
+     * Consistent with CarreauSingleMatSystemFlowAssembler::_assemble_matrix_a_voxel so that the Newton
+     * matrix and residual use the same (approximate) viscosity law when voxel-assembly is enabled.
+     */
+    template<typename VeloVec_, typename Space_, typename Coloring_>
+    void _assemble_defect_velo_voxel(VeloVec_& vec_def_velo, const VeloVec_& vec_primal_velo, const VeloVec_& vec_conv_velo, const Space_& space, const Coloring_& coloring) const
+    {
+      typedef typename VeloVec_::DataType DT;
+      typedef typename VeloVec_::IndexType IT;
+      // reuse the cached voxel assembler (defect is always on the finest level -> index 0); only the
+      // scalar material parameters below change between calls
+      auto& voxel = _voxel_cache.template get<Space_, DT, IT>(0, space, coloring);
+
+      const auto aT = this->_material->get_abiat_aT(this->_temperature);
+      const DataType visco_scale = DataType(1000) / this->_mesh_scale;
+      const auto data = this->_material->get_viscosity_model()->get_data();
+
+      voxel.deformation = true;
+      voxel.nu = DT(this->_material->get_default_viscosity(this->_mesh_scale, aT));
+      voxel.sd_nu = voxel.nu;
+      voxel.sd_delta = DT(0);
+      voxel.theta = DT(0);
+      voxel.beta = navier ? DT(this->_material->get_density_gram_per_unit(this->_mesh_scale)) : DT(0);
+      // residual assembly requires no Jacobian (Frechet) terms
+      voxel.frechet_beta = DT(0);
+      voxel.frechet_material = DT(0);
+      voxel.reg_eps = DT(reg_eps);
+      // approximate mapping of the Carreau-family model onto the voxel carreau functor
+      voxel.material_type = FEAT::VoxelAssembly::MaterialType::carreau;
+      voxel.mu_0 = DT(DataType(data[0]) * visco_scale);
+      voxel.lambda = DT(data[1]);
+      voxel.exp = DT(DataType(1) - DataType(data[2]));
+      voxel.a_T = DT(aT);
+
+      const DT alpha = DT(DataType(-1) / this->stiffness_factor);
+      voxel.assemble_vector(vec_def_velo, vec_conv_velo, vec_primal_velo, space, FEAT::Cubature::DynamicFactory(this->_cubature), alpha);
+    }
+
+    /**
+     * \brief Assembles the velocity residual block of \c vec_def (formats \c vec_def first).
+     *
+     * Uses the voxel assembler when enabled (Carreau-family material + Q2 hypercube space), else the
+     * CPU domain-assembler job. A per-level 'cuda' backend without the voxel path falls back to generic.
+     */
+    void _assemble_velo_residual(VectorType& vec_def, const VectorType& vec_primal, const VectorType& vec_conv) const
+    {
+      auto& cur_dom = *this->domain->front();
+      FEAT::PreferredBackend lvl_backend = this->asm_backend_sel.backend_for(0, vec_def.local().template at<0>().size());
+
+      bool did_voxel = false;
+      // voxel assembler path: Q2/Lagrange2 hypercube velocity space with element coloring, Carreau-
+      // family material, and only when the finest level actually wants the CUDA backend (CPU levels
+      // use the regular domain-assembler job below)
+      if constexpr(std::is_same_v<std::decay_t<decltype(cur_dom.space_velo)>, FEAT::VoxelAssembly::Q2StandardHyperCube<LevelType::dim>> && Intern::supports_element_coloring<Domain_>)
+      {
+#ifdef FEAT_HAVE_CUDA
+        if(this->voxel_asm && lvl_backend == FEAT::PreferredBackend::cuda && is_carreau_family(this->_material->get_current_visc_model_type()))
+        {
+          FEAT::Backend::set_preferred_backend(lvl_backend);
+          vec_def.format();
+          this->_assemble_defect_velo_voxel(vec_def.local().template at<0>(), vec_primal.local().template at<0>(), vec_conv.local().template at<0>(), cur_dom.space_velo, this->domain->front()->element_coloring);
+          did_voxel = true;
+        }
+#endif // FEAT_HAVE_CUDA
+      }
+
+      if(!did_voxel)
+      {
+        if(lvl_backend == FEAT::PreferredBackend::cuda)
+        {
+          this->domain->comm().print("WARNING: defect assembly backend 'cuda' needs voxel-assembly with a Carreau-family material and a Q2 space; falling back to 'generic'");
+          lvl_backend = FEAT::PreferredBackend::generic;
+        }
+        FEAT::Backend::set_preferred_backend(lvl_backend);
+        FEAT::Assembly::BurgersVeloMaterialBlockedVectorAssemblyJob burgers_vec_job(
+          vec_def.local().template at<0>(), vec_primal.local().template at<0>(), vec_conv.local().template at<0>(), cur_dom.space_velo,
+          this->_cubature, this->_material->get_visc_func(_mesh_scale), this->_material->get_visc_der_func(_mesh_scale)
+        );
+        {
+          const auto aT = this->_material->get_abiat_aT(this->_temperature);
+          burgers_vec_job.deformation = true;
+          burgers_vec_job.nu = this->_material->get_default_viscosity(_mesh_scale, aT);
+          burgers_vec_job.aT = aT;
+          burgers_vec_job.beta = navier ? this->_material->get_density_gram_per_unit(_mesh_scale) : DataType(0);
+          burgers_vec_job.reg_eps = reg_eps;
+          burgers_vec_job.alpha = DataType(-1) / this->stiffness_factor;
+        }
+        vec_def.format();
+        cur_dom.domain_asm.assemble(burgers_vec_job);
+      }
+    }
+
     //the front system has to have B and D matrix correctly assembled
     void _assemble_defect(VectorType& vec_def, const VectorType& vec_primal, const VectorType& vec_conv, const VectorType& vec_rhs) const
     {
       watch_assembly.start();
       // setup
       const auto& cur_sys = *this->system_level;
-      auto& cur_dom = *this->domain->front();
-      FEAT::Assembly::BurgersVeloMaterialBlockedVectorAssemblyJob burgers_vec_job(
-        vec_def.local().template at<0>(), vec_primal.local().template at<0>(), vec_conv.local().template at<0>(), cur_dom.space_velo,
-        this->_cubature, this->_material->get_visc_func(_mesh_scale), this->_material->get_visc_der_func(_mesh_scale)
-      );
-      {
-        const auto aT = this->_material->get_abiat_aT(this->_temperature);
-        burgers_vec_job.deformation = true;
-        burgers_vec_job.nu = this->_material->get_default_viscosity(_mesh_scale, aT);
-        burgers_vec_job.aT = aT;
-        burgers_vec_job.beta = navier ? this->_material->get_density_gram_per_unit(_mesh_scale) : DataType(0);
-        burgers_vec_job.reg_eps = reg_eps;
-        burgers_vec_job.alpha = DataType(-1) / this->stiffness_factor;
-      }
-      vec_def.format();
-      // actual assembly
-      cur_dom.domain_asm.assemble(burgers_vec_job);
+      // assemble the velocity residual block (voxel or CPU, per-level backend)
+      this->_assemble_velo_residual(vec_def, vec_primal, vec_conv);
       watch_assembly.stop();
       Intern::DefectSaddlePointHelper<LevelType>::assemble_defect(vec_def, vec_primal, cur_sys, watch_fbm_filter, watch_grad_apply);
       // in theory, one could save the unsynced/unfiltered defect vector now, which we will ignore here
@@ -367,23 +473,8 @@ namespace Gendie
       watch_assembly.start();
       // setup
       const auto& cur_sys = *this->system_level;
-      auto& cur_dom = *this->domain->front();
-      FEAT::Assembly::BurgersVeloMaterialBlockedVectorAssemblyJob burgers_vec_job(
-        vec_def.local().template at<0>(), vec_primal.local().template at<0>(), vec_conv.local().template at<0>(), cur_dom.space_velo,
-        this->_cubature, this->_material->get_visc_func(_mesh_scale), this->_material->get_visc_der_func(_mesh_scale)
-      );
-      {
-        const auto aT = this->_material->get_abiat_aT(this->_temperature);
-        burgers_vec_job.deformation = true;
-        burgers_vec_job.nu = this->_material->get_default_viscosity(_mesh_scale, aT);
-        burgers_vec_job.aT = aT;
-        burgers_vec_job.beta = navier ? this->_material->get_density_gram_per_unit(_mesh_scale) : DataType(0);
-        burgers_vec_job.reg_eps = reg_eps;
-        burgers_vec_job.alpha = DataType(-1) / this->stiffness_factor;
-      }
-      vec_def.format();
-      // actual assembly
-      cur_dom.domain_asm.assemble(burgers_vec_job);
+      // assemble the velocity residual block (voxel or CPU, per-level backend)
+      this->_assemble_velo_residual(vec_def, vec_primal, vec_conv);
       watch_assembly.stop();
       Intern::DefectSaddlePointHelper<LevelType>::assemble_defect(vec_def, vec_primal, cur_sys, watch_fbm_filter, watch_grad_apply);
     }
