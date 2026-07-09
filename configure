@@ -678,6 +678,9 @@ if args.unroll_banded:
 
 for token in buildid:
   if token == "ninja":
+    if not shutil.which("ninja"):
+      error("ninja executable not found in path, aborting")
+
     config.generator = "Ninja"
   elif token == "xcode":
     config.generator = "Xcode"
@@ -807,9 +810,15 @@ for token in buildid:
   elif token == "mpi":
     config.cache_entry("FEAT_HAVE_MPI", "ON", "BOOL")
   elif token == "ccache":
+    if not shutil.which("ccache"):
+      error("ccache executable not found in path, aborting")
+
     config.set_compiler_wrapper("ccache")
     config.cache_entry("FEAT_USE_COMPILER_WRAPPER", "ON", "BOOL")
   elif token == "scorep":
+    if not shutil.which("scorep"):
+      error("scorep executable not found in path, aborting")
+
     config.set_compiler_wrapper("scorep")
     config.cache_entry("FEAT_USE_COMPILER_WRAPPER", "ON", "BOOL")
   elif token == "likwid":
