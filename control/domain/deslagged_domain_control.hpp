@@ -23,6 +23,7 @@
 #include <kernel/trafo/standard/mapping.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/util/dist_file_io.hpp>
+#include <kernel/util/math.hpp>
 #include <kernel/util/property_map.hpp>
 #include <kernel/util/simple_arg_parser.hpp>
 #include <kernel/util/statistics.hpp>
@@ -976,6 +977,13 @@ namespace FEAT::Control::Domain
   protected:
     /// the bounding box of the structured domain
     VertexType _bbox_min, _bbox_max;
+
+    /// Lowest level to deslag on. Inclusive.
+    int _deslag_lvl_min = 0;
+
+    /// Highest level to deslag on. Inclusive.
+    int _deslag_lvl_max = Math::Limits<int>::max();
+
     /// number of element slices on base mesh level 0
     std::array<Index, shape_dim> _base_slices;
 
@@ -1041,9 +1049,27 @@ namespace FEAT::Control::Domain
       this->_keep_deslagging_predicate = true;
     }
 
+    /// Setter for deslagging predicate
     void set_deslagging_predicate(std::unique_ptr<DeslaggingPredicateType>&& pred)
     {
       _deslagging_predicate = std::move(pred);
+    }
+
+    /**
+     * \brief Set the deslag level range
+     *
+     * \param[in] min Lowest level to deslag on. Inclusive.
+     * \param[in] max Highest level to deslag on. Inclusive.
+     *
+     * Only levels within the interval [min, max] will be deslagged by the domain controller.
+     * All other levels will be kept as is.
+     */
+    void set_deslag_level_range(int min, int max)
+    {
+      XASSERT(min <= max);
+
+      _deslag_lvl_min = min;
+      _deslag_lvl_max = max;
     }
 
     /**
@@ -1455,21 +1481,42 @@ namespace FEAT::Control::Domain
      *
      * This function adds a patch with rank -1 to the mesh_node, which represents the deslagged patch.
      *
+     * \param[in] lvl
+     * Current refinement level. Used to determine wether the mesh should be deslagged at this level.
+     *
      * \param[inout] mesh_node
      * A \transient reference to the mesh node that is to be deslagged.
      *
      * \returns A new mesh node that contains the deslagged mesh as well as the deslagged mesh parts.
      */
-    virtual std::unique_ptr<MeshNodeType> _deslag_mesh_node(MeshNodeType& mesh_node)
+    virtual std::unique_ptr<MeshNodeType> _deslag_mesh_node(int lvl, MeshNodeType& mesh_node)
     {
       XASSERTM(mesh_node.get_halo_map().empty(), "This function must not be used for partitioned mesh nodes!");
-      return mesh_node.extract_patch(_gather_masked_elements(*mesh_node.get_mesh(), this->_comm), true, false, false);
+      if(_deslag_lvl_min <= lvl && lvl <= _deslag_lvl_max)
+      {
+        return mesh_node.extract_patch(_gather_masked_elements(*mesh_node.get_mesh(), this->_comm), true, false, false);
+      }
+      else
+      {
+        // Return MeshNode with full patch, i.e. no deslagging
+        const Index num_elements = mesh_node.get_mesh()->get_num_elements();
+        std::vector<Index> elements(num_elements);
+        for(Index i(0); i < num_elements; i++)
+        {
+          elements[i] = i;
+        }
+
+        return mesh_node.extract_patch(std::move(elements), true, false, false);
+      }
     }
 
     /**
      * \brief Deslaggs a (potentially partitioned) mesh node including its mesh-parts and halos
      *
      * This function adds a patch with rank -1 to the mesh_node, which represents the deslagged patch.
+     *
+     * \param[in] lvl
+     * Current refinement level. Used to determine wether the mesh should be deslagged at this level.
      *
      * \param[inout] mesh_node
      * A \transient reference to the mesh node that is to be deslagged.
@@ -1485,19 +1532,35 @@ namespace FEAT::Control::Domain
      * \returns A new mesh node that contains the deslagged mesh as well as the deslagged mesh parts and halos.
      */
     virtual std::unique_ptr<MeshNodeType>
-    _deslag_mesh_node(MeshNodeType& mesh_node, const Ancestor& ancestor, bool is_child)
+    _deslag_mesh_node(int lvl, MeshNodeType& mesh_node, const Ancestor& ancestor, bool is_child)
     {
       const bool split_meshparts = true;
       const bool split_halos = false;
       const bool split_patches = false;
 
-      const auto* prod_comm = is_child ? &ancestor.progeny_comm : nullptr;
-      std::unique_ptr<MeshNodeType> new_node =
-        prod_comm
-          ? mesh_node.extract_patch(_gather_masked_elements(*mesh_node.get_mesh(), *prod_comm), split_meshparts, split_halos, split_patches)
-          : mesh_node.extract_patch(_gather_masked_elements(*mesh_node.get_mesh()), split_meshparts, split_halos, split_patches);
-      this->_deslag_patch_halos(*new_node, mesh_node, ancestor, is_child);
-      return new_node;
+      if(_deslag_lvl_min <= lvl && lvl <= _deslag_lvl_max)
+      {
+        const auto* prod_comm = is_child ? &ancestor.progeny_comm : nullptr;
+        std::unique_ptr<MeshNodeType> new_node =
+          prod_comm
+            ? mesh_node.extract_patch(_gather_masked_elements(*mesh_node.get_mesh(), *prod_comm), split_meshparts, split_halos, split_patches)
+            : mesh_node.extract_patch(_gather_masked_elements(*mesh_node.get_mesh()), split_meshparts, split_halos, split_patches);
+        this->_deslag_patch_halos(*new_node, mesh_node, ancestor, is_child);
+        return new_node;
+      }
+      else
+      {
+        // Return MeshNode with full patch, i.e. no deslagging
+        const Index num_elements = mesh_node.get_mesh()->get_num_elements();
+        std::vector<Index> elements(num_elements);
+        for(Index i(0); i < num_elements; i++)
+        {
+          elements[i] = i;
+        }
+
+        // OPTIMIZATION: Let extract_patch take a range of indices, rather than explicitly a vector.
+        return mesh_node.extract_patch(std::move(elements), true, false, false);
+      }
     }
 
     /**
@@ -2091,7 +2154,7 @@ namespace FEAT::Control::Domain
       // save slagged base mesh node
       std::unique_ptr<MeshNodeType> base_slag_node = std::move(base_mesh_node);
       // deslag base mesh node
-      base_mesh_node = this->_deslag_mesh_node(*base_slag_node);
+      base_mesh_node = this->_deslag_mesh_node(0, *base_slag_node);
 
       // compute base-mesh layering
       Adjacency::Coloring base_layering = _unstructured_mesh ? this->_compute_unstructured_layering(*base_mesh_node)
@@ -2102,7 +2165,7 @@ namespace FEAT::Control::Domain
       for(; lvl < ancestor.desired_level_min; ++lvl)
       {
         base_slag_node = base_mesh_node->refine_unique(this->_adapt_mode);
-        base_mesh_node = this->_deslag_mesh_node(*base_slag_node);
+        base_mesh_node = this->_deslag_mesh_node(lvl + 1, *base_slag_node);
         base_layering = _unstructured_mesh ? this->_compute_unstructured_layering(*base_mesh_node)
                                            : this->_compute_refined_mesh_layering(*base_slag_node, base_layering);
       }
@@ -2148,7 +2211,7 @@ namespace FEAT::Control::Domain
 
         // continue with refined node
         base_slag_node = std::move(refined_node);
-        base_mesh_node = this->_deslag_mesh_node(*base_slag_node);
+        base_mesh_node = this->_deslag_mesh_node(lvl + 1, *base_slag_node);
         base_coloring = _unstructured_mesh ? this->_compute_unstructured_coloring(*base_mesh_node)
                                            : this->_compute_refined_mesh_coloring(*base_slag_node);
         base_layering = _unstructured_mesh
@@ -2197,7 +2260,7 @@ namespace FEAT::Control::Domain
       std::unique_ptr<MeshNodeType> base_slag_node = std::move(base_mesh_node);
 
       // deslag base mesh node
-      base_mesh_node = this->_deslag_mesh_node(*base_slag_node);
+      base_mesh_node = this->_deslag_mesh_node(0, *base_slag_node);
       Adjacency::Coloring base_coloring;
       Adjacency::Coloring base_layering = _unstructured_mesh ? this->_compute_unstructured_layering(*base_mesh_node)
                                                              : this->_compute_base_mesh_layering(*base_slag_node);
@@ -2223,7 +2286,7 @@ namespace FEAT::Control::Domain
 
         // refine and deslag base mesh node
         base_slag_node = base_mesh_node->refine_unique(this->_adapt_mode);
-        base_mesh_node = this->_deslag_mesh_node(*base_slag_node);
+        base_mesh_node = this->_deslag_mesh_node(lvl + 1, *base_slag_node);
         base_coloring = _unstructured_mesh ? this->_compute_unstructured_coloring(*base_mesh_node)
                                            : this->_compute_refined_mesh_coloring(*base_slag_node);
         base_layering = _unstructured_mesh ? this->_compute_unstructured_layering(*base_mesh_node)
@@ -2270,7 +2333,7 @@ namespace FEAT::Control::Domain
       {
         // refine the patch mesh
         patch_slag_node = patch_mesh_node->refine_unique(this->_adapt_mode);
-        patch_mesh_node = this->_deslag_mesh_node(*patch_slag_node, ancestor, false);
+        patch_mesh_node = this->_deslag_mesh_node(lvl + 1, *patch_slag_node, ancestor, false);
         patch_layering = _unstructured_mesh ? this->_compute_unstructured_layering(*patch_mesh_node)
                                             : this->_compute_refined_mesh_layering(*patch_slag_node, patch_layering);
       }
@@ -2307,7 +2370,7 @@ namespace FEAT::Control::Domain
 
         // continue with refined node
         patch_slag_node = std::move(refined_node);
-        patch_mesh_node = this->_deslag_mesh_node(*patch_slag_node, ancestor, false);
+        patch_mesh_node = this->_deslag_mesh_node(lvl + 1, *patch_slag_node, ancestor, false);
         patch_coloring = _unstructured_mesh ? this->_compute_unstructured_coloring(*patch_mesh_node)
                                             : this->_compute_refined_mesh_coloring(*patch_slag_node);
         patch_layering = _unstructured_mesh
@@ -2351,7 +2414,7 @@ namespace FEAT::Control::Domain
       // deslag the base-mesh node and move pointer to a new parent-mesh pointer;
       // the base-mesh is always the one on the layer with only 1 process
       std::unique_ptr<MeshNodeType> parent_slag_node;
-      std::unique_ptr<MeshNodeType> parent_mesh_node = this->_deslag_mesh_node(*base_mesh_node);
+      std::unique_ptr<MeshNodeType> parent_mesh_node = this->_deslag_mesh_node(lvl, *base_mesh_node);
 
       // create the coloring and layering for the unrefined base mesh
       Adjacency::Coloring parent_coloring = _unstructured_mesh ? this->_compute_unstructured_coloring(*parent_mesh_node)
@@ -2449,7 +2512,7 @@ namespace FEAT::Control::Domain
 
           // continue with refined node
           parent_slag_node = std::move(refined_node);
-          parent_mesh_node = this->_deslag_mesh_node(*parent_slag_node, ancestor, !is_base_layer);
+          parent_mesh_node = this->_deslag_mesh_node(lvl + 1, *parent_slag_node, ancestor, !is_base_layer);
           parent_coloring = _unstructured_mesh ? this->_compute_unstructured_coloring(*parent_mesh_node)
                                                : this->_compute_refined_mesh_coloring(*parent_slag_node);
           parent_layering = _unstructured_mesh ? this->_compute_unstructured_layering(*parent_mesh_node)
@@ -2611,7 +2674,7 @@ namespace FEAT::Control::Domain
 
         // continue with refined node
         parent_slag_node = std::move(refined_node);
-        parent_mesh_node = this->_deslag_mesh_node(*parent_slag_node, this->_ancestry.front(), false);
+        parent_mesh_node = this->_deslag_mesh_node(lvl + 1, *parent_slag_node, this->_ancestry.front(), false);
         parent_coloring = _unstructured_mesh ? this->_compute_unstructured_coloring(*parent_mesh_node)
                                              : this->_compute_refined_mesh_coloring(*parent_slag_node);
         parent_layering = _unstructured_mesh
