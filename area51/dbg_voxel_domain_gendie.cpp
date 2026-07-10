@@ -10,7 +10,7 @@
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/analytic/lambda_function.hpp>
 
-#include <control/domain/voxel_domain_control.hpp>
+#include <control/domain/deslagged_domain_control.hpp>
 #include <control/scalar_basic.hpp>
 
 namespace DbgAdaptDrop
@@ -28,9 +28,11 @@ namespace DbgAdaptDrop
   typedef Space::Lagrange1::Element<TrafoType> SpaceType;
 
   typedef Control::Domain::SimpleDomainLevel<MeshType, TrafoType, SpaceType> DomainLevelSubType;
-  typedef Control::Domain::VoxelDomainLevelWrapper<DomainLevelSubType> DomainLevelType;
+  typedef Control::Domain::DeslaggedDomainLevelWrapper<DomainLevelSubType> DomainLevelType;
 
-  typedef Control::Domain::VoxelDomainControl<DomainLevelType> DomainControl;
+  typedef Control::Domain::DeslaggedDomainControl<DomainLevelType> DomainControl;
+
+  typedef Control::Domain::VoxelMapDeslaggingPredicate<MeshType, Real> DeslaggingPredicate;
 
   typedef Control::ScalarBasicSystemLevel<> SystemLevelType;
 }
@@ -45,7 +47,7 @@ int main(int argc, char** argv)
 
   Dist::Comm comm = Dist::Comm::world();
 
-  Control::Domain::VoxelDomainControl<DomainLevelType> domain(comm, true);
+  DomainControl domain(comm, true);
 
   /*if(argc < 2)
   {
@@ -83,21 +85,24 @@ int main(int argc, char** argv)
   Real res = 0.0;
   args.parse("res", res);
 
+  auto deslagging_predicate =
+    std::make_unique<DeslaggingPredicate>(domain.get_bounding_box_min(), domain.get_bounding_box_max(), res);
+
   // create slag mask from OFF file
   if(args.check("off") > 0)
   {
     String off_name = args.query("off")->second.front();
     comm.print("Creating voxel map from OFF file '" + off_name + "'...");
-    domain.create_voxel_map_from_off(off_name, false, res);
+    deslagging_predicate->compute_from_off(domain.comm(), off_name, false);
   }
   if(args.check("vxl") > 0)
   {
     String vxl_name = args.query("vxl")->second.front();
     comm.print("Loading voxel map from file '" + vxl_name + "'...");
-    domain.read_voxel_map(vxl_name);
+    deslagging_predicate->read_voxel_map(domain.comm(), vxl_name);
   }
 
-  domain.keep_voxel_map();
+  domain.keep_deslagging_predicate();
   domain.create_hierarchy();
 
   comm.print("Desired Levels: " + domain.format_desired_levels());
@@ -189,8 +194,8 @@ int main(int argc, char** argv)
   for(Index k(0); k < domain.size_physical(); ++k)
   {
     Geometry::ExportVTK<MeshType> vtk(domain.at(k)->get_mesh());
-    std::vector<int> mask = domain.gather_vertex_voxel_map(k);
-    std::vector<Real> weights = domain.gather_element_voxel_weights(k);
+    std::vector<int> mask = (dynamic_cast<DeslaggingPredicate&>(domain.get_deslagging_predicate())).gather_vertex_voxel_map(domain.at(k)->get_mesh());
+    std::vector<Real> weights = domain.gather_element_weights(k);
     vtk.add_vertex_scalar("mask", mask.data());
     //vtk.add_vertex_scalar("test", vectors.at(k).local().elements());
     vtk.add_cell_scalar("color", domain.at(k)->element_coloring.get_coloring());

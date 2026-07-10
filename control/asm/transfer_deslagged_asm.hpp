@@ -13,7 +13,7 @@
 #include <kernel/assembly/symbolic_assembler.hpp>
 #include <kernel/assembly/grid_transfer.hpp>
 
-#include <control/domain/voxel_domain_control.hpp>
+#include <control/domain/deslagged_domain_control.hpp>
 
 namespace FEAT
 {
@@ -154,7 +154,7 @@ namespace FEAT
        * participate in the parent layer.
        */
       template<typename DomainLevel_, template<typename> class SlagDomainLevelWrapper_, typename SpaceLambda_, typename Transfer_, typename Muxer_, typename Gate_>
-      void asm_transfer_voxel_scalar(
+      void asm_transfer_deslagged_scalar(
         const Control::Domain::VirtualLevel<SlagDomainLevelWrapper_<DomainLevel_>>& virt_lvl_f,
         const Control::Domain::VirtualLevel<SlagDomainLevelWrapper_<DomainLevel_>>& virt_lvl_c,
         const String& cubature, bool trunc, bool shrink,
@@ -341,7 +341,7 @@ namespace FEAT
        * participate in the parent layer.
        */
       template<typename DomainLevel_, template<typename> class SlagDomainLevelWrapper_, typename SpaceLambda_, typename Transfer_, typename Muxer_, typename Gate_>
-      static void asm_transfer_voxel_blocked(
+      static void asm_transfer_deslagged_blocked(
         const Control::Domain::VirtualLevel<SlagDomainLevelWrapper_<DomainLevel_>>& virt_lvl_f,
         const Control::Domain::VirtualLevel<SlagDomainLevelWrapper_<DomainLevel_>>& virt_lvl_c,
         const String& cubature, bool trunc, bool shrink,

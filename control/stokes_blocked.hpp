@@ -46,7 +46,7 @@
 #include <control/asm/muxer_asm.hpp>
 #include <control/asm/splitter_asm.hpp>
 #include <control/asm/transfer_asm.hpp>
-#include <control/asm/transfer_voxel_asm.hpp>
+#include <control/asm/transfer_deslagged_asm.hpp>
 #include <control/asm/unit_filter_asm.hpp>
 #include <control/asm/mean_filter_asm.hpp>
 #include <control/asm/slip_filter_asm.hpp>
@@ -358,10 +358,10 @@ namespace FEAT
         const Domain::VirtualLevel<SlagDomainLevelWrapper_<DomainLevel_>>& virt_lvl_coarse,
         const String& cubature, bool trunc_v = false, bool trunc_p = false, bool shrink = true)
       {
-        Asm::asm_transfer_voxel_blocked(virt_lvl_fine, virt_lvl_coarse, cubature, trunc_v, shrink,
+        Asm::asm_transfer_deslagged_blocked(virt_lvl_fine, virt_lvl_coarse, cubature, trunc_v, shrink,
           [](const DomainLevel_& dl) {return &dl.space_velo;},
           this->transfer_velo.local(), this->coarse_muxer_velo, this->gate_velo, sys_lvl_coarse.gate_velo);
-        Asm::asm_transfer_voxel_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc_p, shrink,
+        Asm::asm_transfer_deslagged_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc_p, shrink,
           [](const DomainLevel_& dl) {return &dl.space_pres;},
           this->transfer_pres.local(), this->coarse_muxer_pres, this->gate_pres, sys_lvl_coarse.gate_pres);
 
@@ -380,10 +380,10 @@ namespace FEAT
         // if the coarse level is a parent, then we need the coarse system level
         XASSERT(!virt_lvl_coarse.is_parent());
 
-        Asm::asm_transfer_voxel_blocked(virt_lvl_fine, virt_lvl_coarse, cubature, trunc_v, shrink,
+        Asm::asm_transfer_deslagged_blocked(virt_lvl_fine, virt_lvl_coarse, cubature, trunc_v, shrink,
           [](const DomainLevel_& dl) {return &dl.space_velo;},
           this->transfer_velo.local(), this->coarse_muxer_velo, this->gate_velo, this->gate_velo);
-        Asm::asm_transfer_voxel_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc_p, shrink,
+        Asm::asm_transfer_deslagged_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc_p, shrink,
           [](const DomainLevel_& dl) {return &dl.space_pres;},
           this->transfer_pres.local(), this->coarse_muxer_pres, this->gate_pres, this->gate_pres);
 

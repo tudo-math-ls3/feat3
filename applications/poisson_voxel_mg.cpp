@@ -43,7 +43,7 @@
 #include <kernel/assembly/common_functionals.hpp>
 #include <kernel/solver/pcg.hpp>
 
-#include <control/domain/voxel_domain_control.hpp>
+#include <control/domain/deslagged_domain_control.hpp>
 #include <control/scalar_basic.hpp>
 #include <control/statistics.hpp>
 
@@ -312,9 +312,9 @@ namespace PoissonVoxelMG
       stats.times[i][Times::asm_muxer] += ts.elapsed_now();
       TimeStamp ts2;
       if((i+1) < domain.size_physical())
-        system_levels.at(i)->assemble_transfer_voxel(*system_levels.at(i+1), domain.at(i), domain.at(i+1), cubature);
+        system_levels.at(i)->assemble_transfer_deslagged(*system_levels.at(i+1), domain.at(i), domain.at(i+1), cubature);
       else
-        system_levels.at(i)->assemble_transfer_voxel(domain.at(i), domain.at(i+1), cubature);
+        system_levels.at(i)->assemble_transfer_deslagged(domain.at(i), domain.at(i+1), cubature);
       stats.times[i][Times::asm_transfer] += ts2.elapsed_now();
       stats.times[i][Times::asm_total] += ts.elapsed_now();
     }
@@ -572,8 +572,9 @@ namespace PoissonVoxelMG
 
     // create our domain control
     typedef Control::Domain::SimpleDomainLevel<MeshType, TrafoType, SpaceType> DomainLevelType;
-    typedef Control::Domain::VoxelDomainLevelWrapper<DomainLevelType> VoxelDomainLevelType;
-    Control::Domain::VoxelDomainControl<VoxelDomainLevelType> domain(comm, true);
+    typedef Control::Domain::DeslaggedDomainLevelWrapper<DomainLevelType> SlaggedDomainLevelType;
+    typedef Control::Domain::VoxelMapDeslaggingPredicate<MeshType, Real> DeslaggingPredicateType;
+    Control::Domain::DeslaggedDomainControl<SlaggedDomainLevelType> domain(comm, true);
 
     if constexpr (MeshType::shape_dim == 2)
       domain.create_base_mesh_2d(2, 2, -1.0, 1.0, -1.0, 1.0);
@@ -581,12 +582,21 @@ namespace PoissonVoxelMG
     if constexpr (MeshType::shape_dim == 3)
       domain.create_base_mesh_3d(2, 2, 2, -1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
 
+
     domain.parse_args(args);
     domain.set_desired_levels(args.query("level")->second);
 
-    //domain.create_voxel_map_from_lambda([](auto p) { return (p[1] < 2.375-2.25*p[0] ) && (p[1] < 2.25*p[0]+0.125); }, 0.0);
-    domain.create_voxel_map_from_lambda([](auto p) {return p.norm_euclid_sqr() < 1.0001;}, 0.0);
-    //domain.create_voxel_map_from_lambda([](auto p) { return (p[1] < 2.375-2.25*p[0] ) && (p[1] < 2.25*p[0]+0.125); }, 0.0);
+    auto deslagging_predicate = std::make_unique<DeslaggingPredicateType>(
+      domain.get_bounding_box_min(),
+      domain.get_bounding_box_max(),
+      Tiny::Vector<Index, MeshType::shape_dim>(2),
+      domain.get_desired_level_max());
+
+    //slagging_predicate.compute_from_lambda(domain.comm(), [](auto p) { return (p[1] < 2.375-2.25*p[0] ) && (p[1] < 2.25*p[0]+0.125); });
+    deslagging_predicate->compute_from_lambda(domain.comm(), [](auto p) {return p.norm_euclid_sqr() < 1.0001;});
+    //slagging_predicate.compute_from_lambda(domain.comm(), [](auto p) { return (p[1] < 2.375-2.25*p[0] ) && (p[1] < 2.25*p[0]+0.125); });
+
+    domain.set_deslagging_predicate(std::move(deslagging_predicate));
     domain.create_hierarchy();
 
     // create boundary meshparts on each level

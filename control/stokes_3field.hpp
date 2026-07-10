@@ -45,7 +45,7 @@
 #include <control/asm/muxer_asm.hpp>
 #include <control/asm/splitter_asm.hpp>
 #include <control/asm/transfer_asm.hpp>
-#include <control/asm/transfer_voxel_asm.hpp>
+#include <control/asm/transfer_deslagged_asm.hpp>
 #include <control/asm/unit_filter_asm.hpp>
 #include <control/asm/mean_filter_asm.hpp>
 #include <control/asm/slip_filter_asm.hpp>

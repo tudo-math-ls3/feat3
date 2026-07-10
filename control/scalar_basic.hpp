@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <control/domain/deslagged_domain_control.hpp>
 #include <kernel/base_header.hpp>
 #include <kernel/util/dist.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
@@ -46,7 +47,7 @@
 #include <control/asm/splitter_asm.hpp>
 #include <control/asm/transfer_adaptive_asm.hpp>
 #include <control/asm/transfer_asm.hpp>
-#include <control/asm/transfer_voxel_asm.hpp>
+#include <control/asm/transfer_deslagged_asm.hpp>
 #include <control/asm/mean_filter_asm.hpp>
 #include <control/asm/unit_filter_asm.hpp>
 
@@ -211,13 +212,13 @@ namespace FEAT
       }
 
       template<typename DomainLevel_>
-      void assemble_transfer_voxel(
+      void assemble_transfer_deslagged(
         const ScalarBasicSystemLevel& sys_lvl_coarse,
-        const Domain::VirtualLevel<Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_fine,
-        const Domain::VirtualLevel<Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_coarse,
+        const Domain::VirtualLevel<Domain::DeslaggedDomainLevelWrapper<DomainLevel_>>& virt_lvl_fine,
+        const Domain::VirtualLevel<Domain::DeslaggedDomainLevelWrapper<DomainLevel_>>& virt_lvl_coarse,
         const String& cubature, bool trunc = false, bool shrink = true)
       {
-        Asm::asm_transfer_voxel_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc, shrink,
+        Asm::asm_transfer_deslagged_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc, shrink,
           [](const DomainLevel_& dl) {return &dl.space;},
           this->transfer_sys.local(), this->coarse_muxer_sys, this->gate_sys, sys_lvl_coarse.gate_sys);
 
@@ -225,15 +226,15 @@ namespace FEAT
       }
 
       template<typename DomainLevel_>
-      void assemble_transfer_voxel(
-        const Domain::VirtualLevel<Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_fine,
-        const Domain::VirtualLevel<Domain::VoxelDomainLevelWrapper<DomainLevel_>>& virt_lvl_coarse,
+      void assemble_transfer_deslagged(
+        const Domain::VirtualLevel<Domain::DeslaggedDomainLevelWrapper<DomainLevel_>>& virt_lvl_fine,
+        const Domain::VirtualLevel<Domain::DeslaggedDomainLevelWrapper<DomainLevel_>>& virt_lvl_coarse,
         const String& cubature, bool trunc = false, bool shrink = true)
       {
         // if the coarse level is a parent, then we need the coarse system level
         XASSERT(!virt_lvl_coarse.is_parent());
 
-        Asm::asm_transfer_voxel_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc, shrink,
+        Asm::asm_transfer_deslagged_scalar(virt_lvl_fine, virt_lvl_coarse, cubature, trunc, shrink,
           [](const DomainLevel_& dl) {return &dl.space;},
           this->transfer_sys.local(), this->coarse_muxer_sys, this->gate_sys, this->gate_sys);
 

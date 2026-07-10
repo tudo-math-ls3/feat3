@@ -10,7 +10,7 @@
 #include <kernel/geometry/export_vtk.hpp>
 #include <kernel/analytic/lambda_function.hpp>
 
-#include <control/domain/voxel_domain_control.hpp>
+#include <control/domain/deslagged_domain_control.hpp>
 #include <control/scalar_basic.hpp>
 
 namespace DbgVoxelDomain
@@ -51,9 +51,11 @@ namespace DbgVoxelDomain
   typedef Space::Lagrange1::Element<TrafoType> SpaceType;
 
   typedef Control::Domain::SimpleDomainLevel<MeshType, TrafoType, SpaceType> DomainLevelSubType;
-  typedef Control::Domain::VoxelDomainLevelWrapper<DomainLevelSubType> DomainLevelType;
+  typedef Control::Domain::DeslaggedDomainLevelWrapper<DomainLevelSubType> DomainLevelType;
 
-  typedef Control::Domain::VoxelDomainControl<DomainLevelType> DomainControl;
+  typedef Control::Domain::DeslaggedDomainControl<DomainLevelType> DomainControl;
+
+  typedef Control::Domain::VoxelMapDeslaggingPredicate<MeshType, Real> DeslaggingPredicate;
 
   typedef Control::ScalarBasicSystemLevel<> SystemLevelType;
 }
@@ -74,7 +76,7 @@ int main(int argc, char** argv)
 
   XASSERT(args.query_unsupported().empty());
 
-  Control::Domain::VoxelDomainControl<DomainLevelType> domain(comm, true);
+  DomainControl domain(comm, true);
 
   // create base mesh node
   //domain.create_base_mesh_2d(4, 4, 0.0, 1.0, 0.0, 1.0);
@@ -93,9 +95,17 @@ int main(int argc, char** argv)
   //domain.set_desired_levels("4 3:4 2:2 1:1 0");
   //domain.set_desired_levels(5, 2, 0);
 
-  domain.keep_voxel_map();
-  domain.create_voxel_map(*std::make_unique<RingDropper<ShapeType::dimension>>(), 0.1);
-  //domain.create_voxel_map_from_lambda([](auto p) { return (p[1] < 2.375-2.25*p[0] ) && (p[1] < 2.25*p[0]+0.125); }, Real(0));
+  auto deslagging_predicate = std::make_unique<DeslaggingPredicate>(
+    domain.get_bounding_box_min(),
+    domain.get_bounding_box_max(),
+    Tiny::Vector<Index, 3>{6, 6, 3},
+    domain.get_desired_level_max());
+
+  deslagging_predicate->compute_from_voxel_masker(domain.comm(), *std::make_unique<RingDropper<ShapeType::dimension>>());
+  //deslagging_predicate.compute_from_lambda(domain.comm(), [](auto p) { return (p[1] < 2.375-2.25*p[0] ) && (p[1] < 2.25*p[0]+0.125); });
+
+  domain.keep_deslagging_predicate();
+  domain.set_deslagging_predicate(std::move(deslagging_predicate));
   domain.create_hierarchy();
 
   comm.print("Desired Levels: " + domain.format_desired_levels());
@@ -185,8 +195,8 @@ int main(int argc, char** argv)
   for(Index k(0); k < domain.size_physical(); ++k)
   {
     Geometry::ExportVTK<MeshType> vtk(domain.at(k)->get_mesh());
-    std::vector<int> mask = domain.gather_vertex_voxel_map(k); //gather_vertex_slag_mask(k);
-    std::vector<Real> weights = domain.gather_element_voxel_weights(k); //gather_element_slag_weights(k);
+    std::vector<int> mask = (dynamic_cast<DeslaggingPredicate&>(domain.get_deslagging_predicate())).gather_vertex_voxel_map(domain.at(k)->get_mesh());
+    std::vector<Real> weights = domain.gather_element_weights(k); //gather_element_slag_weights(k);
     vtk.add_vertex_scalar("mask", mask.data());
     //vtk.add_vertex_scalar("test", vectors.at(k).local().elements());
     vtk.add_cell_scalar("weights", weights.data());

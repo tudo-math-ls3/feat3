@@ -17,23 +17,21 @@
 #include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/util/omp_util.hpp>
 
-#include <control/domain/cgal_domain_control.hpp>
-
-
-
+#include <control/domain/deslagged_domain_control.hpp>
 
 namespace Gendie
 {
 
   /// our domain level
   typedef DomainLevelBase DomainLevelBackground;
-  typedef Control::Domain::CGALDomainLevelWrapper<DomainLevelBackground> DomainLevel;
+  typedef Control::Domain::DeslaggedDomainLevelWrapper<DomainLevelBackground> DomainLevel;
+  typedef Control::Domain::CGALDeslaggingPredicate<MeshType, Real> DeslaggingPredicateType;
 
   template<typename DT_, typename IT_> using SystemLevel = SystemLevelBase<DT_, IT_>;
 
   /// our partidomaincontrol
   template<typename DomainLevel_>
-  using PartitionControl = Control::Domain::CGALDomainControl<DomainLevel_>;
+  using PartitionControl = Control::Domain::DeslaggedDomainControl<DomainLevel_>;
 
   typedef Gendie::InflowBoundary<MeshType> InflowBound;
 
@@ -289,7 +287,6 @@ namespace Gendie
   void create_voxel_domain(PartitionControl<DomainLevel>& domain, const SimpleArgParser& /*args*/, const PropertyMap* config, ParamHolder_& param_holder, const Logger* logger)
   {
     logger->print("Going into create_voxel_domain", PrintLevel::info);
-    domain.cheap_weight_calculation(param_holder.cheap_weights);
     TimeStamp create_voxel_domain;
     {
       const auto* parti_config = config->get_sub_section("partition");
@@ -335,14 +332,12 @@ namespace Gendie
     }
 
     logger->print("Setting CGAL Wrapper");
-    // create slag mask
-    if(domain.cgal_wrapper_empty())
-    {
-      domain.create_cgal_wrapper(param_holder.surface_meshfile, Geometry::CGALFileMode::fm_off);
-      domain.get_cgal_wrapper()->set_expensive_intersection(param_holder.exact_deslagging);
-    }
-    //always keep cgal wrapper
-    domain.keep_cgal_wrapper();
+    auto deslagging_predicate = std::make_unique<DeslaggingPredicateType>(domain.comm(), param_holder.surface_meshfile, Geometry::CGALFileMode::fm_off);
+    deslagging_predicate->get_cgal_wrapper().set_expensive_intersection(param_holder.exact_deslagging);
+    deslagging_predicate->cheap_weight_calculation(param_holder.cheap_weights);
+
+    domain.set_deslagging_predicate(std::move(deslagging_predicate));
+    domain.keep_deslagging_predicate();
 
     // now we can create our hirarchy
     logger->print("Creating hirarchy");
@@ -739,23 +734,6 @@ namespace Gendie
     logger.print("Setting up domain", PrintLevel::info);
     watch_create_domain.start();
     PartitionControl<DomainLevel> domain(comm, true);
-    {
-      std::unique_ptr<Geometry::CGALWrapper<SystemDataType>> _cgal_tmp = Gendie::create_cgal_wrapper(param_holder.surface_meshfile, comm);
-      if(_cgal_tmp)
-      {
-        _cgal_tmp->set_expensive_intersection(param_holder.exact_deslagging);
-      }
-      if(_cgal_tmp && param_holder.measure_cgal_size)
-      {
-        std::size_t bytes_sum, bytes_min, bytes_max;
-        bytes_sum = bytes_min = bytes_max = _cgal_tmp->bytes();
-        comm.allreduce(&bytes_min, &bytes_min, 1, FEAT::Dist::op_min);
-        comm.allreduce(&bytes_max, &bytes_max, 1, FEAT::Dist::op_max);
-        comm.allreduce(&bytes_sum, &bytes_sum, 1, FEAT::Dist::op_sum);
-        logger.print(format_submemory_mm_t_kb("CGAL Size", bytes_sum, bytes_min, bytes_max, pad_len), PrintLevel::info);
-      }
-      domain.set_cgal_wrapper(std::move(_cgal_tmp));
-    }
     watch_create_domain.stop();
 
     // our materials
@@ -769,6 +747,15 @@ namespace Gendie
     {
       create_voxel_domain(domain, args, config.get(), param_holder, &logger);
 
+      if(param_holder.measure_cgal_size)
+      {
+        std::size_t bytes_sum, bytes_min, bytes_max;
+        bytes_sum = bytes_min = bytes_max = dynamic_cast<DeslaggingPredicateType&>(domain.get_deslagging_predicate()).get_cgal_wrapper().bytes();
+        comm.allreduce(&bytes_min, &bytes_min, 1, FEAT::Dist::op_min);
+        comm.allreduce(&bytes_max, &bytes_max, 1, FEAT::Dist::op_max);
+        comm.allreduce(&bytes_sum, &bytes_sum, 1, FEAT::Dist::op_sum);
+        logger.print(format_submemory_mm_t_kb("CGAL Size", bytes_sum, bytes_min, bytes_max, pad_len), PrintLevel::info);
+      }
 
       if(const PropertyMap* problem_config = config->get_sub_section("problem_params"))
       {
@@ -798,13 +785,13 @@ namespace Gendie
       logger.print("Create FBM Meshpart and Assembler", PrintLevel::info);
       {
         // release here to free used memory of cgal afterwards
-        std::unique_ptr<Geometry::CGALWrapper<SystemDataType>> cgal_wrapper(domain.release_cgal_wrapper());
-        XASSERTM(cgal_wrapper.get() != nullptr, "CGAL Wrapper was not allocated");
+        std::unique_ptr<DeslaggingPredicateType> deslagging_predicate(dynamic_cast<DeslaggingPredicateType*>(domain.release_deslagging_predicate()));
+        const auto& cgal_wrapper = deslagging_predicate->get_cgal_wrapper();
 
         // create meshparts on all levels
         for(std::size_t i(0); i < domain.size_physical(); ++i)
         {
-          auto* ptr = Gendie::add_cgal_mesh_part(domain.at(i)->get_mesh_node(), cgal_wrapper.get(), "fbm");
+          auto* ptr = Gendie::add_cgal_mesh_part(domain.at(i)->get_mesh_node(), &cgal_wrapper, "fbm");
           if(ptr == nullptr)
           {
             logger.print("Meshpart is nullptr", PrintLevel::error);
@@ -1119,7 +1106,6 @@ namespace Gendie
         analyze,
         time_asm,
         lin_sol,
-        create_weights,
         create_hirarch,
         num_entries
       };
@@ -1134,7 +1120,6 @@ namespace Gendie
       timings_min[to_underlying(_TimeID::analyze)] = timings_max[to_underlying(_TimeID::analyze)] = timings[to_underlying(_TimeID::analyze)] = watch_analyze_sol.elapsed();
       timings_min[to_underlying(_TimeID::time_asm)] = timings_max[to_underlying(_TimeID::time_asm)] = timings[to_underlying(_TimeID::time_asm)] = assembly_time_solver;
       timings_min[to_underlying(_TimeID::lin_sol)] = timings_max[to_underlying(_TimeID::lin_sol)] = timings[to_underlying(_TimeID::lin_sol)] = ls_time_solver;
-      timings_min[to_underlying(_TimeID::create_weights)] = timings_max[to_underlying(_TimeID::create_weights)] = timings[to_underlying(_TimeID::create_weights)] = domain.get_watch_weights().elapsed();
       timings_min[to_underlying(_TimeID::create_hirarch)] = timings_max[to_underlying(_TimeID::create_hirarch)] = timings[to_underlying(_TimeID::create_hirarch)] = domain.get_watch_hierarchy().elapsed();
       // sync our timings
       comm.allreduce(timings_max, timings_max, to_underlying(_TimeID::num_entries), FEAT::Dist::op_max);
@@ -1145,17 +1130,16 @@ namespace Gendie
       s += FEAT::String("\n------------------------------------Overall Timings-------------------------------------------\n");
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
 
-      s += format_subtime_mm("Create Domain", timings[to_underlying(_TimeID::create_domain)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_domain)], timings_max[to_underlying(_TimeID::create_domain)], pad_len);
-      s += format_subtime_mm("Create Domain Weights", timings[to_underlying(_TimeID::create_weights)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_weights)], timings_max[to_underlying(_TimeID::create_weights)], pad_len);
-      s += format_subtime_mm("Create Domain Hirarch", timings[to_underlying(_TimeID::create_hirarch)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_hirarch)], timings_max[to_underlying(_TimeID::create_hirarch)], pad_len);
-      s += format_subtime_mm("Create System", timings[to_underlying(_TimeID::create_system)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_system)], timings_max[to_underlying(_TimeID::create_system)], pad_len);
-      s += format_subtime_mm("Create Filter", timings[to_underlying(_TimeID::create_filter)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_filter)], timings_max[to_underlying(_TimeID::create_filter)], pad_len);
-      s += format_subtime_mm("Create Solver", timings[to_underlying(_TimeID::create_solver)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_solver)], timings_max[to_underlying(_TimeID::create_solver)], pad_len);
-      s += format_subtime_mm("VTK Output", timings[to_underlying(_TimeID::write_out)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::write_out)], timings_max[to_underlying(_TimeID::write_out)], pad_len);
-      s += format_subtime_mm("Solution Analyze", timings[to_underlying(_TimeID::analyze)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::analyze)], timings_max[to_underlying(_TimeID::analyze)], pad_len);
-      s += format_subtime_mm("Total Time Assembly", timings[to_underlying(_TimeID::time_asm)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::time_asm)], timings_max[to_underlying(_TimeID::time_asm)], pad_len);
-      s += format_subtime_mm("Total Time Linear Solver", timings[to_underlying(_TimeID::lin_sol)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::lin_sol)], timings_max[to_underlying(_TimeID::lin_sol)], pad_len);
-      s += format_subtime_mm("Total Time", timings[to_underlying(_TimeID::total)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::total)], timings_max[to_underlying(_TimeID::total)], pad_len);
+      s += format_subtime_mm("Create Domain", timings[_TimeID::create_domain], timings[_TimeID::total], timings_min[_TimeID::create_domain], timings_max[_TimeID::create_domain], pad_len);
+      s += format_subtime_mm("Create Domain Hirarch", timings[_TimeID::create_hirarch], timings[_TimeID::total], timings_min[_TimeID::create_hirarch], timings_max[_TimeID::create_hirarch], pad_len);
+      s += format_subtime_mm("Create System", timings[_TimeID::create_system], timings[_TimeID::total], timings_min[_TimeID::create_system], timings_max[_TimeID::create_system], pad_len);
+      s += format_subtime_mm("Create Filter", timings[_TimeID::create_filter], timings[_TimeID::total], timings_min[_TimeID::create_filter], timings_max[_TimeID::create_filter], pad_len);
+      s += format_subtime_mm("Create Solver", timings[_TimeID::create_solver], timings[_TimeID::total], timings_min[_TimeID::create_solver], timings_max[_TimeID::create_solver], pad_len);
+      s += format_subtime_mm("VTK Output", timings[_TimeID::write_out], timings[_TimeID::total], timings_min[_TimeID::write_out], timings_max[_TimeID::write_out], pad_len);
+      s += format_subtime_mm("Solution Analyze", timings[_TimeID::analyze], timings[_TimeID::total], timings_min[_TimeID::analyze], timings_max[_TimeID::analyze], pad_len);
+      s += format_subtime_mm("Total Time Assembly", timings[_TimeID::time_asm], timings[_TimeID::total], timings_min[_TimeID::time_asm], timings_max[_TimeID::time_asm], pad_len);
+      s += format_subtime_mm("Total Time Linear Solver", timings[_TimeID::lin_sol], timings[_TimeID::total], timings_min[_TimeID::lin_sol], timings_max[_TimeID::lin_sol], pad_len);
+      s += format_subtime_mm("Total Time", timings[_TimeID::total], timings[_TimeID::total], timings_min[_TimeID::total], timings_max[_TimeID::total], pad_len);
 
       logger.print(s, PrintLevel::info);
     }

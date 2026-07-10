@@ -367,7 +367,7 @@ namespace FEAT
     /**
      * \brief VoxelMap class
      *
-     * This class is responsible for creating an managing voxel maps, which are used by the Control::Domain::VoxelDomainControl
+     * This class is responsible for creating an managing voxel maps, which are used by the Control::Domain::SlaggedDomainControl
      * class to determine which elements can be dropped during the mesh hierarchy creation process.
      *
      * A voxel map is basically a 2D or 3D monochrome raster image representing a domain bounding box, where each voxel

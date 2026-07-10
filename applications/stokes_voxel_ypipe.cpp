@@ -31,10 +31,11 @@
 #include <kernel/solver/amavanka.hpp>
 #include <kernel/solver/direct_stokes_solver.hpp>
 
-#include <control/domain/voxel_domain_control.hpp>
+#include <control/domain/deslagged_domain_control.hpp>
 #include <control/stokes_blocked.hpp>
 #include <control/statistics.hpp>
 
+#include <memory>
 #include <vector>
 
 namespace StokesVoxelYPipe
@@ -287,15 +288,23 @@ namespace StokesVoxelYPipe
 
     // create our domain control
     typedef Control::Domain::StokesDomainLevel<MeshType, TrafoType, SpaceTypeVelo, SpaceTypePres> DomainLevelType;
-    typedef Control::Domain::VoxelDomainLevelWrapper<DomainLevelType> VoxelDomainLevelType;
-    Control::Domain::VoxelDomainControl<VoxelDomainLevelType> domain(comm, true);
+    typedef Control::Domain::DeslaggedDomainLevelWrapper<DomainLevelType> DeslaggedDomainLevelType;
+    typedef Control::Domain::VoxelMapDeslaggingPredicate<MeshType, Real> DeslaggingPredicateType;
+    Control::Domain::DeslaggedDomainControl<DeslaggedDomainLevelType> domain(comm, true);
 
     domain.create_base_mesh_2d(3, 2, 0.0, 3.0, -1.0, 1.0);
 
     domain.parse_args(args);
     domain.set_desired_levels(args.query("level")->second);
 
-    domain.create_voxel_map_from_chart(ypipe_chart, true, 0.0);
+    auto deslagging_predicate = std::make_unique<DeslaggingPredicateType>(
+      domain.get_bounding_box_min(),
+      domain.get_bounding_box_max(),
+      Tiny::Vector<Index, 2>{3, 2},
+      domain.get_desired_level_max());
+    deslagging_predicate->compute_from_chart(domain.comm(), ypipe_chart, true);
+
+    domain.set_deslagging_predicate(std::move(deslagging_predicate));
     domain.create_hierarchy();
 
     auto hit_l = [](auto p) {return p[0] < 0.0001;};
