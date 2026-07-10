@@ -262,7 +262,7 @@ namespace FEAT
         Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& vanka_wrap, const std::vector<Memory::Arbiter>& d_macro_dofs,
         const std::vector<Memory::Arbiter>& d_dof_macros, Memory::Arbiter& d_macro_mask, const std::vector<Index>& max_degree_dofs,
         const std::vector<Index>& max_degree_macros, const Adjacency::ColoringDataHandler& coloring_data,
-        Index num_macros, Index stride, Index actual_matrix_size, DT_ omega, bool skip_singular);
+        Index num_macros, Index stride, Index actual_matrix_size, DT_ omega, bool skip_singular, bool synchronize);
     }
 
   #ifndef __CUDACC__
@@ -331,6 +331,9 @@ namespace FEAT
       Memory::Arbiter _d_macro_mask; // of int
       /// flag whether we should allocate additional device pointer
       bool _allocate_device = false;
+      /// flag whether the batched cuda assembly should synchronize (and error-check) at the end;
+      /// set to false to run the assembly asynchronously (requires stream-ordered allocation support)
+      bool _sync_after_assembly = true;
 
       /// \brief Calculate the max degree of our graphs
       void _alloc_max_degrees()
@@ -483,7 +486,7 @@ namespace FEAT
         {
           XASSERTM(uniform_macros, "Batched assembly only works with uniform macros!");
           // TODO: stride always actual local matrix size?
-          Arch::assemble_vanka_device_batched(mat_wrap, vanka_wrap, _d_macro_dofs, _d_dof_macros, _d_macro_mask, _max_degree_dofs, _max_degree_macros, _coloring_data, num_macros, stride, stride, this->_omega, this->_skip_singular);
+          Arch::assemble_vanka_device_batched(mat_wrap, vanka_wrap, _d_macro_dofs, _d_dof_macros, _d_macro_mask, _max_degree_dofs, _max_degree_macros, _coloring_data, num_macros, stride, stride, this->_omega, this->_skip_singular, _sync_after_assembly);
         }
       }
       #endif
@@ -525,6 +528,22 @@ namespace FEAT
         #ifdef FEAT_HAVE_CUDA
         _allocate_device = Util::cuda_get_device_count() > 0;
         #endif
+      }
+
+      /**
+       * \brief Controls whether the batched cuda assembly synchronizes at the end.
+       *
+       * By default the batched cuda numeric assembly synchronizes and error-checks the device
+       * after assembly. Passing \c false lets the assembly run asynchronously (using stream-ordered
+       * allocation, if supported by the device), so it can overlap with other work on the default
+       * stream. Note that with synchronization disabled the reported init-numeric timing no longer
+       * reflects the actual device runtime.
+       *
+       * \param[in] sync Whether to synchronize after the batched assembly.
+       */
+      void set_sync_after_assembly(bool sync)
+      {
+        _sync_after_assembly = sync;
       }
 
       // rule of 5

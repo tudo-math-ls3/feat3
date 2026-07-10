@@ -780,8 +780,13 @@ namespace FEAT
               const Adjacency::ColoringDataHandler& coloring_data,
               DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params,
               const AssemblyMaterialData<DT_>& material_params,
-              MaterialType material_type, int shared_mem, int blocksize, int gridsize, bool print_occupancy)
+              MaterialType material_type, const Util::RuntimeParameter& runtime_params)
       {
+        // unpack the runtime kernel launch parameters
+        const int shared_mem = runtime_params.shared_mem;
+        const int blocksize = runtime_params.blocksize;
+        const int gridsize = runtime_params.gridsize;
+        const bool print_occupancy = runtime_params.print_occupancy;
         // get the size of all necessary shared memory
         typedef DT_ DataType;
         const DataType tol_eps = CudaMath::cuda_get_sqrt_eps<DataType>();
@@ -909,7 +914,8 @@ namespace FEAT
           }
         }
         //check for cuda error in our kernel
-        Util::cuda_check_last_error();
+        if(runtime_params.synchronize)
+          Util::cuda_check_last_error();
       }
 
 
@@ -987,8 +993,13 @@ namespace FEAT
               DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params,
               const AssemblyMaterialData<DT_>& material_params,
               MaterialType material_type,
-              int shared_mem, int blocksize, int gridsize, bool print_occupancy)
+              const Util::RuntimeParameter& runtime_params)
       {
+        // unpack the runtime kernel launch parameters
+        const int shared_mem = runtime_params.shared_mem;
+        const int blocksize = runtime_params.blocksize;
+        const int gridsize = runtime_params.gridsize;
+        const bool print_occupancy = runtime_params.print_occupancy;
         // get the size of all necessary shared memory
         constexpr int dim = Space_::ShapeType::dimension;
         constexpr int num_loc_dofs = Space_::DofMappingType::dof_count;
@@ -1057,7 +1068,8 @@ namespace FEAT
         }
 
         //check for cuda error (also synchronizes)
-        Util::cuda_check_last_error();
+        if(runtime_params.synchronize)
+          Util::cuda_check_last_error();
       }
 
       template<typename Space_, typename DT_, typename IT_>
@@ -1179,13 +1191,13 @@ using namespace FEAT::VoxelAssembly;
 
 /*******************************************************2D implementations***************************************************/
 template void Arch::assemble_burgers_velo_material_csr(const Q2StandardQuad&, const CSRMatrixData<double, std::uint32_t>&, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
-                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_velo_material_csr(const Q2StandardQuad&, const CSRMatrixData<float, std::uint32_t>&, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint32_t>&,
-                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_velo_material_csr(const Q2StandardQuad&, const CSRMatrixData<double, std::uint64_t>&, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint64_t>&,
-                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_velo_material_csr(const Q2StandardQuad&, const CSRMatrixData<float, std::uint64_t>&, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
-                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, const Util::RuntimeParameter&);
 
 template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardQuad&, const CSRMatrixData<double, std::uint32_t>&, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType);
@@ -1197,13 +1209,13 @@ template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardQuad
                                           const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType);
 
 template void Arch::assemble_burgers_velo_material_defect(const Q2StandardQuad&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
-                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_velo_material_defect(const Q2StandardQuad&, float*, const float*, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint32_t>&,
-                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_velo_material_defect(const Q2StandardQuad&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint64_t>&,
-                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_velo_material_defect(const Q2StandardQuad&, float*, const float*, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
-                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, const Util::RuntimeParameter&);
 
 template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardQuad&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType);
@@ -1217,13 +1229,13 @@ template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardQ
 /*********************************************************3D implementations**************************************************************************************/
 
 template void Arch::assemble_burgers_velo_material_csr(const Q2StandardHexa&, const CSRMatrixData<double, std::uint32_t>&, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
-                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_velo_material_csr(const Q2StandardHexa&, const CSRMatrixData<float, std::uint32_t>&, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint32_t>&,
-                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_velo_material_csr(const Q2StandardHexa&, const CSRMatrixData<double, std::uint64_t>&, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint64_t>&,
-                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_velo_material_csr(const Q2StandardHexa&, const CSRMatrixData<float, std::uint64_t>&, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
-                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, const Util::RuntimeParameter&);
 
 template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardHexa&, const CSRMatrixData<double, std::uint32_t>&, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType);
@@ -1235,13 +1247,13 @@ template void Arch::assemble_burgers_velo_material_csr_host(const Q2StandardHexa
                                           const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType);
 
 template void Arch::assemble_burgers_velo_material_defect(const Q2StandardHexa&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
-                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_velo_material_defect(const Q2StandardHexa&, float*, const float*, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint32_t>&,
-                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_velo_material_defect(const Q2StandardHexa&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint64_t>&,
-                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_velo_material_defect(const Q2StandardHexa&, float*, const float*, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
-                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const AssemblyMaterialData<float>&, MaterialType, const Util::RuntimeParameter&);
 
 template void Arch::assemble_burgers_velo_material_defect_host(const Q2StandardHexa&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
                                           const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const AssemblyMaterialData<double>&, MaterialType);

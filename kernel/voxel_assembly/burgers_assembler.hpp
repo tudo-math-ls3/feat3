@@ -1223,10 +1223,7 @@ namespace FEAT
        * \param[in] coloring_map_sizes A vector of the coloring map sizes.
        * \param[in] alpha Scaling parameter for gathering.
        * \param[in] burgers_params A struct holding all burgers parameters.
-       * \param[in] shared_mem Shared memory to be used.
-       * \param[in] blocksize The thread blocksize working on one element at the same time.
-       * \param[in] gridsize The gridsize to be used. Has to be sufficiently large to support enough parallelity.
-       * \param[in] print_occupancy Print occupancy to std::cout. For debbugging purposes.
+       * \param[in] runtime_params A struct holding the cuda kernel launch parameters (shared memory, blocksize, gridsize, print_occupancy, synchronize).
        */
       template<typename Space_, typename DT_, typename IT_>
       void assemble_burgers_csr(const Space_& space,
@@ -1236,7 +1233,7 @@ namespace FEAT
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
               const Adjacency::ColoringDataHandler& coloring_data,
               DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params,
-              int shared_mem, int blocksize, int gridsize, bool print_occupancy);
+              const Util::RuntimeParameter& runtime_params);
 
       /**
        * \brief Device kernel wrapper for the defect burgers assembler.
@@ -1257,10 +1254,7 @@ namespace FEAT
        * \param[in] coloring_map_sizes A vector of the coloring map sizes.
        * \param[in] alpha Scaling parameter for gathering.
        * \param[in] burgers_params A struct holding all burgers parameters.
-       * \param[in] shared_mem Shared memory to be used.
-       * \param[in] blocksize The thread blocksize working on one element at the same time.
-       * \param[in] gridsize The gridsize to be used. Has to be sufficiently large to support enough parallelity.
-       * \param[in] print_occupancy Print occupancy to std::cout. For debbugging purposes.
+       * \param[in] runtime_params A struct holding the cuda kernel launch parameters (shared memory, blocksize, gridsize, print_occupancy, synchronize).
        */
       template<typename Space_, typename DT_, typename IT_>
       void assemble_burgers_defect(const Space_& space,
@@ -1271,7 +1265,7 @@ namespace FEAT
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
               const Adjacency::ColoringDataHandler& coloring_data,
               DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params,
-              int shared_mem, int blocksize, int gridsize, bool print_occupancy);
+              const Util::RuntimeParameter& runtime_params);
 
       /**
        * \brief Device kernel wrapper for the local sd_v_norm calculation.
@@ -1456,17 +1450,8 @@ namespace FEAT
       DataType sd_v_norm;
 
       // variables controlling cuda kernel launch
-      /// how much shared memory should the kernel use
-      int shared_mem;
-
-      /// the grid size to be used
-      int gridsize;
-
-      /// the block size to be used
-      int blocksize;
-
-      /// print out occupancy
-      bool print_occupancy;
+      /// runtime parameters controlling the cuda kernel launch (shared_mem, blocksize, gridsize, print_occupancy, synchronize)
+      Util::RuntimeParameter runtime_params;
 
       /// Should we use full deformation formulation?
       bool deformation;
@@ -1490,7 +1475,7 @@ namespace FEAT
       explicit VoxelBurgersAssembler(const SpaceType& space, const ColoringType_& coloring, int hint = -1) :
       mesh_data(space, coloring, hint),
       nu(DataType(0)), theta(DataType(0)), beta(DataType(0)), frechet_beta(DataType(0)), sd_delta(DataType(0)),
-      sd_nu(DataType(0)), sd_v_norm(DataType(0)), shared_mem(0), gridsize(1), blocksize(32), print_occupancy(false),  deformation(true)
+      sd_nu(DataType(0)), sd_v_norm(DataType(0)), runtime_params{0, 32, 1, false, true},  deformation(true)
       {
         #ifdef FEAT_HAVE_CUDA
         // #ifdef DEBUG
@@ -1501,7 +1486,7 @@ namespace FEAT
         // #endif
         // set kernel launch parameters
         int target_elements = SpaceType::DofMappingType::dof_count * (dim == 3 ? (SpaceType::DofMappingType::dof_count/2+1) : SpaceType::DofMappingType::dof_count);
-        set_kernel_launch_params(target_elements, blocksize);
+        set_kernel_launch_params(target_elements, runtime_params.blocksize);
         #endif
         // printf("Time to init: mesh %f, color %f\n", mesh_data.time_init_mesh, mesh_data.time_init_color);
       }
@@ -1705,7 +1690,7 @@ namespace FEAT
 
         VoxelAssembly::Arch::assemble_burgers_csr(space, mat_data, vec_data, d_cub_data,
                                                         d_mapping_data, mesh_data.coloring_data, alpha, burgers_params,
-                                                        shared_mem, blocksize, gridsize, print_occupancy);
+                                                        runtime_params);
         Memory::free_cuda(cub_wg_device);
         Memory::free_cuda(cub_pt_device);
       }
@@ -1739,7 +1724,7 @@ namespace FEAT
 
         VoxelAssembly::Arch::assemble_burgers_defect(space, vec_data, conv_data, primal_data, d_cub_data, d_mapping_data,
                                                               mesh_data.coloring_data, alpha, burgers_params,
-                                                              shared_mem, 32, gridsize, print_occupancy);
+                                                              runtime_params);
         Memory::free_cuda(cub_wg_device);
         Memory::free_cuda(cub_pt_device);
       }
@@ -1772,15 +1757,15 @@ namespace FEAT
         constexpr int shared_size_nec = sizeof(VoxelAssembly::BurgersSharedDataGlobalWrapper<VoxelAssembly::SpaceHelper<SpaceType, DataType, IndexType>>) + sizeof(VoxelAssembly::BurgersSharedDataKernelWrapper<VoxelAssembly::SpaceHelper<SpaceType, DataType, IndexType>>);
 
         // our kernel gets the maximal number of local blocks itself, so we just provide the best feasible memory
-        shared_mem = Math::max(shared_mem, shared_size_nec + target_elements * element_size);
-        // XASSERTM(shared_mem < 48000, "Shared mem per block to large without special opt in. To be implemented yet.");
-        XASSERTM(shared_mem < max_shared_mem, "Targeted shared memory is " + stringify(shared_mem) + "B but Hardware only supports " + stringify(max_shared_mem) + " shared memory.");
-        blocksize = blocksize_;
+        runtime_params.shared_mem = Math::max(runtime_params.shared_mem, shared_size_nec + target_elements * element_size);
+        // XASSERTM(runtime_params.shared_mem < 48000, "Shared mem per block to large without special opt in. To be implemented yet.");
+        XASSERTM(runtime_params.shared_mem < max_shared_mem, "Targeted shared memory is " + stringify(runtime_params.shared_mem) + "B but Hardware only supports " + stringify(max_shared_mem) + " shared memory.");
+        runtime_params.blocksize = blocksize_;
         const int max_color_sizes = int(mesh_data.coloring_data.get_max_color_size());
         // spawn enough thread blocks to either handle all elements of a color simultaneously or to have enough
         // thread blocks to have all sms working
         // this should be minimal, due to overhead of thread spawning...
-        gridsize = std::min(int(max_color_sizes), 2*max_sm_per_device*(max_blocks_per_sm/(int(blocksize)/32)));
+        runtime_params.gridsize = std::min(int(max_color_sizes), 2*max_sm_per_device*(max_blocks_per_sm/(int(runtime_params.blocksize)/32)));
       }
 
 

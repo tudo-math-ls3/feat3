@@ -1013,8 +1013,13 @@ namespace FEAT
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
               const Adjacency::ColoringDataHandler& coloring_data,
               DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params,
-              int shared_mem, int blocksize, int gridsize, bool print_occupancy)
+              const Util::RuntimeParameter& runtime_params)
       {
+        // unpack the runtime kernel launch parameters
+        const int shared_mem = runtime_params.shared_mem;
+        const int blocksize = runtime_params.blocksize;
+        const int gridsize = runtime_params.gridsize;
+        const bool print_occupancy = runtime_params.print_occupancy;
         // get the size of all necessary shared memory
         constexpr int dim = Space_::ShapeType::dimension;
         constexpr int num_loc_dofs = Space_::DofMappingType::dof_count;
@@ -1080,7 +1085,8 @@ namespace FEAT
           // );
         }
         //check for cuda error in our kernel
-        Util::cuda_check_last_error();
+        if(runtime_params.synchronize)
+          Util::cuda_check_last_error();
       }
 
 
@@ -1093,8 +1099,13 @@ namespace FEAT
               const AssemblyMappingData<DT_, IT_>& dof_mapping,
               const Adjacency::ColoringDataHandler& coloring_data,
               DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params,
-              int shared_mem, int blocksize, int gridsize, bool print_occupancy)
+              const Util::RuntimeParameter& runtime_params)
       {
+        // unpack the runtime kernel launch parameters
+        const int shared_mem = runtime_params.shared_mem;
+        const int blocksize = runtime_params.blocksize;
+        const int gridsize = runtime_params.gridsize;
+        const bool print_occupancy = runtime_params.print_occupancy;
         // get the size of all necessary shared memory
         constexpr int dim = Space_::ShapeType::dimension;
         constexpr int num_loc_dofs = Space_::DofMappingType::dof_count;
@@ -1152,7 +1163,8 @@ namespace FEAT
         }
 
         //check for cuda error (also synchronizes)
-        Util::cuda_check_last_error();
+        if(runtime_params.synchronize)
+          Util::cuda_check_last_error();
       }
 
       // attention: This requires at max only one device per mpi rank!
@@ -1282,18 +1294,18 @@ using namespace FEAT::VoxelAssembly;
 
 /*******************************************************2D implementations***************************************************/
 template void Arch::assemble_burgers_csr(const Q2StandardQuad&, const CSRMatrixData<double, std::uint32_t>&, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
-                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_csr(const Q2StandardQuad&, const CSRMatrixData<float, std::uint32_t>&, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint32_t>&,
-                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_csr(const Q2StandardQuad&, const CSRMatrixData<double, std::uint64_t>&, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint64_t>&,
-                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_csr(const Q2StandardQuad&, const CSRMatrixData<float, std::uint64_t>&, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
-                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const Util::RuntimeParameter&);
 // #ifdef FEAT_HAVE_HALFMATH
 // template void Arch::assemble_burgers_csr(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint32_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-//                                           const Adjacency::ColoringDataHandler&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
+//                                           const Adjacency::ColoringDataHandler&, Half, const AssemblyBurgersData<Half>&, const Util::RuntimeParameter&);
 // template void Arch::assemble_burgers_csr(const Q2StandardQuad&, const CSRMatrixData<Half, std::uint64_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-//                                           const Adjacency::ColoringDataHandler&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
+//                                           const Adjacency::ColoringDataHandler&, Half, const AssemblyBurgersData<Half>&, const Util::RuntimeParameter&);
 // #endif
 
 template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&, const CSRMatrixData<double, std::uint32_t>&, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
@@ -1312,18 +1324,18 @@ template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&, const CSRMa
 // #endif
 
 template void Arch::assemble_burgers_defect(const Q2StandardQuad&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
-                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_defect(const Q2StandardQuad&, float*, const float*, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint32_t>&,
-                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_defect(const Q2StandardQuad&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint64_t>&,
-                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_defect(const Q2StandardQuad&, float*, const float*, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
-                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const Util::RuntimeParameter&);
 // #ifdef FEAT_HAVE_HALFMATH
 // template void Arch::assemble_burgers_defect(const Q2StandardQuad&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-//                                           const Adjacency::ColoringDataHandler&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
+//                                           const Adjacency::ColoringDataHandler&, Half, const AssemblyBurgersData<Half>&, const Util::RuntimeParameter&);
 // template void Arch::assemble_burgers_defect(const Q2StandardQuad&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-//                                           const Adjacency::ColoringDataHandler&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
+//                                           const Adjacency::ColoringDataHandler&, Half, const AssemblyBurgersData<Half>&, const Util::RuntimeParameter&);
 // #endif
 
 template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
@@ -1380,18 +1392,18 @@ template float Arch::get_sd_v_norm_host(const Global::Vector<LAFEM::DenseVectorB
 /*********************************************************3D implementations**************************************************************************************/
 
 template void Arch::assemble_burgers_csr(const Q2StandardHexa&, const CSRMatrixData<double, std::uint32_t>&, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
-                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_csr(const Q2StandardHexa&, const CSRMatrixData<float, std::uint32_t>&, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint32_t>&,
-                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_csr(const Q2StandardHexa&, const CSRMatrixData<double, std::uint64_t>&, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint64_t>&,
-                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_csr(const Q2StandardHexa&, const CSRMatrixData<float, std::uint64_t>&, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
-                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const Util::RuntimeParameter&);
 // #ifdef FEAT_HAVE_HALFMATH
 // template void Arch::assemble_burgers_csr(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint32_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-//                                           const Adjacency::ColoringDataHandler&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
+//                                           const Adjacency::ColoringDataHandler&, Half, const AssemblyBurgersData<Half>&, const Util::RuntimeParameter&);
 // template void Arch::assemble_burgers_csr(const Q2StandardHexa&, const CSRMatrixData<Half, std::uint64_t>&, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-//                                           const Adjacency::ColoringDataHandler&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
+//                                           const Adjacency::ColoringDataHandler&, Half, const AssemblyBurgersData<Half>&, const Util::RuntimeParameter&);
 // #endif
 
 template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&, const CSRMatrixData<double, std::uint32_t>&, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
@@ -1410,18 +1422,18 @@ template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&, const CSRMa
 // #endif
 
 template void Arch::assemble_burgers_defect(const Q2StandardHexa&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,
-                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_defect(const Q2StandardHexa&, float*, const float*, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint32_t>&,
-                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_defect(const Q2StandardHexa&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint64_t>&,
-                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, double, const AssemblyBurgersData<double>&, const Util::RuntimeParameter&);
 template void Arch::assemble_burgers_defect(const Q2StandardHexa&, float*, const float*, const float*, const AssemblyCubatureData<float>&, const AssemblyMappingData<float, std::uint64_t>&,
-                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, int, int, int, bool);
+                                          const Adjacency::ColoringDataHandler&, float, const AssemblyBurgersData<float>&, const Util::RuntimeParameter&);
 // #ifdef FEAT_HAVE_HALFMATH
 // template void Arch::assemble_burgers_defect(const Q2StandardHexa&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint32_t>&,
-//                                           const Adjacency::ColoringDataHandler&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
+//                                           const Adjacency::ColoringDataHandler&, Half, const AssemblyBurgersData<Half>&, const Util::RuntimeParameter&);
 // template void Arch::assemble_burgers_defect(const Q2StandardHexa&, Half*, const Half*, const Half*, const AssemblyCubatureData<Half>&, const AssemblyMappingData<Half, std::uint64_t>&,
-//                                           const Adjacency::ColoringDataHandler&, Half, const AssemblyBurgersData<Half>&, int, int, int, bool);
+//                                           const Adjacency::ColoringDataHandler&, Half, const AssemblyBurgersData<Half>&, const Util::RuntimeParameter&);
 // #endif
 
 template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&, double*, const double*, const double*, const AssemblyCubatureData<double>&, const AssemblyMappingData<double, std::uint32_t>&,

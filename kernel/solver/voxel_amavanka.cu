@@ -37,6 +37,41 @@ namespace FEAT
         Index max_degree_macros[n_];
       };
     }
+
+    namespace
+    {
+      /// Allocates device memory, using stream-ordered allocation (cudaMallocAsync) when async is
+      /// requested and available, else a plain synchronous cudaMalloc.
+      inline void* vanka_malloc(std::size_t bytes, bool async, cudaStream_t stream)
+      {
+        void* ptr = nullptr;
+        cudaError_t st;
+      #if defined(CUDART_VERSION) && (CUDART_VERSION >= 11020)
+        st = async ? cudaMallocAsync(&ptr, bytes, stream) : cudaMalloc(&ptr, bytes);
+      #else
+        (void)async; (void)stream;
+        st = cudaMalloc(&ptr, bytes);
+      #endif
+        if(st != cudaSuccess)
+          throw InternalError(__func__, __FILE__, __LINE__, "vanka_malloc failed: " + stringify(cudaGetErrorString(st)));
+        return ptr;
+      }
+
+      /// Frees device memory allocated by vanka_malloc, matching the allocation mode.
+      inline void vanka_free(void* ptr, bool async, cudaStream_t stream)
+      {
+        cudaError_t st;
+      #if defined(CUDART_VERSION) && (CUDART_VERSION >= 11020)
+        st = async ? cudaFreeAsync(ptr, stream) : cudaFree(ptr);
+      #else
+        (void)async; (void)stream;
+        st = cudaFree(ptr);
+      #endif
+        if(st != cudaSuccess)
+          throw InternalError(__func__, __FILE__, __LINE__, "vanka_free failed: " + stringify(cudaGetErrorString(st)));
+      }
+    }
+
     namespace Kernel
     {
       template<typename DT_, typename IT_, int n_>
@@ -137,9 +172,12 @@ namespace FEAT
       }
 
       template<typename DT_>
-      void batch_invert_matrices(dim3 grid, dim3 block, Index num_macros, Index stride, Index uniform_mat_size, DT_* __restrict__ local, DT_* __restrict__ local_t, int* __restrict__ pivot, int* __restrict__ info_array)
+      void batch_invert_matrices(dim3 grid, dim3 block, Index num_macros, Index stride, Index uniform_mat_size, DT_* __restrict__ local, DT_* __restrict__ local_t, int* __restrict__ pivot, int* __restrict__ info_array, bool async, cudaStream_t stream, bool do_sync)
       {
-        void* loc_ptr_wrapper = Util::cuda_get_static_memory(2u*sizeof(DT_*)*num_macros);
+        // when running stream-ordered, allocate the pointer-array scratch async as well, so the
+        // whole batched path stays free of device-wide syncs; otherwise reuse the static workspace
+        void* loc_ptr_wrapper = async ? vanka_malloc(2u*sizeof(DT_*)*num_macros, async, stream)
+                                      : Util::cuda_get_static_memory(2u*sizeof(DT_*)*num_macros);
         DT_** local_ptrs = static_cast<DT_**>(loc_ptr_wrapper);
         DT_** local_t_ptrs = local_ptrs + num_macros;
 
@@ -148,11 +186,15 @@ namespace FEAT
         Kernel::template set_batched_matrix_ptrs<DT_><<<grid, block>>>(local_ptrs, local, num_macros, stride);
         Kernel::template set_batched_matrix_ptrs<DT_><<<grid, block>>>(local_t_ptrs, local_t, num_macros, stride);
 
-        Util::cuda_check_last_error();
+        if(do_sync)
+          Util::cuda_check_last_error();
 
         //and now call cublas kernels to invert our matrices
         cublas_getrfBatched(local_ptrs, pivot, info_array, num_macros, uniform_mat_size, uniform_mat_size);
         cublas_getriBatched(local_ptrs, local_t_ptrs, pivot, info_array, num_macros, uniform_mat_size, uniform_mat_size, uniform_mat_size);
+
+        if(async)
+          vanka_free(loc_ptr_wrapper, async, stream);
       }
 
 
@@ -407,9 +449,15 @@ namespace FEAT
         Intern::CSRTupleMatrixWrapper<DT_, IT_, n_>& vanka_wrap, const std::vector<Memory::Arbiter>& d_macro_dofs,
         const std::vector<Memory::Arbiter>& d_dof_macros, Memory::Arbiter& d_macro_mask, const std::vector<Index>& max_degree_dofs,
         const std::vector<Index>& max_degree_macros, const Adjacency::ColoringDataHandler& coloring_data,
-        Index num_macros, Index stride, Index actual_matrix_size, DT_ omega, bool skip_singular)
+        Index num_macros, Index stride, Index actual_matrix_size, DT_ omega, bool skip_singular, bool synchronize)
         {
           typedef DT_ DataType;
+          // stream-ordered (async) allocation requires memory-pool support; if unavailable we fall
+          // back to the synchronous path and always synchronize at the end
+          const bool stream_ordered = Util::cuda_get_stream_ordered_alloc_supported();
+          const cudaStream_t stream = 0;                       // default stream, as everywhere else in this file
+          const bool async   = stream_ordered;                 // use cudaMallocAsync only when pools are supported
+          const bool do_sync = synchronize || !stream_ordered; // force the error-check/sync when we cannot be async
           const Index blocksize = Util::cuda_blocksize_vanka_assembly;
           dim3 grid;
           dim3 block;
@@ -430,22 +478,25 @@ namespace FEAT
             degree_macros.max_degree_macros[i] = max_degree_macros.at(i);
           }
           Memory::TypedView<int> dmm_view(d_macro_mask.view(Memory::Location::cuda, Memory::Access::read_write));
-          // allocate arrays for local matrix
-          DataType* local = (DataType*)Memory::alloc_cuda(num_macros*stride*stride*sizeof(DataType));
-          Memory::format_cuda(local, DataType(0), num_macros*stride*stride);
-          DataType* local_t = (DataType*)Memory::alloc_cuda(num_macros*stride*stride*sizeof(DataType));
-          Memory::format_cuda(local_t, DataType(0), num_macros*stride*stride);
-          int* pivot = (int*)Memory::alloc_cuda(num_macros*actual_matrix_size*sizeof(int));
-          Memory::format_cuda(pivot, int(0), num_macros*stride);
-          // do NOT use static memory here, since the batch invert kernel also uses it
-          int* info_array = (int*)Memory::alloc_cuda(num_macros*sizeof(int));
-          Memory::format_cuda(info_array, int(0), num_macros);
+          // allocate arrays for local matrix (stream-ordered when async, else synchronous cudaMalloc)
+          const std::size_t loc_bytes   = std::size_t(num_macros)*stride*stride*sizeof(DataType);
+          const std::size_t pivot_bytes = std::size_t(num_macros)*actual_matrix_size*sizeof(int);
+          const std::size_t info_bytes  = std::size_t(num_macros)*sizeof(int);
+          DataType* local = (DataType*)vanka_malloc(loc_bytes, async, stream);
+          cudaMemsetAsync(local, 0, loc_bytes, stream);
+          DataType* local_t = (DataType*)vanka_malloc(loc_bytes, async, stream);
+          cudaMemsetAsync(local_t, 0, loc_bytes, stream);
+          int* pivot = (int*)vanka_malloc(pivot_bytes, async, stream);
+          cudaMemsetAsync(pivot, 0, pivot_bytes, stream);
+          // do NOT use static memory here, since the batch invert kernel also uses it (in the sync path)
+          int* info_array = (int*)vanka_malloc(info_bytes, async, stream);
+          cudaMemsetAsync(info_array, 0, info_bytes, stream);
           // gather and invert
           block.x = (unsigned int)blocksize;
           //this is probably to much data
           grid.x = (unsigned int)(ceil(double(num_macros)/double(block.x)));
           Solver::Kernel::template gather_local_matrices<DT_, IT_, n_><<<grid, block>>>(mat_wrap.raw_data, graphs_macro_dofs, degree_dofs, num_macros, stride, local);
-          Solver::Kernel::batch_invert_matrices(grid, block, num_macros, stride, actual_matrix_size, local, local_t, pivot, info_array);
+          Solver::Kernel::batch_invert_matrices(grid, block, num_macros, stride, actual_matrix_size, local, local_t, pivot, info_array, async, stream, do_sync);
           // now scatter local matrices... this requires coloring
           block.x = (unsigned int)blocksize;
           //this is probably to much data
@@ -467,12 +518,13 @@ namespace FEAT
                                               coloring_data.get_color_size(k), info_array);
           }
           //check for cuda error in our kernel
-          Util::cuda_check_last_error();
+          if(do_sync)
+            Util::cuda_check_last_error();
           color_view.release();
-          Memory::free_cuda((void*)info_array);
-          Memory::free_cuda((void*)pivot);
-          Memory::free_cuda((void*)local_t);
-          Memory::free_cuda((void*)local);
+          vanka_free((void*)info_array, async, stream);
+          vanka_free((void*)pivot, async, stream);
+          vanka_free((void*)local_t, async, stream);
+          vanka_free((void*)local, async, stream);
           // get max row_size
           const Index all_row_size = vanka_wrap.raw_data.get_all_rows_size();
           block.x = (unsigned int)Util::cuda_blocksize_spmv;
@@ -483,7 +535,8 @@ namespace FEAT
             Solver::Kernel::template scale_vanka_rows_device<DT_, IT_, n_, false><<<grid, block>>>(vanka_wrap.raw_data, omega, graphs_dof_macros, degree_macros, dmm_view.get_r(), all_row_size);
 
           //check for cuda error in our kernel
-          Util::cuda_check_last_error();
+          if(do_sync)
+            Util::cuda_check_last_error();
 
 
 
@@ -531,35 +584,35 @@ template void Arch::assemble_vanka_device(const FEAT::Solver::Intern::CSRTupleMa
 //######################### cuBlasbasedKernels ##############################################################
 //#########################1x1 kernels###############################################################
 template void Arch::assemble_vanka_device_batched(const FEAT::Solver::Intern::CSRTupleMatrixWrapper<double, std::uint64_t, 1>&, FEAT::Solver::Intern::CSRTupleMatrixWrapper<double, std::uint64_t, 1>&, const std::vector<Memory::Arbiter>&, const std::vector<Memory::Arbiter>&,
-        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, double, bool);
+        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, double, bool, bool);
 template void Arch::assemble_vanka_device_batched(const FEAT::Solver::Intern::CSRTupleMatrixWrapper<float, std::uint64_t, 1>&, FEAT::Solver::Intern::CSRTupleMatrixWrapper<float, std::uint64_t, 1>&, const std::vector<Memory::Arbiter>&, const std::vector<Memory::Arbiter>&,
-        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, float, bool);
+        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, float, bool, bool);
 template void Arch::assemble_vanka_device_batched(const FEAT::Solver::Intern::CSRTupleMatrixWrapper<double, std::uint32_t, 1>&, FEAT::Solver::Intern::CSRTupleMatrixWrapper<double, std::uint32_t, 1>&, const std::vector<Memory::Arbiter>&, const std::vector<Memory::Arbiter>&,
-        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, double, bool);
+        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, double, bool, bool);
 template void Arch::assemble_vanka_device_batched(const FEAT::Solver::Intern::CSRTupleMatrixWrapper<float, std::uint32_t, 1>&, FEAT::Solver::Intern::CSRTupleMatrixWrapper<float, std::uint32_t, 1>&, const std::vector<Memory::Arbiter>&, const std::vector<Memory::Arbiter>&,
-        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, float, bool);
+        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, float, bool, bool);
 
 
 //#########################2x2 kernels###############################################################
 template void Arch::assemble_vanka_device_batched(const FEAT::Solver::Intern::CSRTupleMatrixWrapper<double, std::uint64_t, 2>&, FEAT::Solver::Intern::CSRTupleMatrixWrapper<double, std::uint64_t, 2>&, const std::vector<Memory::Arbiter>&, const std::vector<Memory::Arbiter>&,
-        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, double, bool);
+        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, double, bool, bool);
 template void Arch::assemble_vanka_device_batched(const FEAT::Solver::Intern::CSRTupleMatrixWrapper<float, std::uint64_t, 2>&, FEAT::Solver::Intern::CSRTupleMatrixWrapper<float, std::uint64_t, 2>&, const std::vector<Memory::Arbiter>&, const std::vector<Memory::Arbiter>&,
-        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, float, bool);
+        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, float, bool, bool);
 template void Arch::assemble_vanka_device_batched(const FEAT::Solver::Intern::CSRTupleMatrixWrapper<double, std::uint32_t, 2>&, FEAT::Solver::Intern::CSRTupleMatrixWrapper<double, std::uint32_t, 2>&, const std::vector<Memory::Arbiter>&, const std::vector<Memory::Arbiter>&,
-        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, double, bool);
+        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, double, bool, bool);
 template void Arch::assemble_vanka_device_batched(const FEAT::Solver::Intern::CSRTupleMatrixWrapper<float, std::uint32_t, 2>&, FEAT::Solver::Intern::CSRTupleMatrixWrapper<float, std::uint32_t, 2>&, const std::vector<Memory::Arbiter>&, const std::vector<Memory::Arbiter>&,
-        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, float, bool);
+        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, float, bool, bool);
 
 
 
 
 /** For copy pasting new nxn kernels...
 template void Arch::assemble_vanka_device_batched(const FEAT::Solver::Intern::CSRTupleMatrixWrapper<double, std::uint64_t, n_>&, FEAT::Solver::Intern::CSRTupleMatrixWrapper<double, std::uint64_t, n_>&, const std::vector<Memory::Arbiter>&, const std::vector<Memory::Arbiter>&,
-        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, double, bool);
+        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, double, bool, bool);
 template void Arch::assemble_vanka_device_batched(const FEAT::Solver::Intern::CSRTupleMatrixWrapper<float, std::uint64_t, n_>&, FEAT::Solver::Intern::CSRTupleMatrixWrapper<float, std::uint64_t, n_>&, const std::vector<Memory::Arbiter>&, const std::vector<Memory::Arbiter>&,
-        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, float, bool);
+        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, float, bool, bool);
 template void Arch::assemble_vanka_device_batched(const FEAT::Solver::Intern::CSRTupleMatrixWrapper<double, std::uint32_t, n_>&, FEAT::Solver::Intern::CSRTupleMatrixWrapper<double, std::uint32_t, n_>&, const std::vector<Memory::Arbiter>&, const std::vector<Memory::Arbiter>&,
-        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, double, bool);
+        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, double, bool, bool);
 template void Arch::assemble_vanka_device_batched(const FEAT::Solver::Intern::CSRTupleMatrixWrapper<float, std::uint32_t, n_>&, FEAT::Solver::Intern::CSRTupleMatrixWrapper<float, std::uint32_t, n_>&, const std::vector<Memory::Arbiter>&, const std::vector<Memory::Arbiter>&,
-        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, float, bool);
+        Memory::Arbiter&, const std::vector<Index>&, const std::vector<Index>&, const Adjacency::ColoringDataHandler&, Index, Index, Index, float, bool, bool);
 //*/

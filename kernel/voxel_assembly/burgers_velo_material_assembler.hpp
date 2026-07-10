@@ -1080,7 +1080,7 @@ namespace FEAT
               const Adjacency::ColoringDataHandler& coloring_data,
               DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params,
               const AssemblyMaterialData<DT_>& material_params,
-              MaterialType mat_type, int shared_mem, int blocksize, int gridsize, bool print_occupancy);
+              MaterialType mat_type, const Util::RuntimeParameter& runtime_params);
 
       /**
        * \brief Device kernel wrapper for the defect burgers assembler.
@@ -1115,7 +1115,7 @@ namespace FEAT
               DT_ alpha, const AssemblyBurgersData<DT_>& burgers_params,
               const AssemblyMaterialData<DT_>& material_params,
               MaterialType material_type,
-              int shared_mem, int blocksize, int gridsize, bool print_occupancy);
+              const Util::RuntimeParameter& runtime_params);
 
       #endif
 
@@ -1416,7 +1416,7 @@ namespace FEAT
 
         VoxelAssembly::Arch::assemble_burgers_velo_material_csr(space, mat_data, vec_data.get_r(), d_cub_data, d_mapping_data,
                   this->mesh_data.coloring_data, alpha, burgers_params, material_params, material_type,
-                  this->shared_mem, this->blocksize, this->gridsize, this->print_occupancy);
+                  this->runtime_params);
         Memory::free_cuda(cub_wg_device);
         Memory::free_cuda(cub_pt_device);
       }
@@ -1444,7 +1444,7 @@ namespace FEAT
 
         VoxelAssembly::Arch::assemble_burgers_velo_material_defect(space, vec_data.get_w(), conv_data.get_r(), primal_data.get_r(), d_cub_data, d_mapping_data,
                   this->mesh_data.coloring_data, alpha, burgers_params, material_params, material_type,
-                  this->shared_mem, this->blocksize, this->gridsize, this->print_occupancy);
+                  this->runtime_params);
         Memory::free_cuda(cub_wg_device);
         Memory::free_cuda(cub_pt_device);
       }

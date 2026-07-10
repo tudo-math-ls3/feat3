@@ -60,6 +60,21 @@ namespace FEAT
     /// cuda threading grid blocksize for block typed assembly
     extern Index cuda_blocksize_vanka_assembly;
 
+    /// helper for typicall runtime parameter flags
+    struct RuntimeParameter
+    {
+      /// how much shared mem should be used
+      int shared_mem;
+      /// 1d blocksize that should be used
+      int blocksize;
+      /// 1d gridsize that should be used, i.e. overall start block_size*grid_size threads
+      int gridsize;
+      /// print occupancy of the cuda kernel
+      bool print_occupancy;
+      /// should the function force a synchronization at the end?
+      bool synchronize;
+    };
+
     void cuda_set_blocksize(Index misc, Index reduction, Index spmv, Index axpy, Index scalar_assembly, Index blocked_assembly);
     void cuda_set_device(const int device);
     void cuda_check_last_error();
@@ -104,6 +119,8 @@ namespace FEAT
     std::size_t cuda_get_shared_mem_per_sm();
     std::size_t cuda_get_max_blocks_per_sm();
     std::size_t cuda_get_sm_count();
+    /// returns true if the current device supports stream-ordered memory allocation (cudaMallocAsync/cudaFreeAsync)
+    bool cuda_get_stream_ordered_alloc_supported();
 
     #ifdef __CUDACC__
     /// returns the number of active blocks of size blocksize for a given cuda kernel T

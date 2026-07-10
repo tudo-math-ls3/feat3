@@ -333,6 +333,16 @@ std::size_t FEAT::Util::cuda_get_sm_count()
 
 }
 
+bool FEAT::Util::cuda_get_stream_ordered_alloc_supported()
+{
+  int supported = 0;
+  if(cudaDeviceGetAttribute(&supported, cudaDevAttrMemoryPoolsSupported, Util::cuda_device_number) != cudaSuccess)
+  {
+    throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceGetAttribute failed!");
+  }
+  return supported != 0;
+}
+
 std::uint64_t FEAT::Util::cuda_start_range(const char* name)
 {
   return std::uint64_t(nvtxRangeStartA(name));
