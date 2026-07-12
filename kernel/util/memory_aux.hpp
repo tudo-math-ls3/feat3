@@ -8,6 +8,7 @@
 // includes, FEAT
 #include <kernel/base_header.hpp>
 #include <kernel/util/assertion.hpp>
+#include <kernel/util/cuda_util.hpp>
 
 // includes, system
 #include <memory>
@@ -180,6 +181,22 @@ namespace FEAT
     void* alloc_cuda(std::size_t bytes);
 
     /**
+     * \brief Allocates stream ordered memory block in cuda heap memory
+     *
+     * This is effectively a wrapper around ::cudaMallocAsync.
+     * Note, async capabilities are not available on all devices, so this falls back
+     * to standard cudaMalloc if its not available.
+     * You can query the availability with the Util function cuda_get_async...
+     *
+     * \param[in] bytes
+     * The size of the memory block in bytes.
+     *
+     * \returns
+     * A pointer to the newly allocated cuda memory block or \c nullptr, if the memory allocation failed.
+     */
+    void* alloc_cuda_async(std::size_t bytes, const Util::StreamWrapper& stream = Util::StreamWrapper{});
+
+    /**
      * \brief Frees a memory block in cuda heap memory allocated by alloc_cuda
      *
      * This is effectively a wrapper around ::cudaFree.
@@ -188,6 +205,16 @@ namespace FEAT
      * A pointer to the cuda memory block that is to be freed; must not be \c nullptr.
      */
     void free_cuda(void* ptr);
+
+    /**
+     * \brief Frees a memory block in cuda heap memory allocated by alloc_cuda
+     *
+     * This is effectively a wrapper around ::cudaFree.
+     *
+     * \param[in] ptr
+     * A pointer to the cuda memory block that is to be freed; must not be \c nullptr.
+     */
+    void free_cuda_async(void* ptr, const Util::StreamWrapper& stream = Util::StreamWrapper{});
 
     /**
      * \brief Formats all bytes of a memory block in cuda memory to a given value
@@ -204,7 +231,7 @@ namespace FEAT
      * \param[in] bytes
      * The size of the memory block in bytes.
      */
-    void memset_cuda(void* ptr, int value, std::size_t bytes);
+    void memset_cuda(void* ptr, int value, std::size_t bytes, const Util::StreamWrapper& stream = Util::StreamWrapper{});
 
     /**
      * \brief Copies a region of a cuda memory block into another cuda memory block.
@@ -224,7 +251,7 @@ namespace FEAT
      * \param[in] bytes
      * The number of bytes to be copied from *src to *dst
      */
-    void memcopy_cuda(void* dst, const void* src, std::size_t bytes);
+    void memcopy_cuda(void* dst, const void* src, std::size_t bytes, const Util::StreamWrapper& stream = Util::StreamWrapper{});
 
 
     /**
@@ -257,7 +284,7 @@ namespace FEAT
      * \param[in] bytes
      * The number of bytes to be copied from *src to *dst
      */
-    void memcopy_main_to_cuda(void* dst, const void* src, std::size_t bytes);
+    void memcopy_main_to_cuda(void* dst, const void* src, std::size_t bytes, const Util::StreamWrapper& stream = Util::StreamWrapper{});
 
     /**
      * \brief Converts the elements of an array into element of another array of a different data type

@@ -45,30 +45,40 @@ namespace FEAT
       inline void* vanka_malloc(std::size_t bytes, bool async, cudaStream_t stream)
       {
         void* ptr = nullptr;
-        cudaError_t st;
-      #if defined(CUDART_VERSION) && (CUDART_VERSION >= 11020)
-        st = async ? cudaMallocAsync(&ptr, bytes, stream) : cudaMalloc(&ptr, bytes);
-      #else
-        (void)async; (void)stream;
-        st = cudaMalloc(&ptr, bytes);
-      #endif
-        if(st != cudaSuccess)
-          throw InternalError(__func__, __FILE__, __LINE__, "vanka_malloc failed: " + stringify(cudaGetErrorString(st)));
+        ptr = async ? Memory::alloc_cuda_async(bytes, Util::StreamWrapper{stream, 0u}) : Memory::alloc_cuda(bytes);
+
+      //   cudaError_t st;
+      // #if defined(CUDART_VERSION) && (CUDART_VERSION >= 11020)
+      //   st = async ? cudaMallocAsync(&ptr, bytes, stream) : cudaMalloc(&ptr, bytes);
+      // #else
+      //   (void)async; (void)stream;
+      //   st = cudaMalloc(&ptr, bytes);
+      // #endif
+      //   if(st != cudaSuccess)
+      //     throw InternalError(__func__, __FILE__, __LINE__, "vanka_malloc failed: " + stringify(cudaGetErrorString(st)));
         return ptr;
       }
 
       /// Frees device memory allocated by vanka_malloc, matching the allocation mode.
       inline void vanka_free(void* ptr, bool async, cudaStream_t stream)
       {
-        cudaError_t st;
-      #if defined(CUDART_VERSION) && (CUDART_VERSION >= 11020)
-        st = async ? cudaFreeAsync(ptr, stream) : cudaFree(ptr);
-      #else
-        (void)async; (void)stream;
-        st = cudaFree(ptr);
-      #endif
-        if(st != cudaSuccess)
-          throw InternalError(__func__, __FILE__, __LINE__, "vanka_free failed: " + stringify(cudaGetErrorString(st)));
+        if(async)
+        {
+          Memory::free_cuda_async(ptr, Util::StreamWrapper{stream, 0u});
+        }
+        else
+        {
+          Memory::free_cuda_async(ptr);
+        }
+      //   cudaError_t st;
+      // #if defined(CUDART_VERSION) && (CUDART_VERSION >= 11020)
+      //   st = async ? cudaFreeAsync(ptr, stream) : cudaFree(ptr);
+      // #else
+      //   (void)async; (void)stream;
+      //   st = cudaFree(ptr);
+      // #endif
+      //   if(st != cudaSuccess)
+      //     throw InternalError(__func__, __FILE__, __LINE__, "vanka_free failed: " + stringify(cudaGetErrorString(st)));
       }
     }
 
@@ -379,10 +389,10 @@ namespace FEAT
           DataType* local_t = nullptr;
           if(skip_singular)
           {
-            local_t = (DataType*)Memory::alloc_cuda(max_color_size*stride*stride*sizeof(DataType));
+            local_t = (DataType*)Memory::alloc_cuda_async(max_color_size*stride*stride*sizeof(DataType));
             Memory::format_cuda(local_t, DataType(0), max_color_size*stride*stride);
           }
-          Index* pivot = (Index*)Memory::alloc_cuda(max_color_size*stride*sizeof(Index));
+          Index* pivot = (Index*)Memory::alloc_cuda_async(max_color_size*stride*sizeof(Index));
           Memory::format_cuda(pivot, Index(0), max_color_size*stride);
 
           const Memory::TypedView<int> color_view = coloring_data.color_map_view(Memory::Location::cuda, Memory::Access::read);
@@ -426,10 +436,10 @@ namespace FEAT
           //check for cuda error in our kernel
           Util::cuda_check_last_error();
           color_view.release();
-          Memory::free_cuda((void*)pivot);
+          Memory::free_cuda_async((void*)pivot);
           if(local_t)
-            Memory::free_cuda((void*)local_t);
-          Memory::free_cuda((void*)local);
+            Memory::free_cuda_async((void*)local_t);
+          Memory::free_cuda_async((void*)local);
           // get max row_size
           const Index all_row_size = vanka_wrap.raw_data.get_all_rows_size();
           block.x = (unsigned int)Util::cuda_blocksize_spmv;

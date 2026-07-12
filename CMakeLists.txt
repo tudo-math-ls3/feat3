@@ -264,6 +264,9 @@ if(FEAT_VALGRIND)
   #--keep-stacktraces=alloc-and-free
 endif(FEAT_VALGRIND)
 
+## option to allow async operations, for now controls mainly cuda async calls
+option(FEAT_ASYNC_OPERATIONS "Allow asynchronous operations?" OFF)
+
 # our custom target to build (but not execute) all tests in all directories
 add_custom_target( tests )
 

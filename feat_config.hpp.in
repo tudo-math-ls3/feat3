@@ -104,6 +104,9 @@
 /// Do we use the mkl sparse executor interface
 #cmakedefine FEAT_USE_MKL_SPARSE_EXECUTOR
 
+///Do we allow async operations
+#cmakedefine FEAT_ASYNC_OPERATIONS
+
 /// Descriptive compiler name, as detected by cmake
 #define CMAKE_CXX_COMPILER_ID "${CMAKE_CXX_COMPILER_ID}"
 

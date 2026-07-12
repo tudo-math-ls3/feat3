@@ -359,6 +359,10 @@ parser.add_argument("buildid", default="guess", nargs="?", help="build-id for th
 parser.add_argument("--allow-unsupported-compiler", "--allow_unsupported_compiler", action="store_true", help=
 "allow an unsupported host compiler for nvcc")
 
+parser.add_argument("--async-operations", "--async_operations", action="store_true", help=
+"allow asnyc operations to take place in kernel calls\n" \
+"might screw with timings reported")
+
 parser.add_argument("--cc", help=
 "override default C compiler binary with absolute path to binary. This option does not replace the compiler tag in the build-id")
 
@@ -589,6 +593,9 @@ config.add_c_flags("/O2" if "msvc" in buildid else "-O3")
 
 if args.allow_unsupported_compiler:
   config.cache_entry("FEAT_CUDA_ALLOW_UNSUPPORTED_COMPILER", "ON", "BOOL")
+
+if args.async_operations:
+  config.cache_entry("FEAT_ASYNC_OPERATIONS", "ON", "BOOL")
 
 if args.cc:
   if not os.path.exists(args.compiler_cc):

@@ -4,6 +4,7 @@
 // see the file 'copyright.txt' in the top level directory for details.
 
 #include <kernel/util/memory_aux.hpp>
+#include <kernel/util/cuda_helper.cuh>
 #include <kernel/util/cuda_util.hpp>
 
 namespace FEAT
@@ -20,38 +21,74 @@ namespace FEAT
 
     void free_main(void* ptr)
     {
-      XASSERTM(ptr != nullptr, "Memory::free_main: cannot free nullptr");
-      ::cudaFreeHost(ptr);
+      if(ptr == nullptr)
+        return;
+      cudaCheck(::cudaFreeHost(ptr), "Memory::free_main: cudaFreeHost");
     }
 
     void* alloc_cuda(std::size_t bytes)
     {
       void* ptr = nullptr;
-      if(cudaSuccess != ::cudaMalloc(&ptr, bytes))
-        return nullptr;
+      if(bytes == 0u)
+        return ptr;
+      cudaCheck(::cudaMalloc(&ptr, bytes), "Memory::alloc_cuda: cudaMalloc");
+      return ptr;
+    }
+
+    void* alloc_cuda_async(std::size_t bytes, [[maybe_unused]] const Util::StreamWrapper& stream)
+    {
+      void* ptr = nullptr;
+      cudaError_t st;
+    #ifdef CUDA_ASYNC_SUPPORTED
+      const cudaStream_t s_stream = reinterpret_cast<cudaStream_t>(stream.stream);
+      st = Util::cuda_get_stream_ordered_alloc_supported() ? ::cudaMallocAsync(&ptr, bytes, s_stream) : ::cudaMalloc(&ptr, bytes);
+    #else
+      st = ::cudaMalloc(&ptr, bytes);
+    #endif
+      cudaCheck(st, "Memory::alloc_cuda_async");
       return ptr;
     }
 
     void free_cuda(void* ptr)
     {
-      XASSERTM(ptr != nullptr, "Memory::free_cuda: cannot free nullptr");
-      ::cudaFree(ptr);
+      if(ptr == nullptr)
+        return;
+      cudaCheck(::cudaFree(ptr), "Memory::free_cuda: cudaFree");
     }
 
-    void memset_cuda(void* dst, int value, std::size_t bytes)
+    void free_cuda_async(void* ptr, [[maybe_unused]] const Util::StreamWrapper& stream)
+    {
+      if(ptr == nullptr)
+        return;
+      cudaError_t st;
+    #ifdef CUDA_ASYNC_SUPPORTED
+      const cudaStream_t s_stream = reinterpret_cast<cudaStream_t>(stream.stream);
+      st = Util::cuda_get_stream_ordered_alloc_supported() ? cudaFreeAsync(ptr, s_stream) : cudaFree(ptr);
+    #else
+      st = ::cudaFree(ptr);
+    #endif
+      cudaCheck(st, "Memory::free_cuda_async");
+    }
+
+    void memset_cuda(void* dst, int value, std::size_t bytes, const Util::StreamWrapper& stream)
     {
       if(bytes <= std::size_t(0))
         return;
 
       XASSERTM(dst != nullptr, "cuda device memset destination is nullptr");
 
-      if(cudaSuccess != cudaMemset(dst, value, bytes))
+      if constexpr(async_operations)
       {
-        XABORTM("Memory::memset_cuda: cuda memcopy failed!");
+        const cudaStream_t s_stream = reinterpret_cast<cudaStream_t>(stream.stream);
+        cudaCheck(cudaMemsetAsync(dst, value, bytes, s_stream), "Memory::memset_cuda async");
+      }
+      else
+      {
+        cudaCheck(cudaMemset(dst, value, bytes), "Memory::memset_cuda");
       }
     }
 
-    void memcopy_cuda(void* dst, const void* src, std::size_t bytes)
+    void memcopy_cuda(void* dst, const void* src, std::size_t bytes, const Util::StreamWrapper& stream)
     {
       if(bytes <= std::size_t(0))
         return;
@@ -59,9 +96,14 @@ namespace FEAT
       XASSERTM(dst != nullptr, "cuda device-to-device memcpy destination is nullptr");
       XASSERTM(src != nullptr, "cuda device-to-device memcpy source is nullptr");
 
-      if(cudaSuccess != cudaMemcpy(dst, src, bytes, cudaMemcpyDeviceToDevice))
+      if constexpr(async_operations)
       {
-        XABORTM("Memory::memcopy_cuda: cuda memcopy failed!");
+        const cudaStream_t s_stream = reinterpret_cast<cudaStream_t>(stream.stream);
+        cudaCheck(cudaMemcpyAsync(dst, src, bytes, cudaMemcpyDeviceToDevice, s_stream), "Memory::memcopy_cuda async");
+      }
+      else
+      {
+        cudaCheck(cudaMemcpy(dst, src, bytes, cudaMemcpyDeviceToDevice), "Memory::memcopy_cuda");
       }
     }
 
@@ -73,13 +115,27 @@ namespace FEAT
       XASSERTM(dst != nullptr, "cuda device-to-host memcpy destination is nullptr");
       XASSERTM(src != nullptr, "cuda device-to-host memcpy source is nullptr");
 
-      if(cudaSuccess != cudaMemcpy(dst, src, bytes, cudaMemcpyDeviceToHost))
-      {
-        XABORTM("Memory::memcopy_cuda_to_main: cuda device-to-host memcopy failed!");
-      }
+      cudaCheck(cudaMemcpy(dst, src, bytes, cudaMemcpyDeviceToHost), "Memory::memcopy_cuda_to_main");
     }
 
-    void memcopy_main_to_cuda(void* dst, const void* src, std::size_t bytes)
+    void memcopy_cuda_to_main_async(void* dst, const void* src, std::size_t bytes, const Util::StreamWrapper& stream)
+    {
+      if(bytes <= std::size_t(0))
+        return;
+
+      XASSERTM(dst != nullptr, "cuda device-to-host memcpy destination is nullptr");
+      XASSERTM(src != nullptr, "cuda device-to-host memcpy source is nullptr");
+
+      if constexpr(async_operations)
+      {
+        const cudaStream_t s_stream = reinterpret_cast<cudaStream_t>(stream.stream);
+        cudaCheck(cudaMemcpyAsync(dst, src, bytes, cudaMemcpyDeviceToHost, s_stream), "Memory::memcopy_cuda_to_main_async");
+      }
+      else
+        cudaCheck(cudaMemcpy(dst, src, bytes, cudaMemcpyDeviceToHost), "Memory::memcopy_cuda_to_main_async");
+    }
+
+    void memcopy_main_to_cuda(void* dst, const void* src, std::size_t bytes, const Util::StreamWrapper& stream)
     {
       if(bytes <= std::size_t(0))
         return;
@@ -87,10 +143,14 @@ namespace FEAT
       XASSERTM(dst != nullptr, "cuda host-to-device memcpy destination is nullptr");
       XASSERTM(src != nullptr, "cuda host-to-device memcpy source is nullptr");
 
-      if(cudaSuccess != cudaMemcpy(dst, src, bytes, cudaMemcpyHostToDevice))
+      // should be okay to do on main stream, since we can not delete source memory without sync call
+      if constexpr(async_operations)
       {
-        XABORTM("Memory::memcopy_main_to_cuda: cuda host-to-device memcopy failed!");
+        const cudaStream_t s_stream = reinterpret_cast<cudaStream_t>(stream.stream);
+        cudaCheck(cudaMemcpyAsync(dst, src, bytes, cudaMemcpyHostToDevice, s_stream), "Memory::memcopy_main_to_cuda async");
       }
+      else
+        cudaCheck(cudaMemcpy(dst, src, bytes, cudaMemcpyHostToDevice), "Memory::memcopy_main_to_cuda");
     }
 
     template <typename Tdst_, typename Tsrc_>

@@ -1449,9 +1449,10 @@ namespace FEAT
       /// The current maximum velocity norm.
       DataType sd_v_norm;
 
-      // variables controlling cuda kernel launch
+      #ifdef FEAT_HAVE_CUDA
       /// runtime parameters controlling the cuda kernel launch (shared_mem, blocksize, gridsize, print_occupancy, synchronize)
       Util::RuntimeParameter runtime_params;
+      #endif
 
       /// Should we use full deformation formulation?
       bool deformation;
@@ -1475,9 +1476,10 @@ namespace FEAT
       explicit VoxelBurgersAssembler(const SpaceType& space, const ColoringType_& coloring, int hint = -1) :
       mesh_data(space, coloring, hint),
       nu(DataType(0)), theta(DataType(0)), beta(DataType(0)), frechet_beta(DataType(0)), sd_delta(DataType(0)),
-      sd_nu(DataType(0)), sd_v_norm(DataType(0)), runtime_params{0, 32, 1, false, true},  deformation(true)
+      sd_nu(DataType(0)), sd_v_norm(DataType(0)),  deformation(true)
       {
         #ifdef FEAT_HAVE_CUDA
+        runtime_params = Util::RuntimeParameter{0, 32, 1, false, true};
         // #ifdef DEBUG
         // const std::size_t stack_limit = Util::cuda_get_max_cache_thread();
         // const std::size_t stack_limit_target = sizeof(DataType) * (dim == 3 ? 8096u : 1012u);
@@ -1678,10 +1680,10 @@ namespace FEAT
 
         typedef typename Cubature::Rule<ShapeType, DataType, DataType>::PointType CubPointType;
         //initialize all necessary pointer arrays and values //maybe more sense to specify cubature rule and set this to a const mem location?
-        void* cub_pt_device = Memory::alloc_cuda(Index(num_cubs) * sizeof(CubPointType));
+        void* cub_pt_device = Memory::alloc_cuda_async(Index(num_cubs) * sizeof(CubPointType));
         Memory::memcopy_main_to_cuda(cub_pt_device, (void*)cub_pt, Index(num_cubs) * sizeof(CubPointType));
 
-        void* cub_wg_device = Memory::alloc_cuda(std::size_t(num_cubs) * sizeof(DataType));
+        void* cub_wg_device = Memory::alloc_cuda_async(std::size_t(num_cubs) * sizeof(DataType));
         Memory::memcopy_main_to_cuda(cub_wg_device, (const void*)cub_wg, std::size_t(num_cubs) * sizeof(DataType));
 
         VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
@@ -1691,8 +1693,8 @@ namespace FEAT
         VoxelAssembly::Arch::assemble_burgers_csr(space, mat_data, vec_data, d_cub_data,
                                                         d_mapping_data, mesh_data.coloring_data, alpha, burgers_params,
                                                         runtime_params);
-        Memory::free_cuda(cub_wg_device);
-        Memory::free_cuda(cub_pt_device);
+        Memory::free_cuda_async(cub_wg_device);
+        Memory::free_cuda_async(cub_pt_device);
       }
 
 
@@ -1712,10 +1714,10 @@ namespace FEAT
 
         typedef typename Cubature::Rule<ShapeType, DataType, DataType>::PointType CubPointType;
         //initialize all necessary pointer arrays and values //maybe more sense to specify cubature rule and set this to a const mem location?
-        void* cub_pt_device = Memory::alloc_cuda(Index(num_cubs) * sizeof(CubPointType));
+        void* cub_pt_device = Memory::alloc_cuda_async(Index(num_cubs) * sizeof(CubPointType));
         Memory::memcopy_main_to_cuda(cub_pt_device, (void*)cub_pt, Index(num_cubs) * sizeof(CubPointType));
 
-        void* cub_wg_device = Memory::alloc_cuda(std::size_t(num_cubs) * sizeof(DataType));
+        void* cub_wg_device = Memory::alloc_cuda_async(std::size_t(num_cubs) * sizeof(DataType));
         Memory::memcopy_main_to_cuda(cub_wg_device, (const void*)cub_wg, std::size_t(num_cubs) * sizeof(DataType));
 
         VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
@@ -1725,8 +1727,8 @@ namespace FEAT
         VoxelAssembly::Arch::assemble_burgers_defect(space, vec_data, conv_data, primal_data, d_cub_data, d_mapping_data,
                                                               mesh_data.coloring_data, alpha, burgers_params,
                                                               runtime_params);
-        Memory::free_cuda(cub_wg_device);
-        Memory::free_cuda(cub_pt_device);
+        Memory::free_cuda_async(cub_wg_device);
+        Memory::free_cuda_async(cub_pt_device);
       }
 
       void set_sd_v_norm_cuda(const LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& convect)

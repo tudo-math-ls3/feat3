@@ -32,6 +32,9 @@ namespace FEAT
       extern bool * cublas_lt_algo_matmat_initialized;
       extern size_t cuda_workspace_size;
       extern void * cuda_workspace;
+      /// cache whether we we support stream ordered operations
+      /// by default false, runtime has to query this the first time
+      extern bool stream_ordered_supported;
 #endif
     }
     /// \endcond
@@ -73,6 +76,15 @@ namespace FEAT
       bool print_occupancy;
       /// should the function force a synchronization at the end?
       bool synchronize;
+    };
+
+    /// Wrapper for stream parameter
+    struct StreamWrapper
+    {
+      /// default stream is zero
+      void* stream = nullptr;
+      /// default stream is zero
+      std::uint32_t stream_idx = 0;
     };
 
     void cuda_set_blocksize(Index misc, Index reduction, Index spmv, Index axpy, Index scalar_assembly, Index blocked_assembly);
@@ -119,7 +131,9 @@ namespace FEAT
     std::size_t cuda_get_shared_mem_per_sm();
     std::size_t cuda_get_max_blocks_per_sm();
     std::size_t cuda_get_sm_count();
+
     /// returns true if the current device supports stream-ordered memory allocation (cudaMallocAsync/cudaFreeAsync)
+    /// only valid after init call for internal variable (which is done in cuda_init)
     bool cuda_get_stream_ordered_alloc_supported();
 
     #ifdef __CUDACC__

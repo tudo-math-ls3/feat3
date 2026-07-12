@@ -18,13 +18,13 @@ namespace FEAT
 
   void Backend::set_preferred_backend(PreferredBackend preferred_backend)
   {
-    // do we switch from CUDA to something else?
-#ifdef FEAT_HAVE_CUDA
-    if((PreferredBackend::cuda == _preferred_backend) && (preferred_backend != _preferred_backend))
-    {
-      FEAT::Util::cuda_synchronize();
-    }
-#endif
+//     // do we switch from CUDA to something else?
+// #ifdef FEAT_HAVE_CUDA
+//     if((PreferredBackend::cuda == _preferred_backend) && (preferred_backend != _preferred_backend))
+//     {
+//       FEAT::Util::cuda_synchronize();
+//     }
+// #endif
 
     _preferred_backend = preferred_backend;
   }

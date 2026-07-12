@@ -55,6 +55,7 @@ cublasLtMatmulAlgo_t * FEAT::Util::Intern::cublas_lt_algo_matmat;
 bool * FEAT::Util::Intern::cublas_lt_algo_matmat_initialized;
 size_t FEAT::Util::Intern::cuda_workspace_size;
 void * FEAT::Util::Intern::cuda_workspace;
+bool FEAT::Util::Intern::stream_ordered_supported = false;
 
 namespace FEAT
 {
@@ -91,7 +92,8 @@ void FEAT::Util::cuda_set_device(const int device)
 
 void FEAT::Util::cuda_check_last_error()
 {
-  cudaDeviceSynchronize();
+  if constexpr(!async_operations)
+    cudaDeviceSynchronize();
   cudaError_t last_error(cudaGetLastError());
   if (cudaSuccess != last_error)
     throw InternalError(__func__, __FILE__, __LINE__, "CUDA error occurred in execution!\n" + stringify(cudaGetErrorString(last_error)));
@@ -157,6 +159,16 @@ void FEAT::Util::cuda_initialize(int rank, int /*ranks_per_node*/, int /*ranks_p
 
   //Util::Intern::cuda_workspace_size = 1024ul * 1024ul * 1024ul * 2ul;
   Util::Intern::cuda_workspace_size = 0;
+  {
+    int supported = 0;
+    if(cudaDeviceGetAttribute(&supported, cudaDevAttrMemoryPoolsSupported, Util::cuda_device_number) != cudaSuccess)
+    {
+      throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceGetAttribute failed!");
+    }
+
+    FEAT::Util::Intern::stream_ordered_supported = (supported != 0);
+  }
+
   /*auto status = cudaMalloc(&(Util::Intern::cuda_workspace), Util::Intern::cuda_workspace_size);
   if (status != cudaSuccess)
     throw InternalError(__func__, __FILE__, __LINE__, "cudaMalloc failed: " + stringify(cudaGetErrorString(status)));*/
@@ -335,12 +347,7 @@ std::size_t FEAT::Util::cuda_get_sm_count()
 
 bool FEAT::Util::cuda_get_stream_ordered_alloc_supported()
 {
-  int supported = 0;
-  if(cudaDeviceGetAttribute(&supported, cudaDevAttrMemoryPoolsSupported, Util::cuda_device_number) != cudaSuccess)
-  {
-    throw InternalError(__func__, __FILE__, __LINE__, "cudaDeviceGetAttribute failed!");
-  }
-  return supported != 0;
+  return async_operations ? FEAT::Util::Intern::stream_ordered_supported : false;
 }
 
 std::uint64_t FEAT::Util::cuda_start_range(const char* name)

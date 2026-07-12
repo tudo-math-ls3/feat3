@@ -375,6 +375,16 @@ namespace FEAT
         // reset memory location
         this->valid_locations = Location::none;
 
+        // format cuda memory?
+        if(*(mem_loc & Location::cuda))
+        {
+          if(this->mem_cuda != nullptr)
+            Memory::memset_cuda(reinterpret_cast<char*>(this->mem_cuda) + this_offset, 0, size);
+          else
+            this->_alloc_cuda(Init::format_to_zero);
+          this->valid_locations = this->valid_locations | Location::cuda;
+        }
+
         // format main memory?
         if(*(mem_loc & Location::main))
         {
@@ -385,15 +395,6 @@ namespace FEAT
           this->valid_locations = this->valid_locations | Location::main;
         }
 
-        // format cuda memory?
-        if(*(mem_loc & Location::cuda))
-        {
-          if(this->mem_cuda != nullptr)
-            Memory::memset_cuda(reinterpret_cast<char*>(this->mem_cuda) + this_offset, 0, size);
-          else
-            this->_alloc_cuda(Init::format_to_zero);
-          this->valid_locations = this->valid_locations | Location::cuda;
-        }
       }
 
       void format_random(Location mem_loc, std::size_t this_offset, std::size_t size)
@@ -855,6 +856,20 @@ namespace FEAT
       //void _copy(const Block& other, Location mem_loc, std::size_t offset)
       void _copy_from(const Block& source, Location mem_loc, std::size_t this_offset, std::size_t src_offset, std::size_t size)
       {
+        if(*(mem_loc & Location::cuda))
+        {
+          if(*(source.valid_locations & Location::cuda))
+          {
+            XASSERT(!source._is_mapped_cuda_write());
+            _copy_cuda_from_cuda(reinterpret_cast<char*>(source.mem_cuda) + src_offset, this_offset, size);
+          }
+          else if(*(source.valid_locations & Location::main))
+          {
+            XASSERT(!source._is_mapped_main_write());
+            _copy_cuda_from_main(reinterpret_cast<char*>(source.mem_main) + src_offset, this_offset, size);
+          }
+        }
+
         if(*(mem_loc & Location::main))
         {
           if(*(source.valid_locations & Location::main))
@@ -869,19 +884,6 @@ namespace FEAT
           }
         }
 
-        if(*(mem_loc & Location::cuda))
-        {
-          if(*(source.valid_locations & Location::cuda))
-          {
-            XASSERT(!source._is_mapped_cuda_write());
-            _copy_cuda_from_cuda(reinterpret_cast<char*>(source.mem_cuda) + src_offset, this_offset, size);
-          }
-          else if(*(source.valid_locations & Location::main))
-          {
-            XASSERT(!source._is_mapped_main_write());
-            _copy_cuda_from_main(reinterpret_cast<char*>(source.mem_main) + src_offset, this_offset, size);
-          }
-        }
       }
 
       void _copy_from(const void* src_ptr, Location src_loc, Location mem_loc, std::size_t this_offset, std::size_t size)

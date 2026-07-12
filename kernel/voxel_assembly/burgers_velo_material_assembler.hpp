@@ -1403,10 +1403,10 @@ namespace FEAT
 
         typedef typename Cubature::Rule<ShapeType, DataType, DataType>::PointType CubPointType;
         //initialize all necessary pointer arrays and values //maybe more sense to specify cubature rule and set this to a const mem location?
-        void* cub_pt_device = Memory::alloc_cuda(Index(num_cubs) * sizeof(CubPointType));
+        void* cub_pt_device = Memory::alloc_cuda_async(Index(num_cubs) * sizeof(CubPointType));
         Memory::memcopy_main_to_cuda(cub_pt_device, (void*)cub_pt, Index(num_cubs) * sizeof(CubPointType));
 
-        void* cub_wg_device = Memory::alloc_cuda(std::size_t(num_cubs) * sizeof(DataType));
+        void* cub_wg_device = Memory::alloc_cuda_async(std::size_t(num_cubs) * sizeof(DataType));
         Memory::memcopy_main_to_cuda(cub_wg_device, (const void*)cub_wg, std::size_t(num_cubs) * sizeof(DataType));
 
         VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
@@ -1417,8 +1417,8 @@ namespace FEAT
         VoxelAssembly::Arch::assemble_burgers_velo_material_csr(space, mat_data, vec_data.get_r(), d_cub_data, d_mapping_data,
                   this->mesh_data.coloring_data, alpha, burgers_params, material_params, material_type,
                   this->runtime_params);
-        Memory::free_cuda(cub_wg_device);
-        Memory::free_cuda(cub_pt_device);
+        Memory::free_cuda_async(cub_wg_device);
+        Memory::free_cuda_async(cub_pt_device);
       }
 
 
@@ -1431,10 +1431,10 @@ namespace FEAT
 
         typedef typename Cubature::Rule<ShapeType, DataType, DataType>::PointType CubPointType;
         //initialize all necessary pointer arrays and values //maybe more sense to specify cubature rule and set this to a const mem location?
-        void* cub_pt_device = Memory::alloc_cuda(Index(num_cubs) * sizeof(CubPointType));
+        void* cub_pt_device = Memory::alloc_cuda_async(Index(num_cubs) * sizeof(CubPointType));
         Memory::memcopy_main_to_cuda(cub_pt_device, (void*)cub_pt, Index(num_cubs) * sizeof(CubPointType));
 
-        void* cub_wg_device = Memory::alloc_cuda(std::size_t(num_cubs) * sizeof(DataType));
+        void* cub_wg_device = Memory::alloc_cuda_async(std::size_t(num_cubs) * sizeof(DataType));
         Memory::memcopy_main_to_cuda(cub_wg_device, (const void*)cub_wg, std::size_t(num_cubs) * sizeof(DataType));
 
         VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
@@ -1445,8 +1445,8 @@ namespace FEAT
         VoxelAssembly::Arch::assemble_burgers_velo_material_defect(space, vec_data.get_w(), conv_data.get_r(), primal_data.get_r(), d_cub_data, d_mapping_data,
                   this->mesh_data.coloring_data, alpha, burgers_params, material_params, material_type,
                   this->runtime_params);
-        Memory::free_cuda(cub_wg_device);
-        Memory::free_cuda(cub_pt_device);
+        Memory::free_cuda_async(cub_wg_device);
+        Memory::free_cuda_async(cub_pt_device);
       }
 
       #else //FEAT_HAVE_CUDA

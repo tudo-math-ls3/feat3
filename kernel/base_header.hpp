@@ -143,6 +143,18 @@ namespace FEAT
   {
       return static_cast<std::underlying_type_t<E>>(e);
   }
+
+#ifdef FEAT_ASYNC_OPERATIONS
+  static constexpr bool async_operations = true;
+#else
+  /**
+   * \brief Controls if asynchronous operations should be used by default
+   *
+   *  Using this can lead to false reports in timings.
+   *  Mainly used for cuda operations, but might also be relevant for mpi synchronization.
+   */
+  static constexpr bool async_operations = false;
+#endif
 } // namespace FEAT
 
 // define macros for nvcc
@@ -157,6 +169,9 @@ namespace FEAT
 #define CUDA_DEVICE __device__
 /// Function should be callable from device and host
 #define CUDA_HOST_DEVICE __host__ __device__
+#if defined(CUDART_VERSION) && (CUDART_VERSION >= 11020)
+  #define CUDA_ASYNC_SUPPORTED true
+#endif
 #else
 #define CUDA_HOST
 #define CUDA_DEVICE
