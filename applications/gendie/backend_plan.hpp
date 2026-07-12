@@ -8,6 +8,7 @@
 #include <kernel/solver/base.hpp>
 #include <kernel/util/string.hpp>
 #include <kernel/util/property_map.hpp>
+#include <kernel/util/cuda_util.hpp>
 
 #include <deque>
 #include <memory>
@@ -159,11 +160,14 @@ namespace Gendie
     private:
       std::shared_ptr<InnerType> _inner;
       FEAT::PreferredBackend _backend;
+      /// precomputed NVTX range-name prefix, e.g. "Pin[cuda] " (built once to avoid per-call formatting)
+      FEAT::String _nvtx_prefix;
 
     public:
       explicit BackendPinnedSolver(std::shared_ptr<InnerType> inner, FEAT::PreferredBackend backend) :
         _inner(std::move(inner)),
-        _backend(backend)
+        _backend(backend),
+        _nvtx_prefix("Pin[" + FEAT::stringify(backend) + "] ")
       {
       }
 
@@ -184,30 +188,35 @@ namespace Gendie
 
       virtual void init_symbolic() override
       {
+        FEAT::Util::ScopedNvtxRange _nvtx((_nvtx_prefix + "initS").c_str());
         FEAT::Backend::set_preferred_backend(_backend);
         _inner->init_symbolic();
       }
 
       virtual void init_numeric() override
       {
+        FEAT::Util::ScopedNvtxRange _nvtx((_nvtx_prefix + "initN").c_str());
         FEAT::Backend::set_preferred_backend(_backend);
         _inner->init_numeric();
       }
 
       virtual void done_numeric() override
       {
+        FEAT::Util::ScopedNvtxRange _nvtx((_nvtx_prefix + "doneN").c_str());
         FEAT::Backend::set_preferred_backend(_backend);
         _inner->done_numeric();
       }
 
       virtual void done_symbolic() override
       {
+        FEAT::Util::ScopedNvtxRange _nvtx((_nvtx_prefix + "doneS").c_str());
         FEAT::Backend::set_preferred_backend(_backend);
         _inner->done_symbolic();
       }
 
       virtual FEAT::Solver::Status apply(Vector_& vec_cor, const Vector_& vec_def) override
       {
+        FEAT::Util::ScopedNvtxRange _nvtx((_nvtx_prefix + "apply").c_str());
         FEAT::Backend::set_preferred_backend(_backend);
         return _inner->apply(vec_cor, vec_def);
       }

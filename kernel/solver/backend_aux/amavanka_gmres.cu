@@ -8,6 +8,7 @@
 #include <kernel/lafem/arch/batched_kernel_helper.cuh>
 #include <kernel/solver/base.hpp>
 #include <kernel/solver/amavanka_gmres.hpp>
+#include <kernel/util/cuda_util.hpp>
 #include <kernel/solver/backend_aux/csr_apply_helper.hpp>
 #include "cusparse_v2.h"
 #include <cublas_v2.h>
@@ -717,7 +718,8 @@ namespace FEAT::Solver::VankaGMRES
           alpha = Math::sqrt(nrm_sqr);
         }
         Util::cuda_stop_range(first_section);
-        auto second_section = Util::cuda_start_range("Second Section");
+        { // open "Second Section" scope; RAII so the convergence/max-iter break below still closes it
+        FEAT::Util::ScopedNvtxRange _second_section("Second Section");
         Intern::cublas_scale(vec_v[i+1], DT_(1)/alpha, rows, dt);
         {
           const auto id_givens = Util::cuda_start_range("Givens Rotation");
@@ -781,7 +783,7 @@ namespace FEAT::Solver::VankaGMRES
           }
         }
 
-        Util::cuda_stop_range(second_section);
+        } // close "Second Section" scope (RAII)
       }
       Util::cuda_stop_range(id_inner);
 
@@ -1303,7 +1305,8 @@ namespace FEAT::Solver::VankaGMRES
           alpha = Math::sqrt(nrm_sqr);
         }
         Util::cuda_stop_range(first_section);
-        auto second_section = Util::cuda_start_range("Second Section");
+        { // open "Second Section" scope; RAII so the convergence/max-iter break below still closes it
+        FEAT::Util::ScopedNvtxRange _second_section("Second Section");
         Intern::cublas_scale(vec_v[i+1], DT_(1)/alpha, rows, dt);
         {
           const auto id_givens = Util::cuda_start_range("Givens Rotation");
@@ -1367,7 +1370,7 @@ namespace FEAT::Solver::VankaGMRES
           }
         }
 
-        Util::cuda_stop_range(second_section);
+        } // close "Second Section" scope (RAII)
       }
       Util::cuda_stop_range(id_inner);
 

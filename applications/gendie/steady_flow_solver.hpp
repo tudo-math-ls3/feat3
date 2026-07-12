@@ -11,6 +11,7 @@
 #include <kernel/util/math.hpp>
 #include <kernel/util/stop_watch.hpp>
 #include <kernel/util/string.hpp>
+#include <kernel/util/cuda_util.hpp>
 //#include <applications/gendie/gendie_common.hpp>
 #include "logger.hpp"
 #include "format_helper.hpp"
@@ -506,8 +507,12 @@ namespace Gendie
 
     bool _apply_iteration(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs)
     {
-      this->cast()._prepare_defect_filter(vec_sol);
-      this->cast()._assemble_defect(vec_sol, vec_rhs);
+      FEAT::Util::ScopedNvtxRange _nvtx_iter("NL Iter");
+      {
+        FEAT::Util::ScopedNvtxRange _nvtx_def("NL Defect");
+        this->cast()._prepare_defect_filter(vec_sol);
+        this->cast()._assemble_defect(vec_sol, vec_rhs);
+      }
 
       if constexpr(!no_convert)
       {
@@ -590,23 +595,33 @@ namespace Gendie
       }
 
       /// setup system matrices
-      this->cast()._setup_system_matrices(vec_sol, vec_rhs);
-      this->cast()._prepare_system_filter();
+      {
+        FEAT::Util::ScopedNvtxRange _nvtx_mat("Setup Matrix");
+        this->cast()._setup_system_matrices(vec_sol, vec_rhs);
+        this->cast()._prepare_system_filter();
+      }
 
       //todo: init_numeric sets its own backend??
-      this->flow_solver->init_numeric();
+      {
+        FEAT::Util::ScopedNvtxRange _nvtx_ls_init("LS InitNum");
+        this->flow_solver->init_numeric();
+      }
 
       this->flow_solver->set_tol_abs(SolverDataType(this->cast()._choose_linear_tolerance(this->_cur_iter, def_nl, def_improve, this->_defects)));
       this->flow_solver->set_tol_rel(this->_fixed_ls_tol > DefectDataType(0) ? SolverDataType(this->_fixed_ls_tol) : SolverDataType(1E-2));
 
-      if constexpr(!no_convert)
+      FEAT::Solver::Status status;
       {
-        this->_vec_solver_def.local().convert(this->_vec_def.local());
-      }
-      FEAT::Solver::Status status = this->cast()._apply_solver(this->_vec_solver_cor, this->_vec_solver_def);
-      if constexpr(!no_convert)
-      {
-        this->_vec_cor.local().convert(this->_vec_solver_cor.local());
+        FEAT::Util::ScopedNvtxRange _nvtx_ls("Lin Solve");
+        if constexpr(!no_convert)
+        {
+          this->_vec_solver_def.local().convert(this->_vec_def.local());
+        }
+        status = this->cast()._apply_solver(this->_vec_solver_cor, this->_vec_solver_def);
+        if constexpr(!no_convert)
+        {
+          this->_vec_cor.local().convert(this->_vec_solver_cor.local());
+        }
       }
 
       // get solver statistics

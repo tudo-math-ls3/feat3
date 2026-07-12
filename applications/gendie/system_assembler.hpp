@@ -9,6 +9,7 @@
 #include <kernel/assembly/domain_assembler_basic_jobs.hpp>
 #include <kernel/assembly/common_operators.hpp>
 #include <kernel/util/stop_watch.hpp>
+#include <kernel/util/cuda_util.hpp>
 #include <kernel/voxel_assembly/burgers_velo_material_assembler.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 
@@ -205,6 +206,7 @@ namespace Gendie
     template<typename LevelType_, typename VecType_>
     void assemble_matrices(std::deque<std::shared_ptr<LevelType_>>& system_levels, const VecType_& vec_sol) const
     {
+      FEAT::Util::ScopedNvtxRange _nvtx("Asm SysMat");
       set_backend();
       watch_total.start();
       this->cast()._assemble_matrices(system_levels, vec_sol);
@@ -214,6 +216,7 @@ namespace Gendie
     template<typename LevelType_>
     void assemble_matrices_isotrop(std::deque<std::shared_ptr<LevelType_>>& system_levels) const
     {
+      FEAT::Util::ScopedNvtxRange _nvtx("Asm SysIso");
       set_backend();
       watch_total.start();
       this->cast()._assemble_matrices_isotrop(system_levels);
@@ -223,6 +226,7 @@ namespace Gendie
     template<typename VecType_>
     void assemble_diagonal(VecType_& vec_diag, const VecType_& vec_sol, PreferredBackend backend = PreferredBackend::generic) const
     {
+      FEAT::Util::ScopedNvtxRange _nvtx("Asm Diag");
       FEAT::Backend::set_preferred_backend(backend);
       watch_total.start();
       this->cast()._assemble_diagonal(vec_diag, vec_sol);

@@ -22,6 +22,7 @@
 #include "backend_plan.hpp"
 #include <kernel/util/stop_watch.hpp>
 #include <kernel/util/string.hpp>
+#include <kernel/util/cuda_util.hpp>
 
 #include <kernel/solver/direct_sparse_solver.hpp>
 #include <kernel/solver/frosch.hpp>
@@ -364,6 +365,7 @@ namespace Gendie
 
     void init_symbolic()
     {
+      FEAT::Util::ScopedNvtxRange _nvtx("StS InitSym");
       watch_total.start();
       watch_init_symbolic.start();
       this->cast()._init_symbolic();
@@ -373,6 +375,7 @@ namespace Gendie
 
     void init_numeric()
     {
+      FEAT::Util::ScopedNvtxRange _nvtx("StS InitNum");
       watch_total.start();
       watch_init_numeric.start();
       this->cast()._init_numeric();
@@ -456,6 +459,7 @@ namespace Gendie
 
     FEAT::Solver::Status apply(DefectVectorType& vec_cor, const DefectVectorType& vec_def) const
     {
+      FEAT::Util::ScopedNvtxRange _nvtx("StS Apply");
       watch_total.start();
       watch_apply.start();
       auto status = this->cast()._apply(vec_cor, vec_def);
@@ -466,6 +470,7 @@ namespace Gendie
 
     FEAT::Solver::Status correct(DefectVectorType& vec_cor, const DefectVectorType& vec_def) const
     {
+      FEAT::Util::ScopedNvtxRange _nvtx("StS Correct");
       watch_total.start();
       watch_apply.start();
       auto status = this->cast()._correct(vec_cor, vec_def);
@@ -476,6 +481,7 @@ namespace Gendie
 
     FEAT::Solver::Status solve(DefectVectorType& vec_sol, const DefectVectorType& vec_rhs) const
     {
+      FEAT::Util::ScopedNvtxRange _nvtx("StS Solve");
       watch_total.start();
       watch_apply.start();
       auto status = this->cast()._solve(vec_sol, vec_rhs);
@@ -817,6 +823,7 @@ namespace Gendie
     template<typename Domain_, typename System_, typename... TArgs, template<typename...> typename Container_>
     void set_solver(const Container_<std::shared_ptr<System_>, TArgs...>& system_levels, const Domain_& domain)
     {
+      FEAT::Util::ScopedNvtxRange _nvtx("MG Build");
       // typedef System_ SystemLevelType;
       // XASSERTM(this->_init_params, "You have to initialize the system before calling this function");
       XASSERTM(system_levels.size() > 0, "System levels not set");
@@ -1074,6 +1081,7 @@ namespace Gendie
 
     void init_symbolic()
     {
+      FEAT::Util::ScopedNvtxRange _nvtx("MG InitSym");
       if(multigrid_hierarchy) multigrid_hierarchy->init_symbolic();
     }
 
@@ -1084,6 +1092,7 @@ namespace Gendie
 
     void init_numeric()
     {
+      FEAT::Util::ScopedNvtxRange _nvtx("MG InitNum");
       // FEAT::PreferredBackend prev_backend = FEAT::Backend::get_preferred_backend();
       FEAT::Backend::set_preferred_backend(solver_backend);
       watch_mg_hirarch.start();

@@ -17,6 +17,7 @@
 #include <applications/gendie/shearrate_assembler.hpp>
 #include <kernel/assembly/discrete_projector.hpp>
 #include <kernel/util/omp_util.hpp>
+#include <kernel/util/cuda_util.hpp>
 
 #include <control/domain/deslagged_domain_control.hpp>
 
@@ -537,6 +538,8 @@ namespace Gendie
   {
     // we need a few timer
     FEAT::StopWatch watch_total, watch_create_domain, watch_create_system, watch_write_out, watch_create_filter, watch_create_solver, watch_analyze_sol;
+    // nvtx range stack for coarse-grained profiling of the main phases
+    FEAT::Util::NvtxRangeStack nvtx;
     watch_total.start();
     // create world communicator
     Dist::Comm comm(Dist::Comm::world());
@@ -626,6 +629,7 @@ namespace Gendie
     /*------------------------- Domain and System Setup --------------------------------------------*/
     /*----------------------------------------------------------------------------------------------*/
     logger.print("Setting up domain", PrintLevel::info);
+    nvtx.push("Setup Domain");
     watch_create_domain.start();
     PartitionControl<DomainLevel> domain(comm, true);
     watch_create_domain.stop();
@@ -784,8 +788,10 @@ namespace Gendie
 
     }
     watch_create_domain.stop();
+    nvtx.pop(); // Setup Domain
 
     logger.print("Compile Main Systemlevel", PrintLevel::info);
+    nvtx.push("Asm System");
     watch_create_system.start();
     //next up, create our defect system level, which does not require any mesh hirarchy, but at least the B matrices assembled
     std::shared_ptr<SystemLevel<SystemDataType, SystemIndexType>> system_level(new SystemLevel<SystemDataType, SystemIndexType>());
@@ -801,6 +807,7 @@ namespace Gendie
     system_level->compile_system_matrix();
 
     watch_create_system.stop();
+    nvtx.pop(); // Asm System
 
     // print system information
     {
@@ -837,12 +844,15 @@ namespace Gendie
 
     logger.print("Compile Filter", PrintLevel::info);
     // now we create our system defect filters
+    nvtx.push("Asm Filter");
     watch_create_filter.start();
     assemble_filters(*system_level, domain.front()->get_mesh_node()->get_mesh_part_names(true), *domain.front(), inflow_boundaries, materials, param_holder, true);
     watch_create_filter.stop();
+    nvtx.pop(); // Asm Filter
 
     logger.print("Create Solver", PrintLevel::info);
     // now we can construct our solver
+    nvtx.push("Create Solver");
     watch_create_solver.start();
     const PropertyMap* solver_config = config->query_section("solver-params");
     XASSERTM(solver_config, "No solver config section");
@@ -876,6 +886,7 @@ namespace Gendie
       flow_solver = flow_solver_factory.create_overwrite_config(solver_type, ts_config.get(), &logger);
       watch_create_solver.stop();
     }
+    nvtx.pop(); // Create Solver
 
     //print solver info
     logger.print(flow_solver->format_string(), PrintLevel::info);
@@ -885,7 +896,9 @@ namespace Gendie
     logger.flush_print();
 
     // and now, init our solver
+    nvtx.push("Init Solver");
     flow_solver->init();
+    nvtx.pop(); // Init Solver
 
     logger.print("Initialize Solution", PrintLevel::info);
     logger.print("\n--------------------------------------------------------------------------------------------------\n", PrintLevel::info);
@@ -900,12 +913,16 @@ namespace Gendie
     system_level->filter_sys.filter_rhs(vec_rhs);
 
     //init solution
+    nvtx.push("Init Sol");
     flow_solver->init_sol(vec_sol, vec_rhs);
+    nvtx.pop(); // Init Sol
 
     logger.print("Start Nonlinear Solver", PrintLevel::info);
     logger.flush_print();
     //now solve
+    nvtx.push("NL Solve");
     NonLinearStatus status = flow_solver->apply(vec_sol, vec_rhs);
+    nvtx.pop(); // NL Solve
 
     if(status != NonLinearStatus::success)
     {
@@ -922,13 +939,19 @@ namespace Gendie
         // always create ts solver with double solver precision in case we did not converge
         auto ts_config = config->query_section("solver-params")->clone();
         Gendie::_adjust_solver_config(ts_config.get(), 64, 64);
+        nvtx.push("Create Solver (TS Retry)");
         flow_solver = flow_solver_factory.create_overwrite_config(decltype(solver_type)::pseudo_ts, ts_config.get(), &logger);
         logger.print(flow_solver->format_string(), PrintLevel::info);
         logger.print(flow_solver->format_linear_solver(), PrintLevel::verbose);
         flow_solver->init();
+        nvtx.pop(); // Create Solver (TS Retry)
         // vec_sol.format();
+        nvtx.push("Init Sol (TS Retry)");
         flow_solver->init_sol(vec_sol, vec_rhs);
+        nvtx.pop(); // Init Sol (TS Retry)
+        nvtx.push("NL Solve (TS Retry)");
         status = flow_solver->apply(vec_sol, vec_rhs);
+        nvtx.pop(); // NL Solve (TS Retry)
         if(status != NonLinearStatus::success)
         {
           logger.print("Pseudo ts solver did not converge with status code" + stringify(status), PrintLevel::error);
@@ -953,6 +976,7 @@ namespace Gendie
 
     FEAT::Global::Vector<FEAT::LAFEM::DenseVector<SystemDataType, SystemIndexType>, FEAT::LAFEM::VectorMirror<SystemDataType, SystemIndexType>> vec_shearrate{&system_level->gate_scalar_velo}, vec_viscosity{&system_level->gate_scalar_velo};
     // and now, postprocessing, todo: refactor velo analyzer
+    nvtx.push("Postproc");
     watch_analyze_sol.start();
     if(*param_holder.want_vtk)
     {
@@ -986,10 +1010,13 @@ namespace Gendie
       vec_shearrate.sync_1();
     }
     watch_analyze_sol.stop();
+    nvtx.pop(); // Postproc
 
+    nvtx.push("Write VTK");
     watch_write_out.start();
     write_vtk(vec_sol, vec_rhs, domain, *system_level, vec_shearrate, vec_viscosity, param_holder, &logger);
     watch_write_out.stop();
+    nvtx.pop(); // Write VTK
 
 
     // print memory usage

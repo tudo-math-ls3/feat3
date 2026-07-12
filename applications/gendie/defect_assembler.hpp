@@ -8,6 +8,7 @@
 #include <kernel/assembly/burgers_assembly_job.hpp>
 #include <kernel/assembly/burgers_velo_material_assembly_job.hpp>
 #include <kernel/util/stop_watch.hpp>
+#include <kernel/util/cuda_util.hpp>
 #include <kernel/voxel_assembly/burgers_velo_material_assembler.hpp>
 #include <kernel/cubature/dynamic_factory.hpp>
 #include "format_helper.hpp"
@@ -206,6 +207,7 @@ namespace Gendie
      */
     void assemble_defect(VectorType& vec_def, const VectorType& vec_primal, const VectorType& vec_conv, const VectorType& vec_rhs) const
     {
+      FEAT::Util::ScopedNvtxRange _nvtx("Asm Defect");
       set_backend();
       watch_total.start();
       this->cast()._assemble_defect(vec_def, vec_primal, vec_conv, vec_rhs);
@@ -214,6 +216,7 @@ namespace Gendie
 
     void assemble_unsynced_defect(VectorType& vec_def, const VectorType& vec_primal, const VectorType& vec_conv) const
     {
+      FEAT::Util::ScopedNvtxRange _nvtx("Asm DefectU");
       set_backend();
       watch_total.start();
       this->cast()._assemble_unsynced_defect(vec_def, vec_primal, vec_conv);

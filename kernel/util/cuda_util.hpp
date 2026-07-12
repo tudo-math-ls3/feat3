@@ -160,3 +160,132 @@ namespace FEAT
   }
 }
 #endif // FEAT_HAVE_CUDA
+
+// The following NVTX profiling helpers are always compiled (also without CUDA). When FEAT_HAVE_CUDA
+// is not defined they degrade to no-ops, so call sites may use them unconditionally without guards.
+#include <cstddef>
+#include <cstdint>
+#include <vector>
+
+namespace FEAT
+{
+  namespace Util
+  {
+    /**
+     * \brief Stack manager for nested NVTX profiling ranges.
+     *
+     * Abstracts the paired \c Util::cuda_start_range / \c Util::cuda_stop_range calls behind a
+     * push/pop stack: push() opens a named range and stores its id, pop() closes the most recently
+     * opened one (LIFO). The destructor closes any ranges still open, so an early return or a thrown
+     * exception cannot leak a dangling range.
+     *
+     * All operations are no-ops unless \c FEAT_HAVE_CUDA is defined.
+     *
+     * \author Maximilian Esser
+     */
+    class NvtxRangeStack
+    {
+    private:
+      /// the ids of the currently open ranges (LIFO order)
+      std::vector<std::uint64_t> _ids;
+
+    public:
+      NvtxRangeStack() = default;
+
+      /// stacks must not be copied (ownership of open range ids is unique)
+      NvtxRangeStack(const NvtxRangeStack&) = delete;
+      NvtxRangeStack& operator=(const NvtxRangeStack&) = delete;
+
+      /// closes all ranges that are still open
+      ~NvtxRangeStack()
+      {
+        while(!_ids.empty())
+          pop();
+      }
+
+      /// opens a new named range and pushes it onto the stack
+      void push([[maybe_unused]] const char* name)
+      {
+#ifdef FEAT_HAVE_CUDA
+        _ids.push_back(cuda_start_range(name));
+#endif
+      }
+
+      /// closes the most recently opened range (no-op if the stack is empty)
+      void pop()
+      {
+#ifdef FEAT_HAVE_CUDA
+        if(!_ids.empty())
+        {
+          cuda_stop_range(_ids.back());
+          _ids.pop_back();
+        }
+#endif
+      }
+
+      /// returns the number of currently open ranges
+      std::size_t size() const
+      {
+        return _ids.size();
+      }
+    };
+
+    /// returns the calling thread's default NvtxRangeStack (used by the single-argument ScopedNvtxRange ctor)
+    inline NvtxRangeStack& nvtx_thread_stack()
+    {
+      thread_local NvtxRangeStack stack;
+      return stack;
+    }
+
+    /**
+     * \brief RAII scope guard for an NVTX profiling range.
+     *
+     * Built on top of NvtxRangeStack: opens a range on construction and closes it on destruction,
+     * so wrapping a scope in a range is a single line. Uses the calling thread's default stack
+     * unless an explicit stack is supplied.
+     *
+     * All operations are no-ops unless \c FEAT_HAVE_CUDA is defined.
+     *
+     * \author Maximilian Esser
+     */
+    class ScopedNvtxRange
+    {
+    private:
+      /// the stack this range was pushed onto
+      NvtxRangeStack& _stack;
+
+    public:
+      /// opens a range \p name on the calling thread's default stack
+      explicit ScopedNvtxRange(const char* name) :
+        _stack(nvtx_thread_stack())
+      {
+        _stack.push(name);
+      }
+
+      /// opens a range \p name on the given \p stack
+      ScopedNvtxRange(NvtxRangeStack& stack, const char* name) :
+        _stack(stack)
+      {
+        _stack.push(name);
+      }
+
+      /// scope guards must not be copied or moved
+      ScopedNvtxRange(const ScopedNvtxRange&) = delete;
+      ScopedNvtxRange& operator=(const ScopedNvtxRange&) = delete;
+
+      /// closes the range
+      ~ScopedNvtxRange()
+      {
+        _stack.pop();
+      }
+    };
+
+    /// emits an instantaneous NVTX marker event (no-op unless FEAT_HAVE_CUDA is defined)
+    inline void nvtx_mark([[maybe_unused]] const char* name)
+    {
+#ifdef FEAT_HAVE_CUDA
+      cuda_mark_event(name);
+#endif
+    }
+  } // namespace Util
+} // namespace FEAT

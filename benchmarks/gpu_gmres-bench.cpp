@@ -21,21 +21,8 @@
 #include <kernel/solver/gmres.hpp>
 #include <kernel/solver/amavanka_gmres.hpp>
 
-#ifdef FEAT_HAVE_CUDA
+// NVTX profiling ranges via the shared RAII wrapper (no-op without FEAT_HAVE_CUDA)
 #include <kernel/util/cuda_util.hpp>
-#else
-namespace FEAT::Util{
-    inline std::uint64_t cuda_start_range(const char*)
-    {
-     return 0;
-    }
-    inline void cuda_stop_range(std::uint64_t)
-    {
-    }
-    inline void cuda_mark_event(const char*)
-    {}
-  }
-#endif
 
 namespace GMRESTest
 {
@@ -123,7 +110,7 @@ namespace GMRESTest
     for(int i = 0; i < dim_; ++i)
       name_conv += "_" + stringify(base_size[std::size_t(i)]);
     String dom_name = name_conv + "domain";
-    auto dom_id = Util::cuda_start_range(dom_name.c_str());
+    FEAT::Util::ScopedNvtxRange _dom_nvtx(dom_name.c_str());
     typedef DT_ DataType;
     typedef IT_ IndexType;
     typedef Control::StokesBlockedUnitVeloNonePresSystemLevel<dim_, DataType, IndexType> SystemLevelType;
@@ -234,9 +221,8 @@ namespace GMRESTest
       gmres->set_min_iter(param_holder.num_iter);
       gmres->set_max_iter(param_holder.num_iter);
       String name = name_conv + "stnd_gmres";
-      auto id = Util::cuda_start_range(name.c_str());
+      FEAT::Util::ScopedNvtxRange _nvtx(name.c_str());
       run_solver(*gmres, tmp_cor, tmp_def, times[Times::solve_stnd_gmres]);
-      Util::cuda_stop_range(id);
       Backend::set_preferred_backend(PreferredBackend::generic);
       gmres->done();
     }
@@ -269,9 +255,8 @@ namespace GMRESTest
         gmres->set_min_iter(param_holder.num_iter);
         gmres->set_max_iter(param_holder.num_iter);
         String name = name_conv + (variant.first == Solver::KrylovOrthogonalizerType::cgs2 ? "stnd_gmres_cgs2" : "stnd_gmres_cgs");
-        auto id = Util::cuda_start_range(name.c_str());
+        FEAT::Util::ScopedNvtxRange _nvtx(name.c_str());
         run_solver(*gmres, tmp_cor, tmp_def, times[variant.second]);
-        Util::cuda_stop_range(id);
         Backend::set_preferred_backend(PreferredBackend::generic);
         gmres->done();
       }
@@ -304,13 +289,12 @@ namespace GMRESTest
         gmres->set_min_iter(param_holder.num_iter);
         gmres->set_max_iter(param_holder.num_iter);
         String name = name_conv + (variant.first == Solver::KrylovOrthogonalizerType::cgs2 ? "scalar gmres cgs2" : "scalar gmres");
-        auto id = Util::cuda_start_range(name.c_str());
+        FEAT::Util::ScopedNvtxRange _nvtx(name.c_str());
         run_solver(*gmres, tmp_cor, tmp_def, times[variant.second]);
         // std::printf("Flops %lu \n", gmres->get_flops());
         // report the flop baseline from the plain CGS run
         if(variant.first == Solver::KrylovOrthogonalizerType::classical_gram_schmidt)
           sizes[Sizes::flops] = gmres->get_global_flops();
-        Util::cuda_stop_range(id);
         Backend::set_preferred_backend(PreferredBackend::generic);
         gmres->done();
       }
@@ -343,9 +327,8 @@ namespace GMRESTest
         gmres->set_min_iter(param_holder.num_iter);
         gmres->set_max_iter(param_holder.num_iter);
         String name = name_conv + (variant.first == Solver::KrylovOrthogonalizerType::cgs2 ? "cuda gmres cgs2" : "cuda gmres");
-        auto id = Util::cuda_start_range(name.c_str());
+        FEAT::Util::ScopedNvtxRange _nvtx(name.c_str());
         run_solver(*gmres, tmp_cor, tmp_def, times[variant.second]);
-        Util::cuda_stop_range(id);
         Backend::set_preferred_backend(PreferredBackend::generic);
         gmres->done();
       }
@@ -370,9 +353,8 @@ namespace GMRESTest
         gmres->set_min_iter(param_holder.num_iter);
         gmres->set_max_iter(param_holder.num_iter);
         String name = name_conv + "cuda gmres";
-        auto id = Util::cuda_start_range(name.c_str());
+        FEAT::Util::ScopedNvtxRange _nvtx(name.c_str());
         run_solver(*gmres, tmp_cor, tmp_def, times[Times::solve_cuda_gmres_parallel_kernel]);
-        Util::cuda_stop_range(id);
         Backend::set_preferred_backend(PreferredBackend::generic);
         gmres->done();
 
@@ -398,16 +380,14 @@ namespace GMRESTest
         gmres->set_min_iter(param_holder.num_iter);
         gmres->set_max_iter(param_holder.num_iter);
         String name = name_conv + "cuda gmres";
-        auto id = Util::cuda_start_range(name.c_str());
+        FEAT::Util::ScopedNvtxRange _nvtx(name.c_str());
         run_solver(*gmres, tmp_cor, tmp_def, times[Times::solve_cuda_gmres_prefetch]);
-        Util::cuda_stop_range(id);
         Backend::set_preferred_backend(PreferredBackend::generic);
         gmres->done();
       }
     }
 
 
-    Util::cuda_stop_range(dom_id);
   }
 
 

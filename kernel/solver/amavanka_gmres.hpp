@@ -566,10 +566,22 @@ namespace FEAT
       virtual void init_numeric() override
       {
         BaseClass::init_numeric();
-        this->_vanka->init_numeric();
-        this->_local_vanka_mat.convert(this->_vanka->get_vanka_matrix());
-        this->_vanka->done_numeric();
-        this->_internal_system_mat.local().convert(_system_matrix.local());
+        {
+          Util::ScopedNvtxRange nvtx("Vanka: Init Numeric");
+          this->_vanka->init_numeric();
+        }
+        {
+          Util::ScopedNvtxRange nvtx("Vanka: Convert");
+          this->_local_vanka_mat.convert(this->_vanka->get_vanka_matrix());
+        }
+        {
+          Util::ScopedNvtxRange nvtx("Vanka: Done");
+          this->_vanka->done_numeric();
+        }
+        {
+          Util::ScopedNvtxRange nvtx("System: Convert");
+          this->_internal_system_mat.local().convert(_system_matrix.local());
+        }
 
         this->_local_vanka_mat.init_workspace();
         this->_internal_system_mat.local().init_workspace();
@@ -708,32 +720,15 @@ namespace FEAT
       }
 
     protected:
-      static std::uint64_t _start_cuda_range([[maybe_unused]] const char* name)
-      {
-        std::uint64_t id = 0;
-        #ifdef FEAT_HAVE_CUDA
-        id = Util::cuda_start_range(name);
-        #endif
-        return id;
-      }
-
-      static void _stop_cuda_range([[maybe_unused]] std::uint64_t id)
-      {
-        #ifdef FEAT_HAVE_CUDA
-        Util::cuda_stop_range(id);
-        #endif
-      }
-
       template<typename VecT_>
       static void _calc_dots(std::vector<DataType>& loc_dots, const VecT_& target, const std::vector<Memory::Arbiter>& vec_arb, const Index num_dots)
       {
-        const auto id_dot = _start_cuda_range("Calc Dots");
+        FEAT::Util::ScopedNvtxRange _nvtx("Calc Dots");
         for(Index i = 0; i < num_dots; ++i)
         {
           loc_dots[i] = DataType(0);
         }
         Intern::template BatchedHelper<VecT_>::batched_dot(loc_dots.data(), target, vec_arb.data(), num_dots, num_dots);
-        _stop_cuda_range(id_dot);
       }
 
       /// \brief Batched dot: computes \p num_dots projection dots into \p loc_dots and returns the
@@ -743,7 +738,7 @@ namespace FEAT
       /// the target vector itself and thus yields the self-dot without a separate norm reduction.
       DataType _calc_dots_s(std::vector<DataType>& loc_dots, const VecType& vec_target, const std::vector<Memory::Arbiter*>& vec_arb, const Index num_dots)
       {
-        const auto id_dot = _start_cuda_range("Calc Dots");
+        FEAT::Util::ScopedNvtxRange _nvtx("Calc Dots");
         // zero the accumulation arbiter (host), run the batched dot (device-accumulates for cuda), read back
         _dots_arb.format();
         LAFEM::Arch::BatchedDotProduct::exec<DataType, DataType>(this->_dots_arb, vec_target.elements_arbiter(), vec_target.size(), vec_arb.data(), num_dots + 1u);
@@ -755,7 +750,6 @@ namespace FEAT
             loc_dots[i] = dp[i];
           self_dot = dp[num_dots];
         }
-        _stop_cuda_range(id_dot);
         return self_dot;
       }
 
@@ -763,7 +757,7 @@ namespace FEAT
       /// all-reduce covers the \p num_dots projections \b and the self-dot together.
       DataType _calc_triple_dots_s(std::vector<DataType>& loc_dots, const VecType& vec_target, const std::vector<Memory::Arbiter*>& vec_arb, const VecType& freqs, const Index num_dots)
       {
-        const auto id_dot = _start_cuda_range("Calc Dots");
+        FEAT::Util::ScopedNvtxRange _nvtx("Calc Dots");
         _dots_arb.format();
         LAFEM::Arch::BatchedTripleDotProduct::exec<DataType, DataType>(this->_dots_arb, vec_target.elements_arbiter(), vec_target.size(), vec_arb.data(), freqs.elements_arbiter(), num_dots + 1u);
         DataType self_dot(0);
@@ -776,7 +770,6 @@ namespace FEAT
             loc_dots[i] = dp[i];
           self_dot = dp[num_dots];
         }
-        _stop_cuda_range(id_dot);
         return self_dot;
       }
 
@@ -845,16 +838,14 @@ namespace FEAT
       template<typename VecT_>
       static void _add_vecs(VecT_& target_vec, const std::vector<Memory::Arbiter*>& vec_arb, const std::vector<DataType>& loc_scales, const Index num_axpy, DataType alpha)
       {
-        const auto id_vec_add = _start_cuda_range("Add vecs");
+        FEAT::Util::ScopedNvtxRange _nvtx("Add vecs");
         Intern::template BatchedHelper<VecT_>::commulative_axpy(target_vec, vec_arb.data(), loc_scales.data(), num_axpy, alpha, num_axpy);
-        _stop_cuda_range(id_vec_add);
       }
 
       static void _add_vecs_s(VecType& target_vec, const std::vector<Memory::Arbiter*>& vec_arb, const std::vector<DataType>& loc_scales, const Index num_axpy, DataType alpha)
       {
-        const auto id_vec_add = _start_cuda_range("Add vecs");
+        FEAT::Util::ScopedNvtxRange _nvtx("Add vecs");
         LAFEM::Arch::CumulativeAxpy::exec<DataType>(target_vec.elements_arbiter(), target_vec.size(), vec_arb.data(), loc_scales.data(), num_axpy, alpha);
-        _stop_cuda_range(id_vec_add);
       }
 
       Status _set_initial_defectp(const GlobalVecType& vec_def, const GlobalVecType&)
@@ -1016,7 +1007,7 @@ namespace FEAT
 
       virtual Status _apply_intern(GlobalVecType& vec_sol, const GlobalVecType& vec_rhs)
       {
-        const auto id_total = _start_cuda_range("Internal Apply");
+        FEAT::Util::ScopedNvtxRange _nvtx_total("Internal Apply");
         IterationStats pre_iter(*this);
         Statistics::add_solver_expression(std::make_shared<ExpressionStartSolve>(this->name()));
         const GlobalMatType& matrix(this->_internal_system_mat);
@@ -1043,9 +1034,10 @@ namespace FEAT
           this->_vec_v.at(0).scale(this->_vec_v.at(0), DataType(1) / _q.back());
           _internal_flop_counter += 2u*this->_vec_v.at(0).size_raw();
 
-          const auto id_inner = _start_cuda_range("Inner GMRES Loop");
           // inner GMRES loop
           Index i(0);
+          { // "Inner GMRES Loop" scope (i is declared outside so it survives for the Hessenberg solve)
+          FEAT::Util::ScopedNvtxRange _nvtx_inner("Inner GMRES Loop");
           while(i < this->_krylov_dim)
           {
             // if(i == 0)
@@ -1054,9 +1046,8 @@ namespace FEAT
             // }
             // apply vanka matrix
             {
-              const auto id_vanka = _start_cuda_range("Solve Vanka");
+              FEAT::Util::ScopedNvtxRange _nvtx("Solve Vanka");
               _apply_vanka(this->_vec_w, this->_vec_v.at(i));
-              _stop_cuda_range(id_vanka);
             }
             // // sync by calculating mean
             // if(i == 0)
@@ -1066,10 +1057,9 @@ namespace FEAT
 
             // v[i+1] := A*w
             {
-              const auto id_matvec = _start_cuda_range("A*w");
+              FEAT::Util::ScopedNvtxRange _nvtx("A*w");
               matrix.apply(this->_vec_v.at(i+1), this->_vec_w);
               filter.filter_def(this->_vec_v.at(i+1).local());
-              _stop_cuda_range(id_matvec);
               _internal_flop_counter += 2u*_global_used_elements;
             }
 
@@ -1078,13 +1068,14 @@ namespace FEAT
             const DataType alpha = _orthogonalize_cpu(i);
 
             // normalize v[i+1]
-            const auto id_scale= _start_cuda_range("Norm scale");
+            {
+            FEAT::Util::ScopedNvtxRange _nvtx("Norm scale");
             this->_vec_v.at(i+1).scale(this->_vec_v.at(i+1), DataType(1) / alpha);
             _internal_flop_counter += 2u * _global_vec_size;
-            _stop_cuda_range(id_scale);
+            }
 
             {
-              const auto id_givens = _start_cuda_range("Givens Rotation");
+              FEAT::Util::ScopedNvtxRange _nvtx("Givens Rotation");
               // apply Givens rotations
               for(Index k(0); k < i; ++k)
               {
@@ -1092,11 +1083,11 @@ namespace FEAT
                 this->_h.at(i).at(k  ) = this->_c.at(k) * t + this->_s.at(k) * this->_h.at(i).at(k+1);
                 this->_h.at(i).at(k+1) = this->_s.at(k) * t - this->_c.at(k) * this->_h.at(i).at(k+1);
               }
-              _stop_cuda_range(id_givens);
             }
 
 
-            const auto id_def_push = _start_cuda_range("Push defect");
+            {
+            FEAT::Util::ScopedNvtxRange _nvtx("Push defect");
             // compute beta
             const DataType beta = Math::sqrt(Math::sqr(this->_h.at(i).at(i)) + Math::sqr(alpha));
 
@@ -1107,8 +1098,7 @@ namespace FEAT
             this->_h.at(i).at(i) = beta;
             this->_q.push_back(this->_s.back() * this->_q.at(i));
             this->_q.at(i) *= this->_c.back();
-
-            _stop_cuda_range(id_def_push);
+            }
             // push our new defect
             if(++i < this->_krylov_dim)
             {
@@ -1150,12 +1140,13 @@ namespace FEAT
             }
           }
 
-          _stop_cuda_range(id_inner);
+          } // close "Inner GMRES Loop" scope
 
 
           {
             const Index n = Math::min(i, this->_krylov_dim);
-            const auto id_h_solve = _start_cuda_range("Solve Hessenberg");
+            {
+            FEAT::Util::ScopedNvtxRange _nvtx("Solve Hessenberg");
             // solve H*q = q
             for(Index k(n); k > 0;)
             {
@@ -1167,7 +1158,7 @@ namespace FEAT
                 this->_q.at(j) -= this->_h.at(k).at(j) * this->_q.at(k);
               }
             }
-            _stop_cuda_range(id_h_solve);
+            } // "Solve Hessenberg"
 
             // Runtime::SyncGuard sync_guard;
             // update solution
@@ -1178,19 +1169,17 @@ namespace FEAT
           }
 
           {
-            const auto id_vanka = _start_cuda_range("Solve Vanka");
+            FEAT::Util::ScopedNvtxRange _nvtx("Solve Vanka");
             _apply_vanka(this->_vec_v.front(), this->_vec_w);
             vec_sol.axpy(this->_vec_v.front());
             _internal_flop_counter += _global_vec_size;
-            _stop_cuda_range(id_vanka);
           }
 
           // compute "real" residual
           {
-            const auto id_residual = _start_cuda_range("Residual Calc");
+            FEAT::Util::ScopedNvtxRange _nvtx("Residual Calc");
             matrix.apply(this->_vec_v.at(0), vec_sol, vec_rhs, -DataType(1));
             filter.filter_def(this->_vec_v.at(0).local());
-            _stop_cuda_range(id_residual);
             _internal_flop_counter += 2u*_global_used_elements;
           }
 
@@ -1198,7 +1187,6 @@ namespace FEAT
           status = this->_set_new_defectp(this->_vec_v.at(0), vec_sol);
         }
 
-        _stop_cuda_range(id_total);
         // finished
         Statistics::add_solver_expression(std::make_shared<ExpressionEndSolve>(this->name(), status, this->get_num_iter()));
         return status;
