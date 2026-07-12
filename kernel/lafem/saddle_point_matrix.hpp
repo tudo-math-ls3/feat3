@@ -412,7 +412,14 @@ namespace FEAT
        * \param[in] value
        * The value to which the matrix' entries are to be set to.
        */
-      void format(DataType value = DataType(0))
+      void format()
+      {
+        block_a().format();
+        block_b().format();
+        block_d().format();
+      }
+
+      void format(DataType value)
       {
         block_a().format(value);
         block_b().format(value);

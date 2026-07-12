@@ -289,7 +289,13 @@ namespace FEAT
        * \param[in] value
        * The value to which the matrix's entries are to be set to.
        */
-      void format(DataType value = DataType(0))
+      void format()
+      {
+        first().format();
+        rest().format();
+      }
+
+      void format(DataType value)
       {
         first().format(value);
         rest().format(value);
@@ -609,7 +615,12 @@ namespace FEAT
         return String("TupleMatrixRow<") + sub_name_list() + ">";
       }
 
-      void format(DataType value = DataType(0))
+      void format()
+      {
+        first().format();
+      }
+
+      void format(DataType value)
       {
         first().format(value);
       }
@@ -1076,7 +1087,13 @@ namespace FEAT
        * \param[in] value
        * The value to which the matrix's entries are to be set to.
        */
-      void format(DataType value = DataType(0))
+      void format()
+      {
+        first().format();
+        rest().format();
+      }
+
+      void format(DataType value)
       {
         first().format(value);
         rest().format(value);
@@ -1443,7 +1460,12 @@ namespace FEAT
         return String("TupleMatrix<") + sub_name_list() + ">";
       }
 
-      void format(DataType value = DataType(0))
+      void format()
+      {
+        first().format();
+      }
+
+      void format(DataType value)
       {
         first().format(value);
       }

@@ -514,6 +514,12 @@ namespace FEAT
 
         // initialize internal matrix representation, for this, first initialize vanka preconditioner
         this->_vanka->init_symbolic();
+        this->_vanka->init_numeric();
+        {
+          Util::ScopedNvtxRange nvtx("Vanka: Convert Symbolic");
+          this->_local_vanka_mat.convert(this->_vanka->get_vanka_matrix());
+        }
+        this->_vanka->done_numeric();
 
         // convert the global matrix
         this->_internal_system_mat.local().convert(_system_matrix.local());
@@ -526,6 +532,8 @@ namespace FEAT
           const Index in_size = Intern::FilterHelper<std::decay_t<decltype(this->_system_filter.local())>>::add_filter(tmp_map, this->_system_filter.local(), tmp_sys_vec);
           this->_internal_filter = FilType(in_size, tmp_map);
         }
+        this->_local_vanka_mat.init_workspace();
+        this->_internal_system_mat.local().init_workspace();
 
 
         _c.reserve(_krylov_dim);
@@ -571,26 +579,27 @@ namespace FEAT
           this->_vanka->init_numeric();
         }
         {
-          Util::ScopedNvtxRange nvtx("Vanka: Convert");
-          this->_local_vanka_mat.convert(this->_vanka->get_vanka_matrix());
+          Util::ScopedNvtxRange nvtx("Vanka: Clone");
+          this->_local_vanka_mat.copy(this->_vanka->get_vanka_matrix());
         }
         {
           Util::ScopedNvtxRange nvtx("Vanka: Done");
           this->_vanka->done_numeric();
         }
         {
-          Util::ScopedNvtxRange nvtx("System: Convert");
-          this->_internal_system_mat.local().convert(_system_matrix.local());
+          Util::ScopedNvtxRange nvtx("System: Clone");
+          this->_internal_system_mat.local().copy(_system_matrix.local());
         }
 
-        this->_local_vanka_mat.init_workspace();
-        this->_internal_system_mat.local().init_workspace();
         this->_dots_arb.format(Memory::Location::main);
 
       }
 
       virtual void done_symbolic() override
       {
+        this->_internal_system_mat.local().reset_workspace();
+        this->_local_vanka_mat.reset_workspace();
+        this->_local_vanka_mat.clear();
         this->_global_used_elements = 0u;
         this->_global_vec_size = 0u;
         _vec_sol.clear();
@@ -607,9 +616,6 @@ namespace FEAT
 
       virtual void done_numeric() override
       {
-        this->_internal_system_mat.local().reset_workspace();
-        this->_local_vanka_mat.reset_workspace();
-        this->_local_vanka_mat.clear();
       }
 
       /**

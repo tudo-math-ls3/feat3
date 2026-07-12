@@ -323,6 +323,7 @@ namespace FEAT
           this->_macro_mask.resize(this->_macro_dofs.front().get_num_nodes_domain(), 0);
 
         Solver::Intern::AmaVankaCore::alloc(this->_vanka, this->_dof_macros, this->_macro_dofs, Index(0), Index(0));
+        this->get_vanka_matrix().init_workspace();
 
         watch_init_symbolic.stop();
       }
@@ -330,6 +331,7 @@ namespace FEAT
       /// Releases the symbolic factorization data
       virtual void done_symbolic() override
       {
+        this->get_vanka_matrix().reset_workspace();
         this->_vanka.clear();
         this->_macro_mask.clear();
         this->_dof_macros.clear();
@@ -446,14 +448,11 @@ namespace FEAT
         // scale rows of Vanka matrix
         Solver::Intern::AmaVankaCore::scale_rows(this->_vanka, this->_omega, this->_dof_macros, this->_macro_mask, Index(0), Index(0));
 
-        this->get_vanka_matrix().init_workspace();
-
         watch_init_numeric.stop();
       }
 
       virtual void done_numeric() override
       {
-        this->get_vanka_matrix().reset_workspace();
       }
 
       /// applies the preconditioner

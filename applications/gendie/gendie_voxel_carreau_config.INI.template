@@ -160,6 +160,12 @@ voxel-assembly = true or false     #default false
 # Do we want to use voxel assembler?
 voxel-vanka = true or false     #default false
 
+# Run the CUDA voxel assembly (system + defect) and the voxel AmaVanka smoother asynchronously,
+# i.e. without an end-of-kernel device synchronization. Requires stream-ordered allocation support
+# for the vanka; only affects CUDA paths. Note: disables the end-of-assembly error check, and the
+# reported assembly/init timings no longer reflect the actual device runtime.
+async-assembly = true or false     #default false
+
 # Do we use f-cycle multigrid?
 multigrid-f-cycle = true or false  #default false
 

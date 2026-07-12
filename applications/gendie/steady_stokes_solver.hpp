@@ -138,6 +138,9 @@ namespace Gendie
       FEAT::Parameter<std::deque<FEAT::String>> assembly_backends = parameter(std::deque<FEAT::String>{}).property("backend-parameters/assembly-backends").name("Per-Level Assembly Backends");
       FEAT::Parameter<FEAT::Index> assembly_backend_threshold = parameter(FEAT::Index(0)).property("backend-parameters/assembly-threshold").name("Assembly Backend Threshold");
 
+      // run the CUDA voxel assembly (system/defect) and the voxel AmaVanka smoother asynchronously
+      FEAT::Parameter<bool> async_assembly = parameter(false).property("async-assembly").name("Async Assembly").parser(parse_config_bool);
+
       FEAT::Parameter<FEAT::Index> min_nl_iter = parameter(FEAT::Index(1)).property("min-nl-iter").name("Min Nonlinear Iter");
       FEAT::Parameter<FEAT::Index> max_nl_iter = parameter(FEAT::Index(50)).property("max-nl-iter").name("Max Nonlinear Iter");
       FEAT::Parameter<DataType> nl_tol_abs = parameter(DataType(1E-3)).property("nl-tol-abs").name("Nonlinear Absolute Tolerance");
@@ -620,6 +623,8 @@ namespace Gendie
     FEAT::PreferredBackend solver_backend;
     Intern::BackendSelector solve_backend_sel;
     Intern::BackendSelector asm_backend_sel;
+    /// run the CUDA voxel AmaVanka assembly asynchronously (no end-of-kernel synchronization)
+    bool async_assembly = false;
     FEAT::Solver::MultiGridCycle cycle;
     mutable FEAT::StopWatch watch_mg_hirarch;
     bool coarse_frosch;
@@ -641,6 +646,7 @@ namespace Gendie
       solve_backend_sel = Intern::make_backend_selector(*parser.solve_backends, *parser.solve_backend_threshold, solver_backend);
       const FEAT::PreferredBackend asm_fallback = Intern::backend_from_string(*parser.assembly_backend);
       asm_backend_sel = Intern::make_backend_selector(*parser.assembly_backends, *parser.assembly_backend_threshold, asm_fallback);
+      async_assembly = *parser.async_assembly;
       coarse_gmres |= *parser.coarse_gmres;
       coarse_frosch |= *parser.coarse_frosch;
       coarse_solver_info |= *parser.coarse_info;
@@ -831,6 +837,17 @@ namespace Gendie
       const auto& matrix_sys = system_levels.front()->matrix_sys;
       const auto& filter_sys = system_levels.front()->filter_sys;
 
+      // creates a voxel AmaVanka smoother and applies the async-assembly setting before the concrete
+      // pointer is up-cast into the base-typed solver deque (set_sync_after_assembly is only on the
+      // derived VoxelAmaVanka). With async_assembly enabled the batched CUDA assembly runs without an
+      // end-of-kernel synchronization.
+      auto make_voxel_vanka = [this](const auto& mat, const auto& filt, const auto& coloring)
+      {
+        auto vv = FEAT::Solver::new_voxel_amavanka(mat, filt, coloring);
+        vv->set_sync_after_assembly(!async_assembly);
+        return vv;
+      };
+
       domain_virtual_size = domain.size_virtual();
 
       // if we use frosch, initialize frosch params now
@@ -892,10 +909,10 @@ namespace Gendie
           if(use_voxel_vanka)
           {
             if constexpr(Intern::supports_element_coloring<Domain_>)
-              this->vanka_solver.push_back(FEAT::Solver::new_voxel_amavanka(system_levels.front()->local_matrix_sys, filter_sys.local(), domain.front()->element_coloring));
+              this->vanka_solver.push_back(make_voxel_vanka(system_levels.front()->local_matrix_sys, filter_sys.local(), domain.front()->element_coloring));
             else
             {
-              this->vanka_solver.push_back(FEAT::Solver::new_voxel_amavanka(system_levels.front()->local_matrix_sys, filter_sys.local(), Intern::get_element_coloring(*domain.front())));
+              this->vanka_solver.push_back(make_voxel_vanka(system_levels.front()->local_matrix_sys, filter_sys.local(), Intern::get_element_coloring(*domain.front())));
             }
           }
           else
@@ -940,9 +957,9 @@ namespace Gendie
           if(use_voxel_vanka)
           {
             if constexpr(Intern::supports_element_coloring<Domain_>)
-              vanka = FEAT::Solver::new_voxel_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local(), domain.at(i)->element_coloring);
+              vanka = make_voxel_vanka(lvl.local_matrix_sys, lvl.filter_sys.local(), domain.at(i)->element_coloring);
             else
-              vanka = FEAT::Solver::new_voxel_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local(), Intern::get_element_coloring(*domain.at(i)));
+              vanka = make_voxel_vanka(lvl.local_matrix_sys, lvl.filter_sys.local(), Intern::get_element_coloring(*domain.at(i)));
           }
           else
             vanka = FEAT::Solver::new_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local());
@@ -1011,9 +1028,9 @@ namespace Gendie
           if(use_voxel_vanka)
           {
             if constexpr(Intern::supports_element_coloring<Domain_>)
-              vanka = FEAT::Solver::new_voxel_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local(), domain.at(i)->element_coloring);
+              vanka = make_voxel_vanka(lvl.local_matrix_sys, lvl.filter_sys.local(), domain.at(i)->element_coloring);
             else
-              vanka = FEAT::Solver::new_voxel_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local(), Intern::get_element_coloring(*domain.at(i)));
+              vanka = make_voxel_vanka(lvl.local_matrix_sys, lvl.filter_sys.local(), Intern::get_element_coloring(*domain.at(i)));
           }
           else
             vanka = FEAT::Solver::new_amavanka(lvl.local_matrix_sys, lvl.filter_sys.local());
@@ -1402,14 +1419,32 @@ namespace Gendie
 
     void _init_numeric()
     {
-      // FEAT::PreferredBackend prev_backend = FEAT::Backend::get_preferred_backend();
-      FEAT::Backend::set_preferred_backend(solver_backend);
       // before the numeric initialization, we have to guarantee that our system is compiled
       watch_system_filter.start();
       for(std::size_t i = 0; i < this->system_levels.size(); ++i)
       {
+        Util::ScopedNvtxRange st_init_num("MGVFlow Numeric Init");
         // todo: set backend for each initialization
         auto& system = *this->system_levels.at(i);
+        // get the actual backend our matrix is assembled on by parsing the valid flag
+        {
+          const auto& val_arb = system.matrix_a.local().val_arbiter();
+          auto location = val_arb.location();
+          // if host is in valid locations, always use generic backend, because copy to device is non-blocking
+          if(*(location & Memory::Location::main))
+          {
+            FEAT::Backend::set_preferred_backend(PreferredBackend::generic);
+            // in theory we could now force the other values to also be on host
+          }
+          else if(*(location & Memory::Location::cuda))
+          {
+            FEAT::Backend::set_preferred_backend(PreferredBackend::cuda);
+          }
+          else
+          {
+            XABORTM("System value has to have at least one valid location");
+          }
+        }
         // this solver always assumes fbm
         if constexpr(use_fbm_)
           system.filter_interface_fbm.filter_weak_matrix_rows(system.matrix_a.local(), system.velo_mass_matrix.local());
@@ -1417,6 +1452,7 @@ namespace Gendie
         system.compile_local_matrix();
       }
       watch_system_filter.stop();
+      FEAT::Backend::set_preferred_backend(solver_backend);
       multigrid_solver.init_numeric();
       BaseClass::_init_numeric();
       // FEAT::Backend::set_preferred_backend(prev_backend);

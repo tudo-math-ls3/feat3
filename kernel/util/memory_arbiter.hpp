@@ -979,8 +979,15 @@ namespace FEAT
           TypedView<Tdst_> view_dst = this->template typed_view<Tdst_>(Location::main, Access::write);
           TypedView<Tsrc_> view_src = source.template typed_view<Tsrc_>(Location::main, Access::read);
           view_dst.convert_from(view_src);
+          view_dst.release();
+          // synchronize view by creating write view instead of overwriting location flag
+          if(*(mem_loc & Location::cuda))
+          {
+            TypedView<Tdst_> view_d = this->template typed_view<Tdst_>(Location::cuda, Access::read);
+            (void) view_d;
+          }
         }
-        if(*(mem_loc & Location::cuda))
+        else if(*(mem_loc & Location::cuda))
         {
           TypedView<Tdst_> view_dst = this->template typed_view<Tdst_>(Location::cuda, Access::write);
           TypedView<Tsrc_> view_src = source.template typed_view<Tsrc_>(Location::cuda, Access::read);

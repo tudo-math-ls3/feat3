@@ -867,8 +867,9 @@ namespace Gendie
     }
     SteadyFlowSolverFactory flow_solver_factory(domain, system_level, inflow_boundaries, materials, solver_config, true, param_holder);
     auto solver_type = flow_solver_factory.parse_solver_type(*solver_parser.nl_solver);
-    auto flow_solver = flow_solver_factory.create(solver_type, &logger);
+    typename decltype(flow_solver_factory)::SolverPointer flow_solver;
     watch_create_solver.stop();
+    // auto flow_solver = flow_solver_factory.create(solver_type, &logger);
 
     if(materials.front().get_viscosity_model()->get_type() != MaterialType::pseudo_power_law)
     {

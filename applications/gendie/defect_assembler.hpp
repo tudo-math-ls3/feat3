@@ -99,6 +99,8 @@ namespace Gendie
     Intern::BackendSelector asm_backend_sel;
     /// use the voxel assembler for the velocity residual (Carreau-family materials, Q2 hypercube spaces)
     bool voxel_asm = false;
+    /// run the CUDA voxel assembly asynchronously (skip the end-of-kernel synchronization)
+    bool async_asm = false;
 
   protected:
     /**
@@ -265,6 +267,12 @@ namespace Gendie
       this->voxel_asm = use;
     }
 
+    /// enables/disables asynchronous CUDA voxel assembly (no end-of-kernel synchronization)
+    void set_async_asm(bool use)
+    {
+      this->async_asm = use;
+    }
+
     DataType calc_stiffness_factor() const
     {
       return this->cast()._calc_stiffness_factor();
@@ -366,6 +374,8 @@ namespace Gendie
       // reuse the cached voxel assembler (defect is always on the finest level -> index 0); only the
       // scalar material parameters below change between calls
       auto& voxel = _voxel_cache.template get<Space_, DT, IT>(0, space, coloring);
+      // run the assembly asynchronously if requested (skips the device-wide sync/error-check at the end)
+      voxel.runtime_params.synchronize = !this->async_asm;
 
       const auto aT = this->_material->get_abiat_aT(this->_temperature);
       const DataType visco_scale = DataType(1000) / this->_mesh_scale;

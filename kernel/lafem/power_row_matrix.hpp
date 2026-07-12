@@ -403,7 +403,13 @@ namespace FEAT
        * \param[in] value
        * The value to which the matrix' entries are to be set to.
        */
-      void format(DataType value = DataType(0))
+      void format()
+      {
+        first().format();
+        rest().format();
+      }
+
+      void format(DataType value)
       {
         first().format(value);
         rest().format(value);
@@ -922,7 +928,12 @@ namespace FEAT
         return String("PowerRowMatrix<") + SubMatrixType::name() + "," + stringify(1) + ">";
       }
 
-      void format(DataType value = DataType(0))
+      void format()
+      {
+        first().format();
+      }
+
+      void format(DataType value)
       {
         first().format(value);
       }

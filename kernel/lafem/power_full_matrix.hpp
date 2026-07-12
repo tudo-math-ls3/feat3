@@ -355,7 +355,12 @@ namespace FEAT
       }
 
 
-      void format(DataType value = DataType(0))
+      void format()
+      {
+        _container.format();
+      }
+
+      void format(DataType value)
       {
         _container.format(value);
       }

@@ -43,6 +43,8 @@ namespace Gendie
     Intern::BackendSelector asm_backend_sel;
     /// use the voxel assembler for the velocity block (Carreau-family materials, Q2 hypercube spaces)
     bool voxel_asm = false;
+    /// run the CUDA voxel assembly asynchronously (skip the end-of-kernel synchronization)
+    bool async_asm = false;
 
 
   protected:
@@ -286,6 +288,12 @@ namespace Gendie
       this->voxel_asm = use;
     }
 
+    /// enables/disables asynchronous CUDA voxel assembly (no end-of-kernel synchronization)
+    void set_async_asm(bool use)
+    {
+      this->async_asm = use;
+    }
+
     FEAT::String format_timings() const
     {
       return this->cast()._format_timings();
@@ -386,6 +394,8 @@ namespace Gendie
       // reuse the per-level voxel assembler (expensive to construct); only the scalar material
       // parameters below change between calls
       auto& voxel = _voxel_cache.template get<Space_, DT, IT>(level, space, coloring);
+      // run the assembly asynchronously if requested (skips the device-wide sync/error-check at the end)
+      voxel.runtime_params.synchronize = !this->async_asm;
 
       const auto aT = this->_material->get_abiat_aT(this->_temperature);
       const SystemDataType visco_scale = SystemDataType(1000) / this->_mesh_scale;

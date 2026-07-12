@@ -323,7 +323,13 @@ namespace FEAT
        * \param[in] value
        * The value to which the vector's entries are to be set to.
        */
-      void format(DataType value = DataType(0))
+      void format()
+      {
+        first().format();
+        rest().format();
+      }
+
+      void format(DataType value)
       {
         first().format(value);
         rest().format(value);
@@ -847,7 +853,12 @@ namespace FEAT
         return 1;
       }
 
-      void format(DataType value = DataType(0))
+      void format()
+      {
+        _first.format();
+      }
+
+      void format(DataType value)
       {
         _first.format(value);
       }
