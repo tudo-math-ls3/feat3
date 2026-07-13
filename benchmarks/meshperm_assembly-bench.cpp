@@ -453,8 +453,8 @@ namespace MeshPermAssemblyBench
     TimeStamp stamp_1, stamp_2;
     VoxelAssembly::VoxelBurgersAssembler<SpaceType, DataType, IndexType> burgers(space, coloring);
     burgers.nu = burgers.beta = burgers.frechet_beta = burgers.theta = 1.0;
-    burgers.print_occupancy = true;
-    burgers.shared_mem = 4450;
+    // burgers.print_occupancy = true;
+    // burgers.shared_mem = 4450;
     // burgers.blocksize = 64;
     // burgers.gridsize = 64;
     stamp_2.stamp();

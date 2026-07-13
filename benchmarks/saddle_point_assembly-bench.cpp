@@ -182,7 +182,6 @@ namespace SaddlePointAssemblyBench
     voxel_defo.yasuda_a = DataType(1.9);
     voxel_defo.mu_inf = DataType(0.001);
     voxel_defo.material_type = VoxelAssembly::MaterialType::carreauYasuda;
-    voxel_defo.blocksize = 64;
     asm_sym_matrix_watch.stop();
 
     asm_num_matrix_watch.start();
@@ -347,7 +346,6 @@ namespace SaddlePointAssemblyBench
     voxel_defo.yasuda_a = DataType(1.9);
     voxel_defo.mu_inf = DataType(0.001);
     voxel_defo.material_type = VoxelAssembly::MaterialType::carreauYasuda;
-    voxel_defo.blocksize = 64;
     asm_sym_matrix_watch.stop();
 
     asm_num_matrix_watch.start();
