@@ -109,7 +109,7 @@ namespace Gendie
       return false;
     }
 
-    static bool is_temperature_model(const String& option)
+    static inline bool is_temperature_model(const String& option)
     {
       TemperatureModelType type = TemperatureModelType::isotherm;
       return try_parse_temperature_option(option, type);
