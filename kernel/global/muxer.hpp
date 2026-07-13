@@ -386,7 +386,7 @@ namespace FEAT
 
         // gather to parent sibling
         DataType* dummy = nullptr;
-        _sibling_comm->gather(parent_buffer.elements_view_w().get_w(), _buffer_size, dummy, std::size_t(0), _parent_rank);
+        _sibling_comm->gather(parent_buffer.elements_view_r().get_r(), _buffer_size, dummy, std::size_t(0), _parent_rank);
       }
 
       /**
