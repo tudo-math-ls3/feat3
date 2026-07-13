@@ -127,6 +127,7 @@ namespace Gendie
       FEAT::Parameter<DataType> coarse_tol_abs = parameter(DataType(1E+10)).property("coarse-gmres-parameters/tol-abs").name("Coarse Absolute Tolerance");
       FEAT::Parameter<DataType> coarse_inner_rescale = parameter(DataType(1E+1)).property("coarse-gmres-parameters/inner-rescale").name("Coarse Inner Rescale");
       FEAT::Parameter<FEAT::String> coarse_orthogonalizer = parameter(FEAT::String("cgs2")).property("coarse-gmres-parameters/orthogonalizer").name("Coarse GMRES Orthogonalizer").validator(is_orthogonalizer);
+      FEAT::Parameter<bool> coarse_cuda_gmres = parameter(true).property("coarse-gmres-parameters/cuda-gmres").name("Coarse Fused Kernel GMRES");
 
       // per-level solve backend: explicit list (index 0 = finest) and/or a level-size heuristic threshold
       FEAT::Parameter<std::deque<FEAT::String>> solve_backends = parameter(std::deque<FEAT::String>{}).property("backend-parameters/solve-backends").name("Per-Level Solve Backends");
@@ -629,6 +630,7 @@ namespace Gendie
     mutable FEAT::StopWatch watch_mg_hirarch;
     bool coarse_frosch;
     bool coarse_gmres;
+    bool use_cuda_gmres;
     bool coarse_solver_info;
 
   public:
@@ -795,6 +797,7 @@ namespace Gendie
       params._tol_abs = *parser.coarse_tol_abs;
       params._inner_rescale = *parser.coarse_inner_rescale;
       params._ortho = Intern::orthogonalizer_from_string(*parser.coarse_orthogonalizer);
+      this->use_cuda_gmres = *parser.coarse_cuda_gmres;
       return true;
     }
 
@@ -1041,7 +1044,7 @@ namespace Gendie
           // with a Schwarz-wrapped AmaVanka preconditioner. Both default to the cgs2 orthogonalizer.
           std::shared_ptr<FEAT::Solver::IterativeSolver<DefectVectorType>> coarse_solver_t;
 #ifdef FEAT_HAVE_CUDA
-          if(lvl_solve_backend == FEAT::PreferredBackend::cuda)
+          if((lvl_solve_backend == FEAT::PreferredBackend::cuda) && use_cuda_gmres)
           {
             auto amavanka_gmres = FEAT::Solver::new_amavanka_gmres(lvl.matrix_sys, lvl.filter_sys, vanka, coarse_gmres_params._gmres_dim, coarse_gmres_params._inner_rescale);
             amavanka_gmres->set_use_cuda_gmres(true);
