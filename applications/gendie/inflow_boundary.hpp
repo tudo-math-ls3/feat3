@@ -1028,7 +1028,7 @@ namespace Gendie
       if(*parser.material_id >= materials.size())
         return InflowParserError::material_id_not_found;
       inflow_boundaries.emplace_back(parser, mesh_bb_min, mesh_bb_max, id);
-      inflow_info+="Inflow " + inflow_boundaries[id].get_bnd_name()  + " parameters:\n";
+      inflow_info+="Inflow " + inflow_boundaries[std::size_t(id)].get_bnd_name()  + " parameters:\n";
       inflow_info+=parser.display();
     }
 
