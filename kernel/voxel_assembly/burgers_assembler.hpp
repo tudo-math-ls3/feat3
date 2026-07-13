@@ -1452,6 +1452,11 @@ namespace FEAT
       #ifdef FEAT_HAVE_CUDA
       /// runtime parameters controlling the cuda kernel launch (shared_mem, blocksize, gridsize, print_occupancy, synchronize)
       Util::RuntimeParameter runtime_params;
+
+      /// device-resident cubature cache; the arbiters own the host<->device synchronization so the
+      /// (possibly asynchronous) upload never sources from the transient stack-local cubature rule.
+      /// shared with derived assemblers (e.g. the velo-material assembler) via inheritance.
+      mutable VoxelAssembly::DeviceCubature<DataType, typename Cubature::Rule<ShapeType, DataType, DataType>::PointType> _cub_cache;
       #endif
 
       /// Should we use full deformation formulation?
@@ -1678,23 +1683,17 @@ namespace FEAT
         const Memory::TypedView<DataType> vec_view = convect.elements_view_raw_r(Memory::Location::cuda);
         const DataType* vec_data = vec_view.get_r();
 
-        typedef typename Cubature::Rule<ShapeType, DataType, DataType>::PointType CubPointType;
-        //initialize all necessary pointer arrays and values //maybe more sense to specify cubature rule and set this to a const mem location?
-        void* cub_pt_device = Memory::alloc_cuda_async(Index(num_cubs) * sizeof(CubPointType));
-        Memory::memcopy_main_to_cuda(cub_pt_device, (void*)cub_pt, Index(num_cubs) * sizeof(CubPointType));
-
-        void* cub_wg_device = Memory::alloc_cuda_async(std::size_t(num_cubs) * sizeof(DataType));
-        Memory::memcopy_main_to_cuda(cub_wg_device, (const void*)cub_wg, std::size_t(num_cubs) * sizeof(DataType));
-
-        VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
+        // upload the cubature into the cached device buffers (if it changed) and fetch the device view;
+        // the arbiter sources the host->device copy from its own persistent host memory, so this is
+        // safe even though the assembly kernel below runs asynchronously (no end-of-kernel sync)
+        this->_cub_cache.update(cub_pt, cub_wg, num_cubs);
+        VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = this->_cub_cache.device_data();
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_assembly_field();
         auto burgers_params = wrap_burgers_params();
 
         VoxelAssembly::Arch::assemble_burgers_csr(space, mat_data, vec_data, d_cub_data,
                                                         d_mapping_data, mesh_data.coloring_data, alpha, burgers_params,
                                                         runtime_params);
-        Memory::free_cuda_async(cub_wg_device);
-        Memory::free_cuda_async(cub_pt_device);
       }
 
 
@@ -1712,23 +1711,17 @@ namespace FEAT
         const DataType* conv_data = conv_view.get_r();
         const DataType* primal_data = primal_view.get_r();
 
-        typedef typename Cubature::Rule<ShapeType, DataType, DataType>::PointType CubPointType;
-        //initialize all necessary pointer arrays and values //maybe more sense to specify cubature rule and set this to a const mem location?
-        void* cub_pt_device = Memory::alloc_cuda_async(Index(num_cubs) * sizeof(CubPointType));
-        Memory::memcopy_main_to_cuda(cub_pt_device, (void*)cub_pt, Index(num_cubs) * sizeof(CubPointType));
-
-        void* cub_wg_device = Memory::alloc_cuda_async(std::size_t(num_cubs) * sizeof(DataType));
-        Memory::memcopy_main_to_cuda(cub_wg_device, (const void*)cub_wg, std::size_t(num_cubs) * sizeof(DataType));
-
-        VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
+        // upload the cubature into the cached device buffers (if it changed) and fetch the device view;
+        // the arbiter sources the host->device copy from its own persistent host memory, so this is
+        // safe even though the assembly kernel below runs asynchronously (no end-of-kernel sync)
+        this->_cub_cache.update(cub_pt, cub_wg, num_cubs);
+        VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = this->_cub_cache.device_data();
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_assembly_field();
         auto burgers_params = wrap_burgers_params();
 
         VoxelAssembly::Arch::assemble_burgers_defect(space, vec_data, conv_data, primal_data, d_cub_data, d_mapping_data,
                                                               mesh_data.coloring_data, alpha, burgers_params,
                                                               runtime_params);
-        Memory::free_cuda_async(cub_wg_device);
-        Memory::free_cuda_async(cub_pt_device);
       }
 
       void set_sd_v_norm_cuda(const LAFEM::DenseVectorBlocked<DataType, IndexType, dim>& convect)

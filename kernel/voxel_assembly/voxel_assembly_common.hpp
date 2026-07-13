@@ -90,6 +90,87 @@ namespace FEAT
     };
 
     /**
+     * \brief Owns the device-resident cubature (points + weights) of a voxel assembler.
+     *
+     * The cubature points and weights are held in two \c Memory::Arbiter buffers, which manage the
+     * host/device (main/cuda) synchronization for us. The cubature data is written into the arbiters'
+     * host memory (see update()) and pulled to the device on demand by acquiring a cuda read view
+     * (see device_data()). Because the arbiter sources the host->device copy from its own persistent
+     * host buffer - rather than from the transient stack-local \c Cubature::Rule the assemble entry
+     * points build - the upload stays valid even when the batched assembly runs asynchronously (no
+     * end-of-kernel synchronization, stream-ordered frees). Reusing the buffers across assembly calls
+     * also avoids the per-call device alloc/free churn.
+     *
+     * \tparam DT_ The data type of the cubature weights.
+     * \tparam PointType_ The cubature point type (e.g. Tiny::Vector<DT_, dim>).
+     *
+     * \author Maximilian Esser
+     */
+    template<typename DT_, typename PointType_>
+    class DeviceCubature
+    {
+    private:
+      /// device/host buffer for the cubature points
+      Memory::Arbiter _points;
+      /// device/host buffer for the cubature weights
+      Memory::Arbiter _weights;
+      /// number of cubature points currently cached (0 = nothing uploaded yet)
+      int _num_cubs = 0;
+
+    public:
+      DeviceCubature() = default;
+      // Memory::Arbiter is move-only (copy deleted, move + RAII defaulted); inherit that behavior
+      DeviceCubature(const DeviceCubature&) = delete;
+      DeviceCubature& operator=(const DeviceCubature&) = delete;
+      DeviceCubature(DeviceCubature&&) = default;
+      DeviceCubature& operator=(DeviceCubature&&) = default;
+      ~DeviceCubature() = default;
+
+      /**
+       * \brief Uploads the cubature into the cached host buffers if it changed.
+       *
+       * Reuses the cached upload when the cubature is unchanged (keyed on the point count, which is
+       * constant for a given assembler instance in practice). On a change, fresh arbiters are
+       * allocated - releasing the previous ones through the blocking device free, which drains any
+       * still-pending asynchronous copy - and the new cubature is written synchronously into the
+       * arbiters' own (persistent) host memory. The device copy is (re)synchronized lazily by
+       * device_data(). The unchanged path performs no host write, so it can never race an in-flight
+       * asynchronous host->device copy of the same buffer.
+       *
+       * \param[in] pts A \transient pointer to the \c num_cubs cubature points.
+       * \param[in] wgs A \transient pointer to the \c num_cubs cubature weights.
+       * \param[in] num_cubs The number of cubature points.
+       */
+      void update(const PointType_* pts, const DT_* wgs, int num_cubs)
+      {
+        if(num_cubs == _num_cubs)
+          return;
+        _points = Memory::Arbiter(std::size_t(num_cubs) * sizeof(PointType_));
+        _weights = Memory::Arbiter(std::size_t(num_cubs) * sizeof(DT_));
+        // synchronous host memcpy into the arbiters' own main memory; sets valid location to main
+        _points.copy(reinterpret_cast<const void*>(pts), Memory::Location::main, Memory::Location::main);
+        _weights.copy(reinterpret_cast<const void*>(wgs), Memory::Location::main, Memory::Location::main);
+        _num_cubs = num_cubs;
+      }
+
+      /**
+       * \brief Returns the device-side view of the cached cubature.
+       *
+       * Acquiring the cuda read views performs the host->device copy (from the arbiters' persistent
+       * host memory) when the device copy is not yet up to date, and is a no-op otherwise. The
+       * returned raw device pointers remain valid after the temporary views are released, for as long
+       * as this object (and thus the arbiters) is alive and not re-uploaded (and reuploading requires a stream
+       * synchronization, so this should be save).
+       */
+      AssemblyCubatureData<DT_> device_data() const
+      {
+        const void* pts = _points.template typed_view<PointType_>(Memory::Location::cuda, Memory::Access::read).get_r();
+        const DT_* wgs = _weights.template typed_view<DT_>(Memory::Location::cuda, Memory::Access::read).get_r();
+        return AssemblyCubatureData<DT_>{pts, wgs, _num_cubs};
+      }
+    }; // class DeviceCubature
+
+    /**
      * \brief CSR Matrix data
      *
      * \tparam DT_ The dataype.

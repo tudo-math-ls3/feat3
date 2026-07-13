@@ -139,6 +139,12 @@ namespace FEAT
       /// The datahandler
       DataHandler mesh_data;
 
+      #ifdef FEAT_HAVE_CUDA
+      /// device-resident cubature cache; the arbiters own the host<->device synchronization so the
+      /// (possibly asynchronous) upload never sources from the transient stack-local cubature rule
+      mutable VoxelAssembly::DeviceCubature<DataType, typename Cubature::Rule<ShapeType, DataType, DataType>::PointType> _cub_cache;
+      #endif
+
 
     public:
       explicit VoxelPoissonAssembler() = default;
@@ -212,22 +218,15 @@ namespace FEAT
         const Memory::TypedView<IndexType> col_idx_view(matrix.col_idx_view_r(Memory::Location::cuda));
         CSRMatrixData<DataType, IndexType> mat_data = {val_view.get_w(), row_ptr_view.get_r(), col_idx_view.get_r(), matrix.num_rows(), matrix.num_cols()};
 
-        typedef typename Cubature::Rule<ShapeType, DataType, DataType>::PointType CubPointType;
-        //initialize all necessary pointer arrays and values //maybe more sense to specify cubature rule and set this to a const mem location?
-        void* cub_pt_device = Memory::alloc_cuda_async(std::size_t(num_cubs) * sizeof(CubPointType));
-        Memory::memcopy_main_to_cuda(cub_pt_device, (const void*)cub_pt, std::size_t(num_cubs) * sizeof(CubPointType));
-
-        void* cub_wg_device = Memory::alloc_cuda_async(std::size_t(num_cubs) * sizeof(DataType));
-        Memory::memcopy_main_to_cuda(cub_wg_device, (const void*)cub_wg, std::size_t(num_cubs) * sizeof(DataType));
-
-        VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
+        // upload the cubature into the cached device buffers (if it changed) and fetch the device view;
+        // the arbiter sources the host->device copy from its own persistent host memory, so this is
+        // safe even when the assembly runs asynchronously (no end-of-kernel sync / stream-ordered free)
+        this->_cub_cache.update(cub_pt, cub_wg, num_cubs);
+        VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = this->_cub_cache.device_data();
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = mesh_data.get_assembly_field();
 
 
         VoxelAssembly::Arch::assemble_poisson_csr(space, mat_data, d_cub_data, d_mapping_data, mesh_data.coloring_data, alpha);
-        //free resources
-        Memory::free_cuda_async(cub_wg_device);
-        Memory::free_cuda_async(cub_pt_device);
       }
 
       #else //FEAT_HAVE_CUDA

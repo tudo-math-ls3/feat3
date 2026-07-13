@@ -1241,7 +1241,6 @@ namespace FEAT
       /// material type
       MaterialType material_type;
 
-
     public:
       explicit VoxelBurgersVeloMaterialAssembler() = default;
 
@@ -1401,15 +1400,11 @@ namespace FEAT
         VoxelAssembly::CSRMatrixData<DataType, IndexType> mat_data = {val_view.get_w(), row_ptr_view.get_r(), col_idx_view.get_r(), matrix.num_rows(), matrix.num_cols()};
         const Memory::TypedView<DT_> vec_data = convect.elements_view_raw_r(Memory::Location::cuda);
 
-        typedef typename Cubature::Rule<ShapeType, DataType, DataType>::PointType CubPointType;
-        //initialize all necessary pointer arrays and values //maybe more sense to specify cubature rule and set this to a const mem location?
-        void* cub_pt_device = Memory::alloc_cuda_async(Index(num_cubs) * sizeof(CubPointType));
-        Memory::memcopy_main_to_cuda(cub_pt_device, (void*)cub_pt, Index(num_cubs) * sizeof(CubPointType));
-
-        void* cub_wg_device = Memory::alloc_cuda_async(std::size_t(num_cubs) * sizeof(DataType));
-        Memory::memcopy_main_to_cuda(cub_wg_device, (const void*)cub_wg, std::size_t(num_cubs) * sizeof(DataType));
-
-        VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
+        // upload the cubature into the cached device buffers (if it changed) and fetch the device view;
+        // the arbiter sources the host->device copy from its own persistent host memory, so this is
+        // safe even though the assembly kernel below runs asynchronously (no end-of-kernel sync)
+        this->_cub_cache.update(cub_pt, cub_wg, num_cubs);
+        VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = this->_cub_cache.device_data();
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = this->mesh_data.get_assembly_field();
         auto burgers_params = this->wrap_burgers_params();
         auto material_params = wrap_material_params();
@@ -1417,8 +1412,6 @@ namespace FEAT
         VoxelAssembly::Arch::assemble_burgers_velo_material_csr(space, mat_data, vec_data.get_r(), d_cub_data, d_mapping_data,
                   this->mesh_data.coloring_data, alpha, burgers_params, material_params, material_type,
                   this->runtime_params);
-        Memory::free_cuda_async(cub_wg_device);
-        Memory::free_cuda_async(cub_pt_device);
       }
 
 
@@ -1429,15 +1422,11 @@ namespace FEAT
         const Memory::TypedView<DataType> conv_data = convect.elements_view_raw_r(Memory::Location::cuda);
         const Memory::TypedView<DataType> primal_data = primal.elements_view_raw_r(Memory::Location::cuda);
 
-        typedef typename Cubature::Rule<ShapeType, DataType, DataType>::PointType CubPointType;
-        //initialize all necessary pointer arrays and values //maybe more sense to specify cubature rule and set this to a const mem location?
-        void* cub_pt_device = Memory::alloc_cuda_async(Index(num_cubs) * sizeof(CubPointType));
-        Memory::memcopy_main_to_cuda(cub_pt_device, (void*)cub_pt, Index(num_cubs) * sizeof(CubPointType));
-
-        void* cub_wg_device = Memory::alloc_cuda_async(std::size_t(num_cubs) * sizeof(DataType));
-        Memory::memcopy_main_to_cuda(cub_wg_device, (const void*)cub_wg, std::size_t(num_cubs) * sizeof(DataType));
-
-        VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = {cub_pt_device, (DataType*)cub_wg_device, num_cubs};
+        // upload the cubature into the cached device buffers (if it changed) and fetch the device view;
+        // the arbiter sources the host->device copy from its own persistent host memory, so this is
+        // safe even though the assembly kernel below runs asynchronously (no end-of-kernel sync)
+        this->_cub_cache.update(cub_pt, cub_wg, num_cubs);
+        VoxelAssembly::AssemblyCubatureData<DataType> d_cub_data = this->_cub_cache.device_data();
         VoxelAssembly::AssemblyMappingData<DataType, IndexType> d_mapping_data = this->mesh_data.get_assembly_field();
         auto burgers_params = this->wrap_burgers_params();
         auto material_params = wrap_material_params();
@@ -1445,8 +1434,6 @@ namespace FEAT
         VoxelAssembly::Arch::assemble_burgers_velo_material_defect(space, vec_data.get_w(), conv_data.get_r(), primal_data.get_r(), d_cub_data, d_mapping_data,
                   this->mesh_data.coloring_data, alpha, burgers_params, material_params, material_type,
                   this->runtime_params);
-        Memory::free_cuda_async(cub_wg_device);
-        Memory::free_cuda_async(cub_pt_device);
       }
 
       #else //FEAT_HAVE_CUDA
