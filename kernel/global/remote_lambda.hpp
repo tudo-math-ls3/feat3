@@ -10,7 +10,9 @@
 #include <kernel/util/math.hpp>
 #include <kernel/util/string.hpp>
 
+#include <array>
 #include <numeric>
+#include <tuple>
 #include <type_traits>
 #include <vector>
 
@@ -53,6 +55,36 @@ namespace FEAT::Global
       return (pack_size<typename std::decay<typename std::remove_reference<Ts_>::type>::type>(comm) + ...);
     }
 
+    template<typename... Ts_>
+    using TypeCache = std::array<const Dist::Datatype*, sizeof...(Ts_)>;
+
+    /// Actual recursive implementation of mpi_datatypes()
+    template<std::size_t i = 0, typename... Ts_>
+    void _fill_type_cache(TypeCache<Ts_...>& cache)
+    {
+      if constexpr(i < sizeof...(Ts_))
+      {
+        using T = std::decay_t<std::remove_reference_t<std::tuple_element_t<i, std::tuple<Ts_...>>>>;
+        cache[i] = &Dist::autotype<T>();
+        _fill_type_cache<i + 1, Ts_...>(cache);
+      }
+    }
+
+    /**
+     * \brief Retrieve Dist::Datatypes for all types of a parameter pack
+     *
+     * \tparam Ts_ Types to retrieve Dist::Datatypes for
+     *
+     * \return An array containing references to the Dist::Datatypes for all requested types
+     */
+    template<typename... Ts_>
+    TypeCache<Ts_...> make_type_cache()
+    {
+      TypeCache<Ts_...> result;
+      _fill_type_cache<0, Ts_...>(result);
+      return result;
+    }
+
     /**
      * \brief Pack a tuple into a buffer
      *
@@ -69,6 +101,7 @@ namespace FEAT::Global
     void pack_tuple(
       const Dist::Comm& comm,
       const std::tuple<Ts_...>& tuple,
+      const TypeCache<Ts_...>& cache,
       void* outbuf,
       std::size_t outsize,
       int* position)
@@ -76,11 +109,11 @@ namespace FEAT::Global
       using T = std::decay_t<std::remove_reference_t<decltype(std::get<i>(tuple))>>;
 
       const T& t = std::get<i>(tuple);
-      comm.pack<T>(&t, 1, outbuf, outsize, position);
+      comm.pack(&t, 1, *cache[i], outbuf, outsize, position);
 
       if constexpr(i + 1 != sizeof...(Ts_))
       {
-        pack_tuple<i + 1>(comm, tuple, outbuf, outsize, position);
+        pack_tuple<i + 1>(comm, tuple, cache, outbuf, outsize, position);
       }
     }
 
@@ -100,6 +133,7 @@ namespace FEAT::Global
     void unpack_tuple(
       const Dist::Comm& comm,
       std::tuple<Ts_...>& tuple,
+      const TypeCache<Ts_...>& cache,
       const void* inbuf,
       std::size_t insize,
       int* position)
@@ -107,11 +141,11 @@ namespace FEAT::Global
       using T = std::decay_t<std::remove_reference_t<decltype(std::get<i>(tuple))>>;
 
       T& t = std::get<i>(tuple);
-      comm.unpack(inbuf, insize, position, &t, 1);
+      comm.unpack(inbuf, insize, position, &t, 1, *cache[i]);
 
       if constexpr(i + 1 != sizeof...(Ts_))
       {
-        unpack_tuple<i + 1>(comm, tuple, inbuf, insize, position);
+        unpack_tuple<i + 1>(comm, tuple, cache, inbuf, insize, position);
       }
     }
 
@@ -293,6 +327,12 @@ namespace FEAT::Global
       // Phase 3 - Pack argument buffers
       ////////////////////////////////////////////
 
+      // Packing and unpacking tuples requires access to the Dist::Datatypes of the tuple elements.
+      // For non-standard types this requires looking them up in the TypeRegistry, which is behind a mutex.
+      // We cache the datatypes once and then re-use them for packing and unpacking each tuple.
+
+      Intern::TypeCache<Args_...> cache = Intern::make_type_cache<Args_...>();
+
       // argument_buffer_pos[r] is the current offset into argument_r_buffer[r]
       std::vector<int> argument_buffer_pos(num_ranks, 0);
       {
@@ -306,7 +346,7 @@ namespace FEAT::Global
           const ArgumentTuple& arg = Intern::nth_of_range(args, idx);
 
           // Pack tuple for sending arg, appends to current buffer
-          Intern::pack_tuple(_comm, arg, argument_s_buffers[rank].data(), argument_s_buffers[rank].size(), &argument_buffer_pos[rank]);
+          Intern::pack_tuple(_comm, arg, cache, argument_s_buffers[rank].data(), argument_s_buffers[rank].size(), &argument_buffer_pos[rank]);
         }
       }
 
@@ -352,7 +392,7 @@ namespace FEAT::Global
           for(Index arg(0); arg < Index(calls_from[rank]); arg++)
           {
             ArgumentTuple t;
-            Intern::unpack_tuple(_comm, t, argument_r_buffers[rank].data(), argument_r_buffers[rank].size(), &pos);
+            Intern::unpack_tuple(_comm, t, cache, argument_r_buffers[rank].data(), argument_r_buffers[rank].size(), &pos);
 
             return_s_buffers[rank][arg] = std::apply(lambda, t);
           }
@@ -550,6 +590,12 @@ namespace FEAT::Global
       // Phase 3 - Pack argument buffers
       ////////////////////////////////////////////
 
+      // Packing and unpacking tuples requires access to the Dist::Datatypes of the tuple elements.
+      // For non-standard types this requires looking them up in the TypeRegistry, which is behind a mutex.
+      // We cache the datatypes once and then re-use them for packing and unpacking each tuple.
+
+      Intern::TypeCache<Args_...> cache = Intern::make_type_cache<Args_...>();
+
       // argument_buffer_pos[r] is the current offset into argument_r_buffer[r]
       std::vector<int> argument_buffer_pos(num_ranks, 0);
       {
@@ -563,7 +609,7 @@ namespace FEAT::Global
           const ArgumentTuple& arg = Intern::nth_of_range(args, idx);
 
           // Pack tuple for sending arg
-          Intern::pack_tuple(_comm, arg, argument_s_buffers[rank].data(), argument_s_buffers[rank].size(), &argument_buffer_pos[rank]);
+          Intern::pack_tuple(_comm, arg, cache, argument_s_buffers[rank].data(), argument_s_buffers[rank].size(), &argument_buffer_pos[rank]);
         }
       }
 
@@ -612,7 +658,7 @@ namespace FEAT::Global
           {
             // Unpack argument
             ArgumentTuple t;
-            Intern::unpack_tuple(_comm, t, argument_r_buffers[rank].data(), argument_r_buffers[rank].size(), &pos);
+            Intern::unpack_tuple(_comm, t, cache, argument_r_buffers[rank].data(), argument_r_buffers[rank].size(), &pos);
 
             // Create result range
             auto range = std::apply(lambda, t);
@@ -697,7 +743,7 @@ namespace FEAT::Global
         {
           const Index rank = Index(*rank_iter++);
 
-          result[idx++] = ranges[rank][result_pos[rank]++];
+          result[idx++] = std::move(ranges[rank][result_pos[rank]++]);
         }
       }
 
