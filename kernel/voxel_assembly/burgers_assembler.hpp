@@ -748,11 +748,10 @@ namespace FEAT
           }
         }
 
-        tg.sync();
-
 
         for(int cub_ind = 0; cub_ind < num_cubs; ++cub_ind)
         {
+          tg.sync();
           cg::invoke_one(tg, [&](){dom_point = cub_pt[cub_ind];
                                   SpaceHelp::eval_ref_values(basis_data, dom_point);
                                   SpaceHelp::trans_values(basis_data);});
