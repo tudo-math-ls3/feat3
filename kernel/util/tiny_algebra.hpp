@@ -4086,6 +4086,7 @@ namespace FEAT
         {
           if(tg.thread_rank() == 0)
             b(0,0) = T_(1) / det;
+          tg.sync();
         }
       };
 
@@ -4102,7 +4103,7 @@ namespace FEAT
           {
             const int i = idx /2;
             const int j = idx %2;
-            b(i,0) = ((i+j)==1 ? T_(-1) : T_(1)) * d * a(1-j,1-i);
+            b(i,j) = ((i+j)==1 ? T_(-1) : T_(1)) * d * a(1-j,1-i);
 
           }
         }
