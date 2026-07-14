@@ -31,6 +31,7 @@ PRIVATE
 if (FEAT_HAVE_CUDA)
   add_library(feat-kernel-solver-cuda STATIC
     backend_aux/amavanka_gmres.cu
+    backend_aux/amavanka_richardson.cu
     ilu_precond.cu
     sor_precond.cu
     ssor_precond.cu
@@ -117,6 +118,7 @@ endif (FEAT_HAVE_UMFPACK)
 # list of solver tests
 set(test_list
   amavanka-test
+  amavanka_richardson-test
   basic_solver-test
   batched_vector_apply-test
   cudss-test

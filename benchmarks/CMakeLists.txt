@@ -15,6 +15,7 @@ set(benchmarks
   mixedprec_multigrid-bench
   multiprec_hierarch-bench
   gpu_gmres-bench
+  gpu_richardson-bench
   parperf1-bench
   parperf2-bench
   pcg-bench

@@ -23,6 +23,9 @@
 
 // NVTX profiling ranges via the shared RAII wrapper (no-op without FEAT_HAVE_CUDA)
 #include <kernel/util/cuda_util.hpp>
+#include <kernel/util/arg_parser.hpp>
+
+#include <deque>
 
 namespace GMRESTest
 {
@@ -393,71 +396,73 @@ namespace GMRESTest
 
 
 
+  /// benchmark command-line interface, built on the typed ArgParser
+  struct BenchArgs : public ArgParser
+  {
+    Parameter<Index> level = parameter(Index(1)).long_flag("--level")
+      .help_string("number of size-growth levels");
+    Parameter<Index> iters = parameter(Index(500)).long_flag("--iters")
+      .help_string("number of GMRES iterations per solve");
+    Parameter<Index> krylov_dim = parameter(Index(200)).long_flag("--krylov-dim")
+      .help_string("Krylov subspace (restart) dimension");
+    Parameter<double> grow_factor = parameter(double(1.4)).long_flag("--grow-factor")
+      .help_string("per-level, per-dimension cell-count growth factor");
+    Parameter<std::deque<Index>> base_size = parameter(std::deque<Index>{1u, 1u, 1u}).long_flag("--base-size")
+      .help_string("base cell counts; 2 or 3 values select the problem dimension");
+    Parameter<String> backend = parameter(String("cuda")).long_flag("--backend")
+      .help_string("compute backend: generic | mkl | cuda");
+    Parameter<String> plot_mode = parameter(String("summary")).long_flag("--plot-mode")
+      .help_string("solver plot mode: summary | none | off | all");
+    Parameter<bool> hotrun = parameter(false).long_flag("--hotrun")
+      .help_string("perform an untimed warm-up solve before timing");
+  };
+
   void main_test(int argc, char** argv)
   {
     Dist::Comm comm(Dist::Comm::world());
 
     String msg = String("Number Proccesses").pad_back(pad_len, pad_char) + ":" + stringify(comm.size()) + "\n";
 
-    SimpleArgParser args(argc, argv);
-    ParamHolder param_holder;
-    args.support("level");
-    args.support("iters");
-    args.support("krylov-dim");
-    args.support("base-size");
-    args.support("grow-factor");
-    args.support("backend");
-    args.support("hotrun");
+    BenchArgs args;
+    args.set_description("Compare standard GMRES(Schwarz(AmaVanka)) against the fused AmaVankaGMRES.");
+    if(!args.parse(argc, argv))
+    {
+      for(const auto& error : args.errors())
+        comm.print(error);
+      comm.print(args.help_text());
+      return;
+    }
 
-    Index level = args.parse_default("level", Index(1u));
-    double grow_factor = args.parse_default("grow-factor", double(1.4));
-    param_holder.num_iter = args.parse_default("iters", Index(500u));
-    param_holder.krylov_dim = args.parse_default("krylov-dim", Index(200u));
+    ParamHolder param_holder;
+    const Index level = args.level.value();
+    const double grow_factor = args.grow_factor.value();
+    param_holder.num_iter = args.iters.value();
+    param_holder.krylov_dim = args.krylov_dim.value();
+    param_holder.hotrun = args.hotrun.value();
+
     PreferredBackend backend = PreferredBackend::cuda;
     {
-      String backend_s = args.parse_default("backend", String("cuda"));
+      const String& backend_s = args.backend.value();
       if(backend_s.compare_no_case("generic") == 0)
-      {
         backend = PreferredBackend::generic;
-      }
       else if(backend_s.compare_no_case("mkl") == 0)
-      {
         backend = PreferredBackend::mkl;
-      }
       else if(backend_s.compare_no_case("cuda") == 0)
-      {
         backend = PreferredBackend::cuda;
-      }
       else
-      {
         XABORTM("Backend " + backend_s + " not known");
-      }
       comm.print("Using backend: " + backend_s);
     }
-    if(args.check("hotrun") >= 0)
     {
-      param_holder.hotrun = true;
-    }
-
-    if(args.check("plot-mode") > 0)
-    {
-      String plot_mode = args.parse_default("plot-mode", String("summary"));
+      const String& plot_mode = args.plot_mode.value();
       if(plot_mode.compare_no_case("summary") == 0)
-      {
         param_holder.plot_mode = Solver::PlotMode::summary;
-      }
       else if((plot_mode.compare_no_case("none") == 0) || (plot_mode.compare_no_case("off") == 0))
-      {
         param_holder.plot_mode = Solver::PlotMode::none;
-      }
-      else if((plot_mode.compare_no_case("all") == 0))
-      {
+      else if(plot_mode.compare_no_case("all") == 0)
         param_holder.plot_mode = Solver::PlotMode::all;
-      }
       else
-      {
         XABORTM(String("Option ") + plot_mode + " not known");
-      }
     }
 
     // if(comm.size() > 1 || backend != PreferredBackend::cuda)
@@ -474,19 +479,12 @@ namespace GMRESTest
     msg += String("Hotrun").pad_back(pad_len, pad_char) + ":" + (param_holder.hotrun ?String("Yes") : String("No")) + "\n";
 
     // setup levels
-    int problem_dim = 3;
+    const std::deque<Index>& base_dq = args.base_size.value();
+    const int problem_dim = int(base_dq.size());
+    XASSERTM(problem_dim == 2 || problem_dim == 3, "--base-size expects either 2 or 3 entries");
     Index base_size[3] = {1u, 1u, 1u};
-
-    if(args.check("base-size") >= 0)
-    {
-      problem_dim = args.check("base-size");
-      XASSERTM(problem_dim == 2 || problem_dim == 3, "--base-size expects either 2 or 3 entries");
-      bool success = true;
-      auto opt = args.query("base-size")->second;
-      for(int i = 0; i < problem_dim; ++i)
-        success &= opt.at(std::size_t(i)).parse(base_size[i]);
-      XASSERTM(success, "Something went wrong while parsing base sizes");
-    }
+    for(int i = 0; i < problem_dim; ++i)
+      base_size[i] = base_dq[std::size_t(i)];
 
     msg += String("Dimension").pad_back(pad_len, pad_char) + ":" + stringify(problem_dim) + "\n";
     msg += String("Base sizes").pad_back(pad_len, pad_char) + ":";

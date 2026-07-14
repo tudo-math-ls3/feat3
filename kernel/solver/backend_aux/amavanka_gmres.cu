@@ -146,7 +146,8 @@ namespace FEAT::Solver::VankaGMRES
       for(Index i = idx; i < mirror_size; i += Index(blockDim.x * gridDim.x))
       {
         DT_ val = DT_(0);
-        for(Index k = row_ptr[mirror_indx[i]]; k < row_ptr[mirror_indx[i]]; ++k)
+        //TODO: retry with fixed kernel, index was wrong before...
+        for(Index k = row_ptr[mirror_indx[i]]; k < row_ptr[mirror_indx[i]+1]; ++k)
         {
           val += values[k] * rhs[colidx[k]];
         }
@@ -391,6 +392,7 @@ namespace FEAT::Solver::VankaGMRES
         block.x = (unsigned)64;
         grid.x = (unsigned)ceil((mirrors.at(k).num_indices())/(double)((block.x)));
         scatter_mirror_entries<<<grid, block, 0, streams[s_id]>>>(r, buffer_device[k], mirror_idx_views[k].get_r(), mirrors[k].num_indices());
+        //TODO: stream iter missing...
       }
       cudaCheckLastErr()
 

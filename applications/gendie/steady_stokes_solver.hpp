@@ -16,6 +16,7 @@
 #include <kernel/solver/schwarz_precond.hpp>
 #include <kernel/solver/gmres.hpp>
 #include <kernel/solver/amavanka_gmres.hpp>
+#include <kernel/solver/amavanka_richardson.hpp>
 #include <kernel/solver/fgmres.hpp>
 #include <kernel/solver/richardson.hpp>
 #include "logger.hpp"
@@ -145,6 +146,10 @@ namespace Gendie
       FEAT::Parameter<DataType> coarse_inner_rescale = parameter(DataType(1E+1)).property("coarse-gmres-parameters/inner-rescale").name("Coarse Inner Rescale");
       FEAT::Parameter<FEAT::String> coarse_orthogonalizer = parameter(FEAT::String("cgs2")).property("coarse-gmres-parameters/orthogonalizer").name("Coarse GMRES Orthogonalizer").validator(is_orthogonalizer);
       FEAT::Parameter<bool> coarse_cuda_gmres = parameter(true).property("coarse-gmres-parameters/cuda-gmres").name("Coarse Fused Kernel GMRES");
+      // opt-in: replace the per-level Richardson(Schwarz(AmaVanka)) smoother by the fused CUDA
+      // AmaVankaRichardson on CUDA-solve levels. Only exact for pure-Dirichlet systems (the fused path
+      // enforces only Unit/UnitFilterBlocked DOFs, dropping Slip/Mean — same caveat as AmaVankaGMRES).
+      FEAT::Parameter<bool> smooth_cuda_richardson = parameter(false).property("smooth-cuda-richardson").name("Smoother Fused CUDA Richardson");
 
       // per-level solve backend: explicit list (index 0 = finest) and/or a level-size heuristic threshold
       FEAT::Parameter<std::deque<FEAT::String>> solve_backends = parameter(std::deque<FEAT::String>{}).property("backend-parameters/solve-backends").name("Per-Level Solve Backends");
@@ -648,6 +653,7 @@ namespace Gendie
     bool coarse_frosch;
     bool coarse_gmres;
     bool use_cuda_gmres;
+    bool use_cuda_richardson = false;
     bool coarse_solver_info;
 
   public:
@@ -815,6 +821,7 @@ namespace Gendie
       params._inner_rescale = *parser.coarse_inner_rescale;
       params._ortho = Intern::orthogonalizer_from_string(*parser.coarse_orthogonalizer);
       this->use_cuda_gmres = *parser.coarse_cuda_gmres;
+      this->use_cuda_richardson = *parser.smooth_cuda_richardson;
       return true;
     }
 
@@ -988,8 +995,18 @@ namespace Gendie
           auto schwarz = FEAT::Solver::new_schwarz_precond(vanka, lvl.filter_sys);
           schwarz->set_ignore_status(true);
 
-          // create smoother: either GMRES or Richardson
+          // create smoother: fused CUDA AmaVankaRichardson (opt-in, CUDA levels only), else GMRES or Richardson
           std::shared_ptr<FEAT::Solver::IterativeSolver<DefectVectorType>> smoother_l;
+#ifdef FEAT_HAVE_CUDA
+          if((lvl_solve_backend == FEAT::PreferredBackend::cuda) && use_cuda_richardson && (smooth_gmres_dim == FEAT::Index(0)))
+          {
+            // fused Richardson(Schwarz(AmaVanka)); uses the raw AmaVanka directly (schwarz unused here)
+            auto amavanka_richardson = FEAT::Solver::new_amavanka_richardson(lvl.matrix_sys, lvl.filter_sys, vanka, smoother_damp);
+            amavanka_richardson->set_use_cuda(true);
+            smoother_l = amavanka_richardson;
+          }
+          else
+#endif // FEAT_HAVE_CUDA
           if(smooth_gmres_dim > FEAT::Index(0))
             smoother_l = FEAT::Solver::new_gmres(lvl.matrix_sys, lvl.filter_sys, smooth_gmres_dim, 0.0, schwarz);
           else
@@ -1171,6 +1188,7 @@ namespace Gendie
       s += FEAT::String("Smoother Damp").pad_back(padlen, '.') + ":" + FEAT::stringify_fp_fix(smoother_damp, 3, 5) + "\n";
       s += FEAT::String("Smoother Steps").pad_back(padlen, '.') + ":" + FEAT::stringify(smooth_steps) + "\n";
       s += FEAT::String("Smoother GMRES Dim").pad_back(padlen, '.') + ":" + FEAT::stringify(smooth_gmres_dim) + "\n";
+      s += FEAT::String("Smoother Fused CUDA").pad_back(padlen, '.') + ":" + (use_cuda_richardson ? FEAT::String("Yes") : FEAT::String("No")) + "\n";
       s += FEAT::String("Solve GMRES Dim").pad_back(padlen, '.') + ":" + FEAT::stringify(solve_gmres_dim) + "\n";
       s += FEAT::String("Min MG Iter").pad_back(padlen, '.') + ":" + FEAT::stringify(min_iter) + "\n";
       s += FEAT::String("Max MG Iter").pad_back(padlen, '.') + ":" + FEAT::stringify(max_iter) + "\n";
