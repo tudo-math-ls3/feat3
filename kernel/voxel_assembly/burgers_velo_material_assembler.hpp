@@ -243,7 +243,7 @@ namespace FEAT
           SpaceHelp::eval_ref_gradients(basis_data, dom_point);
           SpaceHelp::trans_gradients(basis_data, loc_jac_inv);
 
-          const DataType weight = loc_jac.det() * cub_wg[cub_ind];
+          const DataType weight = loc_jac.vol() * cub_wg[cub_ind];
           if(need_convection || need_streamline) // need streamdiff or convection?
           {
             loc_v.format();
@@ -560,7 +560,7 @@ namespace FEAT
           SpaceHelp::grouped_calc_jac_mat(tg, loc_jac, dom_point, &local_coeffs[0][0]);
           tg.sync();
           cg::invoke_one(tg, [&](){det = loc_jac.det();
-                                  weight = det * cub_wg[cub_ind];});
+                                  weight = CudaMath::cuda_abs(det) * cub_wg[cub_ind];});
           tg.sync();
           loc_jac_inv.grouped_set_inverse(tg, loc_jac, det);
           tg.sync();
@@ -783,7 +783,7 @@ namespace FEAT
           SpaceHelp::eval_ref_gradients(basis_data, dom_point);
           SpaceHelp::trans_gradients(basis_data, loc_jac_inv);
 
-          const DataType weight = loc_jac.det() * cub_wg[cub_ind];
+          const DataType weight = loc_jac.vol() * cub_wg[cub_ind];
           if(need_convection) // need streamdiff or convection?
           {
             loc_v.format();
@@ -958,7 +958,7 @@ namespace FEAT
           SpaceHelp::grouped_calc_jac_mat(tg, loc_jac, dom_point, &local_coeffs[0][0]);
           tg.sync();
           cg::invoke_one(tg, [&](){det = loc_jac.det();
-          weight = det * cub_wg[cub_ind];});
+          weight = CudaMath::cuda_abs(det) * cub_wg[cub_ind];});
           tg.sync();
           loc_jac_inv.grouped_set_inverse(tg, loc_jac, det);
           tg.sync();

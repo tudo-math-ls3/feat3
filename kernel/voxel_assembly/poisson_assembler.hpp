@@ -69,7 +69,7 @@ namespace FEAT
           // NewSpaceHelp::map_point(img_point, dom_point, local_coeffs);
           SpaceHelp::calc_jac_mat(loc_jac, dom_point, local_coeffs);
           loc_jac_inv.set_inverse(loc_jac);
-          jac_det = loc_jac.det();
+          jac_det = loc_jac.vol();
 
           SpaceHelp::eval_ref_gradients(basis_data, dom_point);
           SpaceHelp::trans_gradients(basis_data, loc_jac_inv);

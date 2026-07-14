@@ -68,7 +68,7 @@ namespace FEAT
           SpaceHelp::eval_ref_gradients(basis_data, dom_point);
           SpaceHelp::trans_gradients(basis_data, loc_jac_inv);
 
-          const DataType weight = loc_jac.det() * cub_wg[cub_ind];
+          const DataType weight = loc_jac.vol() * cub_wg[cub_ind];
           for(int i = 0; i < num_loc_dofs; ++i)
           {
             for(int j = 0; j < num_loc_dofs; ++j)
