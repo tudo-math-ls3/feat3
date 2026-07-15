@@ -54,6 +54,7 @@ namespace RichardsonBench
     bool hotrun = false;
     /// print the final defect norm after each solver run
     bool print_defect = false;
+    Global::SyncLocation sync_location = Global::SyncLocation::host;
   };
 
   struct Times
@@ -81,6 +82,7 @@ namespace RichardsonBench
   {
     TimeStamp ts;
     solver.correct(vec_cor, vec_def);
+    Runtime::synchronize_devices();
     time_total = ts.elapsed_now();
   }
 
@@ -121,6 +123,10 @@ namespace RichardsonBench
       TimeStamp ts;
       domain.front()->domain_asm.compile_all_elements();
       system->assemble_gates(domain.front());
+      system->gate_sys.set_sync_location(param_holder.sync_location);
+      system->gate_velo.set_sync_location(param_holder.sync_location);
+      system->gate_pres.set_sync_location(param_holder.sync_location);
+      system->gate_scalar_velo.set_sync_location(param_holder.sync_location);
       Assembly::Common::DuDvOperatorBlocked<dim_> dudv_operator;
       system->assemble_grad_div_matrices(domain.front()->domain_asm, domain.front()->space_velo, domain.front()->space_pres, cubature);
       system->assemble_velo_struct(domain.front()->space_velo);
@@ -265,6 +271,8 @@ namespace RichardsonBench
       .help_string("also time the synchronized (parallel) CUDA kernel");
     Parameter<bool> defect = parameter(false).long_flag("--defect")
       .help_string("print the final defect norm after each solver run");
+    Parameter<String> sync_location = parameter(String("host")).long_flag("--sync-location")
+      .help_string("sync backend: host | device | backend");
   };
 
   void main_test(int argc, char** argv)
@@ -289,6 +297,25 @@ namespace RichardsonBench
     param_holder.print_defect = args.defect.value();
     const Index level = args.level.value();
     const double grow_factor = args.grow_factor.value();
+    {
+      const String& location = args.sync_location.value();
+      if(location.compare_no_case("host") == 0)
+      {
+        param_holder.sync_location = Global::SyncLocation::host;
+      }
+      else if(location.compare_no_case("device") == 0)
+      {
+        param_holder.sync_location = Global::SyncLocation::device;
+      }
+      else if(location.compare_no_case("backend") == 0)
+      {
+        param_holder.sync_location = Global::SyncLocation::backend;
+      }
+      else
+      {
+        XABORTM("Unkown location flag");
+      }
+    }
 
     PreferredBackend backend = PreferredBackend::cuda;
     {
@@ -323,6 +350,7 @@ namespace RichardsonBench
     msg += String("Omega").pad_back(pad_len, pad_char) + ":" + stringify(param_holder.omega) + "\n";
     msg += String("Hotrun").pad_back(pad_len, pad_char) + ":" + (param_holder.hotrun ? String("Yes") : String("No")) + "\n";
     msg += String("Dimension").pad_back(pad_len, pad_char) + ":" + stringify(problem_dim) + "\n";
+    msg += String("Sync Location").pad_back(pad_len, pad_char) + ":" + args.sync_location.value() + "\n";
     comm.print(msg);
     comm.print_flush();
 

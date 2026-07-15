@@ -48,6 +48,7 @@ namespace GMRESTest
     bool hotrun = false;
     bool cuda_prefetch = false;
     bool compare_to_parallel_kernel = false;
+    Global::SyncLocation sync_location = Global::SyncLocation::host;
   };
 
   struct Times
@@ -88,6 +89,7 @@ namespace GMRESTest
   {
     TimeStamp ts;
     solver.correct(vec_cor, vec_def);
+    Runtime::synchronize_devices();
     time_total = ts.elapsed_now();
   }
 
@@ -136,6 +138,10 @@ namespace GMRESTest
       TimeStamp ts;
       domain.front()->domain_asm.compile_all_elements();
       system->assemble_gates(domain.front());
+      system->gate_sys.set_sync_location(param_holder.sync_location);
+      system->gate_velo.set_sync_location(param_holder.sync_location);
+      system->gate_pres.set_sync_location(param_holder.sync_location);
+      system->gate_scalar_velo.set_sync_location(param_holder.sync_location);
       Assembly::Common::DuDvOperatorBlocked<dim_> dudv_operator;
       system->assemble_grad_div_matrices(domain.front()->domain_asm, domain.front()->space_velo, domain.front()->space_pres, cubature);
       system->assemble_velo_struct(domain.front()->space_velo);
@@ -415,6 +421,8 @@ namespace GMRESTest
       .help_string("solver plot mode: summary | none | off | all");
     Parameter<bool> hotrun = parameter(false).long_flag("--hotrun")
       .help_string("perform an untimed warm-up solve before timing");
+    Parameter<String> sync_location = parameter(String("host")).long_flag("--sync-location")
+      .help_string("sync backend: host | device | backend");
   };
 
   void main_test(int argc, char** argv)
@@ -439,6 +447,25 @@ namespace GMRESTest
     param_holder.num_iter = args.iters.value();
     param_holder.krylov_dim = args.krylov_dim.value();
     param_holder.hotrun = args.hotrun.value();
+    {
+      const String& location = args.sync_location.value();
+      if(location.compare_no_case("host") == 0)
+      {
+        param_holder.sync_location = Global::SyncLocation::host;
+      }
+      else if(location.compare_no_case("device") == 0)
+      {
+        param_holder.sync_location = Global::SyncLocation::device;
+      }
+      else if(location.compare_no_case("backend") == 0)
+      {
+        param_holder.sync_location = Global::SyncLocation::backend;
+      }
+      else
+      {
+        XABORTM("Unkown location flag");
+      }
+    }
 
     PreferredBackend backend = PreferredBackend::cuda;
     {
@@ -477,6 +504,7 @@ namespace GMRESTest
     msg += String("GMRES Iterations").pad_back(pad_len, pad_char) + ":" + stringify(param_holder.num_iter) + "\n";
     msg += String("Krylov-Dim").pad_back(pad_len, pad_char) + ":" + stringify(param_holder.krylov_dim) + "\n";
     msg += String("Hotrun").pad_back(pad_len, pad_char) + ":" + (param_holder.hotrun ?String("Yes") : String("No")) + "\n";
+    msg += String("Sync Location").pad_back(pad_len, pad_char) + ":" + args.sync_location.value() + "\n";
 
     // setup levels
     const std::deque<Index>& base_dq = args.base_size.value();

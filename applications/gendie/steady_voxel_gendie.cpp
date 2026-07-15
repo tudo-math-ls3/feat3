@@ -118,6 +118,22 @@ namespace Gendie
     Parameter<bool> vtk_debug = parameter(false).property("postproc-params/vtk-debug-data");
     Parameter<bool> measure_cgal_size = parameter(true).property("postproc-params/skip-cgal-messure");
     Parameter<String> mesh_hierarchy_vtk = parameter(String("")).property("postproc-params/mesh-hierarchy-vtk");
+    Parameter<Global::SyncLocation> sync_location = parameter(Global::SyncLocation::host).long_flag("sync-location")
+                     .help_string("sync backend: host / device / backend")
+                     .parser([](const String & s) -> Global::SyncLocation {
+                        if(s.compare_no_case("host") == 0)
+                        {
+                          return Global::SyncLocation::host;
+                        }
+                        else if(s.compare_no_case("device") == 0)
+                        {
+                          return Global::SyncLocation::device;
+                        }
+                        else
+                        {
+                          return Global::SyncLocation::backend;
+                        }
+                      });
 
     Parameter<bool> want_vtk = parameter(false).derives_from(
       vtk_filename,
@@ -786,6 +802,10 @@ namespace Gendie
     //next up, create our defect system level, which does not require any mesh hirarchy, but at least the B matrices assembled
     std::shared_ptr<SystemLevel<SystemDataType, SystemIndexType>> system_level(new SystemLevel<SystemDataType, SystemIndexType>());
     system_level->assemble_gates(domain.front());
+    system_level->gate_sys.set_sync_location(*param_holder.sync_location);
+    system_level->gate_velo.set_sync_location(*param_holder.sync_location);
+    system_level->gate_pres.set_sync_location(*param_holder.sync_location);
+    system_level->gate_scalar_velo.set_sync_location(*param_holder.sync_location);
     system_level->assemble_grad_div_matrices(domain.front()->domain_asm, domain.front()->space_velo, domain.front()->space_pres, *param_holder.cubature_b);
 
     // TODO: mass matrix really required?
