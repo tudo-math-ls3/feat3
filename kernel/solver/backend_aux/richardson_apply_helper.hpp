@@ -38,6 +38,9 @@ namespace FEAT::Solver::RichardsonHelper
     const Memory::Arbiter* val = nullptr;
     const Memory::Arbiter* row = nullptr;
     const Memory::Arbiter* col = nullptr;
+    /// persistent cuSPARSE SpMV/BSRMV workspace of this block (owned by the LAFEM matrix), or nullptr
+    /// if the chosen SpMV path needs none; passed through to MatVecMultBCSRDense::exec_cuda_impl
+    void* workspace = nullptr;
     int block_height = 0;
     int block_width = 0;
     Index num_rows = 0;

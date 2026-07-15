@@ -253,6 +253,11 @@ namespace FEAT
       {
         if(m.num_nzes() == Index(0))
           return; // leave the block empty
+        // ensure this block owns a persistent cuSPARSE SpMV workspace (built once, reused across
+        // applies; required by the cuSPARSE BSR SpMV path on CUDA >= 13) and hand it to the driver
+        if(!m.get_workspace(PreferredBackend::cuda))
+          m.init_workspace();
+        mb.workspace = m.get_workspace(PreferredBackend::cuda).get();
         mb.val = &m.val_arbiter();
         mb.row = &m.row_ptr_arbiter();
         mb.col = &m.col_idx_arbiter();

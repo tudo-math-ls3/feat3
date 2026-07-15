@@ -115,6 +115,7 @@ namespace FEAT::Solver::VankaRichardson
       const DT_* val;
       const IT_* row;
       const IT_* col;
+      void* workspace;
       int block_height, block_width;
       Index num_rows, num_cols, num_nnz;
       int out_comp, in_comp;
@@ -142,6 +143,7 @@ namespace FEAT::Solver::VankaRichardson
           rb.val = val_views.back().get_r();
           rb.row = idx_views[idx_views.size() - 2u].get_r();
           rb.col = idx_views[idx_views.size() - 1u].get_r();
+          rb.workspace = b.workspace;
           rb.block_height = b.block_height;
           rb.block_width = b.block_width;
           rb.num_rows = b.num_rows;
@@ -170,9 +172,10 @@ namespace FEAT::Solver::VankaRichardson
       {
         DT_* r = out_ptr[b.out_comp];
         const DT_* x = in_ptr[b.in_comp];
-        // r = y + alpha * A * x with y == r  =>  r += alpha * A * x (native (bh x bw) BCSR SpMV)
+        // r = y + alpha * A * x with y == r  =>  r += alpha * A * x (native (bh x bw) BCSR SpMV),
+        // using the block's persistent cuSPARSE workspace (required by the BSR SpMV path on CUDA >= 13)
         LAFEM::Arch::MatVecMultBCSRDense::exec_cuda_impl<DT_, IT_>(
-          nullptr, r, alpha, x, /*y*/ r, b.val, b.col, b.row,
+          b.workspace, r, alpha, x, /*y*/ r, b.val, b.col, b.row,
           b.num_rows, b.num_cols, b.num_nnz, b.block_height, b.block_width, false);
       }
     }
