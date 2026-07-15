@@ -71,6 +71,19 @@ namespace FEAT
       return (static_cast<std::uint32_t>(a) & 0x3u) != 0u;
     }
 
+    inline Location to_location(PreferredBackend backend)
+    {
+      switch (backend)
+      {
+        case FEAT::PreferredBackend::generic:
+        case FEAT::PreferredBackend::mkl:
+          return Location::main;
+        case FEAT::PreferredBackend::cuda:
+          return Location::cuda;
+      }
+      return Location::main;
+    }
+
     /// \endcond
 
     /**

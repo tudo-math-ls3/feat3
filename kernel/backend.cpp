@@ -34,6 +34,17 @@ namespace FEAT
     return _preferred_backend;
   }
 
+  BackendScope::BackendScope(PreferredBackend backend)
+  {
+    this->_prev_backend = Backend::get_preferred_backend();
+    Backend::set_preferred_backend(backend);
+  }
+
+  BackendScope::~BackendScope()
+  {
+    Backend::set_preferred_backend(this->_prev_backend);
+  }
+
   std::ostream & operator<< (std::ostream & left, PreferredBackend value)
   {
     switch (value)

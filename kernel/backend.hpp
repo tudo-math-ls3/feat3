@@ -75,5 +75,14 @@ namespace FEAT
     }
   }; // class Backend
 
+  class BackendScope
+  {
+    PreferredBackend _prev_backend;
+
+  public:
+    explicit BackendScope(PreferredBackend backend);
+    ~BackendScope();
+  };
+
   std::ostream & operator<< (std::ostream & left, FEAT::PreferredBackend backend);
 } // namespace FEAT

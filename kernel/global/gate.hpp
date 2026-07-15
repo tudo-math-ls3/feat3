@@ -21,6 +21,33 @@ namespace FEAT
    */
   namespace Global
   {
+    enum class SyncLocation : std::uint8_t
+    {
+      host = 0, // always sync on host memory
+      device,   // always sync on cuda device
+      backend   // use the preferred backend
+    };
+
+    inline std::ostream& operator<<(std::ostream& os, SyncLocation loc)
+    {
+      switch (loc)
+      {
+        case FEAT::Global::SyncLocation::host:
+        {
+          return os << "host";
+        }
+        case FEAT::Global::SyncLocation::device:
+        {
+          return os << "device";
+        }
+        case FEAT::Global::SyncLocation::backend:
+        {
+          return os << "backend";
+        }
+      }
+      return os;
+    }
+
     /**
      * \brief Global gate implementation
      *
@@ -71,8 +98,16 @@ namespace FEAT
       std::vector<int> _ranks;
       /// vector mirrors
       std::vector<Mirror_> _mirrors;
+      /// persistent buffer vectors
+      mutable std::vector<BufferVectorType> _send_buffers, _recv_buffers;
+      /// persistent MPI Requests
+      mutable Dist::RequestVector _send_reqs, _recv_reqs;
+      /// send and receive buffer views
+      mutable std::vector<Memory::TypedView<DataType>> _send_views, _recv_views;
       /// frequency vector
       LocalVector_ _freqs;
+
+      SyncLocation _sync_location = SyncLocation::host;
 
       /// Our 'base' class type
       template <typename LocalVector2_, typename Mirror2_>
@@ -103,9 +138,15 @@ namespace FEAT
       /// move constructor
       Gate(Gate&& other) :
         _comm(other._comm),
-        _ranks(std::forward<std::vector<int>>(other._ranks)),
-        _mirrors(std::forward<std::vector<Mirror_>>(other._mirrors)),
-        _freqs(std::forward<LocalVector_>(other._freqs))
+        _ranks(std::move(other._ranks)),
+        _mirrors(std::move(other._mirrors)),
+        _send_buffers(std::move(other._send_buffers)),
+        _recv_buffers(std::move(other._recv_buffers)),
+        _send_reqs(std::move(other._send_reqs)),
+        _recv_reqs(std::move(other._recv_reqs)),
+        _send_views(std::move(other._send_views)),
+        _recv_views(std::move(other._recv_views)),
+        _freqs(std::move(other._freqs))
       {
       }
 
@@ -118,9 +159,15 @@ namespace FEAT
         }
 
         _comm = other._comm;
-        _ranks = std::forward<std::vector<int>>(other._ranks);
-        _mirrors = std::forward<std::vector<Mirror_>>(other._mirrors);
-        _freqs = std::forward<LocalVector_>(other._freqs);
+        _ranks = std::move(other._ranks);
+        _mirrors = std::move(other._mirrors);
+        _send_buffers = std::move(other._send_buffers);
+        _recv_buffers = std::move(other._recv_buffers);
+        _send_reqs = std::move(other._send_reqs);
+        _recv_reqs = std::move(other._recv_reqs);
+        _send_views = std::move(other._send_views);
+        _recv_views = std::move(other._recv_views);
+        _freqs = std::move(other._freqs);
 
         return *this;
       }
@@ -196,11 +243,25 @@ namespace FEAT
         this->_comm = other._comm;
         this->_ranks = other._ranks;
 
-        this->_mirrors.resize(other._mirrors.size());
-        for(std::size_t i(0); i < other._mirrors.size(); ++i)
+        const std::size_t size = other._mirrors.size();
+
+        this->_mirrors.resize(size);
+        this->_send_buffers.clear();
+        this->_send_buffers.reserve(size);
+        this->_recv_buffers.clear();
+        this->_recv_buffers.reserve(size);
+        for(std::size_t i(0); i < size; ++i)
         {
           this->_mirrors.at(i).convert(other._mirrors.at(i));
+          this->_send_buffers.emplace_back(_mirrors.at(i).create_buffer(LocalVector_()));
+          this->_recv_buffers.emplace_back(_mirrors.at(i).create_buffer(LocalVector_()));
         }
+        this->_send_reqs.clear();
+        this->_recv_reqs.clear();
+        this->_send_reqs.reserve(size);
+        this->_recv_reqs.reserve(size);
+        this->_send_views.resize(size);
+        this->_recv_views.resize(size);
 
         this->_freqs.convert(other._freqs);
       }
@@ -230,9 +291,14 @@ namespace FEAT
         if((void*)this == (void*)&other)
           return;
 
+        const std::size_t size = other._mirrors.size();
         this->_ranks.clear();
         this->_mirrors.clear();
-        this->_mirrors.resize(other._mirrors.size());
+        this->_send_buffers.clear(); // will be rebuild by compile function
+        this->_recv_buffers.clear(); // will be rebuild by compile function
+        this->_mirrors.resize(size);
+        this->_send_buffers.reserve(size);
+        this->_recv_buffers.reserve(size);
         this->_freqs.clear(); // will be rebuild by compile function
 
         this->_comm = other._comm;
@@ -252,7 +318,15 @@ namespace FEAT
       std::size_t bytes() const
       {
         size_t temp(0);
-        for (auto& i : _mirrors)
+        for(const auto& i : _mirrors)
+        {
+          temp += i.bytes();
+        }
+        for(const auto& i : _send_buffers)
+        {
+          temp += i.bytes();
+        }
+        for(const auto& i : _recv_buffers)
         {
           temp += i.bytes();
         }
@@ -295,9 +369,29 @@ namespace FEAT
        */
       void compile(LocalVector_&& vector)
       {
+        const std::size_t size = _mirrors.size();
         // initialize frequency vector
         _freqs = std::move(vector);
         _freqs.format(DataType(1));
+
+        _send_buffers.clear();
+        _send_buffers.reserve(size);
+        _recv_buffers.clear();
+        _recv_buffers.reserve(size);
+
+        // loop over all mirrors and create the buffers
+        for(std::size_t i(0); i < size; ++i)
+        {
+          _send_buffers.emplace_back(_mirrors.at(i).create_buffer(_freqs));
+          _recv_buffers.emplace_back(_mirrors.at(i).create_buffer(_freqs));
+        }
+
+        this->_send_reqs.clear();
+        this->_recv_reqs.clear();
+        this->_send_reqs.reserve(size);
+        this->_recv_reqs.reserve(size);
+        this->_send_views.resize(size);
+        this->_recv_views.resize(size);
 
         // loop over all mirrors
         for(std::size_t i(0); i < _mirrors.size(); ++i)
@@ -307,7 +401,7 @@ namespace FEAT
             continue;
 
           // sum up number of ranks per frequency entry, listed in different mirrors
-          auto temp = _mirrors.at(i).create_buffer(_freqs);
+          auto& temp = _send_buffers.at(i);
           temp.format(DataType(1));
 
           // gather-axpy into frequency vector
@@ -454,13 +548,11 @@ namespace FEAT
        * \attention This function is collective, i.e. it must be called by all processes participating
        * in the gate's communicator, otherwise the application will deadlock.
        */
+      // void sync_0(LocalVector_& vector, PreferredBackend sync_backend = Backend::get_preferred_backend()) const
       void sync_0(LocalVector_& vector) const
       {
-        if(!_ranks.empty())
-        {
-          SynchVectorTicket<LocalVector_, Mirror_> ticket(vector, *_comm, _ranks, _mirrors);
-          ticket.wait();
-        }
+        BackendScope scope(get_sync_backend());
+        _sync_vec(vector);
       }
 
       /**
@@ -493,6 +585,9 @@ namespace FEAT
        * On entry, the type-1 vector to be synchronized.\n
        * On exit, the synchronized type-1 vector.
        *
+       * \param[in] sync_backend
+       * The backend on which the sychronization should take place
+       *
        * \note
        * This function effectively applies the from_1_to_0() and sync_0()
        * functions onto the input vector.
@@ -500,13 +595,14 @@ namespace FEAT
        * \attention This function is collective, i.e. it must be called by all processes participating
        * in the gate's communicator, otherwise the application will deadlock.
        */
+      // void sync_1(LocalVector_& vector, PreferredBackend sync_backend = Backend::get_preferred_backend()) const
       void sync_1(LocalVector_& vector) const
       {
         if(!_ranks.empty())
         {
+          BackendScope scope(get_sync_backend());
           from_1_to_0(vector);
-          SynchVectorTicket<LocalVector_, Mirror_> ticket(vector, *_comm, _ranks, _mirrors);
-          ticket.wait();
+          _sync_vec(vector);
         }
       }
 
@@ -718,6 +814,93 @@ namespace FEAT
       {
         return SynchScalarTicket<DataType>(x*x, *_comm, Dist::op_sum, true);
       }
+
+      /**
+       * \brief Set the sync location to be used
+       *
+       * \param[in] sync_location The location to be used by default
+       *
+       */
+      void set_sync_location(SyncLocation sync_location)
+      {
+        _sync_location = sync_location;
+      }
+
+    protected:
+      /**
+       * \brief Sychronizes a vector by adding all mirrors elements
+       *
+       * \param[in] vector The vector to be sychnroied
+       */
+      void _sync_vec(LocalVector_& vector) const
+      {
+        if(_ranks.empty())
+        {
+          return;
+        }
+
+        const PreferredBackend sync_backend = Backend::get_preferred_backend();
+
+        const std::size_t n = this->_mirrors.size();
+        // post receives
+        for(std::size_t i(0); i < n; ++i)
+        {
+          // skip hollow mirrors
+          if(this->_mirrors.at(i).hollow())
+            continue;
+
+          // post receive
+          _recv_views.at(i) = _recv_buffers.at(i).elements_view_w(Memory::to_location(sync_backend));
+          _recv_reqs.push_back(_comm->irecv(_recv_views.at(i).get_w(), _recv_buffers.at(i).size(), _ranks.at(i)));
+        }
+
+        // post sends
+        for(std::size_t i(0); i < n; ++i)
+        {
+          // skip hollow mirrors
+          if(_mirrors.at(i).hollow())
+            continue;
+
+          // gather from mirror
+          _mirrors.at(i).gather(_send_buffers.at(i), vector);
+
+          // post send
+          _send_views.at(i) = _send_buffers.at(i).elements_view_r(Memory::to_location(sync_backend));
+          _send_reqs.push_back(_comm->isend(_send_views.at(i).get_r(), _send_buffers.at(i).size(), _ranks.at(i)));
+        }
+
+        // process all pending receives
+        for(std::size_t idx(0u); _recv_reqs.wait_any(idx); )
+        {
+          // scatter the receive buffer
+          _recv_views.at(idx).release();
+          _mirrors.at(idx).scatter_axpy(vector, _recv_buffers.at(idx));
+        }
+
+        _send_reqs.wait_all();
+        // release send views
+        for(auto& v : _send_views)
+        {
+          v.release();
+        }
+        _send_reqs.clear();
+        _recv_reqs.clear();
+      }
+
+      PreferredBackend get_sync_backend() const
+      {
+        switch (this->_sync_location)
+        {
+          case SyncLocation::host:
+            return PreferredBackend::generic;
+          case SyncLocation::device:
+            return PreferredBackend::cuda;
+          case SyncLocation::backend:
+            return Backend::get_preferred_backend();
+        }
+        return Backend::get_preferred_backend();
+      }
+
     }; // class Gate<...>
   } // namespace Global
 } // namespace FEAT
