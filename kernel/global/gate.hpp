@@ -840,6 +840,7 @@ namespace FEAT
         }
 
         const PreferredBackend sync_backend = Backend::get_preferred_backend();
+        const bool flip_sync_order = sync_backend == PreferredBackend::cuda;
 
         const std::size_t n = this->_mirrors.size();
         // post receives
@@ -854,6 +855,21 @@ namespace FEAT
           _recv_reqs.push_back(_comm->irecv(_recv_views.at(i).get_w(), _recv_buffers.at(i).size(), _ranks.at(i)));
         }
 
+        if(flip_sync_order)
+        {
+          // post sends
+          for(std::size_t i(0); i < n; ++i)
+          {
+            // skip hollow mirrors
+            if(_mirrors.at(i).hollow())
+              continue;
+
+            // gather from mirror
+            _mirrors.at(i).gather(_send_buffers.at(i), vector);
+          }
+
+          Runtime::synchronize_devices();
+        }
         // post sends
         for(std::size_t i(0); i < n; ++i)
         {
@@ -862,7 +878,8 @@ namespace FEAT
             continue;
 
           // gather from mirror
-          _mirrors.at(i).gather(_send_buffers.at(i), vector);
+          if(!flip_sync_order)
+            _mirrors.at(i).gather(_send_buffers.at(i), vector);
 
           // post send
           _send_views.at(i) = _send_buffers.at(i).elements_view_r(Memory::to_location(sync_backend));
