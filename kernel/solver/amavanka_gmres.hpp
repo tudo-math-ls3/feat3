@@ -458,6 +458,7 @@ namespace FEAT
             XASSERTM(offsets.second == num_indices, "Offset does not match overall mirror indices");
 
             this->_gate.push(ranks.at(k), std::move(mirror));
+            this->_gate.set_sync_location(row_gate.get_sync_location());
           }
           // convert frequency
           VecType tmp_freq;

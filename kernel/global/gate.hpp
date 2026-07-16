@@ -551,7 +551,7 @@ namespace FEAT
       // void sync_0(LocalVector_& vector, PreferredBackend sync_backend = Backend::get_preferred_backend()) const
       void sync_0(LocalVector_& vector) const
       {
-        BackendScope scope(get_sync_backend());
+        BackendScope scope(_get_sync_backend());
         _sync_vec(vector);
       }
 
@@ -600,7 +600,7 @@ namespace FEAT
       {
         if(!_ranks.empty())
         {
-          BackendScope scope(get_sync_backend());
+          BackendScope scope(_get_sync_backend());
           from_1_to_0(vector);
           _sync_vec(vector);
         }
@@ -826,6 +826,11 @@ namespace FEAT
         _sync_location = sync_location;
       }
 
+      SyncLocation get_sync_location() const
+      {
+        return _sync_location;
+      }
+
     protected:
       /**
        * \brief Sychronizes a vector by adding all mirrors elements
@@ -904,7 +909,9 @@ namespace FEAT
         _recv_reqs.clear();
       }
 
-      PreferredBackend get_sync_backend() const
+    protected:
+
+      PreferredBackend _get_sync_backend() const
       {
         switch (this->_sync_location)
         {
