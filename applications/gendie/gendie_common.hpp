@@ -355,6 +355,13 @@ namespace Gendie
 
           // create unit-filter assembler
           Assembly::UnitFilterAssembler<MeshType> /*unit_asm_inflow,*/ unit_asm_noflow;
+
+          // if the solver datatype differs from the system datatype, then all inflows are assembled
+          // onto this single scratch filter (in system precision) and converted onto the solver
+          // level's inflow filter once after the mesh-part loop; repeated UnitFilterAssembler::assemble
+          // calls accumulate into their target, whereas UnitFilterBlocked::convert replaces it, so
+          // converting inside the loop would keep only the last inflow.
+          typename SystemLevel_::LocalVeloUnitFilter fil_loc_v;
           // loop over all boundary parts except for the right one, which is outflow
           for(const auto& name : part_names)
           {
@@ -387,33 +394,13 @@ namespace Gendie
                 loc_unit_asm_inflow.add_mesh_part(*mesh_part);
                 if constexpr(system_is_solver_level)
                 {
+                  // directly assemble onto the inflow filter
                   loc_unit_asm_inflow.assemble(filter_v_inflow, this->_domain.at(i)->space_velo, this->_inflow_bounds.at(std::size_t(id)).get_diri_inflow_function(this->_materials, mesh_unit_scale));
                 }
                 else
                 {
-                  // create temporary filter (of correct datatype)
-                  typename SystemLevel_::LocalVeloUnitFilter fil_loc_v;
-                  // directly assembly onto the inflow filter
+                  // assemble onto the shared scratch filter (of correct datatype); this accumulates
                   loc_unit_asm_inflow.assemble(fil_loc_v, this->_domain.at(i)->space_velo, this->_inflow_bounds.at(std::size_t(id)).get_diri_inflow_function(this->_materials, mesh_unit_scale));
-                  //and now convert
-                  filter_v_inflow.convert(fil_loc_v);
-                /*if(filter_v_inflow.size() == Index(0))
-                  filter_v_inflow.convert(fil_loc_v);
-                  else
-                  {
-                  if(fil_loc_v.num_nzes() == 0u) // nothing to add here
-                      continue;
-                  const auto indx = fil_loc_v.get_filter_vector().indices_view_r();
-                  const auto valx = fil_loc_v.get_filter_vector().values_view_r();
-                  for(Index k = 0; k < fil_loc_v.num_nzes(); ++k)
-                    {
-                      if constexpr(dim == 3)
-                      {
-                        FEAT::Tiny::Vector<SolverDataType_, dim> valn{SolverDataType_(valx[k][0]), SolverDataType_(valx[k][1]), SolverDataType_(valx[k][2])};
-                        filter_v_inflow.add(indx[k], valn);
-                      }
-                    }
-                }*/
                 }
               }
               else if((name != "bnd:n") && (!name.starts_with("bnd:out")) && ((name_lower.replace_all(String("outflow"), String("")) == 0u)))
@@ -425,6 +412,13 @@ namespace Gendie
           }
           {
             unit_asm_noflow.assemble(filter_v_noflow, this->_domain.at(i)->space_velo);
+          }
+          // convert all accumulated inflows onto the solver level's inflow filter at once
+          if constexpr(!system_is_solver_level)
+          {
+            // stays empty if this level/rank does not own any inflow mesh-part
+            if(!fil_loc_v.empty())
+              filter_v_inflow.convert(fil_loc_v);
           }
           // assemble fbm parts
           {
