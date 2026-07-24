@@ -1130,16 +1130,16 @@ namespace Gendie
       s += FEAT::String("\n------------------------------------Overall Timings-------------------------------------------\n");
       s += FEAT::String("\n--------------------------------------------------------------------------------------------------\n");
 
-      s += format_subtime_mm("Create Domain", timings[_TimeID::create_domain], timings[_TimeID::total], timings_min[_TimeID::create_domain], timings_max[_TimeID::create_domain], pad_len);
-      s += format_subtime_mm("Create Domain Hirarch", timings[_TimeID::create_hirarch], timings[_TimeID::total], timings_min[_TimeID::create_hirarch], timings_max[_TimeID::create_hirarch], pad_len);
-      s += format_subtime_mm("Create System", timings[_TimeID::create_system], timings[_TimeID::total], timings_min[_TimeID::create_system], timings_max[_TimeID::create_system], pad_len);
-      s += format_subtime_mm("Create Filter", timings[_TimeID::create_filter], timings[_TimeID::total], timings_min[_TimeID::create_filter], timings_max[_TimeID::create_filter], pad_len);
-      s += format_subtime_mm("Create Solver", timings[_TimeID::create_solver], timings[_TimeID::total], timings_min[_TimeID::create_solver], timings_max[_TimeID::create_solver], pad_len);
-      s += format_subtime_mm("VTK Output", timings[_TimeID::write_out], timings[_TimeID::total], timings_min[_TimeID::write_out], timings_max[_TimeID::write_out], pad_len);
-      s += format_subtime_mm("Solution Analyze", timings[_TimeID::analyze], timings[_TimeID::total], timings_min[_TimeID::analyze], timings_max[_TimeID::analyze], pad_len);
-      s += format_subtime_mm("Total Time Assembly", timings[_TimeID::time_asm], timings[_TimeID::total], timings_min[_TimeID::time_asm], timings_max[_TimeID::time_asm], pad_len);
-      s += format_subtime_mm("Total Time Linear Solver", timings[_TimeID::lin_sol], timings[_TimeID::total], timings_min[_TimeID::lin_sol], timings_max[_TimeID::lin_sol], pad_len);
-      s += format_subtime_mm("Total Time", timings[_TimeID::total], timings[_TimeID::total], timings_min[_TimeID::total], timings_max[_TimeID::total], pad_len);
+      s += format_subtime_mm("Create Domain", timings[to_underlying(_TimeID::create_domain)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_domain)], timings_max[to_underlying(_TimeID::create_domain)], pad_len);
+      s += format_subtime_mm("Create Domain Hirarch", timings[to_underlying(_TimeID::create_hirarch)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_hirarch)], timings_max[to_underlying(_TimeID::create_hirarch)], pad_len);
+      s += format_subtime_mm("Create System", timings[to_underlying(_TimeID::create_system)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_system)], timings_max[to_underlying(_TimeID::create_system)], pad_len);
+      s += format_subtime_mm("Create Filter", timings[to_underlying(_TimeID::create_filter)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_filter)], timings_max[to_underlying(_TimeID::create_filter)], pad_len);
+      s += format_subtime_mm("Create Solver", timings[to_underlying(_TimeID::create_solver)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::create_solver)], timings_max[to_underlying(_TimeID::create_solver)], pad_len);
+      s += format_subtime_mm("VTK Output", timings[to_underlying(_TimeID::write_out)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::write_out)], timings_max[to_underlying(_TimeID::write_out)], pad_len);
+      s += format_subtime_mm("Solution Analyze", timings[to_underlying(_TimeID::analyze)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::analyze)], timings_max[to_underlying(_TimeID::analyze)], pad_len);
+      s += format_subtime_mm("Total Time Assembly", timings[to_underlying(_TimeID::time_asm)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::time_asm)], timings_max[to_underlying(_TimeID::time_asm)], pad_len);
+      s += format_subtime_mm("Total Time Linear Solver", timings[to_underlying(_TimeID::lin_sol)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::lin_sol)], timings_max[to_underlying(_TimeID::lin_sol)], pad_len);
+      s += format_subtime_mm("Total Time", timings[to_underlying(_TimeID::total)], timings[to_underlying(_TimeID::total)], timings_min[to_underlying(_TimeID::total)], timings_max[to_underlying(_TimeID::total)], pad_len);
 
       logger.print(s, PrintLevel::info);
     }
