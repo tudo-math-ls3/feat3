@@ -8,7 +8,6 @@
 #include <kernel/util/tiny_algebra.hpp>
 #include <kernel/util/math.hpp>
 #include <kernel/util/dist.hpp>
-#include <control/domain/voxel_domain_control.hpp>
 
 namespace FEAT::Control::Domain
 {
@@ -67,7 +66,7 @@ namespace FEAT::Control::Domain
    * \brief Specilization for voxel domain control
    */
   template<typename DomainLevel_>
-  struct DomainGlobalBoundingBoxHelper<Control::Domain::VoxelDomainControl<DomainLevel_>>
+  struct DomainGlobalBoundingBoxHelper<Control::Domain::DeslaggedDomainControl<DomainLevel_>>
   {
     typedef typename DomainLevel_::MeshType::CoordType DataType;
     static constexpr int dim = DomainLevel_::MeshType::shape_dim;
@@ -83,7 +82,7 @@ namespace FEAT::Control::Domain
     *
     * \note Has to be called from all processes
     */
-    static std::pair<CoordVecType, CoordVecType> calculate_global_boundingbox(const Control::Domain::VoxelDomainControl<DomainLevel_>& domain, [[maybe_unused]] const Index level = Index(0))
+    static std::pair<CoordVecType, CoordVecType> calculate_global_boundingbox(const Control::Domain::DeslaggedDomainControl<DomainLevel_>& domain, [[maybe_unused]] const Index level = Index(0))
     {
       XASSERTM(domain.size_virtual() > level, "Chosen level is larger than virtual size");
       // calculate local boundingbox for all relevant domain level
