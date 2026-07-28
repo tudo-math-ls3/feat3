@@ -139,6 +139,7 @@ namespace PoissonMultigridBench
       const double total_gmg_time = sum(times, Times::gmg_total);
       const double asm_mdofs = (total_asm_time > 1E-5 ? 1E-6 * double(total_gdofs) / total_asm_time : 0.0);
       const double gmg_mdofs = (total_gmg_time > 1E-5 ? 1E-6 * double(total_gdofs) / total_gmg_time : 0.0);
+      const std::size_t max_num_ranks = counts_max[0][Counts::num_ranks];
 
       s += "\nFinal Relative Defect......: " + stringify_fp_sci(final_rel_def);
       s += "\nFinal Normalized Error.....: " + stringify_fp_sci(final_error);
@@ -246,22 +247,24 @@ namespace PoissonMultigridBench
 
       unsigned long long total_bytes = domain_bytes + system_bytes + solver_bytes + 3ull*total_gdofs*sizeof(DataType);
 
-      s += "\n\nOverall Benchmark Summary:";
-      s += "\nTotal Number of Elements...: " + stringify(total_elems).pad_front(15);
-      s += "\nTotal Number of Global DOFs: " + stringify(total_gdofs).pad_front(15);
-      s += "\nTotal Domain Memory Usage..: " + stringify_fp_fix(double(domain_bytes)/(1024.0*1024.0*1024.0), 6, 15) + " GiB";
+      s += "\n\nOverall Benchmark Summary..:";
+      s += "\nTotal Number of Elements.....: " + stringify(total_elems).pad_front(15);
+      s += "\nTotal Number of Global DOFs..: " + stringify(total_gdofs).pad_front(15);
+      s += "\nTotal Domain Memory Usage....: " + stringify_fp_fix(double(domain_bytes)/(1024.0*1024.0*1024.0), 6, 15) + " GiB";
       s += " [" + stringify_fp_fix(100.0*double(domain_bytes) / double(total_bytes), 2, 6) + "%]";
-      s += "\nTotal System Memory Usage..: " + stringify_fp_fix(double(system_bytes)/(1024.0*1024.0*1024.0), 6, 15) + " GiB";
+      s += "\nTotal System Memory Usage....: " + stringify_fp_fix(double(system_bytes)/(1024.0*1024.0*1024.0), 6, 15) + " GiB";
       s += " [" + stringify_fp_fix(100.0*double(system_bytes) / double(total_bytes), 2, 6) + "%]";
-      s += "\nTotal Solver Memory Usage..: " + stringify_fp_fix(double(solver_bytes)/(1024.0*1024.0*1024.0), 6, 15) + " GiB";
+      s += "\nTotal Solver Memory Usage....: " + stringify_fp_fix(double(solver_bytes)/(1024.0*1024.0*1024.0), 6, 15) + " GiB";
       s += " [" + stringify_fp_fix(100.0*double(solver_bytes) / double(total_bytes), 2, 6) + "%]";
-      s += "\nTotal Combined Memory Usage: " + stringify_fp_fix(double(total_bytes)/(1024.0*1024.0*1024.0), 6, 15) + " GiB";
-      s += "\nMemory Usage Reported By OS: " + stringify_fp_fix(double(mem_use_sum[0])/(1024.0*1024.0*1024.0), 6, 15) + " GiB";
+      s += "\nTotal Combined Memory Usage..: " + stringify_fp_fix(double(total_bytes)/(1024.0*1024.0*1024.0), 6, 15) + " GiB";
+      s += "\nMemory Usage Reported By OS..: " + stringify_fp_fix(double(mem_use_sum[0])/(1024.0*1024.0*1024.0), 6, 15) + " GiB";
       s += " [" + stringify_fp_fix(100.0*(double(mem_use_sum[0])/double(total_bytes) - 1.0), 2, 6, true) + "%]";
-      s += "\nTotal Assembly Runtime.....: " + stringify_fp_fix(total_asm_time, 6, 15) + " seconds";
-      s += "\nTotal Multigrid Runtime....: " + stringify_fp_fix(total_gmg_time, 6, 15) + " seconds";
-      s += "\nAssembly Performance.......: " + stringify_fp_fix(asm_mdofs, 6, 15) + " MDOF/s";
-      s += "\nSolver Performance.........: " + stringify_fp_fix(gmg_mdofs, 6, 15) + " MDOF/s";
+      s += "\nTotal Assembly Runtime.......: " + stringify_fp_fix(total_asm_time, 6, 15) + " seconds";
+      s += "\nTotal Multigrid Runtime......: " + stringify_fp_fix(total_gmg_time, 6, 15) + " seconds";
+      s += "\nAssembly Performance.........: " + stringify_fp_fix(asm_mdofs, 6, 15) + " MDOF/s";
+      s += "\nSolver Performance...........: " + stringify_fp_fix(gmg_mdofs, 6, 15) + " MDOF/s";
+      s += "\nAssembly Performance per Rank: " + stringify_fp_fix(asm_mdofs / double(max_num_ranks), 6, 15) + " MDOF/s";
+      s += "\nSolver Performance per Rank..: " + stringify_fp_fix(gmg_mdofs / double(max_num_ranks), 6, 15) + " MDOF/s";
 
       return s;
     }
