@@ -1420,6 +1420,49 @@ namespace Gendie
 
     }
 
+    /**
+     * \brief Prints the velocity/pressure block magnitudes of every level (debug level only)
+     *
+     * Only the momentum block A carries the 1/nu_0 stiffness scaling of the nonlinear solver, the
+     * pressure coupling B does not. Since each level assembles A from its own (restricted) convection
+     * field, a shear-dependent material makes the ratio max|diag(A)| / max|B| vary over the hierarchy,
+     * i.e. the saddle-point block balance is not identical on all levels. This print makes that
+     * visible; the pressure unknown itself is p/nu_0 on every level, so the transfers need no scaling.
+     *
+     * \note max|B| is the maximum over the process-local (type-0) entries, whereas max|diag(A)| is
+     * taken from the synchronized (type-1) diagonal.
+     */
+    void _print_level_block_balance() const
+    {
+      if(this->_logger == nullptr)
+        return;
+      // the reductions below are collective, so all ranks have to agree on whether they happen at
+      // all; the logger levels are identical on all ranks
+      if((this->_logger->std_out_lvl != PrintLevel::debug) && (this->_logger->log_lvl != PrintLevel::debug))
+        return;
+
+      const std::size_t num_lvls = this->system_levels.size();
+      std::vector<DataType> max_b(num_lvls), max_diag_a(num_lvls);
+      for(std::size_t i(0); i < num_lvls; ++i)
+      {
+        const auto& system = *this->system_levels.at(i);
+        auto diag_a = system.matrix_a.create_vector_l();
+        system.matrix_a.extract_diag(diag_a, true);
+        max_diag_a[i] = diag_a.max_abs_element();
+        max_b[i] = system.matrix_b.local().max_abs_element();
+      }
+      this->_logger->comm.allreduce(max_b.data(), max_b.data(), max_b.size(), FEAT::Dist::op_max);
+
+      FEAT::String s("Level block balance (max|diag A| / max|B| / ratio):");
+      for(std::size_t i(0); i < num_lvls; ++i)
+      {
+        s += "\n  lvl " + FEAT::stringify(i).pad_front(2) + ": "
+          + FEAT::stringify_fp_sci(max_diag_a[i], 4) + " / " + FEAT::stringify_fp_sci(max_b[i], 4)
+          + " / " + FEAT::stringify_fp_sci(max_diag_a[i] / max_b[i], 4);
+      }
+      this->_logger->print(s, PrintLevel::debug);
+    }
+
     void _init_numeric()
     {
       // before the numeric initialization, we have to guarantee that our system is compiled
@@ -1455,6 +1498,7 @@ namespace Gendie
         system.compile_local_matrix();
       }
       watch_system_filter.stop();
+      this->_print_level_block_balance();
       FEAT::Backend::set_preferred_backend(solver_backend);
       multigrid_solver.init_numeric();
       BaseClass::_init_numeric();

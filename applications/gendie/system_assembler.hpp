@@ -253,7 +253,7 @@ namespace Gendie
 
     SystemDataType calc_stiffness_factor() const
     {
-      this->cast()._calc_stiffness_factor();
+      return this->cast()._calc_stiffness_factor();
     }
 
     void set_stiffness_factor(SystemDataType factor)

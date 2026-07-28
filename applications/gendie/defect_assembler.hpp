@@ -471,7 +471,7 @@ namespace Gendie
       watch_sync_and_rhs.start();
       vec_def.sync_0();
       // and now add our rhs, if not empty
-      if(!vec_rhs.local().size())
+      if(vec_rhs.local().size())
       {
         vec_def.local().template at<0>().axpy(vec_rhs.local().template at<0>(), DataType(1)/this->stiffness_factor);
         vec_def.local().template at<1>().axpy(vec_rhs.local().template at<1>());
@@ -637,7 +637,7 @@ namespace Gendie
       watch_sync_and_rhs.start();
       vec_def.sync_0();
       // and now add our rhs, if not empty
-      if(!vec_rhs.local().size())
+      if(vec_rhs.local().size())
       {
         vec_def.local().template at<0>().axpy(vec_rhs.local().template at<0>(), DataType(1)/this->stiffness_factor);
         vec_def.local().template at<1>().axpy(vec_rhs.local().template at<1>());

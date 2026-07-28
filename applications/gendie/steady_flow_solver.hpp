@@ -484,6 +484,34 @@ namespace Gendie
       this->filter.filter_def(this->_vec_def);
     }
 
+    /**
+     * \brief Prints the velocity and pressure block norms of the current defect (debug level only)
+     *
+     * The nonlinear defect norm mixes both blocks, but only the momentum block carries the
+     * 1/scaling_factor stiffness scaling (\see _scaling_factor), whereas the continuity block is
+     * left untouched. These two norms therefore expose the block balance that the linear solver -
+     * and every residual-based decision inside it - actually sees.
+     */
+    void _print_defect_blocks() const
+    {
+      if(this->_logger == nullptr)
+        return;
+      // the block norms require collective reductions, so all ranks have to agree on whether they
+      // are computed at all; the logger levels are identical on all ranks
+      if((this->_logger->std_out_lvl != PrintLevel::debug) && (this->_logger->log_lvl != PrintLevel::debug))
+        return;
+
+      typedef typename DefectAssembler::LevelType LevelType;
+      const auto& lvl = *this->defect_asm->system_level;
+      typename LevelType::GlobalVeloVector def_v(&lvl.gate_velo,
+        this->_vec_def.local().template at<0>().clone(FEAT::LAFEM::CloneMode::Shallow));
+      typename LevelType::GlobalPresVector def_p(&lvl.gate_pres,
+        this->_vec_def.local().template at<1>().clone(FEAT::LAFEM::CloneMode::Shallow));
+
+      this->_logger->print("Defect blocks: |d_v| = " + FEAT::stringify_fp_sci(def_v.norm2(), 6)
+        + " / |d_p| = " + FEAT::stringify_fp_sci(def_p.norm2(), 6), PrintLevel::debug);
+    }
+
     bool _solver_stagnates(DefectDataType cur_improve) const
     {
       return this->_stag_rate < cur_improve;
@@ -524,6 +552,8 @@ namespace Gendie
       const DefectDataType def_improve = def_nl / def_prev;
       this->_defects.push_back(def_nl);
       const DefectDataType def_rel = def_nl / this->_defects.front();
+
+      this->_print_defect_blocks();
 
       FEAT::String line = this->cast()._get_solver_name() + ": ";
       line += FEAT::stringify(this->_cur_iter).pad_front(2) + ": ";
