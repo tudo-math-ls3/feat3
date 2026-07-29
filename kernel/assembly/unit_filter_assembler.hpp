@@ -91,25 +91,22 @@ namespace FEAT
       template<typename DataType_, typename IndexType_, typename Space_>
       void assemble(LAFEM::UnitFilter<DataType_, IndexType_>& filter, const Space_& space) const
       {
-        // build index set
-        std::set<Index> idx_set;
-        Intern::UnitAsmWrapper<shape_dim>::assemble(idx_set, space, _cells);
+        // create a sparse vector factory of correct size
+        LAFEM::SparseVectorFactory<DataType_, IndexType_> svf(space.get_num_dofs());
 
-        // allocate filter to correct sizes
-        filter = LAFEM::UnitFilter<DataType_, IndexType_>(space.get_num_dofs(), Index(idx_set.size()));
-
-        // get indices/elements views
-        Memory::TypedView<IndexType_> f_idx = filter.get_filter_vector().indices_view_w();
-        Memory::TypedView<DataType_> f_val = filter.get_filter_vector().elements_view_w();
-        f_val.format_to_zero();
-
-        // loop over all dof-indices and copy indices and values to filter
-        typename std::set<Index>::const_iterator it(idx_set.begin());
-        typename std::set<Index>::const_iterator jt(idx_set.end());
-        for(Index i(0); it != jt; ++it, ++i)
+        // add existing filter entries to factory
+        if(!filter.empty())
         {
-          f_idx[i] = IndexType_(*it);
+          XASSERT(filter.size() == svf.size());
+          if(!filter.hollow())
+            svf.add(filter.get_filter_vector());
         }
+
+        // assemble filter vector
+        Intern::UnitAsmWrapper<shape_dim>::assemble(svf, space, _cells);
+
+        // assign filter vector
+        filter.get_filter_vector() = svf.make_sv();
       }
 
       /**
@@ -124,36 +121,34 @@ namespace FEAT
        * \param[in] space
        * The \transient finite-element space for which the filter is to be assembled.
        *
-       * \param[in] vector_
+       * \param[in] vector
        * A \transient LAFEM::DenseVector containing (among other stuff) the entries to be added.
        */
-      template<typename DataType_, typename IndexType_, typename Space_>
+      template<typename DTF_, typename ITF_, typename DTV_, typename ITV_, typename Space_>
       void assemble(
-        LAFEM::UnitFilter<DataType_, IndexType_>& filter,
+        LAFEM::UnitFilter<DTF_, ITF_>& filter,
         const Space_& space,
-        const LAFEM::DenseVector<DataType_, IndexType_>& vector_) const
+        const LAFEM::DenseVector<DTV_, ITV_>& vector) const
       {
-        // build index set
-        std::set<Index> idx_set;
-        Intern::UnitAsmWrapper<shape_dim>::assemble(idx_set, space, _cells);
+        // create a sparse vector factory of correct size
+        LAFEM::SparseVectorFactory<DTF_, ITF_> svf(space.get_num_dofs());
 
-        // allocate filter to correct sizes
-        filter = LAFEM::UnitFilter<DataType_, IndexType_>(space.get_num_dofs(), Index(idx_set.size()));
-        XASSERT(filter.size() <= vector_.size());
-
-        // get indices/elements views
-        Memory::TypedView<IndexType_> f_idx = filter.get_filter_vector().indices_view_w();
-        Memory::TypedView<DataType_> f_val = filter.get_filter_vector().elements_view_w();
-        Memory::TypedView<DataType_> v_val = vector_.elements_view_r();
-
-        // loop over all dof-indices and copy indices and values to filter
-        typename std::set<Index>::const_iterator it(idx_set.begin());
-        typename std::set<Index>::const_iterator jt(idx_set.end());
-        for(Index i(0); it != jt; ++it, ++i)
+        // add existing filter entries to factory
+        if(!filter.empty())
         {
-          f_idx[i] = IndexType_(*it);
-          f_val[i] = v_val[f_idx[i]];
+          XASSERT(filter.size() == svf.size());
+          if(!filter.hollow())
+            svf.add(filter.get_filter_vector());
         }
+
+        // ensure the vector is of appropriate size
+        XASSERT(svf.size() <= vector.size());
+
+        // assemble filter vector by vector
+        Intern::UnitAsmWrapper<shape_dim>::assemble(svf, space, _cells, vector);
+
+        // assign filter vector
+        filter.get_filter_vector() = svf.make_sv();
       }
 
       /**
@@ -186,25 +181,22 @@ namespace FEAT
         typedef typename Function_::ImageType FuncImageType;
         static_assert(FuncImageType::is_scalar, "only scalar functions are supported");
 
-        // build index-value map
-        std::map<Index, DataType_> idx_map;
-        Intern::UnitAsmWrapper<shape_dim>::assemble(idx_map, space, _cells, function);
+        // create a sparse vector factory of correct size
+        LAFEM::SparseVectorFactory<DataType_, IndexType_> svf(space.get_num_dofs());
 
-        // allocate filter to correct sizes
-        filter = LAFEM::UnitFilter<DataType_, IndexType_>(space.get_num_dofs(), Index(idx_map.size()));
-
-        // get indices/elements views
-        Memory::TypedView<IndexType_> f_idx = filter.get_filter_vector().indices_view_w();
-        Memory::TypedView<DataType_> f_val = filter.get_filter_vector().elements_view_w();
-
-        // loop over all dof-indices and copy indices and values to filter
-        typename std::map<Index, DataType_>::const_iterator it(idx_map.begin());
-        typename std::map<Index, DataType_>::const_iterator jt(idx_map.end());
-        for(Index i(0); it != jt; ++it, ++i)
+        // add existing filter entries to factory
+        if(!filter.empty())
         {
-          f_idx[i] = IndexType_(it->first);
-          f_val[i] = it->second;
+          XASSERT(filter.size() == svf.size());
+          if(!filter.hollow())
+            svf.add(filter.get_filter_vector());
         }
+
+        // assemble filter vector by function
+        Intern::UnitAsmWrapper<shape_dim>::assemble(svf, space, _cells, function);
+
+        // assign filter vector
+        filter.get_filter_vector() = svf.make_sv();
       }
 
       /**
@@ -223,25 +215,22 @@ namespace FEAT
         LAFEM::UnitFilterBlocked<DataType_, IndexType_, block_size_>& filter,
         const Space_& space) const
       {
-        // build index set
-        std::set<Index> idx_set;
-        Intern::UnitAsmWrapper<shape_dim>::assemble(idx_set, space, _cells);
+        // create a sparse vector factory of correct size
+        LAFEM::SparseVectorFactory<DataType_, IndexType_, block_size_> svf(space.get_num_dofs());
 
-        // allocate filter to correct sizes
-        filter = LAFEM::UnitFilterBlocked<DataType_, IndexType_, block_size_>(space.get_num_dofs(), Index(idx_set.size()));
-
-        // get indices/elements views
-        Memory::TypedView<IndexType_> f_idx = filter.get_filter_vector().indices_view_w();
-        Memory::TypedView<Tiny::Vector<DataType_, block_size_>> f_val = filter.get_filter_vector().elements_view_w();
-        f_val.format_to_zero();
-
-        // loop over all dof-indices
-        typename std::set<Index>::const_iterator it(idx_set.begin());
-        typename std::set<Index>::const_iterator jt(idx_set.end());
-        for(Index i(0); it != jt; ++it, ++i)
+        // add existing filter entries to factory
+        if(!filter.empty())
         {
-          f_idx[i] = IndexType_(*it);
+          XASSERT(filter.size() == svf.size());
+          if(!filter.hollow())
+            svf.add(filter.get_filter_vector());
         }
+
+        // assemble filter vector
+        Intern::UnitAsmWrapper<shape_dim>::assemble(svf, space, _cells);
+
+        // assign filter vector
+        filter.get_filter_vector() = svf.make_svb();
       }
 
       /**
@@ -270,28 +259,22 @@ namespace FEAT
         static_assert(FuncImageType::is_vector, "only vector fields are supported");
         static_assert(FuncImageType::image_dim == block_size_, "invalid filter block size");
 
-        // get the value type of the function
-        typedef typename Analytic::EvalTraits<DataType_, Function_>::ValueType ValueType;
+        // create a sparse vector factory of correct size
+        LAFEM::SparseVectorFactory<DataType_, IndexType_, block_size_> svf(space.get_num_dofs());
 
-        // build index-value map
-        std::map<Index, ValueType> idx_map;
-        Intern::UnitAsmWrapper<shape_dim>::assemble(idx_map, space, _cells, function);
-
-        // allocate filter to correct sizes
-        filter = LAFEM::UnitFilterBlocked<DataType_, IndexType_, block_size_>(space.get_num_dofs(), Index(idx_map.size()));
-
-        // get indices/elements views
-        Memory::TypedView<IndexType_> f_idx(filter.get_filter_vector().indices_view_w());
-        Memory::TypedView<ValueType> f_val(filter.get_filter_vector().elements_view_w());
-
-        // loop over all dof-indices and copy indices and values to filter
-        typename std::map<Index, ValueType>::const_iterator it(idx_map.begin());
-        typename std::map<Index, ValueType>::const_iterator jt(idx_map.end());
-        for(Index i(0); it != jt; ++it, ++i)
+        // add existing filter entries to factory
+        if(!filter.empty())
         {
-          f_idx[i] = IndexType_(it->first);
-          f_val[i] = it->second;
+          XASSERT(filter.size() == svf.size());
+          if(!filter.hollow())
+            svf.add(filter.get_filter_vector());
         }
+
+        // assemble filter vector by function
+        Intern::UnitAsmWrapper<shape_dim>::assemble(svf, space, _cells, function);
+
+        // assign filter vector
+        filter.get_filter_vector() = svf.make_svb();
       }
 
       /**
@@ -309,36 +292,31 @@ namespace FEAT
        * \param[in] space
        * The \transient finite-element space for which the filter is to be assembled.
        */
-      template<typename DTF_, typename ITF_, typename DTV_, typename ITV_,int block_size_, typename Space_>
+      template<typename DTF_, typename ITF_, typename DTV_, typename ITV_, int block_size_, typename Space_>
       void assemble(
         LAFEM::UnitFilterBlocked<DTF_, ITF_, block_size_>& filter,
         const Space_& space,
-        const LAFEM::DenseVectorBlocked<DTV_, ITV_, block_size_>& vector_) const
+        const LAFEM::DenseVectorBlocked<DTV_, ITV_, block_size_>& vector) const
       {
-        // build index set
-        std::set<Index> idx_set;
-        Intern::UnitAsmWrapper<shape_dim>::assemble(idx_set, space, _cells);
+        // create a sparse vector factory of correct size
+        LAFEM::SparseVectorFactory<DTF_, ITF_, block_size_> svf(space.get_num_dofs());
 
-        typedef Tiny::Vector<DTF_, block_size_> ValueTypeF;
-        typedef Tiny::Vector<DTV_, block_size_> ValueTypeV;
-
-        // allocate filter to correct sizes
-        filter = LAFEM::UnitFilterBlocked<DTF_, ITF_, block_size_>(space.get_num_dofs(), Index(idx_set.size()));
-        XASSERT(filter.size() <= vector_.size());
-
-        // get indices/elements views
-        Memory::TypedView<ITF_> f_idx = filter.get_filter_vector().indices_view_w();
-        Memory::TypedView<ValueTypeF> f_val = filter.get_filter_vector().elements_view_w();
-        const Memory::TypedView<ValueTypeV> v_val = vector_.elements_view_r();
-
-        // loop over all dof-indices and copy indices and values to filter
-        typename std::set<Index>::const_iterator it(idx_set.begin());
-        typename std::set<Index>::const_iterator jt(idx_set.end());
-        for(Index i(0); it != jt; ++it, ++i)
+        // add existing filter entries to factory
+        if(!filter.empty())
         {
-          f_idx[i] = ITF_(*it);
-          f_val[i] = v_val[f_idx[i]];
+          XASSERT(filter.size() == svf.size());
+          if(!filter.hollow())
+            svf.add(filter.get_filter_vector());
         }
+
+        // ensure the vector is of appropriate size
+        XASSERT(svf.size() <= vector.size());
+
+        // assemble filter vector by function
+        Intern::UnitAsmWrapper<shape_dim>::assemble(svf, space, _cells, vector);
+
+        // assign filter vector
+        filter.get_filter_vector() = svf.make_svb();
       }
     }; // class UnitFilterAssembler
 
@@ -365,11 +343,14 @@ namespace FEAT
         }
 
         /// homogeneous assembly
-        template<typename Space_>
-        static void assemble(std::set<Index>& idx, const Space_& space, const std::set<Index>& cells)
+        template<typename DT_, typename IT_, int block_size_, typename Space_>
+        static void assemble(LAFEM::SparseVectorFactory<DT_, IT_, block_size_>& svf, const Space_& space, const std::set<Index>& cells)
         {
           // create a dof-assignment object
           typename Space_::template DofAssignment<shape_dim_>::Type dof_assign(space);
+
+          Tiny::Vector<DT_, block_size_> null_val;
+          null_val.format();
 
           // loop over all target indices
           std::set<Index>::const_iterator it(cells.begin());
@@ -380,25 +361,22 @@ namespace FEAT
             const int num_assign(dof_assign.get_num_assigned_dofs());
             for(int j(0); j < num_assign; ++j)
             {
-              idx.insert(dof_assign.get_index(j));
+              svf.add(IT_(dof_assign.get_index(j)), null_val);
             }
             dof_assign.finish();
           }
         }
 
         /// function-based assembly
-        template<
-          typename DataType_,
-          typename Space_,
-          typename Function_>
+        template<typename DT_, typename IT_, typename Space_, typename Function_>
         static void assemble(
-          std::map<Index, DataType_>& idx,
+          LAFEM::SparseVectorFactory<DT_, IT_, 1>& svf,
           const Space_& space,
           const std::set<Index>& cells,
           const Function_& function)
         {
           // create a node-functional object
-          typedef typename Space_::template NodeFunctional<shape_dim_, DataType_>::Type NodeFunc;
+          typedef typename Space_::template NodeFunctional<shape_dim_, DT_>::Type NodeFunc;
 
           // check for empty node functional set
           static constexpr Index max_dofs = NodeFunc::max_assigned_dofs;
@@ -409,10 +387,10 @@ namespace FEAT
           NodeFunc node_func(space);
 
           // create a dof-assignment object
-          typename Space_::template DofAssignment<shape_dim_, DataType_>::Type dof_assign(space);
+          typename Space_::template DofAssignment<shape_dim_, DT_>::Type dof_assign(space);
 
           // create node data; avoid zero-length vectors
-          Tiny::Vector<DataType_, max_dofs+1> node_data;
+          Tiny::Vector<DT_, max_dofs+1> node_data;
 
           // loop over all target indices
           std::set<Index>::const_iterator it(cells.begin());
@@ -428,27 +406,22 @@ namespace FEAT
             const int num_assign(dof_assign.get_num_assigned_dofs());
             for(int j(0); j < num_assign; ++j)
             {
-              idx.insert(std::make_pair(dof_assign.get_index(j), node_data[j]));
+              svf.add(dof_assign.get_index(j), node_data[j]);
             }
             dof_assign.finish();
           }
         }
 
         /// function-based assembly
-        template<
-          typename DataType_,
-          int dim_,
-          int s_,
-          typename Space_,
-          typename Function_>
+        template<typename DT_, typename IT_, int dim_, typename Space_, typename Function_>
         static void assemble(
-          std::map<Index, Tiny::Vector<DataType_, dim_, s_>>& idx,
+          LAFEM::SparseVectorFactory<DT_, IT_, dim_>& svf,
           const Space_& space,
           const std::set<Index>& cells,
           const Function_& function)
         {
           // create a node-functional object
-          typedef typename Space_::template NodeFunctional<shape_dim_, DataType_>::Type NodeFunc;
+          typedef typename Space_::template NodeFunctional<shape_dim_, DT_>::Type NodeFunc;
 
           // check for empty node functional set
           static constexpr Index max_dofs = NodeFunc::max_assigned_dofs;
@@ -459,9 +432,9 @@ namespace FEAT
           NodeFunc node_func(space);
 
           // create a dof-assignment object
-          typename Space_::template DofAssignment<shape_dim_, DataType_>::Type dof_assign(space);
+          typename Space_::template DofAssignment<shape_dim_, DT_>::Type dof_assign(space);
 
-          typedef Tiny::Vector<DataType_, dim_, s_> ValueType;
+          typedef Tiny::Vector<DT_, dim_> ValueType;
 
           // create node data; avoid zero-length vectors
           Tiny::Vector<ValueType, max_dofs+1> node_data;
@@ -480,7 +453,68 @@ namespace FEAT
             const int num_assign(dof_assign.get_num_assigned_dofs());
             for(int j(0); j < num_assign; ++j)
             {
-              idx.insert(std::make_pair(dof_assign.get_index(j), node_data[j]));
+              svf.add(dof_assign.get_index(j), node_data[j]);
+            }
+            dof_assign.finish();
+          }
+        }
+
+        /// vector-based assembly
+        template<typename DT_, typename IT_, typename Space_, typename DTV_, typename ITV_>
+        static void assemble(
+          LAFEM::SparseVectorFactory<DT_, IT_, 1>& svf,
+          const Space_& space,
+          const std::set<Index>& cells,
+          const LAFEM::DenseVector<DTV_, ITV_>& vector)
+        {
+          // create a dof-assignment object
+          typename Space_::template DofAssignment<shape_dim_, DT_>::Type dof_assign(space);
+
+          const Memory::TypedView<DTV_> val_view = vector.elements_view_r();
+
+          // loop over all target indices
+          std::set<Index>::const_iterator it(cells.begin());
+          std::set<Index>::const_iterator jt(cells.end());
+          for(; it != jt; ++it)
+          {
+            dof_assign.prepare(*it);
+
+            const int num_assign(dof_assign.get_num_assigned_dofs());
+            for(int j(0); j < num_assign; ++j)
+            {
+              const Index idx = dof_assign.get_index(j);
+              svf.add(idx, val_view(idx));
+            }
+            dof_assign.finish();
+          }
+        }
+
+        /// vector-based assembly
+        template<typename DT_, typename IT_, int dim_, typename Space_, typename DTV_, typename ITV_>
+        static void assemble(
+          LAFEM::SparseVectorFactory<DT_, IT_, dim_>& svf,
+          const Space_& space,
+          const std::set<Index>& cells,
+          const LAFEM::DenseVectorBlocked<DTV_, ITV_, dim_>& vector)
+        {
+          // create a dof-assignment object
+          typename Space_::template DofAssignment<shape_dim_, DT_>::Type dof_assign(space);
+
+          typedef Tiny::Vector<DTV_, dim_> ValueType;
+          const Memory::TypedView<ValueType> val_view = vector.elements_view_r();
+
+          // loop over all target indices
+          std::set<Index>::const_iterator it(cells.begin());
+          std::set<Index>::const_iterator jt(cells.end());
+          for(; it != jt; ++it)
+          {
+            dof_assign.prepare(*it);
+
+            const int num_assign(dof_assign.get_num_assigned_dofs());
+            for(int j(0); j < num_assign; ++j)
+            {
+              const Index idx = dof_assign.get_index(j);
+              svf.add(idx, val_view(idx));
             }
             dof_assign.finish();
           }
@@ -498,25 +532,22 @@ namespace FEAT
           UnitAsmHelper<shape_dim_>::merge(idx[shape_dim_], mesh_part);
         }
 
-        template<typename Space_>
-        static void assemble(std::set<Index>& idx, const Space_& space, const std::set<Index>* cells)
+        template<typename DT_, typename IT_, int dim_, typename Space_>
+        static void assemble(LAFEM::SparseVectorFactory<DT_, IT_, dim_>& svf, const Space_& space, const std::set<Index>* cells)
         {
-          UnitAsmWrapper<shape_dim_ - 1>::assemble(idx, space, cells);
-          UnitAsmHelper<shape_dim_>::assemble(idx, space, cells[shape_dim_]);
+          UnitAsmWrapper<shape_dim_ - 1>::assemble(svf, space, cells);
+          UnitAsmHelper<shape_dim_>::assemble(svf, space, cells[shape_dim_]);
         }
 
-        template<
-          typename DataType_,
-          typename Space_,
-          typename Function_>
+        template<typename DT_, typename IT_, int dim_, typename Space_, typename Whatever_>
         static void assemble(
-          std::map<Index, DataType_>& idx,
+          LAFEM::SparseVectorFactory<DT_, IT_, dim_>& svf,
           const Space_& space,
           const std::set<Index>* cells,
-          const Function_& function)
+          const Whatever_& whatever)
         {
-          UnitAsmWrapper<shape_dim_ - 1>::assemble(idx, space, cells, function);
-          UnitAsmHelper<shape_dim_>::assemble(idx, space, cells[shape_dim_], function);
+          UnitAsmWrapper<shape_dim_ - 1>::assemble(svf, space, cells, whatever);
+          UnitAsmHelper<shape_dim_>::assemble(svf, space, cells[shape_dim_], whatever);
         }
       };
 
@@ -529,23 +560,20 @@ namespace FEAT
           UnitAsmHelper<0>::merge(idx[0], mesh_part);
         }
 
-        template<typename Space_>
-        static void assemble(std::set<Index>& idx, const Space_& space, const std::set<Index>* cells)
+        template<typename DT_, typename IT_, int dim_, typename Space_>
+        static void assemble(LAFEM::SparseVectorFactory<DT_, IT_, dim_>& svf, const Space_& space, const std::set<Index>* cells)
         {
-          UnitAsmHelper<0>::assemble(idx, space, cells[0]);
+          UnitAsmHelper<0>::assemble(svf, space, cells[0]);
         }
 
-        template<
-          typename DataType_,
-          typename Space_,
-          typename Function_>
+        template<typename DT_, typename IT_, int dim_, typename Space_, typename Whatever_>
         static void assemble(
-          std::map<Index, DataType_>& idx,
+          LAFEM::SparseVectorFactory<DT_, IT_, dim_>& svf,
           const Space_& space,
           const std::set<Index>* cells,
-          const Function_& function)
+          const Whatever_& whatever)
         {
-          UnitAsmHelper<0>::assemble(idx, space, cells[0], function);
+          UnitAsmHelper<0>::assemble(svf, space, cells[0], whatever);
         }
       };
     } // namespace Intern

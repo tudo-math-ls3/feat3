@@ -20,6 +20,7 @@ set(test_list
   slip_filter_assembler-test
   space_transfer-test
   surface_integrator-test
+  unit_filter_assembler-test
 )
 
 include(FEATKernelTests)
