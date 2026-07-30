@@ -302,14 +302,12 @@ namespace FEAT::Assembly
       // Determine valences of DoFs in feature network.
       // WARNING: Only works for Space_ = Space::Lagrange1::Element for now
       // To make this work for at least other Lagrange spaces, one needs to interpolate the valences similarly to the DoF positions
-      LAFEM::DenseVector<Index, Index> feature_valences = _feature_network_valences(space.get_mesh());
+      LAFEM::DenseVector<DataType_, Index> feature_valences = _feature_network_valences<DataType_>(space.get_mesh());
 
       // Sync valences if possible/required
       if(gate)
       {
-        Global::Gate<LAFEM::DenseVector<IndexType_, IndexType_>, LAFEM::VectorMirror<IndexType_, IndexType_>> valence_gate;
-        valence_gate.convert(*gate);
-        valence_gate.sync_0(feature_valences);
+        gate->sync_0(feature_valences);
       }
 
       // Create new filter
@@ -326,25 +324,25 @@ namespace FEAT::Assembly
     template<typename DataType_, typename IndexType_>
     void _assemble(
       LAFEM::ProjectionFilter<MeshType, DataType_, IndexType_>& filter,
-      const LAFEM::DenseVector<IndexType_, IndexType_>& feature_valences,
+      const LAFEM::DenseVector<DataType_, IndexType_>& feature_valences,
       const LAFEM::DenseVectorBlocked<DataType_, IndexType_, MeshType::world_dim>& dof_positions) const
     {
       const auto& target_set = _neuman_zero_boundary.template get_target_set<0>();
 
       Memory::TypedView<Tiny::Vector<DataType_, MeshType::world_dim>> dof_view = dof_positions.elements_view_r();
-      Memory::TypedView<Index> valences = feature_valences.elements_view_r();
+      Memory::TypedView<DataType_> valences = feature_valences.elements_view_r();
 
       for(Index i(0); i < target_set.get_num_entities(); i++)
       {
         // TODO: Handle DoF-mapping
         Index vertex = target_set[i];
-        if(valences(vertex) == 0)
+        if(Index(valences(vertex)) == 0)
         {
           // A vertex with valence 0 lies somewhere on the boundary, but not on a feature.
           // Tell the filter it is a boundary DoF and can be freely projected
           filter.add_boundary_dof(vertex, dof_view(vertex));
         }
-        else if(valences(vertex) == 2)
+        else if(Index(valences(vertex)) == 2)
         {
           // A vertex with valence 2 is part of a run of feature edges.
           // Tell the filter is is a boundary DoF and needs to projected onto the feature network
@@ -362,10 +360,11 @@ namespace FEAT::Assembly
     }
 
     // Determine valences of vertices in the feature network
-    LAFEM::DenseVector<Index, Index> _feature_network_valences(const MeshType& mesh) const
+    template<typename DataType_>
+    LAFEM::DenseVector<DataType_, Index> _feature_network_valences(const MeshType& mesh) const
     {
-      LAFEM::DenseVector<Index, Index> valences(mesh.get_num_vertices(), 0);
-      Memory::TypedView<Index> view = valences.elements_view_w();
+      LAFEM::DenseVector<DataType_, Index> valences(mesh.get_num_vertices(), 0);
+      Memory::TypedView<DataType_> view = valences.elements_view_w();
 
       if constexpr(Mesh_::world_dim == 3)
       {
