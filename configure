@@ -1006,7 +1006,9 @@ if sys.platform == "linux" and args.install_tpls:
   header("============== TPLS =====================")
   sys.stdout.flush()
   sys.stderr.flush()
-  subprocess.run(install_tpls_args)
+  tpl_install = subprocess.run(install_tpls_args)
+  if tpl_install.returncode != 0:
+    error("Failed to build thirdparty dependencies.")
 
 if args.preset:
   print("")

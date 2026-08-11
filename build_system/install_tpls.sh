@@ -101,29 +101,27 @@ if hasTag "trilinos" || hasTag "umfpack" || hasTag "mumps" || hasTag "scalapack"
         echo "[OpenBLAS] Skipping download step: $WORKING_DIR/openblas-src already exists"
     fi
 
-    if [[ ! -d "$WORKING_DIR"/openblas-build ]]; then
+    mkdir -p "$WORKING_DIR/openblas-build"
+    if [[ ! -f "$WORKING_DIR/openblas-build/.built" ]]; then
         echo "[OpenBLAS] Build step..."
-
-        mkdir -p openblas-build
         cd openblas-build
         cp -r "$WORKING_DIR"/openblas-src/* .
-
         make  USE_OPENMP=$USE_OPENMP_NUM NO_SHARED=1 -j $NP 2>&1 | tee "$WORKING_DIR"/logs/openblas-build.log
-
-
+        touch ".built"
         cd ..
     else
-        echo "[OpenBLAS] Skipping build step: $WORKING_DIR/openblas-build already exists"
+        echo "[OpenBLAS] Skipping build step: Flag file $WORKING_DIR/openblas-build/.built already exists"
     fi
 
-    if [ ! -f "$INSTALL_DIR"/lib/libopenblas.a ]; then
+    if [ ! -f "$INSTALL_DIR/.openblas-installed" ]; then
         echo "[OpenBLAS] Install step..."
 
         cd "$WORKING_DIR"/openblas-build
         make install USE_OPENMP=$USE_OPENMP_NUM NO_SHARED=1 PREFIX="$INSTALL_DIR" 2>&1 | tee "$WORKING_DIR"/logs/openblas-install.log
+        touch "$INSTALL_DIR/.openblas-installed"
         cd ..
     else
-        echo "[OpenBLAS] Skipping install step: $INSTALL_DIR/lib/libopenblas.a already exists"
+        echo "[OpenBLAS] Skipping install step: Flag file $INSTALL_DIR/.openblas-installed already exists"
     fi
 fi
 
@@ -135,25 +133,27 @@ if hasTag "boost"; then
         echo "[Boost] Skipping download step: $WORKING_DIR/boost-src already exists"
     fi
 
-    if [ ! -d "$WORKING_DIR"/boost-build ]; then
+    mkdir -p boost-build
+    if [ ! -f "$WORKING_DIR/boost-build/.built" ]; then
         echo "[Boost] Build step..."
-        mkdir -p boost-build
         cd boost-build
         cmake ../boost-src \
             -D CMAKE_BUILD_TYPE="Release" 2>&1 | tee "$WORKING_DIR"/logs/boost-configure.log
 
         cmake --build . -j "${NP}" 2>&1 | tee "$WORKING_DIR"/logs/boost-build.log
+        touch ".built"
         cd ..
     else
-        echo "[Boost] Skipping build step: $WORKING_DIR/boost-build already exists"
+        echo "[Boost] Skipping build step: Flag file $WORKING_DIR/boost-build/.built already exists"
     fi
 
-    if [ ! -d "$INSTALL_DIR"/include/boost ]; then
+    if [ ! -f "$INSTALL_DIR/.boost-installed" ]; then
         cd boost-build
         cmake --install . --prefix="$INSTALL_DIR" 2>&1 | tee "$WORKING_DIR"/logs/boost-install-log
+        touch "$INSTALL_DIR/.boost-installed"
         cd ..
     else
-        echo "[Boost] Skipping install step: $INSTALL_DIR/include/boost already exists"
+        echo "[Boost] Skipping install step: Flag file $INSTALL_DIR/.boost-installed already exists"
     fi
 fi
 
@@ -165,27 +165,29 @@ if hasTag "cgal"; then
         echo "[CGAL] Skipping download step: $WORKING_DIR/cgal-src already exists"
     fi
 
-    if [ ! -d "$WORKING_DIR"/cgal-build ]; then
+    mkdir -p cgal-build
+    if [ ! -f "$WORKING_DIR/cgal-build/.built" ]; then
         echo "[CGAL] Build step..."
-        mkdir -p cgal-build
         cd cgal-build
         cmake ../cgal-src \
             -D CMAKE_BUILD_TYPE=Release \
             -D EIGEN3_INCLUDE_DIR="/usr/include/eigen3/" 2>&1 | tee "$WORKING_DIR"/logs/cgal-configure.log
 
         cmake --build . -j "${NP}" 2>&1 | tee "$WORKING_DIR"/logs/cgal-build.log
+        touch ".built"
         cd ..
     else
-        echo "[CGAL] Skipping build step: $WORKING_DIR/cgal-build already exists"
+        echo "[CGAL] Skipping build step: Flag file $WORKING_DIR/cgal-build/.built already exists"
     fi
 
-    if [ ! -d "$INSTALL_DIR"/include/CGAL ]; then
+    if [ ! -f "$INSTALL_DIR/.cgal-installed" ]; then
         echo "[CGAL] Install step..."
         cd cgal-build
         cmake --install . --prefix="$INSTALL_DIR" 2>&1 | tee "$WORKING_DIR"/logs/cgal-install.log
+        touch "$INSTALL_DIR/.cgal-installed"
         cd ..
     else
-        echo "[CGAL] Skipping install step: $INSTALL_DIR/include/CGAL already exists"
+        echo "[CGAL] Skipping install step: Flag file $INSTALL_DIR/.cgal-installed already exists"
     fi
 fi
 
@@ -201,9 +203,9 @@ if hasTag "pmp"; then
         echo "[PMP] Skipping download step: $WORKING_DIR/pmp-src already exists"
     fi
 
-    if [ ! -d "$WORKING_DIR"/pmp-build ]; then
+    mkdir -p pmp-build
+    if [ ! -f "$WORKING_DIR/pmp-build/.built" ]; then
         echo "[PMP] Build step..."
-        mkdir -p pmp-build
         cd pmp-build
         cmake ../pmp-src \
             -D CMAKE_BUILD_TYPE=Release \
@@ -215,18 +217,20 @@ if hasTag "pmp"; then
             2>&1 | tee "$WORKING_DIR"/logs/pmp-configure.log
 
         cmake --build . -j "${NP}" 2>&1 | tee "$WORKING_DIR"/logs/pmp-build.log
+        touch ".built"
         cd ..
     else
-        echo "[PMP] Skipping build step: $WORKING_DIR/pmp-build already exists"
+        echo "[PMP] Skipping build step: Flag file $WORKING_DIR/pmp-build/.built already exists"
     fi
 
-    if [ ! -d "$INSTALL_DIR"/include/pmp ]; then
+    if [ ! -f "$INSTALL_DIR/.pmp-installed" ]; then
         echo "[PMP] Install step..."
         cd pmp-build
         cmake --install . --prefix="$INSTALL_DIR" 2>&1 | tee "$WORKING_DIR"/logs/pmp-install.log
+        touch "$INSTALL_DIR/.pmp-installed"
         cd ..
     else
-        echo "[PMP] Skipping install step: $INSTALL_DIR/include/pmp already exists"
+        echo "[PMP] Skipping install step: Flag file $INSTALL_DIR/.pmp-installed already exists"
     fi
 fi
 
@@ -238,9 +242,9 @@ if hasTag "meshhexer"; then
         echo "[MesHexer] Skipping download step: $WORKING_DIR/meshhexer-src already exists"
     fi
 
-    if [ ! -d "$WORKING_DIR"/meshhexer-build ]; then
+    mkdir -p meshhexer-build
+    if [ ! -f "$WORKING_DIR/meshhexer-build/.built" ]; then
         echo "[MesHexer] Build step..."
-        mkdir -p meshhexer-build
         cd meshhexer-build
         cmake ../meshhexer-src \
             -D CMAKE_BUILD_TYPE=Release \
@@ -253,18 +257,20 @@ if hasTag "meshhexer"; then
             2>&1 | tee "$WORKING_DIR"/logs/meshhexer-configure.log
 
         cmake --build . -j "${NP}" 2>&1 | tee "$WORKING_DIR"/logs/meshhexer-build.log
+        touch ".built"
         cd ..
     else
-        echo "[MesHexer] Skipping build step: $WORKING_DIR/meshhexer-build already exists"
+        echo "[MesHexer] Skipping build step: Flag file $WORKING_DIR/meshhexer-build/.built already exists"
     fi
 
-    if [ ! -d "$INSTALL_DIR"/include/meshhexer ]; then
+    if [ ! -f "$INSTALL_DIR/.meshhexer-installed" ]; then
         echo "[MeshHexer] Install step..."
         cd meshhexer-build
         cmake --install . --prefix="$INSTALL_DIR" 2>&1 | tee "$WORKING_DIR"/logs/meshhexer-install.log
+        touch "$INSTALL_DIR/.meshhexer-installed"
         cd ..
     else
-        echo "[MesHexer] Skipping install step: $INSTALL_DIR/include/meshhexer already exists"
+        echo "[MesHexer] Skipping install step: Flag file $INSTALL_DIR/.meshhexer-installed already exists"
     fi
 fi
 
@@ -276,9 +282,9 @@ if hasTag "hypre"; then
         echo "[Hypre] Skipping download step: $WORKING_DIR/hypre-src already exists"
     fi
 
-    if [ ! -d "$WORKING_DIR"/hypre-build ]; then
+    mkdir -p hypre-build
+    if [ ! -f "$WORKING_DIR/hypre-build/.built" ]; then
         echo "[Hypre] Build step..."
-        mkdir -p hypre-build
         cd hypre-build
         cmake ../hypre-src/src \
             -D CMAKE_BUILD_TYPE=Release \
@@ -289,18 +295,20 @@ if hasTag "hypre"; then
             2>&1 | tee "$WORKING_DIR"/logs/hypre-configure.log
 
         cmake --build . -j "${NP}" 2>&1 | tee "$WORKING_DIR"/logs/meshhexer-build.log
+        touch ".built"
         cd ..
     else
-        echo "[Hypre] Skipping build step: $WORKING_DIR/hypre-build already exists"
+        echo "[Hypre] Skipping build step: Flag file $WORKING_DIR/hypre-build/.built already exists"
     fi
 
-    if [ ! -f "$INSTALL_DIR"/lib64/libHYPRE.a ]; then
+    if [ ! -f "$INSTALL_DIR/.hypre-installed" ]; then
         echo "[Hypre] Install step..."
         cd hypre-build
         cmake --install . --prefix="$INSTALL_DIR" 2>&1 | tee "$WORKING_DIR"/logs/hypre-install.log
+        touch "$INSTALL_DIR/.hypre-installed"
         cd ..
     else
-        echo "[Hypre] Skipping install step: $INSTALL_DIR/lib64/libHYPRE.a already exists"
+        echo "[Hypre] Skipping install step: Flag file $INSTALL_DIR/.hypre-installed already exists"
     fi
 fi
 
@@ -374,32 +382,34 @@ EOF
         echo "[Alglib] Skipping download step: $WORKING_DIR/hypre-src already exists"
     fi
 
-    if [ ! -d "$WORKING_DIR"/alglib-build ]; then
+    mkdir -p alglib-build
+    if [ ! -f "$WORKING_DIR/alglib-build/.built" ]; then
         echo "[Alglib] Build step..."
-        mkdir -p alglib-build
         cd alglib-build
         cmake ../alglib-src/src \
             -D CMAKE_BUILD_TYPE=Release \
             2>&1 | tee "$WORKING_DIR"/logs/alglib-configure.log
 
         cmake --build . -j "${NP}" 2>&1 | tee "$WORKING_DIR"/logs/alglib-build.log
+        touch ".built"
         cd ..
     else
-        echo "[Alglib] Skipping build step: $WORKING_DIR/alglib-build already exists"
+        echo "[Alglib] Skipping build step: Flag file $WORKING_DIR/alglib-build/.built already exists"
     fi
 
-    if [ ! -f "$INSTALL_DIR"/lib64/libalglib.a ]; then
+    if [ ! -f "$INSTALL_DIR/.alglib-installed" ]; then
         echo "[Alglib] Install step..."
         cd alglib-build
         cmake --install . --prefix="$INSTALL_DIR" 2>&1 | tee "$WORKING_DIR"/logs/alglib-install.log
+        touch "$INSTALL_DIR/.alglib-installed"
         cd ..
     else
-        echo "[Alglib] Skipping install step: $INSTALL_DIR/lib64/libalglib.a already exists"
+        echo "[Alglib] Skipping install step: Flag file $INSTALL_DIR/.alglib-installed already exists"
     fi
 fi
 
 if hasTag "cudss"; then
-    if [ ! -d "$WORKING_DIR"/cudss-src ]; then
+    if [ ! -f "$WORKING_DIR"/cudss-src ]; then
         echo "[cuDSS] Download step..."
         wget https://developer.download.nvidia.com/compute/cudss/redist/libcudss/linux-x86_64/libcudss-linux-x86_64-0.7.1.4_cuda12-archive.tar.xz
         tar xvf libcudss-linux-x86_64-0.7.1.4_cuda12-archive.tar.xz
@@ -408,22 +418,24 @@ if hasTag "cudss"; then
         echo "[cuDSS] Skipping download step: $WORKING_DIR/cudss-src already exists"
     fi
 
-    if [ ! -d "$WORKING_DIR"/cudss-build ]; then
+    mkdir -p cudss-build
+    if [ ! -d "$WORKING_DIR/cudss-build/.built" ]; then
         echo "[cuDSS] Build step..."
-        mkdir -p cudss-build
         # Nothing to do. cuDSS is distributed as a binary blob
+        touch "$WORKING_DIR/cudss-build/.built"
     else
-        echo "[cuDSS] Skipping build step: $WORKING_DIR/cudss-build already exists"
+        echo "[cuDSS] Skipping build step: Flag file $WORKING_DIR/cudss-build/.built already exists"
     fi
 
-    if [ ! -f "$INSTALL_DIR"/lib/libcudss_static.a ]; then
+    if [ ! -f "$INSTALL_DIR/.cudss-installed" ]; then
         echo "[cuDSS] Install step..."
         cd cudss-src
         cp -ra ./include/* "$INSTALL_DIR"/include
         cp -ra ./lib/* "$INSTALL_DIR"/lib
+        touch "$INSTALL_DIR/.cudss-installed"
         cd ..
     else
-        echo "[cuDSS] Skipping install step: $INSTALL_DIR/lib/libcudss_static.a already exists"
+        echo "[cuDSS] Skipping install step: Flag file $INSTALL_DIR//.cudss-installed already exists"
     fi
 fi
 
@@ -435,21 +447,23 @@ if hasTag "floatx"; then
         echo "[FloatX] Skipping download step: $WORKING_DIR/floatx-src already exists"
     fi
 
-    if [ ! -d "$WORKING_DIR"/floatx-build ]; then
+    mkdir -p floatx-build
+    if [ ! -f "$WORKING_DIR/floatx-build/.built" ]; then
         echo "[FloatX] Build step..."
-        mkdir -p floatx-build
         # Nothing to do. FloatX is header only
+        touch "$WORKING_DIR/floatx-build/.built"
     else
-        echo "[FloatX] Skipping build step: $WORKING_DIR/floatx-build already exists"
+        echo "[FloatX] Skipping build step: Flag file $WORKING_DIR/floatx-build/.built already exists"
     fi
 
-    if [ ! -f "$INSTALL_DIR"/include/floatx.hpp ]; then
+    if [ ! -f "$INSTALL_DIR/.floatx-installed" ]; then
         echo "[FloatX] Install step..."
         cd floatx-src
         cp -ra ./src/floatx.hpp $INSTALL_DIR/include/floatx.hpp
+        touch "$INSTALL_DIR/.floatx-installed"
         cd ..
     else
-        echo "[FloatX] Skipping install step: $INSTALL_DIR/include/floatx.hpp already exists"
+        echo "[FloatX] Skipping install step: Flag file $INSTALL_DIR/.floatx-installed already exists"
     fi
 fi
 
@@ -464,9 +478,9 @@ if hasTag "umfpack" || hasTag "trilinos"; then
         echo "[SuiteSparse] Skipping download step: $WORKING_DIR/suitesparse-src already exists"
     fi
 
-    if [ ! -d "$WORKING_DIR"/suitesparse-build ]; then
+    mkdir -p suitesparse-build
+    if [ ! -f "$WORKING_DIR/suitesparse-build/.built" ]; then
         echo "[SuiteSparse] Build step..."
-        mkdir -p suitesparse-build
         cd suitesparse-build
 
         # NOTE: CMakes checks for valid BLAS libraries by looking for the sgemm_ symbol.
@@ -486,19 +500,20 @@ if hasTag "umfpack" || hasTag "trilinos"; then
         ../suitesparse-src 2>&1 | tee "$WORKING_DIR"/logs/suitesparse-configure.log
 
         cmake --build . -j "${NP}" 2>&1 | tee "$WORKING_DIR"/logs/suitesparse-build.log
-
+        touch ".built"
         cd ..
     else
-        echo "[SuiteSparse] Skipping build step: $WORKING_DIR/suitesparse-build already exists"
+        echo "[SuiteSparse] Skipping build step: Flag file $WORKING_DIR/suitesparse-build/.built already exists"
     fi
 
-    if [ ! -f "$INSTALL_DIR"/lib64/libumfpack.a ]; then
+    if [ ! -f "$INSTALL_DIR/.suitesparse-installed" ]; then
         echo "[SuiteSparse] Install step..."
         cd suitesparse-build
         cmake --install . --prefix "$INSTALL_DIR" 2>&1 | tee "$WORKING_DIR"/logs/suitesparse-install.log
+        touch "$INSTALL_DIR/.suitesparse-installed"
         cd ..
     else
-        echo "[SuiteSparse] Skipping install step: $INSTALL_DIR/lib64/libumfpack.a already exists"
+        echo "[SuiteSparse] Skipping install step: Flag file $INSTALL_DIR/.suitesparse-installed already exists"
     fi
 fi
 
@@ -510,9 +525,9 @@ if hasTag "zfp"; then
         echo "[ZFP] Skipping install step: $WORKING_DIR/zfp-src already exists"
     fi
 
-    if [ ! -d "$WORKING_DIR"/zfp-build ]; then
+    mkdir -p zfp-build
+    if [ ! -f "$WORKING_DIR/zfp-build/.built" ]; then
         echo "[ZFP] Build step..."
-        mkdir -p zfp-build
         cd zfp-build
 
         cmake ../zfp-src \
@@ -521,18 +536,20 @@ if hasTag "zfp"; then
             -D BUILD_SHARED_LIBS=OFF 2>&1 | tee "$WORKING_DIR"/logs/zfp-configure.log
 
         cmake --build . -j "${NP}" 2>&1 | tee "$WORKING_DIR"/logs/zfp-build.log
+        touch ".built"
 
         cd ..
     else
-        echo "[ZFP] Skipping build step: $WORKING_DIR/zfp-build already exists"
+        echo "[ZFP] Skipping build step: Flag file $WORKING_DIR/zfp-build/.built already exists"
     fi
 
-    if [ ! -d "$INSTALL_DIR"/include/zfp ]; then
+    if [ ! -f "$INSTALL_DIR/.zfp-installed" ]; then
         cd zfp-build
         cmake --install . --prefix="$INSTALL_DIR"
+        touch "$INSTALL_DIR/.zfp-installed"
         cd ..
     else
-        echo "[ZFP] Skipping install step: $INSTALL_DIR/include/zfp already exists"
+        echo "[ZFP] Skipping install step: Flag file $INSTALL_DIR/.zfp-installed already exists"
     fi
 fi
 
@@ -544,28 +561,28 @@ if hasTag "zlib" || hasTag "trilinos"; then
         echo "[Zlib] Skipping download step: $WORKING_DIR/zlib-src already exists"
     fi
 
-    if [ ! -d "$WORKING_DIR"/zlib-build ]; then
+    mkdir -p zlib-build
+    if [ ! -f "$WORKING_DIR/zlib-build/.built" ]; then
         echo "[Zlib] Build step..."
-        mkdir -p zlib-build
         cd zlib-build
 
         ../zlib-src/configure --static 2>&1 | tee "$WORKING_DIR"/logs/zlib-configure.log
         make -j "${NP}" 2>&1 | tee "$WORKING_DIR"/logs/zlib-build.log
-
+        touch ".built"
         cd ..
     else
-        echo "[Zlib] Skipping build step: $WORKING_DIR/zlib-build already exists"
+        echo "[Zlib] Skipping build step: Flag file $WORKING_DIR/zlib-build/.built already exists"
     fi
 
-    if [ ! -f "$INSTALL_DIR"/lib/libz.a ]; then
+    if [ ! -f "$INSTALL_DIR/.zfp-installed" ]; then
         echo "[Zlib] Install step..."
         cd zlib-build
 
         make install 2>&1 | tee "$WORKING_DIR"/logs/zlib-install.log
-
+        touch "$INSTALL_DIR/.zfp-installed"
         cd ..
     else
-        echo "[Zlib] Skipping install step: $INSTALL_DIR/lib/libz.a already exists"
+        echo "[Zlib] Skipping install step: Flag file $INSTALL_DIR/.zfp-installed already exists"
     fi
 fi
 
@@ -577,9 +594,9 @@ if hasTag "hdf5" || hasTag "trilinos"; then
         echo "[HDF5] Skipping download step: $WORKING_DIR/hdf5-src already exists"
     fi
 
-    if [[ ! -d $WORKING_DIR/hdf5-build ]]; then
+    mkdir -p hdf5-build
+    if [[ ! -f "$WORKING_DIR/hdf5-build/.built" ]]; then
         echo "[HDF5] Build step..."
-        mkdir -p hdf5-build
         cd hdf5-build
 
         CC=mpicc ../hdf5-src/configure \
@@ -591,20 +608,21 @@ if hasTag "hdf5" || hasTag "trilinos"; then
             --enable-build-mode=production 2>&1 | tee "$WORKING_DIR"/logs/hdf5-configure.log
 
         make -j "${NP}" 2>&1 | tee "$WORKING_DIR"/logs/hdf5-build.log
+        touch ".built"
         cd ..
     else
-        echo "[HDF5] Skipping build step: $WORKING_DIR/hdf5-build already exists"
+        echo "[HDF5] Skipping build step: Flag file $WORKING_DIR/hdf5-build/.built already exists"
     fi
 
-    if [ ! -f "$INSTALL_DIR"/lib/libhdf5.a ]; then
+    if [ ! -f "$INSTALL_DIR/.hdf5-installed" ]; then
         echo "[HDF5] Install step..."
         cd hdf5-build
 
         make install 2>&1 | tee "$WORKING_DIR"/logs/hdf5-install.log
-
+        touch "$INSTALL_DIR/.hdf5-installed"
         cd ..
     else
-        echo "[HDF5] Skipping install step: $INSTALL_DIR/lib/libhdf5.a already exists"
+        echo "[HDF5] Skipping install step: Flag file $INSTALL_DIR/.hdf5-installed already exists"
     fi
 fi
 
@@ -616,9 +634,9 @@ if hasTag "superlu"; then
         echo "[SuperLU_DIST] Skipping download step: $WORKING_DIR/superludist-src already exists"
     fi
 
-    if [ ! -d "$WORKING_DIR"/superludist-build ]; then
+    mkdir -p superludist-build
+    if [ ! -f "$WORKING_DIR/superludist-build/.built" ]; then
         echo "[SuperLU_DIST] Build step..."
-        mkdir -p superludist-build
 
         cd superludist-build
         cmake ../superludist-src \
@@ -631,18 +649,20 @@ if hasTag "superlu"; then
             2>&1 | tee "$WORKING_DIR"/logs/superludist-configure.log
 
         cmake --build . -j "${NP}" 2>&1 | tee "$WORKING_DIR"/logs/superludist-build.log
+        touch ".built"
         cd ..
     else
-        echo "[SuperLU_DIST] Skipping build step: $WORKING_DIR/superludist-build already exists"
+        echo "[SuperLU_DIST] Skipping build step: Flag file $WORKING_DIR/superludist-build/.built already exists"
     fi
 
-    if [ ! -f "$INSTALL_DIR"/lib64/libsuperlu_dist.a ]; then
+    if [ ! -f "$INSTALL_DIR/.superlu-installed" ]; then
         echo "[SuperLU_DIST] Install step..."
         cd superludist-build
         cmake --install . --prefix="$INSTALL_DIR" 2>&1 | tee "$WORKING_DIR"/superludist-install.log
+        touch "$INSTALL_DIR/.superlu-installed"
         cd ..
     else
-        echo "[SuperLU_DIST] Skipping install step: $INSTALL_DIR/lib64/libsuperlu_dist.a already exists"
+        echo "[SuperLU_DIST] Skipping install step: Flag file $INSTALL_DIR/.superlu-installed already exists"
     fi
 fi
 
@@ -657,9 +677,9 @@ if hasTag "trilinos" || hasTag "mumps"; then
         echo "[ScaLAPACK] Skipping download step: $WORKING_DIR/scalapack-src already exists"
     fi
 
-    if [ ! -d "$WORKING_DIR"/scalapack-build ]; then
+    mkdir -p scalapack-build
+    if [ ! -f "$WORKING_DIR/scalapack-build/.built" ]; then
         echo "[ScaLAPACK] Build step..."
-        mkdir -p scalapack-build
         cd scalapack-build
 
         # NOTE: The CMAKE_INSTALL_PREFIX is required here,
@@ -672,19 +692,20 @@ if hasTag "trilinos" || hasTag "mumps"; then
             -DLAPACK_LIBRARIES=$INSTALL_DIR/lib/libopenblas.a \
             2>&1 | tee "$WORKING_DIR"/logs/scalapack-configure.log
         cmake --build . --target scalapack --config Release -j "${NP}" 2>&1 | tee "$WORKING_DIR"/logs/scalapack-build.log
-
+        touch ".built"
         cd ..
     else
-        echo "[ScaLAPACK] Skipping build step: $WORKING_DIR/scalapack-build already exists"
+        echo "[ScaLAPACK] Skipping build step: Flag file $WORKING_DIR/scalapack-build/.built already exists"
     fi
 
-    if [ ! -f "$INSTALL_DIR"/lib64/libscalapack.a ]; then
+    if [ ! -f "$INSTALL_DIR/.scalapack-installed" ]; then
         echo "[ScaLAPACK] Install step..."
         cd scalapack-build
         cmake --install . --prefix="$INSTALL_DIR" 2>&1 | tee "$WORKING_DIR"/logs/scalapack-install.log
+        touch "$INSTALL_DIR/.scalapack-installed"
         cd ..
     else
-        echo "[ScaLAPACK] Skipping install step: $INSTALL_DIR/lib64/libscalapack.a already exists"
+        echo "[ScaLAPACK] Skipping install step: Flag file $INSTALL_DIR/.scalapack-installed already exists"
     fi
 fi
 
@@ -696,29 +717,30 @@ if hasTag "zoltan" || hasTag "trilinos" || hasTag "mumps"; then
         echo "[scotch] Skipping download step: $WORKING_DIR/scotch-src already exists"
     fi
 
-    if [ ! -d "$WORKING_DIR"/scotch-build ]; then
+    mkdir -p scotch-build
+    if [ ! -f "$WORKING_DIR/scotch-build/.built" ]; then
         echo "[scotch] Build step..."
-        mkdir -p scotch-build
         cd scotch-build
 
         cmake ../scotch-src \
             -DCMAKE_BUILD_TYPE:STRING=Release \
             -DINSTALL_METIS_HEADERS:BOOL=OFF 2>&1 | tee "$WORKING_DIR"/logs/scotch-configure.log
         cmake --build . -j "${NP}" 2>&1 | tee "$WORKING_DIR"/logs/scotch-build.log
-
+        touch ".built"
 
         cd ..
     else
-        echo "[scotch] Skipping build step: $WORKING_DIR/scotch-build already exists"
+        echo "[scotch] Skipping build step: Flag file $WORKING_DIR/scotch-build/.built already exists"
     fi
 
-    if [ ! -f "$INSTALL_DIR"/lib64/libscotch.a ]; then
+    if [ ! -f "$INSTALL_DIR/.scotch-installed" ]; then
         echo "[scotch] Install step..."
         cd scotch-build
         cmake --install . --prefix="$INSTALL_DIR" 2>&1 | tee "$WORKING_DIR"/logs/scotch-install.log
+        touch "$INSTALL_DIR/.scotch-installed"
         cd ..
     else
-        echo "[scotch] Skipping install step: $INSTALL_DIR/lib/libscotch.a already exists"
+        echo "[scotch] Skipping install step: Flag file $INSTALL_DIR/.scotch-installed already exists"
     fi
 fi
 
@@ -733,12 +755,13 @@ if hasTag "mumps" || hasTag "trilinos"; then
         echo "[MUMPS] Skipping download step: $WORKING_DIR/mumps-src already exists"
     fi
 
-    if [[ ! -d "$WORKING_DIR"/mumps-build ]]; then
+    mkdir -p mumps-build
+    if [[ ! -f "$WORKING_DIR/mumps-build/.built" ]]; then
         echo "[MUMPS] Build step..."
-        cp -ra mumps-src mumps-build
 
         cd mumps-build
 
+        cp -ra ../mumps-src/* .
         sed -e "s,@INSTALL_DIR@,${INSTALL_DIR},g" -e "s,@OMP_FLAG@,${USE_OPENMP_FLAG},g" <<'EOF' > Makefile.inc
 #
 #  This file is part of MUMPS 5.7.3, released
@@ -837,19 +860,21 @@ LIBSEQNEEDED =
 EOF
 
         make d -j "${NP}" 2>&1 | tee "$WORKING_DIR"/logs/mumps-build.log
+        touch ".built"
         cd ..
     else
-        echo "[MUMPS] Skipping build step: $WORKING_DIR/mumps-build already exists"
+        echo "[MUMPS] Skipping build step: Flag file $WORKING_DIR/mumps-build/.built already exists"
     fi
 
-    if [ ! -f "$INSTALL_DIR"/lib/libmumps_common.a ]; then
+    if [ ! -f "$INSTALL_DIR/.mumps-installed" ]; then
         echo "[MUMPS] Install step..."
         cd mumps-build
         cp -r lib "$INSTALL_DIR"
         cp -r include "$INSTALL_DIR"
+        touch "$INSTALL_DIR/.mumps-installed"
         cd ..
     else
-        echo "[MUMPS] Skipping install step: $INSTALL_DIR/lib/libmumps_common.a already exists"
+        echo "[MUMPS] Skipping install step: Flag file $INSTALL_DIR/.mumps-installed already exists"
     fi
 fi
 
@@ -861,41 +886,43 @@ if hasTag "zoltan"; then
         echo "[Zoltan] Skipping download step: $WORKING_DIR/zoltan-src already exists"
     fi
 
-    if [ ! -d "$WORKING_DIR"/zoltan-build ]; then
+    mkdir -p zoltan-build
+    if [ ! -f "$WORKING_DIR/zoltan-build/.built" ]; then
         echo "[Zoltan] Build step..."
-        mkdir -p zoltan-build
 
         cd zoltan-build
-        CC=mpicc ../zoltan-src/configure \
+        CC=mpicc CXX=mpic++ ../zoltan-src/configure \
             --prefix="$INSTALL_DIR" \
             --with-gnumake \
             --with-mpi="$MPI_HOME" \
             --with-scotch \
             --with-scotch-incdir="$INSTALL_DIR"/include/ \
             --with-scotch-libdir="$INSTALL_DIR"/lib64 \
-            --with-libs="-lgklib" \
             2>&1 | tee "$WORKING_DIR"/logs/zoltan-configure.log
 
         make everything 2>&1 | tee "$WORKING_DIR"/logs/zoltan-build.log
+        touch ".built"
         cd ..
     else
-        echo "[Zoltan] Skipping build step: $WORKING_DIR/superludist-build already exists"
+        echo "[Zoltan] Skipping build step: Flag file $WORKING_DIR/superludist-build/.built already exists"
     fi
 
-    if [ ! -f "$INSTALL_DIR"/lib/libzoltan.a ]; then
+    if [ ! -f "$INSTALL_DIR/.zoltan-installed" ]; then
         echo "[Zoltan] Install step..."
         cd zoltan-build
         make install 2>&1 | tee "$WORKING_DIR"/logs/zoltan-install.log
+        touch "$INSTALL_DIR/.zoltan-installed"
         cd ..
     else
-        echo "[Zoltan] Skipping install step: $INSTALL_DIR/lib/libzoltan.a already exists"
+        echo "[Zoltan] Skipping install step: Flag file $INSTALL_DIR/.zoltan-installed already exists"
     fi
 fi
 
 if hasTag "trilinos" && [ -d "$TRILINOS_DIR" ]; then
-    if [ ! -d "$WORKING_DIR"/trilinos-build ]; then
+
+    mkdir -p trilinos-build
+    if [ ! -f "$WORKING_DIR/trilinos-build/.built" ]; then
         echo "[Trilinos] Build step..."
-        mkdir -p trilinos-build
         cd trilinos-build
 
         export CC=mpicc
@@ -984,10 +1011,20 @@ if hasTag "trilinos" && [ -d "$TRILINOS_DIR" ]; then
             tee "$WORKING_DIR"/logs/trilinos-configure.log
 
         make all -j4 2>&1 | tee "$WORKING_DIR"/logs/trilinos-build.log || exit
-        make install 2>&1 | tee "$WORKING_DIR"/logs/trilinos-install.log || exit
+        touch ".built"
 
         cd ..
     else
-        echo "[Trilinos] Skipping build step: $WORKING_DIR/trilinos-build already exists"
+        echo "[Trilinos] Skipping build step: Flag file $WORKING_DIR/trilinos-build/.built already exists"
+    fi
+
+    if [ ! -f "$INSTALL_DIR/.trilinos-installed" ]; then
+        echo "[Trilinos] Install step..."
+        cd trilinos-build
+        make install 2>&1 | tee "$WORKING_DIR"/logs/trilinos-install.log || exit
+        touch "$INSTALL_DIR/.trilinos-installed"
+        cd ..
+    else
+        echo "[Trilinos] Skipping install step: Flag file $INSTALL_DIR/.trilinos-installed already exists"
     fi
 fi
