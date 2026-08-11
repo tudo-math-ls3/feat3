@@ -3,6 +3,8 @@
 # enable compiler output
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
+include(GNUInstallDirs)
+
 # add all executables
 add_executable(ccnd-steady-dfg95-2d ccnd_steady_dfg95.cpp)
 add_executable(ccnd-steady-dfg95-2d-q1t ccnd_steady_dfg95.cpp)
@@ -83,6 +85,10 @@ endforeach (app)
 # set the other compile options for all applications
 foreach (app ${app_list})
   target_link_libraries(${app} feat)
+
+  if(FEAT_INSTALL_APPS)
+    install(TARGETS ${app} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  endif()
 endforeach (app)
 
 #######################################################################################################################

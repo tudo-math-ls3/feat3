@@ -3,6 +3,8 @@
 #enable compiler output
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
+include(GNUInstallDirs)
+
 add_subdirectory( ccnd )
 add_subdirectory( ccnd_simple )
 add_subdirectory( dfg95_bench )
@@ -38,6 +40,10 @@ set(app_list
 foreach (app ${app_list} )
   add_executable(${app} ${app}.cpp)
   target_link_libraries(${app} feat)
+
+  if(FEAT_INSTALL_APPS)
+    install(TARGETS ${app} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  endif()
 endforeach (app)
 
 #disable advanced variable tracking for debug informations on big applications (it would be disabled afterwards anyways
@@ -77,6 +83,10 @@ endif (FEAT_HAVE_QUADMATH)
 
 foreach (app ${dfg95_bench1_list} )
   target_link_libraries(${app} feat)
+
+  if(FEAT_INSTALL_APPS)
+    install(TARGETS ${app} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  endif()
 endforeach (app)
 
 ######################### Scalexa FROSch applications
@@ -92,10 +102,18 @@ if (FEAT_HAVE_TRILINOS)
   foreach (app scalexa-nvs-cc-2d scalexa-nvs-pp-2d scalexa-poisson-2d)
     target_compile_definitions(${app} PRIVATE SCALEXA_DIM=2)
     target_link_libraries(${app} PRIVATE feat)
+
+    if(FEAT_INSTALL_APPS)
+      install(TARGETS ${app} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    endif()
   endforeach ()
   foreach (app scalexa-nvs-cc-3d scalexa-nvs-pp-3d scalexa-poisson-3d)
     target_compile_definitions(${app} PRIVATE SCALEXA_DIM=3)
     target_link_libraries(${app} PRIVATE feat)
+
+    if(FEAT_INSTALL_APPS)
+      install(TARGETS ${app} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    endif()
   endforeach ()
 endif ()
 

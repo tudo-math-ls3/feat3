@@ -8,6 +8,11 @@ add_executable(navier_stokes_screws-app navier_stokes_screws-app.cpp)
 target_link_libraries(navier_stokes_screws-app feat)
 add_dependencies(tests navier_stokes_screws-app)
 
+if(FEAT_INSTALL_APPS)
+  include(GNUInstallDirs)
+  install(TARGETS navier_stokes_screws-app RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
+
 # With MPI, run the test in both debug and optimized builds
 if (NOT FEAT_DEBUG_MODE)
   if (FEAT_HAVE_MPI)

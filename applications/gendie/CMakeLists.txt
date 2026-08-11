@@ -3,6 +3,8 @@
 # enable compiler output
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
+include(GNUInstallDirs)
+
 # add all executables
 if(FEAT_HAVE_CGAL)
   add_executable(steady-voxel-gendie steady_voxel_gendie.cpp)
@@ -20,5 +22,9 @@ if(FEAT_HAVE_CGAL)
 
   foreach (app ${app_list})
     target_link_libraries(${app} PRIVATE feat)
+
+    if(FEAT_INSTALL_APPS)
+      install(TARGETS ${app} RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    endif()
   endforeach (app)
 endif(FEAT_HAVE_CGAL)

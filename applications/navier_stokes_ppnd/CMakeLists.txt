@@ -7,6 +7,11 @@ set(CMAKE_VERBOSE_MAKEFILE ON)
 add_executable(navier_stokes_ppnd navier_stokes_ppnd.cpp)
 target_link_libraries(navier_stokes_ppnd feat)
 
+if(FEAT_INSTALL_APPS)
+  include(GNUInstallDirs)
+  install(TARGETS navier_stokes_ppnd RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
+
 if (FEAT_HAVE_MPI)
   add_test(NAME navier_stokes_ppnd_test_mpi_16
     COMMAND ${MPIEXEC} ${FEAT_MPI_MAPPING_FLAG} ${MPIEXEC_NUMPROC_FLAG} 16 ${MPIEXEC_PREFLAGS} $<TARGET_FILE:navier_stokes_ppnd> --level 1 --setup fb-c2d-03 --mesh-path ${FEAT_SOURCE_DIR}/data/meshes/ --time-steps 1600 --tol-rel-a 0.99 --test-mode ${MPIEXEC_POSTFLAGS})

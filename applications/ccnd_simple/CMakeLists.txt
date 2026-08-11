@@ -23,6 +23,14 @@ add_executable(ccnd-simple-unsteady-01-3d domain_control.cpp stokes_level.cpp st
 target_link_libraries(ccnd-simple-unsteady-01-3d feat)
 set_target_properties(ccnd-simple-unsteady-01-3d PROPERTIES COMPILE_FLAGS " -DFEAT_CCND_SIMPLE_DIM=3 -DFEAT_CCND_SIMPLE_ISOPARAM")
 
+if(FEAT_INSTALL_APPS)
+  include(GNUInstallDirs)
+  install(TARGETS ccnd-simple-steady-01-2d RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(TARGETS ccnd-simple-steady-01-3d RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(TARGETS ccnd-simple-unsteady-01-2d RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(TARGETS ccnd-simple-unsteady-01-3d RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
+
 #####################################################################################################################
 
 # add a custom target for all these apps

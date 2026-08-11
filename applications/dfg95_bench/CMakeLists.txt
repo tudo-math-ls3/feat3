@@ -27,6 +27,17 @@ if (FEAT_HAVE_QUADMATH)
   set_target_properties(dfg95-ccnd-unsteady-qp PROPERTIES COMPILE_FLAGS " -DFEAT_CCND_USE_QUADMATH")
 endif (FEAT_HAVE_QUADMATH)
 
+if(FEAT_INSTALL_APPS)
+  install(TARGETS dfg95-ccnd-steady RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(TARGETS dfg95-ccnd-unsteady RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  install(TARGETS dfg95-cp2d-unsteady RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+
+  if(FEAT_HAVE_QUADMATH)
+    install(TARGETS dfg95-ccnd-steady-qp RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+    install(TARGETS dfg95-ccnd-unsteady-qp RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+  endif()
+endif()
+
 ###############################################################################
 
 if (FEAT_HAVE_MPI)

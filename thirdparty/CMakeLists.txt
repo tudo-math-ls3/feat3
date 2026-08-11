@@ -92,6 +92,9 @@ if(FEAT_TPL_CACHE_DIRECTORY)
   file(MAKE_DIRECTORY ${FEAT_TPL_CACHE_DIRECTORY})
 endif()
 
+# Disable install rules for all dependencies
+set(CMAKE_SKIP_INSTALL_RULES TRUE)
+
 option(FEAT_HAVE_ALGLIB "Enable Alglib" OFF)
 if(FEAT_HAVE_ALGLIB)
   feat_get_tpl(
@@ -262,6 +265,7 @@ if(FEAT_HAVE_PARMETIS)
     URL_HASH MD5=42e3d1db6e4ba1284e33808101317af2
     PATCH_COMMAND_WINDOWS python ${CMAKE_CURRENT_LIST_DIR}/patches/parmetis_win.py .
     CONFIG
+    EXCLUDE_FROM_ALL
     SYSTEM
   )
 endif()
@@ -451,3 +455,6 @@ endif()
 # Restore previous C/CXX flags to re-enable warnings
 set(CMAKE_C_FLAGS ${CMAKE_C_FLAGS_BACKUP})
 set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_BACKUP})
+
+# Re-enable install rules
+unset(CMAKE_SKIP_INSTALL_RULES)

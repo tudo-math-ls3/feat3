@@ -44,7 +44,7 @@ function(feat_get_tpl)
   cmake_parse_arguments(
     PARSE_ARGV 0
     TPL
-    "CONFIG;EXLUDE_FROM_ALL;SYSTEM" # Options
+    "CONFIG;EXCLUDE_FROM_ALL;SYSTEM" # Options
     "PACKAGE_NAME;VERSION;URL;URL_HASH;SOURCE_SUBDIR" # Single value keywords
     "PATCH_COMMAND_WINDOWS;PATCH_COMMAND_LINUX;COMPONENTS" # Multi value keywords
   )

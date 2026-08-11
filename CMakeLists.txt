@@ -5,7 +5,6 @@ cmake_minimum_required(VERSION 3.28.0)
 # enable compiler output
 set(CMAKE_VERBOSE_MAKEFILE ON)
 
-
 if(NOT CMAKE_BUILD_TYPE)
   if(FEAT_DEBUG_MODE)
     set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "FEAT3 build type")
@@ -13,6 +12,8 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release" CACHE STRING "FEAT3 build type")
   endif()
 endif()
+
+option(FEAT_INSTALL_APPS "Install FEAT applications?" ON)
 
 # our project
 project(

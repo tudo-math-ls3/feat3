@@ -8,6 +8,12 @@ add_executable(meshopt_refinement-app meshopt_refinement-app.cpp)
 target_link_libraries(meshopt_refinement-app feat)
 add_dependencies(tests meshopt_refinement-app)
 
+
+if(FEAT_INSTALL_APPS)
+  include(GNUInstallDirs)
+  install(TARGETS meshopt_refinement-app RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
+
 if (FEAT_HAVE_MPI)
   add_test(NAME meshopt_refinement_app_test_1_mpi_3
     COMMAND ${MPIEXEC} ${FEAT_MPI_MAPPING_FLAG} ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} $<TARGET_FILE:meshopt_refinement-app> --test 1 --mesh-path "${FEAT_SOURCE_DIR}/data/meshes" ${MPIEXEC_POSTFLAGS})

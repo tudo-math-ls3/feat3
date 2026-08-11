@@ -8,6 +8,11 @@ add_executable(meshopt_r_adapt-app meshopt_r_adapt-app.cpp)
 target_link_libraries(meshopt_r_adapt-app feat)
 add_dependencies(tests meshopt_r_adapt-app)
 
+if(FEAT_INSTALL_APPS)
+  include(GNUInstallDirs)
+  install(TARGETS meshopt_r_adapt-app RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+endif()
+
 if (FEAT_HAVE_MPI)
   add_test(NAME meshopt_r_adapt_app_mpi_3
     COMMAND ${MPIEXEC} ${FEAT_MPI_MAPPING_FLAG} ${MPIEXEC_NUMPROC_FLAG} 3 ${MPIEXEC_PREFLAGS} $<TARGET_FILE:meshopt_r_adapt-app> --test 1 --mesh-path "${FEAT_SOURCE_DIR}/applications/meshopt_r_adapt-app" ${MPIEXEC_POSTFLAGS})
