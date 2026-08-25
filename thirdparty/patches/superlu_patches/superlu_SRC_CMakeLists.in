@@ -501,7 +501,7 @@ endif()
 # This is recommended by modern cmake:
 # https://cliutils.gitlab.io/modern-cmake/chapters/packages/OpenMP.html
 if(SUPERLU_DIST_ENABLE_OMP) # this is found in top-level CMakeLists.txt
-  find_package(openMP REQUIRED)
+  find_package(OpenMP REQUIRED)
   target_link_libraries(superlu_dist PRIVATE OpenMP::OpenMP_C)
 endif()
 
