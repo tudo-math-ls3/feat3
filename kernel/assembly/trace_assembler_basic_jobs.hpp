@@ -947,7 +947,7 @@ namespace FEAT
        * A scaling factor for the assembly.
        */
       explicit TraceAssemblyBasicMatrixTaskCRTP2(Matrix_& matrix_, const TestSpace_& test_space_,
-        const TestSpace_& trial_space_, const Cubature::DynamicFactory& cubature_factory_, DataType alpha_) :
+        const TrialSpace_& trial_space_, const Cubature::DynamicFactory& cubature_factory_, DataType alpha_) :
         BaseClass(test_space_, trial_space_),
         matrix(matrix_),
         cubature_rule(Cubature::ctor_factory, cubature_factory_),
