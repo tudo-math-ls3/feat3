@@ -704,32 +704,12 @@ namespace FEAT::Control::Domain
     {
       const Index num_elems = mesh.get_num_elements();
 
-      // reserve the vector
-      std::vector<Index> masked_elems;
-      masked_elems.reserve(num_elems);
-
       // get the vertex set and the vertices-at-element index set
       const auto& vtx = mesh.get_vertex_set();
       const auto& verts_at_elem = mesh.template get_index_set<dim, 0>();
 
-      // loop over all elements
-        FEAT_PRAGMA_OMP(parallel for)
-        for(Index ielem = 0; ielem < num_elems; ++ielem)
-        {
-          std::array<Tiny::Vector<CoordType, dim>, std::decay_t<decltype(verts_at_elem)>::num_indices> verts;
-          for(std::size_t k = 0; k < verts.size(); ++k)
-          {
-            verts[k] = vtx[verts_at_elem(ielem, int(k))];
-          }
-
-          if(this->_cgal_wrapper->intersects_polygon(verts))
-          {
-            masked_elems.push_back(ielem);
-          }
-        }
-
-        // return the list of all elements that we found
-        return masked_elems;
+      // dispatch so we use the thread safe variant
+      return _offset_gather_mask(vtx, verts_at_elem, 0u, num_elems);
     }
 
     /// \copydoc BaseClass::gather_elements
