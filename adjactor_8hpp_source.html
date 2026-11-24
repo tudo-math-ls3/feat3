@@ -389,8 +389,35 @@ $(document).ready(function(){initNavTree('adjactor_8hpp_source.html',''); initRe
 <div class="line"><a id="l00487" name="l00487"></a><span class="lineno">  487</span>        <span class="keywordflow">return</span> <a class="code hl_variable" href="class_f_e_a_t_1_1_adjacency_1_1_composite_adjactor.html#aee128d3e2e26251079f76083fd4fef3b">_adj2</a>;</div>
 <div class="line"><a id="l00488" name="l00488"></a><span class="lineno">  488</span>      }</div>
 <div class="line"><a id="l00489" name="l00489"></a><span class="lineno">  489</span>    }; <span class="comment">// class CompositeAdjactor</span></div>
-<div class="line"><a id="l00490" name="l00490"></a><span class="lineno">  490</span>  } <span class="comment">// namespace Adjacency</span></div>
-<div class="line"><a id="l00491" name="l00491"></a><span class="lineno">  491</span>} <span class="comment">// namespace FEAT</span></div>
+<div class="line"><a id="l00490" name="l00490"></a><span class="lineno">  490</span> </div>
+<div class="line"><a id="l00515" name="l00515"></a><span class="lineno">  515</span>    <span class="keyword">template</span>&lt;<span class="keyword">typename</span> Adjactor_&gt;</div>
+<div class="line"><a id="l00516" name="l00516"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_adjacency_1_1_image_range.html">  516</a></span>    <span class="keyword">class </span><a class="code hl_class" href="class_f_e_a_t_1_1_adjacency_1_1_image_range.html">ImageRange</a></div>
+<div class="line"><a id="l00517" name="l00517"></a><span class="lineno">  517</span>    {</div>
+<div class="line"><a id="l00518" name="l00518"></a><span class="lineno">  518</span>    <span class="keyword">public</span>:</div>
+<div class="line"><a id="l00519" name="l00519"></a><span class="lineno">  519</span>      <span class="keyword">using </span>Adjactor = Adjactor_;</div>
+<div class="line"><a id="l00520" name="l00520"></a><span class="lineno">  520</span> </div>
+<div class="line"><a id="l00521" name="l00521"></a><span class="lineno">  521</span>      <span class="keyword">using </span>ImageIterator = <span class="keyword">typename</span> <a class="code hl_class" href="class_f_e_a_t_1_1_adjacency_1_1_adjactor_1_1_image_iterator.html">Adjactor::ImageIterator</a>;</div>
+<div class="line"><a id="l00522" name="l00522"></a><span class="lineno">  522</span>    <span class="keyword">private</span>:</div>
+<div class="line"><a id="l00523" name="l00523"></a><span class="lineno">  523</span>      <span class="keyword">const</span> Adjactor_&amp; _adj;</div>
+<div class="line"><a id="l00524" name="l00524"></a><span class="lineno">  524</span>      <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> _domain_node;</div>
+<div class="line"><a id="l00525" name="l00525"></a><span class="lineno">  525</span> </div>
+<div class="line"><a id="l00526" name="l00526"></a><span class="lineno">  526</span>    <span class="keyword">public</span>:</div>
+<div class="line"><a id="l00528" name="l00528"></a><span class="lineno"><a class="line" href="class_f_e_a_t_1_1_adjacency_1_1_image_range.html#ab9edf8f98bc7e5c087713011163ac1bd">  528</a></span>      <a class="code hl_function" href="class_f_e_a_t_1_1_adjacency_1_1_image_range.html#ab9edf8f98bc7e5c087713011163ac1bd">ImageRange</a>(Adjactor&amp; adjactor, <a class="code hl_typedef" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> domain_node) : _adj(adjactor), _domain_node(domain_node)</div>
+<div class="line"><a id="l00529" name="l00529"></a><span class="lineno">  529</span>      {</div>
+<div class="line"><a id="l00530" name="l00530"></a><span class="lineno">  530</span>      }</div>
+<div class="line"><a id="l00531" name="l00531"></a><span class="lineno">  531</span> </div>
+<div class="line"><a id="l00532" name="l00532"></a><span class="lineno">  532</span>      ImageIterator begin()</div>
+<div class="line"><a id="l00533" name="l00533"></a><span class="lineno">  533</span>      {</div>
+<div class="line"><a id="l00534" name="l00534"></a><span class="lineno">  534</span>        <span class="keywordflow">return</span> _adj.image_begin(_domain_node);</div>
+<div class="line"><a id="l00535" name="l00535"></a><span class="lineno">  535</span>      }</div>
+<div class="line"><a id="l00536" name="l00536"></a><span class="lineno">  536</span> </div>
+<div class="line"><a id="l00537" name="l00537"></a><span class="lineno">  537</span>      ImageIterator end()</div>
+<div class="line"><a id="l00538" name="l00538"></a><span class="lineno">  538</span>      {</div>
+<div class="line"><a id="l00539" name="l00539"></a><span class="lineno">  539</span>        <span class="keywordflow">return</span> _adj.image_end(_domain_node);</div>
+<div class="line"><a id="l00540" name="l00540"></a><span class="lineno">  540</span>      }</div>
+<div class="line"><a id="l00541" name="l00541"></a><span class="lineno">  541</span>    };</div>
+<div class="line"><a id="l00542" name="l00542"></a><span class="lineno">  542</span>  } <span class="comment">// namespace Adjacency</span></div>
+<div class="line"><a id="l00543" name="l00543"></a><span class="lineno">  543</span>} <span class="comment">// namespace FEAT</span></div>
 <div class="ttc" id="aassertion_8hpp_html"><div class="ttname"><a href="assertion_8hpp.html">assertion.hpp</a></div></div>
 <div class="ttc" id="aassertion_8hpp_html_a33180af240360ec61a3968af89731f12"><div class="ttname"><a href="assertion_8hpp.html#a33180af240360ec61a3968af89731f12">XABORTM</a></div><div class="ttdeci">#define XABORTM(msg)</div><div class="ttdoc">Abortion macro definition with custom message.</div><div class="ttdef"><b>Definition:</b> <a href="assertion_8hpp_source.html#l00192">assertion.hpp:192</a></div></div>
 <div class="ttc" id="aassertion_8hpp_html_a6a403a52dc93f43184cb46da5a4c8354"><div class="ttname"><a href="assertion_8hpp.html#a6a403a52dc93f43184cb46da5a4c8354">ASSERTM</a></div><div class="ttdeci">#define ASSERTM(expr, msg)</div><div class="ttdoc">Debug-Assertion macro definition with custom message.</div><div class="ttdef"><b>Definition:</b> <a href="assertion_8hpp_source.html#l00230">assertion.hpp:230</a></div></div>
@@ -445,8 +472,10 @@ $(document).ready(function(){initNavTree('adjactor_8hpp_source.html',''); initRe
 <div class="ttc" id="aclass_f_e_a_t_1_1_adjacency_1_1_composite_adjactor_html_aced05fbe289bc145ba17cbdeb23c5b77"><div class="ttname"><a href="class_f_e_a_t_1_1_adjacency_1_1_composite_adjactor.html#aced05fbe289bc145ba17cbdeb23c5b77">FEAT::Adjacency::CompositeAdjactor::Adjactor1</a></div><div class="ttdeci">Adj1_ Adjactor1</div><div class="ttdoc">typedef for first adjactor</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00283">adjactor.hpp:283</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_adjacency_1_1_composite_adjactor_html_aee128d3e2e26251079f76083fd4fef3b"><div class="ttname"><a href="class_f_e_a_t_1_1_adjacency_1_1_composite_adjactor.html#aee128d3e2e26251079f76083fd4fef3b">FEAT::Adjacency::CompositeAdjactor::_adj2</a></div><div class="ttdeci">const Adj2_ &amp; _adj2</div><div class="ttdoc">second adjactor</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00279">adjactor.hpp:279</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_adjacency_1_1_composite_adjactor_html_afdb590ddb07f3922a0dc182f814be000"><div class="ttname"><a href="class_f_e_a_t_1_1_adjacency_1_1_composite_adjactor.html#afdb590ddb07f3922a0dc182f814be000">FEAT::Adjacency::CompositeAdjactor::CompositeAdjactor</a></div><div class="ttdeci">CompositeAdjactor(const Adj1_ &amp;adjactor1, const Adj2_ &amp;adjactor2)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00428">adjactor.hpp:428</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_adjacency_1_1_image_range_html"><div class="ttname"><a href="class_f_e_a_t_1_1_adjacency_1_1_image_range.html">FEAT::Adjacency::ImageRange</a></div><div class="ttdoc">Wrapper for using range-based for loops with adjactors.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00516">adjactor.hpp:517</a></div></div>
+<div class="ttc" id="aclass_f_e_a_t_1_1_adjacency_1_1_image_range_html_ab9edf8f98bc7e5c087713011163ac1bd"><div class="ttname"><a href="class_f_e_a_t_1_1_adjacency_1_1_image_range.html#ab9edf8f98bc7e5c087713011163ac1bd">FEAT::Adjacency::ImageRange::ImageRange</a></div><div class="ttdeci">ImageRange(Adjactor &amp;adjactor, Index domain_node)</div><div class="ttdoc">Constructor.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00528">adjactor.hpp:528</a></div></div>
 <div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00011">adjactor.hpp:12</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00129">base_header.hpp:129</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00130">base_header.hpp:130</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

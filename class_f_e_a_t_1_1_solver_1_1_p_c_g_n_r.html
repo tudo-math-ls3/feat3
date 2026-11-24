@@ -1729,7 +1729,7 @@ template&lt;typename Matrix_ , typename Filter_ &gt; </div>
 </div><div class="memdoc">
 
 <p>Forces the calculation of defect norms in every iteration. </p>
-<dl class="section note"><dt>Note</dt><dd>Please note that allowing the skipping of defect norm calculations is merely a hint and a derived class may override this function therefore always forcing the calculation of defect norms. One possible reason is that the derived solver class may require defect norms as part of its solver algorithm and therefore skipping the computation of the defect norms may break the solver; two examples are the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab.html" title="(Preconditioned) Bi-Conjugate Gradient Stabilized solver implementation">BiCGStab</a> and <a class="el" href="class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html" title="GMRES(k) solver implementation.">GMRES</a> solvers.</dd></dl>
+<dl class="section note"><dt>Note</dt><dd>Please note that allowing the skipping of defect norm calculations is merely a hint and a derived class may override this function therefore always forcing the calculation of defect norms. One possible reason is that the derived solver class may require defect norms as part of its solver algorithm and therefore skipping the computation of the defect norms may break the solver; two examples are the <a class="el" href="class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab.html" title="(Preconditioned) Bi-Conjugate Gradient Stabilized solver implementation">BiCGStab</a> and GMRES solvers.</dd></dl>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramdir">[in]</td><td class="paramname">force</td><td>Specifies whether defect norm computation is to be enforced in every iteration </td></tr>

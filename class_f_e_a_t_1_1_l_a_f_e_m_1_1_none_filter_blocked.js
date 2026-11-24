@@ -12,5 +12,8 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked =
     [ "filter_def", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html#a49dd6b34e22ec62d26535da8f8a6c3b3", null ],
     [ "filter_mat", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html#a9d39c33d05096b54b60c72c0cc6c19a1", null ],
     [ "filter_rhs", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html#a965e401e91b6b23658da3b613e5c0109", null ],
-    [ "filter_sol", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html#aa0e0dbe2558dc322bea63e6ad3d47fdd", null ]
+    [ "filter_sol", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html#aa0e0dbe2558dc322bea63e6ad3d47fdd", null ],
+    [ "size", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html#a4a38c2f462ea887cc1dff8dbfe9e7af7", null ],
+    [ "size_raw", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html#ac8bd8a39dbf7033853f69d9f8a67020b", null ],
+    [ "size_info", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html#a94ed6521a98fdb070765fdb942551570", null ]
 ];

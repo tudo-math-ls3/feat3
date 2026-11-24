@@ -104,6 +104,7 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_global_1_1_gate.html
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="class_f_e_a_t_1_1_global_1_1_gate-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt; Class Template Reference</div></div>
 </div><!--header-->
@@ -205,6 +206,8 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:abe80ee5574a21f4f540273239372d2af"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#abe80ee5574a21f4f540273239372d2af">get_ranks</a> () const</td></tr>
 <tr class="memdesc:abe80ee5574a21f4f540273239372d2af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a const reference to the neighbor ranks vector.  <a href="class_f_e_a_t_1_1_global_1_1_gate.html#abe80ee5574a21f4f540273239372d2af">More...</a><br /></td></tr>
 <tr class="separator:abe80ee5574a21f4f540273239372d2af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae726560a9cb36e96e3f5e77b9101942e"><td class="memItemLeft" align="right" valign="top">SyncLocation&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#ae726560a9cb36e96e3f5e77b9101942e">get_sync_location</a> () const</td></tr>
+<tr class="separator:ae726560a9cb36e96e3f5e77b9101942e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3e5a200de73c2d20a5b1510f19ae10bb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#af25530eb82c8a3e0192198e9cd806be5">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#a3e5a200de73c2d20a5b1510f19ae10bb">max</a> (<a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#af25530eb82c8a3e0192198e9cd806be5">DataType</a> x) const</td></tr>
 <tr class="memdesc:a3e5a200de73c2d20a5b1510f19ae10bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes the maximum of a scalar variable over all processes.  <a href="class_f_e_a_t_1_1_global_1_1_gate.html#a3e5a200de73c2d20a5b1510f19ae10bb">More...</a><br /></td></tr>
 <tr class="separator:a3e5a200de73c2d20a5b1510f19ae10bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -232,6 +235,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a7f0bdd60179d6c5a92989f19fe607924"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#a7f0bdd60179d6c5a92989f19fe607924">set_comm</a> (const <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a> *comm_)</td></tr>
 <tr class="memdesc:a7f0bdd60179d6c5a92989f19fe607924"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the communicator for this gate.  <a href="class_f_e_a_t_1_1_global_1_1_gate.html#a7f0bdd60179d6c5a92989f19fe607924">More...</a><br /></td></tr>
 <tr class="separator:a7f0bdd60179d6c5a92989f19fe607924"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac03189152e7f2fd46b41a54d4dbf62d8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#ac03189152e7f2fd46b41a54d4dbf62d8">set_sync_location</a> (SyncLocation sync_location)</td></tr>
+<tr class="memdesc:ac03189152e7f2fd46b41a54d4dbf62d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the sync location to be used.  <a href="class_f_e_a_t_1_1_global_1_1_gate.html#ac03189152e7f2fd46b41a54d4dbf62d8">More...</a><br /></td></tr>
+<tr class="separator:ac03189152e7f2fd46b41a54d4dbf62d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac0971db9fc0ac19a9dbbc19b14f220d8"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#af25530eb82c8a3e0192198e9cd806be5">DataType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#ac0971db9fc0ac19a9dbbc19b14f220d8">sum</a> (<a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#af25530eb82c8a3e0192198e9cd806be5">DataType</a> x) const</td></tr>
 <tr class="memdesc:ac0971db9fc0ac19a9dbbc19b14f220d8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Computes a reduced sum over all processes.  <a href="class_f_e_a_t_1_1_global_1_1_gate.html#ac0971db9fc0ac19a9dbbc19b14f220d8">More...</a><br /></td></tr>
 <tr class="separator:ac0971db9fc0ac19a9dbbc19b14f220d8"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -265,6 +271,31 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:aea1ccf1a21e9c2dfb1e2f6760bb7c903"><td class="memItemLeft" align="right" valign="top">std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#aea1ccf1a21e9c2dfb1e2f6760bb7c903">_ranks</a></td></tr>
 <tr class="memdesc:aea1ccf1a21e9c2dfb1e2f6760bb7c903"><td class="mdescLeft">&#160;</td><td class="mdescRight">communication ranks  <a href="class_f_e_a_t_1_1_global_1_1_gate.html#aea1ccf1a21e9c2dfb1e2f6760bb7c903">More...</a><br /></td></tr>
 <tr class="separator:aea1ccf1a21e9c2dfb1e2f6760bb7c903"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa5363f5b474ba093ab47a5aff709a318"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#a2fc6a0b0bb66bb55e8ab496f4bd38198">BufferVectorType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#aa5363f5b474ba093ab47a5aff709a318">_recv_buffers</a></td></tr>
+<tr class="separator:aa5363f5b474ba093ab47a5aff709a318"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ccb521240db74ad3e60f51e550a4f78"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_dist_1_1_request_vector.html">Dist::RequestVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#a6ccb521240db74ad3e60f51e550a4f78">_recv_reqs</a></td></tr>
+<tr class="separator:a6ccb521240db74ad3e60f51e550a4f78"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8c897ef2b269c9cb91de4f7a1b69ca8"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_memory_1_1_typed_view.html">Memory::TypedView</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#af25530eb82c8a3e0192198e9cd806be5">DataType</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#ae8c897ef2b269c9cb91de4f7a1b69ca8">_recv_views</a></td></tr>
+<tr class="separator:ae8c897ef2b269c9cb91de4f7a1b69ca8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a17b3cdb25d82090d82076ed2fbfe34bb"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#a2fc6a0b0bb66bb55e8ab496f4bd38198">BufferVectorType</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#a17b3cdb25d82090d82076ed2fbfe34bb">_send_buffers</a></td></tr>
+<tr class="memdesc:a17b3cdb25d82090d82076ed2fbfe34bb"><td class="mdescLeft">&#160;</td><td class="mdescRight">persistent buffer vectors  <a href="class_f_e_a_t_1_1_global_1_1_gate.html#a17b3cdb25d82090d82076ed2fbfe34bb">More...</a><br /></td></tr>
+<tr class="separator:a17b3cdb25d82090d82076ed2fbfe34bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab427afdeb561d3b2c1a175d9cd9c01c5"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_dist_1_1_request_vector.html">Dist::RequestVector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#ab427afdeb561d3b2c1a175d9cd9c01c5">_send_reqs</a></td></tr>
+<tr class="memdesc:ab427afdeb561d3b2c1a175d9cd9c01c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">persistent MPI Requests  <a href="class_f_e_a_t_1_1_global_1_1_gate.html#ab427afdeb561d3b2c1a175d9cd9c01c5">More...</a><br /></td></tr>
+<tr class="separator:ab427afdeb561d3b2c1a175d9cd9c01c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a33e04edbbc6ce5ca697b79c65c3efa"><td class="memItemLeft" align="right" valign="top">std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_memory_1_1_typed_view.html">Memory::TypedView</a>&lt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#af25530eb82c8a3e0192198e9cd806be5">DataType</a> &gt; &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#a2a33e04edbbc6ce5ca697b79c65c3efa">_send_views</a></td></tr>
+<tr class="memdesc:a2a33e04edbbc6ce5ca697b79c65c3efa"><td class="mdescLeft">&#160;</td><td class="mdescRight">send and receive buffer views  <a href="class_f_e_a_t_1_1_global_1_1_gate.html#a2a33e04edbbc6ce5ca697b79c65c3efa">More...</a><br /></td></tr>
+<tr class="separator:a2a33e04edbbc6ce5ca697b79c65c3efa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac66842aec87a0cb338440a3d78738c27"><td class="memItemLeft" align="right" valign="top">SyncLocation&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#ac66842aec87a0cb338440a3d78738c27">_sync_location</a> = SyncLocation::host</td></tr>
+<tr class="separator:ac66842aec87a0cb338440a3d78738c27"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-methods" name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a9dc18c78e26bf8a975530a0c93bb5404"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029">PreferredBackend</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#a9dc18c78e26bf8a975530a0c93bb5404">_get_sync_backend</a> () const</td></tr>
+<tr class="separator:a9dc18c78e26bf8a975530a0c93bb5404"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab622ffaed79dbccf6daae29ac21bc41d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#ab622ffaed79dbccf6daae29ac21bc41d">_sync_vec</a> (LocalVector_ &amp;vector) const</td></tr>
+<tr class="memdesc:ab622ffaed79dbccf6daae29ac21bc41d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sychronizes a vector by adding all mirrors elements.  <a href="class_f_e_a_t_1_1_global_1_1_gate.html#ab622ffaed79dbccf6daae29ac21bc41d">More...</a><br /></td></tr>
+<tr class="separator:ab622ffaed79dbccf6daae29ac21bc41d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><div class="compoundTemplParams">template&lt;typename LocalVector_, typename Mirror_&gt;<br />
@@ -284,7 +315,7 @@ class FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;</div><p ><a class="el" h
 </ol>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00050">50</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00077">77</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a2fc6a0b0bb66bb55e8ab496f4bd38198" name="a2fc6a0b0bb66bb55e8ab496f4bd38198"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a2fc6a0b0bb66bb55e8ab496f4bd38198">&#9670;&#160;</a></span>BufferVectorType</h2>
@@ -302,7 +333,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>the internal buffer vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00062">62</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00089">89</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
 </div>
 </div>
@@ -322,7 +353,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>the data type </p>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00054">54</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00081">81</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
 </div>
 </div>
@@ -344,7 +375,7 @@ template&lt;typename LocalVector2_ , typename Mirror2_ &gt; </div>
 
 <p>Our 'base' class type. </p>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00079">79</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00114">114</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
 </div>
 </div>
@@ -366,7 +397,7 @@ template&lt;typename DataType2_ , typename IndexType2_ &gt; </div>
 
 <p>this typedef lets you create a gate container with new Data and Index types </p>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00083">83</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00118">118</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
 </div>
 </div>
@@ -386,7 +417,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>the index type </p>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00056">56</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00083">83</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
 </div>
 </div>
@@ -406,7 +437,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>the local vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00058">58</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00085">85</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
 </div>
 </div>
@@ -426,7 +457,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>the mirror type </p>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00060">60</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00087">87</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
 </div>
 </div>
@@ -444,7 +475,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00064">64</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00091">91</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
 </div>
 </div>
@@ -462,7 +493,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00065">65</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00092">92</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
 </div>
 </div>
@@ -494,7 +525,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>standard constructor </p>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00087">87</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00122">122</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
 </div>
 </div>
@@ -532,7 +563,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00098">98</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00133">133</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
 </div>
 </div>
@@ -564,7 +595,7 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>move constructor </p>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00104">104</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00139">139</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
 </div>
 </div>
@@ -595,11 +626,82 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>virtual destructor </p>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00129">129</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00176">176</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a9dc18c78e26bf8a975530a0c93bb5404" name="a9dc18c78e26bf8a975530a0c93bb5404"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9dc18c78e26bf8a975530a0c93bb5404">&#9670;&#160;</a></span>_get_sync_backend()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029">PreferredBackend</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html">FEAT::Global::Gate</a>&lt; LocalVector_, Mirror_ &gt;::_get_sync_backend </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00914">914</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ab622ffaed79dbccf6daae29ac21bc41d" name="ab622ffaed79dbccf6daae29ac21bc41d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab622ffaed79dbccf6daae29ac21bc41d">&#9670;&#160;</a></span>_sync_vec()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html">FEAT::Global::Gate</a>&lt; LocalVector_, Mirror_ &gt;::_sync_vec </td>
+          <td>(</td>
+          <td class="paramtype">LocalVector_ &amp;&#160;</td>
+          <td class="paramname"><em>vector</em></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Sychronizes a vector by adding all mirrors elements. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">vector</td><td>The vector to be sychnroied </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00840">840</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00096">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, <a class="el" href="gate_8hpp_source.html#l00100">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, <a class="el" href="gate_8hpp_source.html#l00098">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>, <a class="el" href="gate_8hpp_source.html#l00102">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_send_buffers</a>, <a class="el" href="gate_8hpp_source.html#l00104">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_send_reqs</a>, <a class="el" href="gate_8hpp_source.html#l00106">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_send_views</a>, <a class="el" href="dist_8hpp_source.html#l01323">FEAT::Dist::RequestVector::clear()</a>, <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a39466fe22b062a34cfe09f3cc8c24868">FEAT::cuda</a>, <a class="el" href="backend_8cpp_source.html#l00032">FEAT::Backend::get_preferred_backend()</a>, <a class="el" href="dist_8cpp_source.html#l00719">FEAT::Dist::Comm::irecv()</a>, <a class="el" href="dist_8cpp_source.html#l00707">FEAT::Dist::Comm::isend()</a>, <a class="el" href="dist_8hpp_source.html#l01194">FEAT::Dist::RequestVector::push_back()</a>, <a class="el" href="runtime_8cpp_source.html#l00522">FEAT::Runtime::synchronize_devices()</a>, <a class="el" href="dist_8cpp_source.html#l00327">FEAT::Dist::RequestVector::wait_all()</a>, and <a class="el" href="dist_8cpp_source.html#l00332">FEAT::Dist::RequestVector::wait_any()</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00552">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_0()</a>, and <a class="el" href="gate_8hpp_source.html#l00599">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1()</a>.</p>
+
+</div>
+</div>
 <a id="af4abfdb2b7c13ccd96090e9b87456226" name="af4abfdb2b7c13ccd96090e9b87456226"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#af4abfdb2b7c13ccd96090e9b87456226">&#9670;&#160;</a></span>bytes()</h2>
 
@@ -627,11 +729,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>Returns the total amount of bytes allocated. </p>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00252">252</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00318">318</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00075">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>, <a class="el" href="gate_8hpp_source.html#l00073">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, and <a class="el" href="gate_8hpp_source.html#l00071">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00108">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>, <a class="el" href="gate_8hpp_source.html#l00100">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, <a class="el" href="gate_8hpp_source.html#l00098">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>, and <a class="el" href="gate_8hpp_source.html#l00102">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_send_buffers</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="blocked__basic_8hpp_source.html#l00121">FEAT::Control::BlockedBasicSystemLevel&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;::bytes()</a>, and <a class="el" href="scalar__basic_8hpp_source.html#l00143">FEAT::Control::ScalarBasicSystemLevel&lt; DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::bytes()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="blocked__basic_8hpp_source.html#l00121">FEAT::Control::BlockedBasicSystemLevel&lt; dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ &gt;::bytes()</a>, and <a class="el" href="scalar__basic_8hpp_source.html#l00144">FEAT::Control::ScalarBasicSystemLevel&lt; DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::bytes()</a>.</p>
 
 </div>
 </div>
@@ -670,11 +772,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 </dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00296">296</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00370">370</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00075">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>, and <a class="el" href="gate_8hpp_source.html#l00073">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00108">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>, <a class="el" href="gate_8hpp_source.html#l00100">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, <a class="el" href="gate_8hpp_source.html#l00102">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_send_buffers</a>, <a class="el" href="dist_8hpp_source.html#l01323">FEAT::Dist::RequestVector::clear()</a>, and <a class="el" href="dist_8hpp_source.html#l01121">FEAT::Dist::RequestVector::reserve()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="stokes__power_8hpp_source.html#l00214">FEAT::Control::StokesPowerSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::assemble_gates()</a>, <a class="el" href="meshopt__control_8hpp_source.html#l00628">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_gates()</a>, and <a class="el" href="gate_8hpp_source.html#l00228">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::convert()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="amavanka__gmres_8hpp_source.html#l00413">FEAT::Solver::AmaVankaGMRES&lt; Global::Matrix&lt; LocalMatrix_, MirrorRow_, MirrorCol_ &gt;, Global::Filter&lt; LocalFilter_, MirrorRow_ &gt; &gt;::AmaVankaGMRES()</a>, <a class="el" href="stokes__power_8hpp_source.html#l00214">FEAT::Control::StokesPowerSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::assemble_gates()</a>, <a class="el" href="meshopt__control_8hpp_source.html#l00628">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_gates()</a>, and <a class="el" href="gate_8hpp_source.html#l00289">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::convert()</a>.</p>
 
 </div>
 </div>
@@ -734,9 +836,9 @@ template&lt;typename LVT2_ &gt; </div>
 </dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00228">228</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00289">289</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00073">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, and <a class="el" href="gate_8hpp_source.html#l00296">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::compile()</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00100">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, and <a class="el" href="gate_8hpp_source.html#l00370">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::compile()</a>.</p>
 
 </div>
 </div>
@@ -776,7 +878,9 @@ template&lt;typename LVT2_ , typename MT2_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00191">191</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00238">238</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00100">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, <a class="el" href="dist_8hpp_source.html#l01323">FEAT::Dist::RequestVector::clear()</a>, and <a class="el" href="dist_8hpp_source.html#l01121">FEAT::Dist::RequestVector::reserve()</a>.</p>
 
 </div>
 </div>
@@ -826,9 +930,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The dot-product of <code>x</code> and <code>y</code>.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00549">549</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00645">645</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00069">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, <a class="el" href="gate_8hpp_source.html#l00075">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>, <a class="el" href="gate_8hpp_source.html#l00071">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="gate_8hpp_source.html#l00596">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sum()</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00096">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, <a class="el" href="gate_8hpp_source.html#l00108">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>, <a class="el" href="gate_8hpp_source.html#l00098">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="gate_8hpp_source.html#l00692">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sum()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00396">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot()</a>.</p>
 
@@ -886,9 +990,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A scalar ticket that has to be waited upon to complete the operation.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00579">579</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00675">675</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00075">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>, and <a class="el" href="gate_8hpp_source.html#l00612">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sum_async()</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00108">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>, and <a class="el" href="gate_8hpp_source.html#l00708">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sum_async()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00413">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::dot_async()</a>, and <a class="el" href="vector_8hpp_source.html#l00466">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::norm2_async()</a>.</p>
 
@@ -929,11 +1033,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This function does not perform any synchronization. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00436">436</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00530">530</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00075">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>, and <a class="el" href="gate_8hpp_source.html#l00071">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00108">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>, and <a class="el" href="gate_8hpp_source.html#l00098">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00173">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::from_1_to_0()</a>, <a class="el" href="gate_8hpp_source.html#l00503">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1()</a>, and <a class="el" href="gate_8hpp_source.html#l00531">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1_async()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00173">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::from_1_to_0()</a>, <a class="el" href="gate_8hpp_source.html#l00599">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1()</a>, and <a class="el" href="gate_8hpp_source.html#l00627">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1_async()</a>.</p>
 
 </div>
 </div>
@@ -965,11 +1069,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <p>Returns a const pointer to the underlying communicator. </p>
 <dl class="section return"><dt>Returns</dt><dd>A const pointer to the underlying communicator </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00138">138</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00185">185</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00069">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00096">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="matrix_8hpp_source.html#l00109">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::Matrix()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00526">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_by_gate()</a>, <a class="el" href="matrix_8hpp_source.html#l00281">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::bytes()</a>, <a class="el" href="matrix_8hpp_source.html#l00174">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::get_comm()</a>, <a class="el" href="nonlinear__functional_8hpp_source.html#l00122">FEAT::Global::NonlinearFunctional&lt; LocalNonlinearFunctional_, RowMirrorType_, ColMirrorType_ &gt;::get_comm()</a>, <a class="el" href="vector_8hpp_source.html#l00159">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::get_comm()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00423">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_symbolic()</a>, and <a class="el" href="matrix_8hpp_source.html#l00262">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::num_nzes()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="matrix_8hpp_source.html#l00109">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::Matrix()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00526">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_by_gate()</a>, <a class="el" href="matrix_8hpp_source.html#l00291">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::bytes()</a>, <a class="el" href="matrix_8hpp_source.html#l00184">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::get_comm()</a>, <a class="el" href="nonlinear__functional_8hpp_source.html#l00122">FEAT::Global::NonlinearFunctional&lt; LocalNonlinearFunctional_, RowMirrorType_, ColMirrorType_ &gt;::get_comm()</a>, <a class="el" href="vector_8hpp_source.html#l00159">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::get_comm()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00423">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_symbolic()</a>, and <a class="el" href="matrix_8hpp_source.html#l00272">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::num_nzes()</a>.</p>
 
 </div>
 </div>
@@ -1001,11 +1105,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <p>Returns a const reference to the frequencies vector. </p>
 <dl class="section return"><dt>Returns</dt><dd>A const reference to the frequencies vector </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00179">179</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00226">226</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00075">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00108">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00526">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_by_gate()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="amavanka__gmres_8hpp_source.html#l00793">FEAT::Solver::AmaVankaGMRES&lt; Global::Matrix&lt; LocalMatrix_, MirrorRow_, MirrorCol_ &gt;, Global::Filter&lt; LocalFilter_, MirrorRow_ &gt; &gt;::_orthogonalize_cpu()</a>, and <a class="el" href="alg__dof__parti_8hpp_source.html#l00526">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_by_gate()</a>.</p>
 
 </div>
 </div>
@@ -1037,9 +1141,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <p>Returns a const reference to the neighbor mirrors vector. </p>
 <dl class="section return"><dt>Returns</dt><dd>A const reference to the neighbor mirrors vector </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00169">169</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00216">216</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00073">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00100">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00526">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_by_gate()</a>.</p>
 
@@ -1074,11 +1178,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of native global DOFS </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00349">349</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00443">443</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00073">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, <a class="el" href="dist_8cpp_source.html#l00658">FEAT::Dist::Comm::allreduce()</a>, <a class="el" href="gate_8hpp_source.html#l00326">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_local_dofs()</a>, <a class="el" href="dist_8hpp_source.html#l00571">FEAT::Dist::op_sum</a>, <a class="el" href="dist_8hpp_source.html#l01802">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00100">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, <a class="el" href="dist_8cpp_source.html#l00658">FEAT::Dist::Comm::allreduce()</a>, <a class="el" href="gate_8hpp_source.html#l00420">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_local_dofs()</a>, <a class="el" href="dist_8hpp_source.html#l00571">FEAT::Dist::op_sum</a>, <a class="el" href="dist_8hpp_source.html#l01802">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="matrix_8hpp_source.html#l00222">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::num_cols()</a>, <a class="el" href="matrix_8hpp_source.html#l00242">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::num_rows()</a>, and <a class="el" href="vector_8hpp_source.html#l00255">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::size()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="matrix_8hpp_source.html#l00232">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::num_cols()</a>, <a class="el" href="matrix_8hpp_source.html#l00252">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::num_rows()</a>, and <a class="el" href="vector_8hpp_source.html#l00255">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::size()</a>.</p>
 
 </div>
 </div>
@@ -1111,9 +1215,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>The number of raw global DOFS </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00392">392</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00486">486</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00073">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, <a class="el" href="dist_8cpp_source.html#l00658">FEAT::Dist::Comm::allreduce()</a>, <a class="el" href="gate_8hpp_source.html#l00336">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_local_dofs_raw()</a>, <a class="el" href="dist_8hpp_source.html#l00571">FEAT::Dist::op_sum</a>, <a class="el" href="dist_8hpp_source.html#l01802">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00100">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, <a class="el" href="dist_8cpp_source.html#l00658">FEAT::Dist::Comm::allreduce()</a>, <a class="el" href="gate_8hpp_source.html#l00430">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_local_dofs_raw()</a>, <a class="el" href="dist_8hpp_source.html#l00571">FEAT::Dist::op_sum</a>, <a class="el" href="dist_8hpp_source.html#l01802">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00271">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::size_raw()</a>.</p>
 
@@ -1147,11 +1251,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <p>Returns the number of native local DOFs. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of native local DOFS </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00326">326</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00420">420</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00075">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00108">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00349">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00443">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>.</p>
 
 </div>
 </div>
@@ -1183,11 +1287,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <p>Returns the number of raw local DOFs. </p>
 <dl class="section return"><dt>Returns</dt><dd>The number of raw local DOFS </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00336">336</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00430">430</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00075">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00108">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00392">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs_raw()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00486">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs_raw()</a>.</p>
 
 </div>
 </div>
@@ -1219,9 +1323,40 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <p>Returns a const reference to the neighbor ranks vector. </p>
 <dl class="section return"><dt>Returns</dt><dd>A const reference to the neighbor ranks vector </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00159">159</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00206">206</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00071">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00098">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="amavanka__gmres_8hpp_source.html#l00413">FEAT::Solver::AmaVankaGMRES&lt; Global::Matrix&lt; LocalMatrix_, MirrorRow_, MirrorCol_ &gt;, Global::Filter&lt; LocalFilter_, MirrorRow_ &gt; &gt;::AmaVankaGMRES()</a>.</p>
+
+</div>
+</div>
+<a id="ae726560a9cb36e96e3f5e77b9101942e" name="ae726560a9cb36e96e3f5e77b9101942e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae726560a9cb36e96e3f5e77b9101942e">&#9670;&#160;</a></span>get_sync_location()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">SyncLocation <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html">FEAT::Global::Gate</a>&lt; LocalVector_, Mirror_ &gt;::get_sync_location </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00829">829</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
 </div>
 </div>
@@ -1261,9 +1396,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The maximum of all <code>x</code>.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00662">662</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00758">758</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00678">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max_async()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00198">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00774">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max_async()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00198">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="burgers__assembly__job_8hpp_source.html#l00210">FEAT::Assembly::BurgersAssemblyJobBase&lt; DataType_, Space_, ConvVector_ &gt;::calc_sd_v_norm()</a>, <a class="el" href="burgers__carreau__assembly__job_8hpp_source.html#l00226">FEAT::Assembly::BurgersCarreauAssemblyJobBase&lt; DataType_, Space_, ConvVector_ &gt;::calc_sd_v_norm()</a>, <a class="el" href="vector_8hpp_source.html#l00509">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_abs_element()</a>, <a class="el" href="vector_8hpp_source.html#l00622">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_rel_diff()</a>, <a class="el" href="assembly_2burgers__assembler_8hpp_source.html#l00982">FEAT::Assembly::BurgersAssembler&lt; DataType_, IndexType_, dim_ &gt;::set_sd_v_norm()</a>, and <a class="el" href="burgers__assembler__carreau_8hpp_source.html#l00788">FEAT::Assembly::BurgersAssemblerCarreau&lt; DataType_, IndexType_, dim_ &gt;::set_sd_v_norm()</a>.</p>
 
@@ -1305,11 +1440,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A scalar ticket that has to be waited upon to complete the operation.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00678">678</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00774">774</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00069">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, and <a class="el" href="dist_8hpp_source.html#l00573">FEAT::Dist::op_max</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00096">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, and <a class="el" href="dist_8hpp_source.html#l00573">FEAT::Dist::op_max</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00662">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max()</a>, <a class="el" href="vector_8hpp_source.html#l00523">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_abs_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00565">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_element()</a>, <a class="el" href="vector_8hpp_source.html#l00579">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_element_async()</a>, and <a class="el" href="vector_8hpp_source.html#l00637">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_rel_diff_async()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00758">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max()</a>, <a class="el" href="vector_8hpp_source.html#l00523">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_abs_element_async()</a>, <a class="el" href="vector_8hpp_source.html#l00565">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_element()</a>, <a class="el" href="vector_8hpp_source.html#l00579">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_element_async()</a>, and <a class="el" href="vector_8hpp_source.html#l00637">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::max_rel_diff_async()</a>.</p>
 
 </div>
 </div>
@@ -1349,9 +1484,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The minimum of all <code>x</code>.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00629">629</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00725">725</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00645">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::min_async()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00198">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00741">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::min_async()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00198">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00537">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_abs_element()</a>, and <a class="el" href="vector_8hpp_source.html#l00593">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_element()</a>.</p>
 
@@ -1393,11 +1528,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A scalar ticket that has to be waited upon to complete the operation.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00645">645</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00741">741</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00069">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, and <a class="el" href="dist_8hpp_source.html#l00575">FEAT::Dist::op_min</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00096">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, and <a class="el" href="dist_8hpp_source.html#l00575">FEAT::Dist::op_min</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00629">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::min()</a>, <a class="el" href="vector_8hpp_source.html#l00551">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_abs_element_async()</a>, and <a class="el" href="vector_8hpp_source.html#l00607">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_element_async()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00725">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::min()</a>, <a class="el" href="vector_8hpp_source.html#l00551">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_abs_element_async()</a>, and <a class="el" href="vector_8hpp_source.html#l00607">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::min_element_async()</a>.</p>
 
 </div>
 </div>
@@ -1438,9 +1573,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The reduced 2-norm of all <code>x</code>.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00698">698</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00794">794</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00717">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::norm2_async()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00198">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00813">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::norm2_async()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00198">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
 
 </div>
 </div>
@@ -1481,11 +1616,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A scalar ticket that has to be waited upon to complete the operation.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00717">717</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00813">813</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00069">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, and <a class="el" href="dist_8hpp_source.html#l00571">FEAT::Dist::op_sum</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00096">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, and <a class="el" href="dist_8hpp_source.html#l00571">FEAT::Dist::op_sum</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00698">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::norm2()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00794">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::norm2()</a>.</p>
 
 </div>
 </div>
@@ -1517,9 +1652,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>move-assign operator </p>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00113">113</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00154">154</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00069">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, <a class="el" href="gate_8hpp_source.html#l00075">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>, <a class="el" href="gate_8hpp_source.html#l00073">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, and <a class="el" href="gate_8hpp_source.html#l00071">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00096">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, <a class="el" href="gate_8hpp_source.html#l00108">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_freqs</a>, <a class="el" href="gate_8hpp_source.html#l00100">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, <a class="el" href="gate_8hpp_source.html#l00098">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>, <a class="el" href="gate_8hpp_source.html#l00102">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_send_buffers</a>, <a class="el" href="gate_8hpp_source.html#l00104">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_send_reqs</a>, and <a class="el" href="gate_8hpp_source.html#l00106">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_send_views</a>.</p>
 
 </div>
 </div>
@@ -1568,11 +1703,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00274">274</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00348">348</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00069">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, <a class="el" href="gate_8hpp_source.html#l00073">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, <a class="el" href="gate_8hpp_source.html#l00071">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00096">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, <a class="el" href="gate_8hpp_source.html#l00100">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, <a class="el" href="gate_8hpp_source.html#l00098">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="stokes__power_8hpp_source.html#l00214">FEAT::Control::StokesPowerSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::assemble_gates()</a>, and <a class="el" href="meshopt__control_8hpp_source.html#l00628">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_gates()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="amavanka__gmres_8hpp_source.html#l00413">FEAT::Solver::AmaVankaGMRES&lt; Global::Matrix&lt; LocalMatrix_, MirrorRow_, MirrorCol_ &gt;, Global::Filter&lt; LocalFilter_, MirrorRow_ &gt; &gt;::AmaVankaGMRES()</a>, <a class="el" href="stokes__power_8hpp_source.html#l00214">FEAT::Control::StokesPowerSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::assemble_gates()</a>, and <a class="el" href="meshopt__control_8hpp_source.html#l00628">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_gates()</a>.</p>
 
 </div>
 </div>
@@ -1610,9 +1745,49 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00149">149</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00196">196</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="stokes__power_8hpp_source.html#l00214">FEAT::Control::StokesPowerSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::assemble_gates()</a>, and <a class="el" href="meshopt__control_8hpp_source.html#l00628">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_gates()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="amavanka__gmres_8hpp_source.html#l00413">FEAT::Solver::AmaVankaGMRES&lt; Global::Matrix&lt; LocalMatrix_, MirrorRow_, MirrorCol_ &gt;, Global::Filter&lt; LocalFilter_, MirrorRow_ &gt; &gt;::AmaVankaGMRES()</a>, <a class="el" href="stokes__power_8hpp_source.html#l00214">FEAT::Control::StokesPowerSystemLevel&lt; dim_, DataType_, IndexType_, ScalarMatrix_, TransferMatrix_ &gt;::assemble_gates()</a>, and <a class="el" href="meshopt__control_8hpp_source.html#l00628">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::assemble_gates()</a>.</p>
+
+</div>
+</div>
+<a id="ac03189152e7f2fd46b41a54d4dbf62d8" name="ac03189152e7f2fd46b41a54d4dbf62d8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac03189152e7f2fd46b41a54d4dbf62d8">&#9670;&#160;</a></span>set_sync_location()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html">FEAT::Global::Gate</a>&lt; LocalVector_, Mirror_ &gt;::set_sync_location </td>
+          <td>(</td>
+          <td class="paramtype">SyncLocation&#160;</td>
+          <td class="paramname"><em>sync_location</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Set the sync location to be used. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">sync_location</td><td>The location to be used by default </td></tr>
+  </table>
+  </dd>
+</dl>
+
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00824">824</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="amavanka__gmres_8hpp_source.html#l00413">FEAT::Solver::AmaVankaGMRES&lt; Global::Matrix&lt; LocalMatrix_, MirrorRow_, MirrorCol_ &gt;, Global::Filter&lt; LocalFilter_, MirrorRow_ &gt; &gt;::AmaVankaGMRES()</a>.</p>
 
 </div>
 </div>
@@ -1652,11 +1827,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>The reduced sum of all <code>x</code>.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00596">596</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00692">692</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00612">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sum_async()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00198">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00708">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sum_async()</a>, and <a class="el" href="synch__scal_8hpp_source.html#l00198">FEAT::Global::SynchScalarTicket&lt; DT_ &gt;::wait()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00549">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="nonlinear__functional_8hpp_source.html#l00343">FEAT::Global::NonlinearFunctional&lt; LocalNonlinearFunctional_, RowMirrorType_, ColMirrorType_ &gt;::eval_fval_grad()</a>, <a class="el" href="nonlinear__functional_8hpp_source.html#l00189">FEAT::Global::NonlinearFunctional&lt; LocalNonlinearFunctional_, RowMirrorType_, ColMirrorType_ &gt;::init()</a>, and <a class="el" href="nonlinear__functional_8hpp_source.html#l00223">FEAT::Global::NonlinearFunctional&lt; LocalNonlinearFunctional_, RowMirrorType_, ColMirrorType_ &gt;::prepare()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00645">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="nonlinear__functional_8hpp_source.html#l00343">FEAT::Global::NonlinearFunctional&lt; LocalNonlinearFunctional_, RowMirrorType_, ColMirrorType_ &gt;::eval_fval_grad()</a>, <a class="el" href="nonlinear__functional_8hpp_source.html#l00189">FEAT::Global::NonlinearFunctional&lt; LocalNonlinearFunctional_, RowMirrorType_, ColMirrorType_ &gt;::init()</a>, and <a class="el" href="nonlinear__functional_8hpp_source.html#l00223">FEAT::Global::NonlinearFunctional&lt; LocalNonlinearFunctional_, RowMirrorType_, ColMirrorType_ &gt;::prepare()</a>.</p>
 
 </div>
 </div>
@@ -1706,11 +1881,11 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 <dl class="section return"><dt>Returns</dt><dd>A scalar ticket that has to be waited upon to complete the operation.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00612">612</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00708">708</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00069">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, and <a class="el" href="dist_8hpp_source.html#l00571">FEAT::Dist::op_sum</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00096">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, and <a class="el" href="dist_8hpp_source.html#l00571">FEAT::Dist::op_sum</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00579">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot_async()</a>, and <a class="el" href="gate_8hpp_source.html#l00596">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sum()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00675">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot_async()</a>, and <a class="el" href="gate_8hpp_source.html#l00692">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sum()</a>.</p>
 
 </div>
 </div>
@@ -1751,9 +1926,9 @@ On exit, the synchronized type-1 vector.</td></tr>
 </dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00457">457</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00552">552</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00069">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, <a class="el" href="gate_8hpp_source.html#l00073">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, <a class="el" href="gate_8hpp_source.html#l00071">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>, and <a class="el" href="synch__vec_8hpp_source.html#l00218">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::wait()</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00840">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_sync_vec()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="nonlinear__functional_8hpp_source.html#l00189">FEAT::Global::NonlinearFunctional&lt; LocalNonlinearFunctional_, RowMirrorType_, ColMirrorType_ &gt;::init()</a>, <a class="el" href="nonlinear__functional_8hpp_source.html#l00223">FEAT::Global::NonlinearFunctional&lt; LocalNonlinearFunctional_, RowMirrorType_, ColMirrorType_ &gt;::prepare()</a>, <a class="el" href="vector_8hpp_source.html#l00188">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_0()</a>, and <a class="el" href="meshopt__control_8hpp_source.html#l00537">FEAT::Control::Meshopt::MeshoptSystemLevel&lt; DT_, IT_, Functional_ &gt;::sync_system_filter()</a>.</p>
 
@@ -1797,9 +1972,9 @@ On exit, the synchronized type-1 vector.</td></tr>
 <dl class="section return"><dt>Returns</dt><dd>A ticket that has to be waited upon to complete the sync operation.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00481">481</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00573">573</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00069">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, <a class="el" href="gate_8hpp_source.html#l00073">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, and <a class="el" href="gate_8hpp_source.html#l00071">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00096">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, <a class="el" href="gate_8hpp_source.html#l00100">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, and <a class="el" href="gate_8hpp_source.html#l00098">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00205">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_0_async()</a>.</p>
 
@@ -1837,15 +2012,16 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
   <table class="params">
     <tr><td class="paramdir">[in,out]</td><td class="paramname">vector</td><td>On entry, the type-1 vector to be synchronized.<br  />
 On exit, the synchronized type-1 vector.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">sync_backend</td><td>The backend on which the sychronization should take place</td></tr>
   </table>
   </dd>
 </dl>
 <dl class="section note"><dt>Note</dt><dd>This function effectively applies the <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#a26742046e9805870c9ce2bdd51e84466" title="Converts a type-1 vector into a type-0 vector.">from_1_to_0()</a> and <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#a151f690bd1866d13f920f76e40332aba" title="Synchronizes a type-0 vector, resulting in a type-1 vector.">sync_0()</a> functions onto the input vector.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00503">503</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00599">599</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00069">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, <a class="el" href="gate_8hpp_source.html#l00073">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, <a class="el" href="gate_8hpp_source.html#l00071">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>, <a class="el" href="gate_8hpp_source.html#l00436">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::from_1_to_0()</a>, and <a class="el" href="synch__vec_8hpp_source.html#l00218">FEAT::Global::SynchVectorTicket&lt; VT_, VMT_ &gt;::wait()</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00098">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>, <a class="el" href="gate_8hpp_source.html#l00840">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_sync_vec()</a>, and <a class="el" href="gate_8hpp_source.html#l00530">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::from_1_to_0()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00221">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_1()</a>.</p>
 
@@ -1890,9 +2066,9 @@ On exit, the synchronized type-1 vector.</td></tr>
 <dl class="section note"><dt>Note</dt><dd>This function effectively applies the <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#a26742046e9805870c9ce2bdd51e84466" title="Converts a type-1 vector into a type-0 vector.">from_1_to_0()</a> and <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#a151f690bd1866d13f920f76e40332aba" title="Synchronizes a type-0 vector, resulting in a type-1 vector.">sync_0()</a> functions onto the input vector.</dd></dl>
 <dl class="section attention"><dt>Attention</dt><dd>This function is collective, i.e. it must be called by all processes participating in the gate's communicator, otherwise the application will deadlock. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00531">531</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00627">627</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00069">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, <a class="el" href="gate_8hpp_source.html#l00073">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, <a class="el" href="gate_8hpp_source.html#l00071">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>, and <a class="el" href="gate_8hpp_source.html#l00436">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::from_1_to_0()</a>.</p>
+<p class="reference">References <a class="el" href="gate_8hpp_source.html#l00096">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_comm</a>, <a class="el" href="gate_8hpp_source.html#l00100">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_mirrors</a>, <a class="el" href="gate_8hpp_source.html#l00098">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_ranks</a>, and <a class="el" href="gate_8hpp_source.html#l00530">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::from_1_to_0()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="vector_8hpp_source.html#l00238">FEAT::Global::Vector&lt; LocalVector_, Mirror_ &gt;::sync_1_async()</a>.</p>
 
@@ -1915,9 +2091,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>our communicator </p>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00069">69</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00096">96</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="matrix_8hpp_source.html#l00633">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::convert_to_1()</a>, <a class="el" href="gate_8hpp_source.html#l00549">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="gate_8hpp_source.html#l00138">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_comm()</a>, <a class="el" href="afc__limiter_8hpp_source.html#l00386">FEAT::Control::AFCTransportSolver&lt; MatrixType_ &gt;::init_symbolic()</a>, <a class="el" href="afc__limiter_8hpp_source.html#l00726">FEAT::Control::AFCTransportSolver&lt; MatrixType_ &gt;::limit_fct()</a>, <a class="el" href="gate_8hpp_source.html#l00678">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max_async()</a>, <a class="el" href="gate_8hpp_source.html#l00645">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::min_async()</a>, <a class="el" href="gate_8hpp_source.html#l00717">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::norm2_async()</a>, <a class="el" href="gate_8hpp_source.html#l00113">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::operator=()</a>, <a class="el" href="afc__limiter_8hpp_source.html#l00715">FEAT::Control::AFCTransportSolver&lt; MatrixType_ &gt;::print_times()</a>, <a class="el" href="gate_8hpp_source.html#l00274">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::push()</a>, <a class="el" href="gate_8hpp_source.html#l00612">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sum_async()</a>, <a class="el" href="gate_8hpp_source.html#l00457">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_0()</a>, <a class="el" href="gate_8hpp_source.html#l00481">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_0_async()</a>, <a class="el" href="gate_8hpp_source.html#l00503">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1()</a>, and <a class="el" href="gate_8hpp_source.html#l00531">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1_async()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00840">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_sync_vec()</a>, <a class="el" href="matrix_8hpp_source.html#l00643">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::convert_to_1()</a>, <a class="el" href="gate_8hpp_source.html#l00645">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="gate_8hpp_source.html#l00185">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_comm()</a>, <a class="el" href="afc__limiter_8hpp_source.html#l00386">FEAT::Control::AFCTransportSolver&lt; MatrixType_ &gt;::init_symbolic()</a>, <a class="el" href="afc__limiter_8hpp_source.html#l00726">FEAT::Control::AFCTransportSolver&lt; MatrixType_ &gt;::limit_fct()</a>, <a class="el" href="gate_8hpp_source.html#l00774">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::max_async()</a>, <a class="el" href="gate_8hpp_source.html#l00741">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::min_async()</a>, <a class="el" href="gate_8hpp_source.html#l00813">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::norm2_async()</a>, <a class="el" href="gate_8hpp_source.html#l00154">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::operator=()</a>, <a class="el" href="afc__limiter_8hpp_source.html#l00715">FEAT::Control::AFCTransportSolver&lt; MatrixType_ &gt;::print_times()</a>, <a class="el" href="gate_8hpp_source.html#l00348">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::push()</a>, <a class="el" href="gate_8hpp_source.html#l00708">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sum_async()</a>, <a class="el" href="gate_8hpp_source.html#l00573">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_0_async()</a>, and <a class="el" href="gate_8hpp_source.html#l00627">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1_async()</a>.</p>
 
 </div>
 </div>
@@ -1937,9 +2113,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>frequency vector </p>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00075">75</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00108">108</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00252">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::bytes()</a>, <a class="el" href="gate_8hpp_source.html#l00296">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="gate_8hpp_source.html#l00549">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="gate_8hpp_source.html#l00579">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot_async()</a>, <a class="el" href="gate_8hpp_source.html#l00436">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::from_1_to_0()</a>, <a class="el" href="gate_8hpp_source.html#l00179">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_freqs()</a>, <a class="el" href="gate_8hpp_source.html#l00326">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_local_dofs()</a>, <a class="el" href="gate_8hpp_source.html#l00336">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_local_dofs_raw()</a>, and <a class="el" href="gate_8hpp_source.html#l00113">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::operator=()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00318">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::bytes()</a>, <a class="el" href="gate_8hpp_source.html#l00370">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="gate_8hpp_source.html#l00645">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="gate_8hpp_source.html#l00675">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot_async()</a>, <a class="el" href="gate_8hpp_source.html#l00530">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::from_1_to_0()</a>, <a class="el" href="gate_8hpp_source.html#l00226">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_freqs()</a>, <a class="el" href="gate_8hpp_source.html#l00420">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_local_dofs()</a>, <a class="el" href="gate_8hpp_source.html#l00430">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_local_dofs_raw()</a>, and <a class="el" href="gate_8hpp_source.html#l00154">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::operator=()</a>.</p>
 
 </div>
 </div>
@@ -1959,9 +2135,9 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>vector mirrors </p>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00073">73</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00100">100</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00252">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::bytes()</a>, <a class="el" href="gate_8hpp_source.html#l00296">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="gate_8hpp_source.html#l00228">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::convert()</a>, <a class="el" href="matrix_8hpp_source.html#l00633">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::convert_to_1()</a>, <a class="el" href="gate_8hpp_source.html#l00169">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_mirrors()</a>, <a class="el" href="gate_8hpp_source.html#l00349">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="gate_8hpp_source.html#l00392">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs_raw()</a>, <a class="el" href="afc__limiter_8hpp_source.html#l00386">FEAT::Control::AFCTransportSolver&lt; MatrixType_ &gt;::init_symbolic()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00423">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="afc__limiter_8hpp_source.html#l00726">FEAT::Control::AFCTransportSolver&lt; MatrixType_ &gt;::limit_fct()</a>, <a class="el" href="gate_8hpp_source.html#l00113">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::operator=()</a>, <a class="el" href="gate_8hpp_source.html#l00274">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::push()</a>, <a class="el" href="gate_8hpp_source.html#l00457">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_0()</a>, <a class="el" href="gate_8hpp_source.html#l00481">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_0_async()</a>, <a class="el" href="gate_8hpp_source.html#l00503">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1()</a>, and <a class="el" href="gate_8hpp_source.html#l00531">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1_async()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00840">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_sync_vec()</a>, <a class="el" href="gate_8hpp_source.html#l00318">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::bytes()</a>, <a class="el" href="gate_8hpp_source.html#l00370">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::compile()</a>, <a class="el" href="gate_8hpp_source.html#l00238">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::convert()</a>, <a class="el" href="matrix_8hpp_source.html#l00643">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::convert_to_1()</a>, <a class="el" href="gate_8hpp_source.html#l00216">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_mirrors()</a>, <a class="el" href="gate_8hpp_source.html#l00443">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs()</a>, <a class="el" href="gate_8hpp_source.html#l00486">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_num_global_dofs_raw()</a>, <a class="el" href="afc__limiter_8hpp_source.html#l00386">FEAT::Control::AFCTransportSolver&lt; MatrixType_ &gt;::init_symbolic()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00423">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="afc__limiter_8hpp_source.html#l00726">FEAT::Control::AFCTransportSolver&lt; MatrixType_ &gt;::limit_fct()</a>, <a class="el" href="gate_8hpp_source.html#l00154">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::operator=()</a>, <a class="el" href="gate_8hpp_source.html#l00348">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::push()</a>, <a class="el" href="gate_8hpp_source.html#l00573">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_0_async()</a>, and <a class="el" href="gate_8hpp_source.html#l00627">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1_async()</a>.</p>
 
 </div>
 </div>
@@ -1981,9 +2157,171 @@ template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
 
 <p>communication ranks </p>
 
-<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00071">71</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00098">98</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti_8hpp_source.html#l00526">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_by_gate()</a>, <a class="el" href="gate_8hpp_source.html#l00252">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::bytes()</a>, <a class="el" href="matrix_8hpp_source.html#l00633">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::convert_to_1()</a>, <a class="el" href="gate_8hpp_source.html#l00549">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="gate_8hpp_source.html#l00436">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::from_1_to_0()</a>, <a class="el" href="gate_8hpp_source.html#l00159">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_ranks()</a>, <a class="el" href="afc__limiter_8hpp_source.html#l00386">FEAT::Control::AFCTransportSolver&lt; MatrixType_ &gt;::init_symbolic()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00423">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="afc__limiter_8hpp_source.html#l00726">FEAT::Control::AFCTransportSolver&lt; MatrixType_ &gt;::limit_fct()</a>, <a class="el" href="gate_8hpp_source.html#l00113">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::operator=()</a>, <a class="el" href="gate_8hpp_source.html#l00274">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::push()</a>, <a class="el" href="gate_8hpp_source.html#l00457">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_0()</a>, <a class="el" href="gate_8hpp_source.html#l00481">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_0_async()</a>, <a class="el" href="gate_8hpp_source.html#l00503">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1()</a>, and <a class="el" href="gate_8hpp_source.html#l00531">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1_async()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00840">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_sync_vec()</a>, <a class="el" href="alg__dof__parti_8hpp_source.html#l00526">FEAT::Global::AlgDofParti&lt; LocalVector_, Mirror_ &gt;::assemble_by_gate()</a>, <a class="el" href="gate_8hpp_source.html#l00318">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::bytes()</a>, <a class="el" href="matrix_8hpp_source.html#l00643">FEAT::Global::Matrix&lt; LocalMatrix_, RowMirror_, ColMirror_ &gt;::convert_to_1()</a>, <a class="el" href="gate_8hpp_source.html#l00645">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::dot()</a>, <a class="el" href="gate_8hpp_source.html#l00530">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::from_1_to_0()</a>, <a class="el" href="gate_8hpp_source.html#l00206">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::get_ranks()</a>, <a class="el" href="afc__limiter_8hpp_source.html#l00386">FEAT::Control::AFCTransportSolver&lt; MatrixType_ &gt;::init_symbolic()</a>, <a class="el" href="pmdcdsc__matrix_8hpp_source.html#l00423">FEAT::Global::PMDCDSCMatrix&lt; Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, dim_, 1 &gt;, MirrorV_, MirrorP_ &gt;, Global::Matrix&lt; LAFEM::SparseMatrixBCSR&lt; DT_, IT_, 1, dim_ &gt;, MirrorP_, MirrorV_ &gt; &gt;::init_symbolic()</a>, <a class="el" href="afc__limiter_8hpp_source.html#l00726">FEAT::Control::AFCTransportSolver&lt; MatrixType_ &gt;::limit_fct()</a>, <a class="el" href="gate_8hpp_source.html#l00154">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::operator=()</a>, <a class="el" href="gate_8hpp_source.html#l00348">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::push()</a>, <a class="el" href="gate_8hpp_source.html#l00573">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_0_async()</a>, <a class="el" href="gate_8hpp_source.html#l00599">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1()</a>, and <a class="el" href="gate_8hpp_source.html#l00627">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::sync_1_async()</a>.</p>
+
+</div>
+</div>
+<a id="aa5363f5b474ba093ab47a5aff709a318" name="aa5363f5b474ba093ab47a5aff709a318"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa5363f5b474ba093ab47a5aff709a318">&#9670;&#160;</a></span>_recv_buffers</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#a2fc6a0b0bb66bb55e8ab496f4bd38198">BufferVectorType</a>&gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html">FEAT::Global::Gate</a>&lt; LocalVector_, Mirror_ &gt;::_recv_buffers</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00102">102</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a6ccb521240db74ad3e60f51e550a4f78" name="a6ccb521240db74ad3e60f51e550a4f78"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a6ccb521240db74ad3e60f51e550a4f78">&#9670;&#160;</a></span>_recv_reqs</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_dist_1_1_request_vector.html">Dist::RequestVector</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html">FEAT::Global::Gate</a>&lt; LocalVector_, Mirror_ &gt;::_recv_reqs</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00104">104</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ae8c897ef2b269c9cb91de4f7a1b69ca8" name="ae8c897ef2b269c9cb91de4f7a1b69ca8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae8c897ef2b269c9cb91de4f7a1b69ca8">&#9670;&#160;</a></span>_recv_views</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="class_f_e_a_t_1_1_memory_1_1_typed_view.html">Memory::TypedView</a>&lt;<a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#af25530eb82c8a3e0192198e9cd806be5">DataType</a>&gt; &gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html">FEAT::Global::Gate</a>&lt; LocalVector_, Mirror_ &gt;::_recv_views</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00106">106</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a17b3cdb25d82090d82076ed2fbfe34bb" name="a17b3cdb25d82090d82076ed2fbfe34bb"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a17b3cdb25d82090d82076ed2fbfe34bb">&#9670;&#160;</a></span>_send_buffers</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#a2fc6a0b0bb66bb55e8ab496f4bd38198">BufferVectorType</a>&gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html">FEAT::Global::Gate</a>&lt; LocalVector_, Mirror_ &gt;::_send_buffers</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">mutable</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>persistent buffer vectors </p>
+
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00102">102</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00840">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_sync_vec()</a>, <a class="el" href="gate_8hpp_source.html#l00318">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::bytes()</a>, <a class="el" href="gate_8hpp_source.html#l00370">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::compile()</a>, and <a class="el" href="gate_8hpp_source.html#l00154">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::operator=()</a>.</p>
+
+</div>
+</div>
+<a id="ab427afdeb561d3b2c1a175d9cd9c01c5" name="ab427afdeb561d3b2c1a175d9cd9c01c5"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab427afdeb561d3b2c1a175d9cd9c01c5">&#9670;&#160;</a></span>_send_reqs</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="class_f_e_a_t_1_1_dist_1_1_request_vector.html">Dist::RequestVector</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html">FEAT::Global::Gate</a>&lt; LocalVector_, Mirror_ &gt;::_send_reqs</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">mutable</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>persistent MPI Requests </p>
+
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00104">104</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00840">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_sync_vec()</a>, and <a class="el" href="gate_8hpp_source.html#l00154">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::operator=()</a>.</p>
+
+</div>
+</div>
+<a id="a2a33e04edbbc6ce5ca697b79c65c3efa" name="a2a33e04edbbc6ce5ca697b79c65c3efa"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a33e04edbbc6ce5ca697b79c65c3efa">&#9670;&#160;</a></span>_send_views</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;<a class="el" href="class_f_e_a_t_1_1_memory_1_1_typed_view.html">Memory::TypedView</a>&lt;<a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html#af25530eb82c8a3e0192198e9cd806be5">DataType</a>&gt; &gt; <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html">FEAT::Global::Gate</a>&lt; LocalVector_, Mirror_ &gt;::_send_views</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">mutable</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>send and receive buffer views </p>
+
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00106">106</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00840">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_sync_vec()</a>, and <a class="el" href="gate_8hpp_source.html#l00154">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::operator=()</a>.</p>
+
+</div>
+</div>
+<a id="ac66842aec87a0cb338440a3d78738c27" name="ac66842aec87a0cb338440a3d78738c27"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac66842aec87a0cb338440a3d78738c27">&#9670;&#160;</a></span>_sync_location</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename LocalVector_ , typename Mirror_ &gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname">SyncLocation <a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html">FEAT::Global::Gate</a>&lt; LocalVector_, Mirror_ &gt;::_sync_location = SyncLocation::host</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00110">110</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
 
 </div>
 </div>

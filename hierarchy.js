@@ -65,18 +65,16 @@ var hierarchy =
       [ "FEAT::Control::Domain::HierarchUnitCubeDomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_hierarch_unit_cube_domain_control.html", null ],
       [ "FEAT::Control::Domain::HierarchUnitCubeDomainControl2< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_hierarch_unit_cube_domain_control2.html", null ],
       [ "FEAT::Control::Domain::PartiDomainControlBase< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html", [
-        [ "FEAT::Control::Domain::CGALDomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_c_g_a_l_domain_control.html", null ],
+        [ "FEAT::Control::Domain::DeslaggedDomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_deslagged_domain_control.html", null ],
         [ "FEAT::Control::Domain::PartiDomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html", [
           [ "FEAT::Control::Domain::AdaptivePartiDomainControl< DomainLevel_, TemplateSet_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_adaptive_parti_domain_control.html", null ]
-        ] ],
-        [ "FEAT::Control::Domain::VoxelDomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_control.html", null ]
+        ] ]
       ] ],
       [ "FEAT::Control::Domain::UnitCubeDomainControl< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_unit_cube_domain_control.html", null ]
     ] ],
     [ "DomainLevel_", null, [
       [ "FEAT::Control::Domain::AdaptiveLevelWrapper< DomainLevel_, TemplateSet_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_adaptive_level_wrapper.html", null ],
-      [ "FEAT::Control::Domain::CGALDomainLevelWrapper< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_c_g_a_l_domain_level_wrapper.html", null ],
-      [ "FEAT::Control::Domain::VoxelDomainLevelWrapper< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_level_wrapper.html", null ]
+      [ "FEAT::Control::Domain::DeslaggedDomainLevelWrapper< DomainLevel_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_deslagged_domain_level_wrapper.html", null ]
     ] ],
     [ "FEAT::Cubature::DriverBase< Shape::Simplex< 2 > >", "class_f_e_a_t_1_1_cubature_1_1_driver_base.html", [
       [ "FEAT::Cubature::SymmetricSimplexDriver< Shape::Simplex< 2 > >", "class_f_e_a_t_1_1_cubature_1_1_symmetric_simplex_driver_3_01_shape_1_1_simplex_3_012_01_4_01_4.html", [
@@ -247,6 +245,7 @@ var hierarchy =
     [ "FEAT::Adjacency::DynamicGraph", "class_f_e_a_t_1_1_adjacency_1_1_dynamic_graph.html", null ],
     [ "FEAT::Adjacency::ExportTGA", "class_f_e_a_t_1_1_adjacency_1_1_export_t_g_a.html", null ],
     [ "FEAT::Adjacency::Graph", "class_f_e_a_t_1_1_adjacency_1_1_graph.html", null ],
+    [ "FEAT::Adjacency::ImageRange< Adjactor_ >", "class_f_e_a_t_1_1_adjacency_1_1_image_range.html", null ],
     [ "FEAT::Adjacency::Permutation", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html", null ],
     [ "FEAT::Analytic::Common::CosineTensorStatic< DataType_, k_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_cosine_tensor_static.html", null ],
     [ "FEAT::Analytic::Common::ExpBubbleScalarStatic< DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_common_1_1_exp_bubble_scalar_static.html", null ],
@@ -453,6 +452,7 @@ var hierarchy =
     [ "FEAT::Assembly::DomainAssemblyJob", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_job.html", null ],
     [ "FEAT::Assembly::DomainAssemblyJob::Task", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_job_1_1_task.html", null ],
     [ "FEAT::Assembly::DomainAssemblyLinearFunctionalVectorJob< LinearFunctional_, Vector_, Space_ >", "class_f_e_a_t_1_1_assembly_1_1_domain_assembly_linear_functional_vector_job.html", null ],
+    [ "FEAT::Assembly::FeatureMeshPartFactory< Mesh_ >", "class_f_e_a_t_1_1_assembly_1_1_feature_mesh_part_factory.html", null ],
     [ "FEAT::Assembly::FEInterpolator< ToSpace_, FromSpace_ >", "struct_f_e_a_t_1_1_assembly_1_1_f_e_interpolator.html", null ],
     [ "FEAT::Assembly::FEInterpolator< Space::Lagrange1::Element< Trafo_ >, Space::Lagrange2::Element< Trafo_ > >", "struct_f_e_a_t_1_1_assembly_1_1_f_e_interpolator_3_01_space_1_1_lagrange1_1_1_element_3_01_trafo88bd382a0f92c8baea41863ea8ff4cff.html", null ],
     [ "FEAT::Assembly::FEInterpolator< Space::Lagrange2::Element< Trafo_ >, Space::Lagrange1::Element< Trafo_ > >", "struct_f_e_a_t_1_1_assembly_1_1_f_e_interpolator_3_01_space_1_1_lagrange2_1_1_element_3_01_trafoaad41beedc2a09129705ed54a155ebb0.html", null ],
@@ -489,6 +489,7 @@ var hierarchy =
     [ "FEAT::Assembly::NormalValueSurfaceIntegratorJob< FaceVector_, Space_, FEVector_ >", "class_f_e_a_t_1_1_assembly_1_1_normal_value_surface_integrator_job.html", null ],
     [ "FEAT::Assembly::OldroydAssembler", "class_f_e_a_t_1_1_assembly_1_1_oldroyd_assembler.html", null ],
     [ "FEAT::Assembly::OuterNormalComputer< Trafo_ >", "class_f_e_a_t_1_1_assembly_1_1_outer_normal_computer.html", null ],
+    [ "FEAT::Assembly::ProjectionFilterAssembler< Mesh_ >", "class_f_e_a_t_1_1_assembly_1_1_projection_filter_assembler.html", null ],
     [ "FEAT::Assembly::RewProjector", "class_f_e_a_t_1_1_assembly_1_1_rew_projector.html", null ],
     [ "FEAT::Assembly::ScalarDiscreteEvalData< DT_, dim_ >", "class_f_e_a_t_1_1_assembly_1_1_scalar_discrete_eval_data.html", null ],
     [ "FEAT::Assembly::ScalarErrorComputer< max_norm_, sub_dimensional_ >", "class_f_e_a_t_1_1_assembly_1_1_scalar_error_computer.html", null ],
@@ -529,6 +530,7 @@ var hierarchy =
     [ "FEAT::Assembly::VelocityAnalyser", "class_f_e_a_t_1_1_assembly_1_1_velocity_analyser.html", null ],
     [ "FEAT::Assembly::VelocityInfo< DataType_, dim_ >", "struct_f_e_a_t_1_1_assembly_1_1_velocity_info.html", null ],
     [ "FEAT::Backend", "class_f_e_a_t_1_1_backend.html", null ],
+    [ "FEAT::BackendScope", "class_f_e_a_t_1_1_backend_scope.html", null ],
     [ "FEAT::Control::AFCTransportSolver< MatrixType_ >", "class_f_e_a_t_1_1_control_1_1_a_f_c_transport_solver.html", null ],
     [ "FEAT::Control::BlockedBasicSystemLevel< dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ >", "class_f_e_a_t_1_1_control_1_1_blocked_basic_system_level.html", [
       [ "FEAT::Control::BlockedCombinedSystemLevel< dim_, DataType_, IndexType_, BlockedMatrix_, TransferMatrix_ >", "class_f_e_a_t_1_1_control_1_1_blocked_combined_system_level.html", null ],
@@ -538,7 +540,13 @@ var hierarchy =
       [ "FEAT::Control::CheckpointableWrapper< Object_ >", "class_f_e_a_t_1_1_control_1_1_checkpointable_wrapper.html", null ]
     ] ],
     [ "FEAT::Control::CheckpointControl", "class_f_e_a_t_1_1_control_1_1_checkpoint_control.html", null ],
+    [ "FEAT::Control::Domain::DeslaggingPredicateBase< MeshType_, WeightType_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_deslagging_predicate_base.html", [
+      [ "FEAT::Control::Domain::CGALDeslaggingPredicate< MeshType_, WeightType_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_c_g_a_l_deslagging_predicate.html", null ],
+      [ "FEAT::Control::Domain::VoxelMapDeslaggingPredicate< MeshType_, WeightType_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_map_deslagging_predicate.html", null ]
+    ] ],
     [ "FEAT::Control::Domain::DomainControl< DomLvl_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_control.html", null ],
+    [ "FEAT::Control::Domain::DomainGlobalBoundingBoxHelper< DomainControl_ >", "struct_f_e_a_t_1_1_control_1_1_domain_1_1_domain_global_bounding_box_helper.html", null ],
+    [ "FEAT::Control::Domain::DomainGlobalBoundingBoxHelper< Control::Domain::DeslaggedDomainControl< DomainLevel_ > >", "struct_f_e_a_t_1_1_control_1_1_domain_1_1_domain_global_bounding_box_helper_3_01_control_1_1_dom638f905da98ab33a37d8c76055d894e4.html", null ],
     [ "FEAT::Control::Domain::DomainLayer", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_layer.html", null ],
     [ "FEAT::Control::Domain::DomainLevel< Mesh_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_level.html", [
       [ "FEAT::Control::Domain::SimpleDomainLevel< Mesh_, Trafo_, Space_ >", "class_f_e_a_t_1_1_control_1_1_domain_1_1_simple_domain_level.html", null ],
@@ -824,6 +832,7 @@ var hierarchy =
     [ "FEAT::Geometry::PartiIterative< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_parti_iterative.html", null ],
     [ "FEAT::Geometry::PartiIterative< ConformalMesh< Shape_, num_coords_, Coord_ > >", "class_f_e_a_t_1_1_geometry_1_1_parti_iterative_3_01_conformal_mesh_3_01_shape___00_01num__coords___00_01_coord___01_4_01_4.html", null ],
     [ "FEAT::Geometry::PartiParMETIS", "class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html", null ],
+    [ "FEAT::Geometry::PartiScotch", "class_f_e_a_t_1_1_geometry_1_1_parti_scotch.html", null ],
     [ "FEAT::Geometry::Partition", "class_f_e_a_t_1_1_geometry_1_1_partition.html", null ],
     [ "FEAT::Geometry::PartitionSet", "class_f_e_a_t_1_1_geometry_1_1_partition_set.html", null ],
     [ "FEAT::Geometry::PartiZoltan", "class_f_e_a_t_1_1_geometry_1_1_parti_zoltan.html", null ],
@@ -843,6 +852,7 @@ var hierarchy =
     [ "FEAT::Geometry::RefinementTemplate< Shape_, CoShape_ >", "struct_f_e_a_t_1_1_geometry_1_1_refinement_template.html", null ],
     [ "FEAT::Geometry::RefinementTemplate< Shape_, Shape::Vertex >", "struct_f_e_a_t_1_1_geometry_1_1_refinement_template_3_01_shape___00_01_shape_1_1_vertex_01_4.html", null ],
     [ "FEAT::Geometry::SchneidersData", "class_f_e_a_t_1_1_geometry_1_1_schneiders_data.html", null ],
+    [ "FEAT::Geometry::ScotchGraph", "struct_f_e_a_t_1_1_geometry_1_1_scotch_graph.html", null ],
     [ "FEAT::Geometry::SphereHitTestFunction< DataType_, dim_ >", "class_f_e_a_t_1_1_geometry_1_1_sphere_hit_test_function.html", null ],
     [ "FEAT::Geometry::StandardRefinementType< Shape_ >", "class_f_e_a_t_1_1_geometry_1_1_standard_refinement_type.html", null ],
     [ "FEAT::Geometry::StandardTemplateSet< RawData_ >", "class_f_e_a_t_1_1_geometry_1_1_standard_template_set.html", null ],
@@ -882,9 +892,16 @@ var hierarchy =
     ] ],
     [ "FEAT::Global::AlgDofParti< LocalVector_, Mirror_ >", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html", null ],
     [ "FEAT::Global::AlgDofPartiSystem< LocalMatrix_, LocalFilter_, Mirror_ >", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_system.html", null ],
+    [ "FEAT::Global::DiscreteEvaluator", "class_f_e_a_t_1_1_global_1_1_discrete_evaluator.html", null ],
     [ "FEAT::Global::Filter< LocalFilter_, Mirror_ >", "class_f_e_a_t_1_1_global_1_1_filter.html", null ],
+    [ "FEAT::Global::FloodFill", "class_f_e_a_t_1_1_global_1_1_flood_fill.html", null ],
     [ "FEAT::Global::Gate< LocalVector_, Mirror_ >", "class_f_e_a_t_1_1_global_1_1_gate.html", null ],
     [ "FEAT::Global::GlobalInverseMappingData< DataType_, shape_dim_, world_dim_ >", "class_f_e_a_t_1_1_global_1_1_global_inverse_mapping_data.html", null ],
+    [ "FEAT::Global::Intern::DiscreteEvaluatorTypeHelper< PointRange_, VectorType_, Space_, gradient_ >", "struct_f_e_a_t_1_1_global_1_1_intern_1_1_discrete_evaluator_type_helper.html", null ],
+    [ "FEAT::Global::Intern::DiscreteEvaluatorTypeHelper< PointRange_, LAFEM::DenseVector< DataType_, IndexType_ >, Space_, false >", "struct_f_e_a_t_1_1_global_1_1_intern_1_1_discrete_evaluator_type_helper_3_01_point_range___00_0122c73df686e047fb8f03d296136829fd.html", null ],
+    [ "FEAT::Global::Intern::DiscreteEvaluatorTypeHelper< PointRange_, LAFEM::DenseVector< DataType_, IndexType_ >, Space_, true >", "struct_f_e_a_t_1_1_global_1_1_intern_1_1_discrete_evaluator_type_helper_3_01_point_range___00_01a9ab3b83a4d9ccf31240094b842de578.html", null ],
+    [ "FEAT::Global::Intern::DiscreteEvaluatorTypeHelper< PointRange_, LAFEM::DenseVectorBlocked< DataType_, IndexType_, dim_ >, Space_, false >", "struct_f_e_a_t_1_1_global_1_1_intern_1_1_discrete_evaluator_type_helper_3_01_point_range___00_01af8944238ac64ec6f6b31b58f96b576e.html", null ],
+    [ "FEAT::Global::Intern::DiscreteEvaluatorTypeHelper< PointRange_, LAFEM::DenseVectorBlocked< DataType_, IndexType_, dim_ >, Space_, true >", "struct_f_e_a_t_1_1_global_1_1_intern_1_1_discrete_evaluator_type_helper_3_01_point_range___00_01224716337cd12afc0473e6029869e23b.html", null ],
     [ "FEAT::Global::InverseMapping< InverseMappingType_ >", "class_f_e_a_t_1_1_global_1_1_inverse_mapping.html", null ],
     [ "FEAT::Global::InverseMapping< InverseMappingType_ >::UnmappingResult", "struct_f_e_a_t_1_1_global_1_1_inverse_mapping_1_1_unmapping_result.html", null ],
     [ "FEAT::Global::Matrix< LocalMatrix_, RowMirror_, ColMirror_ >", "class_f_e_a_t_1_1_global_1_1_matrix.html", null ],
@@ -910,9 +927,13 @@ var hierarchy =
     [ "FEAT::KahanAccumulator< DT_ >", "class_f_e_a_t_1_1_kahan_accumulator.html", null ],
     [ "FEAT::LAFEM::Arch::AxpyBlock", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_axpy_block.html", null ],
     [ "FEAT::LAFEM::Arch::AxpyDense", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_axpy_dense.html", null ],
+    [ "FEAT::LAFEM::Arch::BatchedDotProduct", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_batched_dot_product.html", null ],
+    [ "FEAT::LAFEM::Arch::BatchedScratchSpace", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_batched_scratch_space.html", null ],
+    [ "FEAT::LAFEM::Arch::BatchedTripleDotProduct", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_batched_triple_dot_product.html", null ],
     [ "FEAT::LAFEM::Arch::ComponentInvertDense", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_component_invert_dense.html", null ],
     [ "FEAT::LAFEM::Arch::ComponentProductDense", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_component_product_dense.html", null ],
     [ "FEAT::LAFEM::Arch::CopyStride", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_copy_stride.html", null ],
+    [ "FEAT::LAFEM::Arch::CumulativeAxpy", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_cumulative_axpy.html", null ],
     [ "FEAT::LAFEM::Arch::DiagonalBCSR", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_diagonal_b_c_s_r.html", null ],
     [ "FEAT::LAFEM::Arch::DiagonalCSR", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_diagonal_c_s_r.html", null ],
     [ "FEAT::LAFEM::Arch::DotProductBlock", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_arch_1_1_dot_product_block.html", null ],
@@ -996,6 +1017,13 @@ var hierarchy =
     [ "FEAT::LAFEM::DenseVectorBlocked< DT_, IT_, block_size_ >::GatherAxpy", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked_1_1_gather_axpy.html", null ],
     [ "FEAT::LAFEM::DenseVectorBlocked< DT_, IT_, block_size_ >::ScatterAxpy", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_dense_vector_blocked_1_1_scatter_axpy.html", null ],
     [ "FEAT::LAFEM::FilterChain< First_, Rest_ >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_filter_chain.html", null ],
+    [ "FEAT::LAFEM::Intern::ClosestPoint< FacetShape_, MeshType_ >", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_intern_1_1_closest_point.html", null ],
+    [ "FEAT::LAFEM::Intern::ClosestPoint< Shape::Hypercube< 1 >, MeshType_ >", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_intern_1_1_closest_point_3_01_shape_1_1_hypercube_3_011_01_4_00_01_mesh_type___01_4.html", null ],
+    [ "FEAT::LAFEM::Intern::ClosestPoint< Shape::Hypercube< 2 >, MeshType_ >", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_intern_1_1_closest_point_3_01_shape_1_1_hypercube_3_012_01_4_00_01_mesh_type___01_4.html", null ],
+    [ "FEAT::LAFEM::Intern::ClosestPoint< Shape::Simplex< 1 >, MeshType_ >", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_intern_1_1_closest_point_3_01_shape_1_1_simplex_3_011_01_4_00_01_mesh_type___01_4.html", null ],
+    [ "FEAT::LAFEM::Intern::ClosestPoint< Shape::Simplex< 2 >, MeshType_ >", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_intern_1_1_closest_point_3_01_shape_1_1_simplex_3_012_01_4_00_01_mesh_type___01_4.html", null ],
+    [ "FEAT::LAFEM::Intern::ClosestPoint< Shape::Vertex, MeshType_ >", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_intern_1_1_closest_point_3_01_shape_1_1_vertex_00_01_mesh_type___01_4.html", null ],
+    [ "FEAT::LAFEM::Intern::ClosestPointHelpers< DataType_ >", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_intern_1_1_closest_point_helpers.html", null ],
     [ "FEAT::LAFEM::MatrixGatherScatterHelper< Space_, DT_, IT_, policy_ >", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper.html", null ],
     [ "FEAT::LAFEM::MatrixGatherScatterHelper< Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps >", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_tf417dc54e181ee7869a07811099e7e1e.html", null ],
     [ "FEAT::LAFEM::MatrixGatherScatterHelper< Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper >", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_matrix_gather_scatter_helper_3_01_space___00_01_d_t___00_01_i_t615360d4651e74a259baaf0968479879.html", null ],
@@ -1022,6 +1050,8 @@ var hierarchy =
     [ "FEAT::LAFEM::PowerMirror< SubMirror_, count_ >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html", null ],
     [ "FEAT::LAFEM::PowerRowMatrix< SubType_, blocks_ >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_row_matrix.html", null ],
     [ "FEAT::LAFEM::PowerVector< SubType_, count_ >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html", null ],
+    [ "FEAT::LAFEM::ProjectionFilter< MeshType_, DT_, IT_ >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_projection_filter.html", null ],
+    [ "FEAT::LAFEM::ProjectionFilter< MeshType_, DT_, IT_ >::FilterEntry", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_projection_filter_1_1_filter_entry.html", null ],
     [ "FEAT::LAFEM::SaddlePointMatrix< MatrixA_, MatrixB_, MatrixD_ >", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html", null ],
     [ "FEAT::LAFEM::SaddlePointMatrixElement< MatrixA_, MatrixB_, MatrixD_, i_, j_ >", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix_element.html", null ],
     [ "FEAT::LAFEM::SerialConfig", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_serial_config.html", null ],
@@ -1073,6 +1103,8 @@ var hierarchy =
       ] ]
     ] ],
     [ "FEAT::Meshopt::MeshConcentrationFunctionFactory< Trafo_, RefCellTrafo_ >", "struct_f_e_a_t_1_1_meshopt_1_1_mesh_concentration_function_factory.html", null ],
+    [ "FEAT::MeshOpt::MeshDeformer< MeshType_ >", "class_f_e_a_t_1_1_mesh_opt_1_1_mesh_deformer.html", null ],
+    [ "FEAT::MeshOpt::MeshDeformerQuality", "struct_f_e_a_t_1_1_mesh_opt_1_1_mesh_deformer_quality.html", null ],
     [ "FEAT::Meshopt::MeshQualityFunctional< MeshType_ >", "class_f_e_a_t_1_1_meshopt_1_1_mesh_quality_functional.html", null ],
     [ "FEAT::Meshopt::RumpfFunctional< DataType_, TrafoType_ >", "class_f_e_a_t_1_1_meshopt_1_1_rumpf_functional.html", null ],
     [ "FEAT::Meshopt::RumpfFunctionalBase< DataType_ >", "class_f_e_a_t_1_1_meshopt_1_1_rumpf_functional_base.html", null ],
@@ -1102,7 +1134,13 @@ var hierarchy =
     [ "FEAT::Shape::Simplex< dimension_ >", "struct_f_e_a_t_1_1_shape_1_1_simplex.html", null ],
     [ "FEAT::Shape::Vertex", "struct_f_e_a_t_1_1_shape_1_1_vertex.html", null ],
     [ "FEAT::SimpleArgParser", "class_f_e_a_t_1_1_simple_arg_parser.html", null ],
+    [ "FEAT::Solver::AmaVankaGMRES< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_ama_vanka_g_m_r_e_s.html", null ],
+    [ "FEAT::Solver::AmaVankaRichardson< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_ama_vanka_richardson.html", null ],
     [ "FEAT::Solver::AnalyticFunctionOperator< DT_, IT_, Function_ >", "class_f_e_a_t_1_1_solver_1_1_analytic_function_operator.html", null ],
+    [ "FEAT::Solver::CSRHelper::CRSMat< DT_, IT_ >", "struct_f_e_a_t_1_1_solver_1_1_c_s_r_helper_1_1_c_r_s_mat.html", null ],
+    [ "FEAT::Solver::CSRHelper::GMRESApplyInfo< DT_, IT_ >", "struct_f_e_a_t_1_1_solver_1_1_c_s_r_helper_1_1_g_m_r_e_s_apply_info.html", null ],
+    [ "FEAT::Solver::CSRHelper::GMRESStatus< DT_ >", "struct_f_e_a_t_1_1_solver_1_1_c_s_r_helper_1_1_g_m_r_e_s_status.html", null ],
+    [ "FEAT::Solver::CSRHelper::UnitFilterInfo< DT_, IT_ >", "struct_f_e_a_t_1_1_solver_1_1_c_s_r_helper_1_1_unit_filter_info.html", null ],
     [ "FEAT::Solver::DirectStokesCore< SolverDT_, SolverIT_, MatrixA_, MatrixB_, MatrixD_, MatrixS_ >", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_core.html", null ],
     [ "FEAT::Solver::DirectStokesCore< SolverDT_, SolverIT_, LAFEM::SparseMatrixBCSR< DT_, IT_, dim_, dim_ >, LAFEM::SparseMatrixBCSR< DT_, IT_, dim_, 1 >, LAFEM::SparseMatrixBCSR< DT_, IT_, 1, dim_ >, LAFEM::SparseMatrixCSR< DT_, IT_ > >", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_core_3_01_solver_d_t___00_01_solver_i_t___00_01_l_a_fba3df488bc06c314d472100c65203e90.html", null ],
     [ "FEAT::Solver::DirectStokesSolver< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_direct_stokes_solver.html", null ],
@@ -1125,15 +1163,50 @@ var hierarchy =
     [ "FEAT::Solver::ILUPrecondBase< Matrix_ >", "class_f_e_a_t_1_1_solver_1_1_i_l_u_precond_base.html", [
       [ "FEAT::Solver::ILUPrecondWithBackend< backend_, Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_i_l_u_precond_with_backend.html", null ]
     ] ],
+    [ "FEAT::Solver::Intern::BatchedHelper< VectorType_ >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_batched_helper.html", null ],
+    [ "FEAT::Solver::Intern::BatchedHelper< Global::Vector< LocalVector_, Mirror_ > >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_batched_helper_3_01_global_1_1_vector_3_01_local_vector___00_01_mirror___01_4_01_4.html", null ],
+    [ "FEAT::Solver::Intern::BatchedHelper< LAFEM::DenseVector< DTT_, ITT_ > >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_batched_helper_3_01_l_a_f_e_m_1_1_dense_vector_3_01_d_t_t___00_01_i_t_t___01_4_01_4.html", null ],
+    [ "FEAT::Solver::Intern::BatchedHelper< LAFEM::DenseVectorBlocked< DTT_, ITT_, dim_ > >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_batched_helper_3_01_l_a_f_e_m_1_1_dense_vector_blocked_3986422caf515773e2c0c66432580df8a.html", null ],
+    [ "FEAT::Solver::Intern::BatchedHelper< LAFEM::TupleVector< First_ > >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_batched_helper_3_01_l_a_f_e_m_1_1_tuple_vector_3_01_first___01_4_01_4.html", null ],
+    [ "FEAT::Solver::Intern::BatchedHelper< LAFEM::TupleVector< First_, Rest_... > >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_batched_helper_3_01_l_a_f_e_m_1_1_tuple_vector_3_01_firs98aeeaf0aed61eea4b82a995f35da7ab.html", null ],
+    [ "FEAT::Solver::Intern::FilterHelper< InFilterType_ >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_filter_helper.html", null ],
+    [ "FEAT::Solver::Intern::FilterHelper< LAFEM::FilterChain< First_ > >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_filter_helper_3_01_l_a_f_e_m_1_1_filter_chain_3_01_first___01_4_01_4.html", null ],
+    [ "FEAT::Solver::Intern::FilterHelper< LAFEM::FilterChain< First_, Rest_... > >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_filter_helper_3_01_l_a_f_e_m_1_1_filter_chain_3_01_first___00_01_rest___8_8_8_01_4_01_4.html", null ],
+    [ "FEAT::Solver::Intern::FilterHelper< LAFEM::FilterSequence< FType_ > >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_filter_helper_3_01_l_a_f_e_m_1_1_filter_sequence_3_01_f_type___01_4_01_4.html", null ],
+    [ "FEAT::Solver::Intern::FilterHelper< LAFEM::TupleFilter< First_ > >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_filter_helper_3_01_l_a_f_e_m_1_1_tuple_filter_3_01_first___01_4_01_4.html", null ],
+    [ "FEAT::Solver::Intern::FilterHelper< LAFEM::TupleFilter< First_, Rest_... > >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_filter_helper_3_01_l_a_f_e_m_1_1_tuple_filter_3_01_first___00_01_rest___8_8_8_01_4_01_4.html", null ],
+    [ "FEAT::Solver::Intern::FilterHelper< LAFEM::UnitFilter< DTT_, ITT_ > >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_filter_helper_3_01_l_a_f_e_m_1_1_unit_filter_3_01_d_t_t___00_01_i_t_t___01_4_01_4.html", null ],
+    [ "FEAT::Solver::Intern::FilterHelper< LAFEM::UnitFilterBlocked< DTT_, ITT_, dim_ > >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_filter_helper_3_01_l_a_f_e_m_1_1_unit_filter_blocked_3_0ac97dc427a899f3b39251caf192f1040.html", null ],
+    [ "FEAT::Solver::Intern::MirrorHelper< InMirror_ >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_mirror_helper.html", null ],
+    [ "FEAT::Solver::Intern::MirrorHelper< LAFEM::TupleMirror< First_ > >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_mirror_helper_3_01_l_a_f_e_m_1_1_tuple_mirror_3_01_first___01_4_01_4.html", null ],
+    [ "FEAT::Solver::Intern::MirrorHelper< LAFEM::TupleMirror< First_, Rest_... > >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_mirror_helper_3_01_l_a_f_e_m_1_1_tuple_mirror_3_01_first___00_01_rest___8_8_8_01_4_01_4.html", null ],
+    [ "FEAT::Solver::Intern::MirrorHelper< LAFEM::VectorMirror< DT_, IT_ > >", "class_f_e_a_t_1_1_solver_1_1_intern_1_1_mirror_helper_3_01_l_a_f_e_m_1_1_vector_mirror_3_01_d_t___00_01_i_t___01_4_01_4.html", null ],
     [ "FEAT::Solver::IterationStats", "class_f_e_a_t_1_1_solver_1_1_iteration_stats.html", null ],
+    [ "FEAT::Solver::KrylovSubspaceOrthogonalizer< Vector_ >", "class_f_e_a_t_1_1_solver_1_1_krylov_subspace_orthogonalizer.html", [
+      [ "FEAT::Solver::ClassicGramSchmidtOrthogonalizer< Vector_ >", "class_f_e_a_t_1_1_solver_1_1_classic_gram_schmidt_orthogonalizer.html", [
+        [ "FEAT::Solver::CGS2Orthogonalizer< Vector_ >", "class_f_e_a_t_1_1_solver_1_1_c_g_s2_orthogonalizer.html", null ]
+      ] ],
+      [ "FEAT::Solver::ModifiedGramSchmidtOrthogonalizer< Vector_ >", "class_f_e_a_t_1_1_solver_1_1_modified_gram_schmidt_orthogonalizer.html", null ]
+    ] ],
     [ "FEAT::Solver::MultiGridHierarchy< SystemMatrix_, SystemFilter_, TransferOperator_ >", "class_f_e_a_t_1_1_solver_1_1_multi_grid_hierarchy.html", null ],
     [ "FEAT::Solver::MultiGridHierarchy< SystemMatrix_, SystemFilter_, TransferOperator_ >::LevelInfo", "class_f_e_a_t_1_1_solver_1_1_multi_grid_hierarchy_1_1_level_info.html", null ],
     [ "FEAT::Solver::MultiGridLevelBase< SystemMatrix_, SystemFilter_, TransferOperator_ >", "class_f_e_a_t_1_1_solver_1_1_multi_grid_level_base.html", [
       [ "FEAT::Solver::MultiGridLevelStd< SystemMatrix_, SystemFilter_, TransferOperator_ >", "class_f_e_a_t_1_1_solver_1_1_multi_grid_level_std.html", null ]
     ] ],
     [ "FEAT::Solver::OptimizationTestTraits< DT_, Function_ >", "struct_f_e_a_t_1_1_solver_1_1_optimization_test_traits.html", null ],
+    [ "FEAT::Solver::RichardsonHelper::GateWrapper< DT_, IT_ >", "struct_f_e_a_t_1_1_solver_1_1_richardson_helper_1_1_gate_wrapper.html", null ],
+    [ "FEAT::Solver::RichardsonHelper::MetaBlock< DT_, IT_ >", "struct_f_e_a_t_1_1_solver_1_1_richardson_helper_1_1_meta_block.html", null ],
+    [ "FEAT::Solver::RichardsonHelper::MetaMatrix< DT_, IT_, NR_, NC_ >", "struct_f_e_a_t_1_1_solver_1_1_richardson_helper_1_1_meta_matrix.html", null ],
+    [ "FEAT::Solver::RichardsonHelper::MetaVectorInfo", "struct_f_e_a_t_1_1_solver_1_1_richardson_helper_1_1_meta_vector_info.html", null ],
+    [ "FEAT::Solver::RichardsonHelper::RichardsonApplyInfo< DT_, IT_, NC_ >", "struct_f_e_a_t_1_1_solver_1_1_richardson_helper_1_1_richardson_apply_info.html", null ],
+    [ "FEAT::Solver::RichardsonHelper::RichardsonStatus< DT_ >", "struct_f_e_a_t_1_1_solver_1_1_richardson_helper_1_1_richardson_status.html", null ],
+    [ "FEAT::Solver::RichardsonHelper::UnitFilterInfo< DT_, IT_ >", "struct_f_e_a_t_1_1_solver_1_1_richardson_helper_1_1_unit_filter_info.html", null ],
     [ "FEAT::Solver::SchwarzPrecond< Vector_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_schwarz_precond.html", null ],
     [ "FEAT::Solver::SolverBase< Vector_ >", "class_f_e_a_t_1_1_solver_1_1_solver_base.html", [
+      [ "FEAT::Solver::IterativeSolver< Global::Matrix< LocalMatrix_, MirrorRow_, MirrorCol_ >::VectorTypeR >", "class_f_e_a_t_1_1_solver_1_1_iterative_solver.html", [
+        [ "FEAT::Solver::AmaVankaGMRES< Global::Matrix< LocalMatrix_, MirrorRow_, MirrorCol_ >, Global::Filter< LocalFilter_, MirrorRow_ > >", "class_f_e_a_t_1_1_solver_1_1_ama_vanka_g_m_r_e_s_3_01_global_1_1_matrix_3_01_local_matrix___00_0d762f8676132651836c5e02fb8066064.html", null ],
+        [ "FEAT::Solver::AmaVankaRichardson< Global::Matrix< LocalMatrix_, MirrorRow_, MirrorCol_ >, Global::Filter< LocalFilter_, MirrorRow_ > >", "class_f_e_a_t_1_1_solver_1_1_ama_vanka_richardson_3_01_global_1_1_matrix_3_01_local_matrix___00_9b558411d899c1a86e2c9cfe8309ebc2.html", null ]
+      ] ],
       [ "FEAT::Solver::IterativeSolver< Matrix_::VectorTypeR >", "class_f_e_a_t_1_1_solver_1_1_iterative_solver.html", [
         [ "FEAT::Solver::Chebyshev< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_chebyshev.html", null ],
         [ "FEAT::Solver::PCGNR< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_p_c_g_n_r.html", null ],
@@ -1178,7 +1251,6 @@ var hierarchy =
           [ "FEAT::Solver::BiCGStabL< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_bi_c_g_stab_l.html", null ],
           [ "FEAT::Solver::Descent< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_descent.html", null ],
           [ "FEAT::Solver::FGMRES< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_f_g_m_r_e_s.html", null ],
-          [ "FEAT::Solver::GMRES< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_g_m_r_e_s.html", null ],
           [ "FEAT::Solver::GroppPCG< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_gropp_p_c_g.html", null ],
           [ "FEAT::Solver::IDRS< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_i_d_r_s.html", null ],
           [ "FEAT::Solver::PCG< Matrix_, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_p_c_g.html", null ],
@@ -1546,6 +1618,8 @@ var hierarchy =
     [ "FEAT::Type::Traits< unsigned short >", "struct_f_e_a_t_1_1_type_1_1_traits_3_01unsigned_01short_01_4.html", null ],
     [ "FEAT::Util::ConstKeyValuePair< V, Key >", "struct_f_e_a_t_1_1_util_1_1_const_key_value_pair.html", null ],
     [ "FEAT::Util::KeyValuePair< V, Key >", "struct_f_e_a_t_1_1_util_1_1_key_value_pair.html", null ],
+    [ "FEAT::Util::NvtxRangeStack", "class_f_e_a_t_1_1_util_1_1_nvtx_range_stack.html", null ],
+    [ "FEAT::Util::ScopedNvtxRange", "class_f_e_a_t_1_1_util_1_1_scoped_nvtx_range.html", null ],
     [ "FEAT::Util::SecondaryMap< V, Key >", "class_f_e_a_t_1_1_util_1_1_secondary_map.html", null ],
     [ "FEAT::Util::SecondaryMap< V, Key >::Slot", "struct_f_e_a_t_1_1_util_1_1_secondary_map_1_1_slot.html", null ],
     [ "FEAT::Util::SlotMap< V, Key >", "class_f_e_a_t_1_1_util_1_1_slot_map.html", null ],
@@ -1563,6 +1637,7 @@ var hierarchy =
     [ "FEAT::VoxelAssembly::BurgersSharedDataGlobalWrapper< SpaceHelp_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_shared_data_global_wrapper.html", null ],
     [ "FEAT::VoxelAssembly::BurgersSharedDataKernelWrapper< SpaceHelp_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_burgers_shared_data_kernel_wrapper.html", null ],
     [ "FEAT::VoxelAssembly::CSRMatrixData< DT_, IT_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_c_s_r_matrix_data.html", null ],
+    [ "FEAT::VoxelAssembly::DeviceCubature< DT_, PointType_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_device_cubature.html", null ],
     [ "FEAT::VoxelAssembly::IndexSetWrapper< IndexType_ >", "class_f_e_a_t_1_1_voxel_assembly_1_1_index_set_wrapper.html", null ],
     [ "FEAT::VoxelAssembly::Intern::DofHelper< SpaceType_, target_dim_ >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_intern_1_1_dof_helper.html", null ],
     [ "FEAT::VoxelAssembly::Intern::DofHelper< VoxelAssembly::Q2StandardHexa, target_dim >", "struct_f_e_a_t_1_1_voxel_assembly_1_1_intern_1_1_dof_helper_3_01_voxel_assembly_1_1_q2_standard_hexa_00_01target__dim_01_4.html", null ],
@@ -1618,6 +1693,7 @@ var hierarchy =
     [ "Function_", null, [
       [ "FEAT::Analytic::AutoDerive< Function_, DataType_ >", "class_f_e_a_t_1_1_analytic_1_1_auto_derive.html", null ]
     ] ],
+    [ "FEAT::Global::Gate< FEAT::LAFEM::DenseVector< DT_, IT_ >, FEAT::LAFEM::VectorMirror< DT_, IT_ > >", "class_f_e_a_t_1_1_global_1_1_gate.html", null ],
     [ "FEAT::Global::Gate< LocalPresVector, PresMirror >", "class_f_e_a_t_1_1_global_1_1_gate.html", null ],
     [ "FEAT::Global::Gate< LocalScalarVector, ScalarMirror >", "class_f_e_a_t_1_1_global_1_1_gate.html", null ],
     [ "FEAT::Global::Gate< LocalStressVector, StressMirror >", "class_f_e_a_t_1_1_global_1_1_gate.html", null ],
@@ -1626,6 +1702,7 @@ var hierarchy =
     [ "FEAT::Global::Gate< LocalVectorType, typename FEAT::Control::Intern::MatrixTypeHelper< MatrixType_ >::ColMirror >", "class_f_e_a_t_1_1_global_1_1_gate.html", null ],
     [ "FEAT::Global::Gate< LocalVectorType, typename FEAT::Control::Intern::MatrixTypeHelper< MatrixType_ >::RowMirror >", "class_f_e_a_t_1_1_global_1_1_gate.html", null ],
     [ "FEAT::Global::Gate< LocalVeloVector, VeloMirror >", "class_f_e_a_t_1_1_global_1_1_gate.html", null ],
+    [ "FEAT::Global::Gate< VecType, MirrorType >", "class_f_e_a_t_1_1_global_1_1_gate.html", null ],
     [ "FEAT::Solver::ILUPrecondBase< LAFEM::SparseMatrixBCSR< DT_, IT_, dim_, dim_ > >", "class_f_e_a_t_1_1_solver_1_1_i_l_u_precond_base.html", [
       [ "FEAT::Solver::ILUPrecondWithBackend< PreferredBackend::generic, LAFEM::SparseMatrixBCSR< DT_, IT_, dim_, dim_ >, Filter_ >", "class_f_e_a_t_1_1_solver_1_1_i_l_u_precond_with_backend_3_01_preferred_backend_1_1generic_00_01_785a361efe2523a8ba3c26ca3bd778e8.html", null ]
     ] ],
@@ -1685,6 +1762,7 @@ var hierarchy =
     [ "FEAT::Global::Matrix< LocalScalarMatrix, PresMirror, PresMirror >", "class_f_e_a_t_1_1_global_1_1_matrix.html", null ],
     [ "FEAT::Global::Matrix< LocalSystemMatrix, SystemMirror, SystemMirror >", "class_f_e_a_t_1_1_global_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< MatrixValue, max_local_dofs, max_local_dofs >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
+    [ "FEAT::Global::Matrix< SparseMatType, MirrorType, MirrorType >", "class_f_e_a_t_1_1_global_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< T_, m_, n_, m_, n_ >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Tiny::Matrix< ValueType, max_common_dofs, max_common_dofs >", "class_f_e_a_t_1_1_tiny_1_1_matrix.html", null ],
     [ "FEAT::Geometry::MeshAtlas< MeshType >", "class_f_e_a_t_1_1_geometry_1_1_mesh_atlas.html", null ],
@@ -1697,6 +1775,7 @@ var hierarchy =
     [ "FEAT::Geometry::MeshNode< RootMesh_, RootMesh_ >", "class_f_e_a_t_1_1_geometry_1_1_mesh_node.html", [
       [ "FEAT::Geometry::RootMeshNode< RootMesh_ >", "class_f_e_a_t_1_1_geometry_1_1_root_mesh_node.html", null ]
     ] ],
+    [ "FEAT::Geometry::MeshPart< Mesh_ >", "class_f_e_a_t_1_1_geometry_1_1_mesh_part.html", null ],
     [ "FEAT::Geometry::MeshPermutation< ShapeType >", "class_f_e_a_t_1_1_geometry_1_1_mesh_permutation.html", null ],
     [ "FEAT::Meshopt::MeshQualityFunctional< Trafo_::MeshType >", "class_f_e_a_t_1_1_meshopt_1_1_mesh_quality_functional.html", [
       [ "FEAT::Meshopt::HyperelasticityFunctional< DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ >", "class_f_e_a_t_1_1_meshopt_1_1_hyperelasticity_functional.html", null ]
@@ -1705,6 +1784,7 @@ var hierarchy =
       [ "FEAT::Meshopt::DuDvFunctional< DT_, IT_, TrafoType_, MatrixType_ >", "class_f_e_a_t_1_1_meshopt_1_1_du_dv_functional.html", null ]
     ] ],
     [ "FEAT::Geometry::Intern::MeshRoots< shape_dim >", "struct_f_e_a_t_1_1_geometry_1_1_intern_1_1_mesh_roots.html", null ],
+    [ "FEAT::Solver::RichardsonHelper::MetaMatrix< DT_, IT_, NC_, NC_ >", "struct_f_e_a_t_1_1_solver_1_1_richardson_helper_1_1_meta_matrix.html", null ],
     [ "FEAT::Global::Muxer< LocalPresVector, PresMirror >", "class_f_e_a_t_1_1_global_1_1_muxer.html", null ],
     [ "FEAT::Global::Muxer< LocalScalarVector, ScalarMirror >", "class_f_e_a_t_1_1_global_1_1_muxer.html", null ],
     [ "FEAT::Global::Muxer< LocalStressVector, StressMirror >", "class_f_e_a_t_1_1_global_1_1_muxer.html", null ],
@@ -1732,6 +1812,7 @@ var hierarchy =
     [ "FEAT::Util::SlotMap< FEAT::Geometry::Intern::AdaptiveVertex< VertexType_ >, FEAT::Geometry::Intern::ElementKey< 0 > >", "class_f_e_a_t_1_1_util_1_1_slot_map.html", null ],
     [ "FEAT::Util::SlotMap< V, Key >", "class_f_e_a_t_1_1_util_1_1_slot_map.html", null ],
     [ "FEAT::Solver::SolverBase< Functional_::VectorTypeR >", "class_f_e_a_t_1_1_solver_1_1_solver_base.html", null ],
+    [ "FEAT::Solver::SolverBase< Global::Matrix< LocalMatrix_, MirrorRow_, MirrorCol_ >::VectorTypeR >", "class_f_e_a_t_1_1_solver_1_1_solver_base.html", null ],
     [ "FEAT::Solver::SolverBase< Global::Vector< LAFEM::TupleVector< MatrixB_::VectorTypeL, MatrixD_::VectorTypeL >, LAFEM::TupleMirror< MirrorV_, MirrorP_ > > >", "class_f_e_a_t_1_1_solver_1_1_solver_base.html", [
       [ "FEAT::Solver::BFBT< Global::Matrix< MatrixA_, MirrorV_, MirrorV_ >, Global::Matrix< MatrixB_, MirrorV_, MirrorP_ >, Global::Matrix< MatrixD_, MirrorP_, MirrorV_ >, Global::Filter< FilterV_, MirrorV_ >, Global::Filter< FilterP_, MirrorP_ > >", "class_f_e_a_t_1_1_solver_1_1_b_f_b_t_3_01_global_1_1_matrix_3_01_matrix_a___00_01_mirror_v___00_b78d0c70abd3b3b8f4e08d78d44fb7d6.html", null ],
       [ "FEAT::Solver::UzawaPrecond< Global::Matrix< MatrixA_, MirrorV_, MirrorV_ >, Global::Matrix< MatrixB_, MirrorV_, MirrorP_ >, Global::Matrix< MatrixD_, MirrorP_, MirrorV_ >, Global::Filter< FilterV_, MirrorV_ >, Global::Filter< FilterP_, MirrorP_ > >", "class_f_e_a_t_1_1_solver_1_1_uzawa_precond_3_01_global_1_1_matrix_3_01_matrix_a___00_01_mirror_v267746ef0d8b831732ecfa70b7d32300.html", null ]
@@ -1858,7 +1939,8 @@ var hierarchy =
     ] ],
     [ "std::false_type", null, [
       [ "FEAT::Intern::has_input_operator< T, typename >", "struct_f_e_a_t_1_1_intern_1_1has__input__operator.html", null ],
-      [ "FEAT::Intern::is_std_deque< typename >", "struct_f_e_a_t_1_1_intern_1_1is__std__deque.html", null ]
+      [ "FEAT::Intern::is_std_deque< typename >", "struct_f_e_a_t_1_1_intern_1_1is__std__deque.html", null ],
+      [ "FEAT::Intern::is_std_map< typename >", "struct_f_e_a_t_1_1_intern_1_1is__std__map.html", null ]
     ] ],
     [ "std::hash< FEAT::Geometry::IsolatedPointRefinementType< Shape_ > >", "structstd_1_1hash_3_01_f_e_a_t_1_1_geometry_1_1_isolated_point_refinement_type_3_01_shape___01_4_01_4.html", null ],
     [ "std::hash< FEAT::Geometry::StandardRefinementType< Shape_ > >", "structstd_1_1hash_3_01_f_e_a_t_1_1_geometry_1_1_standard_refinement_type_3_01_shape___01_4_01_4.html", null ],
@@ -1873,7 +1955,8 @@ var hierarchy =
     ] ],
     [ "std::true_type", null, [
       [ "FEAT::Intern::has_input_operator< T, std::void_t< decltype((std::declval< std::istringstream & >() > > std::declval< T & >()))> >", "struct_f_e_a_t_1_1_intern_1_1has__input__operator_3_01_t_00_01std_1_1void__t_3_01decltype_07_07s80f520ffb6c16b6d0972ef20f18ff7ca.html", null ],
-      [ "FEAT::Intern::is_std_deque< std::deque< T, A > >", "struct_f_e_a_t_1_1_intern_1_1is__std__deque_3_01std_1_1deque_3_01_t_00_01_a_01_4_01_4.html", null ]
+      [ "FEAT::Intern::is_std_deque< std::deque< T, A > >", "struct_f_e_a_t_1_1_intern_1_1is__std__deque_3_01std_1_1deque_3_01_t_00_01_a_01_4_01_4.html", null ],
+      [ "FEAT::Intern::is_std_map< std::map< K, V, C, A > >", "struct_f_e_a_t_1_1_intern_1_1is__std__map_3_01std_1_1map_3_01_k_00_01_v_00_01_c_00_01_a_01_4_01_4.html", null ]
     ] ],
     [ "FEAT::Control::StokesBlockedSystemLevel< dim_, Real, Index, LAFEM::SparseMatrixBCSR< Real, Index, dim_, dim_ >, LAFEM::SparseMatrixBCSR< Real, Index, dim_, 1 >, LAFEM::SparseMatrixBCSR< Real, Index, 1, dim_ >, LAFEM::SparseMatrixCSR< Real, Index >, LAFEM::SparseMatrixBWrappedCSR< Real, Index, dim_ >, LAFEM::SparseMatrixCSR< Real, Index > >", "class_f_e_a_t_1_1_control_1_1_stokes_blocked_system_level.html", null ],
     [ "FEAT::Control::StokesPowerSystemLevel< dim_, Real, Index, LAFEM::SparseMatrixCSR< Real, Index > >", "struct_f_e_a_t_1_1_control_1_1_stokes_power_system_level.html", null ],
@@ -1925,8 +2008,8 @@ var hierarchy =
     [ "FEAT::Tiny::Vector< CoordType, 2 >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< CoordType, 3 >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< CoordType, n_, n_ >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
-    [ "FEAT::Tiny::Vector< CoordType, shape_dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, 2 >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
+    [ "FEAT::Tiny::Vector< DataType, BlockSize >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, conv_dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, dim >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< DataType, dimension_ >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
@@ -1951,6 +2034,7 @@ var hierarchy =
     [ "FEAT::Tiny::Vector< T_, n_, n_ >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< T_, n_, sn_ >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
     [ "FEAT::Tiny::Vector< ValueType, n_, n_ >", "class_f_e_a_t_1_1_tiny_1_1_vector.html", null ],
+    [ "FEAT::Global::Vector< VecType, MirrorType >", "class_f_e_a_t_1_1_global_1_1_vector.html", null ],
     [ "FEAT::Geometry::VertexSet< Shape_::dimension, Real >", "struct_f_e_a_t_1_1_geometry_1_1_vertex_set.html", null ],
     [ "FEAT::Geometry::VertexSet< shape_dim_, Real >", "struct_f_e_a_t_1_1_geometry_1_1_vertex_set.html", null ],
     [ "FEAT::Geometry::VoxelMasker< CoordType_, 3 >", "class_f_e_a_t_1_1_geometry_1_1_voxel_masker.html", [

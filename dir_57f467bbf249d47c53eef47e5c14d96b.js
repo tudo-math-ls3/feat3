@@ -30,6 +30,7 @@ var dir_57f467bbf249d47c53eef47e5c14d96b =
     [ "power_mirror.hpp", "power__mirror_8hpp_source.html", null ],
     [ "power_row_matrix.hpp", "power__row__matrix_8hpp_source.html", null ],
     [ "power_vector.hpp", "power__vector_8hpp_source.html", null ],
+    [ "projection_filter.hpp", "projection__filter_8hpp_source.html", null ],
     [ "saddle_point_matrix.hpp", "saddle__point__matrix_8hpp_source.html", null ],
     [ "slip_filter.hpp", "slip__filter_8hpp_source.html", null ],
     [ "sparse_layout.hpp", "sparse__layout_8hpp_source.html", null ],

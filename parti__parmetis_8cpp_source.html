@@ -296,23 +296,23 @@ $(document).ready(function(){initNavTree('parti__parmetis_8cpp_source.html','');
 <div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span> </div>
 <div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>      <span class="comment">// call ParMETIS</span></div>
 <div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>      <span class="keywordtype">int</span> rtn = ParMETIS_V3_PartGeomKway(</div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>        vtxdist.data(),   <span class="comment">// in: first dof for each processor, on all processes, length P+1</span></div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>        xadj.data(),      <span class="comment">// in: dom_ptr of adjacency Graph (w/o self-adjacency)</span></div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>        adjncy.data(),    <span class="comment">// in: img_idx of adjacency Graph (w/o self-adjacency)</span></div>
-<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>        vwgt.data(),      <span class="comment">// in: vertex weights (may be set to nullptr)</span></div>
-<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>        <span class="keyword">nullptr</span>,          <span class="comment">// in: edge weights (may be set to nullptr)</span></div>
-<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>        &amp;wgtflag,         <span class="comment">// in: 0 for no weights</span></div>
-<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>        &amp;numflag,         <span class="comment">// in: 0 for C numbering</span></div>
-<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>        &amp;ndims,           <span class="comment">// in: dimension of mesh</span></div>
-<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>        xyz.data(),       <span class="comment">// in: vertex coords (element midpoints), process-local only</span></div>
-<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>        &amp;ncon,            <span class="comment">// in: =1</span></div>
-<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>        &amp;nparts,          <span class="comment">// in: number of desired partitions</span></div>
-<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>        tpwgts.data(),    <span class="comment">// in: array of 1/nparts</span></div>
-<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>        ubvec.data(),     <span class="comment">// in: array of 1.05</span></div>
-<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>        options.data(),   <span class="comment">// parameter array</span></div>
-<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>        &amp;edgecut,         <span class="comment">// out: number of cut edges</span></div>
-<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>        part.data(),      <span class="comment">// out: partition for each local node</span></div>
-<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>        &amp;_sub_comm.mpi_comm() <span class="comment">// in: self explanatory</span></div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>        vtxdist.data(),                          <span class="comment">// in: first dof for each processor, on all processes, length P+1</span></div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>        xadj.data(),                             <span class="comment">// in: dom_ptr of adjacency Graph (w/o self-adjacency)</span></div>
+<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>        adjncy.data(),                           <span class="comment">// in: img_idx of adjacency Graph (w/o self-adjacency)</span></div>
+<div class="line"><a id="l00197" name="l00197"></a><span class="lineno">  197</span>        vwgt.size() &gt; 0 ? vwgt.data() : <span class="keyword">nullptr</span>, <span class="comment">// in: vertex weights (may be set to nullptr)</span></div>
+<div class="line"><a id="l00198" name="l00198"></a><span class="lineno">  198</span>        <span class="keyword">nullptr</span>,                                 <span class="comment">// in: edge weights (may be set to nullptr)</span></div>
+<div class="line"><a id="l00199" name="l00199"></a><span class="lineno">  199</span>        &amp;wgtflag,                                <span class="comment">// in: 0 for no weights</span></div>
+<div class="line"><a id="l00200" name="l00200"></a><span class="lineno">  200</span>        &amp;numflag,                                <span class="comment">// in: 0 for C numbering</span></div>
+<div class="line"><a id="l00201" name="l00201"></a><span class="lineno">  201</span>        &amp;ndims,                                  <span class="comment">// in: dimension of mesh</span></div>
+<div class="line"><a id="l00202" name="l00202"></a><span class="lineno">  202</span>        xyz.data(),                              <span class="comment">// in: vertex coords (element midpoints), process-local only</span></div>
+<div class="line"><a id="l00203" name="l00203"></a><span class="lineno">  203</span>        &amp;ncon,                                   <span class="comment">// in: =1</span></div>
+<div class="line"><a id="l00204" name="l00204"></a><span class="lineno">  204</span>        &amp;nparts,                                 <span class="comment">// in: number of desired partitions</span></div>
+<div class="line"><a id="l00205" name="l00205"></a><span class="lineno">  205</span>        tpwgts.data(),                           <span class="comment">// in: array of 1/nparts</span></div>
+<div class="line"><a id="l00206" name="l00206"></a><span class="lineno">  206</span>        ubvec.data(),                            <span class="comment">// in: array of 1.05</span></div>
+<div class="line"><a id="l00207" name="l00207"></a><span class="lineno">  207</span>        options.data(),                          <span class="comment">// parameter array</span></div>
+<div class="line"><a id="l00208" name="l00208"></a><span class="lineno">  208</span>        &amp;edgecut,                                <span class="comment">// out: number of cut edges</span></div>
+<div class="line"><a id="l00209" name="l00209"></a><span class="lineno">  209</span>        part.data(),                             <span class="comment">// out: partition for each local node</span></div>
+<div class="line"><a id="l00210" name="l00210"></a><span class="lineno">  210</span>        &amp;_sub_comm.mpi_comm()                    <span class="comment">// in: self explanatory</span></div>
 <div class="line"><a id="l00211" name="l00211"></a><span class="lineno">  211</span>      );</div>
 <div class="line"><a id="l00212" name="l00212"></a><span class="lineno">  212</span> </div>
 <div class="line"><a id="l00213" name="l00213"></a><span class="lineno">  213</span>      <span class="comment">// convert parts</span></div>
@@ -416,8 +416,8 @@ $(document).ready(function(){initNavTree('parti__parmetis_8cpp_source.html','');
 <div class="ttc" id="aclass_f_e_a_t_1_1_dist_1_1_comm_html"><div class="ttname"><a href="class_f_e_a_t_1_1_dist_1_1_comm.html">FEAT::Dist::Comm</a></div><div class="ttdoc">Communicator class.</div><div class="ttdef"><b>Definition:</b> <a href="dist_8hpp_source.html#l01656">dist.hpp:1657</a></div></div>
 <div class="ttc" id="aclass_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s_html_ad9bd5c761612d795b59eb326e467b14a"><div class="ttname"><a href="class_f_e_a_t_1_1_geometry_1_1_parti_par_m_e_t_i_s.html#ad9bd5c761612d795b59eb326e467b14a">FEAT::Geometry::PartiParMETIS::PartiParMETIS</a></div><div class="ttdeci">PartiParMETIS(const Dist::Comm &amp;comm, Index min_elems=1000u, int max_procs=1000)</div><div class="ttdoc">Constructor.</div></div>
 <div class="ttc" id="anamespace_f_e_a_t_html"><div class="ttname"><a href="namespace_f_e_a_t.html">FEAT</a></div><div class="ttdoc">FEAT namespace.</div><div class="ttdef"><b>Definition:</b> <a href="adjactor_8hpp_source.html#l00011">adjactor.hpp:12</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_html_a36baa4de7876ef0ecb7c1e44cb88d7e9"><div class="ttname"><a href="namespace_f_e_a_t.html#a36baa4de7876ef0ecb7c1e44cb88d7e9">FEAT::Real</a></div><div class="ttdeci">double Real</div><div class="ttdoc">Real data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00135">base_header.hpp:135</a></div></div>
-<div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00129">base_header.hpp:129</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_a36baa4de7876ef0ecb7c1e44cb88d7e9"><div class="ttname"><a href="namespace_f_e_a_t.html#a36baa4de7876ef0ecb7c1e44cb88d7e9">FEAT::Real</a></div><div class="ttdeci">double Real</div><div class="ttdoc">Real data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00136">base_header.hpp:136</a></div></div>
+<div class="ttc" id="anamespace_f_e_a_t_html_aea15318a59381180ea8b771242a3bbe1"><div class="ttname"><a href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">FEAT::Index</a></div><div class="ttdeci">std::uint64_t Index</div><div class="ttdoc">Index data type.</div><div class="ttdef"><b>Definition:</b> <a href="base__header_8hpp_source.html#l00130">base_header.hpp:130</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

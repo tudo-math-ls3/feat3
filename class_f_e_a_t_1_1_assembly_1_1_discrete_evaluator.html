@@ -110,7 +110,7 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_assembly_1_1_discret
 <p>Discrete function evaluator.  
  <a href="class_f_e_a_t_1_1_assembly_1_1_discrete_evaluator.html#details">More...</a></p>
 
-<p><code>#include &lt;<a class="el" href="discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>&gt;</code></p>
+<p><code>#include &lt;<a class="el" href="assembly_2discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-methods" name="pub-static-methods"></a>
 Static Public Member Functions</h2></td></tr>
@@ -155,7 +155,7 @@ Static Public Member Functions</h2></td></tr>
 <dl class="section note"><dt>Note</dt><dd>This class is strongly related to the <a class="el" href="class_f_e_a_t_1_1_trafo_1_1_inverse_mapping.html" title="Inverse Trafo mapping class template.">Trafo::InverseMapping</a> class template, which is used for the unmapping of the input point, so you might want to get familiar with that one, too.</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="discrete__evaluator_8hpp_source.html#l00354">354</a> of file <a class="el" href="discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00354">354</a> of file <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a7dfc45906523ad08facb81c5c23baca8" name="a7dfc45906523ad08facb81c5c23baca8"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a7dfc45906523ad08facb81c5c23baca8">&#9670;&#160;</a></span>eval_fe_function() <span class="overload">[1/4]</span></h2>
@@ -211,11 +211,11 @@ template&lt;typename DT_ , typename DTP_ , typename IT_ , int dim_, int s_, type
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_scalar_discrete_eval_data.html" title="Discrete evaluation data for scalar functions.">ScalarDiscreteEvalData</a> object that contains the evaluations results. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="discrete__evaluator_8hpp_source.html#l00379">379</a> of file <a class="el" href="discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00379">379</a> of file <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="discrete__evaluator_8hpp_source.html#l00379">eval_fe_function()</a>, and <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00336">FEAT::Trafo::InverseMapping&lt; Trafo_, DataType_ &gt;::unmap_point()</a>.</p>
+<p class="reference">References <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00379">eval_fe_function()</a>, and <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00336">FEAT::Trafo::InverseMapping&lt; Trafo_, DataType_ &gt;::unmap_point()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="discrete__evaluator_8hpp_source.html#l00379">eval_fe_function()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="mesh__deformer_8hpp_source.html#l00355">FEAT::MeshOpt::MeshDeformer&lt; MeshType_ &gt;::_deform()</a>, <a class="el" href="global_2discrete__evaluator_8hpp_source.html#l00299">FEAT::Global::DiscreteEvaluator::_remote_eval()</a>, and <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00379">eval_fe_function()</a>.</p>
 
 </div>
 </div>
@@ -273,9 +273,9 @@ template&lt;typename DT_ , typename DTP_ , typename IT_ , int dim_, int s_, type
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_vector_discrete_eval_data.html" title="Discrete evaluation data for vector-valued functions.">VectorDiscreteEvalData</a> object that contains the evaluations results. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="discrete__evaluator_8hpp_source.html#l00526">526</a> of file <a class="el" href="discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00526">526</a> of file <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="discrete__evaluator_8hpp_source.html#l00379">eval_fe_function()</a>, and <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00336">FEAT::Trafo::InverseMapping&lt; Trafo_, DataType_ &gt;::unmap_point()</a>.</p>
+<p class="reference">References <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00379">eval_fe_function()</a>, and <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00336">FEAT::Trafo::InverseMapping&lt; Trafo_, DataType_ &gt;::unmap_point()</a>.</p>
 
 </div>
 </div>
@@ -332,9 +332,9 @@ template&lt;typename DT_ , typename DTP_ , typename IT_ , int dim_, typename Spa
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_scalar_discrete_eval_data.html" title="Discrete evaluation data for scalar functions.">ScalarDiscreteEvalData</a> object that contains the evaluations results. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="discrete__evaluator_8hpp_source.html#l00411">411</a> of file <a class="el" href="discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00411">411</a> of file <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00084">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::cells</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00087">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::dom_points</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00126">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::size()</a>, <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>, and <a class="el" href="discrete__evaluator_8hpp_source.html#l00043">FEAT::Assembly::ScalarDiscreteEvalData&lt; DT_, dim_ &gt;::values</a>.</p>
+<p class="reference">References <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00084">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::cells</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00087">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::dom_points</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00126">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::size()</a>, <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>, and <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00043">FEAT::Assembly::ScalarDiscreteEvalData&lt; DT_, dim_ &gt;::values</a>.</p>
 
 </div>
 </div>
@@ -391,9 +391,9 @@ template&lt;typename DT_ , typename DTP_ , typename IT_ , int dim_, typename Spa
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_vector_discrete_eval_data.html" title="Discrete evaluation data for vector-valued functions.">VectorDiscreteEvalData</a> object that contains the evaluations results. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="discrete__evaluator_8hpp_source.html#l00558">558</a> of file <a class="el" href="discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00558">558</a> of file <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00084">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::cells</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00087">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::dom_points</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00126">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::size()</a>, <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>, and <a class="el" href="discrete__evaluator_8hpp_source.html#l00132">FEAT::Assembly::VectorDiscreteEvalData&lt; DT_, dim_ &gt;::values</a>.</p>
+<p class="reference">References <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00084">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::cells</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00087">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::dom_points</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00126">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::size()</a>, <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>, and <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00132">FEAT::Assembly::VectorDiscreteEvalData&lt; DT_, dim_ &gt;::values</a>.</p>
 
 </div>
 </div>
@@ -451,11 +451,11 @@ template&lt;typename DT_ , typename DTP_ , typename IT_ , int dim_, int s_, type
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_vector_discrete_eval_data.html" title="Discrete evaluation data for vector-valued functions.">VectorDiscreteEvalData</a> object that contains the evaluations results. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="discrete__evaluator_8hpp_source.html#l00680">680</a> of file <a class="el" href="discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00680">680</a> of file <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="discrete__evaluator_8hpp_source.html#l00680">eval_fe_gradient()</a>, and <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00336">FEAT::Trafo::InverseMapping&lt; Trafo_, DataType_ &gt;::unmap_point()</a>.</p>
+<p class="reference">References <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00680">eval_fe_gradient()</a>, and <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00336">FEAT::Trafo::InverseMapping&lt; Trafo_, DataType_ &gt;::unmap_point()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="discrete__evaluator_8hpp_source.html#l00680">eval_fe_gradient()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="global_2discrete__evaluator_8hpp_source.html#l00299">FEAT::Global::DiscreteEvaluator::_remote_eval()</a>, and <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00680">eval_fe_gradient()</a>.</p>
 
 </div>
 </div>
@@ -513,9 +513,9 @@ template&lt;typename DT_ , typename DTP_ , typename IT_ , int dim_, int s_, type
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_matrix_discrete_eval_data.html" title="Discrete evaluation data for matrix-valued functions.">MatrixDiscreteEvalData</a> object that contains the evaluations results. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="discrete__evaluator_8hpp_source.html#l00838">838</a> of file <a class="el" href="discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00838">838</a> of file <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="discrete__evaluator_8hpp_source.html#l00680">eval_fe_gradient()</a>, and <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00336">FEAT::Trafo::InverseMapping&lt; Trafo_, DataType_ &gt;::unmap_point()</a>.</p>
+<p class="reference">References <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00680">eval_fe_gradient()</a>, and <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00336">FEAT::Trafo::InverseMapping&lt; Trafo_, DataType_ &gt;::unmap_point()</a>.</p>
 
 </div>
 </div>
@@ -572,9 +572,9 @@ template&lt;typename DT_ , typename DTP_ , typename IT_ , int dim_, typename Spa
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_vector_discrete_eval_data.html" title="Discrete evaluation data for vector-valued functions.">VectorDiscreteEvalData</a> object that contains the evaluations results. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="discrete__evaluator_8hpp_source.html#l00712">712</a> of file <a class="el" href="discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00712">712</a> of file <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l03175">FEAT::Tiny::axpy()</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00084">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::cells</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00087">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::dom_points</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00512">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00126">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::size()</a>, and <a class="el" href="discrete__evaluator_8hpp_source.html#l00132">FEAT::Assembly::VectorDiscreteEvalData&lt; DT_, dim_ &gt;::values</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l03175">FEAT::Tiny::axpy()</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00084">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::cells</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00087">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::dom_points</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l00512">FEAT::Tiny::Vector&lt; T_, n_, s_ &gt;::format()</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00126">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::size()</a>, and <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00132">FEAT::Assembly::VectorDiscreteEvalData&lt; DT_, dim_ &gt;::values</a>.</p>
 
 </div>
 </div>
@@ -631,14 +631,14 @@ template&lt;typename DT_ , typename DTP_ , typename IT_ , int dim_, typename Spa
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_matrix_discrete_eval_data.html" title="Discrete evaluation data for matrix-valued functions.">MatrixDiscreteEvalData</a> object that contains the evaluations results. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="discrete__evaluator_8hpp_source.html#l00870">870</a> of file <a class="el" href="discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00870">870</a> of file <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l01980">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::add_outer_product()</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00084">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::cells</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00087">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::dom_points</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01647">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::format()</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00126">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::size()</a>, and <a class="el" href="discrete__evaluator_8hpp_source.html#l00230">FEAT::Assembly::MatrixDiscreteEvalData&lt; DT_, dim_i_, dim_j_ &gt;::values</a>.</p>
+<p class="reference">References <a class="el" href="tiny__algebra_8hpp_source.html#l01980">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::add_outer_product()</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00084">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::cells</a>, <a class="el" href="namespace_f_e_a_t.html#aeeeaf7afcb3a42f69b57031db04b2428a37dac7d6c34afb6b795558c11c34d879">FEAT::dom_point</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00087">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::dom_points</a>, <a class="el" href="tiny__algebra_8hpp_source.html#l01647">FEAT::Tiny::Matrix&lt; T_, m_, n_, sm_, sn_ &gt;::format()</a>, <a class="el" href="trafo_2inverse__mapping_8hpp_source.html#l00126">FEAT::Trafo::InverseMappingData&lt; DataType_, shape_dim_, world_dim_ &gt;::size()</a>, and <a class="el" href="assembly_2discrete__evaluator_8hpp_source.html#l00230">FEAT::Assembly::MatrixDiscreteEvalData&lt; DT_, dim_i_, dim_j_ &gt;::values</a>.</p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>kernel/assembly/<a class="el" href="discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a></li>
+<li>kernel/assembly/<a class="el" href="assembly_2discrete__evaluator_8hpp_source.html">discrete_evaluator.hpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

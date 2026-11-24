@@ -24,7 +24,7 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix =
     [ "clone", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#a2d440fdd517a165ce379dda46d62eb4d", null ],
     [ "create_vector_l", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#a278f0ffa6548c5bd920b09e6936ec861", null ],
     [ "create_vector_r", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#a2975d97f66c2b4ee705213b2559e781f", null ],
-    [ "format", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#a5f61ef75b08f258ec9bd785d66caa386", null ],
+    [ "format", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#a3f80eec67ea25f2698bffd33f3edb47f", null ],
     [ "format", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#a1edc518c3b24875a67c3bb8205c6c2e9", null ],
     [ "get_checkpoint_size", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#a521a46d73ad19c1214ffb676ad9d96a7", null ],
     [ "name", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_matrix.html#af1a1c2bd94429117900d73140e037a41", null ],

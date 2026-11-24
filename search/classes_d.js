@@ -55,5 +55,6 @@ var searchData=
   ['nullmatrix_3c_20real_2c_20index_2c_201_2c_201_20_3e_52',['NullMatrix&lt; Real, Index, 1, 1 &gt;',['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_null_matrix.html',1,'FEAT::LAFEM']]],
   ['nullmatrix_3c_20real_2c_20index_2c_201_2c_20nsc_20_3e_53',['NullMatrix&lt; Real, Index, 1, nsc &gt;',['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_null_matrix.html',1,'FEAT::LAFEM']]],
   ['nullmatrix_3c_20real_2c_20index_2c_20nsc_2c_201_20_3e_54',['NullMatrix&lt; Real, Index, nsc, 1 &gt;',['../class_f_e_a_t_1_1_l_a_f_e_m_1_1_null_matrix.html',1,'FEAT::LAFEM']]],
-  ['nvsbdfq_55',['NvsBdfQ',['../class_f_e_a_t_1_1_control_1_1_time_1_1_nvs_bdf_q.html',1,'FEAT::Control::Time']]]
+  ['nvsbdfq_55',['NvsBdfQ',['../class_f_e_a_t_1_1_control_1_1_time_1_1_nvs_bdf_q.html',1,'FEAT::Control::Time']]],
+  ['nvtxrangestack_56',['NvtxRangeStack',['../class_f_e_a_t_1_1_util_1_1_nvtx_range_stack.html',1,'FEAT::Util']]]
 ];

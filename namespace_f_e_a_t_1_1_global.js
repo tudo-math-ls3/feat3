@@ -2,7 +2,9 @@ var namespace_f_e_a_t_1_1_global =
 [
     [ "AlgDofParti", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti.html", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti" ],
     [ "AlgDofPartiSystem", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_system.html", "class_f_e_a_t_1_1_global_1_1_alg_dof_parti_system" ],
+    [ "DiscreteEvaluator", "class_f_e_a_t_1_1_global_1_1_discrete_evaluator.html", "class_f_e_a_t_1_1_global_1_1_discrete_evaluator" ],
     [ "Filter", "class_f_e_a_t_1_1_global_1_1_filter.html", "class_f_e_a_t_1_1_global_1_1_filter" ],
+    [ "FloodFill", "class_f_e_a_t_1_1_global_1_1_flood_fill.html", "class_f_e_a_t_1_1_global_1_1_flood_fill" ],
     [ "Gate", "class_f_e_a_t_1_1_global_1_1_gate.html", "class_f_e_a_t_1_1_global_1_1_gate" ],
     [ "GlobalInverseMappingData", "class_f_e_a_t_1_1_global_1_1_global_inverse_mapping_data.html", "class_f_e_a_t_1_1_global_1_1_global_inverse_mapping_data" ],
     [ "InverseMapping", "class_f_e_a_t_1_1_global_1_1_inverse_mapping.html", "class_f_e_a_t_1_1_global_1_1_inverse_mapping" ],

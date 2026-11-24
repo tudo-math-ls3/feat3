@@ -187,11 +187,11 @@ Note that a call-stack dump may not be available on all platforms. </td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="runtime_8cpp_source.html#l00426">426</a> of file <a class="el" href="runtime_8cpp_source.html">runtime.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime_8cpp_source.html#l00431">431</a> of file <a class="el" href="runtime_8cpp_source.html">runtime.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="os__windows_8cpp_source.html#l00152">FEAT::Windows::dump_call_stack_to_stderr()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="assertion_8hpp_source.html#l00038">FEAT::abortion()</a>, <a class="el" href="assertion_8hpp_source.html#l00114">FEAT::assertion()</a>, <a class="el" href="runtime_8cpp_source.html#l00458">finalize()</a>, <a class="el" href="runtime_8cpp_source.html#l00050">initialize()</a>, and <a class="el" href="afc__limiter_8hpp_source.html#l00726">FEAT::Control::AFCTransportSolver&lt; MatrixType_ &gt;::limit_fct()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="assertion_8hpp_source.html#l00038">FEAT::abortion()</a>, <a class="el" href="assertion_8hpp_source.html#l00114">FEAT::assertion()</a>, <a class="el" href="runtime_8cpp_source.html#l00463">finalize()</a>, <a class="el" href="runtime_8cpp_source.html#l00050">initialize()</a>, and <a class="el" href="afc__limiter_8hpp_source.html#l00726">FEAT::Control::AFCTransportSolver&lt; MatrixType_ &gt;::limit_fct()</a>.</p>
 
 </div>
 </div>
@@ -224,9 +224,9 @@ Note that a call-stack dump may not be available on all platforms. </td></tr>
 <dl class="section note"><dt>Note</dt><dd>Internally this functions calls the MemoryPool::finalize function. To get proper warnings one memory that is still in use and not freed correctly one has to make sure, that any <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> Container has been destructed when calling the finalize method. This is usually achieved by keeping the C++ main function slim and kicking off all the fancy application stuff in a separate function/method. Thus (at most) every <a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> related stuff is destructed when this separate function/method ends.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>An exit code (<code>EXIT_SUCCESS</code>) that can be returned by the <code>main</code> function. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="runtime_8cpp_source.html#l00458">458</a> of file <a class="el" href="runtime_8cpp_source.html">runtime.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime_8cpp_source.html#l00463">463</a> of file <a class="el" href="runtime_8cpp_source.html">runtime.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="runtime_8hpp_source.html#l00025">_finalized</a>, <a class="el" href="runtime_8hpp_source.html#l00022">_initialized</a>, <a class="el" href="runtime_8cpp_source.html#l00426">abort()</a>, <a class="el" href="likwid__marker_8hpp_source.html#l00052">FEAT_MARKER_CLOSE</a>, <a class="el" href="dist_8cpp_source.html#l00148">FEAT::Dist::finalize()</a>, and <a class="el" href="memory__arbiter_8cpp_source.html#l01466">FEAT::Memory::Manager::finalize()</a>.</p>
+<p class="reference">References <a class="el" href="runtime_8hpp_source.html#l00025">_finalized</a>, <a class="el" href="runtime_8hpp_source.html#l00022">_initialized</a>, <a class="el" href="runtime_8cpp_source.html#l00431">abort()</a>, <a class="el" href="likwid__marker_8hpp_source.html#l00052">FEAT_MARKER_CLOSE</a>, <a class="el" href="dist_8cpp_source.html#l00148">FEAT::Dist::finalize()</a>, and <a class="el" href="memory__arbiter_8cpp_source.html#l01469">FEAT::Memory::Manager::finalize()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="runtime_8hpp_source.html#l00052">FEAT::Runtime::ScopeGuard::~ScopeGuard()</a>.</p>
 
@@ -257,7 +257,7 @@ Note that a call-stack dump may not be available on all platforms. </td></tr>
 
 <p>Returns the unique cuDSS third-party library handle. </p>
 
-<p class="definition">Definition at line <a class="el" href="runtime_8cpp_source.html#l00508">508</a> of file <a class="el" href="runtime_8cpp_source.html">runtime.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime_8cpp_source.html#l00513">513</a> of file <a class="el" href="runtime_8cpp_source.html">runtime.cpp</a>.</p>
 
 </div>
 </div>
@@ -308,7 +308,7 @@ Note that a call-stack dump may not be available on all platforms. </td></tr>
 
 <p class="definition">Definition at line <a class="el" href="runtime_8cpp_source.html#l00050">50</a> of file <a class="el" href="runtime_8cpp_source.html">runtime.cpp</a>.</p>
 
-<p class="reference">References <a class="el" href="runtime_8hpp_source.html#l00025">_finalized</a>, <a class="el" href="runtime_8hpp_source.html#l00022">_initialized</a>, <a class="el" href="runtime_8cpp_source.html#l00426">abort()</a>, <a class="el" href="os__windows_8cpp_source.html#l00214">FEAT::Windows::disable_error_prompts()</a>, <a class="el" href="likwid__marker_8hpp_source.html#l00046">FEAT_MARKER_INIT</a>, <a class="el" href="os__windows_8cpp_source.html#l00222">FEAT::Windows::get_current_process_id()</a>, <a class="el" href="dist_8cpp_source.html#l00105">FEAT::Dist::initialize()</a>, <a class="el" href="memory__arbiter_8cpp_source.html#l01461">FEAT::Memory::Manager::initialize()</a>, <a class="el" href="os__windows_8cpp_source.html#l00208">FEAT::Windows::install_seh_filter()</a>, <a class="el" href="dist_8hpp_source.html#l01802">FEAT::Dist::Comm::rank()</a>, <a class="el" href="base__header_8hpp_source.html#l00117">FEAT::version_major</a>, <a class="el" href="base__header_8hpp_source.html#l00119">FEAT::version_minor</a>, <a class="el" href="base__header_8hpp_source.html#l00121">FEAT::version_patch</a>, and <a class="el" href="dist_8cpp_source.html#l00432">FEAT::Dist::Comm::world()</a>.</p>
+<p class="reference">References <a class="el" href="runtime_8hpp_source.html#l00025">_finalized</a>, <a class="el" href="runtime_8hpp_source.html#l00022">_initialized</a>, <a class="el" href="runtime_8cpp_source.html#l00431">abort()</a>, <a class="el" href="os__windows_8cpp_source.html#l00214">FEAT::Windows::disable_error_prompts()</a>, <a class="el" href="likwid__marker_8hpp_source.html#l00046">FEAT_MARKER_INIT</a>, <a class="el" href="os__windows_8cpp_source.html#l00222">FEAT::Windows::get_current_process_id()</a>, <a class="el" href="dist_8cpp_source.html#l00105">FEAT::Dist::initialize()</a>, <a class="el" href="memory__arbiter_8cpp_source.html#l01464">FEAT::Memory::Manager::initialize()</a>, <a class="el" href="os__windows_8cpp_source.html#l00208">FEAT::Windows::install_seh_filter()</a>, <a class="el" href="dist_8hpp_source.html#l01802">FEAT::Dist::Comm::rank()</a>, <a class="el" href="base__header_8hpp_source.html#l00118">FEAT::version_major</a>, <a class="el" href="base__header_8hpp_source.html#l00120">FEAT::version_minor</a>, <a class="el" href="base__header_8hpp_source.html#l00122">FEAT::version_patch</a>, and <a class="el" href="dist_8cpp_source.html#l00432">FEAT::Dist::Comm::world()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="runtime_8hpp_source.html#l00042">FEAT::Runtime::ScopeGuard::ScopeGuard()</a>.</p>
 
@@ -339,7 +339,9 @@ Note that a call-stack dump may not be available on all platforms. </td></tr>
 
 <p>Synchronizes with all available devices (CUDA, HIP, etc...) </p>
 
-<p class="definition">Definition at line <a class="el" href="runtime_8cpp_source.html#l00517">517</a> of file <a class="el" href="runtime_8cpp_source.html">runtime.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="runtime_8cpp_source.html#l00522">522</a> of file <a class="el" href="runtime_8cpp_source.html">runtime.cpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="gate_8hpp_source.html#l00840">FEAT::Global::Gate&lt; LocalVector_, Mirror_ &gt;::_sync_vec()</a>.</p>
 
 </div>
 </div>
@@ -368,7 +370,7 @@ Note that a call-stack dump may not be available on all platforms. </td></tr>
 
 <p class="definition">Definition at line <a class="el" href="runtime_8hpp_source.html#l00025">25</a> of file <a class="el" href="runtime_8hpp_source.html">runtime.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="runtime_8cpp_source.html#l00458">finalize()</a>, and <a class="el" href="runtime_8cpp_source.html#l00050">initialize()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="runtime_8cpp_source.html#l00463">finalize()</a>, and <a class="el" href="runtime_8cpp_source.html#l00050">initialize()</a>.</p>
 
 </div>
 </div>
@@ -396,7 +398,7 @@ Note that a call-stack dump may not be available on all platforms. </td></tr>
 
 <p class="definition">Definition at line <a class="el" href="runtime_8hpp_source.html#l00022">22</a> of file <a class="el" href="runtime_8hpp_source.html">runtime.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="runtime_8cpp_source.html#l00458">finalize()</a>, and <a class="el" href="runtime_8cpp_source.html#l00050">initialize()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="runtime_8cpp_source.html#l00463">finalize()</a>, and <a class="el" href="runtime_8cpp_source.html#l00050">initialize()</a>.</p>
 
 </div>
 </div>

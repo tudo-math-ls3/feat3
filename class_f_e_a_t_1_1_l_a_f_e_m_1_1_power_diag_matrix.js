@@ -30,7 +30,7 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix =
     [ "create_vector_l", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#aa748affd32348c1d41a454f4428facc4", null ],
     [ "create_vector_r", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#aedb2bbd6b42d9cba977b163181fb9b04", null ],
     [ "extract_diag", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#af8abc63e89b9d801e47c53d8d8482c49", null ],
-    [ "format", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#ad434acbd64d76eac136a67236b69e197", null ],
+    [ "format", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#a8b9cdfe968e5f707ceb68669605ef3c8", null ],
     [ "get", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#a070029dcba14b0a743a3810c3bb760fc", null ],
     [ "get", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#acf9b06cf1fc65d8aa99bb68367f4338a", null ],
     [ "get_checkpoint_size", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_diag_matrix.html#a9df5e3f7cb3fb43b7f5d7ebf2aacb73f", null ],

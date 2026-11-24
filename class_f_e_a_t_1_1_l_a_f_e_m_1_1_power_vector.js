@@ -29,7 +29,7 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector =
     [ "convert", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a1118dd4122f83683d9c3c81d2db4ac39", null ],
     [ "copy", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a595c167f1749ed14ab1ca78a6da9e7d8", null ],
     [ "dot", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#af30f53383632499f6ec71327c0d6fe40", null ],
-    [ "format", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#adbc6c744b75e9a13d7266030627dbb1d", null ],
+    [ "format", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a8a1338ff4ba98e82bad88f357acd6cea", null ],
     [ "format", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#ab7252652cfda2d1aea1dda6e8d28f65b", null ],
     [ "get", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#ae8643f9852c7e5fe5d40a3c2debbd6db", null ],
     [ "get", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html#a22588a7124bcf45c9cff7d6bb9daed1f", null ],

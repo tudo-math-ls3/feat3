@@ -11,7 +11,7 @@ var class_f_e_a_t_1_1_solver_1_1_ama_vanka =
     [ "clear_macro_dofs", "class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#af667a9fb0956558df78c27b4720ce99f", null ],
     [ "data_size", "class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a9b9d1846417be83357859c2763c89a2f", null ],
     [ "done", "class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#acacbcaccbf7ec307778128928a901d59", null ],
-    [ "done_numeric", "class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#af2ea6e8c96de45c8408f3dcc59b8f186", null ],
+    [ "done_numeric", "class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#ac2d74fe76ed7fb3b9cf8a1290f018871", null ],
     [ "done_symbolic", "class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#ac72948c9353e0b61f53f2e2e03d7b27a", null ],
     [ "init", "class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a7e61ce0b51e7f97317042a184aba8613", null ],
     [ "init_numeric", "class_f_e_a_t_1_1_solver_1_1_ama_vanka.html#a7385cec40d933c15743700017474b56f", null ],

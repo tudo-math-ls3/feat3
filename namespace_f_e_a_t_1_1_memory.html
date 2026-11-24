@@ -173,6 +173,9 @@ Functions</h2></td></tr>
 <tr class="memitem:aa62b8261c1e3ea27d8f96f1f40286060"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_memory.html#aa62b8261c1e3ea27d8f96f1f40286060">alloc_cuda</a> (std::size_t bytes)</td></tr>
 <tr class="memdesc:aa62b8261c1e3ea27d8f96f1f40286060"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a memory block in cuda heap memory.  <a href="namespace_f_e_a_t_1_1_memory.html#aa62b8261c1e3ea27d8f96f1f40286060">More...</a><br /></td></tr>
 <tr class="separator:aa62b8261c1e3ea27d8f96f1f40286060"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade72446855d0ec787252677039096d67"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_memory.html#ade72446855d0ec787252677039096d67">alloc_cuda_async</a> (std::size_t bytes, const Util::StreamWrapper &amp;stream=Util::StreamWrapper{})</td></tr>
+<tr class="memdesc:ade72446855d0ec787252677039096d67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocates stream ordered memory block in cuda heap memory.  <a href="namespace_f_e_a_t_1_1_memory.html#ade72446855d0ec787252677039096d67">More...</a><br /></td></tr>
+<tr class="separator:ade72446855d0ec787252677039096d67"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb047f48794a552d0d899c7945641c6d"><td class="memItemLeft" align="right" valign="top">void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_memory.html#adb047f48794a552d0d899c7945641c6d">alloc_main</a> (std::size_t bytes)</td></tr>
 <tr class="memdesc:adb047f48794a552d0d899c7945641c6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Allocate a memory block in main heap memory.  <a href="namespace_f_e_a_t_1_1_memory.html#adb047f48794a552d0d899c7945641c6d">More...</a><br /></td></tr>
 <tr class="separator:adb047f48794a552d0d899c7945641c6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -203,24 +206,27 @@ Functions</h2></td></tr>
 <tr class="memitem:ac916de02586f4b83554b0aa78510e717"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_memory.html#ac916de02586f4b83554b0aa78510e717">free_cuda</a> (void *ptr)</td></tr>
 <tr class="memdesc:ac916de02586f4b83554b0aa78510e717"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees a memory block in cuda heap memory allocated by alloc_cuda.  <a href="namespace_f_e_a_t_1_1_memory.html#ac916de02586f4b83554b0aa78510e717">More...</a><br /></td></tr>
 <tr class="separator:ac916de02586f4b83554b0aa78510e717"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5f21f80870a697c886912780365a7a8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_memory.html#ad5f21f80870a697c886912780365a7a8">free_cuda_async</a> (void *ptr, const Util::StreamWrapper &amp;stream=Util::StreamWrapper{})</td></tr>
+<tr class="memdesc:ad5f21f80870a697c886912780365a7a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees a memory block in cuda heap memory allocated by alloc_cuda.  <a href="namespace_f_e_a_t_1_1_memory.html#ad5f21f80870a697c886912780365a7a8">More...</a><br /></td></tr>
+<tr class="separator:ad5f21f80870a697c886912780365a7a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab85545b34050afba3d809d65655f7824"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_memory.html#ab85545b34050afba3d809d65655f7824">free_main</a> (void *ptr)</td></tr>
 <tr class="memdesc:ab85545b34050afba3d809d65655f7824"><td class="mdescLeft">&#160;</td><td class="mdescRight">Frees a memory block in main heap memory allocated by alloc_main.  <a href="namespace_f_e_a_t_1_1_memory.html#ab85545b34050afba3d809d65655f7824">More...</a><br /></td></tr>
 <tr class="separator:ab85545b34050afba3d809d65655f7824"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5b51b6ae9192ae9c40941dab2ae3158b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_memory.html#a5b51b6ae9192ae9c40941dab2ae3158b">memcopy_cuda</a> (void *dst, const void *src, std::size_t bytes)</td></tr>
-<tr class="memdesc:a5b51b6ae9192ae9c40941dab2ae3158b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies a region of a cuda memory block into another cuda memory block.  <a href="namespace_f_e_a_t_1_1_memory.html#a5b51b6ae9192ae9c40941dab2ae3158b">More...</a><br /></td></tr>
-<tr class="separator:a5b51b6ae9192ae9c40941dab2ae3158b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaa59e4af56efb84185cd4e288a2c7a6e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_memory.html#aaa59e4af56efb84185cd4e288a2c7a6e">memcopy_cuda</a> (void *dst, const void *src, std::size_t bytes, const Util::StreamWrapper &amp;stream=Util::StreamWrapper{})</td></tr>
+<tr class="memdesc:aaa59e4af56efb84185cd4e288a2c7a6e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies a region of a cuda memory block into another cuda memory block.  <a href="namespace_f_e_a_t_1_1_memory.html#aaa59e4af56efb84185cd4e288a2c7a6e">More...</a><br /></td></tr>
+<tr class="separator:aaa59e4af56efb84185cd4e288a2c7a6e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4e35256945816211ea25312120a29ae8"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_memory.html#a4e35256945816211ea25312120a29ae8">memcopy_cuda_to_main</a> (void *dst, const void *src, std::size_t bytes)</td></tr>
 <tr class="memdesc:a4e35256945816211ea25312120a29ae8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies a region of a cuda memory block into a main memory block.  <a href="namespace_f_e_a_t_1_1_memory.html#a4e35256945816211ea25312120a29ae8">More...</a><br /></td></tr>
 <tr class="separator:a4e35256945816211ea25312120a29ae8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a065a4470fd0f8ae87edccbacb44f5aee"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_memory.html#a065a4470fd0f8ae87edccbacb44f5aee">memcopy_main</a> (void *dst, const void *src, std::size_t bytes)</td></tr>
 <tr class="memdesc:a065a4470fd0f8ae87edccbacb44f5aee"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies a region of a main memory block into another main memory block.  <a href="namespace_f_e_a_t_1_1_memory.html#a065a4470fd0f8ae87edccbacb44f5aee">More...</a><br /></td></tr>
 <tr class="separator:a065a4470fd0f8ae87edccbacb44f5aee"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9bb2a87dae3b6bc7c8238ef8e8d92f87"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_memory.html#a9bb2a87dae3b6bc7c8238ef8e8d92f87">memcopy_main_to_cuda</a> (void *dst, const void *src, std::size_t bytes)</td></tr>
-<tr class="memdesc:a9bb2a87dae3b6bc7c8238ef8e8d92f87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies a region of a main memory block into a cuda memory block.  <a href="namespace_f_e_a_t_1_1_memory.html#a9bb2a87dae3b6bc7c8238ef8e8d92f87">More...</a><br /></td></tr>
-<tr class="separator:a9bb2a87dae3b6bc7c8238ef8e8d92f87"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a80d99d3ce1a2bc532e92b2b4d534c62c"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_memory.html#a80d99d3ce1a2bc532e92b2b4d534c62c">memset_cuda</a> (void *ptr, int <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">value</a>, std::size_t bytes)</td></tr>
-<tr class="memdesc:a80d99d3ce1a2bc532e92b2b4d534c62c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Formats all bytes of a memory block in cuda memory to a given value.  <a href="namespace_f_e_a_t_1_1_memory.html#a80d99d3ce1a2bc532e92b2b4d534c62c">More...</a><br /></td></tr>
-<tr class="separator:a80d99d3ce1a2bc532e92b2b4d534c62c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1873f2b796536d02533e6dee62b5f629"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_memory.html#a1873f2b796536d02533e6dee62b5f629">memcopy_main_to_cuda</a> (void *dst, const void *src, std::size_t bytes, const Util::StreamWrapper &amp;stream=Util::StreamWrapper{})</td></tr>
+<tr class="memdesc:a1873f2b796536d02533e6dee62b5f629"><td class="mdescLeft">&#160;</td><td class="mdescRight">Copies a region of a main memory block into a cuda memory block.  <a href="namespace_f_e_a_t_1_1_memory.html#a1873f2b796536d02533e6dee62b5f629">More...</a><br /></td></tr>
+<tr class="separator:a1873f2b796536d02533e6dee62b5f629"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aaaf7292f0ab36cfcd2571b1958debc90"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_memory.html#aaaf7292f0ab36cfcd2571b1958debc90">memset_cuda</a> (void *ptr, int <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">value</a>, std::size_t bytes, const Util::StreamWrapper &amp;stream=Util::StreamWrapper{})</td></tr>
+<tr class="memdesc:aaaf7292f0ab36cfcd2571b1958debc90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Formats all bytes of a memory block in cuda memory to a given value.  <a href="namespace_f_e_a_t_1_1_memory.html#aaaf7292f0ab36cfcd2571b1958debc90">More...</a><br /></td></tr>
+<tr class="separator:aaaf7292f0ab36cfcd2571b1958debc90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a637a7dff37ce3840f55a517506e021fe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_memory.html#a637a7dff37ce3840f55a517506e021fe">memset_main</a> (void *ptr, int <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">value</a>, std::size_t bytes)</td></tr>
 <tr class="memdesc:a637a7dff37ce3840f55a517506e021fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Formats all bytes of a memory block in main memory to a given value.  <a href="namespace_f_e_a_t_1_1_memory.html#a637a7dff37ce3840f55a517506e021fe">More...</a><br /></td></tr>
 <tr class="separator:a637a7dff37ce3840f55a517506e021fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -267,7 +273,7 @@ Functions</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="memory__arbiter_8hpp_source.html#l00084">84</a> of file <a class="el" href="memory__arbiter_8hpp_source.html">memory_arbiter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="memory__arbiter_8hpp_source.html#l00097">97</a> of file <a class="el" href="memory__arbiter_8hpp_source.html">memory_arbiter.hpp</a>.</p>
 
 </div>
 </div>
@@ -305,7 +311,7 @@ Functions</h2></td></tr>
 </td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="memory__arbiter_8hpp_source.html#l00124">124</a> of file <a class="el" href="memory__arbiter_8hpp_source.html">memory_arbiter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="memory__arbiter_8hpp_source.html#l00137">137</a> of file <a class="el" href="memory__arbiter_8hpp_source.html">memory_arbiter.hpp</a>.</p>
 
 </div>
 </div>
@@ -374,6 +380,44 @@ Functions</h2></td></tr>
 
 </div>
 </div>
+<a id="ade72446855d0ec787252677039096d67" name="ade72446855d0ec787252677039096d67"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ade72446855d0ec787252677039096d67">&#9670;&#160;</a></span>alloc_cuda_async()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void * FEAT::Memory::alloc_cuda_async </td>
+          <td>(</td>
+          <td class="paramtype">std::size_t&#160;</td>
+          <td class="paramname"><em>bytes</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Util::StreamWrapper &amp;&#160;</td>
+          <td class="paramname"><em>stream</em> = <code>Util::StreamWrapper{}</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Allocates stream ordered memory block in cuda heap memory. </p>
+<p >This is effectively a wrapper around ::cudaMallocAsync. Note, async capabilities are not available on all devices, so this falls back to standard cudaMalloc if its not available. You can query the availability with the Util function cuda_get_async...</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">bytes</td><td>The size of the memory block in bytes.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>A pointer to the newly allocated cuda memory block or <code>nullptr</code>, if the memory allocation failed. </dd></dl>
+
+</div>
+</div>
 <a id="adb047f48794a552d0d899c7945641c6d" name="adb047f48794a552d0d899c7945641c6d"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#adb047f48794a552d0d899c7945641c6d">&#9670;&#160;</a></span>alloc_main()</h2>
 
@@ -400,7 +444,7 @@ Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>A pointer to the newly allocated main memory block or <code>nullptr</code>, if the memory allocation failed. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="memory__aux__main_8cpp_source.html#l00018">18</a> of file <a class="el" href="memory__aux__main_8cpp_source.html">memory_aux_main.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="memory__aux__main_8cpp_source.html#l00019">19</a> of file <a class="el" href="memory__aux__main_8cpp_source.html">memory_aux_main.cpp</a>.</p>
 
 </div>
 </div>
@@ -448,9 +492,9 @@ template&lt;typename T_ &gt; </div>
 
 <p>overload for Tdst_ = Tsrc_; performs a memcopy internally </p>
 
-<p class="definition">Definition at line <a class="el" href="memory__aux_8hpp_source.html#l00293">293</a> of file <a class="el" href="memory__aux_8hpp_source.html">memory_aux.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="memory__aux_8hpp_source.html#l00320">320</a> of file <a class="el" href="memory__aux_8hpp_source.html">memory_aux.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_memory.html#a5b51b6ae9192ae9c40941dab2ae3158b">memcopy_cuda()</a>.</p>
+<p class="reference">References <a class="el" href="namespace_f_e_a_t_1_1_memory.html#aaa59e4af56efb84185cd4e288a2c7a6e">memcopy_cuda()</a>.</p>
 
 </div>
 </div>
@@ -507,7 +551,7 @@ template&lt;typename Tdst_ , typename Tsrc_ &gt; </div>
   </dd>
 </dl>
 
-<p class="reference">Referenced by <a class="el" href="memory__arbiter_8hpp_source.html#l00549">FEAT::Memory::TypedView&lt; T_ &gt;::convert_from()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="memory__arbiter_8hpp_source.html#l00562">FEAT::Memory::TypedView&lt; T_ &gt;::convert_from()</a>.</p>
 
 </div>
 </div>
@@ -555,11 +599,11 @@ template&lt;typename T_ &gt; </div>
 
 <p>overload for Tdst_ = Tsrc_; performs a memcopy internally </p>
 
-<p class="definition">Definition at line <a class="el" href="memory__aux_8hpp_source.html#l00098">98</a> of file <a class="el" href="memory__aux_8hpp_source.html">memory_aux.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="memory__aux_8hpp_source.html#l00099">99</a> of file <a class="el" href="memory__aux_8hpp_source.html">memory_aux.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="memory__aux__main_8cpp_source.html#l00067">memcopy_main()</a>.</p>
+<p class="reference">References <a class="el" href="memory__aux__main_8cpp_source.html#l00071">memcopy_main()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="memory__arbiter_8hpp_source.html#l00549">FEAT::Memory::TypedView&lt; T_ &gt;::convert_from()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="memory__arbiter_8hpp_source.html#l00562">FEAT::Memory::TypedView&lt; T_ &gt;::convert_from()</a>.</p>
 
 </div>
 </div>
@@ -616,7 +660,7 @@ template&lt;typename Tdst_ , typename Tsrc_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="memory__aux_8hpp_source.html#l00120">120</a> of file <a class="el" href="memory__aux_8hpp_source.html">memory_aux.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="memory__aux_8hpp_source.html#l00121">121</a> of file <a class="el" href="memory__aux_8hpp_source.html">memory_aux.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
@@ -666,7 +710,7 @@ template&lt;typename T_ &gt; </div>
   </dd>
 </dl>
 
-<p class="reference">Referenced by <a class="el" href="memory__arbiter_8hpp_source.html#l00590">FEAT::Memory::TypedView&lt; T_ &gt;::format()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="memory__arbiter_8hpp_source.html#l00603">FEAT::Memory::TypedView&lt; T_ &gt;::format()</a>.</p>
 
 </div>
 </div>
@@ -722,11 +766,11 @@ template&lt;typename T_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="memory__aux_8hpp_source.html#l00153">153</a> of file <a class="el" href="memory__aux_8hpp_source.html">memory_aux.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="memory__aux_8hpp_source.html#l00154">154</a> of file <a class="el" href="memory__aux_8hpp_source.html">memory_aux.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="memory__arbiter_8hpp_source.html#l00590">FEAT::Memory::TypedView&lt; T_ &gt;::format()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="memory__arbiter_8hpp_source.html#l00603">FEAT::Memory::TypedView&lt; T_ &gt;::format()</a>.</p>
 
 </div>
 </div>
@@ -742,6 +786,43 @@ template&lt;typename T_ &gt; </div>
           <td class="paramtype">void *&#160;</td>
           <td class="paramname"><em>ptr</em></td><td>)</td>
           <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Frees a memory block in cuda heap memory allocated by alloc_cuda. </p>
+<p >This is effectively a wrapper around ::cudaFree.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in]</td><td class="paramname">ptr</td><td>A pointer to the cuda memory block that is to be freed; must not be <code>nullptr</code>. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="ad5f21f80870a697c886912780365a7a8" name="ad5f21f80870a697c886912780365a7a8"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad5f21f80870a697c886912780365a7a8">&#9670;&#160;</a></span>free_cuda_async()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void FEAT::Memory::free_cuda_async </td>
+          <td>(</td>
+          <td class="paramtype">void *&#160;</td>
+          <td class="paramname"><em>ptr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Util::StreamWrapper &amp;&#160;</td>
+          <td class="paramname"><em>stream</em> = <code>Util::StreamWrapper{}</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -782,12 +863,12 @@ template&lt;typename T_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="memory__aux__main_8cpp_source.html#l00023">23</a> of file <a class="el" href="memory__aux__main_8cpp_source.html">memory_aux_main.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="memory__aux__main_8cpp_source.html#l00026">26</a> of file <a class="el" href="memory__aux__main_8cpp_source.html">memory_aux_main.cpp</a>.</p>
 
 </div>
 </div>
-<a id="a5b51b6ae9192ae9c40941dab2ae3158b" name="a5b51b6ae9192ae9c40941dab2ae3158b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a5b51b6ae9192ae9c40941dab2ae3158b">&#9670;&#160;</a></span>memcopy_cuda()</h2>
+<a id="aaa59e4af56efb84185cd4e288a2c7a6e" name="aaa59e4af56efb84185cd4e288a2c7a6e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaa59e4af56efb84185cd4e288a2c7a6e">&#9670;&#160;</a></span>memcopy_cuda()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -808,7 +889,13 @@ template&lt;typename T_ &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>bytes</em>&#160;</td>
+          <td class="paramname"><em>bytes</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Util::StreamWrapper &amp;&#160;</td>
+          <td class="paramname"><em>stream</em> = <code>Util::StreamWrapper{}</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -830,7 +917,7 @@ template&lt;typename T_ &gt; </div>
   </dd>
 </dl>
 
-<p class="reference">Referenced by <a class="el" href="memory__aux_8hpp_source.html#l00293">convert_cuda()</a>, and <a class="el" href="memory__arbiter_8cpp_source.html#l01095">FEAT::Memory::View::copy_raw_from()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="memory__aux_8hpp_source.html#l00320">convert_cuda()</a>, and <a class="el" href="memory__arbiter_8cpp_source.html#l01098">FEAT::Memory::View::copy_raw_from()</a>.</p>
 
 </div>
 </div>
@@ -877,7 +964,7 @@ template&lt;typename T_ &gt; </div>
   </dd>
 </dl>
 
-<p class="reference">Referenced by <a class="el" href="memory__arbiter_8cpp_source.html#l01095">FEAT::Memory::View::copy_raw_from()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="memory__arbiter_8cpp_source.html#l01098">FEAT::Memory::View::copy_raw_from()</a>.</p>
 
 </div>
 </div>
@@ -925,16 +1012,16 @@ template&lt;typename T_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="memory__aux__main_8cpp_source.html#l00067">67</a> of file <a class="el" href="memory__aux__main_8cpp_source.html">memory_aux_main.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="memory__aux__main_8cpp_source.html#l00071">71</a> of file <a class="el" href="memory__aux__main_8cpp_source.html">memory_aux_main.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, <a class="el" href="container_8hpp_source.html#l00429">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialize()</a>, <a class="el" href="memory__aux_8hpp_source.html#l00098">convert_main()</a>, <a class="el" href="memory__arbiter_8cpp_source.html#l01095">FEAT::Memory::View::copy_raw_from()</a>, <a class="el" href="transpose__dense__generic_8hpp_source.html#l00016">FEAT::LAFEM::Arch::TransposeDense::exec_generic_impl()</a>, <a class="el" href="coloring__data__handler_8hpp_source.html#l00155">FEAT::Adjacency::ColoringDataHandler::fill_color()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l01988">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, block_height_, block_width_ &gt;::permute()</a>, and <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02419">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::permute()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00354">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, <a class="el" href="container_8hpp_source.html#l00436">FEAT::LAFEM::Container&lt; DT_, IT_ &gt;::_serialize()</a>, <a class="el" href="memory__aux_8hpp_source.html#l00099">convert_main()</a>, <a class="el" href="memory__arbiter_8cpp_source.html#l01098">FEAT::Memory::View::copy_raw_from()</a>, <a class="el" href="transpose__dense__generic_8hpp_source.html#l00016">FEAT::LAFEM::Arch::TransposeDense::exec_generic_impl()</a>, <a class="el" href="coloring__data__handler_8hpp_source.html#l00155">FEAT::Adjacency::ColoringDataHandler::fill_color()</a>, <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l02009">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, block_height_, block_width_ &gt;::permute()</a>, and <a class="el" href="sparse__matrix__csr_8hpp_source.html#l02440">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::permute()</a>.</p>
 
 </div>
 </div>
-<a id="a9bb2a87dae3b6bc7c8238ef8e8d92f87" name="a9bb2a87dae3b6bc7c8238ef8e8d92f87"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a9bb2a87dae3b6bc7c8238ef8e8d92f87">&#9670;&#160;</a></span>memcopy_main_to_cuda()</h2>
+<a id="a1873f2b796536d02533e6dee62b5f629" name="a1873f2b796536d02533e6dee62b5f629"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1873f2b796536d02533e6dee62b5f629">&#9670;&#160;</a></span>memcopy_main_to_cuda()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -955,7 +1042,13 @@ template&lt;typename T_ &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>bytes</em>&#160;</td>
+          <td class="paramname"><em>bytes</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Util::StreamWrapper &amp;&#160;</td>
+          <td class="paramname"><em>stream</em> = <code>Util::StreamWrapper{}</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -976,12 +1069,12 @@ template&lt;typename T_ &gt; </div>
   </dd>
 </dl>
 
-<p class="reference">Referenced by <a class="el" href="memory__arbiter_8cpp_source.html#l01095">FEAT::Memory::View::copy_raw_from()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="memory__arbiter_8cpp_source.html#l01098">FEAT::Memory::View::copy_raw_from()</a>.</p>
 
 </div>
 </div>
-<a id="a80d99d3ce1a2bc532e92b2b4d534c62c" name="a80d99d3ce1a2bc532e92b2b4d534c62c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a80d99d3ce1a2bc532e92b2b4d534c62c">&#9670;&#160;</a></span>memset_cuda()</h2>
+<a id="aaaf7292f0ab36cfcd2571b1958debc90" name="aaaf7292f0ab36cfcd2571b1958debc90"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aaaf7292f0ab36cfcd2571b1958debc90">&#9670;&#160;</a></span>memset_cuda()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -1002,7 +1095,13 @@ template&lt;typename T_ &gt; </div>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">std::size_t&#160;</td>
-          <td class="paramname"><em>bytes</em>&#160;</td>
+          <td class="paramname"><em>bytes</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const Util::StreamWrapper &amp;&#160;</td>
+          <td class="paramname"><em>stream</em> = <code>Util::StreamWrapper{}</code>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -1023,7 +1122,7 @@ template&lt;typename T_ &gt; </div>
   </dd>
 </dl>
 
-<p class="reference">Referenced by <a class="el" href="memory__arbiter_8cpp_source.html#l01082">FEAT::Memory::View::format_to_one()</a>, and <a class="el" href="memory__arbiter_8cpp_source.html#l01069">FEAT::Memory::View::format_to_zero()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="memory__arbiter_8cpp_source.html#l01085">FEAT::Memory::View::format_to_one()</a>, and <a class="el" href="memory__arbiter_8cpp_source.html#l01072">FEAT::Memory::View::format_to_zero()</a>.</p>
 
 </div>
 </div>
@@ -1070,11 +1169,11 @@ template&lt;typename T_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="memory__aux__main_8cpp_source.html#l00028">28</a> of file <a class="el" href="memory__aux__main_8cpp_source.html">memory_aux_main.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="memory__aux__main_8cpp_source.html#l00032">32</a> of file <a class="el" href="memory__aux__main_8cpp_source.html">memory_aux_main.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00351">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, <a class="el" href="vanka_8hpp_source.html#l01759">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_factor_diag()</a>, <a class="el" href="vanka_8hpp_source.html#l01552">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_factor_full()</a>, <a class="el" href="memory__arbiter_8cpp_source.html#l01082">FEAT::Memory::View::format_to_one()</a>, <a class="el" href="memory__arbiter_8cpp_source.html#l01069">FEAT::Memory::View::format_to_zero()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00553">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_matrix_numeric()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="voxel__amavanka_8hpp_source.html#l00354">FEAT::Solver::VoxelAmaVanka&lt; Matrix_, Filter_, pol_threading_, macro_type_ &gt;::_alloc_device()</a>, <a class="el" href="vanka_8hpp_source.html#l01759">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_factor_diag()</a>, <a class="el" href="vanka_8hpp_source.html#l01552">FEAT::Solver::Vanka&lt; LAFEM::SaddlePointMatrix&lt; MatrixA_, MatrixB_, MatrixD_ &gt;, Filter_ &gt;::_factor_full()</a>, <a class="el" href="memory__arbiter_8cpp_source.html#l01085">FEAT::Memory::View::format_to_one()</a>, <a class="el" href="memory__arbiter_8cpp_source.html#l01072">FEAT::Memory::View::format_to_zero()</a>, and <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00553">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::upload_matrix_numeric()</a>.</p>
 
 </div>
 </div>
@@ -1120,7 +1219,7 @@ template&lt;typename T_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="memory__aux__main_8cpp_source.html#l00038">38</a> of file <a class="el" href="memory__aux__main_8cpp_source.html">memory_aux_main.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="memory__aux__main_8cpp_source.html#l00042">42</a> of file <a class="el" href="memory__aux__main_8cpp_source.html">memory_aux_main.cpp</a>.</p>
 
 <p class="reference">References <a class="el" href="random_8hpp_source.html#l00106">FEAT::Random::next()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 

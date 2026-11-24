@@ -2,7 +2,9 @@ var dir_80edb0e741e9eb75eaac840853b897b8 =
 [
     [ "alg_dof_parti.hpp", "alg__dof__parti_8hpp_source.html", null ],
     [ "alg_dof_parti_system.hpp", "alg__dof__parti__system_8hpp_source.html", null ],
+    [ "discrete_evaluator.hpp", "global_2discrete__evaluator_8hpp_source.html", null ],
     [ "filter.hpp", "filter_8hpp_source.html", null ],
+    [ "flood_fill.hpp", "flood__fill_8hpp_source.html", null ],
     [ "gate.hpp", "gate_8hpp_source.html", null ],
     [ "inverse_mapping.hpp", "global_2inverse__mapping_8hpp_source.html", null ],
     [ "matrix.hpp", "matrix_8hpp_source.html", null ],

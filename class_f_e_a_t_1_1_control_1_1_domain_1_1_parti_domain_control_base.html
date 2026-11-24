@@ -122,10 +122,9 @@ Inheritance diagram for FEAT::Control::Domain::PartiDomainControlBase&lt; Domain
  <div class="center">
   <img src="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.png" usemap="#FEAT::Control::Domain::PartiDomainControlBase_3C_20DomainLevel_5F_20_3E_map" alt=""/>
   <map id="FEAT::Control::Domain::PartiDomainControlBase_3C_20DomainLevel_5F_20_3E_map" name="FEAT::Control::Domain::PartiDomainControlBase_3C_20DomainLevel_5F_20_3E_map">
-<area href="class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_control.html" alt="FEAT::Control::Domain::DomainControl&lt; DomainLevel_ &gt;" shape="rect" coords="502,0,994,24"/>
-<area href="class_f_e_a_t_1_1_control_1_1_domain_1_1_c_g_a_l_domain_control.html" title="Hierarchical partitioned Voxel Domain Control." alt="FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;" shape="rect" coords="0,112,492,136"/>
+<area href="class_f_e_a_t_1_1_control_1_1_domain_1_1_domain_control.html" alt="FEAT::Control::Domain::DomainControl&lt; DomainLevel_ &gt;" shape="rect" coords="251,0,743,24"/>
+<area href="class_f_e_a_t_1_1_control_1_1_domain_1_1_deslagged_domain_control.html" title="Hierarchical partitioned Slagged Domain Control." alt="FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;" shape="rect" coords="0,112,492,136"/>
 <area href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html" title="Recursively Partitioned Domain Control." alt="FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;" shape="rect" coords="502,112,994,136"/>
-<area href="class_f_e_a_t_1_1_control_1_1_domain_1_1_voxel_domain_control.html" title="Hierarchical partitioned Voxel Domain Control." alt="FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;" shape="rect" coords="1004,112,1496,136"/>
 <area href="class_f_e_a_t_1_1_control_1_1_domain_1_1_adaptive_parti_domain_control.html" title="Adaptive Partitioned Domain Control." alt="FEAT::Control::Domain::AdaptivePartiDomainControl&lt; DomainLevel_, TemplateSet_ &gt;" shape="rect" coords="502,168,994,192"/>
   </map>
 </div></div>
@@ -310,6 +309,9 @@ Protected Member Functions</h2></td></tr>
 <tr class="memitem:a3f54a4c0782e6b8dde350e528f5d10fa"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a3f54a4c0782e6b8dde350e528f5d10fa">_apply_parti_naive</a> (<a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base_1_1_ancestor.html">Ancestor</a> &amp;ancestor, const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a4bc22ff565df9dddbbfa73feb4f66e2e">MeshNodeType</a> &amp;mesh_node, const std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a347c0ab7fba2b74c52829cec3b9341e5">WeightType</a> &gt; &amp;weights)</td></tr>
 <tr class="memdesc:a3f54a4c0782e6b8dde350e528f5d10fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the naive partitioner onto the base-mesh.  <a href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a3f54a4c0782e6b8dde350e528f5d10fa">More...</a><br /></td></tr>
 <tr class="separator:a3f54a4c0782e6b8dde350e528f5d10fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2574e8155f0d0b7d3393c2e96ca0b61e"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a2574e8155f0d0b7d3393c2e96ca0b61e">_apply_parti_scotch</a> (<a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base_1_1_ancestor.html">Ancestor</a> &amp;ancestor, const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a4bc22ff565df9dddbbfa73feb4f66e2e">MeshNodeType</a> &amp;base_mesh_node, const std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a347c0ab7fba2b74c52829cec3b9341e5">WeightType</a> &gt; &amp;weights)</td></tr>
+<tr class="memdesc:a2574e8155f0d0b7d3393c2e96ca0b61e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the SCOTCH partitioner onto the base-mesh.  <a href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a2574e8155f0d0b7d3393c2e96ca0b61e">More...</a><br /></td></tr>
+<tr class="separator:a2574e8155f0d0b7d3393c2e96ca0b61e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b281e0e75d413c114f033bac92aaa90"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a3b281e0e75d413c114f033bac92aaa90">_apply_parti_zoltan</a> (<a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base_1_1_ancestor.html">Ancestor</a> &amp;ancestor, const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a4bc22ff565df9dddbbfa73feb4f66e2e">MeshNodeType</a> &amp;base_mesh_node, const std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a347c0ab7fba2b74c52829cec3b9341e5">WeightType</a> &gt; &amp;weights)</td></tr>
 <tr class="memdesc:a3b281e0e75d413c114f033bac92aaa90"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the Zoltan partitioner onto the base-mesh.  <a href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a3b281e0e75d413c114f033bac92aaa90">More...</a><br /></td></tr>
 <tr class="separator:a3b281e0e75d413c114f033bac92aaa90"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -352,6 +354,9 @@ Protected Attributes</h2></td></tr>
 <tr class="memitem:a03e496846b01e2391f1ded07d8be19cc"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a03e496846b01e2391f1ded07d8be19cc">_allow_parti_naive</a></td></tr>
 <tr class="memdesc:a03e496846b01e2391f1ded07d8be19cc"><td class="mdescLeft">&#160;</td><td class="mdescRight">allow naive partitioner?  <a href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a03e496846b01e2391f1ded07d8be19cc">More...</a><br /></td></tr>
 <tr class="separator:a03e496846b01e2391f1ded07d8be19cc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8c24425d828914d71ad93b4464c78854"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a8c24425d828914d71ad93b4464c78854">_allow_parti_scotch</a></td></tr>
+<tr class="memdesc:a8c24425d828914d71ad93b4464c78854"><td class="mdescLeft">&#160;</td><td class="mdescRight">allow scotch partitioner?  <a href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a8c24425d828914d71ad93b4464c78854">More...</a><br /></td></tr>
+<tr class="separator:a8c24425d828914d71ad93b4464c78854"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afddf5df0ac7908f4b270aa208ed76012"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#afddf5df0ac7908f4b270aa208ed76012">_allow_parti_zoltan</a></td></tr>
 <tr class="memdesc:afddf5df0ac7908f4b270aa208ed76012"><td class="mdescLeft">&#160;</td><td class="mdescRight">allow Zoltan partitioner?  <a href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#afddf5df0ac7908f4b270aa208ed76012">More...</a><br /></td></tr>
 <tr class="separator:afddf5df0ac7908f4b270aa208ed76012"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -406,7 +411,7 @@ class FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;</div><
 <p >For more details on meshes, see the related doxygen page <a class="el" href="mesh_file_format.html">FEAT Mesh File Format</a>.</p>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00041">41</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00042">42</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a16840bb079fdc10186c23c115889bd38" name="a16840bb079fdc10186c23c115889bd38"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a16840bb079fdc10186c23c115889bd38">&#9670;&#160;</a></span>AtlasType</h2>
@@ -448,7 +453,7 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>Our base class. </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00046">46</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00047">47</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -516,7 +521,7 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>our root mesh node type </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00056">56</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00057">57</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -536,7 +541,7 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>our mesh-part type </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00058">58</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00059">59</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -628,7 +633,7 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>weight type for partitioner element weights; always Real </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00061">61</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00062">62</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -678,7 +683,7 @@ template&lt;typename DomainLevel_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00176">176</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00179">179</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -709,7 +714,7 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>virtual destructor </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00194">194</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00198">198</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
 </div>
 </div>
@@ -760,11 +765,11 @@ template&lt;typename DomainLevel_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if the base-mesh was partitioned, otherwise <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l01317">1317</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l01324">1324</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l01466">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_genetic()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l01413">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_metis()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l01508">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_naive()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l01361">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_zoltan()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00773">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_compute_weights()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00076">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_parts</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00113">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_apriori</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l01527">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_genetic()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l01422">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_metis()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l01569">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_naive()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l01478">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_scotch()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l01370">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti_zoltan()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00780">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_compute_weights()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00077">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_parts</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00114">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_apriori</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="cgal__domain__control_8hpp_source.html#l01497">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00564">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01826">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00458">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, and <a class="el" href="voxel__domain__control_8hpp_source.html#l01704">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="deslagged__domain__control_8hpp_source.html#l02381">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00700">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="deslagged__domain__control_8hpp_source.html#l02227">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, and <a class="el" href="parti__domain__control_8hpp_source.html#l00594">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>.</p>
 
 </div>
 </div>
@@ -820,11 +825,11 @@ template&lt;typename DomainLevel_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l01466">1466</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l01527">1527</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00076">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_parts</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00107">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_found</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00115">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_graph</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00109">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_info</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00104">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_comm</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00077">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_parts</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00108">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_found</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00116">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_graph</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00110">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_info</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00105">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_comm</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01317">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01324">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti()</a>.</p>
 
 </div>
 </div>
@@ -881,11 +886,11 @@ template&lt;typename DomainLevel_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if METIS was applied successfully, otherwise <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l01413">1413</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l01422">1422</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__parmetis_8hpp_source.html#l00112">FEAT::Geometry::PartiParMETIS::build_elems_at_rank()</a>, <a class="el" href="parti__parmetis_8hpp_source.html#l00099">FEAT::Geometry::PartiParMETIS::execute()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00076">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_parts</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00107">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_found</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00115">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_graph</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00109">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_info</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00104">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_comm</a>.</p>
+<p class="reference">References <a class="el" href="parti__parmetis_8hpp_source.html#l00112">FEAT::Geometry::PartiParMETIS::build_elems_at_rank()</a>, <a class="el" href="parti__parmetis_8hpp_source.html#l00099">FEAT::Geometry::PartiParMETIS::execute()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00077">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_parts</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00108">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_found</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00116">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_graph</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00110">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_info</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00105">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_comm</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01317">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01324">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti()</a>.</p>
 
 </div>
 </div>
@@ -942,11 +947,72 @@ template&lt;typename DomainLevel_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if a naive partition was created successfully, otherwise <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l01508">1508</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l01569">1569</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="graph_8hpp_source.html#l00359">FEAT::Adjacency::Graph::get_domain_ptr()</a>, <a class="el" href="graph_8hpp_source.html#l00374">FEAT::Adjacency::Graph::get_image_idx()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>, <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00076">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_parts</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00107">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_found</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00115">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_graph</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00109">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_info</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="graph_8hpp_source.html#l00359">FEAT::Adjacency::Graph::get_domain_ptr()</a>, <a class="el" href="graph_8hpp_source.html#l00374">FEAT::Adjacency::Graph::get_image_idx()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>, <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00077">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_parts</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00108">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_found</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00116">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_graph</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00110">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_info</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01317">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01324">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti()</a>.</p>
+
+</div>
+</div>
+<a id="a2574e8155f0d0b7d3393c2e96ca0b61e" name="a2574e8155f0d0b7d3393c2e96ca0b61e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2574e8155f0d0b7d3393c2e96ca0b61e">&#9670;&#160;</a></span>_apply_parti_scotch()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename DomainLevel_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html">FEAT::Control::Domain::PartiDomainControlBase</a>&lt; DomainLevel_ &gt;::_apply_parti_scotch </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base_1_1_ancestor.html">Ancestor</a> &amp;&#160;</td>
+          <td class="paramname"><em>ancestor</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a4bc22ff565df9dddbbfa73feb4f66e2e">MeshNodeType</a> &amp;&#160;</td>
+          <td class="paramname"><em>base_mesh_node</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const std::vector&lt; <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a347c0ab7fba2b74c52829cec3b9341e5">WeightType</a> &gt; &amp;&#160;</td>
+          <td class="paramname"><em>weights</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Applies the SCOTCH partitioner onto the base-mesh. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramdir">[in,out]</td><td class="paramname">ancestor</td><td>The ancestor object for this layer.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">base_mesh_node</td><td>The base-mesh node that is to be partitioned.</td></tr>
+    <tr><td class="paramdir">[in]</td><td class="paramname">weights</td><td>A vector containing the distribution weights for each element. May be empty if all elements are to be weighted equally.</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd><code>true</code>, if SCOTCH was applied successfully, otherwise <code>false</code>. </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l01478">1478</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00077">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_parts</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00108">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_found</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00116">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_graph</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00110">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_info</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00105">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_comm</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01324">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti()</a>.</p>
 
 </div>
 </div>
@@ -1003,11 +1069,11 @@ template&lt;typename DomainLevel_ &gt; </div>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd><code>true</code>, if Zoltan was applied successfully, otherwise <code>false</code>. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l01361">1361</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l01370">1370</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__zoltan_8hpp_source.html#l00145">FEAT::Geometry::PartiZoltan::build_elems_at_rank()</a>, <a class="el" href="parti__zoltan_8hpp_source.html#l00116">FEAT::Geometry::PartiZoltan::execute()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00076">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_parts</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00107">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_found</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00115">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_graph</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00109">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_info</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00104">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_comm</a>.</p>
+<p class="reference">References <a class="el" href="parti__zoltan_8hpp_source.html#l00145">FEAT::Geometry::PartiZoltan::build_elems_at_rank()</a>, <a class="el" href="parti__zoltan_8hpp_source.html#l00116">FEAT::Geometry::PartiZoltan::execute()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00077">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_parts</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00108">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_found</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00116">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_graph</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00110">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_info</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00105">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_comm</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01317">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01324">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti()</a>.</p>
 
 </div>
 </div>
@@ -1067,11 +1133,11 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>Reimplemented in <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#af42c92441b9e1faf9eb261072cfe42db">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l01276">1276</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l01283">1283</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00157">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_required_elems_per_rank</a>, <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>, <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00076">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_parts</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00107">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_found</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00111">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_level</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00160">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_required_elems_per_rank</a>, <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>, <a class="el" href="math_8hpp_source.html#l00137">FEAT::Math::max()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00077">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_parts</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00108">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_found</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00112">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::parti_level</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00824">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_check_parti()</a>, <a class="el" href="cgal__domain__control_8hpp_source.html#l01497">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, and <a class="el" href="voxel__domain__control_8hpp_source.html#l01826">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00960">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_check_parti()</a>, and <a class="el" href="deslagged__domain__control_8hpp_source.html#l02381">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>.</p>
 
 </div>
 </div>
@@ -1115,11 +1181,11 @@ template&lt;typename DomainLevel_ &gt; </div>
 <dl class="section note"><dt>Note</dt><dd>This base-class implementation always returns an empty vector, but a derived class may override this method and an actual non-trivial weight vector.</dd></dl>
 <dl class="section return"><dt>Returns</dt><dd>A vector containing the weights for the base mesh elements or an empty vector, if all elements are to be weighted equally. </dd></dl>
 
-<p>Reimplemented in <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_adaptive_parti_domain_control.html#aec3728fba897c98899b3d15a99435089">FEAT::Control::Domain::AdaptivePartiDomainControl&lt; DomainLevel_, TemplateSet_ &gt;</a>, and <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_c_g_a_l_domain_control.html#a8faf55d75d41fb535b7f70b8db3a54bc">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;</a>.</p>
+<p>Reimplemented in <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_adaptive_parti_domain_control.html#aec3728fba897c98899b3d15a99435089">FEAT::Control::Domain::AdaptivePartiDomainControl&lt; DomainLevel_, TemplateSet_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00773">773</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00780">780</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01317">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01324">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_apply_parti()</a>.</p>
 
 </div>
 </div>
@@ -1150,11 +1216,11 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>Creates the layers for a multi-layered domain control in a scattered fashion. </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00887">887</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00894">894</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00151">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_desired_levels</a>, <a class="el" href="dist_8cpp_source.html#l00475">FEAT::Dist::Comm::comm_create_range_incl()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00078">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::desired_level_max</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00070">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::layer</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00072">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::layer_p</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00076">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_parts</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00074">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_procs</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00090">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_child</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00104">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_comm</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00095">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_count</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00093">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_first</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00081">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_group</a>, <a class="el" href="dist_8hpp_source.html#l01802">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00154">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_desired_levels</a>, <a class="el" href="dist_8cpp_source.html#l00475">FEAT::Dist::Comm::comm_create_range_incl()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00079">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::desired_level_max</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00071">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::layer</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00073">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::layer_p</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00077">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_parts</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00075">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_procs</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00091">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_child</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00105">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_comm</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00096">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_count</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00094">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_first</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00082">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_group</a>, <a class="el" href="dist_8hpp_source.html#l01802">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="cgal__domain__control_8hpp_source.html#l01497">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00564">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, and <a class="el" href="voxel__domain__control_8hpp_source.html#l01826">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="deslagged__domain__control_8hpp_source.html#l02381">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, and <a class="el" href="parti__domain__control_8hpp_source.html#l00700">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>.</p>
 
 </div>
 </div>
@@ -1185,11 +1251,11 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>Creates the ancestry for a single layer (or a single process) </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00781">781</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00788">788</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00462">FEAT::Dist::Comm::comm_dup()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00078">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::desired_level_max</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00070">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::layer</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00072">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::layer_p</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00076">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_parts</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00074">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_procs</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00090">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_child</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00104">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_comm</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00095">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_count</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00093">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_first</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00081">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_group</a>, <a class="el" href="dist_8hpp_source.html#l01802">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="dist_8cpp_source.html#l00462">FEAT::Dist::Comm::comm_dup()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00079">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::desired_level_max</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00071">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::layer</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00073">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::layer_p</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00077">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_parts</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00075">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::num_procs</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00091">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_child</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00105">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_comm</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00096">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_count</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00094">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_first</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00082">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_group</a>, <a class="el" href="dist_8hpp_source.html#l01802">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="cgal__domain__control_8hpp_source.html#l01383">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00458">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01704">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="cgal__domain__control_8hpp_source.html#l01304">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00403">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, and <a class="el" href="voxel__domain__control_8hpp_source.html#l01620">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="deslagged__domain__control_8hpp_source.html#l02227">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00594">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="deslagged__domain__control_8hpp_source.html#l02122">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, and <a class="el" href="parti__domain__control_8hpp_source.html#l00539">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>.</p>
 
 </div>
 </div>
@@ -1220,11 +1286,11 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>Creates the layers for a multi-layered domain control in a scattered fashion. </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00826">826</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00833">833</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8hpp_source.html#l01661">FEAT::Dist::Comm::comm</a>, <a class="el" href="dist_8cpp_source.html#l00475">FEAT::Dist::Comm::comm_create_range_incl()</a>, <a class="el" href="dist_8cpp_source.html#l00462">FEAT::Dist::Comm::comm_dup()</a>, <a class="el" href="dist_8cpp_source.html#l00457">FEAT::Dist::Comm::is_null()</a>, <a class="el" href="dist_8hpp_source.html#l01802">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="cgal__domain__control_8hpp_source.html#l01497">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00564">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, and <a class="el" href="voxel__domain__control_8hpp_source.html#l01826">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="deslagged__domain__control_8hpp_source.html#l02381">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, and <a class="el" href="parti__domain__control_8hpp_source.html#l00700">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>.</p>
 
 </div>
 </div>
@@ -1265,11 +1331,11 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>Reimplemented in <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a49ae670ec4aa5ad0e7415cf1884e0af7">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00749">749</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00754">754</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00141">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_genetic</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00139">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_metis</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00143">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_naive</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00145">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_zoltan</a>, and <a class="el" href="string_8hpp_source.html#l00680">FEAT::String::compare_no_case()</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00142">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_genetic</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00140">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_metis</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00144">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_naive</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00148">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_scotch</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00146">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_zoltan</a>, and <a class="el" href="string_8hpp_source.html#l00680">FEAT::String::compare_no_case()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00332">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_parse_parti_type()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00210">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00254">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_property_map()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00468">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_parse_parti_type()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00214">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00258">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_property_map()</a>.</p>
 
 </div>
 </div>
@@ -1303,11 +1369,11 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>Reimplemented in <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#aefa902e36770d5cc267a6f2919e0a4a1">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00735">735</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00739">739</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00141">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_genetic</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00139">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_metis</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00143">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_naive</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00145">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_zoltan</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00142">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_genetic</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00140">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_metis</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00144">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_naive</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00148">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_scotch</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00146">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_allow_parti_zoltan</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00318">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_reset_parti_types()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00210">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00254">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_property_map()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00454">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_reset_parti_types()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00214">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00258">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_property_map()</a>.</p>
 
 </div>
 </div>
@@ -1371,11 +1437,11 @@ template&lt;typename DomainLevel_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00963">963</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00970">970</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00874">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::add_halo()</a>, <a class="el" href="dist_8cpp_source.html#l00544">FEAT::Dist::Comm::bcast()</a>, <a class="el" href="dist_8cpp_source.html#l00556">FEAT::Dist::Comm::gather()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00896">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::get_halo_map()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00962">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::get_patch()</a>, <a class="el" href="dist_8cpp_source.html#l00719">FEAT::Dist::Comm::irecv()</a>, <a class="el" href="dist_8cpp_source.html#l00457">FEAT::Dist::Comm::is_null()</a>, <a class="el" href="dist_8cpp_source.html#l00707">FEAT::Dist::Comm::isend()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00070">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::layer</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00072">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::layer_p</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00090">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_child</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00104">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_comm</a>, <a class="el" href="dist_8hpp_source.html#l01802">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, <a class="el" href="dist_8cpp_source.html#l00327">FEAT::Dist::RequestVector::wait_all()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
+<p class="reference">References <a class="el" href="mesh__node_8hpp_source.html#l00874">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::add_halo()</a>, <a class="el" href="dist_8cpp_source.html#l00544">FEAT::Dist::Comm::bcast()</a>, <a class="el" href="dist_8cpp_source.html#l00556">FEAT::Dist::Comm::gather()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00896">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::get_halo_map()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00225">FEAT::Geometry::MeshNode&lt; RootMesh_, ThisMesh_ &gt;::get_mesh()</a>, <a class="el" href="mesh__node_8hpp_source.html#l00962">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::get_patch()</a>, <a class="el" href="dist_8cpp_source.html#l00719">FEAT::Dist::Comm::irecv()</a>, <a class="el" href="dist_8cpp_source.html#l00457">FEAT::Dist::Comm::is_null()</a>, <a class="el" href="dist_8cpp_source.html#l00707">FEAT::Dist::Comm::isend()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00071">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::layer</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00073">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::layer_p</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00091">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_child</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00105">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::Ancestor::progeny_comm</a>, <a class="el" href="dist_8hpp_source.html#l01802">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, <a class="el" href="dist_8cpp_source.html#l00327">FEAT::Dist::RequestVector::wait_all()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="cgal__domain__control_8hpp_source.html#l01497">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00564">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, and <a class="el" href="voxel__domain__control_8hpp_source.html#l01826">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="deslagged__domain__control_8hpp_source.html#l02381">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, and <a class="el" href="parti__domain__control_8hpp_source.html#l00700">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>.</p>
 
 </div>
 </div>
@@ -1678,7 +1744,7 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>Debugging function: Returns a string containing encoded ancestry information. </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00593">593</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00597">597</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="string_8hpp_source.html#l00393">FEAT::String::pad_front()</a>, and <a class="el" href="string_8hpp_source.html#l00993">FEAT::stringify()</a>.</p>
 
@@ -1794,9 +1860,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 <p >The string returned by this function can be parsed by the <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a1b43c769181c8b46e8660727cb728811" title="Sets the desired levels for the partitioned hierarchy.">set_desired_levels()</a> function.</p>
 <dl class="section return"><dt>Returns</dt><dd>The chosen levels formatted as a parsable string. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00523">523</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00527">527</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00154">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_chosen_levels</a>, and <a class="el" href="string_8hpp_source.html#l00993">FEAT::stringify()</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00157">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_chosen_levels</a>, and <a class="el" href="string_8hpp_source.html#l00993">FEAT::stringify()</a>.</p>
 
 </div>
 </div>
@@ -1829,9 +1895,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 <p >The string returned by this function can be parsed by the <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html#a1b43c769181c8b46e8660727cb728811" title="Sets the desired levels for the partitioned hierarchy.">set_desired_levels()</a> function.</p>
 <dl class="section return"><dt>Returns</dt><dd>The desired levels formatted as a parsable string. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00502">502</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00506">506</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00151">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_desired_levels</a>, and <a class="el" href="string_8hpp_source.html#l00993">FEAT::stringify()</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00154">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_desired_levels</a>, and <a class="el" href="string_8hpp_source.html#l00993">FEAT::stringify()</a>.</p>
 
 </div>
 </div>
@@ -1971,9 +2037,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 <p>Gets the adapt-mode for refinement. </p>
 <dl class="section return"><dt>Returns</dt><dd>The adapt-mode that is used. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00326">326</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00330">330</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00136">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_adapt_mode</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00137">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_adapt_mode</a>.</p>
 
 </div>
 </div>
@@ -2004,9 +2070,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>Returns a const reference to the ancestry. </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00628">628</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00632">632</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00164">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_ancestry</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00167">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_ancestry</a>.</p>
 
 </div>
 </div>
@@ -2092,9 +2158,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 <p>Returns the deque of chosen refinement levels. </p>
 <dl class="section return"><dt>Returns</dt><dd>The deque of chosen refinement levels. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00585">585</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00589">589</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00154">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_chosen_levels</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00157">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_chosen_levels</a>.</p>
 
 </div>
 </div>
@@ -2128,7 +2194,7 @@ template&lt;typename DomainLevel_ &gt; </div>
 <dd>
 In the case of a multi-layered recursive partitioning, the returned string is a multi-line string containing the partitioning info for each recursive layer in a separate line. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00549">549</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00553">553</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="string_8hpp_source.html#l00993">FEAT::stringify()</a>.</p>
 
@@ -2162,11 +2228,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 <p>Returns the desired maximum refinement level. </p>
 <dl class="section return"><dt>Returns</dt><dd>The desired maximum refinement level </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00480">480</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00484">484</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00151">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_desired_levels</a>.</p>
-
-<p class="reference">Referenced by <a class="el" href="voxel__domain__control_8hpp_source.html#l00827">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_precreate_voxel_map()</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00154">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_desired_levels</a>.</p>
 
 </div>
 </div>
@@ -2198,9 +2262,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 <p>Returns the desired minimum refinement level. </p>
 <dl class="section return"><dt>Returns</dt><dd>The desired minimum refinement level </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00490">490</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00494">494</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00151">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_desired_levels</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00154">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_desired_levels</a>.</p>
 
 </div>
 </div>
@@ -2232,9 +2296,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 <p>Returns the deque of desired refinement levels. </p>
 <dl class="section return"><dt>Returns</dt><dd>The deque of desired refinement levels. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00575">575</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00579">579</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00151">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_desired_levels</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00154">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_desired_levels</a>.</p>
 
 </div>
 </div>
@@ -2497,11 +2561,11 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>Reimplemented in <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#ac1c81fe91c0da812d53fa2188fc48ac6">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00210">210</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00214">214</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00159">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_genetic_time_init</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00161">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_genetic_time_mutate</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00749">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_parse_parti_type()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00157">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_required_elems_per_rank</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00735">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_reset_parti_types()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00134">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_was_created</a>, <a class="el" href="simple__arg__parser_8hpp_source.html#l00384">FEAT::SimpleArgParser::parse()</a>, <a class="el" href="dist_8cpp_source.html#l00800">FEAT::Dist::Comm::print()</a>, <a class="el" href="simple__arg__parser_8hpp_source.html#l00356">FEAT::SimpleArgParser::query()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00162">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_genetic_time_init</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00164">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_genetic_time_mutate</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00754">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_parse_parti_type()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00160">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_required_elems_per_rank</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00739">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_reset_parti_types()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00135">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_was_created</a>, <a class="el" href="simple__arg__parser_8hpp_source.html#l00384">FEAT::SimpleArgParser::parse()</a>, <a class="el" href="dist_8cpp_source.html#l00800">FEAT::Dist::Comm::print()</a>, <a class="el" href="simple__arg__parser_8hpp_source.html#l00356">FEAT::SimpleArgParser::query()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00135">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::parse_args()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00142">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::parse_args()</a>.</p>
 
 </div>
 </div>
@@ -2542,11 +2606,11 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>Reimplemented in <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#afa6a43e0bfb0b52b14ba9a19c17e94b3">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00254">254</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00258">258</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00159">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_genetic_time_init</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00161">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_genetic_time_mutate</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00749">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_parse_parti_type()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00157">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_required_elems_per_rank</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00735">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_reset_parti_types()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00134">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_was_created</a>, <a class="el" href="dist_8cpp_source.html#l00800">FEAT::Dist::Comm::print()</a>, <a class="el" href="property__map_8cpp_source.html#l00125">FEAT::PropertyMap::query()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00162">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_genetic_time_init</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00164">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_genetic_time_mutate</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00754">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_parse_parti_type()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00160">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_required_elems_per_rank</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00739">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_reset_parti_types()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00135">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_was_created</a>, <a class="el" href="dist_8cpp_source.html#l00800">FEAT::Dist::Comm::print()</a>, <a class="el" href="property__map_8cpp_source.html#l00125">FEAT::PropertyMap::query()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00161">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::parse_property_map()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00168">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::parse_property_map()</a>.</p>
 
 </div>
 </div>
@@ -2708,7 +2772,7 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>Serializes the partitioning information into a binary buffer. </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00636">636</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00640">640</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="dist_8cpp_source.html#l00658">FEAT::Dist::Comm::allreduce()</a>, <a class="el" href="binary__stream_8hpp_source.html#l00236">FEAT::BinaryStream::container()</a>, <a class="el" href="dist_8cpp_source.html#l00556">FEAT::Dist::Comm::gather()</a>, <a class="el" href="dist_8hpp_source.html#l00573">FEAT::Dist::op_max</a>, <a class="el" href="dist_8hpp_source.html#l01802">FEAT::Dist::Comm::rank()</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
@@ -2748,9 +2812,9 @@ template&lt;typename DomainLevel_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00314">314</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00318">318</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00136">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_adapt_mode</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00134">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_was_created</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00137">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_adapt_mode</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00135">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_was_created</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -2789,9 +2853,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 </dl>
 <p>Each entry of the deque is supposed to be in the format <code>level:nprocs</code>. </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00351">351</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00355">355</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00151">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_desired_levels</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00134">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_was_created</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, <a class="el" href="string_8hpp_source.html#l00993">FEAT::stringify()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00154">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_desired_levels</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00135">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_was_created</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, <a class="el" href="string_8hpp_source.html#l00993">FEAT::stringify()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -2829,11 +2893,11 @@ template&lt;typename DomainLevel_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00337">337</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00341">341</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00337">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::set_desired_levels()</a>, and <a class="el" href="string_8hpp_source.html#l00519">FEAT::String::split_by_whitespaces()</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00341">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::set_desired_levels()</a>, and <a class="el" href="string_8hpp_source.html#l00519">FEAT::String::split_by_whitespaces()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00337">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::set_desired_levels()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00341">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::set_desired_levels()</a>.</p>
 
 </div>
 </div>
@@ -2889,9 +2953,9 @@ template&lt;typename DomainLevel_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00451">451</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00455">455</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00151">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_desired_levels</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00134">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_was_created</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00154">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_desired_levels</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00135">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_was_created</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -2940,9 +3004,9 @@ template&lt;typename DomainLevel_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00421">421</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00425">425</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00151">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_desired_levels</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00134">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_was_created</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+<p class="reference">References <a class="el" href="parti__domain__control__base_8hpp_source.html#l00154">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_desired_levels</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00135">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_was_created</a>, <a class="el" href="dist_8hpp_source.html#l01814">FEAT::Dist::Comm::size()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
 </div>
 </div>
@@ -3025,9 +3089,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>the adapt mode for refinement </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00136">136</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00137">137</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="cgal__domain__control_8hpp_source.html#l01497">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00564">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01826">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="cgal__domain__control_8hpp_source.html#l01383">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00458">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01704">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="cgal__domain__control_8hpp_source.html#l01304">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00403">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01620">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00326">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::get_adapt_mode()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00314">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::set_adapt_mode()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="deslagged__domain__control_8hpp_source.html#l02381">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00700">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="deslagged__domain__control_8hpp_source.html#l02227">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00594">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="deslagged__domain__control_8hpp_source.html#l02122">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00539">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00330">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::get_adapt_mode()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00318">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::set_adapt_mode()</a>.</p>
 
 </div>
 </div>
@@ -3055,9 +3119,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>allow genetic partitioner? </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00141">141</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00142">142</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00749">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_parse_parti_type()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00735">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_reset_parti_types()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00754">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_parse_parti_type()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00739">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_reset_parti_types()</a>.</p>
 
 </div>
 </div>
@@ -3085,9 +3149,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>allow metis partitioner? </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00139">139</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00140">140</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00749">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_parse_parti_type()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00735">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_reset_parti_types()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00754">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_parse_parti_type()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00739">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_reset_parti_types()</a>.</p>
 
 </div>
 </div>
@@ -3115,9 +3179,39 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>allow naive partitioner? </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00143">143</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00144">144</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00749">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_parse_parti_type()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00735">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_reset_parti_types()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00754">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_parse_parti_type()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00739">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_reset_parti_types()</a>.</p>
+
+</div>
+</div>
+<a id="a8c24425d828914d71ad93b4464c78854" name="a8c24425d828914d71ad93b4464c78854"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8c24425d828914d71ad93b4464c78854">&#9670;&#160;</a></span>_allow_parti_scotch</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename DomainLevel_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool <a class="el" href="class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control_base.html">FEAT::Control::Domain::PartiDomainControlBase</a>&lt; DomainLevel_ &gt;::_allow_parti_scotch</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>allow scotch partitioner? </p>
+
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00148">148</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00754">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_parse_parti_type()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00739">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_reset_parti_types()</a>.</p>
 
 </div>
 </div>
@@ -3145,9 +3239,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>allow Zoltan partitioner? </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00145">145</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00146">146</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00749">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_parse_parti_type()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00735">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_reset_parti_types()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00754">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_parse_parti_type()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00739">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_reset_parti_types()</a>.</p>
 
 </div>
 </div>
@@ -3175,9 +3269,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>the partition ancestry deque </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00164">164</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00167">167</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="cgal__domain__control_8hpp_source.html#l01497">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00564">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01826">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="cgal__domain__control_8hpp_source.html#l01383">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00458">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01704">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="cgal__domain__control_8hpp_source.html#l01304">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00403">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01620">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00628">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::get_ancestry()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="deslagged__domain__control_8hpp_source.html#l02381">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00700">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="deslagged__domain__control_8hpp_source.html#l02227">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00594">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="deslagged__domain__control_8hpp_source.html#l02122">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00539">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00632">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::get_ancestry()</a>.</p>
 
 </div>
 </div>
@@ -3253,9 +3347,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>chosen level deque </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00154">154</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00157">157</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="cgal__domain__control_8hpp_source.html#l01497">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00564">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01826">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="cgal__domain__control_8hpp_source.html#l01383">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00458">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01704">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="cgal__domain__control_8hpp_source.html#l01304">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00403">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01620">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00523">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::format_chosen_levels()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00585">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::get_chosen_levels()</a>, and <a class="el" href="adaptive__parti__domain__control_8hpp_source.html#l00249">FEAT::Control::Domain::AdaptivePartiDomainControl&lt; DomainLevel_, TemplateSet_ &gt;::refine_partially()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="deslagged__domain__control_8hpp_source.html#l02381">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00700">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="deslagged__domain__control_8hpp_source.html#l02227">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00594">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="deslagged__domain__control_8hpp_source.html#l02122">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00539">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_single_process()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00527">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::format_chosen_levels()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00589">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::get_chosen_levels()</a>, and <a class="el" href="adaptive__parti__domain__control_8hpp_source.html#l00249">FEAT::Control::Domain::AdaptivePartiDomainControl&lt; DomainLevel_, TemplateSet_ &gt;::refine_partially()</a>.</p>
 
 </div>
 </div>
@@ -3307,9 +3401,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>desired level deque </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00151">151</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00154">154</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00348">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00887">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_scattered()</a>, <a class="el" href="cgal__domain__control_8hpp_source.html#l01497">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00564">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01826">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="cgal__domain__control_8hpp_source.html#l00371">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::create_hierarchy()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00640">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::create_hierarchy()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00502">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::format_desired_levels()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00480">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::get_desired_level_max()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00490">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::get_desired_level_min()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00575">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::get_desired_levels()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00351">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::set_desired_levels()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00484">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00894">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_create_ancestry_scattered()</a>, <a class="el" href="deslagged__domain__control_8hpp_source.html#l02381">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00700">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create_multi_layered()</a>, <a class="el" href="deslagged__domain__control_8hpp_source.html#l01271">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::create_hierarchy()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00506">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::format_desired_levels()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00484">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::get_desired_level_max()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00494">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::get_desired_level_min()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00579">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::get_desired_levels()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00355">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::set_desired_levels()</a>.</p>
 
 </div>
 </div>
@@ -3337,9 +3431,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>time for genetic partitioner initialization </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00159">159</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00162">162</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00210">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00254">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_property_map()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00214">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00258">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_property_map()</a>.</p>
 
 </div>
 </div>
@@ -3367,9 +3461,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>time for genetic partitioner mutation </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00161">161</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00164">164</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00210">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00254">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_property_map()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l00214">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00258">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_property_map()</a>.</p>
 
 </div>
 </div>
@@ -3495,9 +3589,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>required number of elements per rank for a-posteriori partitioning </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00157">157</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00160">160</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01276">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_check_parti()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01704">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00210">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00254">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_property_map()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control__base_8hpp_source.html#l01283">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::_check_parti()</a>, <a class="el" href="deslagged__domain__control_8hpp_source.html#l02227">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_create_single_layered()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00214">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, and <a class="el" href="parti__domain__control__base_8hpp_source.html#l00258">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_property_map()</a>.</p>
 
 </div>
 </div>
@@ -3525,9 +3619,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>support multi-layered hierarchy? </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00148">148</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00151">151</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00348">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create()</a>, <a class="el" href="cgal__domain__control_8hpp_source.html#l00371">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::create_hierarchy()</a>, and <a class="el" href="voxel__domain__control_8hpp_source.html#l00640">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::create_hierarchy()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00484">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create()</a>, and <a class="el" href="deslagged__domain__control_8hpp_source.html#l01271">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::create_hierarchy()</a>.</p>
 
 </div>
 </div>
@@ -3603,9 +3697,9 @@ template&lt;typename DomainLevel_ &gt; </div>
 
 <p>specifies whether the domain control was already created </p>
 
-<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00134">134</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="parti__domain__control__base_8hpp_source.html#l00135">135</a> of file <a class="el" href="parti__domain__control__base_8hpp_source.html">parti_domain_control_base.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00348">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00202">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::create()</a>, <a class="el" href="cgal__domain__control_8hpp_source.html#l00371">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::create_hierarchy()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00640">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::create_hierarchy()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00251">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::create_rectilinear()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00210">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00254">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_property_map()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00314">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::set_adapt_mode()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00351">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::set_desired_levels()</a>, and <a class="el" href="parti__domain__control_8hpp_source.html#l00283">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::set_permutation_strategy()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="parti__domain__control_8hpp_source.html#l00484">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::_create()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00209">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::create()</a>, <a class="el" href="deslagged__domain__control_8hpp_source.html#l01271">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::create_hierarchy()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00292">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::create_rectilinear()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00258">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::create_unit_hypercube()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00214">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_args()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00258">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_property_map()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00318">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::set_adapt_mode()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00355">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::set_desired_levels()</a>, and <a class="el" href="parti__domain__control_8hpp_source.html#l00419">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::set_permutation_strategy()</a>.</p>
 
 </div>
 </div>

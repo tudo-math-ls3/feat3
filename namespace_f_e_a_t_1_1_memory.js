@@ -28,6 +28,7 @@ var namespace_f_e_a_t_1_1_memory =
       [ "cuda", "namespace_f_e_a_t_1_1_memory.html#a723b53b6060c8a2d420a40f79e4b8c06a39466fe22b062a34cfe09f3cc8c24868", null ]
     ] ],
     [ "alloc_cuda", "namespace_f_e_a_t_1_1_memory.html#aa62b8261c1e3ea27d8f96f1f40286060", null ],
+    [ "alloc_cuda_async", "namespace_f_e_a_t_1_1_memory.html#ade72446855d0ec787252677039096d67", null ],
     [ "alloc_main", "namespace_f_e_a_t_1_1_memory.html#adb047f48794a552d0d899c7945641c6d", null ],
     [ "convert_cuda", "namespace_f_e_a_t_1_1_memory.html#a0e74842e363957800172af91e5db436d", null ],
     [ "convert_cuda", "namespace_f_e_a_t_1_1_memory.html#a1c266eaf4b1b258bcab13b4c561e53a8", null ],
@@ -36,12 +37,13 @@ var namespace_f_e_a_t_1_1_memory =
     [ "format_cuda", "namespace_f_e_a_t_1_1_memory.html#a0e9c92e7113367785383cf14747e0188", null ],
     [ "format_main", "namespace_f_e_a_t_1_1_memory.html#ade04c3af50d89715540cdc2336316b74", null ],
     [ "free_cuda", "namespace_f_e_a_t_1_1_memory.html#ac916de02586f4b83554b0aa78510e717", null ],
+    [ "free_cuda_async", "namespace_f_e_a_t_1_1_memory.html#ad5f21f80870a697c886912780365a7a8", null ],
     [ "free_main", "namespace_f_e_a_t_1_1_memory.html#ab85545b34050afba3d809d65655f7824", null ],
-    [ "memcopy_cuda", "namespace_f_e_a_t_1_1_memory.html#a5b51b6ae9192ae9c40941dab2ae3158b", null ],
+    [ "memcopy_cuda", "namespace_f_e_a_t_1_1_memory.html#aaa59e4af56efb84185cd4e288a2c7a6e", null ],
     [ "memcopy_cuda_to_main", "namespace_f_e_a_t_1_1_memory.html#a4e35256945816211ea25312120a29ae8", null ],
     [ "memcopy_main", "namespace_f_e_a_t_1_1_memory.html#a065a4470fd0f8ae87edccbacb44f5aee", null ],
-    [ "memcopy_main_to_cuda", "namespace_f_e_a_t_1_1_memory.html#a9bb2a87dae3b6bc7c8238ef8e8d92f87", null ],
-    [ "memset_cuda", "namespace_f_e_a_t_1_1_memory.html#a80d99d3ce1a2bc532e92b2b4d534c62c", null ],
+    [ "memcopy_main_to_cuda", "namespace_f_e_a_t_1_1_memory.html#a1873f2b796536d02533e6dee62b5f629", null ],
+    [ "memset_cuda", "namespace_f_e_a_t_1_1_memory.html#aaaf7292f0ab36cfcd2571b1958debc90", null ],
     [ "memset_main", "namespace_f_e_a_t_1_1_memory.html#a637a7dff37ce3840f55a517506e021fe", null ],
     [ "memset_random_main", "namespace_f_e_a_t_1_1_memory.html#acfe4bb451114e8366ed7ff86a48ba635", null ]
 ];

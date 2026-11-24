@@ -1118,467 +1118,479 @@ $(document).ready(function(){initNavTree('burgers__assembler_8cu_source.html',''
 <div class="line"><a id="l01013" name="l01013"></a><span class="lineno"> 1013</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
 <div class="line"><a id="l01014" name="l01014"></a><span class="lineno"> 1014</span>              const Adjacency::ColoringDataHandler&amp; coloring_data,</div>
 <div class="line"><a id="l01015" name="l01015"></a><span class="lineno"> 1015</span>              DT_ alpha, const AssemblyBurgersData&lt;DT_&gt;&amp; burgers_params,</div>
-<div class="line"><a id="l01016" name="l01016"></a><span class="lineno"> 1016</span>              int shared_mem, int blocksize, int gridsize, bool print_occupancy)</div>
+<div class="line"><a id="l01016" name="l01016"></a><span class="lineno"> 1016</span>              const Util::RuntimeParameter&amp; runtime_params)</div>
 <div class="line"><a id="l01017" name="l01017"></a><span class="lineno"> 1017</span>      {</div>
-<div class="line"><a id="l01018" name="l01018"></a><span class="lineno"> 1018</span>        // get the size of all necessary shared memory</div>
-<div class="line"><a id="l01019" name="l01019"></a><span class="lineno"> 1019</span>        constexpr int dim = Space_::ShapeType::dimension;</div>
-<div class="line"><a id="l01020" name="l01020"></a><span class="lineno"> 1020</span>        constexpr int num_loc_dofs = Space_::DofMappingType::dof_count;</div>
-<div class="line"><a id="l01021" name="l01021"></a><span class="lineno"> 1021</span>        constexpr int shared_size_nec = sizeof(VoxelAssembly::BurgersSharedDataGlobalWrapper&lt;VoxelAssembly::SpaceHelper&lt;Space_, DT_, IT_&gt;&gt;) + sizeof(VoxelAssembly::BurgersSharedDataKernelWrapper&lt;VoxelAssembly::SpaceHelper&lt;Space_, DT_, IT_&gt;&gt;);</div>
-<div class="line"><a id="l01022" name="l01022"></a><span class="lineno"> 1022</span>        const int loc_mat_shared_mem = shared_mem - shared_size_nec;</div>
-<div class="line"><a id="l01023" name="l01023"></a><span class="lineno"> 1023</span>        XASSERTM(loc_mat_shared_mem &gt; 0, String(&quot;Not enough assigned shared memory\n Minimum required: &quot;) + stringify(shared_size_nec)</div>
-<div class="line"><a id="l01024" name="l01024"></a><span class="lineno"> 1024</span>            + String(&quot;\nProvided: &quot;) + stringify(shared_mem));</div>
-<div class="line"><a id="l01025" name="l01025"></a><span class="lineno"> 1025</span> </div>
-<div class="line"><a id="l01026" name="l01026"></a><span class="lineno"> 1026</span>        const int loc_block_size = CudaMath::cuda_min(loc_mat_shared_mem / int(sizeof(DT_)*dim*dim), num_loc_dofs*num_loc_dofs);</div>
-<div class="line"><a id="l01027" name="l01027"></a><span class="lineno"> 1027</span>        XASSERTM(loc_block_size &gt; 0, &quot;Not enough memory assigned to assemble a single matrix entry!&quot;);</div>
-<div class="line"><a id="l01028" name="l01028"></a><span class="lineno"> 1028</span>        XASSERTM(loc_block_size &gt;= num_loc_dofs, &quot;Not enough memory assigned to assemble a single matrix row!&quot;);</div>
-<div class="line"><a id="l01029" name="l01029"></a><span class="lineno"> 1029</span> </div>
-<div class="line"><a id="l01030" name="l01030"></a><span class="lineno"> 1030</span>        if(print_occupancy)</div>
-<div class="line"><a id="l01031" name="l01031"></a><span class="lineno"> 1031</span>        {</div>
-<div class="line"><a id="l01032" name="l01032"></a><span class="lineno"> 1032</span>          int numBlocksWarp = Util::cuda_get_occupancy(VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_warp_based&lt;Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt;, blocksize, shared_mem);</div>
-<div class="line"><a id="l01033" name="l01033"></a><span class="lineno"> 1033</span>          const int max_blocks_per_sm = int(Util::cuda_get_max_blocks_per_sm());</div>
-<div class="line"><a id="l01034" name="l01034"></a><span class="lineno"> 1034</span>          printf(&quot;Numblocks/Occupancy per SM for device number %i: %i, %f\n&quot;, Util::cuda_device_number, numBlocksWarp, double(numBlocksWarp*(blocksize/32))/double(max_blocks_per_sm));</div>
-<div class="line"><a id="l01035" name="l01035"></a><span class="lineno"> 1035</span>        }</div>
-<div class="line"><a id="l01036" name="l01036"></a><span class="lineno"> 1036</span> </div>
-<div class="line"><a id="l01037" name="l01037"></a><span class="lineno"> 1037</span>        if(shared_mem &gt; 48000)</div>
-<div class="line"><a id="l01038" name="l01038"></a><span class="lineno"> 1038</span>        {</div>
-<div class="line"><a id="l01039" name="l01039"></a><span class="lineno"> 1039</span>          if(cudaSuccess != cudaFuncSetAttribute(VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_warp_based&lt;Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt;,</div>
-<div class="line"><a id="l01040" name="l01040"></a><span class="lineno"> 1040</span>            cudaFuncAttributeMaxDynamicSharedMemorySize, shared_mem))</div>
-<div class="line"><a id="l01041" name="l01041"></a><span class="lineno"> 1041</span>          {</div>
-<div class="line"><a id="l01042" name="l01042"></a><span class="lineno"> 1042</span>            XABORTM(&quot;cudaFuncSetAttribute failed.&quot;);</div>
-<div class="line"><a id="l01043" name="l01043"></a><span class="lineno"> 1043</span>          }</div>
-<div class="line"><a id="l01044" name="l01044"></a><span class="lineno"> 1044</span>        }</div>
-<div class="line"><a id="l01045" name="l01045"></a><span class="lineno"> 1045</span> </div>
-<div class="line"><a id="l01046" name="l01046"></a><span class="lineno"> 1046</span>        const Memory::TypedView&lt;int&gt; color_view = coloring_data.color_map_view(Memory::Location::cuda, Memory::Access::read);</div>
-<div class="line"><a id="l01047" name="l01047"></a><span class="lineno"> 1047</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_view(dof_mapping.cell_to_dof.view(Memory::Location::cuda, Memory::Access::read));</div>
-<div class="line"><a id="l01048" name="l01048"></a><span class="lineno"> 1048</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_sorter_view(dof_mapping.cell_to_dof_sorter.view(Memory::Location::cuda, Memory::Access::read));</div>
-<div class="line"><a id="l01049" name="l01049"></a><span class="lineno"> 1049</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, Space_::world_dim&gt;&gt; nodes_view(dof_mapping.nodes.view(Memory::Location::cuda, Memory::Access::read));</div>
+<div class="line"><a id="l01018" name="l01018"></a><span class="lineno"> 1018</span>        // unpack the runtime kernel launch parameters</div>
+<div class="line"><a id="l01019" name="l01019"></a><span class="lineno"> 1019</span>        const int shared_mem = runtime_params.shared_mem;</div>
+<div class="line"><a id="l01020" name="l01020"></a><span class="lineno"> 1020</span>        const int blocksize = runtime_params.blocksize;</div>
+<div class="line"><a id="l01021" name="l01021"></a><span class="lineno"> 1021</span>        const int gridsize = runtime_params.gridsize;</div>
+<div class="line"><a id="l01022" name="l01022"></a><span class="lineno"> 1022</span>        const bool print_occupancy = runtime_params.print_occupancy;</div>
+<div class="line"><a id="l01023" name="l01023"></a><span class="lineno"> 1023</span>        // get the size of all necessary shared memory</div>
+<div class="line"><a id="l01024" name="l01024"></a><span class="lineno"> 1024</span>        constexpr int dim = Space_::ShapeType::dimension;</div>
+<div class="line"><a id="l01025" name="l01025"></a><span class="lineno"> 1025</span>        constexpr int num_loc_dofs = Space_::DofMappingType::dof_count;</div>
+<div class="line"><a id="l01026" name="l01026"></a><span class="lineno"> 1026</span>        constexpr int shared_size_nec = sizeof(VoxelAssembly::BurgersSharedDataGlobalWrapper&lt;VoxelAssembly::SpaceHelper&lt;Space_, DT_, IT_&gt;&gt;) + sizeof(VoxelAssembly::BurgersSharedDataKernelWrapper&lt;VoxelAssembly::SpaceHelper&lt;Space_, DT_, IT_&gt;&gt;);</div>
+<div class="line"><a id="l01027" name="l01027"></a><span class="lineno"> 1027</span>        const int loc_mat_shared_mem = shared_mem - shared_size_nec;</div>
+<div class="line"><a id="l01028" name="l01028"></a><span class="lineno"> 1028</span>        XASSERTM(loc_mat_shared_mem &gt; 0, String(&quot;Not enough assigned shared memory\n Minimum required: &quot;) + stringify(shared_size_nec)</div>
+<div class="line"><a id="l01029" name="l01029"></a><span class="lineno"> 1029</span>            + String(&quot;\nProvided: &quot;) + stringify(shared_mem));</div>
+<div class="line"><a id="l01030" name="l01030"></a><span class="lineno"> 1030</span> </div>
+<div class="line"><a id="l01031" name="l01031"></a><span class="lineno"> 1031</span>        const int loc_block_size = CudaMath::cuda_min(loc_mat_shared_mem / int(sizeof(DT_)*dim*dim), num_loc_dofs*num_loc_dofs);</div>
+<div class="line"><a id="l01032" name="l01032"></a><span class="lineno"> 1032</span>        XASSERTM(loc_block_size &gt; 0, &quot;Not enough memory assigned to assemble a single matrix entry!&quot;);</div>
+<div class="line"><a id="l01033" name="l01033"></a><span class="lineno"> 1033</span>        XASSERTM(loc_block_size &gt;= num_loc_dofs, &quot;Not enough memory assigned to assemble a single matrix row!&quot;);</div>
+<div class="line"><a id="l01034" name="l01034"></a><span class="lineno"> 1034</span> </div>
+<div class="line"><a id="l01035" name="l01035"></a><span class="lineno"> 1035</span>        if(print_occupancy)</div>
+<div class="line"><a id="l01036" name="l01036"></a><span class="lineno"> 1036</span>        {</div>
+<div class="line"><a id="l01037" name="l01037"></a><span class="lineno"> 1037</span>          int numBlocksWarp = Util::cuda_get_occupancy(VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_warp_based&lt;Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt;, blocksize, shared_mem);</div>
+<div class="line"><a id="l01038" name="l01038"></a><span class="lineno"> 1038</span>          const int max_blocks_per_sm = int(Util::cuda_get_max_blocks_per_sm());</div>
+<div class="line"><a id="l01039" name="l01039"></a><span class="lineno"> 1039</span>          printf(&quot;Numblocks/Occupancy per SM for device number %i: %i, %f\n&quot;, Util::cuda_device_number, numBlocksWarp, double(numBlocksWarp*(blocksize/32))/double(max_blocks_per_sm));</div>
+<div class="line"><a id="l01040" name="l01040"></a><span class="lineno"> 1040</span>        }</div>
+<div class="line"><a id="l01041" name="l01041"></a><span class="lineno"> 1041</span> </div>
+<div class="line"><a id="l01042" name="l01042"></a><span class="lineno"> 1042</span>        if(shared_mem &gt; 48000)</div>
+<div class="line"><a id="l01043" name="l01043"></a><span class="lineno"> 1043</span>        {</div>
+<div class="line"><a id="l01044" name="l01044"></a><span class="lineno"> 1044</span>          if(cudaSuccess != cudaFuncSetAttribute(VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_warp_based&lt;Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt;,</div>
+<div class="line"><a id="l01045" name="l01045"></a><span class="lineno"> 1045</span>            cudaFuncAttributeMaxDynamicSharedMemorySize, shared_mem))</div>
+<div class="line"><a id="l01046" name="l01046"></a><span class="lineno"> 1046</span>          {</div>
+<div class="line"><a id="l01047" name="l01047"></a><span class="lineno"> 1047</span>            XABORTM(&quot;cudaFuncSetAttribute failed.&quot;);</div>
+<div class="line"><a id="l01048" name="l01048"></a><span class="lineno"> 1048</span>          }</div>
+<div class="line"><a id="l01049" name="l01049"></a><span class="lineno"> 1049</span>        }</div>
 <div class="line"><a id="l01050" name="l01050"></a><span class="lineno"> 1050</span> </div>
-<div class="line"><a id="l01051" name="l01051"></a><span class="lineno"> 1051</span>        for(Index col = 0; col &lt; coloring_data.get_num_colors(); ++col)</div>
-<div class="line"><a id="l01052" name="l01052"></a><span class="lineno"> 1052</span>        {</div>
-<div class="line"><a id="l01053" name="l01053"></a><span class="lineno"> 1053</span>          dim3 grid;</div>
-<div class="line"><a id="l01054" name="l01054"></a><span class="lineno"> 1054</span>          dim3 block;</div>
-<div class="line"><a id="l01055" name="l01055"></a><span class="lineno"> 1055</span>          block.x = (unsigned int)blocksize;</div>
-<div class="line"><a id="l01056" name="l01056"></a><span class="lineno"> 1056</span>          // grid.x = (unsigned int)ceil(double(coloring_map_sizes[col])/double(block.x));</div>
-<div class="line"><a id="l01057" name="l01057"></a><span class="lineno"> 1057</span>          grid.x = (unsigned int)gridsize;</div>
-<div class="line"><a id="l01058" name="l01058"></a><span class="lineno"> 1058</span>          // warp_base_kernel = false;</div>
-<div class="line"><a id="l01059" name="l01059"></a><span class="lineno"> 1059</span>          // if(!warp_base_kernel)</div>
-<div class="line"><a id="l01060" name="l01060"></a><span class="lineno"> 1060</span>          //   grid.x = (unsigned int)ceil(double(coloring_map_sizes[col])/double(block.x));</div>
-<div class="line"><a id="l01061" name="l01061"></a><span class="lineno"> 1061</span> </div>
-<div class="line"><a id="l01062" name="l01062"></a><span class="lineno"> 1062</span>          VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_warp_based&lt;Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt;&lt;&lt;&lt; grid, block, shared_mem &gt;&gt;&gt;(</div>
-<div class="line"><a id="l01063" name="l01063"></a><span class="lineno"> 1063</span>              matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
-<div class="line"><a id="l01064" name="l01064"></a><span class="lineno"> 1064</span>              (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l01065" name="l01065"></a><span class="lineno"> 1065</span>              cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l01066" name="l01066"></a><span class="lineno"> 1066</span>              cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
-<div class="line"><a id="l01067" name="l01067"></a><span class="lineno"> 1067</span>              nodes_view.get_r(), dof_mapping.node_size,</div>
-<div class="line"><a id="l01068" name="l01068"></a><span class="lineno"> 1068</span>              &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col),</div>
-<div class="line"><a id="l01069" name="l01069"></a><span class="lineno"> 1069</span>              cell_to_dof_sorter_view.get_r(), burgers_params, loc_block_size</div>
-<div class="line"><a id="l01070" name="l01070"></a><span class="lineno"> 1070</span>          );</div>
-<div class="line"><a id="l01071" name="l01071"></a><span class="lineno"> 1071</span>          // todo: test if this is faster if we have to assemble streamline difussion...</div>
-<div class="line"><a id="l01072" name="l01072"></a><span class="lineno"> 1072</span>          // VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_warp_based_alt&lt;Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt;&lt;&lt;&lt; grid, block, actual_shared_mem &gt;&gt;&gt;(</div>
-<div class="line"><a id="l01073" name="l01073"></a><span class="lineno"> 1073</span>          //     matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
-<div class="line"><a id="l01074" name="l01074"></a><span class="lineno"> 1074</span>          //     (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l01075" name="l01075"></a><span class="lineno"> 1075</span>          //     cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l01076" name="l01076"></a><span class="lineno"> 1076</span>          //     cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
-<div class="line"><a id="l01077" name="l01077"></a><span class="lineno"> 1077</span>          //     nodes_view.get_r(), dof_mapping.node_size,</div>
-<div class="line"><a id="l01078" name="l01078"></a><span class="lineno"> 1078</span>          //     (const int*) coloring_maps[col], coloring_map_sizes[col], cell_to_dof_sorter_view.get_r(),</div>
-<div class="line"><a id="l01079" name="l01079"></a><span class="lineno"> 1079</span>          //     burgers_params, loc_block_size</div>
-<div class="line"><a id="l01080" name="l01080"></a><span class="lineno"> 1080</span>          // );</div>
-<div class="line"><a id="l01081" name="l01081"></a><span class="lineno"> 1081</span>        }</div>
-<div class="line"><a id="l01082" name="l01082"></a><span class="lineno"> 1082</span>        //check for cuda error in our kernel</div>
-<div class="line"><a id="l01083" name="l01083"></a><span class="lineno"> 1083</span>        Util::cuda_check_last_error();</div>
-<div class="line"><a id="l01084" name="l01084"></a><span class="lineno"> 1084</span>      }</div>
-<div class="line"><a id="l01085" name="l01085"></a><span class="lineno"> 1085</span> </div>
-<div class="line"><a id="l01086" name="l01086"></a><span class="lineno"> 1086</span> </div>
-<div class="line"><a id="l01087" name="l01087"></a><span class="lineno"> 1087</span>      template&lt;typename Space_, typename DT_, typename IT_&gt;</div>
-<div class="line"><a id="l01088" name="l01088"></a><span class="lineno"> 1088</span>      void assemble_burgers_defect([[maybe_unused]] const Space_&amp; space,</div>
-<div class="line"><a id="l01089" name="l01089"></a><span class="lineno"> 1089</span>              DT_* vector_data,</div>
-<div class="line"><a id="l01090" name="l01090"></a><span class="lineno"> 1090</span>              const DT_* conv_data,</div>
-<div class="line"><a id="l01091" name="l01091"></a><span class="lineno"> 1091</span>              const DT_* primal_data,</div>
-<div class="line"><a id="l01092" name="l01092"></a><span class="lineno"> 1092</span>              const AssemblyCubatureData&lt;DT_&gt;&amp; cubature,</div>
-<div class="line"><a id="l01093" name="l01093"></a><span class="lineno"> 1093</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
-<div class="line"><a id="l01094" name="l01094"></a><span class="lineno"> 1094</span>              const Adjacency::ColoringDataHandler&amp; coloring_data,</div>
-<div class="line"><a id="l01095" name="l01095"></a><span class="lineno"> 1095</span>              DT_ alpha, const AssemblyBurgersData&lt;DT_&gt;&amp; burgers_params,</div>
-<div class="line"><a id="l01096" name="l01096"></a><span class="lineno"> 1096</span>              int shared_mem, int blocksize, int gridsize, bool print_occupancy)</div>
-<div class="line"><a id="l01097" name="l01097"></a><span class="lineno"> 1097</span>      {</div>
-<div class="line"><a id="l01098" name="l01098"></a><span class="lineno"> 1098</span>        // get the size of all necessary shared memory</div>
-<div class="line"><a id="l01099" name="l01099"></a><span class="lineno"> 1099</span>        constexpr int dim = Space_::ShapeType::dimension;</div>
-<div class="line"><a id="l01100" name="l01100"></a><span class="lineno"> 1100</span>        constexpr int num_loc_dofs = Space_::DofMappingType::dof_count;</div>
-<div class="line"><a id="l01101" name="l01101"></a><span class="lineno"> 1101</span>        constexpr int shared_size_nec = sizeof(VoxelAssembly::BurgersDefectSharedDataGlobalWrapper&lt;VoxelAssembly::SpaceHelper&lt;Space_, DT_, IT_&gt;&gt;) + sizeof(VoxelAssembly::BurgersSharedDataKernelWrapper&lt;VoxelAssembly::SpaceHelper&lt;Space_, DT_, IT_&gt;&gt;);</div>
-<div class="line"><a id="l01102" name="l01102"></a><span class="lineno"> 1102</span>        const int loc_vec_shared_mem = shared_mem - shared_size_nec;</div>
-<div class="line"><a id="l01103" name="l01103"></a><span class="lineno"> 1103</span>        XASSERTM(loc_vec_shared_mem &gt; 0, String(&quot;Not enough assigned shared memory\n Minimum required: &quot;) + stringify(shared_size_nec)</div>
-<div class="line"><a id="l01104" name="l01104"></a><span class="lineno"> 1104</span>            + String(&quot;\nProvided: &quot;) + stringify(shared_mem));</div>
-<div class="line"><a id="l01105" name="l01105"></a><span class="lineno"> 1105</span> </div>
-<div class="line"><a id="l01106" name="l01106"></a><span class="lineno"> 1106</span>        const int loc_block_size = CudaMath::cuda_min(loc_vec_shared_mem / int(sizeof(DT_)*dim), num_loc_dofs);</div>
-<div class="line"><a id="l01107" name="l01107"></a><span class="lineno"> 1107</span>        XASSERTM(loc_block_size &gt; 0, &quot;Not enough memory assigned to assemble a single defect entry!&quot;);</div>
-<div class="line"><a id="l01108" name="l01108"></a><span class="lineno"> 1108</span> </div>
-<div class="line"><a id="l01109" name="l01109"></a><span class="lineno"> 1109</span>        if(print_occupancy)</div>
-<div class="line"><a id="l01110" name="l01110"></a><span class="lineno"> 1110</span>        {</div>
-<div class="line"><a id="l01111" name="l01111"></a><span class="lineno"> 1111</span>          int numBlocksWarp = Util::cuda_get_occupancy(VoxelAssembly::Kernel::template full_burgers_assembler_vector_bd_warp_based&lt;Space_, DT_, IT_&gt;, blocksize, shared_mem);</div>
-<div class="line"><a id="l01112" name="l01112"></a><span class="lineno"> 1112</span>          const int max_blocks_per_sm = int(Util::cuda_get_max_blocks_per_sm());</div>
-<div class="line"><a id="l01113" name="l01113"></a><span class="lineno"> 1113</span>          printf(&quot;Loc size %i Numblocks/Occupancy per SM for device number %i: %i, %f\n&quot;, loc_block_size, Util::cuda_device_number, numBlocksWarp, double(numBlocksWarp*(blocksize/32))/double(max_blocks_per_sm));</div>
-<div class="line"><a id="l01114" name="l01114"></a><span class="lineno"> 1114</span>        }</div>
-<div class="line"><a id="l01115" name="l01115"></a><span class="lineno"> 1115</span> </div>
-<div class="line"><a id="l01116" name="l01116"></a><span class="lineno"> 1116</span>        if(shared_mem &gt; 48000)</div>
-<div class="line"><a id="l01117" name="l01117"></a><span class="lineno"> 1117</span>        {</div>
-<div class="line"><a id="l01118" name="l01118"></a><span class="lineno"> 1118</span>          if(cudaSuccess != cudaFuncSetAttribute(VoxelAssembly::Kernel::template full_burgers_assembler_vector_bd_warp_based&lt;Space_, DT_, IT_&gt;,</div>
-<div class="line"><a id="l01119" name="l01119"></a><span class="lineno"> 1119</span>            cudaFuncAttributeMaxDynamicSharedMemorySize, shared_mem))</div>
-<div class="line"><a id="l01120" name="l01120"></a><span class="lineno"> 1120</span>          {</div>
-<div class="line"><a id="l01121" name="l01121"></a><span class="lineno"> 1121</span>            XABORTM(&quot;cudaFuncSetAttribute failed.&quot;);</div>
-<div class="line"><a id="l01122" name="l01122"></a><span class="lineno"> 1122</span>          }</div>
-<div class="line"><a id="l01123" name="l01123"></a><span class="lineno"> 1123</span>        }</div>
-<div class="line"><a id="l01124" name="l01124"></a><span class="lineno"> 1124</span> </div>
-<div class="line"><a id="l01125" name="l01125"></a><span class="lineno"> 1125</span>        const Memory::TypedView&lt;int&gt; color_view = coloring_data.color_map_view(Memory::Location::cuda, Memory::Access::read);</div>
-<div class="line"><a id="l01126" name="l01126"></a><span class="lineno"> 1126</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_view(dof_mapping.cell_to_dof.view(Memory::Location::cuda, Memory::Access::read));</div>
-<div class="line"><a id="l01127" name="l01127"></a><span class="lineno"> 1127</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, Space_::world_dim&gt;&gt; nodes_view(dof_mapping.nodes.view(Memory::Location::cuda, Memory::Access::read));</div>
-<div class="line"><a id="l01128" name="l01128"></a><span class="lineno"> 1128</span> </div>
-<div class="line"><a id="l01129" name="l01129"></a><span class="lineno"> 1129</span>        for(Index col = 0; col &lt; coloring_data.get_num_colors(); ++col)</div>
-<div class="line"><a id="l01130" name="l01130"></a><span class="lineno"> 1130</span>        {</div>
-<div class="line"><a id="l01131" name="l01131"></a><span class="lineno"> 1131</span>          dim3 grid;</div>
-<div class="line"><a id="l01132" name="l01132"></a><span class="lineno"> 1132</span>          dim3 block;</div>
-<div class="line"><a id="l01133" name="l01133"></a><span class="lineno"> 1133</span>          block.x = (unsigned int)blocksize;</div>
-<div class="line"><a id="l01134" name="l01134"></a><span class="lineno"> 1134</span>          grid.x = (unsigned int)gridsize;</div>
-<div class="line"><a id="l01135" name="l01135"></a><span class="lineno"> 1135</span>          // grid.x = (unsigned int)(coloring_map_sizes[col]/blocksize +1);</div>
-<div class="line"><a id="l01136" name="l01136"></a><span class="lineno"> 1136</span> </div>
-<div class="line"><a id="l01137" name="l01137"></a><span class="lineno"> 1137</span>          VoxelAssembly::Kernel::template full_burgers_assembler_vector_bd_warp_based&lt;Space_, DT_, IT_&gt;&lt;&lt;&lt; grid, block, shared_mem &gt;&gt;&gt;(vector_data, conv_data, primal_data,</div>
-<div class="line"><a id="l01138" name="l01138"></a><span class="lineno"> 1138</span>              space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l01139" name="l01139"></a><span class="lineno"> 1139</span>              cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l01140" name="l01140"></a><span class="lineno"> 1140</span>              cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
-<div class="line"><a id="l01141" name="l01141"></a><span class="lineno"> 1141</span>              nodes_view.get_r(), dof_mapping.node_size,</div>
-<div class="line"><a id="l01142" name="l01142"></a><span class="lineno"> 1142</span>              &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col),</div>
-<div class="line"><a id="l01143" name="l01143"></a><span class="lineno"> 1143</span>              burgers_params, loc_block_size</div>
-<div class="line"><a id="l01144" name="l01144"></a><span class="lineno"> 1144</span>          );</div>
-<div class="line"><a id="l01145" name="l01145"></a><span class="lineno"> 1145</span>          // VoxelAssembly::Kernel::template full_burgers_assembler_vector_bd&lt;Space_, DT_, IT_&gt;&lt;&lt;&lt; grid, block &gt;&gt;&gt;(vector_data, conv_data, primal_data,</div>
-<div class="line"><a id="l01146" name="l01146"></a><span class="lineno"> 1146</span>          //     space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l01147" name="l01147"></a><span class="lineno"> 1147</span>          //     cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l01148" name="l01148"></a><span class="lineno"> 1148</span>          //     cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
-<div class="line"><a id="l01149" name="l01149"></a><span class="lineno"> 1149</span>          //     nodes_view.get_r(), dof_mapping.node_size,</div>
-<div class="line"><a id="l01150" name="l01150"></a><span class="lineno"> 1150</span>          //     (const int*) coloring_maps[col], coloring_map_sizes[col], burgers_params</div>
-<div class="line"><a id="l01151" name="l01151"></a><span class="lineno"> 1151</span>          // );</div>
-<div class="line"><a id="l01152" name="l01152"></a><span class="lineno"> 1152</span>        }</div>
-<div class="line"><a id="l01153" name="l01153"></a><span class="lineno"> 1153</span> </div>
-<div class="line"><a id="l01154" name="l01154"></a><span class="lineno"> 1154</span>        //check for cuda error (also synchronizes)</div>
-<div class="line"><a id="l01155" name="l01155"></a><span class="lineno"> 1155</span>        Util::cuda_check_last_error();</div>
-<div class="line"><a id="l01156" name="l01156"></a><span class="lineno"> 1156</span>      }</div>
-<div class="line"><a id="l01157" name="l01157"></a><span class="lineno"> 1157</span> </div>
-<div class="line"><a id="l01158" name="l01158"></a><span class="lineno"> 1158</span>      // attention: This requires at max only one device per mpi rank!</div>
-<div class="line"><a id="l01159" name="l01159"></a><span class="lineno"> 1159</span>      template&lt;typename DT_, typename IT_, int dim_&gt;</div>
-<div class="line"><a id="l01160" name="l01160"></a><span class="lineno"> 1160</span>      DT_ get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;DT_, IT_, dim_&gt;&amp; convect)</div>
-<div class="line"><a id="l01161" name="l01161"></a><span class="lineno"> 1161</span>      {</div>
-<div class="line"><a id="l01162" name="l01162"></a><span class="lineno"> 1162</span>        dim3 block(static_cast&lt;unsigned int&gt;(Util::cuda_blocksize_reduction));</div>
-<div class="line"><a id="l01163" name="l01163"></a><span class="lineno"> 1163</span>        dim3 grid((static_cast&lt;unsigned int&gt;(convect.size()) + block.x - 1u) / block.x); // round up to next integer</div>
+<div class="line"><a id="l01051" name="l01051"></a><span class="lineno"> 1051</span>        const Memory::TypedView&lt;int&gt; color_view = coloring_data.color_map_view(Memory::Location::cuda, Memory::Access::read);</div>
+<div class="line"><a id="l01052" name="l01052"></a><span class="lineno"> 1052</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_view(dof_mapping.cell_to_dof.view(Memory::Location::cuda, Memory::Access::read));</div>
+<div class="line"><a id="l01053" name="l01053"></a><span class="lineno"> 1053</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_sorter_view(dof_mapping.cell_to_dof_sorter.view(Memory::Location::cuda, Memory::Access::read));</div>
+<div class="line"><a id="l01054" name="l01054"></a><span class="lineno"> 1054</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, Space_::world_dim&gt;&gt; nodes_view(dof_mapping.nodes.view(Memory::Location::cuda, Memory::Access::read));</div>
+<div class="line"><a id="l01055" name="l01055"></a><span class="lineno"> 1055</span> </div>
+<div class="line"><a id="l01056" name="l01056"></a><span class="lineno"> 1056</span>        for(Index col = 0; col &lt; coloring_data.get_num_colors(); ++col)</div>
+<div class="line"><a id="l01057" name="l01057"></a><span class="lineno"> 1057</span>        {</div>
+<div class="line"><a id="l01058" name="l01058"></a><span class="lineno"> 1058</span>          dim3 grid;</div>
+<div class="line"><a id="l01059" name="l01059"></a><span class="lineno"> 1059</span>          dim3 block;</div>
+<div class="line"><a id="l01060" name="l01060"></a><span class="lineno"> 1060</span>          block.x = (unsigned int)blocksize;</div>
+<div class="line"><a id="l01061" name="l01061"></a><span class="lineno"> 1061</span>          // grid.x = (unsigned int)ceil(double(coloring_map_sizes[col])/double(block.x));</div>
+<div class="line"><a id="l01062" name="l01062"></a><span class="lineno"> 1062</span>          grid.x = (unsigned int)gridsize;</div>
+<div class="line"><a id="l01063" name="l01063"></a><span class="lineno"> 1063</span>          // warp_base_kernel = false;</div>
+<div class="line"><a id="l01064" name="l01064"></a><span class="lineno"> 1064</span>          // if(!warp_base_kernel)</div>
+<div class="line"><a id="l01065" name="l01065"></a><span class="lineno"> 1065</span>          //   grid.x = (unsigned int)ceil(double(coloring_map_sizes[col])/double(block.x));</div>
+<div class="line"><a id="l01066" name="l01066"></a><span class="lineno"> 1066</span> </div>
+<div class="line"><a id="l01067" name="l01067"></a><span class="lineno"> 1067</span>          VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_warp_based&lt;Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt;&lt;&lt;&lt; grid, block, shared_mem &gt;&gt;&gt;(</div>
+<div class="line"><a id="l01068" name="l01068"></a><span class="lineno"> 1068</span>              matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
+<div class="line"><a id="l01069" name="l01069"></a><span class="lineno"> 1069</span>              (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l01070" name="l01070"></a><span class="lineno"> 1070</span>              cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l01071" name="l01071"></a><span class="lineno"> 1071</span>              cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l01072" name="l01072"></a><span class="lineno"> 1072</span>              nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l01073" name="l01073"></a><span class="lineno"> 1073</span>              &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col),</div>
+<div class="line"><a id="l01074" name="l01074"></a><span class="lineno"> 1074</span>              cell_to_dof_sorter_view.get_r(), burgers_params, loc_block_size</div>
+<div class="line"><a id="l01075" name="l01075"></a><span class="lineno"> 1075</span>          );</div>
+<div class="line"><a id="l01076" name="l01076"></a><span class="lineno"> 1076</span>          // todo: test if this is faster if we have to assemble streamline difussion...</div>
+<div class="line"><a id="l01077" name="l01077"></a><span class="lineno"> 1077</span>          // VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_warp_based_alt&lt;Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalOps&gt;&lt;&lt;&lt; grid, block, actual_shared_mem &gt;&gt;&gt;(</div>
+<div class="line"><a id="l01078" name="l01078"></a><span class="lineno"> 1078</span>          //     matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
+<div class="line"><a id="l01079" name="l01079"></a><span class="lineno"> 1079</span>          //     (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l01080" name="l01080"></a><span class="lineno"> 1080</span>          //     cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l01081" name="l01081"></a><span class="lineno"> 1081</span>          //     cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l01082" name="l01082"></a><span class="lineno"> 1082</span>          //     nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l01083" name="l01083"></a><span class="lineno"> 1083</span>          //     (const int*) coloring_maps[col], coloring_map_sizes[col], cell_to_dof_sorter_view.get_r(),</div>
+<div class="line"><a id="l01084" name="l01084"></a><span class="lineno"> 1084</span>          //     burgers_params, loc_block_size</div>
+<div class="line"><a id="l01085" name="l01085"></a><span class="lineno"> 1085</span>          // );</div>
+<div class="line"><a id="l01086" name="l01086"></a><span class="lineno"> 1086</span>        }</div>
+<div class="line"><a id="l01087" name="l01087"></a><span class="lineno"> 1087</span>        //check for cuda error in our kernel</div>
+<div class="line"><a id="l01088" name="l01088"></a><span class="lineno"> 1088</span>        if(runtime_params.synchronize)</div>
+<div class="line"><a id="l01089" name="l01089"></a><span class="lineno"> 1089</span>          Util::cuda_check_last_error();</div>
+<div class="line"><a id="l01090" name="l01090"></a><span class="lineno"> 1090</span>      }</div>
+<div class="line"><a id="l01091" name="l01091"></a><span class="lineno"> 1091</span> </div>
+<div class="line"><a id="l01092" name="l01092"></a><span class="lineno"> 1092</span> </div>
+<div class="line"><a id="l01093" name="l01093"></a><span class="lineno"> 1093</span>      template&lt;typename Space_, typename DT_, typename IT_&gt;</div>
+<div class="line"><a id="l01094" name="l01094"></a><span class="lineno"> 1094</span>      void assemble_burgers_defect([[maybe_unused]] const Space_&amp; space,</div>
+<div class="line"><a id="l01095" name="l01095"></a><span class="lineno"> 1095</span>              DT_* vector_data,</div>
+<div class="line"><a id="l01096" name="l01096"></a><span class="lineno"> 1096</span>              const DT_* conv_data,</div>
+<div class="line"><a id="l01097" name="l01097"></a><span class="lineno"> 1097</span>              const DT_* primal_data,</div>
+<div class="line"><a id="l01098" name="l01098"></a><span class="lineno"> 1098</span>              const AssemblyCubatureData&lt;DT_&gt;&amp; cubature,</div>
+<div class="line"><a id="l01099" name="l01099"></a><span class="lineno"> 1099</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
+<div class="line"><a id="l01100" name="l01100"></a><span class="lineno"> 1100</span>              const Adjacency::ColoringDataHandler&amp; coloring_data,</div>
+<div class="line"><a id="l01101" name="l01101"></a><span class="lineno"> 1101</span>              DT_ alpha, const AssemblyBurgersData&lt;DT_&gt;&amp; burgers_params,</div>
+<div class="line"><a id="l01102" name="l01102"></a><span class="lineno"> 1102</span>              const Util::RuntimeParameter&amp; runtime_params)</div>
+<div class="line"><a id="l01103" name="l01103"></a><span class="lineno"> 1103</span>      {</div>
+<div class="line"><a id="l01104" name="l01104"></a><span class="lineno"> 1104</span>        // unpack the runtime kernel launch parameters</div>
+<div class="line"><a id="l01105" name="l01105"></a><span class="lineno"> 1105</span>        const int shared_mem = runtime_params.shared_mem;</div>
+<div class="line"><a id="l01106" name="l01106"></a><span class="lineno"> 1106</span>        const int blocksize = runtime_params.blocksize;</div>
+<div class="line"><a id="l01107" name="l01107"></a><span class="lineno"> 1107</span>        const int gridsize = runtime_params.gridsize;</div>
+<div class="line"><a id="l01108" name="l01108"></a><span class="lineno"> 1108</span>        const bool print_occupancy = runtime_params.print_occupancy;</div>
+<div class="line"><a id="l01109" name="l01109"></a><span class="lineno"> 1109</span>        // get the size of all necessary shared memory</div>
+<div class="line"><a id="l01110" name="l01110"></a><span class="lineno"> 1110</span>        constexpr int dim = Space_::ShapeType::dimension;</div>
+<div class="line"><a id="l01111" name="l01111"></a><span class="lineno"> 1111</span>        constexpr int num_loc_dofs = Space_::DofMappingType::dof_count;</div>
+<div class="line"><a id="l01112" name="l01112"></a><span class="lineno"> 1112</span>        constexpr int shared_size_nec = sizeof(VoxelAssembly::BurgersDefectSharedDataGlobalWrapper&lt;VoxelAssembly::SpaceHelper&lt;Space_, DT_, IT_&gt;&gt;) + sizeof(VoxelAssembly::BurgersSharedDataKernelWrapper&lt;VoxelAssembly::SpaceHelper&lt;Space_, DT_, IT_&gt;&gt;);</div>
+<div class="line"><a id="l01113" name="l01113"></a><span class="lineno"> 1113</span>        const int loc_vec_shared_mem = shared_mem - shared_size_nec;</div>
+<div class="line"><a id="l01114" name="l01114"></a><span class="lineno"> 1114</span>        XASSERTM(loc_vec_shared_mem &gt; 0, String(&quot;Not enough assigned shared memory\n Minimum required: &quot;) + stringify(shared_size_nec)</div>
+<div class="line"><a id="l01115" name="l01115"></a><span class="lineno"> 1115</span>            + String(&quot;\nProvided: &quot;) + stringify(shared_mem));</div>
+<div class="line"><a id="l01116" name="l01116"></a><span class="lineno"> 1116</span> </div>
+<div class="line"><a id="l01117" name="l01117"></a><span class="lineno"> 1117</span>        const int loc_block_size = CudaMath::cuda_min(loc_vec_shared_mem / int(sizeof(DT_)*dim), num_loc_dofs);</div>
+<div class="line"><a id="l01118" name="l01118"></a><span class="lineno"> 1118</span>        XASSERTM(loc_block_size &gt; 0, &quot;Not enough memory assigned to assemble a single defect entry!&quot;);</div>
+<div class="line"><a id="l01119" name="l01119"></a><span class="lineno"> 1119</span> </div>
+<div class="line"><a id="l01120" name="l01120"></a><span class="lineno"> 1120</span>        if(print_occupancy)</div>
+<div class="line"><a id="l01121" name="l01121"></a><span class="lineno"> 1121</span>        {</div>
+<div class="line"><a id="l01122" name="l01122"></a><span class="lineno"> 1122</span>          int numBlocksWarp = Util::cuda_get_occupancy(VoxelAssembly::Kernel::template full_burgers_assembler_vector_bd_warp_based&lt;Space_, DT_, IT_&gt;, blocksize, shared_mem);</div>
+<div class="line"><a id="l01123" name="l01123"></a><span class="lineno"> 1123</span>          const int max_blocks_per_sm = int(Util::cuda_get_max_blocks_per_sm());</div>
+<div class="line"><a id="l01124" name="l01124"></a><span class="lineno"> 1124</span>          printf(&quot;Loc size %i Numblocks/Occupancy per SM for device number %i: %i, %f\n&quot;, loc_block_size, Util::cuda_device_number, numBlocksWarp, double(numBlocksWarp*(blocksize/32))/double(max_blocks_per_sm));</div>
+<div class="line"><a id="l01125" name="l01125"></a><span class="lineno"> 1125</span>        }</div>
+<div class="line"><a id="l01126" name="l01126"></a><span class="lineno"> 1126</span> </div>
+<div class="line"><a id="l01127" name="l01127"></a><span class="lineno"> 1127</span>        if(shared_mem &gt; 48000)</div>
+<div class="line"><a id="l01128" name="l01128"></a><span class="lineno"> 1128</span>        {</div>
+<div class="line"><a id="l01129" name="l01129"></a><span class="lineno"> 1129</span>          if(cudaSuccess != cudaFuncSetAttribute(VoxelAssembly::Kernel::template full_burgers_assembler_vector_bd_warp_based&lt;Space_, DT_, IT_&gt;,</div>
+<div class="line"><a id="l01130" name="l01130"></a><span class="lineno"> 1130</span>            cudaFuncAttributeMaxDynamicSharedMemorySize, shared_mem))</div>
+<div class="line"><a id="l01131" name="l01131"></a><span class="lineno"> 1131</span>          {</div>
+<div class="line"><a id="l01132" name="l01132"></a><span class="lineno"> 1132</span>            XABORTM(&quot;cudaFuncSetAttribute failed.&quot;);</div>
+<div class="line"><a id="l01133" name="l01133"></a><span class="lineno"> 1133</span>          }</div>
+<div class="line"><a id="l01134" name="l01134"></a><span class="lineno"> 1134</span>        }</div>
+<div class="line"><a id="l01135" name="l01135"></a><span class="lineno"> 1135</span> </div>
+<div class="line"><a id="l01136" name="l01136"></a><span class="lineno"> 1136</span>        const Memory::TypedView&lt;int&gt; color_view = coloring_data.color_map_view(Memory::Location::cuda, Memory::Access::read);</div>
+<div class="line"><a id="l01137" name="l01137"></a><span class="lineno"> 1137</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_view(dof_mapping.cell_to_dof.view(Memory::Location::cuda, Memory::Access::read));</div>
+<div class="line"><a id="l01138" name="l01138"></a><span class="lineno"> 1138</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, Space_::world_dim&gt;&gt; nodes_view(dof_mapping.nodes.view(Memory::Location::cuda, Memory::Access::read));</div>
+<div class="line"><a id="l01139" name="l01139"></a><span class="lineno"> 1139</span> </div>
+<div class="line"><a id="l01140" name="l01140"></a><span class="lineno"> 1140</span>        for(Index col = 0; col &lt; coloring_data.get_num_colors(); ++col)</div>
+<div class="line"><a id="l01141" name="l01141"></a><span class="lineno"> 1141</span>        {</div>
+<div class="line"><a id="l01142" name="l01142"></a><span class="lineno"> 1142</span>          dim3 grid;</div>
+<div class="line"><a id="l01143" name="l01143"></a><span class="lineno"> 1143</span>          dim3 block;</div>
+<div class="line"><a id="l01144" name="l01144"></a><span class="lineno"> 1144</span>          block.x = (unsigned int)blocksize;</div>
+<div class="line"><a id="l01145" name="l01145"></a><span class="lineno"> 1145</span>          grid.x = (unsigned int)gridsize;</div>
+<div class="line"><a id="l01146" name="l01146"></a><span class="lineno"> 1146</span>          // grid.x = (unsigned int)(coloring_map_sizes[col]/blocksize +1);</div>
+<div class="line"><a id="l01147" name="l01147"></a><span class="lineno"> 1147</span> </div>
+<div class="line"><a id="l01148" name="l01148"></a><span class="lineno"> 1148</span>          VoxelAssembly::Kernel::template full_burgers_assembler_vector_bd_warp_based&lt;Space_, DT_, IT_&gt;&lt;&lt;&lt; grid, block, shared_mem &gt;&gt;&gt;(vector_data, conv_data, primal_data,</div>
+<div class="line"><a id="l01149" name="l01149"></a><span class="lineno"> 1149</span>              space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l01150" name="l01150"></a><span class="lineno"> 1150</span>              cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l01151" name="l01151"></a><span class="lineno"> 1151</span>              cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l01152" name="l01152"></a><span class="lineno"> 1152</span>              nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l01153" name="l01153"></a><span class="lineno"> 1153</span>              &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col),</div>
+<div class="line"><a id="l01154" name="l01154"></a><span class="lineno"> 1154</span>              burgers_params, loc_block_size</div>
+<div class="line"><a id="l01155" name="l01155"></a><span class="lineno"> 1155</span>          );</div>
+<div class="line"><a id="l01156" name="l01156"></a><span class="lineno"> 1156</span>          // VoxelAssembly::Kernel::template full_burgers_assembler_vector_bd&lt;Space_, DT_, IT_&gt;&lt;&lt;&lt; grid, block &gt;&gt;&gt;(vector_data, conv_data, primal_data,</div>
+<div class="line"><a id="l01157" name="l01157"></a><span class="lineno"> 1157</span>          //     space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l01158" name="l01158"></a><span class="lineno"> 1158</span>          //     cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l01159" name="l01159"></a><span class="lineno"> 1159</span>          //     cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l01160" name="l01160"></a><span class="lineno"> 1160</span>          //     nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l01161" name="l01161"></a><span class="lineno"> 1161</span>          //     (const int*) coloring_maps[col], coloring_map_sizes[col], burgers_params</div>
+<div class="line"><a id="l01162" name="l01162"></a><span class="lineno"> 1162</span>          // );</div>
+<div class="line"><a id="l01163" name="l01163"></a><span class="lineno"> 1163</span>        }</div>
 <div class="line"><a id="l01164" name="l01164"></a><span class="lineno"> 1164</span> </div>
-<div class="line"><a id="l01165" name="l01165"></a><span class="lineno"> 1165</span>        //extract pointer</div>
-<div class="line"><a id="l01166" name="l01166"></a><span class="lineno"> 1166</span>        //const Tiny::Vector&lt;DT_, dim_&gt;* vec_data = (const Tiny::Vector&lt;DT_, dim_&gt;*)convect.template elements&lt;LAFEM::Perspective::native&gt;();</div>
-<div class="line"><a id="l01167" name="l01167"></a><span class="lineno"> 1167</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, dim_&gt;&gt; vec_data(convect.elements_view_r(Memory::Location::cuda));</div>
-<div class="line"><a id="l01168" name="l01168"></a><span class="lineno"> 1168</span> </div>
-<div class="line"><a id="l01169" name="l01169"></a><span class="lineno"> 1169</span>        Memory::Arbiter glob_res(sizeof(DT_), Memory::Location::cuda, Memory::Init::format_to_zero);</div>
-<div class="line"><a id="l01170" name="l01170"></a><span class="lineno"> 1170</span>        Memory::TypedView&lt;DT_&gt; vgr(glob_res.view(Memory::Location::cuda, Memory::Access::read_write));</div>
-<div class="line"><a id="l01171" name="l01171"></a><span class="lineno"> 1171</span> </div>
-<div class="line"><a id="l01172" name="l01172"></a><span class="lineno"> 1172</span>        VoxelAssembly::Kernel::template set_sd_v_norm&lt;DT_, dim_&gt;&lt;&lt;&lt;grid, block, block.x*sizeof(DT_)&gt;&gt;&gt;(vec_data.get_r(), vgr.get_w(), convect.size());</div>
-<div class="line"><a id="l01173" name="l01173"></a><span class="lineno"> 1173</span>        vgr.release();</div>
-<div class="line"><a id="l01174" name="l01174"></a><span class="lineno"> 1174</span> </div>
-<div class="line"><a id="l01175" name="l01175"></a><span class="lineno"> 1175</span>        //check for cuda error in our kernel</div>
-<div class="line"><a id="l01176" name="l01176"></a><span class="lineno"> 1176</span>        Util::cuda_check_last_error();</div>
-<div class="line"><a id="l01177" name="l01177"></a><span class="lineno"> 1177</span> </div>
-<div class="line"><a id="l01178" name="l01178"></a><span class="lineno"> 1178</span>        return glob_res.template typed_view&lt;DT_&gt;(Memory::Location::main, Memory::Access::read)(0);</div>
-<div class="line"><a id="l01179" name="l01179"></a><span class="lineno"> 1179</span>      }</div>
+<div class="line"><a id="l01165" name="l01165"></a><span class="lineno"> 1165</span>        //check for cuda error (also synchronizes)</div>
+<div class="line"><a id="l01166" name="l01166"></a><span class="lineno"> 1166</span>        if(runtime_params.synchronize)</div>
+<div class="line"><a id="l01167" name="l01167"></a><span class="lineno"> 1167</span>          Util::cuda_check_last_error();</div>
+<div class="line"><a id="l01168" name="l01168"></a><span class="lineno"> 1168</span>      }</div>
+<div class="line"><a id="l01169" name="l01169"></a><span class="lineno"> 1169</span> </div>
+<div class="line"><a id="l01170" name="l01170"></a><span class="lineno"> 1170</span>      // attention: This requires at max only one device per mpi rank!</div>
+<div class="line"><a id="l01171" name="l01171"></a><span class="lineno"> 1171</span>      template&lt;typename DT_, typename IT_, int dim_&gt;</div>
+<div class="line"><a id="l01172" name="l01172"></a><span class="lineno"> 1172</span>      DT_ get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;DT_, IT_, dim_&gt;&amp; convect)</div>
+<div class="line"><a id="l01173" name="l01173"></a><span class="lineno"> 1173</span>      {</div>
+<div class="line"><a id="l01174" name="l01174"></a><span class="lineno"> 1174</span>        dim3 block(static_cast&lt;unsigned int&gt;(Util::cuda_blocksize_reduction));</div>
+<div class="line"><a id="l01175" name="l01175"></a><span class="lineno"> 1175</span>        dim3 grid((static_cast&lt;unsigned int&gt;(convect.size()) + block.x - 1u) / block.x); // round up to next integer</div>
+<div class="line"><a id="l01176" name="l01176"></a><span class="lineno"> 1176</span> </div>
+<div class="line"><a id="l01177" name="l01177"></a><span class="lineno"> 1177</span>        //extract pointer</div>
+<div class="line"><a id="l01178" name="l01178"></a><span class="lineno"> 1178</span>        //const Tiny::Vector&lt;DT_, dim_&gt;* vec_data = (const Tiny::Vector&lt;DT_, dim_&gt;*)convect.template elements&lt;LAFEM::Perspective::native&gt;();</div>
+<div class="line"><a id="l01179" name="l01179"></a><span class="lineno"> 1179</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, dim_&gt;&gt; vec_data(convect.elements_view_r(Memory::Location::cuda));</div>
 <div class="line"><a id="l01180" name="l01180"></a><span class="lineno"> 1180</span> </div>
-<div class="line"><a id="l01181" name="l01181"></a><span class="lineno"> 1181</span>      template&lt;typename DT_, typename IT_, int dim_&gt;</div>
-<div class="line"><a id="l01182" name="l01182"></a><span class="lineno"> 1182</span>      DT_ get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;DT_, IT_, dim_&gt;, LAFEM::VectorMirror&lt;DT_, IT_&gt;&gt;&amp; convect)</div>
-<div class="line"><a id="l01183" name="l01183"></a><span class="lineno"> 1183</span>      {</div>
-<div class="line"><a id="l01184" name="l01184"></a><span class="lineno"> 1184</span>        auto local_norm = get_sd_v_norm(convect.local());</div>
-<div class="line"><a id="l01185" name="l01185"></a><span class="lineno"> 1185</span>        const auto* gate = convect.get_gate();</div>
-<div class="line"><a id="l01186" name="l01186"></a><span class="lineno"> 1186</span>        if(gate != nullptr)</div>
-<div class="line"><a id="l01187" name="l01187"></a><span class="lineno"> 1187</span>        {</div>
-<div class="line"><a id="l01188" name="l01188"></a><span class="lineno"> 1188</span>          local_norm = gate-&gt;max(local_norm);</div>
-<div class="line"><a id="l01189" name="l01189"></a><span class="lineno"> 1189</span>        }</div>
-<div class="line"><a id="l01190" name="l01190"></a><span class="lineno"> 1190</span>        return local_norm;</div>
+<div class="line"><a id="l01181" name="l01181"></a><span class="lineno"> 1181</span>        Memory::Arbiter glob_res(sizeof(DT_), Memory::Location::cuda, Memory::Init::format_to_zero);</div>
+<div class="line"><a id="l01182" name="l01182"></a><span class="lineno"> 1182</span>        Memory::TypedView&lt;DT_&gt; vgr(glob_res.view(Memory::Location::cuda, Memory::Access::read_write));</div>
+<div class="line"><a id="l01183" name="l01183"></a><span class="lineno"> 1183</span> </div>
+<div class="line"><a id="l01184" name="l01184"></a><span class="lineno"> 1184</span>        VoxelAssembly::Kernel::template set_sd_v_norm&lt;DT_, dim_&gt;&lt;&lt;&lt;grid, block, block.x*sizeof(DT_)&gt;&gt;&gt;(vec_data.get_r(), vgr.get_w(), convect.size());</div>
+<div class="line"><a id="l01185" name="l01185"></a><span class="lineno"> 1185</span>        vgr.release();</div>
+<div class="line"><a id="l01186" name="l01186"></a><span class="lineno"> 1186</span> </div>
+<div class="line"><a id="l01187" name="l01187"></a><span class="lineno"> 1187</span>        //check for cuda error in our kernel</div>
+<div class="line"><a id="l01188" name="l01188"></a><span class="lineno"> 1188</span>        Util::cuda_check_last_error();</div>
+<div class="line"><a id="l01189" name="l01189"></a><span class="lineno"> 1189</span> </div>
+<div class="line"><a id="l01190" name="l01190"></a><span class="lineno"> 1190</span>        return glob_res.template typed_view&lt;DT_&gt;(Memory::Location::main, Memory::Access::read)(0);</div>
 <div class="line"><a id="l01191" name="l01191"></a><span class="lineno"> 1191</span>      }</div>
 <div class="line"><a id="l01192" name="l01192"></a><span class="lineno"> 1192</span> </div>
-<div class="line"><a id="l01193" name="l01193"></a><span class="lineno"> 1193</span>      template&lt;typename Space_, typename DT_, typename IT_&gt;</div>
-<div class="line"><a id="l01194" name="l01194"></a><span class="lineno"> 1194</span>      void assemble_burgers_csr_host([[maybe_unused]] const Space_&amp; space,</div>
-<div class="line"><a id="l01195" name="l01195"></a><span class="lineno"> 1195</span>              const CSRMatrixData&lt;DT_, IT_&gt;&amp; matrix_data,</div>
-<div class="line"><a id="l01196" name="l01196"></a><span class="lineno"> 1196</span>              const DT_* conv_data,</div>
-<div class="line"><a id="l01197" name="l01197"></a><span class="lineno"> 1197</span>              const AssemblyCubatureData&lt;DT_&gt;&amp; cubature,</div>
-<div class="line"><a id="l01198" name="l01198"></a><span class="lineno"> 1198</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
-<div class="line"><a id="l01199" name="l01199"></a><span class="lineno"> 1199</span>              const Adjacency::ColoringDataHandler&amp; coloring_data,</div>
-<div class="line"><a id="l01200" name="l01200"></a><span class="lineno"> 1200</span>              DT_ alpha, const AssemblyBurgersData&lt;DT_&gt;&amp; burgers_params)</div>
-<div class="line"><a id="l01201" name="l01201"></a><span class="lineno"> 1201</span>      {</div>
-<div class="line"><a id="l01202" name="l01202"></a><span class="lineno"> 1202</span>        const Memory::TypedView&lt;int&gt; color_view = coloring_data.color_map_view(Memory::Location::main, Memory::Access::read);</div>
-<div class="line"><a id="l01203" name="l01203"></a><span class="lineno"> 1203</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_view(dof_mapping.cell_to_dof.view(Memory::Location::main, Memory::Access::read));</div>
-<div class="line"><a id="l01204" name="l01204"></a><span class="lineno"> 1204</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_sorter_view(dof_mapping.cell_to_dof_sorter.view(Memory::Location::main, Memory::Access::read));</div>
-<div class="line"><a id="l01205" name="l01205"></a><span class="lineno"> 1205</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, Space_::world_dim&gt;&gt; nodes_view(dof_mapping.nodes.view(Memory::Location::main, Memory::Access::read));</div>
-<div class="line"><a id="l01206" name="l01206"></a><span class="lineno"> 1206</span> </div>
-<div class="line"><a id="l01207" name="l01207"></a><span class="lineno"> 1207</span>        for(Index col = 0; col &lt; coloring_data.get_num_colors(); ++col)</div>
-<div class="line"><a id="l01208" name="l01208"></a><span class="lineno"> 1208</span>        {</div>
-<div class="line"><a id="l01209" name="l01209"></a><span class="lineno"> 1209</span>          VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_host&lt;Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper&gt;(</div>
-<div class="line"><a id="l01210" name="l01210"></a><span class="lineno"> 1210</span>              matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
-<div class="line"><a id="l01211" name="l01211"></a><span class="lineno"> 1211</span>              (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l01212" name="l01212"></a><span class="lineno"> 1212</span>              cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l01213" name="l01213"></a><span class="lineno"> 1213</span>              cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
-<div class="line"><a id="l01214" name="l01214"></a><span class="lineno"> 1214</span>              nodes_view.get_r(), dof_mapping.node_size,</div>
-<div class="line"><a id="l01215" name="l01215"></a><span class="lineno"> 1215</span>              &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col),</div>
-<div class="line"><a id="l01216" name="l01216"></a><span class="lineno"> 1216</span>              cell_to_dof_sorter_view.get_r(), burgers_params</div>
-<div class="line"><a id="l01217" name="l01217"></a><span class="lineno"> 1217</span>          );</div>
-<div class="line"><a id="l01218" name="l01218"></a><span class="lineno"> 1218</span>        }</div>
-<div class="line"><a id="l01219" name="l01219"></a><span class="lineno"> 1219</span>      }</div>
-<div class="line"><a id="l01220" name="l01220"></a><span class="lineno"> 1220</span> </div>
-<div class="line"><a id="l01221" name="l01221"></a><span class="lineno"> 1221</span>      template&lt;typename Space_, typename DT_, typename IT_&gt;</div>
-<div class="line"><a id="l01222" name="l01222"></a><span class="lineno"> 1222</span>      void assemble_burgers_defect_host([[maybe_unused]] const Space_&amp; space,</div>
-<div class="line"><a id="l01223" name="l01223"></a><span class="lineno"> 1223</span>              DT_* vector_data,</div>
-<div class="line"><a id="l01224" name="l01224"></a><span class="lineno"> 1224</span>              const DT_* conv_data,</div>
-<div class="line"><a id="l01225" name="l01225"></a><span class="lineno"> 1225</span>              const DT_* primal_data,</div>
-<div class="line"><a id="l01226" name="l01226"></a><span class="lineno"> 1226</span>              const AssemblyCubatureData&lt;DT_&gt;&amp; cubature,</div>
-<div class="line"><a id="l01227" name="l01227"></a><span class="lineno"> 1227</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
-<div class="line"><a id="l01228" name="l01228"></a><span class="lineno"> 1228</span>              const Adjacency::ColoringDataHandler&amp; coloring_data,</div>
-<div class="line"><a id="l01229" name="l01229"></a><span class="lineno"> 1229</span>              DT_ alpha, const AssemblyBurgersData&lt;DT_&gt;&amp; burgers_params)</div>
-<div class="line"><a id="l01230" name="l01230"></a><span class="lineno"> 1230</span>      {</div>
-<div class="line"><a id="l01231" name="l01231"></a><span class="lineno"> 1231</span>        const Memory::TypedView&lt;int&gt; color_view = coloring_data.color_map_view(Memory::Location::main, Memory::Access::read);</div>
-<div class="line"><a id="l01232" name="l01232"></a><span class="lineno"> 1232</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_view(dof_mapping.cell_to_dof.view(Memory::Location::main, Memory::Access::read));</div>
-<div class="line"><a id="l01233" name="l01233"></a><span class="lineno"> 1233</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, Space_::world_dim&gt;&gt; nodes_view(dof_mapping.nodes.view(Memory::Location::main, Memory::Access::read));</div>
-<div class="line"><a id="l01234" name="l01234"></a><span class="lineno"> 1234</span> </div>
-<div class="line"><a id="l01235" name="l01235"></a><span class="lineno"> 1235</span>        for(Index col = 0; col &lt; coloring_data.get_num_colors(); ++col)</div>
-<div class="line"><a id="l01236" name="l01236"></a><span class="lineno"> 1236</span>        {</div>
-<div class="line"><a id="l01237" name="l01237"></a><span class="lineno"> 1237</span>          VoxelAssembly::Kernel::template full_burgers_assembler_vector_bd_host&lt;Space_, DT_, IT_&gt;(vector_data, conv_data, primal_data,</div>
-<div class="line"><a id="l01238" name="l01238"></a><span class="lineno"> 1238</span>              space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
-<div class="line"><a id="l01239" name="l01239"></a><span class="lineno"> 1239</span>              cubature.cub_wg, cubature.num_cubs, alpha,</div>
-<div class="line"><a id="l01240" name="l01240"></a><span class="lineno"> 1240</span>              cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
-<div class="line"><a id="l01241" name="l01241"></a><span class="lineno"> 1241</span>              nodes_view.get_r(), dof_mapping.node_size,</div>
-<div class="line"><a id="l01242" name="l01242"></a><span class="lineno"> 1242</span>              &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col),</div>
-<div class="line"><a id="l01243" name="l01243"></a><span class="lineno"> 1243</span>              burgers_params</div>
-<div class="line"><a id="l01244" name="l01244"></a><span class="lineno"> 1244</span>          );</div>
-<div class="line"><a id="l01245" name="l01245"></a><span class="lineno"> 1245</span>        }</div>
-<div class="line"><a id="l01246" name="l01246"></a><span class="lineno"> 1246</span>      }</div>
-<div class="line"><a id="l01247" name="l01247"></a><span class="lineno"> 1247</span> </div>
-<div class="line"><a id="l01248" name="l01248"></a><span class="lineno"> 1248</span> </div>
-<div class="line"><a id="l01249" name="l01249"></a><span class="lineno"> 1249</span>      template&lt;typename DT_, typename IT_, int dim_&gt;</div>
-<div class="line"><a id="l01250" name="l01250"></a><span class="lineno"> 1250</span>      DT_ get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;DT_, IT_, dim_&gt;&amp; convect)</div>
-<div class="line"><a id="l01251" name="l01251"></a><span class="lineno"> 1251</span>      {</div>
-<div class="line"><a id="l01252" name="l01252"></a><span class="lineno"> 1252</span>        //extract pointer</div>
-<div class="line"><a id="l01253" name="l01253"></a><span class="lineno"> 1253</span>        //const Tiny::Vector&lt;DT_, dim_&gt;* vec_data = (const Tiny::Vector&lt;DT_, dim_&gt;*)convect.template elements&lt;LAFEM::Perspective::native&gt;();</div>
-<div class="line"><a id="l01254" name="l01254"></a><span class="lineno"> 1254</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, dim_&gt;&gt; vec_data(convect.elements_view_r(Memory::Location::main));</div>
-<div class="line"><a id="l01255" name="l01255"></a><span class="lineno"> 1255</span> </div>
-<div class="line"><a id="l01256" name="l01256"></a><span class="lineno"> 1256</span>        DT_ glob_res = DT_(0);</div>
-<div class="line"><a id="l01257" name="l01257"></a><span class="lineno"> 1257</span> </div>
-<div class="line"><a id="l01258" name="l01258"></a><span class="lineno"> 1258</span>        VoxelAssembly::Kernel::template set_sd_v_norm_host&lt;DT_, dim_&gt;(vec_data.get_r(), &amp;glob_res, convect.size());</div>
+<div class="line"><a id="l01193" name="l01193"></a><span class="lineno"> 1193</span>      template&lt;typename DT_, typename IT_, int dim_&gt;</div>
+<div class="line"><a id="l01194" name="l01194"></a><span class="lineno"> 1194</span>      DT_ get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;DT_, IT_, dim_&gt;, LAFEM::VectorMirror&lt;DT_, IT_&gt;&gt;&amp; convect)</div>
+<div class="line"><a id="l01195" name="l01195"></a><span class="lineno"> 1195</span>      {</div>
+<div class="line"><a id="l01196" name="l01196"></a><span class="lineno"> 1196</span>        auto local_norm = get_sd_v_norm(convect.local());</div>
+<div class="line"><a id="l01197" name="l01197"></a><span class="lineno"> 1197</span>        const auto* gate = convect.get_gate();</div>
+<div class="line"><a id="l01198" name="l01198"></a><span class="lineno"> 1198</span>        if(gate != nullptr)</div>
+<div class="line"><a id="l01199" name="l01199"></a><span class="lineno"> 1199</span>        {</div>
+<div class="line"><a id="l01200" name="l01200"></a><span class="lineno"> 1200</span>          local_norm = gate-&gt;max(local_norm);</div>
+<div class="line"><a id="l01201" name="l01201"></a><span class="lineno"> 1201</span>        }</div>
+<div class="line"><a id="l01202" name="l01202"></a><span class="lineno"> 1202</span>        return local_norm;</div>
+<div class="line"><a id="l01203" name="l01203"></a><span class="lineno"> 1203</span>      }</div>
+<div class="line"><a id="l01204" name="l01204"></a><span class="lineno"> 1204</span> </div>
+<div class="line"><a id="l01205" name="l01205"></a><span class="lineno"> 1205</span>      template&lt;typename Space_, typename DT_, typename IT_&gt;</div>
+<div class="line"><a id="l01206" name="l01206"></a><span class="lineno"> 1206</span>      void assemble_burgers_csr_host([[maybe_unused]] const Space_&amp; space,</div>
+<div class="line"><a id="l01207" name="l01207"></a><span class="lineno"> 1207</span>              const CSRMatrixData&lt;DT_, IT_&gt;&amp; matrix_data,</div>
+<div class="line"><a id="l01208" name="l01208"></a><span class="lineno"> 1208</span>              const DT_* conv_data,</div>
+<div class="line"><a id="l01209" name="l01209"></a><span class="lineno"> 1209</span>              const AssemblyCubatureData&lt;DT_&gt;&amp; cubature,</div>
+<div class="line"><a id="l01210" name="l01210"></a><span class="lineno"> 1210</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
+<div class="line"><a id="l01211" name="l01211"></a><span class="lineno"> 1211</span>              const Adjacency::ColoringDataHandler&amp; coloring_data,</div>
+<div class="line"><a id="l01212" name="l01212"></a><span class="lineno"> 1212</span>              DT_ alpha, const AssemblyBurgersData&lt;DT_&gt;&amp; burgers_params)</div>
+<div class="line"><a id="l01213" name="l01213"></a><span class="lineno"> 1213</span>      {</div>
+<div class="line"><a id="l01214" name="l01214"></a><span class="lineno"> 1214</span>        const Memory::TypedView&lt;int&gt; color_view = coloring_data.color_map_view(Memory::Location::main, Memory::Access::read);</div>
+<div class="line"><a id="l01215" name="l01215"></a><span class="lineno"> 1215</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_view(dof_mapping.cell_to_dof.view(Memory::Location::main, Memory::Access::read));</div>
+<div class="line"><a id="l01216" name="l01216"></a><span class="lineno"> 1216</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_sorter_view(dof_mapping.cell_to_dof_sorter.view(Memory::Location::main, Memory::Access::read));</div>
+<div class="line"><a id="l01217" name="l01217"></a><span class="lineno"> 1217</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, Space_::world_dim&gt;&gt; nodes_view(dof_mapping.nodes.view(Memory::Location::main, Memory::Access::read));</div>
+<div class="line"><a id="l01218" name="l01218"></a><span class="lineno"> 1218</span> </div>
+<div class="line"><a id="l01219" name="l01219"></a><span class="lineno"> 1219</span>        for(Index col = 0; col &lt; coloring_data.get_num_colors(); ++col)</div>
+<div class="line"><a id="l01220" name="l01220"></a><span class="lineno"> 1220</span>        {</div>
+<div class="line"><a id="l01221" name="l01221"></a><span class="lineno"> 1221</span>          VoxelAssembly::Kernel::template full_burgers_assembler_matrix1_bcsr_host&lt;Space_, DT_, IT_, FEAT::Intern::MatrixGatherScatterPolicy::useLocalSortHelper&gt;(</div>
+<div class="line"><a id="l01222" name="l01222"></a><span class="lineno"> 1222</span>              matrix_data.data, conv_data, matrix_data.row_ptr, matrix_data.col_idx, matrix_data.num_rows, matrix_data.num_cols,</div>
+<div class="line"><a id="l01223" name="l01223"></a><span class="lineno"> 1223</span>              (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l01224" name="l01224"></a><span class="lineno"> 1224</span>              cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l01225" name="l01225"></a><span class="lineno"> 1225</span>              cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l01226" name="l01226"></a><span class="lineno"> 1226</span>              nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l01227" name="l01227"></a><span class="lineno"> 1227</span>              &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col),</div>
+<div class="line"><a id="l01228" name="l01228"></a><span class="lineno"> 1228</span>              cell_to_dof_sorter_view.get_r(), burgers_params</div>
+<div class="line"><a id="l01229" name="l01229"></a><span class="lineno"> 1229</span>          );</div>
+<div class="line"><a id="l01230" name="l01230"></a><span class="lineno"> 1230</span>        }</div>
+<div class="line"><a id="l01231" name="l01231"></a><span class="lineno"> 1231</span>      }</div>
+<div class="line"><a id="l01232" name="l01232"></a><span class="lineno"> 1232</span> </div>
+<div class="line"><a id="l01233" name="l01233"></a><span class="lineno"> 1233</span>      template&lt;typename Space_, typename DT_, typename IT_&gt;</div>
+<div class="line"><a id="l01234" name="l01234"></a><span class="lineno"> 1234</span>      void assemble_burgers_defect_host([[maybe_unused]] const Space_&amp; space,</div>
+<div class="line"><a id="l01235" name="l01235"></a><span class="lineno"> 1235</span>              DT_* vector_data,</div>
+<div class="line"><a id="l01236" name="l01236"></a><span class="lineno"> 1236</span>              const DT_* conv_data,</div>
+<div class="line"><a id="l01237" name="l01237"></a><span class="lineno"> 1237</span>              const DT_* primal_data,</div>
+<div class="line"><a id="l01238" name="l01238"></a><span class="lineno"> 1238</span>              const AssemblyCubatureData&lt;DT_&gt;&amp; cubature,</div>
+<div class="line"><a id="l01239" name="l01239"></a><span class="lineno"> 1239</span>              const AssemblyMappingData&lt;DT_, IT_&gt;&amp; dof_mapping,</div>
+<div class="line"><a id="l01240" name="l01240"></a><span class="lineno"> 1240</span>              const Adjacency::ColoringDataHandler&amp; coloring_data,</div>
+<div class="line"><a id="l01241" name="l01241"></a><span class="lineno"> 1241</span>              DT_ alpha, const AssemblyBurgersData&lt;DT_&gt;&amp; burgers_params)</div>
+<div class="line"><a id="l01242" name="l01242"></a><span class="lineno"> 1242</span>      {</div>
+<div class="line"><a id="l01243" name="l01243"></a><span class="lineno"> 1243</span>        const Memory::TypedView&lt;int&gt; color_view = coloring_data.color_map_view(Memory::Location::main, Memory::Access::read);</div>
+<div class="line"><a id="l01244" name="l01244"></a><span class="lineno"> 1244</span>        const Memory::TypedView&lt;IT_&gt; cell_to_dof_view(dof_mapping.cell_to_dof.view(Memory::Location::main, Memory::Access::read));</div>
+<div class="line"><a id="l01245" name="l01245"></a><span class="lineno"> 1245</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, Space_::world_dim&gt;&gt; nodes_view(dof_mapping.nodes.view(Memory::Location::main, Memory::Access::read));</div>
+<div class="line"><a id="l01246" name="l01246"></a><span class="lineno"> 1246</span> </div>
+<div class="line"><a id="l01247" name="l01247"></a><span class="lineno"> 1247</span>        for(Index col = 0; col &lt; coloring_data.get_num_colors(); ++col)</div>
+<div class="line"><a id="l01248" name="l01248"></a><span class="lineno"> 1248</span>        {</div>
+<div class="line"><a id="l01249" name="l01249"></a><span class="lineno"> 1249</span>          VoxelAssembly::Kernel::template full_burgers_assembler_vector_bd_host&lt;Space_, DT_, IT_&gt;(vector_data, conv_data, primal_data,</div>
+<div class="line"><a id="l01250" name="l01250"></a><span class="lineno"> 1250</span>              space.get_num_dofs(), (const typename Tiny::Vector&lt;DT_, Space_::world_dim&gt;*) cubature.cub_pt,</div>
+<div class="line"><a id="l01251" name="l01251"></a><span class="lineno"> 1251</span>              cubature.cub_wg, cubature.num_cubs, alpha,</div>
+<div class="line"><a id="l01252" name="l01252"></a><span class="lineno"> 1252</span>              cell_to_dof_view.get_r(), dof_mapping.cell_num,</div>
+<div class="line"><a id="l01253" name="l01253"></a><span class="lineno"> 1253</span>              nodes_view.get_r(), dof_mapping.node_size,</div>
+<div class="line"><a id="l01254" name="l01254"></a><span class="lineno"> 1254</span>              &amp;color_view.get_r()[coloring_data.get_color_offset(col)], coloring_data.get_color_size(col),</div>
+<div class="line"><a id="l01255" name="l01255"></a><span class="lineno"> 1255</span>              burgers_params</div>
+<div class="line"><a id="l01256" name="l01256"></a><span class="lineno"> 1256</span>          );</div>
+<div class="line"><a id="l01257" name="l01257"></a><span class="lineno"> 1257</span>        }</div>
+<div class="line"><a id="l01258" name="l01258"></a><span class="lineno"> 1258</span>      }</div>
 <div class="line"><a id="l01259" name="l01259"></a><span class="lineno"> 1259</span> </div>
 <div class="line"><a id="l01260" name="l01260"></a><span class="lineno"> 1260</span> </div>
-<div class="line"><a id="l01261" name="l01261"></a><span class="lineno"> 1261</span>        return glob_res;</div>
-<div class="line"><a id="l01262" name="l01262"></a><span class="lineno"> 1262</span>      }</div>
-<div class="line"><a id="l01263" name="l01263"></a><span class="lineno"> 1263</span> </div>
-<div class="line"><a id="l01264" name="l01264"></a><span class="lineno"> 1264</span>      template&lt;typename DT_, typename IT_, int dim_&gt;</div>
-<div class="line"><a id="l01265" name="l01265"></a><span class="lineno"> 1265</span>      DT_ get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;DT_, IT_, dim_&gt;, LAFEM::VectorMirror&lt;DT_, IT_&gt;&gt;&amp; convect)</div>
-<div class="line"><a id="l01266" name="l01266"></a><span class="lineno"> 1266</span>      {</div>
-<div class="line"><a id="l01267" name="l01267"></a><span class="lineno"> 1267</span>        auto local_norm = get_sd_v_norm_host(convect.local());</div>
-<div class="line"><a id="l01268" name="l01268"></a><span class="lineno"> 1268</span>        const auto* gate = convect.get_gate();</div>
-<div class="line"><a id="l01269" name="l01269"></a><span class="lineno"> 1269</span>        if(gate != nullptr)</div>
-<div class="line"><a id="l01270" name="l01270"></a><span class="lineno"> 1270</span>        {</div>
-<div class="line"><a id="l01271" name="l01271"></a><span class="lineno"> 1271</span>          local_norm = gate-&gt;max(local_norm);</div>
-<div class="line"><a id="l01272" name="l01272"></a><span class="lineno"> 1272</span>        }</div>
-<div class="line"><a id="l01273" name="l01273"></a><span class="lineno"> 1273</span>        return local_norm;</div>
+<div class="line"><a id="l01261" name="l01261"></a><span class="lineno"> 1261</span>      template&lt;typename DT_, typename IT_, int dim_&gt;</div>
+<div class="line"><a id="l01262" name="l01262"></a><span class="lineno"> 1262</span>      DT_ get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;DT_, IT_, dim_&gt;&amp; convect)</div>
+<div class="line"><a id="l01263" name="l01263"></a><span class="lineno"> 1263</span>      {</div>
+<div class="line"><a id="l01264" name="l01264"></a><span class="lineno"> 1264</span>        //extract pointer</div>
+<div class="line"><a id="l01265" name="l01265"></a><span class="lineno"> 1265</span>        //const Tiny::Vector&lt;DT_, dim_&gt;* vec_data = (const Tiny::Vector&lt;DT_, dim_&gt;*)convect.template elements&lt;LAFEM::Perspective::native&gt;();</div>
+<div class="line"><a id="l01266" name="l01266"></a><span class="lineno"> 1266</span>        const Memory::TypedView&lt;Tiny::Vector&lt;DT_, dim_&gt;&gt; vec_data(convect.elements_view_r(Memory::Location::main));</div>
+<div class="line"><a id="l01267" name="l01267"></a><span class="lineno"> 1267</span> </div>
+<div class="line"><a id="l01268" name="l01268"></a><span class="lineno"> 1268</span>        DT_ glob_res = DT_(0);</div>
+<div class="line"><a id="l01269" name="l01269"></a><span class="lineno"> 1269</span> </div>
+<div class="line"><a id="l01270" name="l01270"></a><span class="lineno"> 1270</span>        VoxelAssembly::Kernel::template set_sd_v_norm_host&lt;DT_, dim_&gt;(vec_data.get_r(), &amp;glob_res, convect.size());</div>
+<div class="line"><a id="l01271" name="l01271"></a><span class="lineno"> 1271</span> </div>
+<div class="line"><a id="l01272" name="l01272"></a><span class="lineno"> 1272</span> </div>
+<div class="line"><a id="l01273" name="l01273"></a><span class="lineno"> 1273</span>        return glob_res;</div>
 <div class="line"><a id="l01274" name="l01274"></a><span class="lineno"> 1274</span>      }</div>
 <div class="line"><a id="l01275" name="l01275"></a><span class="lineno"> 1275</span> </div>
-<div class="line"><a id="l01276" name="l01276"></a><span class="lineno"> 1276</span>    }</div>
-<div class="line"><a id="l01277" name="l01277"></a><span class="lineno"> 1277</span>  }</div>
-<div class="line"><a id="l01278" name="l01278"></a><span class="lineno"> 1278</span>}</div>
-<div class="line"><a id="l01279" name="l01279"></a><span class="lineno"> 1279</span> </div>
-<div class="line"><a id="l01280" name="l01280"></a><span class="lineno"> 1280</span>using namespace FEAT;</div>
-<div class="line"><a id="l01281" name="l01281"></a><span class="lineno"> 1281</span>using namespace FEAT::VoxelAssembly;</div>
-<div class="line"><a id="l01282" name="l01282"></a><span class="lineno"> 1282</span> </div>
-<div class="line"><a id="l01283" name="l01283"></a><span class="lineno"> 1283</span>/*******************************************************2D implementations***************************************************/</div>
-<div class="line"><a id="l01284" name="l01284"></a><span class="lineno"> 1284</span>template void Arch::assemble_burgers_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01285" name="l01285"></a><span class="lineno"> 1285</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01286" name="l01286"></a><span class="lineno"> 1286</span>template void Arch::assemble_burgers_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01287" name="l01287"></a><span class="lineno"> 1287</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01288" name="l01288"></a><span class="lineno"> 1288</span>template void Arch::assemble_burgers_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01289" name="l01289"></a><span class="lineno"> 1289</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01290" name="l01290"></a><span class="lineno"> 1290</span>template void Arch::assemble_burgers_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01291" name="l01291"></a><span class="lineno"> 1291</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01292" name="l01292"></a><span class="lineno"> 1292</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l01293" name="l01293"></a><span class="lineno"> 1293</span>// template void Arch::assemble_burgers_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;Half, std::uint32_t&gt;&amp;, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01294" name="l01294"></a><span class="lineno"> 1294</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01295" name="l01295"></a><span class="lineno"> 1295</span>// template void Arch::assemble_burgers_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;Half, std::uint64_t&gt;&amp;, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01296" name="l01296"></a><span class="lineno"> 1296</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01297" name="l01297"></a><span class="lineno"> 1297</span>// #endif</div>
-<div class="line"><a id="l01298" name="l01298"></a><span class="lineno"> 1298</span> </div>
-<div class="line"><a id="l01299" name="l01299"></a><span class="lineno"> 1299</span>template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01300" name="l01300"></a><span class="lineno"> 1300</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;);</div>
-<div class="line"><a id="l01301" name="l01301"></a><span class="lineno"> 1301</span>template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01302" name="l01302"></a><span class="lineno"> 1302</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;);</div>
-<div class="line"><a id="l01303" name="l01303"></a><span class="lineno"> 1303</span>template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01304" name="l01304"></a><span class="lineno"> 1304</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;);</div>
-<div class="line"><a id="l01305" name="l01305"></a><span class="lineno"> 1305</span>template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01306" name="l01306"></a><span class="lineno"> 1306</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;);</div>
-<div class="line"><a id="l01307" name="l01307"></a><span class="lineno"> 1307</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l01308" name="l01308"></a><span class="lineno"> 1308</span>// template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;Half, std::uint32_t&gt;&amp;, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01309" name="l01309"></a><span class="lineno"> 1309</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;);</div>
-<div class="line"><a id="l01310" name="l01310"></a><span class="lineno"> 1310</span>// template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;Half, std::uint64_t&gt;&amp;, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01311" name="l01311"></a><span class="lineno"> 1311</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;);</div>
-<div class="line"><a id="l01312" name="l01312"></a><span class="lineno"> 1312</span>// #endif</div>
-<div class="line"><a id="l01313" name="l01313"></a><span class="lineno"> 1313</span> </div>
-<div class="line"><a id="l01314" name="l01314"></a><span class="lineno"> 1314</span>template void Arch::assemble_burgers_defect(const Q2StandardQuad&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01315" name="l01315"></a><span class="lineno"> 1315</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01316" name="l01316"></a><span class="lineno"> 1316</span>template void Arch::assemble_burgers_defect(const Q2StandardQuad&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01317" name="l01317"></a><span class="lineno"> 1317</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01318" name="l01318"></a><span class="lineno"> 1318</span>template void Arch::assemble_burgers_defect(const Q2StandardQuad&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01319" name="l01319"></a><span class="lineno"> 1319</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01320" name="l01320"></a><span class="lineno"> 1320</span>template void Arch::assemble_burgers_defect(const Q2StandardQuad&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01321" name="l01321"></a><span class="lineno"> 1321</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01322" name="l01322"></a><span class="lineno"> 1322</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l01323" name="l01323"></a><span class="lineno"> 1323</span>// template void Arch::assemble_burgers_defect(const Q2StandardQuad&amp;, Half*, const Half*, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01324" name="l01324"></a><span class="lineno"> 1324</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01325" name="l01325"></a><span class="lineno"> 1325</span>// template void Arch::assemble_burgers_defect(const Q2StandardQuad&amp;, Half*, const Half*, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01326" name="l01326"></a><span class="lineno"> 1326</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01327" name="l01327"></a><span class="lineno"> 1327</span>// #endif</div>
-<div class="line"><a id="l01328" name="l01328"></a><span class="lineno"> 1328</span> </div>
-<div class="line"><a id="l01329" name="l01329"></a><span class="lineno"> 1329</span>template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01330" name="l01330"></a><span class="lineno"> 1330</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;);</div>
-<div class="line"><a id="l01331" name="l01331"></a><span class="lineno"> 1331</span>template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01332" name="l01332"></a><span class="lineno"> 1332</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;);</div>
-<div class="line"><a id="l01333" name="l01333"></a><span class="lineno"> 1333</span>template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01334" name="l01334"></a><span class="lineno"> 1334</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;);</div>
-<div class="line"><a id="l01335" name="l01335"></a><span class="lineno"> 1335</span>template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01336" name="l01336"></a><span class="lineno"> 1336</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;);</div>
-<div class="line"><a id="l01337" name="l01337"></a><span class="lineno"> 1337</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l01338" name="l01338"></a><span class="lineno"> 1338</span>// template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&amp;, Half*, const Half*, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01339" name="l01339"></a><span class="lineno"> 1339</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;);</div>
-<div class="line"><a id="l01340" name="l01340"></a><span class="lineno"> 1340</span>// template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&amp;, Half*, const Half*, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01341" name="l01341"></a><span class="lineno"> 1341</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;);</div>
-<div class="line"><a id="l01342" name="l01342"></a><span class="lineno"> 1342</span>// #endif</div>
-<div class="line"><a id="l01343" name="l01343"></a><span class="lineno"> 1343</span> </div>
-<div class="line"><a id="l01344" name="l01344"></a><span class="lineno"> 1344</span>template double Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;double, std::uint32_t, 2&gt;&amp;);</div>
-<div class="line"><a id="l01345" name="l01345"></a><span class="lineno"> 1345</span>template float Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;float, std::uint32_t, 2&gt;&amp;);</div>
-<div class="line"><a id="l01346" name="l01346"></a><span class="lineno"> 1346</span>template double Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;double, std::uint64_t, 2&gt;&amp;);</div>
-<div class="line"><a id="l01347" name="l01347"></a><span class="lineno"> 1347</span>template float Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;float, std::uint64_t, 2&gt;&amp;);</div>
-<div class="line"><a id="l01348" name="l01348"></a><span class="lineno"> 1348</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l01349" name="l01349"></a><span class="lineno"> 1349</span>// template Half Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;Half, std::uint32_t, 2&gt;&amp;);</div>
-<div class="line"><a id="l01350" name="l01350"></a><span class="lineno"> 1350</span>// template Half Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;Half, std::uint64_t, 2&gt;&amp;);</div>
-<div class="line"><a id="l01351" name="l01351"></a><span class="lineno"> 1351</span>// #endif</div>
-<div class="line"><a id="l01352" name="l01352"></a><span class="lineno"> 1352</span> </div>
-<div class="line"><a id="l01353" name="l01353"></a><span class="lineno"> 1353</span>template double Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;double, std::uint32_t, 2&gt;, LAFEM::VectorMirror&lt;double, std::uint32_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01354" name="l01354"></a><span class="lineno"> 1354</span>template float Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;float, std::uint32_t, 2&gt;, LAFEM::VectorMirror&lt;float, std::uint32_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01355" name="l01355"></a><span class="lineno"> 1355</span>template double Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;double, std::uint64_t, 2&gt;, LAFEM::VectorMirror&lt;double, std::uint64_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01356" name="l01356"></a><span class="lineno"> 1356</span>template float Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;float, std::uint64_t, 2&gt;, LAFEM::VectorMirror&lt;float, std::uint64_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01357" name="l01357"></a><span class="lineno"> 1357</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l01358" name="l01358"></a><span class="lineno"> 1358</span>// template Half Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;Half, std::uint32_t, 2&gt;, LAFEM::VectorMirror&lt;Half, std::uint32_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01359" name="l01359"></a><span class="lineno"> 1359</span>// template Half Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;Half, std::uint64_t, 2&gt;, LAFEM::VectorMirror&lt;Half, std::uint64_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01360" name="l01360"></a><span class="lineno"> 1360</span>// #endif</div>
-<div class="line"><a id="l01361" name="l01361"></a><span class="lineno"> 1361</span> </div>
-<div class="line"><a id="l01362" name="l01362"></a><span class="lineno"> 1362</span>template double Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;double, std::uint32_t, 2&gt;&amp;);</div>
-<div class="line"><a id="l01363" name="l01363"></a><span class="lineno"> 1363</span>template float Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;float, std::uint32_t, 2&gt;&amp;);</div>
-<div class="line"><a id="l01364" name="l01364"></a><span class="lineno"> 1364</span>template double Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;double, std::uint64_t, 2&gt;&amp;);</div>
-<div class="line"><a id="l01365" name="l01365"></a><span class="lineno"> 1365</span>template float Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;float, std::uint64_t, 2&gt;&amp;);</div>
-<div class="line"><a id="l01366" name="l01366"></a><span class="lineno"> 1366</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l01367" name="l01367"></a><span class="lineno"> 1367</span>// template Half Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;Half, std::uint32_t, 2&gt;&amp;);</div>
-<div class="line"><a id="l01368" name="l01368"></a><span class="lineno"> 1368</span>// template Half Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;Half, std::uint64_t, 2&gt;&amp;);</div>
-<div class="line"><a id="l01369" name="l01369"></a><span class="lineno"> 1369</span>// #endif</div>
-<div class="line"><a id="l01370" name="l01370"></a><span class="lineno"> 1370</span> </div>
-<div class="line"><a id="l01371" name="l01371"></a><span class="lineno"> 1371</span>template double Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;double, std::uint32_t, 2&gt;, LAFEM::VectorMirror&lt;double, std::uint32_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01372" name="l01372"></a><span class="lineno"> 1372</span>template float Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;float, std::uint32_t, 2&gt;, LAFEM::VectorMirror&lt;float, std::uint32_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01373" name="l01373"></a><span class="lineno"> 1373</span>template double Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;double, std::uint64_t, 2&gt;, LAFEM::VectorMirror&lt;double, std::uint64_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01374" name="l01374"></a><span class="lineno"> 1374</span>template float Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;float, std::uint64_t, 2&gt;, LAFEM::VectorMirror&lt;float, std::uint64_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01375" name="l01375"></a><span class="lineno"> 1375</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l01376" name="l01376"></a><span class="lineno"> 1376</span>// template Half Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;Half, std::uint32_t, 2&gt;, LAFEM::VectorMirror&lt;Half, std::uint32_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01377" name="l01377"></a><span class="lineno"> 1377</span>// template Half Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;Half, std::uint64_t, 2&gt;, LAFEM::VectorMirror&lt;Half, std::uint64_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01378" name="l01378"></a><span class="lineno"> 1378</span>// #endif</div>
-<div class="line"><a id="l01379" name="l01379"></a><span class="lineno"> 1379</span> </div>
-<div class="line"><a id="l01380" name="l01380"></a><span class="lineno"> 1380</span>/*********************************************************3D implementations**************************************************************************************/</div>
-<div class="line"><a id="l01381" name="l01381"></a><span class="lineno"> 1381</span> </div>
-<div class="line"><a id="l01382" name="l01382"></a><span class="lineno"> 1382</span>template void Arch::assemble_burgers_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01383" name="l01383"></a><span class="lineno"> 1383</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01384" name="l01384"></a><span class="lineno"> 1384</span>template void Arch::assemble_burgers_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01385" name="l01385"></a><span class="lineno"> 1385</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01386" name="l01386"></a><span class="lineno"> 1386</span>template void Arch::assemble_burgers_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01387" name="l01387"></a><span class="lineno"> 1387</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01388" name="l01388"></a><span class="lineno"> 1388</span>template void Arch::assemble_burgers_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01389" name="l01389"></a><span class="lineno"> 1389</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01390" name="l01390"></a><span class="lineno"> 1390</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l01391" name="l01391"></a><span class="lineno"> 1391</span>// template void Arch::assemble_burgers_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;Half, std::uint32_t&gt;&amp;, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01392" name="l01392"></a><span class="lineno"> 1392</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01393" name="l01393"></a><span class="lineno"> 1393</span>// template void Arch::assemble_burgers_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;Half, std::uint64_t&gt;&amp;, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01394" name="l01394"></a><span class="lineno"> 1394</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01395" name="l01395"></a><span class="lineno"> 1395</span>// #endif</div>
-<div class="line"><a id="l01396" name="l01396"></a><span class="lineno"> 1396</span> </div>
-<div class="line"><a id="l01397" name="l01397"></a><span class="lineno"> 1397</span>template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01398" name="l01398"></a><span class="lineno"> 1398</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;);</div>
-<div class="line"><a id="l01399" name="l01399"></a><span class="lineno"> 1399</span>template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01400" name="l01400"></a><span class="lineno"> 1400</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;);</div>
-<div class="line"><a id="l01401" name="l01401"></a><span class="lineno"> 1401</span>template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01402" name="l01402"></a><span class="lineno"> 1402</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;);</div>
-<div class="line"><a id="l01403" name="l01403"></a><span class="lineno"> 1403</span>template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01404" name="l01404"></a><span class="lineno"> 1404</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;);</div>
-<div class="line"><a id="l01405" name="l01405"></a><span class="lineno"> 1405</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l01406" name="l01406"></a><span class="lineno"> 1406</span>// template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;Half, std::uint32_t&gt;&amp;, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01407" name="l01407"></a><span class="lineno"> 1407</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;);</div>
-<div class="line"><a id="l01408" name="l01408"></a><span class="lineno"> 1408</span>// template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;Half, std::uint64_t&gt;&amp;, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01409" name="l01409"></a><span class="lineno"> 1409</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;);</div>
-<div class="line"><a id="l01410" name="l01410"></a><span class="lineno"> 1410</span>// #endif</div>
-<div class="line"><a id="l01411" name="l01411"></a><span class="lineno"> 1411</span> </div>
-<div class="line"><a id="l01412" name="l01412"></a><span class="lineno"> 1412</span>template void Arch::assemble_burgers_defect(const Q2StandardHexa&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01413" name="l01413"></a><span class="lineno"> 1413</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01414" name="l01414"></a><span class="lineno"> 1414</span>template void Arch::assemble_burgers_defect(const Q2StandardHexa&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01415" name="l01415"></a><span class="lineno"> 1415</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01416" name="l01416"></a><span class="lineno"> 1416</span>template void Arch::assemble_burgers_defect(const Q2StandardHexa&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01417" name="l01417"></a><span class="lineno"> 1417</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01418" name="l01418"></a><span class="lineno"> 1418</span>template void Arch::assemble_burgers_defect(const Q2StandardHexa&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01419" name="l01419"></a><span class="lineno"> 1419</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01420" name="l01420"></a><span class="lineno"> 1420</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l01421" name="l01421"></a><span class="lineno"> 1421</span>// template void Arch::assemble_burgers_defect(const Q2StandardHexa&amp;, Half*, const Half*, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01422" name="l01422"></a><span class="lineno"> 1422</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01423" name="l01423"></a><span class="lineno"> 1423</span>// template void Arch::assemble_burgers_defect(const Q2StandardHexa&amp;, Half*, const Half*, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01424" name="l01424"></a><span class="lineno"> 1424</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;, int, int, int, bool);</div>
-<div class="line"><a id="l01425" name="l01425"></a><span class="lineno"> 1425</span>// #endif</div>
-<div class="line"><a id="l01426" name="l01426"></a><span class="lineno"> 1426</span> </div>
-<div class="line"><a id="l01427" name="l01427"></a><span class="lineno"> 1427</span>template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01428" name="l01428"></a><span class="lineno"> 1428</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;);</div>
-<div class="line"><a id="l01429" name="l01429"></a><span class="lineno"> 1429</span>template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01430" name="l01430"></a><span class="lineno"> 1430</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;);</div>
-<div class="line"><a id="l01431" name="l01431"></a><span class="lineno"> 1431</span>template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01432" name="l01432"></a><span class="lineno"> 1432</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;);</div>
-<div class="line"><a id="l01433" name="l01433"></a><span class="lineno"> 1433</span>template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01434" name="l01434"></a><span class="lineno"> 1434</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;);</div>
-<div class="line"><a id="l01435" name="l01435"></a><span class="lineno"> 1435</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l01436" name="l01436"></a><span class="lineno"> 1436</span>// template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&amp;, Half*, const Half*, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
-<div class="line"><a id="l01437" name="l01437"></a><span class="lineno"> 1437</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;);</div>
-<div class="line"><a id="l01438" name="l01438"></a><span class="lineno"> 1438</span>// template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&amp;, Half*, const Half*, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
-<div class="line"><a id="l01439" name="l01439"></a><span class="lineno"> 1439</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;);</div>
-<div class="line"><a id="l01440" name="l01440"></a><span class="lineno"> 1440</span>// #endif</div>
-<div class="line"><a id="l01441" name="l01441"></a><span class="lineno"> 1441</span> </div>
-<div class="line"><a id="l01442" name="l01442"></a><span class="lineno"> 1442</span>template double Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;double, std::uint32_t, 3&gt;&amp;);</div>
-<div class="line"><a id="l01443" name="l01443"></a><span class="lineno"> 1443</span>template float Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;float, std::uint32_t, 3&gt;&amp;);</div>
-<div class="line"><a id="l01444" name="l01444"></a><span class="lineno"> 1444</span>template double Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;double, std::uint64_t, 3&gt;&amp;);</div>
-<div class="line"><a id="l01445" name="l01445"></a><span class="lineno"> 1445</span>template float Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;float, std::uint64_t, 3&gt;&amp;);</div>
-<div class="line"><a id="l01446" name="l01446"></a><span class="lineno"> 1446</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l01447" name="l01447"></a><span class="lineno"> 1447</span>// template Half Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;Half, std::uint32_t, 3&gt;&amp;);</div>
-<div class="line"><a id="l01448" name="l01448"></a><span class="lineno"> 1448</span>// template Half Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;Half, std::uint64_t, 3&gt;&amp;);</div>
-<div class="line"><a id="l01449" name="l01449"></a><span class="lineno"> 1449</span>// #endif</div>
-<div class="line"><a id="l01450" name="l01450"></a><span class="lineno"> 1450</span> </div>
-<div class="line"><a id="l01451" name="l01451"></a><span class="lineno"> 1451</span>template double Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;double, std::uint32_t, 3&gt;, LAFEM::VectorMirror&lt;double, std::uint32_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01452" name="l01452"></a><span class="lineno"> 1452</span>template float Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;float, std::uint32_t, 3&gt;, LAFEM::VectorMirror&lt;float, std::uint32_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01453" name="l01453"></a><span class="lineno"> 1453</span>template double Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;double, std::uint64_t, 3&gt;, LAFEM::VectorMirror&lt;double, std::uint64_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01454" name="l01454"></a><span class="lineno"> 1454</span>template float Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;float, std::uint64_t, 3&gt;, LAFEM::VectorMirror&lt;float, std::uint64_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01455" name="l01455"></a><span class="lineno"> 1455</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l01456" name="l01456"></a><span class="lineno"> 1456</span>// template Half Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;Half, std::uint32_t, 3&gt;, LAFEM::VectorMirror&lt;Half, std::uint32_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01457" name="l01457"></a><span class="lineno"> 1457</span>// template Half Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;Half, std::uint64_t, 3&gt;, LAFEM::VectorMirror&lt;Half, std::uint64_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01458" name="l01458"></a><span class="lineno"> 1458</span>// #endif</div>
-<div class="line"><a id="l01459" name="l01459"></a><span class="lineno"> 1459</span> </div>
-<div class="line"><a id="l01460" name="l01460"></a><span class="lineno"> 1460</span>template double Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;double, std::uint32_t, 3&gt;&amp;);</div>
-<div class="line"><a id="l01461" name="l01461"></a><span class="lineno"> 1461</span>template float Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;float, std::uint32_t, 3&gt;&amp;);</div>
-<div class="line"><a id="l01462" name="l01462"></a><span class="lineno"> 1462</span>template double Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;double, std::uint64_t, 3&gt;&amp;);</div>
-<div class="line"><a id="l01463" name="l01463"></a><span class="lineno"> 1463</span>template float Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;float, std::uint64_t, 3&gt;&amp;);</div>
-<div class="line"><a id="l01464" name="l01464"></a><span class="lineno"> 1464</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l01465" name="l01465"></a><span class="lineno"> 1465</span>// template Half Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;Half, std::uint32_t, 3&gt;&amp;);</div>
-<div class="line"><a id="l01466" name="l01466"></a><span class="lineno"> 1466</span>// template Half Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;Half, std::uint64_t, 3&gt;&amp;);</div>
-<div class="line"><a id="l01467" name="l01467"></a><span class="lineno"> 1467</span>// #endif</div>
-<div class="line"><a id="l01468" name="l01468"></a><span class="lineno"> 1468</span> </div>
-<div class="line"><a id="l01469" name="l01469"></a><span class="lineno"> 1469</span>template double Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;double, std::uint32_t, 3&gt;, LAFEM::VectorMirror&lt;double, std::uint32_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01470" name="l01470"></a><span class="lineno"> 1470</span>template float Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;float, std::uint32_t, 3&gt;, LAFEM::VectorMirror&lt;float, std::uint32_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01471" name="l01471"></a><span class="lineno"> 1471</span>template double Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;double, std::uint64_t, 3&gt;, LAFEM::VectorMirror&lt;double, std::uint64_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01472" name="l01472"></a><span class="lineno"> 1472</span>template float Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;float, std::uint64_t, 3&gt;, LAFEM::VectorMirror&lt;float, std::uint64_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01473" name="l01473"></a><span class="lineno"> 1473</span>// #ifdef FEAT_HAVE_HALFMATH</div>
-<div class="line"><a id="l01474" name="l01474"></a><span class="lineno"> 1474</span>// template Half Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;Half, std::uint32_t, 3&gt;, LAFEM::VectorMirror&lt;Half, std::uint32_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01475" name="l01475"></a><span class="lineno"> 1475</span>// template Half Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;Half, std::uint64_t, 3&gt;, LAFEM::VectorMirror&lt;Half, std::uint64_t&gt;&gt;&amp;);</div>
-<div class="line"><a id="l01476" name="l01476"></a><span class="lineno"> 1476</span>// #endif</div>
+<div class="line"><a id="l01276" name="l01276"></a><span class="lineno"> 1276</span>      template&lt;typename DT_, typename IT_, int dim_&gt;</div>
+<div class="line"><a id="l01277" name="l01277"></a><span class="lineno"> 1277</span>      DT_ get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;DT_, IT_, dim_&gt;, LAFEM::VectorMirror&lt;DT_, IT_&gt;&gt;&amp; convect)</div>
+<div class="line"><a id="l01278" name="l01278"></a><span class="lineno"> 1278</span>      {</div>
+<div class="line"><a id="l01279" name="l01279"></a><span class="lineno"> 1279</span>        auto local_norm = get_sd_v_norm_host(convect.local());</div>
+<div class="line"><a id="l01280" name="l01280"></a><span class="lineno"> 1280</span>        const auto* gate = convect.get_gate();</div>
+<div class="line"><a id="l01281" name="l01281"></a><span class="lineno"> 1281</span>        if(gate != nullptr)</div>
+<div class="line"><a id="l01282" name="l01282"></a><span class="lineno"> 1282</span>        {</div>
+<div class="line"><a id="l01283" name="l01283"></a><span class="lineno"> 1283</span>          local_norm = gate-&gt;max(local_norm);</div>
+<div class="line"><a id="l01284" name="l01284"></a><span class="lineno"> 1284</span>        }</div>
+<div class="line"><a id="l01285" name="l01285"></a><span class="lineno"> 1285</span>        return local_norm;</div>
+<div class="line"><a id="l01286" name="l01286"></a><span class="lineno"> 1286</span>      }</div>
+<div class="line"><a id="l01287" name="l01287"></a><span class="lineno"> 1287</span> </div>
+<div class="line"><a id="l01288" name="l01288"></a><span class="lineno"> 1288</span>    }</div>
+<div class="line"><a id="l01289" name="l01289"></a><span class="lineno"> 1289</span>  }</div>
+<div class="line"><a id="l01290" name="l01290"></a><span class="lineno"> 1290</span>}</div>
+<div class="line"><a id="l01291" name="l01291"></a><span class="lineno"> 1291</span> </div>
+<div class="line"><a id="l01292" name="l01292"></a><span class="lineno"> 1292</span>using namespace FEAT;</div>
+<div class="line"><a id="l01293" name="l01293"></a><span class="lineno"> 1293</span>using namespace FEAT::VoxelAssembly;</div>
+<div class="line"><a id="l01294" name="l01294"></a><span class="lineno"> 1294</span> </div>
+<div class="line"><a id="l01295" name="l01295"></a><span class="lineno"> 1295</span>/*******************************************************2D implementations***************************************************/</div>
+<div class="line"><a id="l01296" name="l01296"></a><span class="lineno"> 1296</span>template void Arch::assemble_burgers_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01297" name="l01297"></a><span class="lineno"> 1297</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01298" name="l01298"></a><span class="lineno"> 1298</span>template void Arch::assemble_burgers_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01299" name="l01299"></a><span class="lineno"> 1299</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01300" name="l01300"></a><span class="lineno"> 1300</span>template void Arch::assemble_burgers_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01301" name="l01301"></a><span class="lineno"> 1301</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01302" name="l01302"></a><span class="lineno"> 1302</span>template void Arch::assemble_burgers_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01303" name="l01303"></a><span class="lineno"> 1303</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01304" name="l01304"></a><span class="lineno"> 1304</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l01305" name="l01305"></a><span class="lineno"> 1305</span>// template void Arch::assemble_burgers_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;Half, std::uint32_t&gt;&amp;, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01306" name="l01306"></a><span class="lineno"> 1306</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01307" name="l01307"></a><span class="lineno"> 1307</span>// template void Arch::assemble_burgers_csr(const Q2StandardQuad&amp;, const CSRMatrixData&lt;Half, std::uint64_t&gt;&amp;, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01308" name="l01308"></a><span class="lineno"> 1308</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01309" name="l01309"></a><span class="lineno"> 1309</span>// #endif</div>
+<div class="line"><a id="l01310" name="l01310"></a><span class="lineno"> 1310</span> </div>
+<div class="line"><a id="l01311" name="l01311"></a><span class="lineno"> 1311</span>template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01312" name="l01312"></a><span class="lineno"> 1312</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;);</div>
+<div class="line"><a id="l01313" name="l01313"></a><span class="lineno"> 1313</span>template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01314" name="l01314"></a><span class="lineno"> 1314</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;);</div>
+<div class="line"><a id="l01315" name="l01315"></a><span class="lineno"> 1315</span>template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01316" name="l01316"></a><span class="lineno"> 1316</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;);</div>
+<div class="line"><a id="l01317" name="l01317"></a><span class="lineno"> 1317</span>template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01318" name="l01318"></a><span class="lineno"> 1318</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;);</div>
+<div class="line"><a id="l01319" name="l01319"></a><span class="lineno"> 1319</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l01320" name="l01320"></a><span class="lineno"> 1320</span>// template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;Half, std::uint32_t&gt;&amp;, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01321" name="l01321"></a><span class="lineno"> 1321</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;);</div>
+<div class="line"><a id="l01322" name="l01322"></a><span class="lineno"> 1322</span>// template void Arch::assemble_burgers_csr_host(const Q2StandardQuad&amp;, const CSRMatrixData&lt;Half, std::uint64_t&gt;&amp;, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01323" name="l01323"></a><span class="lineno"> 1323</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;);</div>
+<div class="line"><a id="l01324" name="l01324"></a><span class="lineno"> 1324</span>// #endif</div>
+<div class="line"><a id="l01325" name="l01325"></a><span class="lineno"> 1325</span> </div>
+<div class="line"><a id="l01326" name="l01326"></a><span class="lineno"> 1326</span>template void Arch::assemble_burgers_defect(const Q2StandardQuad&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01327" name="l01327"></a><span class="lineno"> 1327</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01328" name="l01328"></a><span class="lineno"> 1328</span>template void Arch::assemble_burgers_defect(const Q2StandardQuad&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01329" name="l01329"></a><span class="lineno"> 1329</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01330" name="l01330"></a><span class="lineno"> 1330</span>template void Arch::assemble_burgers_defect(const Q2StandardQuad&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01331" name="l01331"></a><span class="lineno"> 1331</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01332" name="l01332"></a><span class="lineno"> 1332</span>template void Arch::assemble_burgers_defect(const Q2StandardQuad&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01333" name="l01333"></a><span class="lineno"> 1333</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01334" name="l01334"></a><span class="lineno"> 1334</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l01335" name="l01335"></a><span class="lineno"> 1335</span>// template void Arch::assemble_burgers_defect(const Q2StandardQuad&amp;, Half*, const Half*, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01336" name="l01336"></a><span class="lineno"> 1336</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01337" name="l01337"></a><span class="lineno"> 1337</span>// template void Arch::assemble_burgers_defect(const Q2StandardQuad&amp;, Half*, const Half*, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01338" name="l01338"></a><span class="lineno"> 1338</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01339" name="l01339"></a><span class="lineno"> 1339</span>// #endif</div>
+<div class="line"><a id="l01340" name="l01340"></a><span class="lineno"> 1340</span> </div>
+<div class="line"><a id="l01341" name="l01341"></a><span class="lineno"> 1341</span>template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01342" name="l01342"></a><span class="lineno"> 1342</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;);</div>
+<div class="line"><a id="l01343" name="l01343"></a><span class="lineno"> 1343</span>template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01344" name="l01344"></a><span class="lineno"> 1344</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;);</div>
+<div class="line"><a id="l01345" name="l01345"></a><span class="lineno"> 1345</span>template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01346" name="l01346"></a><span class="lineno"> 1346</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;);</div>
+<div class="line"><a id="l01347" name="l01347"></a><span class="lineno"> 1347</span>template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01348" name="l01348"></a><span class="lineno"> 1348</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;);</div>
+<div class="line"><a id="l01349" name="l01349"></a><span class="lineno"> 1349</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l01350" name="l01350"></a><span class="lineno"> 1350</span>// template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&amp;, Half*, const Half*, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01351" name="l01351"></a><span class="lineno"> 1351</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;);</div>
+<div class="line"><a id="l01352" name="l01352"></a><span class="lineno"> 1352</span>// template void Arch::assemble_burgers_defect_host(const Q2StandardQuad&amp;, Half*, const Half*, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01353" name="l01353"></a><span class="lineno"> 1353</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;);</div>
+<div class="line"><a id="l01354" name="l01354"></a><span class="lineno"> 1354</span>// #endif</div>
+<div class="line"><a id="l01355" name="l01355"></a><span class="lineno"> 1355</span> </div>
+<div class="line"><a id="l01356" name="l01356"></a><span class="lineno"> 1356</span>template double Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;double, std::uint32_t, 2&gt;&amp;);</div>
+<div class="line"><a id="l01357" name="l01357"></a><span class="lineno"> 1357</span>template float Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;float, std::uint32_t, 2&gt;&amp;);</div>
+<div class="line"><a id="l01358" name="l01358"></a><span class="lineno"> 1358</span>template double Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;double, std::uint64_t, 2&gt;&amp;);</div>
+<div class="line"><a id="l01359" name="l01359"></a><span class="lineno"> 1359</span>template float Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;float, std::uint64_t, 2&gt;&amp;);</div>
+<div class="line"><a id="l01360" name="l01360"></a><span class="lineno"> 1360</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l01361" name="l01361"></a><span class="lineno"> 1361</span>// template Half Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;Half, std::uint32_t, 2&gt;&amp;);</div>
+<div class="line"><a id="l01362" name="l01362"></a><span class="lineno"> 1362</span>// template Half Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;Half, std::uint64_t, 2&gt;&amp;);</div>
+<div class="line"><a id="l01363" name="l01363"></a><span class="lineno"> 1363</span>// #endif</div>
+<div class="line"><a id="l01364" name="l01364"></a><span class="lineno"> 1364</span> </div>
+<div class="line"><a id="l01365" name="l01365"></a><span class="lineno"> 1365</span>template double Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;double, std::uint32_t, 2&gt;, LAFEM::VectorMirror&lt;double, std::uint32_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01366" name="l01366"></a><span class="lineno"> 1366</span>template float Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;float, std::uint32_t, 2&gt;, LAFEM::VectorMirror&lt;float, std::uint32_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01367" name="l01367"></a><span class="lineno"> 1367</span>template double Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;double, std::uint64_t, 2&gt;, LAFEM::VectorMirror&lt;double, std::uint64_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01368" name="l01368"></a><span class="lineno"> 1368</span>template float Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;float, std::uint64_t, 2&gt;, LAFEM::VectorMirror&lt;float, std::uint64_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01369" name="l01369"></a><span class="lineno"> 1369</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l01370" name="l01370"></a><span class="lineno"> 1370</span>// template Half Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;Half, std::uint32_t, 2&gt;, LAFEM::VectorMirror&lt;Half, std::uint32_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01371" name="l01371"></a><span class="lineno"> 1371</span>// template Half Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;Half, std::uint64_t, 2&gt;, LAFEM::VectorMirror&lt;Half, std::uint64_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01372" name="l01372"></a><span class="lineno"> 1372</span>// #endif</div>
+<div class="line"><a id="l01373" name="l01373"></a><span class="lineno"> 1373</span> </div>
+<div class="line"><a id="l01374" name="l01374"></a><span class="lineno"> 1374</span>template double Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;double, std::uint32_t, 2&gt;&amp;);</div>
+<div class="line"><a id="l01375" name="l01375"></a><span class="lineno"> 1375</span>template float Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;float, std::uint32_t, 2&gt;&amp;);</div>
+<div class="line"><a id="l01376" name="l01376"></a><span class="lineno"> 1376</span>template double Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;double, std::uint64_t, 2&gt;&amp;);</div>
+<div class="line"><a id="l01377" name="l01377"></a><span class="lineno"> 1377</span>template float Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;float, std::uint64_t, 2&gt;&amp;);</div>
+<div class="line"><a id="l01378" name="l01378"></a><span class="lineno"> 1378</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l01379" name="l01379"></a><span class="lineno"> 1379</span>// template Half Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;Half, std::uint32_t, 2&gt;&amp;);</div>
+<div class="line"><a id="l01380" name="l01380"></a><span class="lineno"> 1380</span>// template Half Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;Half, std::uint64_t, 2&gt;&amp;);</div>
+<div class="line"><a id="l01381" name="l01381"></a><span class="lineno"> 1381</span>// #endif</div>
+<div class="line"><a id="l01382" name="l01382"></a><span class="lineno"> 1382</span> </div>
+<div class="line"><a id="l01383" name="l01383"></a><span class="lineno"> 1383</span>template double Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;double, std::uint32_t, 2&gt;, LAFEM::VectorMirror&lt;double, std::uint32_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01384" name="l01384"></a><span class="lineno"> 1384</span>template float Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;float, std::uint32_t, 2&gt;, LAFEM::VectorMirror&lt;float, std::uint32_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01385" name="l01385"></a><span class="lineno"> 1385</span>template double Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;double, std::uint64_t, 2&gt;, LAFEM::VectorMirror&lt;double, std::uint64_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01386" name="l01386"></a><span class="lineno"> 1386</span>template float Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;float, std::uint64_t, 2&gt;, LAFEM::VectorMirror&lt;float, std::uint64_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01387" name="l01387"></a><span class="lineno"> 1387</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l01388" name="l01388"></a><span class="lineno"> 1388</span>// template Half Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;Half, std::uint32_t, 2&gt;, LAFEM::VectorMirror&lt;Half, std::uint32_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01389" name="l01389"></a><span class="lineno"> 1389</span>// template Half Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;Half, std::uint64_t, 2&gt;, LAFEM::VectorMirror&lt;Half, std::uint64_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01390" name="l01390"></a><span class="lineno"> 1390</span>// #endif</div>
+<div class="line"><a id="l01391" name="l01391"></a><span class="lineno"> 1391</span> </div>
+<div class="line"><a id="l01392" name="l01392"></a><span class="lineno"> 1392</span>/*********************************************************3D implementations**************************************************************************************/</div>
+<div class="line"><a id="l01393" name="l01393"></a><span class="lineno"> 1393</span> </div>
+<div class="line"><a id="l01394" name="l01394"></a><span class="lineno"> 1394</span>template void Arch::assemble_burgers_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01395" name="l01395"></a><span class="lineno"> 1395</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01396" name="l01396"></a><span class="lineno"> 1396</span>template void Arch::assemble_burgers_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01397" name="l01397"></a><span class="lineno"> 1397</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01398" name="l01398"></a><span class="lineno"> 1398</span>template void Arch::assemble_burgers_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01399" name="l01399"></a><span class="lineno"> 1399</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01400" name="l01400"></a><span class="lineno"> 1400</span>template void Arch::assemble_burgers_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01401" name="l01401"></a><span class="lineno"> 1401</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01402" name="l01402"></a><span class="lineno"> 1402</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l01403" name="l01403"></a><span class="lineno"> 1403</span>// template void Arch::assemble_burgers_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;Half, std::uint32_t&gt;&amp;, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01404" name="l01404"></a><span class="lineno"> 1404</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01405" name="l01405"></a><span class="lineno"> 1405</span>// template void Arch::assemble_burgers_csr(const Q2StandardHexa&amp;, const CSRMatrixData&lt;Half, std::uint64_t&gt;&amp;, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01406" name="l01406"></a><span class="lineno"> 1406</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01407" name="l01407"></a><span class="lineno"> 1407</span>// #endif</div>
+<div class="line"><a id="l01408" name="l01408"></a><span class="lineno"> 1408</span> </div>
+<div class="line"><a id="l01409" name="l01409"></a><span class="lineno"> 1409</span>template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint32_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01410" name="l01410"></a><span class="lineno"> 1410</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;);</div>
+<div class="line"><a id="l01411" name="l01411"></a><span class="lineno"> 1411</span>template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint32_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01412" name="l01412"></a><span class="lineno"> 1412</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;);</div>
+<div class="line"><a id="l01413" name="l01413"></a><span class="lineno"> 1413</span>template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;double, std::uint64_t&gt;&amp;, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01414" name="l01414"></a><span class="lineno"> 1414</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;);</div>
+<div class="line"><a id="l01415" name="l01415"></a><span class="lineno"> 1415</span>template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;float, std::uint64_t&gt;&amp;, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01416" name="l01416"></a><span class="lineno"> 1416</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;);</div>
+<div class="line"><a id="l01417" name="l01417"></a><span class="lineno"> 1417</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l01418" name="l01418"></a><span class="lineno"> 1418</span>// template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;Half, std::uint32_t&gt;&amp;, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01419" name="l01419"></a><span class="lineno"> 1419</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;);</div>
+<div class="line"><a id="l01420" name="l01420"></a><span class="lineno"> 1420</span>// template void Arch::assemble_burgers_csr_host(const Q2StandardHexa&amp;, const CSRMatrixData&lt;Half, std::uint64_t&gt;&amp;, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01421" name="l01421"></a><span class="lineno"> 1421</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;);</div>
+<div class="line"><a id="l01422" name="l01422"></a><span class="lineno"> 1422</span>// #endif</div>
+<div class="line"><a id="l01423" name="l01423"></a><span class="lineno"> 1423</span> </div>
+<div class="line"><a id="l01424" name="l01424"></a><span class="lineno"> 1424</span>template void Arch::assemble_burgers_defect(const Q2StandardHexa&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01425" name="l01425"></a><span class="lineno"> 1425</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01426" name="l01426"></a><span class="lineno"> 1426</span>template void Arch::assemble_burgers_defect(const Q2StandardHexa&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01427" name="l01427"></a><span class="lineno"> 1427</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01428" name="l01428"></a><span class="lineno"> 1428</span>template void Arch::assemble_burgers_defect(const Q2StandardHexa&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01429" name="l01429"></a><span class="lineno"> 1429</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01430" name="l01430"></a><span class="lineno"> 1430</span>template void Arch::assemble_burgers_defect(const Q2StandardHexa&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01431" name="l01431"></a><span class="lineno"> 1431</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01432" name="l01432"></a><span class="lineno"> 1432</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l01433" name="l01433"></a><span class="lineno"> 1433</span>// template void Arch::assemble_burgers_defect(const Q2StandardHexa&amp;, Half*, const Half*, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01434" name="l01434"></a><span class="lineno"> 1434</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01435" name="l01435"></a><span class="lineno"> 1435</span>// template void Arch::assemble_burgers_defect(const Q2StandardHexa&amp;, Half*, const Half*, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01436" name="l01436"></a><span class="lineno"> 1436</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;, const Util::RuntimeParameter&amp;);</div>
+<div class="line"><a id="l01437" name="l01437"></a><span class="lineno"> 1437</span>// #endif</div>
+<div class="line"><a id="l01438" name="l01438"></a><span class="lineno"> 1438</span> </div>
+<div class="line"><a id="l01439" name="l01439"></a><span class="lineno"> 1439</span>template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01440" name="l01440"></a><span class="lineno"> 1440</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;);</div>
+<div class="line"><a id="l01441" name="l01441"></a><span class="lineno"> 1441</span>template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01442" name="l01442"></a><span class="lineno"> 1442</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;);</div>
+<div class="line"><a id="l01443" name="l01443"></a><span class="lineno"> 1443</span>template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&amp;, double*, const double*, const double*, const AssemblyCubatureData&lt;double&gt;&amp;, const AssemblyMappingData&lt;double, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01444" name="l01444"></a><span class="lineno"> 1444</span>                                          const Adjacency::ColoringDataHandler&amp;, double, const AssemblyBurgersData&lt;double&gt;&amp;);</div>
+<div class="line"><a id="l01445" name="l01445"></a><span class="lineno"> 1445</span>template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&amp;, float*, const float*, const float*, const AssemblyCubatureData&lt;float&gt;&amp;, const AssemblyMappingData&lt;float, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01446" name="l01446"></a><span class="lineno"> 1446</span>                                          const Adjacency::ColoringDataHandler&amp;, float, const AssemblyBurgersData&lt;float&gt;&amp;);</div>
+<div class="line"><a id="l01447" name="l01447"></a><span class="lineno"> 1447</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l01448" name="l01448"></a><span class="lineno"> 1448</span>// template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&amp;, Half*, const Half*, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint32_t&gt;&amp;,</div>
+<div class="line"><a id="l01449" name="l01449"></a><span class="lineno"> 1449</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;);</div>
+<div class="line"><a id="l01450" name="l01450"></a><span class="lineno"> 1450</span>// template void Arch::assemble_burgers_defect_host(const Q2StandardHexa&amp;, Half*, const Half*, const Half*, const AssemblyCubatureData&lt;Half&gt;&amp;, const AssemblyMappingData&lt;Half, std::uint64_t&gt;&amp;,</div>
+<div class="line"><a id="l01451" name="l01451"></a><span class="lineno"> 1451</span>//                                           const Adjacency::ColoringDataHandler&amp;, Half, const AssemblyBurgersData&lt;Half&gt;&amp;);</div>
+<div class="line"><a id="l01452" name="l01452"></a><span class="lineno"> 1452</span>// #endif</div>
+<div class="line"><a id="l01453" name="l01453"></a><span class="lineno"> 1453</span> </div>
+<div class="line"><a id="l01454" name="l01454"></a><span class="lineno"> 1454</span>template double Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;double, std::uint32_t, 3&gt;&amp;);</div>
+<div class="line"><a id="l01455" name="l01455"></a><span class="lineno"> 1455</span>template float Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;float, std::uint32_t, 3&gt;&amp;);</div>
+<div class="line"><a id="l01456" name="l01456"></a><span class="lineno"> 1456</span>template double Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;double, std::uint64_t, 3&gt;&amp;);</div>
+<div class="line"><a id="l01457" name="l01457"></a><span class="lineno"> 1457</span>template float Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;float, std::uint64_t, 3&gt;&amp;);</div>
+<div class="line"><a id="l01458" name="l01458"></a><span class="lineno"> 1458</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l01459" name="l01459"></a><span class="lineno"> 1459</span>// template Half Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;Half, std::uint32_t, 3&gt;&amp;);</div>
+<div class="line"><a id="l01460" name="l01460"></a><span class="lineno"> 1460</span>// template Half Arch::get_sd_v_norm(const LAFEM::DenseVectorBlocked&lt;Half, std::uint64_t, 3&gt;&amp;);</div>
+<div class="line"><a id="l01461" name="l01461"></a><span class="lineno"> 1461</span>// #endif</div>
+<div class="line"><a id="l01462" name="l01462"></a><span class="lineno"> 1462</span> </div>
+<div class="line"><a id="l01463" name="l01463"></a><span class="lineno"> 1463</span>template double Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;double, std::uint32_t, 3&gt;, LAFEM::VectorMirror&lt;double, std::uint32_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01464" name="l01464"></a><span class="lineno"> 1464</span>template float Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;float, std::uint32_t, 3&gt;, LAFEM::VectorMirror&lt;float, std::uint32_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01465" name="l01465"></a><span class="lineno"> 1465</span>template double Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;double, std::uint64_t, 3&gt;, LAFEM::VectorMirror&lt;double, std::uint64_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01466" name="l01466"></a><span class="lineno"> 1466</span>template float Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;float, std::uint64_t, 3&gt;, LAFEM::VectorMirror&lt;float, std::uint64_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01467" name="l01467"></a><span class="lineno"> 1467</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l01468" name="l01468"></a><span class="lineno"> 1468</span>// template Half Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;Half, std::uint32_t, 3&gt;, LAFEM::VectorMirror&lt;Half, std::uint32_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01469" name="l01469"></a><span class="lineno"> 1469</span>// template Half Arch::get_sd_v_norm(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;Half, std::uint64_t, 3&gt;, LAFEM::VectorMirror&lt;Half, std::uint64_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01470" name="l01470"></a><span class="lineno"> 1470</span>// #endif</div>
+<div class="line"><a id="l01471" name="l01471"></a><span class="lineno"> 1471</span> </div>
+<div class="line"><a id="l01472" name="l01472"></a><span class="lineno"> 1472</span>template double Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;double, std::uint32_t, 3&gt;&amp;);</div>
+<div class="line"><a id="l01473" name="l01473"></a><span class="lineno"> 1473</span>template float Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;float, std::uint32_t, 3&gt;&amp;);</div>
+<div class="line"><a id="l01474" name="l01474"></a><span class="lineno"> 1474</span>template double Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;double, std::uint64_t, 3&gt;&amp;);</div>
+<div class="line"><a id="l01475" name="l01475"></a><span class="lineno"> 1475</span>template float Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;float, std::uint64_t, 3&gt;&amp;);</div>
+<div class="line"><a id="l01476" name="l01476"></a><span class="lineno"> 1476</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l01477" name="l01477"></a><span class="lineno"> 1477</span>// template Half Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;Half, std::uint32_t, 3&gt;&amp;);</div>
+<div class="line"><a id="l01478" name="l01478"></a><span class="lineno"> 1478</span>// template Half Arch::get_sd_v_norm_host(const LAFEM::DenseVectorBlocked&lt;Half, std::uint64_t, 3&gt;&amp;);</div>
+<div class="line"><a id="l01479" name="l01479"></a><span class="lineno"> 1479</span>// #endif</div>
+<div class="line"><a id="l01480" name="l01480"></a><span class="lineno"> 1480</span> </div>
+<div class="line"><a id="l01481" name="l01481"></a><span class="lineno"> 1481</span>template double Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;double, std::uint32_t, 3&gt;, LAFEM::VectorMirror&lt;double, std::uint32_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01482" name="l01482"></a><span class="lineno"> 1482</span>template float Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;float, std::uint32_t, 3&gt;, LAFEM::VectorMirror&lt;float, std::uint32_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01483" name="l01483"></a><span class="lineno"> 1483</span>template double Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;double, std::uint64_t, 3&gt;, LAFEM::VectorMirror&lt;double, std::uint64_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01484" name="l01484"></a><span class="lineno"> 1484</span>template float Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;float, std::uint64_t, 3&gt;, LAFEM::VectorMirror&lt;float, std::uint64_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01485" name="l01485"></a><span class="lineno"> 1485</span>// #ifdef FEAT_HAVE_HALFMATH</div>
+<div class="line"><a id="l01486" name="l01486"></a><span class="lineno"> 1486</span>// template Half Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;Half, std::uint32_t, 3&gt;, LAFEM::VectorMirror&lt;Half, std::uint32_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01487" name="l01487"></a><span class="lineno"> 1487</span>// template Half Arch::get_sd_v_norm_host(const Global::Vector&lt;LAFEM::DenseVectorBlocked&lt;Half, std::uint64_t, 3&gt;, LAFEM::VectorMirror&lt;Half, std::uint64_t&gt;&gt;&amp;);</div>
+<div class="line"><a id="l01488" name="l01488"></a><span class="lineno"> 1488</span>// #endif</div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

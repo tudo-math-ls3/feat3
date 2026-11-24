@@ -33,7 +33,7 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix =
     [ "create_vector_l", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a1144aaad59f574dc66d41371e8dfc2c4", null ],
     [ "create_vector_r", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a7266a90fb4f055407b1099fdded81629", null ],
     [ "extract_diag", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#ac9a4c080eb891fa38703cd1aac14667b", null ],
-    [ "format", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a9a664a73050d0e893acf5b07dc2a5771", null ],
+    [ "format", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#ae080dc893df3db2675c1ada79de71b9a", null ],
     [ "get_checkpoint_size", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a9af63e9c43016f311b9d869950ea3097", null ],
     [ "max_rel_diff", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#a379d7845518210a5aa3999285ee84389", null ],
     [ "name", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html#ac035545e02805294a10e9d90960cc305", null ],

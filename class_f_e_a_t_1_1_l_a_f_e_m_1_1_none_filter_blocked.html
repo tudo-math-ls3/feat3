@@ -103,6 +103,7 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_f
   <div class="summary">
 <a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pub-attribs">Public Attributes</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">FEAT::LAFEM::NoneFilterBlocked&lt; DataType_, IndexType_, block_size_ &gt; Class Template Reference</div></div>
@@ -164,6 +165,18 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa0e0dbe2558dc322bea63e6ad3d47fdd"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html#aa0e0dbe2558dc322bea63e6ad3d47fdd">filter_sol</a> (<a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html#aa7218fb1e555579a04985a734fdb0a39">VectorType</a> &amp;vector) const</td></tr>
 <tr class="memdesc:aa0e0dbe2558dc322bea63e6ad3d47fdd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Applies the filter onto the solution vector.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html#aa0e0dbe2558dc322bea63e6ad3d47fdd">More...</a><br /></td></tr>
 <tr class="separator:aa0e0dbe2558dc322bea63e6ad3d47fdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a38c2f462ea887cc1dff8dbfe9e7af7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html#a4a38c2f462ea887cc1dff8dbfe9e7af7">size</a> () const</td></tr>
+<tr class="memdesc:a4a38c2f462ea887cc1dff8dbfe9e7af7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets optional size information.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html#a4a38c2f462ea887cc1dff8dbfe9e7af7">More...</a><br /></td></tr>
+<tr class="separator:a4a38c2f462ea887cc1dff8dbfe9e7af7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac8bd8a39dbf7033853f69d9f8a67020b"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html#ac8bd8a39dbf7033853f69d9f8a67020b">size_raw</a> () const</td></tr>
+<tr class="memdesc:ac8bd8a39dbf7033853f69d9f8a67020b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Gets optional raw size information.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html#ac8bd8a39dbf7033853f69d9f8a67020b">More...</a><br /></td></tr>
+<tr class="separator:ac8bd8a39dbf7033853f69d9f8a67020b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
+Public Attributes</h2></td></tr>
+<tr class="memitem:a94ed6521a98fdb070765fdb942551570"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html#a94ed6521a98fdb070765fdb942551570">size_info</a> = 0u</td></tr>
+<tr class="memdesc:a94ed6521a98fdb070765fdb942551570"><td class="mdescLeft">&#160;</td><td class="mdescRight">Size of the space this filter usually acts upon, to be set by user.  <a href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html#a94ed6521a98fdb070765fdb942551570">More...</a><br /></td></tr>
+<tr class="separator:a94ed6521a98fdb070765fdb942551570"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-static-attribs" name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -177,7 +190,7 @@ class FEAT::LAFEM::NoneFilterBlocked&lt; DataType_, IndexType_, block_size_ &gt;
 <dl class="section note"><dt>Note</dt><dd>Not to be confused with <em>do-nothing boundary conditions</em>.</dd></dl>
 <dl class="section author"><dt>Author</dt><dd>Peter Zajac </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00139">139</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00166">166</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a4cecfebcc2b9b291b05087c321d18aac" name="a4cecfebcc2b9b291b05087c321d18aac"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4cecfebcc2b9b291b05087c321d18aac">&#9670;&#160;</a></span>DataType</h2>
@@ -195,7 +208,7 @@ template&lt;typename DataType_ , typename IndexType_ , int block_size_&gt; </div
 
 <p>data-type typedef </p>
 
-<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00143">143</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00170">170</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
 
 </div>
 </div>
@@ -217,7 +230,7 @@ template&lt;typename DT2_  = DataType_, typename IT2_  = IndexType_, int BS_ = b
 
 <p>Our 'base' class type. </p>
 
-<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00154">154</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00181">181</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
 
 </div>
 </div>
@@ -239,7 +252,7 @@ template&lt;typename DataType2_ , typename IndexType2_ , int block_size2_&gt; </
 
 <p>this typedef lets you create a filter with different Data and Index types </p>
 
-<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00158">158</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00185">185</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
 
 </div>
 </div>
@@ -259,7 +272,7 @@ template&lt;typename DataType_ , typename IndexType_ , int block_size_&gt; </div
 
 <p>index-type typedef </p>
 
-<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00145">145</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00172">172</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
 
 </div>
 </div>
@@ -279,7 +292,7 @@ template&lt;typename DataType_ , typename IndexType_ , int block_size_&gt; </div
 
 <p>our supported vector type </p>
 
-<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00150">150</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00177">177</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
 
 </div>
 </div>
@@ -311,7 +324,7 @@ template&lt;typename DataType_ , typename IndexType_ , int block_size_&gt; </div
 
 <p>Returns the total amount of bytes allocated. </p>
 
-<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00178">178</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00208">208</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
 
 </div>
 </div>
@@ -343,7 +356,7 @@ template&lt;typename DataType_ , typename IndexType_ , int block_size_&gt; </div
 
 <p>Creates a (empty) clone of itself. </p>
 
-<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00161">161</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00191">191</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
 
 </div>
 </div>
@@ -385,7 +398,7 @@ template&lt;typename DataType_ , typename IndexType_ , int block_size_&gt; </div
 
 <p>Clones data from another <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html" title="Blocked None Filter class template.">NoneFilterBlocked</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00167">167</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00197">197</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
 
 </div>
 </div>
@@ -417,7 +430,7 @@ template&lt;typename DT2_ , typename IT2_ &gt; </div>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00173">173</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00203">203</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
 
 </div>
 </div>
@@ -455,7 +468,7 @@ template&lt;typename DataType_ , typename IndexType_ , int block_size_&gt; </div
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00219">219</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00249">249</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
 
 </div>
 </div>
@@ -493,7 +506,7 @@ template&lt;typename DataType_ , typename IndexType_ , int block_size_&gt; </div
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00209">209</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00239">239</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
 
 </div>
 </div>
@@ -533,7 +546,7 @@ template&lt;typename MT_ &gt; </div>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00230">230</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00260">260</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
 
 </div>
 </div>
@@ -571,7 +584,7 @@ template&lt;typename DataType_ , typename IndexType_ , int block_size_&gt; </div
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00189">189</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00219">219</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
 
 </div>
 </div>
@@ -609,7 +622,77 @@ template&lt;typename DataType_ , typename IndexType_ , int block_size_&gt; </div
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00199">199</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00229">229</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a4a38c2f462ea887cc1dff8dbfe9e7af7" name="a4a38c2f462ea887cc1dff8dbfe9e7af7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a38c2f462ea887cc1dff8dbfe9e7af7">&#9670;&#160;</a></span>size()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename DataType_ , typename IndexType_ , int block_size_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html">FEAT::LAFEM::NoneFilterBlocked</a>&lt; DataType_, IndexType_, block_size_ &gt;::size </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets optional size information. </p>
+<p >Return an internal size value, set by the user, necessary to track sizes when iterating through filter chains</p>
+<dl class="section return"><dt>Returns</dt><dd>Size of the underlying space </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00271">271</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="none__filter_8hpp_source.html#l00188">FEAT::LAFEM::NoneFilterBlocked&lt; DataType_, IndexType_, block_size_ &gt;::size_info</a>.</p>
+
+</div>
+</div>
+<a id="ac8bd8a39dbf7033853f69d9f8a67020b" name="ac8bd8a39dbf7033853f69d9f8a67020b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac8bd8a39dbf7033853f69d9f8a67020b">&#9670;&#160;</a></span>size_raw()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename DataType_ , typename IndexType_ , int block_size_&gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html">FEAT::LAFEM::NoneFilterBlocked</a>&lt; DataType_, IndexType_, block_size_ &gt;::size_raw </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Gets optional raw size information. </p>
+<p >Return an internal size value, set by the user, necessary to track sizes when iterating through filter chains</p>
+<dl class="section return"><dt>Returns</dt><dd>Raw size of the underlying dofs </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00283">283</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+
+<p class="reference">References <a class="el" href="none__filter_8hpp_source.html#l00188">FEAT::LAFEM::NoneFilterBlocked&lt; DataType_, IndexType_, block_size_ &gt;::size_info</a>.</p>
 
 </div>
 </div>
@@ -636,7 +719,29 @@ template&lt;typename DataType_ , typename IndexType_ , int block_size_&gt; </div
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00147">147</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00174">174</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a94ed6521a98fdb070765fdb942551570" name="a94ed6521a98fdb070765fdb942551570"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a94ed6521a98fdb070765fdb942551570">&#9670;&#160;</a></span>size_info</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename DataType_ , typename IndexType_ , int block_size_&gt; </div>
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="namespace_f_e_a_t.html#aea15318a59381180ea8b771242a3bbe1">Index</a> <a class="el" href="class_f_e_a_t_1_1_l_a_f_e_m_1_1_none_filter_blocked.html">FEAT::LAFEM::NoneFilterBlocked</a>&lt; DataType_, IndexType_, block_size_ &gt;::size_info = 0u</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Size of the space this filter usually acts upon, to be set by user. </p>
+
+<p class="definition">Definition at line <a class="el" href="none__filter_8hpp_source.html#l00188">188</a> of file <a class="el" href="none__filter_8hpp_source.html">none_filter.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="none__filter_8hpp_source.html#l00271">FEAT::LAFEM::NoneFilterBlocked&lt; DataType_, IndexType_, block_size_ &gt;::size()</a>, and <a class="el" href="none__filter_8hpp_source.html#l00283">FEAT::LAFEM::NoneFilterBlocked&lt; DataType_, IndexType_, block_size_ &gt;::size_raw()</a>.</p>
 
 </div>
 </div>

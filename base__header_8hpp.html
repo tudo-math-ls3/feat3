@@ -104,6 +104,7 @@ $(document).ready(function(){initNavTree('base__header_8hpp.html',''); initResiz
 <a href="#namespaces">Namespaces</a> &#124;
 <a href="#define-members">Macros</a> &#124;
 <a href="#typedef-members">Typedefs</a> &#124;
+<a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle"><div class="title">base_header.hpp File Reference</div></div>
 </div><!--header-->
@@ -118,6 +119,7 @@ $(document).ready(function(){initNavTree('base__header_8hpp.html',''); initResiz
 <code>#include &lt;<a class="el" href="compiler__cray_8hpp_source.html">kernel/util/compiler_cray.hpp</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="compiler__microsoft_8hpp_source.html">kernel/util/compiler_microsoft.hpp</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="compiler__gnu_8hpp_source.html">kernel/util/compiler_gnu.hpp</a>&gt;</code><br />
+<code>#include &lt;type_traits&gt;</code><br />
 <code>#include &lt;cstdint&gt;</code><br />
 </div>
 <p><a href="base__header_8hpp_source.html">Go to the source code of this file.</a></p>
@@ -137,15 +139,25 @@ Typedefs</h2></td></tr>
 <tr class="memdesc:a36baa4de7876ef0ecb7c1e44cb88d7e9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Real data type.  <a href="namespace_f_e_a_t.html#a36baa4de7876ef0ecb7c1e44cb88d7e9">More...</a><br /></td></tr>
 <tr class="separator:a36baa4de7876ef0ecb7c1e44cb88d7e9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
+Functions</h2></td></tr>
+<tr class="memitem:ad7f418c1baa13c2f0bb9235a83a98433"><td class="memTemplParams" colspan="2">template&lt;typename E &gt; </td></tr>
+<tr class="memitem:ad7f418c1baa13c2f0bb9235a83a98433"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#ad7f418c1baa13c2f0bb9235a83a98433">FEAT::to_underlying</a> (E e) noexcept</td></tr>
+<tr class="memdesc:ad7f418c1baa13c2f0bb9235a83a98433"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast enum to underlying type.  <a href="namespace_f_e_a_t.html#ad7f418c1baa13c2f0bb9235a83a98433">More...</a><br /></td></tr>
+<tr class="separator:ad7f418c1baa13c2f0bb9235a83a98433"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:a211e907fb27932e0db7e41722695ad6a"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#a211e907fb27932e0db7e41722695ad6a">FEAT::async_operations</a> = false</td></tr>
+<tr class="memdesc:a211e907fb27932e0db7e41722695ad6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Controls if asynchronous operations should be used by default.  <a href="namespace_f_e_a_t.html#a211e907fb27932e0db7e41722695ad6a">More...</a><br /></td></tr>
+<tr class="separator:a211e907fb27932e0db7e41722695ad6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a915f550e5e25f665a148950f1ae4e249"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#a915f550e5e25f665a148950f1ae4e249">FEAT::version_major</a> = 3</td></tr>
 <tr class="memdesc:a915f550e5e25f665a148950f1ae4e249"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> major version number.  <a href="namespace_f_e_a_t.html#a915f550e5e25f665a148950f1ae4e249">More...</a><br /></td></tr>
 <tr class="separator:a915f550e5e25f665a148950f1ae4e249"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aadedb307b3e7ac10f521c388fe78eb34"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#aadedb307b3e7ac10f521c388fe78eb34">FEAT::version_minor</a> = 2026</td></tr>
 <tr class="memdesc:aadedb307b3e7ac10f521c388fe78eb34"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> minor version number (year)  <a href="namespace_f_e_a_t.html#aadedb307b3e7ac10f521c388fe78eb34">More...</a><br /></td></tr>
 <tr class="separator:aadedb307b3e7ac10f521c388fe78eb34"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaae2520d89ae4daec4069ccbe29a33b7"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#aaae2520d89ae4daec4069ccbe29a33b7">FEAT::version_patch</a> = 6</td></tr>
+<tr class="memitem:aaae2520d89ae4daec4069ccbe29a33b7"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#aaae2520d89ae4daec4069ccbe29a33b7">FEAT::version_patch</a> = 11</td></tr>
 <tr class="memdesc:aaae2520d89ae4daec4069ccbe29a33b7"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> patch version number (month)  <a href="namespace_f_e_a_t.html#aaae2520d89ae4daec4069ccbe29a33b7">More...</a><br /></td></tr>
 <tr class="separator:aaae2520d89ae4daec4069ccbe29a33b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -167,7 +179,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00152">152</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00177">177</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
 
 </div>
 </div>
@@ -183,7 +195,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00151">151</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00176">176</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
 
 </div>
 </div>
@@ -199,7 +211,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00153">153</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00178">178</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
 
 </div>
 </div>

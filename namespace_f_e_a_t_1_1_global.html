@@ -102,6 +102,7 @@ $(document).ready(function(){initNavTree('namespace_f_e_a_t_1_1_global.html','')
 <div class="header">
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
+<a href="#enum-members">Enumerations</a> &#124;
 <a href="#func-members">Functions</a>  </div>
   <div class="headertitle"><div class="title">FEAT::Global Namespace Reference</div></div>
 </div><!--header-->
@@ -118,8 +119,14 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti_system.html">AlgDofPartiSystem</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Algebraic DOF partitioning linear system conversion class.  <a href="class_f_e_a_t_1_1_global_1_1_alg_dof_parti_system.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_discrete_evaluator.html">DiscreteEvaluator</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t_1_1_global.html" title="Global linear algebra namespace.">Global</a> discrete evaluator.  <a href="class_f_e_a_t_1_1_global_1_1_discrete_evaluator.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_filter.html">Filter</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t_1_1_global.html" title="Global linear algebra namespace.">Global</a> <a class="el" href="class_f_e_a_t_1_1_global_1_1_filter.html" title="Global Filter wrapper class template.">Filter</a> wrapper class template.  <a href="class_f_e_a_t_1_1_global_1_1_filter.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_flood_fill.html">FloodFill</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Distributed flood fill.  <a href="class_f_e_a_t_1_1_global_1_1_flood_fill.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_global_1_1_gate.html">Gate</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t_1_1_global.html" title="Global linear algebra namespace.">Global</a> gate implementation.  <a href="class_f_e_a_t_1_1_global_1_1_gate.html#details">More...</a><br /></td></tr>
@@ -184,8 +191,18 @@ Classes</h2></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">MPI-abstraction for running vector-values lambdas on other ranks.  <a href="class_f_e_a_t_1_1_global_1_1_vector_remote_lambda_3_01_r___07_args___8_8_8_08_4.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
+Enumerations</h2></td></tr>
+<tr class="memitem:a2554f6d1171d6f1f2da5e93249e35973"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><b>SyncLocation</b> : std::uint8_t { <b>host</b> = 0
+, <b>device</b>
+, <b>backend</b>
+ }</td></tr>
+<tr class="separator:a2554f6d1171d6f1f2da5e93249e35973"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
+<tr class="memitem:a192689ea215c82ecddbdb79e9b25a582"><td class="memItemLeft" align="right" valign="top">std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_global.html#a192689ea215c82ecddbdb79e9b25a582">operator&lt;&lt;</a> (std::ostream &amp;os, SyncLocation loc)</td></tr>
+<tr class="separator:a192689ea215c82ecddbdb79e9b25a582"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a158feb2556901b96b3fbd19734d796ef"><td class="memTemplParams" colspan="2">template&lt;typename MT_ , typename VMT_ &gt; </td></tr>
 <tr class="memitem:a158feb2556901b96b3fbd19734d796ef"><td class="memTemplItemLeft" align="right" valign="top">void&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t_1_1_global.html#a158feb2556901b96b3fbd19734d796ef">synch_matrix</a> (MT_ &amp;target, const <a class="el" href="class_f_e_a_t_1_1_dist_1_1_comm.html">Dist::Comm</a> &amp;comm, const std::vector&lt; int &gt; &amp;ranks, const std::vector&lt; VMT_ &gt; &amp;mirrors_row, const std::vector&lt; VMT_ &gt; &amp;mirrors_col)</td></tr>
 <tr class="memdesc:a158feb2556901b96b3fbd19734d796ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">Synchronizes a type-0 matrix.  <a href="namespace_f_e_a_t_1_1_global.html#a158feb2556901b96b3fbd19734d796ef">More...</a><br /></td></tr>
@@ -193,7 +210,70 @@ Functions</h2></td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p ><a class="el" href="namespace_f_e_a_t_1_1_global.html" title="Global linear algebra namespace.">Global</a> linear algebra namespace. </p>
-</div><h2 class="groupheader">Function Documentation</h2>
+</div><h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="a2554f6d1171d6f1f2da5e93249e35973" name="a2554f6d1171d6f1f2da5e93249e35973"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2554f6d1171d6f1f2da5e93249e35973">&#9670;&#160;</a></span>SyncLocation</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum class FEAT::Global::SyncLocation : std::uint8_t</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00024">24</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Function Documentation</h2>
+<a id="a192689ea215c82ecddbdb79e9b25a582" name="a192689ea215c82ecddbdb79e9b25a582"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a192689ea215c82ecddbdb79e9b25a582">&#9670;&#160;</a></span>operator&lt;&lt;()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::ostream &amp; FEAT::Global::operator&lt;&lt; </td>
+          <td>(</td>
+          <td class="paramtype">std::ostream &amp;&#160;</td>
+          <td class="paramname"><em>os</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">SyncLocation&#160;</td>
+          <td class="paramname"><em>loc</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="gate_8hpp_source.html#l00031">31</a> of file <a class="el" href="gate_8hpp_source.html">gate.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a158feb2556901b96b3fbd19734d796ef" name="a158feb2556901b96b3fbd19734d796ef"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a158feb2556901b96b3fbd19734d796ef">&#9670;&#160;</a></span>synch_matrix()</h2>
 

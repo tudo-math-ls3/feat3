@@ -154,7 +154,7 @@ $(document).ready(function(){initNavTree('omp__util_8hpp_source.html',''); initR
 <div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span>      y[i] = (k += x[i]);</div>
 <div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="preprocessor">#else</span></div>
 <div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span>    <span class="comment">// don&#39;t parallelize unless we have at least 10 elements per thread</span></div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    <span class="keyword">const</span> std::size_t max_threads(omp_get_max_threads());</div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>    <span class="keyword">const</span> std::size_t max_threads = std::size_t(omp_get_max_threads());</div>
 <div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span>    <span class="keywordflow">if</span>(n &lt; 10u*max_threads)</div>
 <div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span>    {</div>
 <div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span>      <span class="comment">// sequential inclusive scan</span></div>
@@ -170,8 +170,8 @@ $(document).ready(function(){initNavTree('omp__util_8hpp_source.html',''); initR
 <div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span>    <span class="comment">// parallel OpenMP region</span></div>
 <div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span>    FEAT_PRAGMA_OMP(parallel shared(vo))</div>
 <div class="line"><a id="l00093" name="l00093"></a><span class="lineno">   93</span>    {</div>
-<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>      <span class="keyword">const</span> std::size_t num_threads(omp_get_num_threads());</div>
-<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>      <span class="keyword">const</span> std::size_t thread_id(omp_get_thread_num());</div>
+<div class="line"><a id="l00094" name="l00094"></a><span class="lineno">   94</span>      <span class="keyword">const</span> std::size_t num_threads =  std::size_t(omp_get_num_threads());</div>
+<div class="line"><a id="l00095" name="l00095"></a><span class="lineno">   95</span>      <span class="keyword">const</span> std::size_t thread_id = std::size_t(omp_get_thread_num());</div>
 <div class="line"><a id="l00096" name="l00096"></a><span class="lineno">   96</span> </div>
 <div class="line"><a id="l00097" name="l00097"></a><span class="lineno">   97</span>      <span class="comment">// chunk begin and end for each threads</span></div>
 <div class="line"><a id="l00098" name="l00098"></a><span class="lineno">   98</span>      <span class="keyword">const</span> std::size_t i0 = (n * thread_id) / num_threads;</div>
@@ -232,7 +232,7 @@ $(document).ready(function(){initNavTree('omp__util_8hpp_source.html',''); initR
 <div class="line"><a id="l00169" name="l00169"></a><span class="lineno">  169</span>    }</div>
 <div class="line"><a id="l00170" name="l00170"></a><span class="lineno">  170</span><span class="preprocessor">#else</span></div>
 <div class="line"><a id="l00171" name="l00171"></a><span class="lineno">  171</span>    <span class="comment">// don&#39;t parallelize unless we have at least 10 elements per thread</span></div>
-<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    <span class="keyword">const</span> std::size_t max_threads(omp_get_max_threads());</div>
+<div class="line"><a id="l00172" name="l00172"></a><span class="lineno">  172</span>    <span class="keyword">const</span> std::size_t max_threads = std::size_t(omp_get_max_threads());</div>
 <div class="line"><a id="l00173" name="l00173"></a><span class="lineno">  173</span>    <span class="keywordflow">if</span>(n &lt; 10u*max_threads)</div>
 <div class="line"><a id="l00174" name="l00174"></a><span class="lineno">  174</span>    {</div>
 <div class="line"><a id="l00175" name="l00175"></a><span class="lineno">  175</span>      <span class="comment">// sequential exclusive scan</span></div>
@@ -252,8 +252,8 @@ $(document).ready(function(){initNavTree('omp__util_8hpp_source.html',''); initR
 <div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>    <span class="comment">// parallel OpenMP region</span></div>
 <div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>    FEAT_PRAGMA_OMP(parallel shared(vo))</div>
 <div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>    {</div>
-<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>      <span class="keyword">const</span> std::size_t num_threads(omp_get_num_threads());</div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>      <span class="keyword">const</span> std::size_t thread_id(omp_get_thread_num());</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>      <span class="keyword">const</span> std::size_t num_threads = std::size_t(omp_get_num_threads());</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>      <span class="keyword">const</span> std::size_t thread_id = std::size_t(omp_get_thread_num());</div>
 <div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span> </div>
 <div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>      <span class="comment">// chunk begin and end for each threads</span></div>
 <div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>      <span class="keyword">const</span> std::size_t i0 = (n * thread_id) / num_threads;</div>

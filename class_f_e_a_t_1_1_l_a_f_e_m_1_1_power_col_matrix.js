@@ -27,7 +27,7 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix =
     [ "convert", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#ae6c1eb429564109823b5709a7386616e", null ],
     [ "create_vector_l", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#a18e8e0aafffc4d0f1faf079eb9a4445a", null ],
     [ "create_vector_r", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#a364569af1da98f78b743bad0b2a66821", null ],
-    [ "format", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#a9e998a9ad3bdc7decaff9a59349588e2", null ],
+    [ "format", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#af8409004eba220dce5752a574d7730e3", null ],
     [ "get", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#a6b641ccc27791a2857636fc9fbb4e6f7", null ],
     [ "get", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#a2f3486648d64266f96d4e9ec62807887", null ],
     [ "get_checkpoint_size", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_col_matrix.html#a2804e7345c3c5c94d1d52f4b7fbe7576", null ],

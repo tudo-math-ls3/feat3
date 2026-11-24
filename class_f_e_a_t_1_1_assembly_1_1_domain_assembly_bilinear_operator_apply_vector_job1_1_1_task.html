@@ -105,6 +105,7 @@ $(document).ready(function(){initNavTree('class_f_e_a_t_1_1_assembly_1_1_domain_
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-attribs">Static Public Attributes</a> &#124;
 <a href="#pro-types">Protected Types</a> &#124;
+<a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="class_f_e_a_t_1_1_assembly_1_1_domain_assembly_bilinear_operator_apply_vector_job1_1_1_task-members.html">List of all members</a>  </div>
   <div class="headertitle"><div class="title">FEAT::Assembly::DomainAssemblyBilinearOperatorApplyVectorJob1&lt; BilinearOperator_, Vector_, VectorSol_, Space_ &gt;::Task Class Reference</div></div>
@@ -173,6 +174,11 @@ Protected Types</h2></td></tr>
 <tr class="separator:a89018cdc3f7926f0476d93476aae1115"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a82fb417ccbf94f5d60eb1ebcf5120ca4"><td class="memItemLeft" align="right" valign="top">typedef BilinearOperator_::template Evaluator&lt; <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembly_bilinear_operator_apply_vector_job1_1_1_task.html#a0c0a185412f417956148f0507061930d">AsmTraits</a> &gt;<a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembly_basic_vector_task_c_r_t_p.html#a63543c28150f79052361c37a3f889afe">::ValueType</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembly_bilinear_operator_apply_vector_job1_1_1_task.html#a82fb417ccbf94f5d60eb1ebcf5120ca4">MatValType</a></td></tr>
 <tr class="separator:a82fb417ccbf94f5d60eb1ebcf5120ca4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-static-methods" name="pro-static-methods"></a>
+Static Protected Member Functions</h2></td></tr>
+<tr class="memitem:a20cd01beee0a09f1584cafd29b2abc44"><td class="memItemLeft" align="right" valign="top">static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembly_bilinear_operator_apply_vector_job1_1_1_task.html#a20cd01beee0a09f1584cafd29b2abc44">add_local_product</a> (<a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembly_basic_vector_task_c_r_t_p.html#a63543c28150f79052361c37a3f889afe">ValueType</a> &amp;y, const MatValType &amp;a, const <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembly_basic_vector_task_c_r_t_p.html#a63543c28150f79052361c37a3f889afe">ValueType</a> &amp;x)</td></tr>
+<tr class="separator:a20cd01beee0a09f1584cafd29b2abc44"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pro-attribs" name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -393,11 +399,57 @@ template&lt;typename BilinearOperator_ , typename Vector_ , typename VectorSol_ 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01374">1374</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01386">1386</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a20cd01beee0a09f1584cafd29b2abc44" name="a20cd01beee0a09f1584cafd29b2abc44"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a20cd01beee0a09f1584cafd29b2abc44">&#9670;&#160;</a></span>add_local_product()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename BilinearOperator_ , typename Vector_ , typename VectorSol_ , typename Space_ &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">static void <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembly_bilinear_operator_apply_vector_job1.html">FEAT::Assembly::DomainAssemblyBilinearOperatorApplyVectorJob1</a>&lt; BilinearOperator_, Vector_, VectorSol_, Space_ &gt;::Task::add_local_product </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembly_basic_vector_task_c_r_t_p.html#a63543c28150f79052361c37a3f889afe">ValueType</a> &amp;&#160;</td>
+          <td class="paramname"><em>y</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const MatValType &amp;&#160;</td>
+          <td class="paramname"><em>a</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembly_basic_vector_task_c_r_t_p.html#a63543c28150f79052361c37a3f889afe">ValueType</a> &amp;&#160;</td>
+          <td class="paramname"><em>x</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span><span class="mlabel">static</span><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01372">1372</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a3c40b98bf36462cce7745ce9e5f91fc1" name="a3c40b98bf36462cce7745ce9e5f91fc1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3c40b98bf36462cce7745ce9e5f91fc1">&#9670;&#160;</a></span>assemble()</h2>
 
@@ -425,7 +477,7 @@ template&lt;typename BilinearOperator_ , typename Vector_ , typename VectorSol_ 
 
 <p>Performs the local assembly. </p>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01404">1404</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01416">1416</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l00080">FEAT::Assembly::DomainAssemblyBasicVectorTaskCRTP&lt; Task, Vector_, Space_, trafo_config, space_config &gt;::cubature_rule</a>, <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01369">FEAT::Assembly::DomainAssemblyBilinearOperatorApplyVectorJob1&lt; BilinearOperator_, Vector_, VectorSol_, Space_ &gt;::Task::local_matrix</a>, <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l00086">FEAT::Assembly::DomainAssemblyBasicVectorTaskCRTP&lt; Task, Vector_, Space_, trafo_config, space_config &gt;::local_vector</a>, <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l00084">FEAT::Assembly::DomainAssemblyBasicVectorTaskCRTP&lt; Task, Vector_, Space_, trafo_config, space_config &gt;::space_data</a>, <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l00076">FEAT::Assembly::DomainAssemblyBasicVectorTaskCRTP&lt; Task, Vector_, Space_, trafo_config, space_config &gt;::space_eval</a>, <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l00082">FEAT::Assembly::DomainAssemblyBasicVectorTaskCRTP&lt; Task, Vector_, Space_, trafo_config, space_config &gt;::trafo_data</a>, and <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l00074">FEAT::Assembly::DomainAssemblyBasicVectorTaskCRTP&lt; Task, Vector_, Space_, trafo_config, space_config &gt;::trafo_eval</a>.</p>
 
@@ -508,7 +560,7 @@ template&lt;typename BilinearOperator_ , typename Vector_ , typename VectorSol_ 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01395">1395</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01407">1407</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
 
 </div>
 </div>
@@ -589,7 +641,7 @@ template&lt;typename BilinearOperator_ , typename Vector_ , typename VectorSol_ 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01447">1447</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01459">1459</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
 
 </div>
 </div>
@@ -619,7 +671,7 @@ template&lt;typename BilinearOperator_ , typename Vector_ , typename VectorSol_ 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01382">1382</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01394">1394</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
 
 </div>
 </div>
@@ -678,7 +730,7 @@ template&lt;typename BilinearOperator_ , typename Vector_ , typename VectorSol_ 
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01390">1390</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01402">1402</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
 
 </div>
 </div>
@@ -761,7 +813,7 @@ template&lt;typename BilinearOperator_ , typename Vector_ , typename VectorSol_ 
 
 <p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01369">1369</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01404">FEAT::Assembly::DomainAssemblyBilinearOperatorApplyVectorJob1&lt; BilinearOperator_, Vector_, VectorSol_, Space_ &gt;::Task::assemble()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01416">FEAT::Assembly::DomainAssemblyBilinearOperatorApplyVectorJob1&lt; BilinearOperator_, Vector_, VectorSol_, Space_ &gt;::Task::assemble()</a>.</p>
 
 </div>
 </div>

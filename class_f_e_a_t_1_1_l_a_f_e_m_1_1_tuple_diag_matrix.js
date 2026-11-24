@@ -28,7 +28,7 @@ var class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_diag_matrix =
     [ "create_vector_l", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_diag_matrix.html#afe4143fd8fb6bb613fe84cd4486ffdf1", null ],
     [ "create_vector_r", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_diag_matrix.html#a6a6c00e077edf435e3a172fb7f220251", null ],
     [ "extract_diag", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_diag_matrix.html#ab3df7d0efba921069d9879d769774c2e", null ],
-    [ "format", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_diag_matrix.html#a4f5f5d6932551e64b4519cabd7f71c60", null ],
+    [ "format", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_diag_matrix.html#a38fdb51f00de05a48be0db300b538ddf", null ],
     [ "get_checkpoint_size", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_diag_matrix.html#a66c740b359e6ae68a0157cb4069d74e7", null ],
     [ "name", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_diag_matrix.html#ab271e704fb8a18bbff8b045895d442c7", null ],
     [ "num_cols", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_tuple_diag_matrix.html#aa4110806a22951193010a0c615fde4c1", null ],

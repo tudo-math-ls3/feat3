@@ -1,6 +1,7 @@
 var class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control =
 [
     [ "BaseClass", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#aa6418bba40405c43dea84f0c99a04a4f", null ],
+    [ "CoordType", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a85fcaa7b70e75389d35c368420c762a6", null ],
     [ "MeshNodeType", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a4bc22ff565df9dddbbfa73feb4f66e2e", null ],
     [ "MeshPartType", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a800d3c72b7195f11cf496daf02e4ae71", null ],
     [ "WeightType", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a347c0ab7fba2b74c52829cec3b9341e5", null ],
@@ -10,6 +11,7 @@ var class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control =
     [ "_apply_parti_genetic", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a4b12d9f60d937a3a5a7e3ce97e27005e", null ],
     [ "_apply_parti_metis", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a4724a30f7727e6de335a6977a2ff53f4", null ],
     [ "_apply_parti_naive", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a3f54a4c0782e6b8dde350e528f5d10fa", null ],
+    [ "_apply_parti_scotch", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a2574e8155f0d0b7d3393c2e96ca0b61e", null ],
     [ "_apply_parti_zoltan", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a3b281e0e75d413c114f033bac92aaa90", null ],
     [ "_check_parti", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#af42c92441b9e1faf9eb261072cfe42db", null ],
     [ "_check_parti_2level", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#ac3ce6d36f32fa36f83c5f71f8d2ba38b", null ],
@@ -29,7 +31,9 @@ var class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control =
     [ "create", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#acaaef6f1e579cc13a14ee455e1f7774e", null ],
     [ "create", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#acdd41a1d33df9667b729eab7ab507b14", null ],
     [ "create_mesh_permutations", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#ad318a32ef627910cfc77850cd62bef67", null ],
+    [ "create_rectilinear", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#aeafb0215cc778bc3ac4eeb882a862438", null ],
     [ "create_rectilinear", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a44dd4f32669bf609b87cff49f9ddad85", null ],
+    [ "create_unit_hypercube", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#aaa5e904aafb395fd1d666124b2763b60", null ],
     [ "dump_ancestry", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a196ad37b1bdb689090fa9824854a153b", null ],
     [ "format_chosen_levels", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a6e7ff70c85c100e6a8475ab87e818179", null ],
     [ "format_desired_levels", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a02d0cb614bcf85e53801eb43f16ec5b8", null ],
@@ -58,6 +62,7 @@ var class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control =
     [ "_allow_parti_genetic", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#afc0f046709c34a9d79407ca29b28dd9f", null ],
     [ "_allow_parti_metis", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a8bbbd4a484a0eb66aa13c68ee84d8161", null ],
     [ "_allow_parti_naive", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a03e496846b01e2391f1ded07d8be19cc", null ],
+    [ "_allow_parti_scotch", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a8c24425d828914d71ad93b4464c78854", null ],
     [ "_allow_parti_zoltan", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#afddf5df0ac7908f4b270aa208ed76012", null ],
     [ "_ancestry", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a38447075c1be60622a996b8b03e93757", null ],
     [ "_chosen_levels", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a2e1d38f6612ae9575b2588de3214b4e1", null ],
@@ -70,5 +75,6 @@ var class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control =
     [ "_permutation_strategy", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#ab378beb68e1ccb09bfed4b79d1a15893", null ],
     [ "_required_elems_per_rank", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a28e0c40a4dff6ae303d7956fffb4866a", null ],
     [ "_support_multi_layered", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#ad1303539a3cd1760c77f851b0532fa0d", null ],
-    [ "_was_created", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#aafd286a472ef07ab175262777f7e2057", null ]
+    [ "_was_created", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#aafd286a472ef07ab175262777f7e2057", null ],
+    [ "shape_dim", "class_f_e_a_t_1_1_control_1_1_domain_1_1_parti_domain_control.html#a921d8b84968398dfef6215d21df82b38", null ]
 ];

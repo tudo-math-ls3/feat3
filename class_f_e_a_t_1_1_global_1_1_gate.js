@@ -11,6 +11,7 @@ var class_f_e_a_t_1_1_global_1_1_gate =
     [ "Gate", "class_f_e_a_t_1_1_global_1_1_gate.html#afe7c5f082239560169055369165952fb", null ],
     [ "Gate", "class_f_e_a_t_1_1_global_1_1_gate.html#ad617af511bed171cf241422788233de5", null ],
     [ "~Gate", "class_f_e_a_t_1_1_global_1_1_gate.html#a0e168a2db82e0b71013b90322fad6c2c", null ],
+    [ "_sync_vec", "class_f_e_a_t_1_1_global_1_1_gate.html#ab622ffaed79dbccf6daae29ac21bc41d", null ],
     [ "bytes", "class_f_e_a_t_1_1_global_1_1_gate.html#af4abfdb2b7c13ccd96090e9b87456226", null ],
     [ "compile", "class_f_e_a_t_1_1_global_1_1_gate.html#a0d3ac6f4a0b558701712d74d6faca866", null ],
     [ "convert", "class_f_e_a_t_1_1_global_1_1_gate.html#aa4e2ffc94e3c1e795ebe119c614bf76d", null ],
@@ -35,6 +36,7 @@ var class_f_e_a_t_1_1_global_1_1_gate =
     [ "operator=", "class_f_e_a_t_1_1_global_1_1_gate.html#a982a7c06e42769739033fa6c23bee29d", null ],
     [ "push", "class_f_e_a_t_1_1_global_1_1_gate.html#a19d986fbec24c3d6857837d524b593cd", null ],
     [ "set_comm", "class_f_e_a_t_1_1_global_1_1_gate.html#a7f0bdd60179d6c5a92989f19fe607924", null ],
+    [ "set_sync_location", "class_f_e_a_t_1_1_global_1_1_gate.html#ac03189152e7f2fd46b41a54d4dbf62d8", null ],
     [ "sum", "class_f_e_a_t_1_1_global_1_1_gate.html#ac0971db9fc0ac19a9dbbc19b14f220d8", null ],
     [ "sum_async", "class_f_e_a_t_1_1_global_1_1_gate.html#a302e3da29ef3ba8d88f198755dd386f0", null ],
     [ "sync_0", "class_f_e_a_t_1_1_global_1_1_gate.html#a151f690bd1866d13f920f76e40332aba", null ],
@@ -44,5 +46,8 @@ var class_f_e_a_t_1_1_global_1_1_gate =
     [ "_comm", "class_f_e_a_t_1_1_global_1_1_gate.html#a8dbd4c32b2a8b39f349b74a194d0d187", null ],
     [ "_freqs", "class_f_e_a_t_1_1_global_1_1_gate.html#abe6d5a2afcf6027988fb2bf347941a28", null ],
     [ "_mirrors", "class_f_e_a_t_1_1_global_1_1_gate.html#a612b1d0d8d3270737cb6bb6fbd534cc2", null ],
-    [ "_ranks", "class_f_e_a_t_1_1_global_1_1_gate.html#aea1ccf1a21e9c2dfb1e2f6760bb7c903", null ]
+    [ "_ranks", "class_f_e_a_t_1_1_global_1_1_gate.html#aea1ccf1a21e9c2dfb1e2f6760bb7c903", null ],
+    [ "_send_buffers", "class_f_e_a_t_1_1_global_1_1_gate.html#a17b3cdb25d82090d82076ed2fbfe34bb", null ],
+    [ "_send_reqs", "class_f_e_a_t_1_1_global_1_1_gate.html#ab427afdeb561d3b2c1a175d9cd9c01c5", null ],
+    [ "_send_views", "class_f_e_a_t_1_1_global_1_1_gate.html#a2a33e04edbbc6ce5ca697b79c65c3efa", null ]
 ];

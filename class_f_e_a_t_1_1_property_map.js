@@ -15,6 +15,7 @@ var class_f_e_a_t_1_1_property_map =
     [ "begin_entry", "class_f_e_a_t_1_1_property_map.html#a56fdb6cdb13a382af8e0a236f5062211", null ],
     [ "begin_section", "class_f_e_a_t_1_1_property_map.html#a28796dfd9e0f5621c56d92da0c8f34b8", null ],
     [ "begin_section", "class_f_e_a_t_1_1_property_map.html#a075a35a04f549de653b983d4313c7225", null ],
+    [ "clone", "class_f_e_a_t_1_1_property_map.html#a8f44446fd50be236b033634472595900", null ],
     [ "end_entry", "class_f_e_a_t_1_1_property_map.html#a8ada5db913cafa26352256428bd01819", null ],
     [ "end_entry", "class_f_e_a_t_1_1_property_map.html#af97d77a001b641974007aa73a4628468", null ],
     [ "end_section", "class_f_e_a_t_1_1_property_map.html#a304cae9530457b665608227340219b94", null ],

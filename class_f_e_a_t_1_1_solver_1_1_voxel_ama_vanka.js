@@ -18,7 +18,7 @@ var class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka =
     [ "clear_macro_dofs", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#af667a9fb0956558df78c27b4720ce99f", null ],
     [ "data_size", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a9b9d1846417be83357859c2763c89a2f", null ],
     [ "done", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#acacbcaccbf7ec307778128928a901d59", null ],
-    [ "done_numeric", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#af2ea6e8c96de45c8408f3dcc59b8f186", null ],
+    [ "done_numeric", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#ac2d74fe76ed7fb3b9cf8a1290f018871", null ],
     [ "done_symbolic", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a2c48a03da15655c7d7d0e1d6c02ae9ba", null ],
     [ "fill_color", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#abc24ef50dc503e756a03c085e322f2a7", null ],
     [ "init", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a7e61ce0b51e7f97317042a184aba8613", null ],
@@ -30,6 +30,7 @@ var class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka =
     [ "set_num_steps", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#ad2b70f26d345e042078ba6b6fab9cd5c", null ],
     [ "set_omega", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a5e066b245bf42e2ba526295031a04ee7", null ],
     [ "set_skip_singular", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a9ff2d11b820030081078bcbe4c26cd2d", null ],
+    [ "set_sync_after_assembly", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a0a7591ea80f672f1a738f8b04d6ddb50", null ],
     [ "time_apply", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a44d333229de6223df6ffa8af0259699f", null ],
     [ "time_init_numeric", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#abf134ae900d98017b525e6b14f701ab7", null ],
     [ "time_init_symbolic", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a95de055597350f019bd257350deab955", null ],
@@ -47,6 +48,7 @@ var class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka =
     [ "_num_threads", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a6c7226f4ecf4e826b6eb87c8feaa1e31", null ],
     [ "_omega", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a67a3cee4f00ac13bb67068c4eeca4a80", null ],
     [ "_skip_singular", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a6a8ccda8eae633d6aa78a4abaaf99476", null ],
+    [ "_sync_after_assembly", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#aadab3d9175479564f212cdbafd97e45e", null ],
     [ "_vanka", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#abf7ae2f4d2e3585d276567e25163f60d", null ],
     [ "_vec_c", "class_f_e_a_t_1_1_solver_1_1_voxel_ama_vanka.html#a5ec627d1c43520c8eb7ed436c3fcf065", null ]
 ];

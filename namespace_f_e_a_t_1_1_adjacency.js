@@ -8,6 +8,7 @@ var namespace_f_e_a_t_1_1_adjacency =
     [ "DynamicGraph", "class_f_e_a_t_1_1_adjacency_1_1_dynamic_graph.html", "class_f_e_a_t_1_1_adjacency_1_1_dynamic_graph" ],
     [ "ExportTGA", "class_f_e_a_t_1_1_adjacency_1_1_export_t_g_a.html", "class_f_e_a_t_1_1_adjacency_1_1_export_t_g_a" ],
     [ "Graph", "class_f_e_a_t_1_1_adjacency_1_1_graph.html", "class_f_e_a_t_1_1_adjacency_1_1_graph" ],
+    [ "ImageRange", "class_f_e_a_t_1_1_adjacency_1_1_image_range.html", "class_f_e_a_t_1_1_adjacency_1_1_image_range" ],
     [ "Permutation", "class_f_e_a_t_1_1_adjacency_1_1_permutation.html", "class_f_e_a_t_1_1_adjacency_1_1_permutation" ],
     [ "RenderType", "namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7", [
       [ "as_is", "namespace_f_e_a_t_1_1_adjacency.html#a85fc833108471df98e28d6b06324f3e7ab91bbd5bee662ac721bd55c847e41a5b", null ],

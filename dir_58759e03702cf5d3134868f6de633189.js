@@ -1,10 +1,13 @@
 var dir_58759e03702cf5d3134868f6de633189 =
 [
+    [ "backend_aux", "dir_d13e6151d4541483b79f6f7524fd313c.html", "dir_d13e6151d4541483b79f6f7524fd313c" ],
     [ "test_aux", "dir_84c3b0933ccd2eb211a0799d97f6c435.html", "dir_84c3b0933ccd2eb211a0799d97f6c435" ],
     [ "adp_solver_base.hpp", "adp__solver__base_8hpp_source.html", null ],
     [ "alglib_wrapper.hpp", "alglib__wrapper_8hpp_source.html", null ],
     [ "amavanka.hpp", "amavanka_8hpp_source.html", null ],
     [ "amavanka_base.hpp", "amavanka__base_8hpp_source.html", null ],
+    [ "amavanka_gmres.hpp", "amavanka__gmres_8hpp_source.html", null ],
+    [ "amavanka_richardson.hpp", "amavanka__richardson_8hpp_source.html", null ],
     [ "base.hpp", "kernel_2solver_2base_8hpp_source.html", null ],
     [ "bfbt.hpp", "bfbt_8hpp_source.html", null ],
     [ "bicgstab.hpp", "bicgstab_8hpp_source.html", null ],
@@ -37,6 +40,7 @@ var dir_58759e03702cf5d3134868f6de633189 =
     [ "ilu_precond.hpp", "ilu__precond_8hpp_source.html", null ],
     [ "iterative.hpp", "iterative_8hpp_source.html", null ],
     [ "jacobi_precond.hpp", "jacobi__precond_8hpp_source.html", null ],
+    [ "krylov_orthogonalizer.hpp", "krylov__orthogonalizer_8hpp_source.html", null ],
     [ "linesearch.hpp", "linesearch_8hpp_source.html", null ],
     [ "matrix_precond.hpp", "matrix__precond_8hpp_source.html", null ],
     [ "mkl_dss.cpp", "mkl__dss_8cpp_source.html", null ],

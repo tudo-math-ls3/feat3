@@ -35,6 +35,7 @@ var namespace_f_e_a_t =
     [ "Xml", "namespace_f_e_a_t_1_1_xml.html", "namespace_f_e_a_t_1_1_xml" ],
     [ "ArgParser", "class_f_e_a_t_1_1_arg_parser.html", "class_f_e_a_t_1_1_arg_parser" ],
     [ "Backend", "class_f_e_a_t_1_1_backend.html", "class_f_e_a_t_1_1_backend" ],
+    [ "BackendScope", "class_f_e_a_t_1_1_backend_scope.html", null ],
     [ "BinaryStream", "class_f_e_a_t_1_1_binary_stream.html", "class_f_e_a_t_1_1_binary_stream" ],
     [ "DistFileIO", "class_f_e_a_t_1_1_dist_file_i_o.html", "class_f_e_a_t_1_1_dist_file_i_o" ],
     [ "Exception", "class_f_e_a_t_1_1_exception.html", "class_f_e_a_t_1_1_exception" ],
@@ -115,6 +116,8 @@ var namespace_f_e_a_t =
     [ "stringify_fp_sci", "namespace_f_e_a_t.html#abb8ee3d761bb7c3710a943fe34746ad2", null ],
     [ "stringify_join", "namespace_f_e_a_t.html#ac633c320068698769f27c234ea2bc8d6", null ],
     [ "stringify_join", "namespace_f_e_a_t.html#a72efdb23696a9e7e8cd6a163ed8f0767", null ],
+    [ "to_underlying", "namespace_f_e_a_t.html#ad7f418c1baa13c2f0bb9235a83a98433", null ],
+    [ "async_operations", "namespace_f_e_a_t.html#a211e907fb27932e0db7e41722695ad6a", null ],
     [ "version_major", "namespace_f_e_a_t.html#a915f550e5e25f665a148950f1ae4e249", null ],
     [ "version_minor", "namespace_f_e_a_t.html#aadedb307b3e7ac10f521c388fe78eb34", null ],
     [ "version_patch", "namespace_f_e_a_t.html#aaae2520d89ae4daec4069ccbe29a33b7", null ]

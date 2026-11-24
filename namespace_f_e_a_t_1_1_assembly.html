@@ -262,6 +262,9 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_domain_assembly_linear_functional_vector_job.html">DomainAssemblyLinearFunctionalVectorJob</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Vector assembly job for <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_linear_functional.html" title="Base class for Linear Functionals.">LinearFunctional</a> implementations.  <a href="class_f_e_a_t_1_1_assembly_1_1_domain_assembly_linear_functional_vector_job.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_feature_mesh_part_factory.html">FeatureMeshPartFactory</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Factory for MeshParts describing features of the mesh boundary.  <a href="class_f_e_a_t_1_1_assembly_1_1_feature_mesh_part_factory.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struct_f_e_a_t_1_1_assembly_1_1_f_e_interpolator.html">FEInterpolator</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Interpolation operator between two finite element spaces.  <a href="struct_f_e_a_t_1_1_assembly_1_1_f_e_interpolator.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -324,6 +327,9 @@ Classes</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_outer_normal_computer.html">OuterNormalComputer</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper class that computes a weighted outer unit normal field.  <a href="class_f_e_a_t_1_1_assembly_1_1_outer_normal_computer.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_projection_filter_assembler.html">ProjectionFilterAssembler</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">ProjectionFilter assembler class template.  <a href="class_f_e_a_t_1_1_assembly_1_1_projection_filter_assembler.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_assembly_1_1_rew_projector.html">RewProjector</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Restricted Element-Wise Projection operator.  <a href="class_f_e_a_t_1_1_assembly_1_1_rew_projector.html#details">More...</a><br /></td></tr>
@@ -697,9 +703,11 @@ template&lt;typename Trafo_ , typename Vector_ , typename VectorSol_ , typename 
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01524">1524</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01536">1536</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l01215">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01088">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::get_trafo()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="mesh__deformer_8hpp_source.html#l00355">FEAT::MeshOpt::MeshDeformer&lt; MeshType_ &gt;::_deform()</a>.</p>
 
 </div>
 </div>
@@ -849,6 +857,8 @@ template&lt;typename Trafo_ , typename Matrix_ , typename BilOp_ , typename Spac
 <p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01137">1137</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l01215">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01088">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::get_trafo()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="mesh__deformer_8hpp_source.html#l00355">FEAT::MeshOpt::MeshDeformer&lt; MeshType_ &gt;::_deform()</a>.</p>
 
 </div>
 </div>
@@ -1487,9 +1497,9 @@ template&lt;int max_der_, typename DataType_ , typename Trafo_ , typename Functi
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The integrals of the input function stored in an <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html" title="Function integral info class.">Assembly::FunctionIntegralInfo</a> instance, whose exact type is determined by the <a class="el" href="struct_f_e_a_t_1_1_assembly_1_1_analytic_function_integral.html" title="Helper class to determine the FunctionIntegralInfo type for analytic functions.">Assembly::AnalyticFunctionIntegral</a> helper class. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01706">1706</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01718">1718</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l01215">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01088">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::get_trafo()</a>, and <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01680">FEAT::Assembly::DomainAssemblyAnalyticFunctionIntegralJob&lt; DataType_, Function_, Trafo_, max_der_ &gt;::result()</a>.</p>
+<p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l01215">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01088">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::get_trafo()</a>, and <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01692">FEAT::Assembly::DomainAssemblyAnalyticFunctionIntegralJob&lt; DataType_, Function_, Trafo_, max_der_ &gt;::result()</a>.</p>
 
 </div>
 </div>
@@ -1603,7 +1613,7 @@ template&lt;int max_der_, typename Vector_ , typename Trafo_ , typename Space_ &
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The integrals of the input function stored in an <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html" title="Function integral info class.">Assembly::FunctionIntegralInfo</a> instance, whose exact type is determined by the <a class="el" href="struct_f_e_a_t_1_1_assembly_1_1_discrete_function_integral.html" title="Helper class to determine the FunctionIntegralInfo type for discrete functions.">Assembly::DiscreteFunctionIntegral</a> helper class. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01915">1915</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l01927">1927</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l01215">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01088">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::get_trafo()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
@@ -1732,7 +1742,7 @@ template&lt;int max_der_, typename Function_ , typename Vector_ , typename Trafo
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>The integrals of the error function stored in an <a class="el" href="class_f_e_a_t_1_1_assembly_1_1_function_integral_info.html" title="Function integral info class.">Assembly::FunctionIntegralInfo</a> instance, whose exact type is determined by the <a class="el" href="struct_f_e_a_t_1_1_assembly_1_1_discrete_function_integral.html" title="Helper class to determine the FunctionIntegralInfo type for discrete functions.">Assembly::DiscreteFunctionIntegral</a> helper class. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l02153">2153</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html#l02165">2165</a> of file <a class="el" href="domain__assembler__basic__jobs_8hpp_source.html">domain_assembler_basic_jobs.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="domain__assembler_8hpp_source.html#l01215">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::assemble()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01088">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::get_trafo()</a>, and <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 

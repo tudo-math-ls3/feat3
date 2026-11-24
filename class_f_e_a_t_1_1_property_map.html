@@ -165,6 +165,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a075a35a04f549de653b983d4313c7225"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_property_map.html#ae3f872eea5e7e3b4ebe4c33abe9146f4">ConstSectionIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_property_map.html#a075a35a04f549de653b983d4313c7225">begin_section</a> () const</td></tr>
 <tr class="memdesc:a075a35a04f549de653b983d4313c7225"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the first section iterator.   <a href="class_f_e_a_t_1_1_property_map.html#a075a35a04f549de653b983d4313c7225">More...</a><br /></td></tr>
 <tr class="separator:a075a35a04f549de653b983d4313c7225"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8f44446fd50be236b033634472595900"><td class="memItemLeft" align="right" valign="top">std::unique_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_property_map.html#a8f44446fd50be236b033634472595900">clone</a> () const</td></tr>
+<tr class="memdesc:a8f44446fd50be236b033634472595900"><td class="mdescLeft">&#160;</td><td class="mdescRight">Clones this property map to allow parameter modifications.  <a href="class_f_e_a_t_1_1_property_map.html#a8f44446fd50be236b033634472595900">More...</a><br /></td></tr>
+<tr class="separator:a8f44446fd50be236b033634472595900"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8ada5db913cafa26352256428bd01819"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_property_map.html#a613a8722a909ba074eaeaefb5f8e6536">EntryIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_property_map.html#a8ada5db913cafa26352256428bd01819">end_entry</a> ()</td></tr>
 <tr class="memdesc:a8ada5db913cafa26352256428bd01819"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the last entry iterator.  <a href="class_f_e_a_t_1_1_property_map.html#a8ada5db913cafa26352256428bd01819">More...</a><br /></td></tr>
 <tr class="separator:a8ada5db913cafa26352256428bd01819"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -508,7 +511,7 @@ Peter Zajac </dd></dl>
 
 <p class="reference">References <a class="el" href="property__map_8hpp_source.html#l00069">_values</a>, and <a class="el" href="namespace_f_e_a_t.html#ad574925e947c823619c356d5d12b0815a2063c1608d6e0baf80249c42e2be5804">FEAT::value</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="property__map_8cpp_source.html#l00195">merge()</a>, and <a class="el" href="property__map_8cpp_source.html#l00224">read()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="arg__parser_8cpp_source.html#l00566">FEAT::ArgParser::_property_map()</a>, <a class="el" href="property__map_8cpp_source.html#l00195">merge()</a>, and <a class="el" href="property__map_8cpp_source.html#l00224">read()</a>.</p>
 
 </div>
 </div>
@@ -543,7 +546,7 @@ Peter Zajac </dd></dl>
 
 <p class="reference">References <a class="el" href="property__map_8hpp_source.html#l00072">_sections</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="property__map_8cpp_source.html#l00195">merge()</a>, and <a class="el" href="property__map_8cpp_source.html#l00224">read()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="arg__parser_8cpp_source.html#l00566">FEAT::ArgParser::_property_map()</a>, <a class="el" href="property__map_8cpp_source.html#l00195">merge()</a>, and <a class="el" href="property__map_8cpp_source.html#l00224">read()</a>.</p>
 
 </div>
 </div>
@@ -668,6 +671,29 @@ Peter Zajac </dd></dl>
 <p class="definition">Definition at line <a class="el" href="property__map_8hpp_source.html#l00349">349</a> of file <a class="el" href="property__map_8hpp_source.html">property_map.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="property__map_8hpp_source.html#l00072">_sections</a>.</p>
+
+</div>
+</div>
+<a id="a8f44446fd50be236b033634472595900" name="a8f44446fd50be236b033634472595900"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8f44446fd50be236b033634472595900">&#9670;&#160;</a></span>clone()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::unique_ptr&lt; <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> &gt; FEAT::PropertyMap::clone </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Clones this property map to allow parameter modifications. </p>
+<p >This function copies the current property map as new root to another property map by deep copying its entries.</p>
+<dl class="section return"><dt>Returns</dt><dd>A unique ptr with a new property map </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="property__map_8cpp_source.html#l00531">531</a> of file <a class="el" href="property__map_8cpp_source.html">property_map.cpp</a>.</p>
 
 </div>
 </div>
@@ -1116,7 +1142,7 @@ Peter Zajac </dd></dl>
 
 <p class="reference">References <a class="el" href="property__map_8hpp_source.html#l00072">_sections</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="property__map_8cpp_source.html#l00087">query_section()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="arg__parser_8cpp_source.html#l00566">FEAT::ArgParser::_property_map()</a>, and <a class="el" href="property__map_8cpp_source.html#l00087">query_section()</a>.</p>
 
 </div>
 </div>
@@ -1183,7 +1209,7 @@ Peter Zajac </dd></dl>
 
 <p class="reference">References <a class="el" href="property__map_8hpp_source.html#l00072">_sections</a>, <a class="el" href="property__map_8hpp_source.html#l00069">_values</a>, <a class="el" href="property__map_8cpp_source.html#l00025">add_entry()</a>, <a class="el" href="property__map_8cpp_source.html#l00044">add_section()</a>, and <a class="el" href="property__map_8cpp_source.html#l00195">merge()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="property__map_8cpp_source.html#l00195">merge()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="arg__parser_8cpp_source.html#l00305">FEAT::ArgParser::bootstrap()</a>, and <a class="el" href="property__map_8cpp_source.html#l00195">merge()</a>.</p>
 
 </div>
 </div>
@@ -1282,7 +1308,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="reference">References <a class="el" href="property__map_8cpp_source.html#l00165">get_entry()</a>, <a class="el" href="property__map_8cpp_source.html#l00081">query_section()</a>, <a class="el" href="string_8hpp_source.html#l00328">FEAT::String::trim()</a>, and <a class="el" href="string_8hpp_source.html#l00359">FEAT::String::trim_me()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alglib__wrapper_8hpp_source.html#l00680">FEAT::Solver::ALGLIBMinCG&lt; Functional_, Filter_ &gt;::ALGLIBMinCG()</a>, <a class="el" href="alglib__wrapper_8hpp_source.html#l00155">FEAT::Solver::ALGLIBMinLBFGS&lt; Functional_, Filter_ &gt;::ALGLIBMinLBFGS()</a>, <a class="el" href="bicgstab_8hpp_source.html#l00227">FEAT::Solver::BiCGStab&lt; Matrix_, Filter_ &gt;::BiCGStab()</a>, <a class="el" href="bicgstabl_8hpp_source.html#l00195">FEAT::Solver::BiCGStabL&lt; Matrix_, Filter_ &gt;::BiCGStabL()</a>, <a class="el" href="chebyshev_8hpp_source.html#l00101">FEAT::Solver::Chebyshev&lt; Matrix_, Filter_ &gt;::Chebyshev()</a>, <a class="el" href="descent_8hpp_source.html#l00134">FEAT::Solver::Descent&lt; Matrix_, Filter_ &gt;::Descent()</a>, <a class="el" href="fixed__step__linesearch_8hpp_source.html#l00081">FEAT::Solver::FixedStepLinesearch&lt; Functional_, Filter_ &gt;::FixedStepLinesearch()</a>, <a class="el" href="jacobi__precond_8hpp_source.html#l00096">FEAT::Solver::JacobiPrecond&lt; Matrix_, Filter_ &gt;::JacobiPrecond()</a>, <a class="el" href="linesearch_8hpp_source.html#l00157">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::Linesearch()</a>, <a class="el" href="nlcg_8hpp_source.html#l00221">FEAT::Solver::NLCG&lt; Functional_, Filter_ &gt;::NLCG()</a>, <a class="el" href="nlsd_8hpp_source.html#l00130">FEAT::Solver::NLSD&lt; Functional_, Filter_ &gt;::NLSD()</a>, <a class="el" href="nvs__bdf__q_8hpp_source.html#l00185">FEAT::Control::Time::NvsBdfQ&lt; DT_ &gt;::NvsBdfQ()</a>, <a class="el" href="pcgnrilu_8hpp_source.html#l00109">FEAT::Solver::PCGNRILU&lt; Matrix_, Filter_ &gt;::PCGNRILU()</a>, <a class="el" href="polynomial__precond_8hpp_source.html#l00096">FEAT::Solver::PolynomialPrecond&lt; Matrix_, Filter_ &gt;::PolynomialPrecond()</a>, <a class="el" href="qpenalty_8hpp_source.html#l00112">FEAT::Solver::QPenalty&lt; Functional_ &gt;::QPenalty()</a>, <a class="el" href="richardson_8hpp_source.html#l00100">FEAT::Solver::Richardson&lt; Matrix_, Filter_ &gt;::Richardson()</a>, <a class="el" href="scale__precond_8hpp_source.html#l00061">FEAT::Solver::ScalePrecond&lt; Vector_, Filter_ &gt;::ScalePrecond()</a>, <a class="el" href="schwarz__precond_8hpp_source.html#l00111">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::SchwarzPrecond()</a>, <a class="el" href="secant__linesearch_8hpp_source.html#l00093">FEAT::Solver::SecantLinesearch&lt; Functional_, Filter_ &gt;::SecantLinesearch()</a>, <a class="el" href="sor__precond_8hpp_source.html#l00312">FEAT::Solver::SORPrecondWithBackend&lt; PreferredBackend::generic, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, block_height_, block_width_ &gt;, Filter_ &gt;::SORPrecondWithBackend()</a>, <a class="el" href="sor__precond_8hpp_source.html#l00134">FEAT::Solver::SORPrecondWithBackend&lt; PreferredBackend::generic, LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;, Filter_ &gt;::SORPrecondWithBackend()</a>, <a class="el" href="meshopt__control__factory_8hpp_source.html#l00174">FEAT::Control::Meshopt::ControlFactory&lt; DT_, IT_ &gt;::create_hyperelasticity_control()</a>, <a class="el" href="meshopt__control__factory_8hpp_source.html#l00344">FEAT::Control::Meshopt::ControlFactory&lt; DT_, IT_ &gt;::create_hyperelasticity_control_with_cell_functional()</a>, <a class="el" href="meshopt__precond__factory_8hpp_source.html#l00061">FEAT::Control::Meshopt::MeshoptPrecondFactory::create_nlopt_precond()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00254">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_property_map()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00161">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::parse_property_map()</a>, and <a class="el" href="property__map_8cpp_source.html#l00156">query()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alglib__wrapper_8hpp_source.html#l00680">FEAT::Solver::ALGLIBMinCG&lt; Functional_, Filter_ &gt;::ALGLIBMinCG()</a>, <a class="el" href="alglib__wrapper_8hpp_source.html#l00155">FEAT::Solver::ALGLIBMinLBFGS&lt; Functional_, Filter_ &gt;::ALGLIBMinLBFGS()</a>, <a class="el" href="bicgstab_8hpp_source.html#l00227">FEAT::Solver::BiCGStab&lt; Matrix_, Filter_ &gt;::BiCGStab()</a>, <a class="el" href="bicgstabl_8hpp_source.html#l00195">FEAT::Solver::BiCGStabL&lt; Matrix_, Filter_ &gt;::BiCGStabL()</a>, <a class="el" href="chebyshev_8hpp_source.html#l00101">FEAT::Solver::Chebyshev&lt; Matrix_, Filter_ &gt;::Chebyshev()</a>, <a class="el" href="descent_8hpp_source.html#l00134">FEAT::Solver::Descent&lt; Matrix_, Filter_ &gt;::Descent()</a>, <a class="el" href="fixed__step__linesearch_8hpp_source.html#l00081">FEAT::Solver::FixedStepLinesearch&lt; Functional_, Filter_ &gt;::FixedStepLinesearch()</a>, <a class="el" href="jacobi__precond_8hpp_source.html#l00096">FEAT::Solver::JacobiPrecond&lt; Matrix_, Filter_ &gt;::JacobiPrecond()</a>, <a class="el" href="linesearch_8hpp_source.html#l00157">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::Linesearch()</a>, <a class="el" href="nlcg_8hpp_source.html#l00221">FEAT::Solver::NLCG&lt; Functional_, Filter_ &gt;::NLCG()</a>, <a class="el" href="nlsd_8hpp_source.html#l00130">FEAT::Solver::NLSD&lt; Functional_, Filter_ &gt;::NLSD()</a>, <a class="el" href="nvs__bdf__q_8hpp_source.html#l00185">FEAT::Control::Time::NvsBdfQ&lt; DT_ &gt;::NvsBdfQ()</a>, <a class="el" href="pcgnrilu_8hpp_source.html#l00109">FEAT::Solver::PCGNRILU&lt; Matrix_, Filter_ &gt;::PCGNRILU()</a>, <a class="el" href="polynomial__precond_8hpp_source.html#l00096">FEAT::Solver::PolynomialPrecond&lt; Matrix_, Filter_ &gt;::PolynomialPrecond()</a>, <a class="el" href="qpenalty_8hpp_source.html#l00112">FEAT::Solver::QPenalty&lt; Functional_ &gt;::QPenalty()</a>, <a class="el" href="richardson_8hpp_source.html#l00100">FEAT::Solver::Richardson&lt; Matrix_, Filter_ &gt;::Richardson()</a>, <a class="el" href="scale__precond_8hpp_source.html#l00061">FEAT::Solver::ScalePrecond&lt; Vector_, Filter_ &gt;::ScalePrecond()</a>, <a class="el" href="schwarz__precond_8hpp_source.html#l00111">FEAT::Solver::SchwarzPrecond&lt; Global::Vector&lt; LocalVector_, Mirror_ &gt;, Global::Filter&lt; LocalFilter_, Mirror_ &gt; &gt;::SchwarzPrecond()</a>, <a class="el" href="secant__linesearch_8hpp_source.html#l00093">FEAT::Solver::SecantLinesearch&lt; Functional_, Filter_ &gt;::SecantLinesearch()</a>, <a class="el" href="sor__precond_8hpp_source.html#l00312">FEAT::Solver::SORPrecondWithBackend&lt; PreferredBackend::generic, LAFEM::SparseMatrixBCSR&lt; DT_, IT_, block_height_, block_width_ &gt;, Filter_ &gt;::SORPrecondWithBackend()</a>, <a class="el" href="sor__precond_8hpp_source.html#l00134">FEAT::Solver::SORPrecondWithBackend&lt; PreferredBackend::generic, LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;, Filter_ &gt;::SORPrecondWithBackend()</a>, <a class="el" href="meshopt__control__factory_8hpp_source.html#l00174">FEAT::Control::Meshopt::ControlFactory&lt; DT_, IT_ &gt;::create_hyperelasticity_control()</a>, <a class="el" href="meshopt__control__factory_8hpp_source.html#l00344">FEAT::Control::Meshopt::ControlFactory&lt; DT_, IT_ &gt;::create_hyperelasticity_control_with_cell_functional()</a>, <a class="el" href="meshopt__precond__factory_8hpp_source.html#l00061">FEAT::Control::Meshopt::MeshoptPrecondFactory::create_nlopt_precond()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00258">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::parse_property_map()</a>, <a class="el" href="parti__domain__control_8hpp_source.html#l00168">FEAT::Control::Domain::PartiDomainControl&lt; DomainLevel_ &gt;::parse_property_map()</a>, and <a class="el" href="property__map_8cpp_source.html#l00156">query()</a>.</p>
 
 </div>
 </div>
@@ -1546,7 +1572,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="reference">References <a class="el" href="property__map_8hpp_source.html#l00390">read()</a>, and <a class="el" href="dist_8cpp_source.html#l00432">FEAT::Dist::Comm::world()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="arg__parser_8hpp_source.html#l01028">FEAT::ArgParser::parse()</a>, and <a class="el" href="property__map_8cpp_source.html#l00217">read()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="arg__parser_8cpp_source.html#l00305">FEAT::ArgParser::bootstrap()</a>, <a class="el" href="arg__parser_8hpp_source.html#l01373">FEAT::ArgParser::parse()</a>, and <a class="el" href="property__map_8cpp_source.html#l00217">read()</a>.</p>
 
 </div>
 </div>
@@ -1569,7 +1595,7 @@ template&lt;typename T_ &gt; </div>
 <p >This function transforms a all sections consisting of "sec1/sec2" into real subsections. i.e. transform [sec1] \ [sec1] key1=val1 === \ { key1=val1 [sec1/sec2] === / [sec2] key2=val2 / key2=val2 }</p>
 <p >This appears to be necessary due to the oversight?! that "/" is not a reserved charset in sections. </p>
 
-<p class="definition">Definition at line <a class="el" href="property__map_8cpp_source.html#l00518">518</a> of file <a class="el" href="property__map_8cpp_source.html">property_map.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="property__map_8cpp_source.html#l00540">540</a> of file <a class="el" href="property__map_8cpp_source.html">property_map.cpp</a>.</p>
 
 </div>
 </div>

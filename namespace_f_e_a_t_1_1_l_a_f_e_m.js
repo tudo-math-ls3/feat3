@@ -33,6 +33,7 @@ var namespace_f_e_a_t_1_1_l_a_f_e_m =
     [ "PowerMirror", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_mirror" ],
     [ "PowerRowMatrix", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_row_matrix.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_row_matrix" ],
     [ "PowerVector", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_power_vector" ],
+    [ "ProjectionFilter", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_projection_filter.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_projection_filter" ],
     [ "SaddlePointMatrix", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix" ],
     [ "SaddlePointMatrixElement", "struct_f_e_a_t_1_1_l_a_f_e_m_1_1_saddle_point_matrix_element.html", null ],
     [ "SerialConfig", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_serial_config.html", "class_f_e_a_t_1_1_l_a_f_e_m_1_1_serial_config" ],

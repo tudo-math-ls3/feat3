@@ -7,6 +7,8 @@ var dir_07e58768f5c710b2527f2ba88732ca38 =
     [ "axpy_dense_generic-eickt.cpp", "axpy__dense__generic-eickt_8cpp_source.html", null ],
     [ "axpy_dense_generic.hpp", "axpy__dense__generic_8hpp_source.html", null ],
     [ "axpy_dense_mkl.cpp", "axpy__dense__mkl_8cpp_source.html", null ],
+    [ "batched_vector_apply.cu", "batched__vector__apply_8cu_source.html", null ],
+    [ "batched_vector_apply.hpp", "batched__vector__apply_8hpp_source.html", null ],
     [ "component_invert_dense.cu", "component__invert__dense_8cu_source.html", null ],
     [ "component_invert_dense.hpp", "component__invert__dense_8hpp_source.html", null ],
     [ "component_invert_dense_generic-eickt.cpp", "component__invert__dense__generic-eickt_8cpp_source.html", null ],

@@ -200,6 +200,8 @@ Classes</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_backend.html">Backend</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="class_f_e_a_t_1_1_backend.html" title="Backend support class.">Backend</a> support class.  <a href="class_f_e_a_t_1_1_backend.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_backend_scope.html">BackendScope</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_f_e_a_t_1_1_binary_stream.html">BinaryStream</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Binary Stream class.  <a href="class_f_e_a_t_1_1_binary_stream.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -288,6 +290,12 @@ Typedefs</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="enum-members" name="enum-members"></a>
 Enumerations</h2></td></tr>
+<tr class="memitem:a3632f23931f5b048e6870b2060c5f661"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><b>BackendIdx</b> : std::uint8_t { <b>generic</b> = 0
+, <b>mkl</b>
+, <b>cuda</b>
+, <b>num_backends</b>
+ }</td></tr>
+<tr class="separator:a3632f23931f5b048e6870b2060c5f661"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a050b7378896da037a96211e8db059029"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029">PreferredBackend</a> { <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a3d517f8924ac7fd03699a29d97dc52d9">generic</a> = 0
 , <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a324ddb5e2f605b34cce9110cbf390f6b">mkl</a>
 , <a class="el" href="namespace_f_e_a_t.html#a050b7378896da037a96211e8db059029a39466fe22b062a34cfe09f3cc8c24868">cuda</a>
@@ -338,6 +346,8 @@ Enumerations</h2></td></tr>
 Functions</h2></td></tr>
 <tr class="memitem:ad385a8f84199ad68964f9969906f8cd3"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#ad385a8f84199ad68964f9969906f8cd3">_add_sections</a> (<a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *out, const std::deque&lt; <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &gt; &amp;deq)</td></tr>
 <tr class="separator:ad385a8f84199ad68964f9969906f8cd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada8ce63d7f1a91be73f7ca0d1df8afa6"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#ada8ce63d7f1a91be73f7ca0d1df8afa6">_clone</a> (<a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *out, const <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *in)</td></tr>
+<tr class="separator:ada8ce63d7f1a91be73f7ca0d1df8afa6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae5a2b662a929af77970033124e4ae8a5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#ae5a2b662a929af77970033124e4ae8a5">_treeify</a> (<a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *out, const <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *in)</td></tr>
 <tr class="separator:ae5a2b662a929af77970033124e4ae8a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a881f84ab2c02e235ac8b688a6100f1f6"><td class="memItemLeft" align="right" valign="top">CUDA_HOST_DEVICE void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#a881f84ab2c02e235ac8b688a6100f1f6">abortion</a> (const char *const func, const char *const file, const int line, const char *const msg)</td></tr>
@@ -415,9 +425,16 @@ Functions</h2></td></tr>
 <tr class="memitem:a72efdb23696a9e7e8cd6a163ed8f0767"><td class="memTemplItemLeft" align="right" valign="top"><a class="el" href="class_f_e_a_t_1_1_string.html">String</a>&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#a72efdb23696a9e7e8cd6a163ed8f0767">stringify_join</a> (Iterator_ first, Iterator_ last, const <a class="el" href="class_f_e_a_t_1_1_string.html">String</a> &amp;delimiter=&quot;&quot;)</td></tr>
 <tr class="memdesc:a72efdb23696a9e7e8cd6a163ed8f0767"><td class="mdescLeft">&#160;</td><td class="mdescRight">Joins a sequence of strings.  <a href="namespace_f_e_a_t.html#a72efdb23696a9e7e8cd6a163ed8f0767">More...</a><br /></td></tr>
 <tr class="separator:a72efdb23696a9e7e8cd6a163ed8f0767"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad7f418c1baa13c2f0bb9235a83a98433"><td class="memTemplParams" colspan="2">template&lt;typename E &gt; </td></tr>
+<tr class="memitem:ad7f418c1baa13c2f0bb9235a83a98433"><td class="memTemplItemLeft" align="right" valign="top">constexpr auto&#160;</td><td class="memTemplItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#ad7f418c1baa13c2f0bb9235a83a98433">to_underlying</a> (E e) noexcept</td></tr>
+<tr class="memdesc:ad7f418c1baa13c2f0bb9235a83a98433"><td class="mdescLeft">&#160;</td><td class="mdescRight">Cast enum to underlying type.  <a href="namespace_f_e_a_t.html#ad7f418c1baa13c2f0bb9235a83a98433">More...</a><br /></td></tr>
+<tr class="separator:ad7f418c1baa13c2f0bb9235a83a98433"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
+<tr class="memitem:a211e907fb27932e0db7e41722695ad6a"><td class="memItemLeft" align="right" valign="top">static constexpr bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#a211e907fb27932e0db7e41722695ad6a">async_operations</a> = false</td></tr>
+<tr class="memdesc:a211e907fb27932e0db7e41722695ad6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Controls if asynchronous operations should be used by default.  <a href="namespace_f_e_a_t.html#a211e907fb27932e0db7e41722695ad6a">More...</a><br /></td></tr>
+<tr class="separator:a211e907fb27932e0db7e41722695ad6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad1683d7a0b5429b1bbff48716c222df9"><td class="memItemLeft" align="right" valign="top">static const std::uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#ad1683d7a0b5429b1bbff48716c222df9">hash_crc32_table</a> []</td></tr>
 <tr class="separator:ad1683d7a0b5429b1bbff48716c222df9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a915f550e5e25f665a148950f1ae4e249"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#a915f550e5e25f665a148950f1ae4e249">version_major</a> = 3</td></tr>
@@ -426,7 +443,7 @@ Variables</h2></td></tr>
 <tr class="memitem:aadedb307b3e7ac10f521c388fe78eb34"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#aadedb307b3e7ac10f521c388fe78eb34">version_minor</a> = 2026</td></tr>
 <tr class="memdesc:aadedb307b3e7ac10f521c388fe78eb34"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> minor version number (year)  <a href="namespace_f_e_a_t.html#aadedb307b3e7ac10f521c388fe78eb34">More...</a><br /></td></tr>
 <tr class="separator:aadedb307b3e7ac10f521c388fe78eb34"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aaae2520d89ae4daec4069ccbe29a33b7"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#aaae2520d89ae4daec4069ccbe29a33b7">version_patch</a> = 6</td></tr>
+<tr class="memitem:aaae2520d89ae4daec4069ccbe29a33b7"><td class="memItemLeft" align="right" valign="top">static constexpr int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespace_f_e_a_t.html#aaae2520d89ae4daec4069ccbe29a33b7">version_patch</a> = 11</td></tr>
 <tr class="memdesc:aaae2520d89ae4daec4069ccbe29a33b7"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> patch version number (month)  <a href="namespace_f_e_a_t.html#aaae2520d89ae4daec4069ccbe29a33b7">More...</a><br /></td></tr>
 <tr class="separator:aaae2520d89ae4daec4069ccbe29a33b7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
@@ -468,7 +485,7 @@ Variables</h2></td></tr>
 
 <p>Index data type. </p>
 
-<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00129">129</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00130">130</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
 
 </div>
 </div>
@@ -486,11 +503,35 @@ Variables</h2></td></tr>
 
 <p>Real data type. </p>
 
-<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00135">135</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00136">136</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Enumeration Type Documentation</h2>
+<a id="a3632f23931f5b048e6870b2060c5f661" name="a3632f23931f5b048e6870b2060c5f661"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3632f23931f5b048e6870b2060c5f661">&#9670;&#160;</a></span>BackendIdx</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">enum class FEAT::BackendIdx : std::uint8_t</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="backend_8hpp_source.html#l00024">24</a> of file <a class="el" href="backend_8hpp_source.html">backend.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a050b7378896da037a96211e8db059029" name="a050b7378896da037a96211e8db059029"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a050b7378896da037a96211e8db059029">&#9670;&#160;</a></span>PreferredBackend</h2>
 
@@ -679,6 +720,36 @@ Variables</h2></td></tr>
 
 </div>
 </div>
+<a id="ada8ce63d7f1a91be73f7ca0d1df8afa6" name="ada8ce63d7f1a91be73f7ca0d1df8afa6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ada8ce63d7f1a91be73f7ca0d1df8afa6">&#9670;&#160;</a></span>_clone()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void FEAT::_clone </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *&#160;</td>
+          <td class="paramname"><em>out</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">const <a class="el" href="class_f_e_a_t_1_1_property_map.html">PropertyMap</a> *&#160;</td>
+          <td class="paramname"><em>in</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="property__map_8cpp_source.html#l00518">518</a> of file <a class="el" href="property__map_8cpp_source.html">property_map.cpp</a>.</p>
+
+</div>
+</div>
 <a id="ae5a2b662a929af77970033124e4ae8a5" name="ae5a2b662a929af77970033124e4ae8a5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ae5a2b662a929af77970033124e4ae8a5">&#9670;&#160;</a></span>_treeify()</h2>
 
@@ -769,7 +840,7 @@ Variables</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00038">38</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="runtime_8cpp_source.html#l00426">FEAT::Runtime::abort()</a>.</p>
+<p class="reference">References <a class="el" href="runtime_8cpp_source.html#l00431">FEAT::Runtime::abort()</a>.</p>
 
 </div>
 </div>
@@ -901,7 +972,7 @@ Variables</h2></td></tr>
 
 <p class="definition">Definition at line <a class="el" href="assertion_8hpp_source.html#l00114">114</a> of file <a class="el" href="assertion_8hpp_source.html">assertion.hpp</a>.</p>
 
-<p class="reference">References <a class="el" href="runtime_8cpp_source.html#l00426">FEAT::Runtime::abort()</a>.</p>
+<p class="reference">References <a class="el" href="runtime_8cpp_source.html#l00431">FEAT::Runtime::abort()</a>.</p>
 
 </div>
 </div>
@@ -1019,7 +1090,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00262">XASSERT</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00725">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_asm_mat_buf()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="alg__dof__parti__system_8hpp_source.html#l00726">FEAT::Global::AlgDofPartiSystem&lt; LocalMatrix_, LocalFilter_, Mirror_ &gt;::_asm_mat_buf()</a>.</p>
 
 </div>
 </div>
@@ -1333,7 +1404,7 @@ template&lt;typename T_ &gt; </div>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="backend_8cpp_source.html#l00037">37</a> of file <a class="el" href="backend_8cpp_source.html">backend.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="backend_8cpp_source.html#l00048">48</a> of file <a class="el" href="backend_8cpp_source.html">backend.cpp</a>.</p>
 
 </div>
 </div>
@@ -1587,7 +1658,7 @@ template&lt;typename T_ &gt; </div>
 
 <p class="definition">Definition at line <a class="el" href="string_8hpp_source.html#l00993">993</a> of file <a class="el" href="string_8hpp_source.html">string.hpp</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="bicgstabl_8hpp_source.html#l00195">FEAT::Solver::BiCGStabL&lt; Matrix_, Filter_ &gt;::BiCGStabL()</a>, <a class="el" href="descent_8hpp_source.html#l00101">FEAT::Solver::Descent&lt; Matrix_, Filter_ &gt;::Descent()</a>, <a class="el" href="gmsh__reader_8hpp_source.html#l00211">FEAT::Geometry::GmshFileReader::GmshFileReader()</a>, <a class="el" href="qpenalty_8hpp_source.html#l00226">FEAT::Solver::QPenalty&lt; Functional_ &gt;::_apply_intern()</a>, <a class="el" href="linesearch_8hpp_source.html#l00543">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_check_convergence()</a>, <a class="el" href="cgal__domain__control_8hpp_source.html#l00818">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l01112">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="iterative_8hpp_source.html#l00773">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_plot_iter_line()</a>, <a class="el" href="dist__file__io_8cpp_source.html#l00014">FEAT::DistFileIO::_rankname()</a>, <a class="el" href="qpenalty_8hpp_source.html#l00331">FEAT::Solver::QPenalty&lt; Functional_ &gt;::_set_initial_defect()</a>, <a class="el" href="nloptls_8hpp_source.html#l00267">FEAT::Solver::NLOptLS&lt; Functional_, Filter_ &gt;::_set_initial_defect()</a>, <a class="el" href="nloptls_8hpp_source.html#l00325">FEAT::Solver::NLOptLS&lt; Functional_, Filter_ &gt;::_set_new_defect()</a>, <a class="el" href="linesearch_8hpp_source.html#l00464">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_startup()</a>, <a class="el" href="dist_8cpp_source.html#l00807">FEAT::Dist::Comm::allprint()</a>, <a class="el" href="nlcg_8hpp_source.html#l00636">FEAT::Solver::NLCG&lt; Functional_, Filter_ &gt;::compute_beta()</a>, <a class="el" href="meshopt__control_8hpp_source.html#l00275">FEAT::Control::Meshopt::MeshoptControlBase&lt; DomainControl_ &gt;::compute_mesh_quality()</a>, <a class="el" href="driver__factory_8hpp_source.html#l00187">FEAT::Cubature::DriverFactory&lt; Driver_, Shape_, true &gt;::create()</a>, <a class="el" href="scalar_2driver__factory_8hpp_source.html#l00184">FEAT::Cubature::Scalar::DriverFactory&lt; Driver_, true &gt;::create()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01483">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::dump()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00593">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::dump_ancestry()</a>, <a class="el" href="cgal__domain__control_8hpp_source.html#l00500">FEAT::Control::Domain::CGALDomainControl&lt; DomainLevel_ &gt;::dump_slag_layer_levels()</a>, <a class="el" href="voxel__domain__control_8hpp_source.html#l00762">FEAT::Control::Domain::VoxelDomainControl&lt; DomainLevel_ &gt;::dump_slag_layer_levels()</a>, <a class="el" href="voxel__map_8cpp_source.html#l00459">FEAT::Geometry::VoxelMap::export_to_bmp()</a>, <a class="el" href="mesh__node_8hpp_source.html#l01299">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::extract_patch()</a>, <a class="el" href="patch__meshpart__splitter_8hpp_source.html#l00372">FEAT::Geometry::PatchPartMap::fill_index_set()</a>, <a class="el" href="surface__mesh_8hpp_source.html#l00552">FEAT::Geometry::Atlas::SurfaceMesh&lt; Mesh_ &gt;::find_cell()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00523">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::format_chosen_levels()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00502">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::format_desired_levels()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00549">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::get_chosen_parti_info()</a>, <a class="el" href="kernel_2util_2statistics_8hpp_source.html#l00218">FEAT::Statistics::get_formatted_flops()</a>, <a class="el" href="memory__usage_8hpp_source.html#l00232">FEAT::MemoryUsage::get_formatted_memory_usage()</a>, <a class="el" href="statistics_8cpp_source.html#l00558">FEAT::Statistics::get_formatted_solver_internals()</a>, <a class="el" href="statistics_8cpp_source.html#l00473">FEAT::Statistics::get_formatted_times()</a>, <a class="el" href="iterative_8hpp_source.html#l00610">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::get_summary()</a>, <a class="el" href="linesearch_8hpp_source.html#l00213">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::get_summary()</a>, <a class="el" href="nloptls_8hpp_source.html#l00182">FEAT::Solver::NLOptLS&lt; Functional_, Filter_ &gt;::get_summary()</a>, <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00579">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::info()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01713">FEAT::Meshopt::ConcentrationFunctionDefault&lt; DT_ &gt;::info()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01829">FEAT::Meshopt::ConcentrationFunctionPowOfDist&lt; DT_ &gt;::info()</a>, <a class="el" href="dudv__functional__control_8hpp_source.html#l00251">FEAT::Control::Meshopt::DuDvFunctionalControl&lt; DT_, IT_, DomainControl_ &gt;::info()</a>, <a class="el" href="hyperelasticity__functional__control_8hpp_source.html#l00293">FEAT::Control::Meshopt::HyperelasticityFunctionalControl&lt; DT_, IT_, DomainControl_, Hyperelasticity_ &gt;::info()</a>, <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00712">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::init_pre_sync()</a>, <a class="el" href="pack_8cpp_source.html#l00951">FEAT::Pack::lossy_decode()</a>, <a class="el" href="conformal__mesh_8hpp_source.html#l00630">FEAT::Geometry::ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt;::name()</a>, <a class="el" href="index__calculator_8hpp_source.html#l00408">FEAT::Geometry::IndexCalculator&lt; Shape_, face_dim_ &gt;::name()</a>, <a class="el" href="index__set_8hpp_source.html#l00324">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::name()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00395">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::name()</a>, <a class="el" href="power__diag__matrix_8hpp_source.html#l00440">FEAT::LAFEM::PowerDiagMatrix&lt; SubType_, blocks_ &gt;::name()</a>, <a class="el" href="power__full__matrix_8hpp_source.html#l00352">FEAT::LAFEM::PowerFullMatrix&lt; SubType_, width_, height_ &gt;::name()</a>, <a class="el" href="power__row__matrix_8hpp_source.html#l00395">FEAT::LAFEM::PowerRowMatrix&lt; SubType_, blocks_ &gt;::name()</a>, <a class="el" href="power__vector_8hpp_source.html#l00353">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::name()</a>, <a class="el" href="shape_8hpp_source.html#l00051">FEAT::Shape::Simplex&lt; dimension_ &gt;::name()</a>, <a class="el" href="shape_8hpp_source.html#l00071">FEAT::Shape::Hypercube&lt; dimension_ &gt;::name()</a>, <a class="el" href="multigrid_8hpp_source.html#l01160">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;::name()</a>, <a class="el" href="template__builder_8hpp_source.html#l00507">FEAT::Geometry::operator&lt;&lt;()</a>, <a class="el" href="parsed__function_8hpp_source.html#l00485">FEAT::Analytic::ParsedVectorFunction&lt; dom_dim_, img_dim_ &gt;::parse()</a>, <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00791">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::prepare_pre_sync()</a>, <a class="el" href="statistics_8cpp_source.html#l00355">FEAT::Statistics::print_solver_expressions()</a>, <a class="el" href="schneiders__data_8hpp_source.html#l00098">FEAT::Geometry::SchneidersData::raw_templates()</a>, <a class="el" href="sun__zhao__ma__data_8hpp_source.html#l00101">FEAT::Geometry::SunZhaoMaData::raw_templates()</a>, <a class="el" href="sun__zhao__ma__expansion__data_8hpp_source.html#l00100">FEAT::Geometry::SunZhaoMaExpansionData::raw_templates()</a>, <a class="el" href="two__refinement__data_8hpp_source.html#l00098">FEAT::Geometry::TwoRefinementData::raw_templates()</a>, <a class="el" href="property__map_8cpp_source.html#l00224">FEAT::PropertyMap::read()</a>, <a class="el" href="voxel__map_8cpp_source.html#l00332">FEAT::Geometry::VoxelMap::read()</a>, <a class="el" href="dist__file__io_8cpp_source.html#l00490">FEAT::DistFileIO::read_combined()</a>, <a class="el" href="power__vector_8hpp_source.html#l00588">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::read_from()</a>, <a class="el" href="gmsh__reader_8hpp_source.html#l00297">FEAT::Geometry::GmshFileReader::read_root_markup()</a>, <a class="el" href="voxel__map_8cpp_source.html#l00484">FEAT::Geometry::VoxelMap::render_to_bmp()</a>, <a class="el" href="nvs__bdf__q_8hpp_source.html#l00368">FEAT::Control::Time::NvsBdfQ&lt; DT_ &gt;::set_coeffs()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00351">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::set_desired_levels()</a>, <a class="el" href="alglib__wrapper_8hpp_source.html#l00746">FEAT::Solver::ALGLIBMinCG&lt; Functional_, Filter_ &gt;::set_direction_update()</a>, <a class="el" href="template__builder_8hpp_source.html#l01537">FEAT::Geometry::TemplateBuilder&lt; RawData_ &gt;::stats()</a>, <a class="el" href="string_8hpp_source.html#l01310">stringify_bytes()</a>, <a class="el" href="string_8hpp_source.html#l01066">stringify_join()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00887">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write()</a>, <a class="el" href="tuple__diag__matrix_8hpp_source.html#l00245">FEAT::LAFEM::TupleDiagMatrix&lt; First_, Rest_ &gt;::write_out_submatrices()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00243">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::write_out_submatrices()</a>, <a class="el" href="power__diag__matrix_8hpp_source.html#l00245">FEAT::LAFEM::PowerDiagMatrix&lt; SubType_, blocks_ &gt;::write_out_submatrices()</a>, <a class="el" href="power__row__matrix_8hpp_source.html#l00243">FEAT::LAFEM::PowerRowMatrix&lt; SubType_, blocks_ &gt;::write_out_submatrices()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l01198">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_pvtu()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="bicgstabl_8hpp_source.html#l00195">FEAT::Solver::BiCGStabL&lt; Matrix_, Filter_ &gt;::BiCGStabL()</a>, <a class="el" href="descent_8hpp_source.html#l00101">FEAT::Solver::Descent&lt; Matrix_, Filter_ &gt;::Descent()</a>, <a class="el" href="gmsh__reader_8hpp_source.html#l00211">FEAT::Geometry::GmshFileReader::GmshFileReader()</a>, <a class="el" href="qpenalty_8hpp_source.html#l00226">FEAT::Solver::QPenalty&lt; Functional_ &gt;::_apply_intern()</a>, <a class="el" href="linesearch_8hpp_source.html#l00543">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_check_convergence()</a>, <a class="el" href="deslagged__domain__control_8hpp_source.html#l01563">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::_deslag_patch_halos()</a>, <a class="el" href="iterative_8hpp_source.html#l00773">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::_plot_iter_line()</a>, <a class="el" href="dist__file__io_8cpp_source.html#l00014">FEAT::DistFileIO::_rankname()</a>, <a class="el" href="qpenalty_8hpp_source.html#l00331">FEAT::Solver::QPenalty&lt; Functional_ &gt;::_set_initial_defect()</a>, <a class="el" href="nloptls_8hpp_source.html#l00267">FEAT::Solver::NLOptLS&lt; Functional_, Filter_ &gt;::_set_initial_defect()</a>, <a class="el" href="nloptls_8hpp_source.html#l00325">FEAT::Solver::NLOptLS&lt; Functional_, Filter_ &gt;::_set_new_defect()</a>, <a class="el" href="linesearch_8hpp_source.html#l00464">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::_startup()</a>, <a class="el" href="dist_8cpp_source.html#l00807">FEAT::Dist::Comm::allprint()</a>, <a class="el" href="nlcg_8hpp_source.html#l00636">FEAT::Solver::NLCG&lt; Functional_, Filter_ &gt;::compute_beta()</a>, <a class="el" href="meshopt__control_8hpp_source.html#l00275">FEAT::Control::Meshopt::MeshoptControlBase&lt; DomainControl_ &gt;::compute_mesh_quality()</a>, <a class="el" href="driver__factory_8hpp_source.html#l00187">FEAT::Cubature::DriverFactory&lt; Driver_, Shape_, true &gt;::create()</a>, <a class="el" href="scalar_2driver__factory_8hpp_source.html#l00184">FEAT::Cubature::Scalar::DriverFactory&lt; Driver_, true &gt;::create()</a>, <a class="el" href="domain__assembler_8hpp_source.html#l01483">FEAT::Assembly::DomainAssembler&lt; Trafo_ &gt;::dump()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00597">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::dump_ancestry()</a>, <a class="el" href="deslagged__domain__control_8hpp_source.html#l01363">FEAT::Control::Domain::DeslaggedDomainControl&lt; DomainLevel_ &gt;::dump_slag_layer_levels()</a>, <a class="el" href="voxel__map_8cpp_source.html#l00459">FEAT::Geometry::VoxelMap::export_to_bmp()</a>, <a class="el" href="mesh__node_8hpp_source.html#l01299">FEAT::Geometry::RootMeshNode&lt; RootMesh_ &gt;::extract_patch()</a>, <a class="el" href="patch__meshpart__splitter_8hpp_source.html#l00372">FEAT::Geometry::PatchPartMap::fill_index_set()</a>, <a class="el" href="surface__mesh_8hpp_source.html#l00552">FEAT::Geometry::Atlas::SurfaceMesh&lt; Mesh_ &gt;::find_cell()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00527">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::format_chosen_levels()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00506">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::format_desired_levels()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00553">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::get_chosen_parti_info()</a>, <a class="el" href="kernel_2util_2statistics_8hpp_source.html#l00218">FEAT::Statistics::get_formatted_flops()</a>, <a class="el" href="memory__usage_8hpp_source.html#l00232">FEAT::MemoryUsage::get_formatted_memory_usage()</a>, <a class="el" href="statistics_8cpp_source.html#l00558">FEAT::Statistics::get_formatted_solver_internals()</a>, <a class="el" href="statistics_8cpp_source.html#l00473">FEAT::Statistics::get_formatted_times()</a>, <a class="el" href="iterative_8hpp_source.html#l00610">FEAT::Solver::IterativeSolver&lt; Vector_ &gt;::get_summary()</a>, <a class="el" href="linesearch_8hpp_source.html#l00213">FEAT::Solver::Linesearch&lt; Functional_, Filter_ &gt;::get_summary()</a>, <a class="el" href="nloptls_8hpp_source.html#l00182">FEAT::Solver::NLOptLS&lt; Functional_, Filter_ &gt;::get_summary()</a>, <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00579">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::info()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01713">FEAT::Meshopt::ConcentrationFunctionDefault&lt; DT_ &gt;::info()</a>, <a class="el" href="mesh__concentration__function_8hpp_source.html#l01829">FEAT::Meshopt::ConcentrationFunctionPowOfDist&lt; DT_ &gt;::info()</a>, <a class="el" href="dudv__functional__control_8hpp_source.html#l00251">FEAT::Control::Meshopt::DuDvFunctionalControl&lt; DT_, IT_, DomainControl_ &gt;::info()</a>, <a class="el" href="hyperelasticity__functional__control_8hpp_source.html#l00293">FEAT::Control::Meshopt::HyperelasticityFunctionalControl&lt; DT_, IT_, DomainControl_, Hyperelasticity_ &gt;::info()</a>, <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00712">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::init_pre_sync()</a>, <a class="el" href="pack_8cpp_source.html#l00951">FEAT::Pack::lossy_decode()</a>, <a class="el" href="projection__filter__assembler_8hpp_source.html#l00077">FEAT::Assembly::FeatureMeshPartFactory&lt; Mesh_ &gt;::make()</a>, <a class="el" href="conformal__mesh_8hpp_source.html#l00630">FEAT::Geometry::ConformalMesh&lt; Shape_, num_coords_, Coord_ &gt;::name()</a>, <a class="el" href="index__calculator_8hpp_source.html#l00414">FEAT::Geometry::IndexCalculator&lt; Shape_, face_dim_ &gt;::name()</a>, <a class="el" href="index__set_8hpp_source.html#l00324">FEAT::Geometry::IndexSet&lt; num_indices_ &gt;::name()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00395">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::name()</a>, <a class="el" href="power__diag__matrix_8hpp_source.html#l00440">FEAT::LAFEM::PowerDiagMatrix&lt; SubType_, blocks_ &gt;::name()</a>, <a class="el" href="power__full__matrix_8hpp_source.html#l00352">FEAT::LAFEM::PowerFullMatrix&lt; SubType_, width_, height_ &gt;::name()</a>, <a class="el" href="power__row__matrix_8hpp_source.html#l00395">FEAT::LAFEM::PowerRowMatrix&lt; SubType_, blocks_ &gt;::name()</a>, <a class="el" href="power__vector_8hpp_source.html#l00359">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::name()</a>, <a class="el" href="shape_8hpp_source.html#l00051">FEAT::Shape::Simplex&lt; dimension_ &gt;::name()</a>, <a class="el" href="shape_8hpp_source.html#l00071">FEAT::Shape::Hypercube&lt; dimension_ &gt;::name()</a>, <a class="el" href="multigrid_8hpp_source.html#l01160">FEAT::Solver::MultiGrid&lt; SystemMatrix_, SystemFilter_, TransferOperator_ &gt;::name()</a>, <a class="el" href="template__builder_8hpp_source.html#l00507">FEAT::Geometry::operator&lt;&lt;()</a>, <a class="el" href="parsed__function_8hpp_source.html#l00485">FEAT::Analytic::ParsedVectorFunction&lt; dom_dim_, img_dim_ &gt;::parse()</a>, <a class="el" href="hyperelasticity__functional_8hpp_source.html#l00791">FEAT::Meshopt::HyperelasticityFunctional&lt; DT_, IT_, Trafo_, CellFunctionalType_, RefCellTrafo_ &gt;::prepare_pre_sync()</a>, <a class="el" href="statistics_8cpp_source.html#l00355">FEAT::Statistics::print_solver_expressions()</a>, <a class="el" href="schneiders__data_8hpp_source.html#l00098">FEAT::Geometry::SchneidersData::raw_templates()</a>, <a class="el" href="sun__zhao__ma__data_8hpp_source.html#l00101">FEAT::Geometry::SunZhaoMaData::raw_templates()</a>, <a class="el" href="sun__zhao__ma__expansion__data_8hpp_source.html#l00100">FEAT::Geometry::SunZhaoMaExpansionData::raw_templates()</a>, <a class="el" href="two__refinement__data_8hpp_source.html#l00098">FEAT::Geometry::TwoRefinementData::raw_templates()</a>, <a class="el" href="property__map_8cpp_source.html#l00224">FEAT::PropertyMap::read()</a>, <a class="el" href="voxel__map_8cpp_source.html#l00332">FEAT::Geometry::VoxelMap::read()</a>, <a class="el" href="dist__file__io_8cpp_source.html#l00490">FEAT::DistFileIO::read_combined()</a>, <a class="el" href="power__vector_8hpp_source.html#l00594">FEAT::LAFEM::PowerVector&lt; SubType_, count_ &gt;::read_from()</a>, <a class="el" href="gmsh__reader_8hpp_source.html#l00297">FEAT::Geometry::GmshFileReader::read_root_markup()</a>, <a class="el" href="voxel__map_8cpp_source.html#l00484">FEAT::Geometry::VoxelMap::render_to_bmp()</a>, <a class="el" href="nvs__bdf__q_8hpp_source.html#l00368">FEAT::Control::Time::NvsBdfQ&lt; DT_ &gt;::set_coeffs()</a>, <a class="el" href="parti__domain__control__base_8hpp_source.html#l00355">FEAT::Control::Domain::PartiDomainControlBase&lt; DomainLevel_ &gt;::set_desired_levels()</a>, <a class="el" href="alglib__wrapper_8hpp_source.html#l00746">FEAT::Solver::ALGLIBMinCG&lt; Functional_, Filter_ &gt;::set_direction_update()</a>, <a class="el" href="template__builder_8hpp_source.html#l01537">FEAT::Geometry::TemplateBuilder&lt; RawData_ &gt;::stats()</a>, <a class="el" href="string_8hpp_source.html#l01310">stringify_bytes()</a>, <a class="el" href="string_8hpp_source.html#l01066">stringify_join()</a>, <a class="el" href="export__vtk_8hpp_source.html#l00887">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write()</a>, <a class="el" href="tuple__diag__matrix_8hpp_source.html#l00245">FEAT::LAFEM::TupleDiagMatrix&lt; First_, Rest_ &gt;::write_out_submatrices()</a>, <a class="el" href="power__col__matrix_8hpp_source.html#l00243">FEAT::LAFEM::PowerColMatrix&lt; SubType_, blocks_ &gt;::write_out_submatrices()</a>, <a class="el" href="power__diag__matrix_8hpp_source.html#l00245">FEAT::LAFEM::PowerDiagMatrix&lt; SubType_, blocks_ &gt;::write_out_submatrices()</a>, <a class="el" href="power__row__matrix_8hpp_source.html#l00243">FEAT::LAFEM::PowerRowMatrix&lt; SubType_, blocks_ &gt;::write_out_submatrices()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l01198">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_pvtu()</a>.</p>
 
 </div>
 </div>
@@ -1907,7 +1978,68 @@ template&lt;typename Iterator_ &gt; </div>
 
 </div>
 </div>
+<a id="ad7f418c1baa13c2f0bb9235a83a98433" name="ad7f418c1baa13c2f0bb9235a83a98433"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad7f418c1baa13c2f0bb9235a83a98433">&#9670;&#160;</a></span>to_underlying()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<div class="memtemplate">
+template&lt;typename E &gt; </div>
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr auto FEAT::to_underlying </td>
+          <td>(</td>
+          <td class="paramtype">E&#160;</td>
+          <td class="paramname"><em>e</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">constexpr</span><span class="mlabel">noexcept</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Cast enum to underlying type. </p>
+
+<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00142">142</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
+
+<p class="reference">Referenced by <a class="el" href="sparse__matrix__bcsr_8hpp_source.html#l00983">FEAT::LAFEM::SparseMatrixBCSR&lt; DT_, IT_, block_height_, block_width_ &gt;::init_workspace()</a>, and <a class="el" href="sparse__matrix__csr_8hpp_source.html#l01218">FEAT::LAFEM::SparseMatrixCSR&lt; DT_, IT_ &gt;::init_workspace()</a>.</p>
+
+</div>
+</div>
 <h2 class="groupheader">Variable Documentation</h2>
+<a id="a211e907fb27932e0db7e41722695ad6a" name="a211e907fb27932e0db7e41722695ad6a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a211e907fb27932e0db7e41722695ad6a">&#9670;&#160;</a></span>async_operations</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">constexpr bool FEAT::async_operations = false</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span><span class="mlabel">constexpr</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Controls if asynchronous operations should be used by default. </p>
+<p >Using this can lead to false reports in timings. Mainly used for cuda operations, but might also be relevant for mpi synchronization. </p>
+
+<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00156">156</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
+
+</div>
+</div>
 <a id="ad1683d7a0b5429b1bbff48716c222df9" name="ad1683d7a0b5429b1bbff48716c222df9"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ad1683d7a0b5429b1bbff48716c222df9">&#9670;&#160;</a></span>hash_crc32_table</h2>
 
@@ -1954,7 +2086,7 @@ template&lt;typename Iterator_ &gt; </div>
 
 <p><a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> major version number. </p>
 
-<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00117">117</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00118">118</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="runtime_8cpp_source.html#l00050">FEAT::Runtime::initialize()</a>, <a class="el" href="ext__vtk__writer_8hpp_source.html#l00140">FEAT::Space::ExtVtkWriter&lt; Trafo_ &gt;::open()</a>, <a class="el" href="export__vtk_8hpp_source.html#l01198">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_pvtu()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00996">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
 
@@ -1982,7 +2114,7 @@ template&lt;typename Iterator_ &gt; </div>
 
 <p><a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> minor version number (year) </p>
 
-<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00119">119</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00120">120</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="runtime_8cpp_source.html#l00050">FEAT::Runtime::initialize()</a>, <a class="el" href="ext__vtk__writer_8hpp_source.html#l00140">FEAT::Space::ExtVtkWriter&lt; Trafo_ &gt;::open()</a>, <a class="el" href="export__vtk_8hpp_source.html#l01198">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_pvtu()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00996">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
 
@@ -1998,7 +2130,7 @@ template&lt;typename Iterator_ &gt; </div>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">constexpr int FEAT::version_patch = 6</td>
+          <td class="memname">constexpr int FEAT::version_patch = 11</td>
         </tr>
       </table>
   </td>
@@ -2010,7 +2142,7 @@ template&lt;typename Iterator_ &gt; </div>
 
 <p><a class="el" href="namespace_f_e_a_t.html" title="FEAT namespace.">FEAT</a> patch version number (month) </p>
 
-<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00121">121</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="base__header_8hpp_source.html#l00122">122</a> of file <a class="el" href="base__header_8hpp_source.html">base_header.hpp</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="runtime_8cpp_source.html#l00050">FEAT::Runtime::initialize()</a>, <a class="el" href="ext__vtk__writer_8hpp_source.html#l00140">FEAT::Space::ExtVtkWriter&lt; Trafo_ &gt;::open()</a>, <a class="el" href="export__vtk_8hpp_source.html#l01198">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_pvtu()</a>, and <a class="el" href="export__vtk_8hpp_source.html#l00996">FEAT::Geometry::ExportVTK&lt; Mesh_, cell_dim_ &gt;::write_vtu()</a>.</p>
 

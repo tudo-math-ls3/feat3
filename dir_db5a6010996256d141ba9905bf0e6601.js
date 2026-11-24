@@ -45,6 +45,8 @@ var dir_db5a6010996256d141ba9905bf0e6601 =
     [ "parti_iterative.hpp", "parti__iterative_8hpp_source.html", null ],
     [ "parti_parmetis.cpp", "parti__parmetis_8cpp_source.html", null ],
     [ "parti_parmetis.hpp", "parti__parmetis_8hpp_source.html", null ],
+    [ "parti_scotch.cpp", "parti__scotch_8cpp_source.html", null ],
+    [ "parti_scotch.hpp", "parti__scotch_8hpp_source.html", null ],
     [ "parti_zoltan.cpp", "parti__zoltan_8cpp_source.html", null ],
     [ "parti_zoltan.hpp", "parti__zoltan_8hpp_source.html", null ],
     [ "partition_set.hpp", "partition__set_8hpp_source.html", null ],

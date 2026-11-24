@@ -47,9 +47,10 @@ var searchData=
   ['tiny_44',['Tiny',['../namespace_f_e_a_t_1_1_tiny.html',1,'FEAT']]],
   ['trafo_45',['Trafo',['../namespace_f_e_a_t_1_1_trafo.html',1,'FEAT']]],
   ['type_46',['Type',['../namespace_f_e_a_t_1_1_type.html',1,'FEAT']]],
-  ['variant_47',['Variant',['../namespace_f_e_a_t_1_1_space_1_1_discontinuous_1_1_variant.html',1,'FEAT::Space::Discontinuous']]],
-  ['voxelassembly_48',['VoxelAssembly',['../namespace_f_e_a_t_1_1_voxel_assembly.html',1,'FEAT']]],
-  ['voxelassemblypolicies_49',['VoxelAssemblyPolicies',['../namespace_f_e_a_t_1_1_voxel_assembly_policies.html',1,'FEAT']]],
-  ['windows_50',['Windows',['../namespace_f_e_a_t_1_1_windows.html',1,'FEAT']]],
-  ['xml_51',['Xml',['../namespace_f_e_a_t_1_1_xml.html',1,'FEAT']]]
+  ['vankarichardson_47',['VankaRichardson',['../namespace_f_e_a_t_1_1_solver_1_1_vanka_richardson.html',1,'FEAT::Solver']]],
+  ['variant_48',['Variant',['../namespace_f_e_a_t_1_1_space_1_1_discontinuous_1_1_variant.html',1,'FEAT::Space::Discontinuous']]],
+  ['voxelassembly_49',['VoxelAssembly',['../namespace_f_e_a_t_1_1_voxel_assembly.html',1,'FEAT']]],
+  ['voxelassemblypolicies_50',['VoxelAssemblyPolicies',['../namespace_f_e_a_t_1_1_voxel_assembly_policies.html',1,'FEAT']]],
+  ['windows_51',['Windows',['../namespace_f_e_a_t_1_1_windows.html',1,'FEAT']]],
+  ['xml_52',['Xml',['../namespace_f_e_a_t_1_1_xml.html',1,'FEAT']]]
 ];

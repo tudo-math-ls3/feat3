@@ -162,7 +162,7 @@ class FEAT::Global::ScalarRemoteLambda&lt; R_(Args_...)&gt;</div><p >MPI-abstrac
 <p>This class-template allows calling scalar lambda functions on other ranks. We call a lambda function scalar if it returns a single MPI-transmittable type.</p>
 <dl class="section see"><dt>See also</dt><dd>RemoteLambda&lt;Range_&lt;R_&gt;(Args_...)&gt; for the specialization for vector-valued lambdas </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="remote__lambda_8hpp_source.html#l00653">653</a> of file <a class="el" href="remote__lambda_8hpp_source.html">remote_lambda.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remote__lambda_8hpp_source.html#l00775">775</a> of file <a class="el" href="remote__lambda_8hpp_source.html">remote_lambda.hpp</a>.</p>
 </div><h2 class="groupheader">Member Typedef Documentation</h2>
 <a id="a47984d57184cdbcf00f6b715b78b9706" name="a47984d57184cdbcf00f6b715b78b9706"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a47984d57184cdbcf00f6b715b78b9706">&#9670;&#160;</a></span>ArgumentTuple</h2>
@@ -180,7 +180,7 @@ template&lt;typename R_ , typename... Args_&gt; </div>
 
 <p>Tuple of arguments for the lambda function. </p>
 
-<p class="definition">Definition at line <a class="el" href="remote__lambda_8hpp_source.html#l00660">660</a> of file <a class="el" href="remote__lambda_8hpp_source.html">remote_lambda.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remote__lambda_8hpp_source.html#l00782">782</a> of file <a class="el" href="remote__lambda_8hpp_source.html">remote_lambda.hpp</a>.</p>
 
 </div>
 </div>
@@ -200,7 +200,7 @@ template&lt;typename R_ , typename... Args_&gt; </div>
 
 <p>Return type of the lambda function. </p>
 
-<p class="definition">Definition at line <a class="el" href="remote__lambda_8hpp_source.html#l00657">657</a> of file <a class="el" href="remote__lambda_8hpp_source.html">remote_lambda.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remote__lambda_8hpp_source.html#l00779">779</a> of file <a class="el" href="remote__lambda_8hpp_source.html">remote_lambda.hpp</a>.</p>
 
 </div>
 </div>
@@ -233,7 +233,7 @@ template&lt;typename R_ , typename... Args_&gt; </div>
 
 <p>Constructor. </p>
 
-<p class="definition">Definition at line <a class="el" href="remote__lambda_8hpp_source.html#l00672">672</a> of file <a class="el" href="remote__lambda_8hpp_source.html">remote_lambda.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remote__lambda_8hpp_source.html#l00794">794</a> of file <a class="el" href="remote__lambda_8hpp_source.html">remote_lambda.hpp</a>.</p>
 
 </div>
 </div>
@@ -310,7 +310,7 @@ template&lt;typename RankRange_ , typename IndexRange_ , typename ArgsRange_ , t
 <dl class="section return"><dt>Returns</dt><dd>A vector containing the return values of all calls described by <code>ranks</code>, <code>indices</code>, and <code>args</code>, in the same order.</dd></dl>
 <p>Assume we have ranges <code>ranks</code>, <code>indices</code>, and <code>args</code>. Assume <code>result = remote_lambda.call(ranks, indices, args, lambda)</code> for some <code>remote_lambda</code> and some <code>lambda</code>. Let <code>n</code> be the size of ranks. Then for 0 &lt;= i &lt; n: <code>result[i] = lambda(args[indices[i]])</code> </p>
 
-<p class="definition">Definition at line <a class="el" href="remote__lambda_8hpp_source.html#l00707">707</a> of file <a class="el" href="remote__lambda_8hpp_source.html">remote_lambda.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remote__lambda_8hpp_source.html#l00829">829</a> of file <a class="el" href="remote__lambda_8hpp_source.html">remote_lambda.hpp</a>.</p>
 
 <p class="reference">References <a class="el" href="assertion_8hpp_source.html#l00263">XASSERTM</a>.</p>
 
@@ -341,7 +341,7 @@ template&lt;typename R_ , typename... Args_&gt; </div>
 
 <p>The communicator used by the remote lambda. </p>
 
-<p class="definition">Definition at line <a class="el" href="remote__lambda_8hpp_source.html#l00668">668</a> of file <a class="el" href="remote__lambda_8hpp_source.html">remote_lambda.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remote__lambda_8hpp_source.html#l00790">790</a> of file <a class="el" href="remote__lambda_8hpp_source.html">remote_lambda.hpp</a>.</p>
 
 </div>
 </div>
@@ -369,7 +369,7 @@ template&lt;typename R_ , typename... Args_&gt; </div>
 
 <p>Tag for messages carrying an argument tuple. </p>
 
-<p class="definition">Definition at line <a class="el" href="remote__lambda_8hpp_source.html#l00664">664</a> of file <a class="el" href="remote__lambda_8hpp_source.html">remote_lambda.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remote__lambda_8hpp_source.html#l00786">786</a> of file <a class="el" href="remote__lambda_8hpp_source.html">remote_lambda.hpp</a>.</p>
 
 </div>
 </div>
@@ -397,7 +397,7 @@ template&lt;typename R_ , typename... Args_&gt; </div>
 
 <p>Tag for messages carrying a return value. </p>
 
-<p class="definition">Definition at line <a class="el" href="remote__lambda_8hpp_source.html#l00666">666</a> of file <a class="el" href="remote__lambda_8hpp_source.html">remote_lambda.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="remote__lambda_8hpp_source.html#l00788">788</a> of file <a class="el" href="remote__lambda_8hpp_source.html">remote_lambda.hpp</a>.</p>
 
 </div>
 </div>
